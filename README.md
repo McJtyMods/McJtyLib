@@ -1,4 +1,4 @@
-RFTools
-=======
+McJtyLib
+========
 
-A set of blocks and items to help with RF in general.
+Companion library for all my mods (RFTools, Deep Resonance)
