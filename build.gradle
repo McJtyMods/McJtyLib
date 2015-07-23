@@ -17,13 +17,13 @@ buildscript {
 
 apply plugin: 'forge'
 
-version = "3.12beta1"
+version = "1.00beta1"
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
 }
-group= "mcjty.rftools" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "rftools"
+group= "mcjty.mcjtylib" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "mcjtylib"
 
 minecraft {
     version = "1.7.10-10.13.3.1395-1710ls"
