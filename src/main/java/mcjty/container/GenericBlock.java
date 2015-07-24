@@ -4,16 +4,12 @@ import cofh.api.item.IToolHammer;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mcjty.api.Infusable;
+import mcjty.base.GeneralConfig;
+import mcjty.base.ModBaseRef;
 import mcjty.entity.GenericTileEntity;
-import mcjty.rftools.RFTools;
-import mcjty.rftools.apideps.WailaInfoProvider;
-import mcjty.rftools.apideps.WrenchChecker;
-import mcjty.rftools.blocks.BlockTools;
-import mcjty.rftools.blocks.dimlets.DimletConfiguration;
-import mcjty.rftools.blocks.security.SecurityCardItem;
-import mcjty.rftools.blocks.security.SecurityChannels;
-import mcjty.rftools.items.smartwrench.SmartWrench;
-import mcjty.rftools.items.smartwrench.SmartWrenchMode;
+import mcjty.varia.BlockTools;
+import mcjty.varia.WrenchChecker;
+import mcjty.wailasupport.WailaInfoProvider;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
@@ -51,8 +47,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     // Set this to true in case horizontal rotation is used (2 bits rotation as opposed to 3).
     private boolean horizRotation = false;
 
-    public GenericBlock(Material material, Class<? extends TileEntity> tileEntityClass) {
+    public GenericBlock(Material material, Class<? extends TileEntity> tileEntityClass, boolean isContainer) {
         super(material);
+        this.isBlockContainer = isContainer;
         this.creative = false;
         this.tileEntityClass = tileEntityClass;
         setHardness(2.0f);
@@ -85,7 +82,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             GenericTileEntity genericTileEntity = (GenericTileEntity) tileEntity;
             if (block instanceof Infusable) {
                 int infused = genericTileEntity.getInfused();
-                int pct = infused * 100 / DimletConfiguration.maxInfuse;
+                int pct = infused * 100 / GeneralConfig.maxInfuse;
                 currenttip.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
             }
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
@@ -113,7 +110,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             }
             if (this instanceof Infusable) {
                 int infused = tagCompound.getInteger("infused");
-                int pct = infused * 100 / DimletConfiguration.maxInfuse;
+                int pct = infused * 100 / GeneralConfig.maxInfuse;
                 list.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
             }
             if (tagCompound.hasKey("ownerM")) {
@@ -185,33 +182,26 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         if (itemStack != null) {
             Item item = itemStack.getItem();
             if (item != null) {
-                if (item instanceof IToolHammer) {
-                    IToolHammer hammer = (IToolHammer) item;
-                    if (hammer.isUsable(itemStack, player, x, y, z)) {
-                        hammer.toolUsed(itemStack, player, x, y, z);
-                        wrenchUsed = WrenchUsage.NORMAL;
-                    } else {
-                        // It is still possible it is a smart wrench.
-                        if (item instanceof SmartWrench) {
-                            SmartWrench smartWrench = (SmartWrench) item;
-                            SmartWrenchMode mode = smartWrench.getMode(itemStack);
-                            if (mode.equals(SmartWrenchMode.MODE_SELECT)) {
-                                if (player.isSneaking()) {
-                                    return WrenchUsage.SNEAK_SELECT;
-                                } else {
-                                    return WrenchUsage.SELECT;
-                                }
-                            }
-                        }
-                        wrenchUsed = WrenchUsage.DISABLED;
-                    }
-                } else if (WrenchChecker.isAWrench(item)) {
-                    wrenchUsed = WrenchUsage.NORMAL;
-                }
+                wrenchUsed = getWrenchUsage(x, y, z, player, itemStack, wrenchUsed, item);
             }
         }
         if (wrenchUsed == WrenchUsage.NORMAL && player.isSneaking()) {
             wrenchUsed = WrenchUsage.SNEAKING;
+        }
+        return wrenchUsed;
+    }
+
+    protected WrenchUsage getWrenchUsage(int x, int y, int z, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
+        if (item instanceof IToolHammer) {
+            IToolHammer hammer = (IToolHammer) item;
+            if (hammer.isUsable(itemStack, player, x, y, z)) {
+                hammer.toolUsed(itemStack, player, x, y, z);
+                wrenchUsed = WrenchUsage.NORMAL;
+            } else {
+                wrenchUsed = WrenchUsage.DISABLED;
+            }
+        } else if (WrenchChecker.isAWrench(item)) {
+            wrenchUsed = WrenchUsage.NORMAL;
         }
         return wrenchUsed;
     }
@@ -262,27 +252,12 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
                 return true;
             }
             if (checkAccess(world, player, te)) return true;
-            player.openGui(RFTools.instance, getGuiID(), world, x, y, z);
+            player.openGui(ModBaseRef.INSTANCE, getGuiID(), world, x, y, z);
         }
         return true;
     }
 
-    private boolean checkAccess(World world, EntityPlayer player, TileEntity te) {
-        if (te instanceof GenericTileEntity) {
-            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-            if ((!SecurityCardItem.isAdmin(player)) && (!player.getPersistentID().equals(genericTileEntity.getOwnerUUID()))) {
-                int securityChannel = genericTileEntity.getSecurityChannel();
-                if (securityChannel != -1) {
-                    SecurityChannels securityChannels = SecurityChannels.getChannels(world);
-                    SecurityChannels.SecurityChannel channel = securityChannels.getChannel(securityChannel);
-                    boolean playerListed = channel.getPlayers().contains(player.getDisplayName());
-                    if (channel.isWhitelist() != playerListed) {
-                        RFTools.message(player, EnumChatFormatting.RED + "You have no permission to use this block!");
-                        return true;
-                    }
-                }
-            }
-        }
+    protected boolean checkAccess(World world, EntityPlayer player, TileEntity te) {
         return false;
     }
 
@@ -414,11 +389,11 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     @Override
     public void registerBlockIcons(IIconRegister iconRegister) {
         if (getIdentifyingIconName() != null) {
-            iconInd = iconRegister.registerIcon(RFTools.MODID + ":" + getIdentifyingIconName());
+            iconInd = iconRegister.registerIcon(ModBaseRef.MODID + ":" + getIdentifyingIconName());
         }
-        iconSide = iconRegister.registerIcon(RFTools.MODID + ":" + getSideIconName());
-        iconTop = iconRegister.registerIcon(RFTools.MODID + ":" + getTopIconName());
-        iconBottom = iconRegister.registerIcon(RFTools.MODID + ":" + getBottomIconName());
+        iconSide = iconRegister.registerIcon(ModBaseRef.MODID + ":" + getSideIconName());
+        iconTop = iconRegister.registerIcon(ModBaseRef.MODID + ":" + getTopIconName());
+        iconBottom = iconRegister.registerIcon(ModBaseRef.MODID + ":" + getBottomIconName());
     }
 
     public String getSideIconName() {
@@ -511,5 +486,16 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     public IIcon getIconInd(IBlockAccess blockAccess, int x, int y, int z, int meta) {
         return iconInd;
+    }
+
+    @Override
+    public boolean onBlockEventReceived(World world, int x, int y, int z, int eventId, int eventData) {
+        if (isBlockContainer) {
+            super.onBlockEventReceived(world, x, y, z, eventId, eventData);
+            TileEntity tileentity = world.getTileEntity(x, y, z);
+            return tileentity != null && tileentity.receiveClientEvent(eventId, eventData);
+        } else {
+            return super.onBlockEventReceived(world, x, y, z, eventId, eventData);
+        }
     }
 }

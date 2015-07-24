@@ -1,6 +1,5 @@
 package mcjty.gui;
 
-import mcjty.container.GuiSideWindow;
 import mcjty.gui.widgets.WidgetList;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
@@ -8,7 +7,7 @@ import org.lwjgl.input.Mouse;
 import java.util.List;
 
 public class GuiItemScreen extends GuiScreen {
-    protected mcjty.gui.Window window;
+    protected Window window;
     protected int xSize;
     protected int ySize;
     protected int guiLeft;

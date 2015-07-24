@@ -1,18 +1,14 @@
-package mcjty.container;
+package mcjty.gui;
 
-import mcjty.gui.Window;
+import mcjty.base.ModBaseRef;
 import mcjty.gui.events.ButtonEvent;
 import mcjty.gui.layout.PositionalLayout;
 import mcjty.gui.widgets.Button;
 import mcjty.gui.widgets.Panel;
 import mcjty.gui.widgets.Widget;
 import mcjty.gui.widgets.WidgetList;
-import mcjty.rftools.GeneralConfiguration;
-import mcjty.rftools.RFTools;
-import mcjty.rftools.items.manual.GuiRFToolsManual;
-import mcjty.rftools.network.PacketHandler;
-import mcjty.rftools.playerprops.GuiStyle;
-import mcjty.rftools.playerprops.PlayerExtendedProperties;
+import mcjty.network.PacketHandler;
+import mcjty.network.PacketSetGuiStyle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,7 +36,7 @@ public class GuiSideWindow {
     }
 
     public void initGui(final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
-        style = PlayerExtendedProperties.getProperties(mc.thePlayer).getPreferencesProperties().getStyle();
+        style = ModBaseRef.INSTANCE.getGuiStyle(mc.thePlayer);
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
                 setTooltips("Open manual").
@@ -67,8 +63,7 @@ public class GuiSideWindow {
 
     private void help(Minecraft mc) {
         EntityPlayer player = mc.thePlayer;
-        GuiRFToolsManual.locatePage = manualNode;
-        player.openGui(RFTools.instance, manual, player.worldObj, (int) player.posX, (int) player.posY, (int) player.posZ);
+        ModBaseRef.INSTANCE.openManual(player, manual, manualNode);
     }
 
     private void setStyleTooltip() {
@@ -95,7 +90,7 @@ public class GuiSideWindow {
         if (style == GuiStyle.STYLE_BEVEL) {
             list.setFilledRectThickness(1);
         } else {
-            list.setFilledBackground(GeneralConfiguration.itemListBackground);
+            list.setFilledBackground(GuiConfig.itemListBackground);
         }
     }
 

@@ -1,11 +1,11 @@
-package mcjty.container;
+package mcjty.network;
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import mcjty.rftools.network.NetworkTools;
-import mcjty.rftools.playerprops.PlayerExtendedProperties;
+import mcjty.base.ModBaseRef;
+import mcjty.gui.GuiStyle;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 /**
@@ -36,8 +36,7 @@ public class PacketSetGuiStyle implements IMessage, IMessageHandler<PacketSetGui
     @Override
     public IMessage onMessage(PacketSetGuiStyle message, MessageContext ctx) {
         EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
-        PlayerExtendedProperties properties = PlayerExtendedProperties.getProperties(playerEntity);
-        properties.getPreferencesProperties().setStyle(message.style);
+        ModBaseRef.INSTANCE.setGuiStyle(playerEntity, GuiStyle.getStyle(message.style));
         return null;
     }
 

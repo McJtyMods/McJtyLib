@@ -1,11 +1,12 @@
 package mcjty.container;
 
 import mcjty.entity.GenericTileEntity;
+import mcjty.gui.GuiSideWindow;
 import mcjty.gui.Window;
 import mcjty.gui.widgets.WidgetList;
-import mcjty.rftools.network.Argument;
-import mcjty.rftools.network.PacketHandler;
-import mcjty.rftools.network.PacketServerCommand;
+import mcjty.network.Argument;
+import mcjty.network.PacketHandler;
+import mcjty.network.PacketServerCommand;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
