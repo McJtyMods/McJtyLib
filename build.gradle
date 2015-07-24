@@ -114,3 +114,67 @@ processResources
         exclude 'nei_at.cfg'
     }
 }
+
+uploadArchives() {
+    dependsOn reobf
+
+    if (project.hasProperty("mavenUrl") && project.hasProperty("mavenUser") && project.hasProperty("mavenPassword")) {
+        repositories {
+            logger.info('Publishing to files server')
+
+            mavenDeployer {
+
+                repository(url: project."mavenUrl") {
+                    authentication(userName: project."mavenUser", password: project."mavenPassword")
+                }
+
+                addFilter('deobf') {artifact, file ->
+                    artifact.attributes['classifier'] == 'dev'
+                }
+                pom('deobf').version = project.version
+                addFilter('sources') {artifact, file ->
+                    artifact.attributes['classifier'] == 'sources'
+                }
+                pom('sources').version = project.version
+                addFilter('universal') {artifact, file ->
+                    artifact.attributes['classifier'] == null
+                }
+                pom('universal').version = project.version
+
+                pom {
+                    groupId = project.group
+                    version = project.version
+                    artifactId = project.archivesBaseName
+                    project {
+                        name project.archivesBaseName
+                        packaging 'jar'
+                        description 'Common library for McJty mods (RFTools, Deep Resonance)'
+                        url 'https://github.com/McJty/McJtyLib'
+
+                        scm {
+                            url 'scm:git:git@github.com:McJty/McJtyLib.git'
+                            connection 'scm:git:git@github.com:McJty/McJtyLib.git'
+                            developerConnection 'scm:git:git@github.com:McJty/McJtyLib.git'
+                        }
+
+                        issueManagement {
+                            system 'github'
+                            url 'https://github.com/McJty/McJtyLib/issues'
+                        }
+
+                        developers {
+                            developer {
+                                id 'McJty'
+                                name 'McJty'
+                                roles { role 'developer' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else {
+        logger.log(LogLevel.ERROR, 'No upload variables defined!');
+    }
+}
