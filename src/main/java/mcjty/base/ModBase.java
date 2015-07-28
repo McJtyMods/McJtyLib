@@ -5,6 +5,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 public interface ModBase {
+    public static final int VERSION = 1;
+
     /**
      * This is called whenever the user change the gui style.
      * @param player
