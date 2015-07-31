@@ -46,6 +46,7 @@ public class TextPage extends AbstractWidget<TextPage> {
 
     public TextPage(ModBase modBase, Minecraft mc, Gui gui) {
         super(mc, gui);
+        this.modBase = modBase;
     }
 
     public TextPage setArrowImage(ResourceLocation image, int u, int v) {
