@@ -1,5 +1,6 @@
 package mcjty.container;
 
+import mcjty.base.ModBase;
 import mcjty.entity.GenericTileEntity;
 import mcjty.gui.GuiSideWindow;
 import mcjty.gui.Window;
@@ -16,13 +17,17 @@ import org.lwjgl.input.Mouse;
 import java.util.List;
 
 public abstract class GenericGuiContainer<T extends GenericTileEntity> extends GuiContainer {
+
+    protected ModBase modBase;
+
     protected Window window;
     protected final T tileEntity;
 
     private GuiSideWindow sideWindow;
 
-    public GenericGuiContainer(T tileEntity, Container container, int manual, String manualNode) {
+    public GenericGuiContainer(ModBase mod, T tileEntity, Container container, int manual, String manualNode) {
         super(container);
+        this.modBase = mod;
         this.tileEntity = tileEntity;
         sideWindow = new GuiSideWindow(manual, manualNode);
     }
@@ -30,7 +35,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     @Override
     public void initGui() {
         super.initGui();
-        sideWindow.initGui(mc, this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(modBase, mc, this, guiLeft, guiTop, xSize, ySize);
     }
 
     protected WidgetList createStyledList() {

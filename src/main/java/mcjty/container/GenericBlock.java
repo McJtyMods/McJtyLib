@@ -5,7 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import mcjty.api.Infusable;
 import mcjty.base.GeneralConfig;
-import mcjty.base.ModBaseRef;
+import mcjty.base.ModBase;
 import mcjty.entity.GenericTileEntity;
 import mcjty.varia.BlockTools;
 import mcjty.varia.WrenchChecker;
@@ -36,6 +36,8 @@ import java.util.List;
 
 public abstract class GenericBlock extends Block implements ITileEntityProvider, WailaInfoProvider {
 
+    protected ModBase modBase;
+
     protected IIcon iconInd;        // The identifying face of the block (front by default but can be different).
     protected IIcon iconSide;
     protected IIcon iconTop;
@@ -47,8 +49,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     // Set this to true in case horizontal rotation is used (2 bits rotation as opposed to 3).
     private boolean horizRotation = false;
 
-    public GenericBlock(Material material, Class<? extends TileEntity> tileEntityClass, boolean isContainer) {
+    public GenericBlock(ModBase mod, Material material, Class<? extends TileEntity> tileEntityClass, boolean isContainer) {
         super(material);
+        this.modBase = mod;
         this.isBlockContainer = isContainer;
         this.creative = false;
         this.tileEntityClass = tileEntityClass;
@@ -252,7 +255,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
                 return true;
             }
             if (checkAccess(world, player, te)) return true;
-            player.openGui(ModBaseRef.INSTANCE, getGuiID(), world, x, y, z);
+            player.openGui(modBase, getGuiID(), world, x, y, z);
         }
         return true;
     }
@@ -389,11 +392,11 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     @Override
     public void registerBlockIcons(IIconRegister iconRegister) {
         if (getIdentifyingIconName() != null) {
-            iconInd = iconRegister.registerIcon(ModBaseRef.MODID + ":" + getIdentifyingIconName());
+            iconInd = iconRegister.registerIcon(modBase.getModId() + ":" + getIdentifyingIconName());
         }
-        iconSide = iconRegister.registerIcon(ModBaseRef.MODID + ":" + getSideIconName());
-        iconTop = iconRegister.registerIcon(ModBaseRef.MODID + ":" + getTopIconName());
-        iconBottom = iconRegister.registerIcon(ModBaseRef.MODID + ":" + getBottomIconName());
+        iconSide = iconRegister.registerIcon(modBase.getModId() + ":" + getSideIconName());
+        iconTop = iconRegister.registerIcon(modBase.getModId() + ":" + getTopIconName());
+        iconBottom = iconRegister.registerIcon(modBase.getModId() + ":" + getBottomIconName());
     }
 
     public String getSideIconName() {

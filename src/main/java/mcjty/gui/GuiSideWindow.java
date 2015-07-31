@@ -1,6 +1,6 @@
 package mcjty.gui;
 
-import mcjty.base.ModBaseRef;
+import mcjty.base.ModBase;
 import mcjty.gui.events.ButtonEvent;
 import mcjty.gui.layout.PositionalLayout;
 import mcjty.gui.widgets.Button;
@@ -35,22 +35,22 @@ public class GuiSideWindow {
         this.manualNode = manualNode;
     }
 
-    public void initGui(final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
-        style = ModBaseRef.INSTANCE.getGuiStyle(mc.thePlayer);
+    public void initGui(final ModBase modBase, final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
+        style = modBase.getGuiStyle(mc.thePlayer);
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
                 setTooltips("Open manual").
                 addButtonEvent(new ButtonEvent() {
                     @Override
                     public void buttonClicked(Widget parent) {
-                        help(mc);
+                        help(modBase, mc);
                     }
                 });
         guiButton = new Button(mc, gui).setText("s").setLayoutHint(new PositionalLayout.PositionalHint(1, 19, 16, 16)).
                 addButtonEvent(new ButtonEvent() {
                     @Override
                     public void buttonClicked(Widget parent) {
-                        changeStyle();
+                        changeStyle(modBase);
                     }
                 });
         setStyleTooltip();
@@ -61,22 +61,22 @@ public class GuiSideWindow {
         sideWindow = new Window(gui, sidePanel);
     }
 
-    private void help(Minecraft mc) {
+    private void help(ModBase modBase, Minecraft mc) {
         EntityPlayer player = mc.thePlayer;
-        ModBaseRef.INSTANCE.openManual(player, manual, manualNode);
+        modBase.openManual(player, manual, manualNode);
     }
 
     private void setStyleTooltip() {
         guiButton.setTooltips("Gui style:", style.getStyle());
     }
 
-    private void changeStyle() {
+    private void changeStyle(ModBase modBase) {
         int next = style.ordinal() + 1;
         if (next >= GuiStyle.values().length) {
             next = 0;
         }
         style = GuiStyle.values()[next];
-        PacketHandler.INSTANCE.sendToServer(new PacketSetGuiStyle(style.getStyle()));
+        PacketHandler.INSTANCE.sendToServer(new PacketSetGuiStyle(modBase, style.getStyle()));
 
         setStyleTooltip();
         for (WidgetList list : styledLists) {

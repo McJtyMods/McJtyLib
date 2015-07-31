@@ -1,7 +1,7 @@
 package mcjty.gui.widgets;
 
 import cpw.mods.fml.common.registry.GameRegistry;
-import mcjty.base.ModBaseRef;
+import mcjty.base.ModBase;
 import mcjty.gui.RenderHelper;
 import mcjty.gui.Window;
 import net.minecraft.block.Block;
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 public class TextPage extends AbstractWidget<TextPage> {
+    private ModBase modBase;
     private final List<Page> pages = new ArrayList<Page>();
     private final Map<String,Integer> nodes = new HashMap<String, Integer>();
 
@@ -43,7 +44,7 @@ public class TextPage extends AbstractWidget<TextPage> {
 
     private int tabCounter = 0;
 
-    public TextPage(Minecraft mc, Gui gui) {
+    public TextPage(ModBase modBase, Minecraft mc, Gui gui) {
         super(mc, gui);
     }
 
@@ -108,7 +109,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                     newPage(page);
                     page = new TextPage.Page();
                 } else {
-                    Line l = page.addLine(line);
+                    Line l = page.addLine(modBase, line);
                     if (l.isNode()) {
                         nodes.put(l.node, pages.size());
                     }
@@ -335,7 +336,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             return nexttab;
         }
 
-        Line(String line) {
+        Line(ModBase modBase, String line) {
             bold = false;
             islink = false;
             nexttab = false;
@@ -356,11 +357,11 @@ public class TextPage extends AbstractWidget<TextPage> {
             } else if (line.startsWith("{l:")) {
                 parseLink(line);
             } else if (line.startsWith("{i:")) {
-                parseImage(line);
+                parseImage(modBase, line);
             } else if (line.startsWith("{ri:")) {
-                parseItemRecipe(line);
+                parseItemRecipe(modBase, line);
             } else if (line.startsWith("{rb:")) {
-                parseBlockRecipe(line);
+                parseBlockRecipe(modBase, line);
             } else {
                 this.line = line;
             }
@@ -391,13 +392,13 @@ public class TextPage extends AbstractWidget<TextPage> {
             }
         }
 
-        private void parseBlockRecipe(String line) {
+        private void parseBlockRecipe(ModBase modBase, String line) {
             int end = line.indexOf('}');
             if (end == -1) {
                 // Error, just put in the entire line
                 this.line = line;
             } else {
-                Block block = GameRegistry.findBlock(ModBaseRef.MODID, line.substring(4, end));
+                Block block = GameRegistry.findBlock(modBase.getModId(), line.substring(4, end));
                 recipe = findRecipe(new ItemStack(block));
                 if (recipe == null) {
                     // Error,
@@ -408,13 +409,13 @@ public class TextPage extends AbstractWidget<TextPage> {
             }
         }
 
-        private void parseItemRecipe(String line) {
+        private void parseItemRecipe(ModBase modBase, String line) {
             int end = line.indexOf('}');
             if (end == -1) {
                 // Error, just put in the entire line
                 this.line = line;
             } else {
-                Item item = GameRegistry.findItem(ModBaseRef.MODID, line.substring(4, end));
+                Item item = GameRegistry.findItem(modBase.getModId(), line.substring(4, end));
                 recipe = findRecipe(new ItemStack(item));
                 if (recipe == null) {
                     // Error,
@@ -429,7 +430,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             }
         }
 
-        private void parseImage(String line) {
+        private void parseImage(ModBase modBase, String line) {
             int end = line.indexOf('}');
             if (end == -1) {
                 // Error, just put in the entire line
@@ -445,7 +446,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                 } catch (IndexOutOfBoundsException e) {
                 } catch (NumberFormatException e) {
                 }
-                resourceLocation = new ResourceLocation(ModBaseRef.MODID, split[0]);
+                resourceLocation = new ResourceLocation(modBase.getModId(), split[0]);
                 try {
                     this.line = split[3];
                 } catch (IndexOutOfBoundsException e) {
@@ -479,8 +480,8 @@ public class TextPage extends AbstractWidget<TextPage> {
             return lines.isEmpty();
         }
 
-        public Line addLine(String line) {
-            Line l = new Line(line);
+        public Line addLine(ModBase modBase, String line) {
+            Line l = new Line(modBase, line);
             lines.add(l);
             return l;
         }

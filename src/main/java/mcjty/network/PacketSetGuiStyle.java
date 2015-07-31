@@ -4,7 +4,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import mcjty.base.ModBaseRef;
+import mcjty.base.ModBase;
 import mcjty.gui.GuiStyle;
 import net.minecraft.entity.player.EntityPlayerMP;
 
@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
  */
 public class PacketSetGuiStyle implements IMessage, IMessageHandler<PacketSetGuiStyle, IMessage> {
 
+    private ModBase modBase;
     private String style;
 
     @Override
@@ -29,14 +30,14 @@ public class PacketSetGuiStyle implements IMessage, IMessageHandler<PacketSetGui
     public PacketSetGuiStyle() {
     }
 
-    public PacketSetGuiStyle(String style) {
-        this.style = style;
+    public PacketSetGuiStyle(ModBase modBase, String style) {
+        this.modBase = modBase; this.style = style;
     }
 
     @Override
     public IMessage onMessage(PacketSetGuiStyle message, MessageContext ctx) {
         EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
-        ModBaseRef.INSTANCE.setGuiStyle(playerEntity, GuiStyle.getStyle(message.style));
+        modBase.setGuiStyle(playerEntity, GuiStyle.getStyle(message.style));
         return null;
     }
 

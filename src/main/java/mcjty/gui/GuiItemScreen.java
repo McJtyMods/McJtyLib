@@ -1,5 +1,6 @@
 package mcjty.gui;
 
+import mcjty.base.ModBase;
 import mcjty.gui.widgets.WidgetList;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
@@ -7,6 +8,7 @@ import org.lwjgl.input.Mouse;
 import java.util.List;
 
 public class GuiItemScreen extends GuiScreen {
+    protected ModBase modBase;
     protected Window window;
     protected int xSize;
     protected int ySize;
@@ -15,7 +17,8 @@ public class GuiItemScreen extends GuiScreen {
 
     private GuiSideWindow sideWindow;
 
-    public GuiItemScreen(int xSize, int ySize, int manual, String manualNode) {
+    public GuiItemScreen(ModBase mod, int xSize, int ySize, int manual, String manualNode) {
+        this.modBase = mod;
         this.xSize = xSize;
         this.ySize = ySize;
         sideWindow = new GuiSideWindow(manual, manualNode);
@@ -31,7 +34,7 @@ public class GuiItemScreen extends GuiScreen {
         super.initGui();
         guiLeft = (this.width - xSize) / 2;
         guiTop = (this.height - ySize) / 2;
-        sideWindow.initGui(mc, this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(modBase, mc, this, guiLeft, guiTop, xSize, ySize);
     }
 
     protected WidgetList createStyledList() {
