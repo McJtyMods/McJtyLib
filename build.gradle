@@ -19,7 +19,7 @@ apply plugin: 'forge'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-version = "1.0.0"
+version = "1.1.0"
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
