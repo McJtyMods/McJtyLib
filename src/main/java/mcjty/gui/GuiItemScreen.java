@@ -1,5 +1,6 @@
 package mcjty.gui;
 
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.base.ModBase;
 import mcjty.gui.widgets.WidgetList;
 import net.minecraft.client.gui.GuiScreen;
@@ -9,6 +10,7 @@ import java.util.List;
 
 public class GuiItemScreen extends GuiScreen {
     protected ModBase modBase;
+    protected SimpleNetworkWrapper network;
     protected Window window;
     protected int xSize;
     protected int ySize;
@@ -34,7 +36,7 @@ public class GuiItemScreen extends GuiScreen {
         super.initGui();
         guiLeft = (this.width - xSize) / 2;
         guiTop = (this.height - ySize) / 2;
-        sideWindow.initGui(modBase, mc, this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(modBase, network, mc, this, guiLeft, guiTop, xSize, ySize);
     }
 
     protected WidgetList createStyledList() {

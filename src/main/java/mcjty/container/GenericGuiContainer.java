@@ -1,12 +1,12 @@
 package mcjty.container;
 
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.base.ModBase;
 import mcjty.entity.GenericTileEntity;
 import mcjty.gui.GuiSideWindow;
 import mcjty.gui.Window;
 import mcjty.gui.widgets.WidgetList;
 import mcjty.network.Argument;
-import mcjty.network.PacketHandler;
 import mcjty.network.PacketServerCommand;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
@@ -19,15 +19,17 @@ import java.util.List;
 public abstract class GenericGuiContainer<T extends GenericTileEntity> extends GuiContainer {
 
     protected ModBase modBase;
+    protected SimpleNetworkWrapper network;
 
     protected Window window;
     protected final T tileEntity;
 
     private GuiSideWindow sideWindow;
 
-    public GenericGuiContainer(ModBase mod, T tileEntity, Container container, int manual, String manualNode) {
+    public GenericGuiContainer(ModBase mod, SimpleNetworkWrapper network, T tileEntity, Container container, int manual, String manualNode) {
         super(container);
         this.modBase = mod;
+        this.network = network;
         this.tileEntity = tileEntity;
         sideWindow = new GuiSideWindow(manual, manualNode);
     }
@@ -35,7 +37,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     @Override
     public void initGui() {
         super.initGui();
-        sideWindow.initGui(modBase, mc, this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(modBase, network, mc, this, guiLeft, guiTop, xSize, ySize);
     }
 
     protected WidgetList createStyledList() {
@@ -106,8 +108,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         }
     }
 
-    protected void sendServerCommand(String command, Argument... arguments) {
-        PacketHandler.INSTANCE.sendToServer(new PacketServerCommand(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord,
+    protected void sendServerCommand(SimpleNetworkWrapper network, String command, Argument... arguments) {
+        network.sendToServer(new PacketServerCommand(tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord,
                 command, arguments));
     }
 }

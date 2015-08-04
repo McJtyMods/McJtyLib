@@ -1,5 +1,6 @@
 package mcjty.gui;
 
+import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.base.ModBase;
 import mcjty.gui.events.ButtonEvent;
 import mcjty.gui.layout.PositionalLayout;
@@ -35,7 +36,7 @@ public class GuiSideWindow {
         this.manualNode = manualNode;
     }
 
-    public void initGui(final ModBase modBase, final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
+    public void initGui(final ModBase modBase, final SimpleNetworkWrapper network, final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
         style = modBase.getGuiStyle(mc.thePlayer);
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
@@ -50,7 +51,7 @@ public class GuiSideWindow {
                 addButtonEvent(new ButtonEvent() {
                     @Override
                     public void buttonClicked(Widget parent) {
-                        changeStyle(modBase);
+                        changeStyle(modBase, network);
                     }
                 });
         setStyleTooltip();
@@ -70,13 +71,13 @@ public class GuiSideWindow {
         guiButton.setTooltips("Gui style:", style.getStyle());
     }
 
-    private void changeStyle(ModBase modBase) {
+    private void changeStyle(ModBase modBase, SimpleNetworkWrapper network) {
         int next = style.ordinal() + 1;
         if (next >= GuiStyle.values().length) {
             next = 0;
         }
         style = GuiStyle.values()[next];
-        PacketHandler.INSTANCE.sendToServer(new PacketSetGuiStyle(modBase, style.getStyle()));
+        network.sendToServer(new PacketSetGuiStyle(modBase, style.getStyle()));
 
         setStyleTooltip();
         for (WidgetList list : styledLists) {
