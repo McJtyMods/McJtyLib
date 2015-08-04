@@ -42,7 +42,7 @@ public class PacketSetGuiStyle implements IMessage, IMessageHandler<PacketSetGui
     public IMessage onMessage(PacketSetGuiStyle message, MessageContext ctx) {
         EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
         ModContainer modContainer = Loader.instance().getIndexedModList().get(message.modId);
-        ((ModBase)modContainer).setGuiStyle(playerEntity, GuiStyle.getStyle(message.style));
+        ((ModBase)(modContainer.getMod())).setGuiStyle(playerEntity, GuiStyle.getStyle(message.style));
         return null;
     }
 
