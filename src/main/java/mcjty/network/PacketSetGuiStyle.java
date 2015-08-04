@@ -21,12 +21,13 @@ public class PacketSetGuiStyle implements IMessage, IMessageHandler<PacketSetGui
     @Override
     public void fromBytes(ByteBuf buf) {
         style = NetworkTools.readString(buf);
-
+        modId = NetworkTools.readString(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         NetworkTools.writeString(buf, style);
+        NetworkTools.writeString(buf, modId);
     }
 
     public PacketSetGuiStyle() {
