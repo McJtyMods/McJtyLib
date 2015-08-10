@@ -327,11 +327,11 @@ public class RenderHelper {
     }
 
     public static class Vector {
-        private final float x;
-        private final float y;
-        private final float z;
+        public final float x;
+        public final float y;
+        public final float z;
 
-        private Vector(float x, float y, float z) {
+        public Vector(float x, float y, float z) {
             this.x = x;
             this.y = y;
             this.z = z;
