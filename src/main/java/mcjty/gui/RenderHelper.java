@@ -237,7 +237,7 @@ public class RenderHelper {
         Gui.drawRect(x1, y1, x2-1, y1+thickness, topleftcolor);
         Gui.drawRect(x1, y1, x1+thickness, y2-1, topleftcolor);
         Gui.drawRect(x2-thickness, y1, x2, y2-1, botrightcolor);
-        Gui.drawRect(x1, y2-thickness, x2, y2, botrightcolor);
+        Gui.drawRect(x1, y2 - thickness, x2, y2, botrightcolor);
     }
 
     /**
@@ -250,10 +250,131 @@ public class RenderHelper {
         Tessellator tessellator = Tessellator.instance;
         tessellator.startDrawingQuads();
         tessellator.addVertexWithUV((double)(x + 0), (double)(y + height), (double)zLevel, (double)((float)(u + 0) * f), (double)((float)(v + height) * f1));
-        tessellator.addVertexWithUV((double)(x + width), (double)(y + height), (double)zLevel, (double)((float)(u + width) * f), (double)((float)(v + height) * f1));
-        tessellator.addVertexWithUV((double)(x + width), (double)(y + 0), (double)zLevel, (double)((float)(u + width) * f), (double)((float)(v + 0) * f1));
-        tessellator.addVertexWithUV((double)(x + 0), (double)(y + 0), (double)zLevel, (double)((float)(u + 0) * f), (double)((float)(v + 0) * f1));
+        tessellator.addVertexWithUV((double) (x + width), (double) (y + height), (double) zLevel, (double) ((float) (u + width) * f), (double) ((float) (v + height) * f1));
+        tessellator.addVertexWithUV((double) (x + width), (double) (y + 0), (double) zLevel, (double) ((float) (u + width) * f), (double) ((float) (v + 0) * f1));
+        tessellator.addVertexWithUV((double) (x + 0), (double) (y + 0), (double) zLevel, (double) ((float) (u + 0) * f), (double) ((float) (v + 0) * f1));
         tessellator.draw();
     }
+
+    public static void renderBillboardQuad(double scale) {
+        GL11.glPushMatrix();
+
+        rotateToPlayer();
+
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
+        tessellator.addVertexWithUV(-scale, +scale, 0, 0, 1);
+        tessellator.addVertexWithUV(+scale, +scale, 0, 1, 1);
+        tessellator.addVertexWithUV(+scale, -scale, 0, 1, 0);
+        tessellator.draw();
+        GL11.glPopMatrix();
+    }
+
+    public static void renderBillboardQuadWithRotation(float rot, double scale) {
+        GL11.glPushMatrix();
+
+        rotateToPlayer();
+
+//        GL11.glPushMatrix();
+
+        GL11.glRotatef(rot, 0, 0, 1);
+
+        Tessellator tessellator = Tessellator.instance;
+        tessellator.startDrawingQuads();
+        tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
+        tessellator.addVertexWithUV(-scale, +scale, 0, 0, 1);
+        tessellator.addVertexWithUV(+scale, +scale, 0, 1, 1);
+        tessellator.addVertexWithUV(+scale, -scale, 0, 1, 0);
+        tessellator.draw();
+//        GL11.glPopMatrix();
+        GL11.glPopMatrix();
+    }
+
+    public static void rotateToPlayer() {
+        GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+    }
+
+    /**
+     * Draw a beam with some thickness.
+     * @param S
+     * @param E
+     * @param P
+     * @param width
+     */
+    public static void drawBeam(Vector S, Vector E, Vector P, float width) {
+        Vector PS = Sub(S, P);
+        Vector SE = Sub(E, S);
+
+        Vector normal = Cross(PS, SE);
+        normal = normal.normalize();
+
+        Vector half = Mul(normal, width);
+        Vector p1 = Add(S, half);
+        Vector p2 = Sub(S, half);
+        Vector p3 = Add(E, half);
+        Vector p4 = Sub(E, half);
+
+        drawQuad(Tessellator.instance, p1, p3, p4, p2);
+    }
+
+    public static void drawQuad(Tessellator tessellator, Vector p1, Vector p2, Vector p3, Vector p4) {
+        tessellator.addVertexWithUV(p1.getX(), p1.getY(), p1.getZ(), 0, 0);
+        tessellator.addVertexWithUV(p2.getX(), p2.getY(), p2.getZ(), 1, 0);
+        tessellator.addVertexWithUV(p3.getX(), p3.getY(), p3.getZ(), 1, 1);
+        tessellator.addVertexWithUV(p4.getX(), p4.getY(), p4.getZ(), 0, 1);
+    }
+
+    public static class Vector {
+        private final float x;
+        private final float y;
+        private final float z;
+
+        private Vector(float x, float y, float z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        public float getX() {
+            return x;
+        }
+
+        public float getY() {
+            return y;
+        }
+
+        public float getZ() {
+            return z;
+        }
+
+        public float norm() {
+            return (float) Math.sqrt(x * x + y * y + z * z);
+        }
+
+        public Vector normalize() {
+            float n = norm();
+            return new Vector(x / n, y / n, z / n);
+        }
+    }
+
+    private static Vector Cross(Vector a, Vector b) {
+        float x = a.y*b.z - a.z*b.y;
+        float y = a.z*b.x - a.x*b.z;
+        float z = a.x*b.y - a.y*b.x;
+        return new Vector(x, y, z);
+    }
+
+    private static Vector Sub(Vector a, Vector b) {
+        return new Vector(a.x-b.x, a.y-b.y, a.z-b.z);
+    }
+    private static Vector Add(Vector a, Vector b) {
+        return new Vector(a.x+b.x, a.y+b.y, a.z+b.z);
+    }
+    private static Vector Mul(Vector a, float f) {
+        return new Vector(a.x * f, a.y * f, a.z * f);
+    }
+
 
 }
