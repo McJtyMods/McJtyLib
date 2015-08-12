@@ -41,6 +41,7 @@ public class TextField extends AbstractWidget<TextField> {
             window.setTextFocus(this);
             if (button == 1) {
                 setText("");
+                fireTextEvents("");
             }
             return this;
         }
