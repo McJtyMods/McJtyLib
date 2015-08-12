@@ -257,7 +257,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             if (checkAccess(world, player, te)) return true;
             player.openGui(modBase, getGuiID(), world, x, y, z);
         }
-        return true;
+        return false;
     }
 
     protected boolean checkAccess(World world, EntityPlayer player, TileEntity te) {
