@@ -252,10 +252,12 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             }
             TileEntity te = world.getTileEntity(x, y, z);
             if (isBlockContainer && !tileEntityClass.isInstance(te)) {
-                return true;
+                return false;
             }
-            if (checkAccess(world, player, te)) return true;
+            if (checkAccess(world, player, te))
+                return true;
             player.openGui(modBase, getGuiID(), world, x, y, z);
+            return true;
         }
         return false;
     }
