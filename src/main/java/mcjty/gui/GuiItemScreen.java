@@ -19,8 +19,9 @@ public class GuiItemScreen extends GuiScreen {
 
     private GuiSideWindow sideWindow;
 
-    public GuiItemScreen(ModBase mod, int xSize, int ySize, int manual, String manualNode) {
+    public GuiItemScreen(ModBase mod, SimpleNetworkWrapper network, int xSize, int ySize, int manual, String manualNode) {
         this.modBase = mod;
+        this.network = network;
         this.xSize = xSize;
         this.ySize = ySize;
         sideWindow = new GuiSideWindow(manual, manualNode);
