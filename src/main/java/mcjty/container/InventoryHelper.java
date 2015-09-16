@@ -34,7 +34,11 @@ public class InventoryHelper {
      * This version also checks for ISidedInventory if that's implemented by the inventory
      */
     public static int mergeItemStackSafe(IInventory inventory, int side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
-        return mergeItemStackInternal(inventory, (ISidedInventory) inventory, side, result, start, stop, undo);
+        if (inventory instanceof ISidedInventory) {
+            return mergeItemStackInternal(inventory, (ISidedInventory) inventory, side, result, start, stop, undo);
+        } else {
+            return mergeItemStackInternal(inventory, null, side, result, start, stop, undo);
+        }
     }
 
     /**
