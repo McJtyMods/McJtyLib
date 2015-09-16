@@ -1,6 +1,7 @@
 package mcjty.container;
 
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -30,8 +31,21 @@ public class InventoryHelper {
     /**
      * Merges provided ItemStack with the first available one in this inventory. It will return the amount
      * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
+     * This version also checks for ISidedInventory if that's implemented by the inventory
+     */
+    public static int mergeItemStackSafe(IInventory inventory, int side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+        return mergeItemStackInternal(inventory, (ISidedInventory) inventory, side, result, start, stop, undo);
+    }
+
+    /**
+     * Merges provided ItemStack with the first available one in this inventory. It will return the amount
+     * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
      */
     public static int mergeItemStack(IInventory inventory, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+        return mergeItemStackInternal(inventory, null, 0, result, start, stop, undo);
+    }
+
+    private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, int side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
         int k = start;
 
         ItemStack itemstack1;
@@ -41,7 +55,7 @@ public class InventoryHelper {
             while (itemsToPlace > 0 && (k < stop)) {
                 itemstack1 = inventory.getStackInSlot(k);
 
-                if (itemstack1 != null && itemstack1.getItem() == result.getItem() && (!result.getHasSubtypes() || result.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1)) {
+                if (isItemStackConsideredEqual(result, itemstack1) && (sidedInventory == null || sidedInventory.canInsertItem(k, result, side))) {
                     int l = itemstack1.stackSize + itemsToPlace;
 
                     if (l <= result.getMaxStackSize()) {
@@ -76,7 +90,7 @@ public class InventoryHelper {
             while (k < stop) {
                 itemstack1 = inventory.getStackInSlot(k);
 
-                if (itemstack1 == null) {
+                if (itemstack1 == null && (sidedInventory == null || sidedInventory.canInsertItem(k, result, side))) {
                     if (undo != null) {
                         if (!undo.containsKey(k)) {
                             undo.put(k, null);
@@ -95,6 +109,10 @@ public class InventoryHelper {
         }
 
         return itemsToPlace;
+    }
+
+    private static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
+        return itemstack1 != null && itemstack1.getItem() == result.getItem() && (!result.getHasSubtypes() || result.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
     }
 
     public int getCount() {
