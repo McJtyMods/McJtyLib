@@ -28,7 +28,7 @@ public class GhostOutputSlot extends Slot {
 
     @Override
     public boolean isItemValid(ItemStack stack) {
-        return true;
+        return false;
     }
 
     @Override
