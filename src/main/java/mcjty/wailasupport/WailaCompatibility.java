@@ -1,5 +1,6 @@
 package mcjty.wailasupport;
 
+import cpw.mods.fml.common.event.FMLInterModComms;
 import mcjty.container.GenericBlock;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -20,10 +21,26 @@ public class WailaCompatibility implements IWailaDataProvider {
 
     private WailaCompatibility() {}
 
+    public static void register(){
+        if (registered)
+            return;
+        registered = true;
+        FMLInterModComms.sendMessage("Waila", "register", "mcjty.wailasupport.WailaCompatibility.load");
+    }
+
+    private static boolean registered;
+    private static boolean loaded;
+
     public static void load(IWailaRegistrar registrar) {
-        registrar.registerHeadProvider(INSTANCE, GenericBlock.class);
-        registrar.registerBodyProvider(INSTANCE, GenericBlock.class);
-        registrar.registerTailProvider(INSTANCE, GenericBlock.class);
+        if (!registered){
+            throw new RuntimeException("Please register this handler using the provided method.");
+        }
+        if (!loaded) {
+            registrar.registerHeadProvider(INSTANCE, GenericBlock.class);
+            registrar.registerBodyProvider(INSTANCE, GenericBlock.class);
+            registrar.registerTailProvider(INSTANCE, GenericBlock.class);
+            loaded = true;
+        }
     }
 
     @Override
@@ -54,4 +71,5 @@ public class WailaCompatibility implements IWailaDataProvider {
     public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         return currenttip;
     }
+
 }
