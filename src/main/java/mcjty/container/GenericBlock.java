@@ -89,7 +89,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
                 currenttip.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
             }
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-                if (genericTileEntity.getOwnerUUID() != null) {
+                if (GeneralConfig.manageOwnership && genericTileEntity.getOwnerUUID() != null) {
                     int securityChannel = genericTileEntity.getSecurityChannel();
                     if (securityChannel == -1) {
                         currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
@@ -116,7 +116,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
                 int pct = infused * 100 / GeneralConfig.maxInfuse;
                 list.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
             }
-            if (tagCompound.hasKey("ownerM")) {
+            if (GeneralConfig.manageOwnership && tagCompound.hasKey("ownerM")) {
                 String owner = tagCompound.getString("owner");
                 int securityChannel = -1;
                 if (tagCompound.hasKey("secChannel")) {
@@ -286,7 +286,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             world.setBlockMetadataWithNotify(x, y, z, BlockTools.setOrientation(meta, dir), 2);
         }
         restoreBlockFromNBT(world, x, y, z, itemStack);
-        if (!world.isRemote) {
+        if (!world.isRemote && GeneralConfig.manageOwnership) {
             setOwner(world, x, y, z, entityLivingBase);
         }
     }

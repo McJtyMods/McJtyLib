@@ -177,6 +177,10 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     public boolean setOwner(EntityPlayer player) {
+        if (!GeneralConfig.manageOwnership) {
+            return false;
+        }
+
         if (ownerUUID != null) {
             // Already has an owner.
             return false;
@@ -190,6 +194,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     public void clearOwner() {
+        if (!GeneralConfig.manageOwnership) {
+            return;
+        }
         ownerUUID = null;
         ownerName = "";
         securityChannel = -1;
