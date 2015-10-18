@@ -26,6 +26,7 @@ public class WrenchChecker {
                 "mods.railcraft.api.core.items.IToolCrowbar",   //Railcraft
                 "com.bluepowermod.items.ItemScrewdriver",       //BluePower
                 "cofh.api.item.IToolHammer",                    //Thermal Expansion and compatible
+                "thermalexpansion.item.tool.ItemWrench",
                 "appeng.items.tools.quartz.ToolQuartzWrench",   //Applied Energistics
                 "crazypants.enderio.api.tool.ITool",            //Ender IO
                 "mekanism.api.IMekWrench",                      //Mekanism
