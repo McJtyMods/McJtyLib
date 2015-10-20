@@ -10,6 +10,7 @@ public class Slider extends AbstractWidget<Slider> {
     private boolean dragging = false;
     private int dx, dy;
     private boolean horizontal = false;
+    private int minimumKnobSize = 4;
 
     private Scrollable scrollable;
 
@@ -34,6 +35,11 @@ public class Slider extends AbstractWidget<Slider> {
         return !horizontal;
     }
 
+    public Slider setMinimumKnobSize(int m) {
+        minimumKnobSize = m;
+        return this;
+    }
+
     public Slider setHorizontal() {
         this.horizontal = true;
         return this;
@@ -54,18 +60,32 @@ public class Slider extends AbstractWidget<Slider> {
         int xx = x + bounds.x;
         int yy = y + bounds.y;
 
-        Gui.drawRect(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff000000);
+        RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, 0xff2b2b2b, 0xffffffff, 0xff636363);
 
         int divider = scrollable.getMaximum() - scrollable.getCountSelected();
 
         if (horizontal) {
             int size = calculateKnobSize(divider, bounds.width);
             int first = calculateKnobOffset(divider, size, bounds.width);
-            RenderHelper.drawBeveledBox(xx + 2 + first, yy + 2, xx + 2 + first + size - 1, yy + bounds.height - 4, 0xffeeeeee, 0xff333333, 0xff666666);
+            RenderHelper.drawBeveledBox(xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, 0xffeeeeee, 0xff333333, 0xff8b8b8b);
+            if (size >= 8) {
+                RenderHelper.drawVerticalLine(xx + 1 + first + size / 2 - 1, yy + 3, yy + bounds.height - 6, 0xff4e4e4e);
+                if (size >= 10) {
+                    RenderHelper.drawVerticalLine(xx + 1 + first + size / 2 - 2 - 1, yy + 3, yy + bounds.height - 6, 0xff4e4e4e);
+                    RenderHelper.drawVerticalLine(xx + 1 + first + size / 2 + 2 - 1, yy + 3, yy + bounds.height - 6, 0xff4e4e4e);
+                }
+            }
         } else {
             int size = calculateKnobSize(divider, bounds.height);
             int first = calculateKnobOffset(divider, size, bounds.height);
-            RenderHelper.drawBeveledBox(xx+2, yy+2 + first, xx+bounds.width-3, yy + 2 + first + size-1, 0xffeeeeee, 0xff333333, 0xff666666);
+            RenderHelper.drawBeveledBox(xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, 0xffeeeeee, 0xff333333, 0xff8b8b8b);
+            if (size >= 8) {
+                RenderHelper.drawHorizontalLine(xx + 3, yy + 1 + first + size/2 -1, xx + bounds.width-4, 0xff4e4e4e);
+                if (size >= 10) {
+                    RenderHelper.drawHorizontalLine(xx + 3, yy + 1 + first + size / 2 - 2 - 1, xx + bounds.width - 4, 0xff4e4e4e);
+                    RenderHelper.drawHorizontalLine(xx + 3, yy + 1 + first + size / 2 + 2 - 1, xx + bounds.width - 4, 0xff4e4e4e);
+                }
+            }
         }
     }
 
@@ -74,7 +94,7 @@ public class Slider extends AbstractWidget<Slider> {
         if (divider <= 0) {
             first = 0;
         } else {
-            first = (scrollable.getFirstSelected() * (boundsSize-4-size)) / divider;
+            first = (scrollable.getFirstSelected() * (boundsSize-2-size)) / divider;
         }
         return first;
     }
@@ -82,12 +102,12 @@ public class Slider extends AbstractWidget<Slider> {
     private int calculateKnobSize(int divider, int boundsSize) {
         int size;
         if (divider <= 0) {
-            size = boundsSize - 4;
+            size = boundsSize - 2;
         } else {
-            size = (scrollable.getCountSelected() * (boundsSize-4)) / scrollable.getMaximum();
+            size = (scrollable.getCountSelected() * (boundsSize-2)) / scrollable.getMaximum();
         }
-        if (size < 4) {
-            size = 4;
+        if (size < minimumKnobSize) {
+            size = minimumKnobSize;
         }
         return size;
     }

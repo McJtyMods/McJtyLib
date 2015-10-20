@@ -63,12 +63,16 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
         int yy = y + bounds.y;
 
         if (isEnabled()) {
-            RenderHelper.drawBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xff333333, 0xff000000 | getCurrentColor());
+            RenderHelper.drawThinButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xff000000 | getCurrentColor(), 0xff333333);
+            RenderHelper.drawUpTriangle(xx + bounds.width - 7, yy + bounds.height / 2 - 4, 0xff000000);
+            RenderHelper.drawDownTriangle(xx + bounds.width - 7, yy + bounds.height / 2 + 2, 0xff000000);
         } else {
-            RenderHelper.drawBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xff555555, 0xff666666);
+            RenderHelper.drawThinButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xff666666, 0xff555555);
+            RenderHelper.drawUpTriangle(xx + bounds.width - 7, yy + bounds.height / 2 - 4, 0xff888888);
+            RenderHelper.drawDownTriangle(xx + bounds.width - 7, yy + bounds.height / 2 + 2, 0xff888888);
         }
 
-        super.draw(window, x, y);
+        super.drawOffset(window, x, y, 0, 1);
     }
 
     @Override

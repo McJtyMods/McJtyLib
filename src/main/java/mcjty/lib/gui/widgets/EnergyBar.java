@@ -149,16 +149,30 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             return;
         }
         super.draw(window, x, y);
+
+        int bx = x + bounds.x;
+        int by = y + bounds.y;
+        RenderHelper.drawThickBeveledBox(bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, 0xff2b2b2b, 0xffffffff, 0xff636363);
+
         int currentValue = getValue();
         int maximum = getMaxValue();
         if (maximum > 0) {
-            int w = 0;
+            int color;
+            boolean on = false;
             if (horizontal) {
-                w = (int) ((bounds.width) * (float) currentValue / maximum);
-                RenderHelper.drawHorizontalGradientRect(x + bounds.x, y + bounds.y, x + bounds.x + w, y + bounds.y + bounds.height - 1, leftColor, rightColor);
+                int w = (int) ((bounds.width-2) * (float) currentValue / maximum);
+                for (int xx = bx+1 ; xx < bx + bounds.width-2 ; xx++) {
+                    color = getColor(bx, w, on, xx);
+                    RenderHelper.drawVerticalLine(xx, by+1, by + bounds.height - 2, color);
+                    on = !on;
+                }
             } else {
-                w = (int) ((bounds.height) * (float) currentValue / maximum);
-                RenderHelper.drawVerticalGradientRect(x + bounds.x, y + bounds.y + bounds.height - w, x + bounds.x + bounds.width - 1, y + bounds.y + bounds.height, leftColor, rightColor);
+                int h = (int) ((bounds.height-2) * (float) currentValue / maximum);
+                for (int yy = y+1 ; yy < y + bounds.height-2 ; yy++) {
+                    color = getColorReversed(y, h, on, yy);
+                    RenderHelper.drawHorizontalLine(bx+1, y + by + bounds.height - yy -2, bx + bounds.width - 2, color);
+                    on = !on;
+                }
             }
         }
         if (showText) {
@@ -172,5 +186,32 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         }
     }
 
+    private int getColor(int pos, int total, boolean on, int cur) {
+        int color;
+        if (on) {
+            if (cur < pos + total) {
+                color = 0xffdd0000;
+            } else {
+                color = 0xff631111;
+            }
+        } else {
+            color = 0xff430000;
+        }
+        return color;
+    }
+
+    private int getColorReversed(int pos, int total, boolean on, int cur) {
+        int color;
+        if (on) {
+            if (cur < pos + total) {
+                color = 0xffdd0000;
+            } else {
+                color = 0xff631111;
+            }
+        } else {
+            color = 0xff430000;
+        }
+        return color;
+    }
 }
 
