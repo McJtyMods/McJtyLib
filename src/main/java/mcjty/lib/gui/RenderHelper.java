@@ -257,6 +257,23 @@ public class RenderHelper {
     }
 
     /**
+     * Draw a button box. x2 and y2 are not included.
+     */
+    public static void drawThinButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        Gui.drawRect(x1+1, y1+1, x2-1, y2-1, average);
+        drawHorizontalLine(x1+1, y1, x2-1, 0xff000000);
+        drawHorizontalLine(x1+1, y2-1, x2-1, 0xff000000);
+        drawVerticalLine(x1, y1 + 1, y2 - 1, 0xff000000);
+        drawVerticalLine(x2-1, y1+1, y2-1, 0xff000000);
+
+        drawHorizontalLine(x1+1, y1+1, x2-1, bright);
+        drawVerticalLine(x1+1, y1+2, y2-2, bright);
+
+        drawHorizontalLine(x1+2, y2-2, x2-1, dark);
+        drawVerticalLine(x2-2, y1+2, y2-2, dark);
+    }
+
+    /**
      * Draw a beveled box. x2 and y2 are not included.
      */
     public static void drawBeveledBox(int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {

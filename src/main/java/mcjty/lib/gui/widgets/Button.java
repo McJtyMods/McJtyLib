@@ -27,12 +27,12 @@ public class Button extends Label<Button> {
 
         if (isEnabledAndVisible()) {
             if (pressed) {
-                RenderHelper.drawButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff666666, 0xffeeeeee, 0xff333333);
+                RenderHelper.drawThinButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff666666, 0xffeeeeee, 0xff333333);
             } else {
-                RenderHelper.drawButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xffc6c6c6, 0xff333333);
+                RenderHelper.drawThinButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xffc6c6c6, 0xff333333);
             }
         } else {
-            RenderHelper.drawButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xffc6c6c6, 0xff555555);
+            RenderHelper.drawThinButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xffc6c6c6, 0xff555555);
         }
 
         super.drawOffset(window, x, y, 0, 1);
