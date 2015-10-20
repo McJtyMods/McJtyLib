@@ -32,6 +32,7 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     private int backgroundOffset = 256;
     private int filledRectThickness = 0;
     private int filledBackground = -1;
+    private int filledBackground2 = -1;
 
     protected AbstractWidget(Minecraft mc, Gui gui) {
         this.mc = mc;
@@ -163,8 +164,19 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
         return filledBackground;
     }
 
+    public int getFilledBackground2() {
+        return filledBackground2;
+    }
+
     public P setFilledBackground(int filledBackground) {
         this.filledBackground = filledBackground;
+        this.filledBackground2 = -1;
+        return (P) this;
+    }
+
+    public P setFilledBackground(int filledBackground, int filledBackground2) {
+        this.filledBackground = filledBackground;
+        this.filledBackground2 = filledBackground2;
         return (P) this;
     }
 
@@ -211,11 +223,11 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
                 }
             }
         } else if (filledRectThickness > 0) {
-            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledRectThickness, 0xffffffff, 0xff555555, 0xffc6c6c6);
+            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledRectThickness, 0xffffffff, 0xff2b2b2b, filledBackground == -1 ? 0xffc6c6c6 : filledBackground);
         } else if (filledRectThickness < 0) {
-            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, -filledRectThickness, 0xffc6c6c6, 0xff555555, 0xffffffff);
+            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, -filledRectThickness, 0xff2b2b2b, 0xffffffff, filledBackground == -1 ? 0xffc6c6c6 : filledBackground);
         } else if (filledBackground != -1) {
-            RenderHelper.drawHorizontalGradientRect(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledBackground, filledBackground);
+            RenderHelper.drawHorizontalGradientRect(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledBackground, filledBackground2 == -1 ? filledBackground : filledBackground2);
         }
     }
 

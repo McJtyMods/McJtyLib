@@ -88,7 +88,8 @@ public class GuiSideWindow {
 
     private void updateStyle(WidgetList list) {
         if (style == GuiStyle.STYLE_BEVEL) {
-            list.setFilledRectThickness(1);
+            list.setFilledRectThickness(-1);
+            list.setFilledBackground(0xff8b8b8b);
         } else {
             list.setFilledBackground(GuiConfig.itemListBackground);
         }

@@ -113,12 +113,13 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             boolean hilighted = hilightedRows.contains(i);
+            RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh-1, xx + bounds.width - 7, 0xff5c5c5c);
             if (i == selected && hilighted) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top, xx + bounds.width - 4, yy + top + rh, 0xff888844, 0xff666622);
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, 0xffbbbb00, 0xff999900);
             } else if (i == selected) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top, xx + bounds.width - 4, yy + top + rh, 0xff666666, 0xff444444);
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, 0xff616161, 0xff414141);        // 0xff515151
             } else if (hilighted) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top, xx + bounds.width - 4, yy + top + rh, 0xffbbbb00, 0xff999900);
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, 0xff717120, 0xff515110);
             }
             if (isEnabledAndVisible()) {
                 child.draw(window, xx, yy);
@@ -211,6 +212,9 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     @Override
     public int getCountSelected() {
+        if (bounds == null) {
+            return 0;
+        }
         if (rowheight != -1) {
             return bounds.height / rowheight;
         } else {
