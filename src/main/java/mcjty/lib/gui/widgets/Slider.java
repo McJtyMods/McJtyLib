@@ -67,7 +67,11 @@ public class Slider extends AbstractWidget<Slider> {
         if (horizontal) {
             int size = calculateKnobSize(divider, bounds.width);
             int first = calculateKnobOffset(divider, size, bounds.width);
-            RenderHelper.drawBeveledBox(xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, 0xffeeeeee, 0xff333333, 0xff8b8b8b);
+            if (dragging) {
+                RenderHelper.drawBeveledBox(xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, 0xff5c669d, 0xffbcc5ff, 0xff7f89bf);
+            } else {
+                RenderHelper.drawBeveledBox(xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, 0xffeeeeee, 0xff333333, 0xff8b8b8b);
+            }
             if (size >= 8) {
                 RenderHelper.drawVerticalLine(xx + 1 + first + size / 2 - 1, yy + 3, yy + bounds.height - 6, 0xff4e4e4e);
                 if (size >= 10) {
@@ -78,9 +82,13 @@ public class Slider extends AbstractWidget<Slider> {
         } else {
             int size = calculateKnobSize(divider, bounds.height);
             int first = calculateKnobOffset(divider, size, bounds.height);
-            RenderHelper.drawBeveledBox(xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, 0xffeeeeee, 0xff333333, 0xff8b8b8b);
+            if (dragging) {
+                RenderHelper.drawBeveledBox(xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, 0xff5c669d, 0xffbcc5ff, 0xff7f89bf);
+            } else {
+                RenderHelper.drawBeveledBox(xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, 0xffeeeeee, 0xff333333, 0xff8b8b8b);
+            }
             if (size >= 8) {
-                RenderHelper.drawHorizontalLine(xx + 3, yy + 1 + first + size/2 -1, xx + bounds.width-4, 0xff4e4e4e);
+                RenderHelper.drawHorizontalLine(xx + 3, yy + 1 + first + size / 2 - 1, xx + bounds.width - 4, 0xff4e4e4e);
                 if (size >= 10) {
                     RenderHelper.drawHorizontalLine(xx + 3, yy + 1 + first + size / 2 - 2 - 1, xx + bounds.width - 4, 0xff4e4e4e);
                     RenderHelper.drawHorizontalLine(xx + 3, yy + 1 + first + size / 2 + 2 - 1, xx + bounds.width - 4, 0xff4e4e4e);

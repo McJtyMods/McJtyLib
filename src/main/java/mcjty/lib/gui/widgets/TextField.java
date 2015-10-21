@@ -121,9 +121,9 @@ public class TextField extends AbstractWidget<TextField> {
 
         ensureVisible();
 
-        int col = 0xffc6c6c6;
+        int col = AbstractWidget.COLOR_AVERAGE_FILLER;;
         if (window.getTextFocus() == this) {
-            col = 0xffeeeeee;
+            col = AbstractWidget.COLOR_BRIGHT_BORDER;
         }
 
         RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, 0xff2b2b2b, 0xffffffff, col);

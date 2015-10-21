@@ -1,6 +1,5 @@
 package mcjty.lib.gui.widgets;
 
-import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
 import net.minecraft.client.Minecraft;
@@ -27,12 +26,12 @@ public class Button extends Label<Button> {
 
         if (isEnabledAndVisible()) {
             if (pressed) {
-                drawStyledBox(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff666666, 0xffeeeeee, 0xff333333);
+                drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             } else {
-                drawStyledBox(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xffc6c6c6, 0xff333333);
+                drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             }
         } else {
-            drawStyledBox(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xffc6c6c6, 0xff555555);
+            drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
         }
 
         super.drawOffset(window, x, y, 0, 1);

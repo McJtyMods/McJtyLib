@@ -13,6 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractWidget<P extends AbstractWidget> implements Widget<P> {
+    public static final int COLOR_DARK_BORDER = 0xff777777;//0xff666666;
+    public static final int COLOR_BRIGHT_BORDER = 0xffeeeeee;
+    public static final int COLOR_AVERAGE_FILLER = 0xffc6c6c6;
+
     protected Rectangle bounds;
     private int desiredWidth = SIZE_UNKNOWN;
     private int desiredHeight = SIZE_UNKNOWN;
@@ -223,28 +227,49 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
                 }
             }
         } else if (filledRectThickness > 0) {
-            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledRectThickness, 0xffffffff, 0xff2b2b2b, filledBackground == -1 ? 0xffc6c6c6 : filledBackground);
+            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledRectThickness, 0xffffffff, 0xff2b2b2b, filledBackground == -1 ? COLOR_AVERAGE_FILLER : filledBackground);
         } else if (filledRectThickness < 0) {
-            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, -filledRectThickness, 0xff2b2b2b, 0xffffffff, filledBackground == -1 ? 0xffc6c6c6 : filledBackground);
+            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, -filledRectThickness, 0xff2b2b2b, 0xffffffff, filledBackground == -1 ? COLOR_AVERAGE_FILLER : filledBackground);
         } else if (filledBackground != -1) {
             RenderHelper.drawHorizontalGradientRect(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledBackground, filledBackground2 == -1 ? filledBackground : filledBackground2);
         }
     }
 
-    protected void drawStyledBox(Window window, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+    protected void drawStyledBoxNormal(Window window, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, x1, y1, x2, y2, COLOR_BRIGHT_BORDER, COLOR_AVERAGE_FILLER, 0xffb1b1b1, 0xffe1e1e1, COLOR_DARK_BORDER);
+    }
+
+    protected void drawStyledBoxNormal(Window window, int x1, int y1, int x2, int y2, int averageOverride) {
+        drawStyledBox(window, x1, y1, x2, y2, COLOR_BRIGHT_BORDER, averageOverride, averageOverride, averageOverride, COLOR_DARK_BORDER);
+    }
+
+    protected void drawStyledBoxSelected(Window window, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, x1, y1, x2, y2, 0xff5c669d, 0xff7f89bf, 0xff6a74aa, 0xff949ed4, 0xffbcc5ff);
+    }
+
+    protected void drawStyledBoxDisabled(Window window, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, x1, y1, x2, y2, COLOR_BRIGHT_BORDER, COLOR_AVERAGE_FILLER, 0xffb1b1b1, 0xffe1e1e1, COLOR_DARK_BORDER);
+    }
+
+    private void drawStyledBox(Window window, int x1, int y1, int x2, int y2, int bright, int average, int average1, int average2, int dark) {
         switch (window.getCurrentStyle()) {
             case STYLE_BEVEL:
                 RenderHelper.drawThinButtonBox(x1, y1, x2, y2, bright, average, dark);
                 break;
+            case STYLE_BEVEL_GRADIENT:
+                RenderHelper.drawThinButtonBoxGradient(x1, y1, x2, y2, bright, average1, average2, dark);
+                break;
             case STYLE_FLAT:
                 RenderHelper.drawFlatButtonBox(x1, y1, x2, y2, bright, average, dark);
+                break;
+            case STYLE_FLAT_GRADIENT:
+                RenderHelper.drawFlatButtonBoxGradient(x1, y1, x2, y2, bright, average1, average2, dark);
                 break;
             case STYLE_THICK:
                 RenderHelper.drawThickButtonBox(x1, y1, x2, y2, bright, average, dark);
                 break;
         }
     }
-
 
     @Override
     public void draw(Window window, int x, int y) {

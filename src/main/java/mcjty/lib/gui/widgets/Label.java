@@ -7,9 +7,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
 public class Label<P extends Label> extends AbstractWidget<P> {
+    public static final int DEFAULT_TEXT_COLOR = 0xFF303030;
+    public static final int DEFAULT_DISABLED_TEXT_COLOR = 0xFFa0a0a0;
+
     private String text;
-    private int color = 0xFF000000;
-    private int disabledColor = 0xFFa0a0a0;
+    private int color = DEFAULT_TEXT_COLOR;
+    private int disabledColor = DEFAULT_DISABLED_TEXT_COLOR;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.ALIGN_CENTER;
     private VerticalAlignment verticalAlignment = VerticalAlignment.ALIGN_CENTER;
     private boolean dynamic = false;        // The size of this label is dynamic and not based on the contents
@@ -107,8 +110,8 @@ public class Label<P extends Label> extends AbstractWidget<P> {
         }
         super.draw(window, x, y);
 
-        int dx = calculateHorizontalOffset();
-        int dy = calculateVerticalOffset();
+        int dx = calculateHorizontalOffset() + offsetx;
+        int dy = calculateVerticalOffset() + offsety;
 
         int col = color;
         if (!isEnabled()) {

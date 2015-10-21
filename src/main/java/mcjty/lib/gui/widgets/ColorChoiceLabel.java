@@ -63,13 +63,13 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
         int yy = y + bounds.y;
 
         if (isEnabled()) {
-            drawStyledBox(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xff000000 | getCurrentColor(), 0xff333333);
-            RenderHelper.drawUpTriangle(xx + bounds.width - 7, yy + bounds.height / 2 - 4, 0xff000000);
-            RenderHelper.drawDownTriangle(xx + bounds.width - 7, yy + bounds.height / 2 + 2, 0xff000000);
+            drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff000000 | getCurrentColor());
+            RenderHelper.drawLeftTriangle(xx + bounds.width - 10, yy + bounds.height / 2, 0xff000000);
+            RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, 0xff000000);
         } else {
-            drawStyledBox(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xff666666, 0xff555555);
-            RenderHelper.drawUpTriangle(xx + bounds.width - 7, yy + bounds.height / 2 - 4, 0xff888888);
-            RenderHelper.drawDownTriangle(xx + bounds.width - 7, yy + bounds.height / 2 + 2, 0xff888888);
+            drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+            RenderHelper.drawLeftTriangle(xx + bounds.width - 10, yy + bounds.height / 2, 0xff888888);
+            RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, 0xff888888);
         }
 
         super.drawOffset(window, x, y, 0, 1);

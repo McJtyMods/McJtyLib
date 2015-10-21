@@ -115,7 +115,9 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             boolean hilighted = hilightedRows.contains(i);
-            RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh-1, xx + bounds.width - 7, 0xff5c5c5c);
+            if (top + rh-1 < bounds.height-3) {
+                RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh - 1, xx + bounds.width - 7, 0xff5c5c5c);
+            }
             if (i == selected && hilighted) {
                 RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, 0xffbbbb00, 0xff999900);
             } else if (i == selected) {
