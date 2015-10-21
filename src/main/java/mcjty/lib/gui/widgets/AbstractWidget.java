@@ -231,6 +231,21 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
         }
     }
 
+    protected void drawStyledBox(Window window, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        switch (window.getCurrentStyle()) {
+            case STYLE_BEVEL:
+                RenderHelper.drawThinButtonBox(x1, y1, x2, y2, bright, average, dark);
+                break;
+            case STYLE_FLAT:
+                RenderHelper.drawFlatButtonBox(x1, y1, x2, y2, bright, average, dark);
+                break;
+            case STYLE_THICK:
+                RenderHelper.drawThickButtonBox(x1, y1, x2, y2, bright, average, dark);
+                break;
+        }
+    }
+
+
     @Override
     public void draw(Window window, int x, int y) {
         drawBackground(x, y);

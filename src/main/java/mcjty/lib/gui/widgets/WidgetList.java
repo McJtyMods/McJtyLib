@@ -28,6 +28,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     public WidgetList(Minecraft mc, Gui gui) {
         super(mc, gui);
+        setFilledRectThickness(-1);
+        setFilledBackground(0xff8b8b8b);
     }
 
     public int getRowheight() {

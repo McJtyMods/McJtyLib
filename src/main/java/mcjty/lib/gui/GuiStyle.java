@@ -2,7 +2,8 @@ package mcjty.lib.gui;
 
 public enum GuiStyle {
     STYLE_BEVEL("bevel"),
-    STYLE_FLAT("flat");
+    STYLE_FLAT("flat"),
+    STYLE_THICK("thick");
 
     private final String style;
 

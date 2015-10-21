@@ -22,6 +22,7 @@ public class PacketHandler {
 
         // Client side
         network.registerMessage(PacketIntegerFromServer.class, PacketIntegerFromServer.class, nextID(), Side.CLIENT);
+        network.registerMessage(PacketSendPreferencesToClientHandler.class, PacketSendPreferencesToClient.class, nextID(), Side.CLIENT);
 
         return network;
     }

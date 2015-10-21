@@ -2,7 +2,6 @@ package mcjty.lib.gui;
 
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.gui.widgets.WidgetList;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
 
@@ -38,12 +37,6 @@ public class GuiItemScreen extends GuiScreen {
         guiLeft = (this.width - xSize) / 2;
         guiTop = (this.height - ySize) / 2;
         sideWindow.initGui(modBase, network, mc, this, guiLeft, guiTop, xSize, ySize);
-    }
-
-    protected WidgetList createStyledList() {
-        WidgetList list = new WidgetList(mc, this);
-        sideWindow.register(list);
-        return list;
     }
 
     @Override

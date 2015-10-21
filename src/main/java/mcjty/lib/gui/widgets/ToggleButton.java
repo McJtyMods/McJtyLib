@@ -46,15 +46,15 @@ public class ToggleButton extends Label<ToggleButton> {
 
         if (isEnabled()) {
             if (pressed) {
-                RenderHelper.drawThinButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff666666, 0xffeeeeee, 0xff333333);
+                drawStyledBox(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff666666, 0xffeeeeee, 0xff333333);
                 if (checkMarker) {
                     RenderHelper.drawHorizontalGradientRect(xx - 5, yy + 2, xx - 1, yy + bounds.height - 3, 0xffff0000, 0xffff0000);
                 }
             } else {
-                RenderHelper.drawThinButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xffc6c6c6, 0xff333333);
+                drawStyledBox(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xffc6c6c6, 0xff333333);
             }
         } else {
-            RenderHelper.drawThinButtonBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xffc6c6c6, 0xff555555);
+            drawStyledBox(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xffc6c6c6, 0xff555555);
         }
 
         super.draw(window, x, y);
