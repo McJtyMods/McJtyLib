@@ -1,6 +1,7 @@
 package mcjty.lib.gui.widgets;
 
 import cofh.api.energy.IEnergyHandler;
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
@@ -13,9 +14,10 @@ import java.util.List;
 public class EnergyBar extends AbstractWidget<EnergyBar> {
     private int value;
     private int maxValue;
-    private int color = 0xFF000000;
-    private int leftColor = 0xFFFF0000;
-    private int rightColor = 0xFF550000;
+    private int energyOnColor = StyleConfig.colorEnergyBarHighEnergy;
+    private int energyOffColor = StyleConfig.colorEnergyBarLowEnergy;
+    private int spacerColor = StyleConfig.colorEnergyBarSpacer;
+    private int textColor = StyleConfig.colorEnergyBarText;
     private boolean horizontal = false;
     private IEnergyHandler handler = null;
     private boolean showText = true;
@@ -116,30 +118,39 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return this;
     }
 
-    public int getColor() {
-        return color;
+    public int getEnergyOnColor() {
+        return energyOnColor;
     }
 
-    public EnergyBar setColor(int color) {
-        this.color = color;
+    public EnergyBar setEnergyOnColor(int energyOnColor) {
+        this.energyOnColor = energyOnColor;
         return this;
     }
 
-    public int getColor1() {
-        return leftColor;
+    public int getEnergyOffColor() {
+        return energyOffColor;
     }
 
-    public EnergyBar setColor1(int leftColor) {
-        this.leftColor = leftColor;
+    public EnergyBar setEnergyOffColor(int leftColor) {
+        this.energyOffColor = leftColor;
         return this;
     }
 
-    public int getColor2() {
-        return rightColor;
+    public int getSpacerColor() {
+        return spacerColor;
     }
 
-    public EnergyBar setColor2(int rightColor) {
-        this.rightColor = rightColor;
+    public EnergyBar setSpacerColor(int rightColor) {
+        this.spacerColor = rightColor;
+        return this;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public EnergyBar setTextColor(int textColor) {
+        this.textColor = textColor;
         return this;
     }
 
@@ -149,16 +160,30 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             return;
         }
         super.draw(window, x, y);
+
+        int bx = x + bounds.x;
+        int by = y + bounds.y;
+        RenderHelper.drawThickBeveledBox(bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, StyleConfig.colorEnergyBarTopLeft, StyleConfig.colorEnergyBarBottomRight, 0xff636363);
+
         int currentValue = getValue();
         int maximum = getMaxValue();
         if (maximum > 0) {
-            int w = 0;
+            int color;
+            boolean on = false;
             if (horizontal) {
-                w = (int) ((bounds.width) * (float) currentValue / maximum);
-                RenderHelper.drawHorizontalGradientRect(x + bounds.x, y + bounds.y, x + bounds.x + w, y + bounds.y + bounds.height - 1, leftColor, rightColor);
+                int w = (int) ((bounds.width-2) * (float) currentValue / maximum);
+                for (int xx = bx+1 ; xx < bx + bounds.width-2 ; xx++) {
+                    color = getColor(bx, w, on, xx);
+                    RenderHelper.drawVerticalLine(xx, by+1, by + bounds.height - 2, color);
+                    on = !on;
+                }
             } else {
-                w = (int) ((bounds.height) * (float) currentValue / maximum);
-                RenderHelper.drawVerticalGradientRect(x + bounds.x, y + bounds.y + bounds.height - w, x + bounds.x + bounds.width - 1, y + bounds.y + bounds.height, leftColor, rightColor);
+                int h = (int) ((bounds.height-2) * (float) currentValue / maximum);
+                for (int yy = y+1 ; yy < y + bounds.height-2 ; yy++) {
+                    color = getColorReversed(y, h, on, yy);
+                    RenderHelper.drawHorizontalLine(bx+1, y + by + bounds.height - yy -2, bx + bounds.width - 2, color);
+                    on = !on;
+                }
             }
         }
         if (showText) {
@@ -168,9 +193,36 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             } else {
                 s = currentValue + "/" + maximum;
             }
-            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, getBounds().width), x+bounds.x, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, color);
+            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, textColor);
         }
     }
 
+    private int getColor(int pos, int total, boolean on, int cur) {
+        int color;
+        if (on) {
+            if (cur < pos + total) {
+                color = energyOnColor;
+            } else {
+                color = energyOffColor;
+            }
+        } else {
+            color = spacerColor;
+        }
+        return color;
+    }
+
+    private int getColorReversed(int pos, int total, boolean on, int cur) {
+        int color;
+        if (on) {
+            if (cur < pos + total) {
+                color = energyOnColor;
+            } else {
+                color = energyOffColor;
+            }
+        } else {
+            color = spacerColor;
+        }
+        return color;
+    }
 }
 

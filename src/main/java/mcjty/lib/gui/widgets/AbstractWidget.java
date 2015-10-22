@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
@@ -13,9 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractWidget<P extends AbstractWidget> implements Widget<P> {
+
     protected Rectangle bounds;
-    private int desiredWidth = SIZE_UNKNOWN;
-    private int desiredHeight = SIZE_UNKNOWN;
+    protected int desiredWidth = SIZE_UNKNOWN;
+    protected int desiredHeight = SIZE_UNKNOWN;
     protected Minecraft mc;
     protected Gui gui;
     private LayoutHint layoutHint = null;
@@ -32,6 +34,14 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     private int backgroundOffset = 256;
     private int filledRectThickness = 0;
     private int filledBackground = -1;
+    private int filledBackground2 = -1;
+
+    // Bevel:           vvv
+    // Bevel gradient:  vvvv
+    // Flat:            vvvvvvvvvvvvvv
+    // Flat gradient:   vvvvvvvv
+    // Thick:           vv
+
 
     protected AbstractWidget(Minecraft mc, Gui gui) {
         this.mc = mc;
@@ -163,8 +173,19 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
         return filledBackground;
     }
 
+    public int getFilledBackground2() {
+        return filledBackground2;
+    }
+
     public P setFilledBackground(int filledBackground) {
         this.filledBackground = filledBackground;
+        this.filledBackground2 = -1;
+        return (P) this;
+    }
+
+    public P setFilledBackground(int filledBackground, int filledBackground2) {
+        this.filledBackground = filledBackground;
+        this.filledBackground2 = filledBackground2;
         return (P) this;
     }
 
@@ -211,11 +232,51 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
                 }
             }
         } else if (filledRectThickness > 0) {
-            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledRectThickness, 0xffffffff, 0xff555555, 0xffc6c6c6);
+            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledRectThickness, StyleConfig.colorBackgroundBevelBright, StyleConfig.colorBackgroundBevelDark, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
         } else if (filledRectThickness < 0) {
-            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, -filledRectThickness, 0xffc6c6c6, 0xff555555, 0xffffffff);
+            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, -filledRectThickness, StyleConfig.colorBackgroundBevelDark, StyleConfig.colorBackgroundBevelBright, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
         } else if (filledBackground != -1) {
-            RenderHelper.drawHorizontalGradientRect(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledBackground, filledBackground);
+            RenderHelper.drawHorizontalGradientRect(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledBackground, filledBackground2 == -1 ? filledBackground : filledBackground2);
+        }
+    }
+
+    protected void drawStyledBoxNormal(Window window, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, x1, y1, x2, y2,
+                StyleConfig.colorButtonBorderTopLeft, StyleConfig.colorButtonFiller, StyleConfig.colorButtonFillerGradient1, StyleConfig.colorButtonFillerGradient2, StyleConfig.colorButtonBorderBottomRight);
+    }
+
+    protected void drawStyledBoxNormal(Window window, int x1, int y1, int x2, int y2, int averageOverride) {
+        drawStyledBox(window, x1, y1, x2, y2,
+                StyleConfig.colorButtonBorderTopLeft, averageOverride, averageOverride, averageOverride, StyleConfig.colorButtonBorderBottomRight);
+    }
+
+    protected void drawStyledBoxSelected(Window window, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, x1, y1, x2, y2,
+                StyleConfig.colorButtonSelectedBorderTopLeft, StyleConfig.colorButtonSelectedFiller, StyleConfig.colorButtonSelectedFillerGradient1, StyleConfig.colorButtonSelectedFillerGradient2, StyleConfig.colorButtonSelectedBorderBottomRight);
+    }
+
+    protected void drawStyledBoxDisabled(Window window, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, x1, y1, x2, y2,
+                StyleConfig.colorButtonDisabledBorderTopLeft, StyleConfig.colorButtonDisabledFiller, StyleConfig.colorButtonDisabledFillerGradient1, StyleConfig.colorButtonDisabledFillerGradient2, StyleConfig.colorButtonDisabledBorderBottomRight);
+    }
+
+    private void drawStyledBox(Window window, int x1, int y1, int x2, int y2, int bright, int average, int average1, int average2, int dark) {
+        switch (window.getCurrentStyle()) {
+            case STYLE_BEVEL:
+                RenderHelper.drawThinButtonBox(x1, y1, x2, y2, bright, average, dark);
+                break;
+            case STYLE_BEVEL_GRADIENT:
+                RenderHelper.drawThinButtonBoxGradient(x1, y1, x2, y2, bright, average1, average2, dark);
+                break;
+            case STYLE_FLAT:
+                RenderHelper.drawFlatButtonBox(x1, y1, x2, y2, bright, average, dark);
+                break;
+            case STYLE_FLAT_GRADIENT:
+                RenderHelper.drawFlatButtonBoxGradient(x1, y1, x2, y2, bright, average1, average2, dark);
+                break;
+            case STYLE_THICK:
+                RenderHelper.drawThickButtonBox(x1, y1, x2, y2, bright, average, dark);
+                break;
         }
     }
 

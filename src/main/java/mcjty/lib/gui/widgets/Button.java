@@ -1,6 +1,5 @@
 package mcjty.lib.gui.widgets;
 
-import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
 import net.minecraft.client.Minecraft;
@@ -27,15 +26,15 @@ public class Button extends Label<Button> {
 
         if (isEnabledAndVisible()) {
             if (pressed) {
-                RenderHelper.drawBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff666666, 0xff333333, 0xffeeeeee);
+                drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             } else {
-                RenderHelper.drawBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xff333333, 0xff666666);
+                drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             }
         } else {
-            RenderHelper.drawBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xff555555, 0xff666666);
+            drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
         }
 
-        super.draw(window, x, y);
+        super.drawOffset(window, x, y, 0, 1);
     }
 
     @Override

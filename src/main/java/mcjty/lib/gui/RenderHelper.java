@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import mcjty.lib.base.StyleConfig;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -213,6 +214,115 @@ public class RenderHelper {
         GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 
+    public static void drawHorizontalLine(int x1, int y1, int x2, int color) {
+        Gui.drawRect(x1, y1, x2, y1+1, color);
+    }
+
+    public static void drawVerticalLine(int x1, int y1, int y2, int color) {
+        Gui.drawRect(x1, y1, x1+1, y2, color);
+    }
+
+    // Draw a small triangle. x,y is the coordinate of the left point
+    public static void drawLeftTriangle(int x, int y, int color) {
+        drawVerticalLine(x, y, y, color);
+        drawVerticalLine(x + 1, y - 1, y + 1, color);
+        drawVerticalLine(x + 2, y - 2, y + 2, color);
+    }
+
+    // Draw a small triangle. x,y is the coordinate of the right point
+    public static void drawRightTriangle(int x, int y, int color) {
+        drawVerticalLine(x, y, y, color);
+        drawVerticalLine(x - 1, y - 1, y + 1, color);
+        drawVerticalLine(x - 2, y - 2, y + 2, color);
+    }
+
+    // Draw a small triangle. x,y is the coordinate of the top point
+    public static void drawUpTriangle(int x, int y, int color) {
+        drawHorizontalLine(x, y, x, color);
+        drawHorizontalLine(x-1, y+1, x+1, color);
+        drawHorizontalLine(x - 2, y + 2, x + 2, color);
+    }
+
+    // Draw a small triangle. x,y is the coordinate of the bottom point
+    public static void drawDownTriangle(int x, int y, int color) {
+        drawHorizontalLine(x, y, x, color);
+        drawHorizontalLine(x-1, y-1, x+1, color);
+        drawHorizontalLine(x-2, y-2, x+2, color);
+    }
+
+    /**
+     * Draw a button box. x2 and y2 are not included.
+     */
+    public static void drawThickButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        Gui.drawRect(x1+2, y1+2, x2-2, y2-2, average);
+        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
+
+        drawHorizontalLine(x1+1, y1+1, x2-1, bright);
+        drawHorizontalLine(x1+2, y1+2, x2-2, bright);
+        drawVerticalLine(x1+1, y1+2, y2-2, bright);
+        drawVerticalLine(x1+2, y1+3, y2-3, bright);
+
+        drawHorizontalLine(x1+3, y2-3, x2-2, dark);
+        drawHorizontalLine(x1+2, y2-2, x2-1, dark);
+        drawVerticalLine(x2 - 2, y1 + 2, y2 - 2, dark);
+        drawVerticalLine(x2 - 3, y1 + 3, y2 - 3, dark);
+    }
+
+    /**
+     * Draw a button box. x2 and y2 are not included.
+     */
+    public static void drawThinButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
+        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
+
+        drawHorizontalLine(x1+1, y1+1, x2-2, bright);
+        drawVerticalLine(x1 + 1, y1 + 2, y2 - 3, bright);
+
+        drawHorizontalLine(x1 + 1, y2 - 2, x2 - 1, dark);
+        drawVerticalLine(x2-2, y1+1, y2-2, dark);
+    }
+
+    /**
+     * Draw a button box. x2 and y2 are not included.
+     */
+    public static void drawThinButtonBoxGradient(int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
+        drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
+        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
+
+        drawHorizontalLine(x1+1, y1+1, x2-2, bright);
+        drawVerticalLine(x1 + 1, y1 + 2, y2 - 3, bright);
+
+        drawHorizontalLine(x1 + 1, y2 - 2, x2 - 1, dark);
+        drawVerticalLine(x2-2, y1+1, y2-2, dark);
+    }
+
+    /**
+     * Draw a button box. x2 and y2 are not included.
+     */
+    public static void drawFlatButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        drawBeveledBox(x1, y1, x2, y2, bright, dark, average);
+    }
+
+    /**
+     * Draw a button box. x2 and y2 are not included.
+     */
+    public static void drawFlatButtonBoxGradient(int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
+        drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
+        drawHorizontalLine(x1, y1, x2-1, bright);
+        drawVerticalLine(x1, y1, y2-1, bright);
+        drawVerticalLine(x2-1, y1, y2-1, dark);
+        drawHorizontalLine(x1, y2 - 1, x2, dark);
+    }
+
     /**
      * Draw a beveled box. x2 and y2 are not included.
      */
@@ -220,10 +330,10 @@ public class RenderHelper {
         if (fillcolor != -1) {
             Gui.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
         }
-        Gui.drawRect(x1, y1, x2-1, y1+1, topleftcolor);
-        Gui.drawRect(x1, y1, x1+1, y2-1, topleftcolor);
-        Gui.drawRect(x2-1, y1, x2, y2-1, botrightcolor);
-        Gui.drawRect(x1, y2-1, x2, y2, botrightcolor);
+        drawHorizontalLine(x1, y1, x2-1, topleftcolor);
+        drawVerticalLine(x1, y1, y2-1, topleftcolor);
+        drawVerticalLine(x2-1, y1, y2-1, botrightcolor);
+        drawHorizontalLine(x1, y2-1, x2, botrightcolor);
     }
 
     /**

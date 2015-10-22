@@ -1,5 +1,7 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.TextEvent;
 import net.minecraft.client.Minecraft;
@@ -120,17 +122,22 @@ public class TextField extends AbstractWidget<TextField> {
 
         ensureVisible();
 
-        int col = 0xff000000;
+        int col = StyleConfig.colorTextFieldFiller;;
         if (window.getTextFocus() == this) {
-            col = 0xff444444;
+            col = StyleConfig.colorTextFieldFocusedFiller;
         }
-        Gui.drawRect(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, col);
 
-        mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width-10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xffffffff);
+        RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
+
+        if (isEnabled()) {
+            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff000000);
+        } else {
+            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xffa0a0a0);
+        }
 
         if (window.getTextFocus() == this) {
             int w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
-            Gui.drawRect(xx+5+w, yy, xx+5+w+2, yy + bounds.height - 1, 0xffffffff);
+            Gui.drawRect(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }
 

@@ -7,19 +7,16 @@ import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.gui.widgets.WidgetList;
 import mcjty.lib.network.PacketSetGuiStyle;
+import mcjty.lib.preferences.PlayerPreferencesProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GuiSideWindow {
     protected GuiStyle style;
-    private final List<WidgetList> styledLists = new ArrayList<WidgetList>();
 
     protected Window sideWindow;
     private Button guiButton;
@@ -36,7 +33,7 @@ public class GuiSideWindow {
     }
 
     public void initGui(final ModBase modBase, final SimpleNetworkWrapper network, final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
-        style = modBase.getGuiStyle(mc.thePlayer);
+        style = PlayerPreferencesProperties.getProperties(mc.thePlayer).getPreferencesProperties().getStyle();
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
                 setTooltips("Open manual").
@@ -50,7 +47,7 @@ public class GuiSideWindow {
                 addButtonEvent(new ButtonEvent() {
                     @Override
                     public void buttonClicked(Widget parent) {
-                        changeStyle(modBase, network);
+                        changeStyle(network);
                     }
                 });
         setStyleTooltip();
@@ -70,34 +67,15 @@ public class GuiSideWindow {
         guiButton.setTooltips("Gui style:", style.getStyle());
     }
 
-    private void changeStyle(ModBase modBase, SimpleNetworkWrapper network) {
+    private void changeStyle(SimpleNetworkWrapper network) {
         int next = style.ordinal() + 1;
         if (next >= GuiStyle.values().length) {
             next = 0;
         }
         style = GuiStyle.values()[next];
-        network.sendToServer(new PacketSetGuiStyle(modBase, style.getStyle()));
+        network.sendToServer(new PacketSetGuiStyle(style.getStyle()));
 
         setStyleTooltip();
-        for (WidgetList list : styledLists) {
-            list.setFilledRectThickness(0);
-            list.setFilledBackground(-1);
-            updateStyle(list);
-        }
-    }
-
-    private void updateStyle(WidgetList list) {
-        if (style == GuiStyle.STYLE_BEVEL) {
-            list.setFilledRectThickness(1);
-        } else {
-            list.setFilledBackground(GuiConfig.itemListBackground);
-        }
-    }
-
-
-    public void register(WidgetList list) {
-        updateStyle(list);
-        styledLists.add(list);
     }
 
     public Window getWindow() {

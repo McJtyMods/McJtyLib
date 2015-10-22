@@ -5,7 +5,6 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.gui.GuiSideWindow;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.widgets.WidgetList;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketServerCommand;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -38,12 +37,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     public void initGui() {
         super.initGui();
         sideWindow.initGui(modBase, network, mc, this, guiLeft, guiTop, xSize, ySize);
-    }
-
-    protected WidgetList createStyledList() {
-        WidgetList list = new WidgetList(mc, this);
-        sideWindow.register(list);
-        return list;
     }
 
     @Override

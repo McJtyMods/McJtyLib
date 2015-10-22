@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
@@ -28,6 +29,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     public WidgetList(Minecraft mc, Gui gui) {
         super(mc, gui);
+        setFilledRectThickness(-1);
+        setFilledBackground(StyleConfig.colorListBackground);
     }
 
     public int getRowheight() {
@@ -113,12 +116,15 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             boolean hilighted = hilightedRows.contains(i);
+            if (top + rh-1 < bounds.height-3) {
+                RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh - 1, xx + bounds.width - 7, StyleConfig.colorListSeparatorLine);
+            }
             if (i == selected && hilighted) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top, xx + bounds.width - 4, yy + top + rh, 0xff888844, 0xff666622);
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListSelectedHighlightedGradient1, StyleConfig.colorListSelectedHighlightedGradient2);
             } else if (i == selected) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top, xx + bounds.width - 4, yy + top + rh, 0xff666666, 0xff444444);
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListSelectedGradient1, StyleConfig.colorListSelectedGradient2);        // 0xff515151
             } else if (hilighted) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top, xx + bounds.width - 4, yy + top + rh, 0xffbbbb00, 0xff999900);
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListHighlightedGradient1, StyleConfig.colorListHighlightedGradient2);
             }
             if (isEnabledAndVisible()) {
                 child.draw(window, xx, yy);
@@ -211,6 +217,9 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     @Override
     public int getCountSelected() {
+        if (bounds == null) {
+            return 0;
+        }
         if (rowheight != -1) {
             return bounds.height / rowheight;
         } else {

@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
@@ -7,9 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
 public class Label<P extends Label> extends AbstractWidget<P> {
+
     private String text;
-    private int color = 0xFF000000;
-    private int disabledColor = 0xFF555555;
+    private int color = StyleConfig.colorTextNormal;
+    private int disabledColor = StyleConfig.colorTextDisabled;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.ALIGN_CENTER;
     private VerticalAlignment verticalAlignment = VerticalAlignment.ALIGN_CENTER;
     private boolean dynamic = false;        // The size of this label is dynamic and not based on the contents
@@ -98,13 +100,17 @@ public class Label<P extends Label> extends AbstractWidget<P> {
 
     @Override
     public void draw(Window window, int x, int y) {
+        drawOffset(window, x, y, 0, 0);
+    }
+
+    public void drawOffset(Window window, int x, int y, int offsetx, int offsety) {
         if (!visible) {
             return;
         }
         super.draw(window, x, y);
 
-        int dx = calculateHorizontalOffset();
-        int dy = calculateVerticalOffset();
+        int dx = calculateHorizontalOffset() + offsetx;
+        int dy = calculateVerticalOffset() + offsety;
 
         int col = color;
         if (!isEnabled()) {

@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
@@ -8,6 +9,8 @@ import net.minecraft.client.gui.Gui;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static mcjty.lib.base.StyleConfig.*;
 
 public class ToggleButton extends Label<ToggleButton> {
     private List<ButtonEvent> buttonEvents = null;
@@ -25,6 +28,18 @@ public class ToggleButton extends Label<ToggleButton> {
     public ToggleButton setPressed(boolean pressed) {
         this.pressed = pressed;
         return this;
+    }
+
+    @Override
+    public int getDesiredWidth() {
+        int w = desiredWidth;
+        if (isDynamic()) {
+            return w;
+        }
+        if (w == -1) {
+            w = mc.fontRenderer.getStringWidth(getText())+6 + (checkMarker ? 9 : 0);
+        }
+        return w;
     }
 
     public boolean isCheckMarker() {
@@ -46,18 +61,28 @@ public class ToggleButton extends Label<ToggleButton> {
 
         if (isEnabled()) {
             if (pressed) {
-                RenderHelper.drawBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff666666, 0xff333333, 0xffeeeeee);
+                drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
                 if (checkMarker) {
-                    RenderHelper.drawHorizontalGradientRect(xx - 5, yy + 2, xx - 1, yy + bounds.height - 3, 0xffff0000, 0xffff0000);
+                    RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-4, xx+10, yy+bounds.height/2+4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
+                    mc.fontRenderer.drawString("v", xx+3, yy+bounds.height/2-4, StyleConfig.colorToggleTextNormal);
                 }
             } else {
-                RenderHelper.drawBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffeeeeee, 0xff333333, 0xff666666);
+                drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                if (checkMarker) {
+                    RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-3, xx+9, yy+bounds.height/2+4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
+                }
             }
         } else {
-            RenderHelper.drawBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff888888, 0xff555555, 0xff666666);
+            drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+            if (checkMarker) {
+                RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-4, xx+10, yy+bounds.height/2+4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
+                if (pressed) {
+                    mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);
+                }
+            }
         }
 
-        super.draw(window, x, y);
+        super.drawOffset(window, x, y, checkMarker ? 6 : 0, 1);
     }
 
     @Override

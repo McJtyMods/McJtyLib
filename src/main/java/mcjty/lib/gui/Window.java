@@ -1,6 +1,7 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.preferences.PlayerPreferencesProperties;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
 
@@ -15,6 +16,7 @@ public class Window {
     private final Widget toplevel;
     private final GuiScreen gui;
     private Widget textFocus = null;
+    private GuiStyle currentStyle;
 
     public Window(GuiScreen gui, Widget toplevel) {
         this.gui = gui;
@@ -72,7 +74,17 @@ public class Window {
             int y = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
             toplevel.mouseWheel(dwheel, x, y);
         }
+        PlayerPreferencesProperties properties = PlayerPreferencesProperties.getProperties(gui.mc.thePlayer);
+        if (properties != null) {
+            currentStyle = properties.getPreferencesProperties().getStyle();
+        } else {
+            currentStyle = GuiStyle.STYLE_BEVEL;
+        }
         toplevel.draw(this, 0, 0);
+    }
+
+    public GuiStyle getCurrentStyle() {
+        return currentStyle;
     }
 
     public List<String> getTooltips() {
