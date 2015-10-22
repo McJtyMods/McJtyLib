@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ColorChoiceEvent;
@@ -64,12 +65,12 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
 
         if (isEnabled()) {
             drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff000000 | getCurrentColor());
-            RenderHelper.drawLeftTriangle(xx + bounds.width - 10, yy + bounds.height / 2, 0xff000000);
-            RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, 0xff000000);
+            RenderHelper.drawLeftTriangle(xx + bounds.width - 10, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleNormal);
+            RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleNormal);
         } else {
             drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
-            RenderHelper.drawLeftTriangle(xx + bounds.width - 10, yy + bounds.height / 2, 0xff888888);
-            RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, 0xff888888);
+            RenderHelper.drawLeftTriangle(xx + bounds.width - 10, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleDisabled);
+            RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleDisabled);
         }
 
         super.drawOffset(window, x, y, 0, 1);

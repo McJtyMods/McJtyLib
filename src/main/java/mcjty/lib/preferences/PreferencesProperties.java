@@ -11,7 +11,7 @@ public class PreferencesProperties {
 
     private static final int DEFAULT_BUFFX = 2;
     private static final int DEFAULT_BUFFY = 2;
-    private static final GuiStyle DEFAULT_STYLE = GuiStyle.STYLE_BEVEL;
+    private static final GuiStyle DEFAULT_STYLE = GuiStyle.STYLE_FLAT_GRADIENT;
 
     private Entity entity = null;
 

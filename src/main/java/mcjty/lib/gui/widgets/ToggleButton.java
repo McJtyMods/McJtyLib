@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
@@ -9,9 +10,7 @@ import net.minecraft.client.gui.Gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import static mcjty.lib.gui.widgets.AbstractWidget.COLOR_AVERAGE_FILLER;
-import static mcjty.lib.gui.widgets.AbstractWidget.COLOR_BRIGHT_BORDER;
-import static mcjty.lib.gui.widgets.AbstractWidget.COLOR_DARK_BORDER;
+import static mcjty.lib.base.StyleConfig.*;
 
 public class ToggleButton extends Label<ToggleButton> {
     private List<ButtonEvent> buttonEvents = null;
@@ -29,6 +28,18 @@ public class ToggleButton extends Label<ToggleButton> {
     public ToggleButton setPressed(boolean pressed) {
         this.pressed = pressed;
         return this;
+    }
+
+    @Override
+    public int getDesiredWidth() {
+        int w = desiredWidth;
+        if (isDynamic()) {
+            return w;
+        }
+        if (w == -1) {
+            w = mc.fontRenderer.getStringWidth(getText())+6 + (checkMarker ? 9 : 0);
+        }
+        return w;
     }
 
     public boolean isCheckMarker() {
@@ -52,21 +63,21 @@ public class ToggleButton extends Label<ToggleButton> {
             if (pressed) {
                 drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
                 if (checkMarker) {
-                    RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-4, xx+10, yy+bounds.height/2+4, COLOR_BRIGHT_BORDER, COLOR_DARK_BORDER, COLOR_AVERAGE_FILLER);
-                    mc.fontRenderer.drawString("v", xx+3, yy+bounds.height/2-4, Label.DEFAULT_TEXT_COLOR);
+                    RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-4, xx+10, yy+bounds.height/2+4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
+                    mc.fontRenderer.drawString("v", xx+3, yy+bounds.height/2-4, StyleConfig.colorToggleTextNormal);
                 }
             } else {
                 drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
                 if (checkMarker) {
-                    RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-3, xx+9, yy+bounds.height/2+4, COLOR_BRIGHT_BORDER, COLOR_DARK_BORDER, COLOR_AVERAGE_FILLER);
+                    RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-3, xx+9, yy+bounds.height/2+4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
                 }
             }
         } else {
             drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             if (checkMarker) {
-                RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-4, xx+10, yy+bounds.height/2+4, COLOR_BRIGHT_BORDER, COLOR_DARK_BORDER, COLOR_AVERAGE_FILLER);
+                RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-4, xx+10, yy+bounds.height/2+4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
                 if (pressed) {
-                    mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, Label.DEFAULT_DISABLED_TEXT_COLOR);
+                    mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);
                 }
             }
         }

@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import mcjty.lib.base.StyleConfig;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -254,10 +255,10 @@ public class RenderHelper {
      */
     public static void drawThickButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
         Gui.drawRect(x1+2, y1+2, x2-2, y2-2, average);
-        drawHorizontalLine(x1+1, y1, x2-1, 0xff000000);
-        drawHorizontalLine(x1+1, y2-1, x2-1, 0xff000000);
-        drawVerticalLine(x1, y1 + 1, y2 - 1, 0xff000000);
-        drawVerticalLine(x2-1, y1+1, y2-1, 0xff000000);
+        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
 
         drawHorizontalLine(x1+1, y1+1, x2-1, bright);
         drawHorizontalLine(x1+2, y1+2, x2-2, bright);
@@ -275,10 +276,10 @@ public class RenderHelper {
      */
     public static void drawThinButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
         Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
-        drawHorizontalLine(x1+1, y1, x2-1, 0xff000000);
-        drawHorizontalLine(x1+1, y2-1, x2-1, 0xff000000);
-        drawVerticalLine(x1, y1 + 1, y2 - 1, 0xff000000);
-        drawVerticalLine(x2-1, y1+1, y2-1, 0xff000000);
+        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
 
         drawHorizontalLine(x1+1, y1+1, x2-2, bright);
         drawVerticalLine(x1 + 1, y1 + 2, y2 - 3, bright);
@@ -292,10 +293,10 @@ public class RenderHelper {
      */
     public static void drawThinButtonBoxGradient(int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
         drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
-        drawHorizontalLine(x1+1, y1, x2-1, 0xff000000);
-        drawHorizontalLine(x1+1, y2-1, x2-1, 0xff000000);
-        drawVerticalLine(x1, y1 + 1, y2 - 1, 0xff000000);
-        drawVerticalLine(x2-1, y1+1, y2-1, 0xff000000);
+        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
 
         drawHorizontalLine(x1+1, y1+1, x2-2, bright);
         drawVerticalLine(x1 + 1, y1 + 2, y2 - 3, bright);

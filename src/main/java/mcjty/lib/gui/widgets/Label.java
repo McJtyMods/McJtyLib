@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
@@ -7,12 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
 public class Label<P extends Label> extends AbstractWidget<P> {
-    public static final int DEFAULT_TEXT_COLOR = 0xFF303030;
-    public static final int DEFAULT_DISABLED_TEXT_COLOR = 0xFFa0a0a0;
 
     private String text;
-    private int color = DEFAULT_TEXT_COLOR;
-    private int disabledColor = DEFAULT_DISABLED_TEXT_COLOR;
+    private int color = StyleConfig.colorTextNormal;
+    private int disabledColor = StyleConfig.colorTextDisabled;
     private HorizontalAlignment horizontalAlignment = HorizontalAlignment.ALIGN_CENTER;
     private VerticalAlignment verticalAlignment = VerticalAlignment.ALIGN_CENTER;
     private boolean dynamic = false;        // The size of this label is dynamic and not based on the contents

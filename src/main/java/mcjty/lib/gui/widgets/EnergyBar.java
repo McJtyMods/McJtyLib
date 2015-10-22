@@ -1,6 +1,7 @@
 package mcjty.lib.gui.widgets;
 
 import cofh.api.energy.IEnergyHandler;
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
@@ -13,9 +14,10 @@ import java.util.List;
 public class EnergyBar extends AbstractWidget<EnergyBar> {
     private int value;
     private int maxValue;
-    private int color = 0xFF000000;
-    private int leftColor = 0xFFFF0000;
-    private int rightColor = 0xFF550000;
+    private int energyOnColor = StyleConfig.colorEnergyBarHighEnergy;
+    private int energyOffColor = StyleConfig.colorEnergyBarLowEnergy;
+    private int spacerColor = StyleConfig.colorEnergyBarSpacer;
+    private int textColor = StyleConfig.colorEnergyBarText;
     private boolean horizontal = false;
     private IEnergyHandler handler = null;
     private boolean showText = true;
@@ -116,30 +118,39 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return this;
     }
 
-    public int getColor() {
-        return color;
+    public int getEnergyOnColor() {
+        return energyOnColor;
     }
 
-    public EnergyBar setColor(int color) {
-        this.color = color;
+    public EnergyBar setEnergyOnColor(int energyOnColor) {
+        this.energyOnColor = energyOnColor;
         return this;
     }
 
-    public int getColor1() {
-        return leftColor;
+    public int getEnergyOffColor() {
+        return energyOffColor;
     }
 
-    public EnergyBar setColor1(int leftColor) {
-        this.leftColor = leftColor;
+    public EnergyBar setEnergyOffColor(int leftColor) {
+        this.energyOffColor = leftColor;
         return this;
     }
 
-    public int getColor2() {
-        return rightColor;
+    public int getSpacerColor() {
+        return spacerColor;
     }
 
-    public EnergyBar setColor2(int rightColor) {
-        this.rightColor = rightColor;
+    public EnergyBar setSpacerColor(int rightColor) {
+        this.spacerColor = rightColor;
+        return this;
+    }
+
+    public int getTextColor() {
+        return textColor;
+    }
+
+    public EnergyBar setTextColor(int textColor) {
+        this.textColor = textColor;
         return this;
     }
 
@@ -152,7 +163,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
 
         int bx = x + bounds.x;
         int by = y + bounds.y;
-        RenderHelper.drawThickBeveledBox(bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, 0xff2b2b2b, 0xffffffff, 0xff636363);
+        RenderHelper.drawThickBeveledBox(bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, StyleConfig.colorEnergyBarTopLeft, StyleConfig.colorEnergyBarBottomRight, 0xff636363);
 
         int currentValue = getValue();
         int maximum = getMaxValue();
@@ -182,7 +193,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             } else {
                 s = currentValue + "/" + maximum;
             }
-            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, getBounds().width), x+bounds.x, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, color);
+            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, textColor);
         }
     }
 
@@ -190,12 +201,12 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         int color;
         if (on) {
             if (cur < pos + total) {
-                color = 0xffdd0000;
+                color = energyOnColor;
             } else {
-                color = 0xff631111;
+                color = energyOffColor;
             }
         } else {
-            color = 0xff430000;
+            color = spacerColor;
         }
         return color;
     }
@@ -204,12 +215,12 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         int color;
         if (on) {
             if (cur < pos + total) {
-                color = 0xffdd0000;
+                color = energyOnColor;
             } else {
-                color = 0xff631111;
+                color = energyOffColor;
             }
         } else {
-            color = 0xff430000;
+            color = spacerColor;
         }
         return color;
     }

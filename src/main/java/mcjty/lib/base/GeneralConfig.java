@@ -30,7 +30,9 @@ public class GeneralConfig {
         try {
             mainConfig.load();
             mainConfig.addCustomCategoryComment(CATEGORY_GENERAL, "General settings for all mods using mcjtylib");
+            mainConfig.addCustomCategoryComment(StyleConfig.CATEGORY_STYLE, "Style settings for all mods using mcjtylib");
             init(mainConfig);
+            StyleConfig.init(mainConfig);
         } catch (Exception e1) {
             FMLLog.log(Level.ERROR, e1, "Problem loading config file: mcjtylib.cfg!");
         } finally {

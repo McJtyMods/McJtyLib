@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
@@ -29,7 +30,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     public WidgetList(Minecraft mc, Gui gui) {
         super(mc, gui);
         setFilledRectThickness(-1);
-        setFilledBackground(0xff8b8b8b);
+        setFilledBackground(StyleConfig.colorListBackground);
     }
 
     public int getRowheight() {
@@ -116,14 +117,14 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             boolean hilighted = hilightedRows.contains(i);
             if (top + rh-1 < bounds.height-3) {
-                RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh - 1, xx + bounds.width - 7, 0xff5c5c5c);
+                RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh - 1, xx + bounds.width - 7, StyleConfig.colorListSeparatorLine);
             }
             if (i == selected && hilighted) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, 0xffbbbb00, 0xff999900);
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListSelectedHighlightedGradient1, StyleConfig.colorListSelectedHighlightedGradient2);
             } else if (i == selected) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, 0xff616161, 0xff414141);        // 0xff515151
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListSelectedGradient1, StyleConfig.colorListSelectedGradient2);        // 0xff515151
             } else if (hilighted) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, 0xff717120, 0xff515110);
+                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListHighlightedGradient1, StyleConfig.colorListHighlightedGradient2);
             }
             if (isEnabledAndVisible()) {
                 child.draw(window, xx, yy);

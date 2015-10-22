@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.TextEvent;
@@ -121,12 +122,12 @@ public class TextField extends AbstractWidget<TextField> {
 
         ensureVisible();
 
-        int col = AbstractWidget.COLOR_AVERAGE_FILLER;;
+        int col = StyleConfig.colorTextFieldFiller;;
         if (window.getTextFocus() == this) {
-            col = AbstractWidget.COLOR_BRIGHT_BORDER;
+            col = StyleConfig.colorTextFieldFocusedFiller;
         }
 
-        RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, 0xff2b2b2b, 0xffffffff, col);
+        RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
 
         if (isEnabled()) {
             mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff000000);
@@ -136,7 +137,7 @@ public class TextField extends AbstractWidget<TextField> {
 
         if (window.getTextFocus() == this) {
             int w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
-            Gui.drawRect(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, 0xff000000);
+            Gui.drawRect(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }
 
