@@ -5,7 +5,9 @@ import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
 
 public class PacketHandler {
-    private static int ID = 0;
+
+    /* Make sure this number is higher than the amount of packets registered by default*/
+    private static int ID = 12;
 
     public static int nextID() {
         return ID++;
@@ -13,17 +15,26 @@ public class PacketHandler {
 
     public static SimpleNetworkWrapper registerMessages(String channelName) {
         SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
+        registerMessages(network);
+        return network;
+    }
+
+    public static int registerMessages(SimpleNetworkWrapper networkWrapper){
+        return registerMessages(networkWrapper, 0);
+    }
+
+    public static int registerMessages(SimpleNetworkWrapper networkWrapper, int startIndex){
 
         // Server side
-        network.registerMessage(PacketSetGuiStyle.class, PacketSetGuiStyle.class, nextID(), Side.SERVER);
-        network.registerMessage(PacketServerCommand.class, PacketServerCommand.class, nextID(), Side.SERVER);
-        network.registerMessage(PacketRequestIntegerFromServer.class, PacketRequestIntegerFromServer.class, nextID(), Side.SERVER);
-        network.registerMessage(PacketUpdateNBTItem.class, PacketUpdateNBTItem.class, nextID(), Side.SERVER);
+        networkWrapper.registerMessage(PacketSetGuiStyle.class, PacketSetGuiStyle.class, startIndex++, Side.SERVER);
+        networkWrapper.registerMessage(PacketServerCommand.class, PacketServerCommand.class, startIndex++, Side.SERVER);
+        networkWrapper.registerMessage(PacketRequestIntegerFromServer.class, PacketRequestIntegerFromServer.class, startIndex++, Side.SERVER);
+        networkWrapper.registerMessage(PacketUpdateNBTItem.class, PacketUpdateNBTItem.class, startIndex++, Side.SERVER);
 
         // Client side
-        network.registerMessage(PacketIntegerFromServer.class, PacketIntegerFromServer.class, nextID(), Side.CLIENT);
-        network.registerMessage(PacketSendPreferencesToClientHandler.class, PacketSendPreferencesToClient.class, nextID(), Side.CLIENT);
+        networkWrapper.registerMessage(PacketIntegerFromServer.class, PacketIntegerFromServer.class, startIndex++, Side.CLIENT);
+        networkWrapper.registerMessage(PacketSendPreferencesToClientHandler.class, PacketSendPreferencesToClient.class, startIndex++, Side.CLIENT);
 
-        return network;
+        return startIndex;
     }
 }
