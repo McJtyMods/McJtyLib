@@ -16,6 +16,9 @@ public class StyleConfig {
     public static int colorSliderKnobDraggingBottomRight = 0xffbcc5ff;
     public static int colorSliderKnobDraggingFiller = 0xff7f89bf;
     public static int colorSliderKnobMarkerLine = 0xff4e4e4e;
+    public static int colorSliderKnobHoveringTopLeft = 0xffa5aac5;
+    public static int colorSliderKnobHoveringBottomRight = 0xff777c99;
+    public static int colorSliderKnobHoveringFiller = 0xff858aa5;
 
     public static int colorTextNormal = 0xFF303030;
     public static int colorTextInListNormal = 0xFF151515;
@@ -23,6 +26,7 @@ public class StyleConfig {
 
     public static int colorTextFieldFiller = 0xffc6c6c6;
     public static int colorTextFieldFocusedFiller = 0xffeeeeee;
+    public static int colorTextFieldHoveringFiller = 0xffdadada;
     public static int colorTextFieldCursor = 0xff000000;
     public static int colorTextFieldTopLeft = 0xff2b2b2b;
     public static int colorTextFieldBottomRight = 0xffffffff;
@@ -47,11 +51,11 @@ public class StyleConfig {
     public static int colorBackgroundBevelDark = 0xff2b2b2b;
     public static int colorBackgroundFiller = 0xffc6c6c6;
 
-    public static int colorToggleNormalBorderBottomRight = 0xff777777;
     public static int colorToggleNormalBorderTopLeft = 0xffeeeeee;
+    public static int colorToggleNormalBorderBottomRight = 0xff777777;
     public static int colorToggleNormalFiller = 0xffc6c6c6;
-    public static int colorToggleDisabledBorderBottomRight = 0xff777777;
     public static int colorToggleDisabledBorderTopLeft = 0xffeeeeee;
+    public static int colorToggleDisabledBorderBottomRight = 0xff777777;
     public static int colorToggleDisabledFiller = 0xffc6c6c6;
     public static int colorToggleTextNormal = 0xFF303030;
     public static int colorToggleTextDisabled = 0xFFa0a0a0;
@@ -61,23 +65,29 @@ public class StyleConfig {
     public static int colorCycleButtonTriangleNormal = 0xff000000;
     public static int colorCycleButtonTriangleDisabled = 0xff888888;
 
-    public static int colorButtonBorderBottomRight = 0xff777777;
     public static int colorButtonBorderTopLeft = 0xffeeeeee;
+    public static int colorButtonBorderBottomRight = 0xff777777;
     public static int colorButtonFiller = 0xffc6c6c6;
     public static int colorButtonFillerGradient1 = 0xffb1b1b1;
     public static int colorButtonFillerGradient2 = 0xffe1e1e1;
 
-    public static int colorButtonDisabledBorderBottomRight = 0xff777777;
     public static int colorButtonDisabledBorderTopLeft = 0xffeeeeee;
+    public static int colorButtonDisabledBorderBottomRight = 0xff777777;
     public static int colorButtonDisabledFiller = 0xffc6c6c6;
     public static int colorButtonDisabledFillerGradient1 = 0xffb1b1b1;
     public static int colorButtonDisabledFillerGradient2 = 0xffe1e1e1;
 
     public static int colorButtonSelectedBorderTopLeft = 0xff5c669d;
+    public static int colorButtonSelectedBorderBottomRight = 0xffbcc5ff;
     public static int colorButtonSelectedFiller = 0xff7f89bf;
     public static int colorButtonSelectedFillerGradient1 = 0xff6a74aa;
     public static int colorButtonSelectedFillerGradient2 = 0xff949ed4;
-    public static int colorButtonSelectedBorderBottomRight = 0xffbcc5ff;
+
+    public static int colorButtonHoveringBorderTopLeft = 0xffa5aac5;
+    public static int colorButtonHoveringBorderBottomRight = 0xff999ebb;
+    public static int colorButtonHoveringFiller = 0xffa2a7c2;
+    public static int colorButtonHoveringFillerGradient1 = 0xff8d92ad;
+    public static int colorButtonHoveringFillerGradient2 = 0xffbabfda;
 
     public static void init(Configuration cfg) {
 
@@ -90,6 +100,9 @@ public class StyleConfig {
         colorSliderKnobDraggingTopLeft = getSetting(cfg, "colorSliderKnobDraggingTopLeft", colorSliderKnobDraggingTopLeft, "Color: slider knob top left border while dragging");
         colorSliderKnobDraggingBottomRight = getSetting(cfg, "colorSliderKnobDraggingBottomRight", colorSliderKnobDraggingBottomRight, "Color: slider knob bottom right border while dragging");
         colorSliderKnobDraggingFiller = getSetting(cfg, "colorSliderKnobDraggingFiller", colorSliderKnobDraggingFiller, "Color: slider knob background while dragging");
+        colorSliderKnobHoveringTopLeft = getSetting(cfg, "colorSliderKnobHoveringTopLeft", colorSliderKnobHoveringTopLeft, "Color: slider knob top left border while hovering");
+        colorSliderKnobHoveringBottomRight = getSetting(cfg, "colorSliderKnobHoveringBottomRight", colorSliderKnobHoveringBottomRight, "Color: slider knob bottom right border while hovering");
+        colorSliderKnobHoveringFiller = getSetting(cfg, "colorSliderKnobHoveringFiller", colorSliderKnobHoveringFiller, "Color: slider knob background while hovering");
         colorSliderKnobMarkerLine = getSetting(cfg, "colorSliderKnobMarkerLine", colorSliderKnobMarkerLine, "Color: slider knob little marker lines");
 
         colorTextNormal = getSetting(cfg, "colorTextNormal", colorTextNormal, "Color: text normal");
@@ -100,6 +113,7 @@ public class StyleConfig {
         colorTextFieldBottomRight = getSetting(cfg, "colorTextFieldBottomRight", colorTextFieldBottomRight, "Color: textfield bottom right border");
         colorTextFieldFiller = getSetting(cfg, "colorTextFieldFiller", colorTextFieldFiller, "Color: textfield background");
         colorTextFieldFocusedFiller = getSetting(cfg, "colorTextFieldFocusedFiller", colorTextFieldFocusedFiller, "Color: textfield backbground while focused");
+        colorTextFieldHoveringFiller = getSetting(cfg, "colorTextFieldHoveringFiller", colorTextFieldHoveringFiller, "Color: textfield backbground while hovering");
         colorTextFieldCursor = getSetting(cfg, "colorTextFieldCursor", colorTextFieldCursor, "Color: textfield cursor");
 
         colorEnergyBarTopLeft = getSetting(cfg, "colorEnergyBarTopLeft", colorEnergyBarTopLeft, "Color: energy bar top left border");
@@ -148,10 +162,16 @@ public class StyleConfig {
         colorButtonDisabledFillerGradient2 = getSetting(cfg, "colorButtonDisabledFillerGradient2", colorButtonDisabledFillerGradient2, "Color: disabled button background gradient");
 
         colorButtonSelectedBorderTopLeft = getSetting(cfg, "colorButtonSelectedBorderTopLeft", colorButtonSelectedBorderTopLeft, "Color: selected button top left border");
-        colorButtonSelectedBorderBottomRight = getSetting(cfg, "colorButtonSelectedBorderBottomRight", colorButtonSelectedBorderBottomRight, "Color:selected  button bottom right border");
+        colorButtonSelectedBorderBottomRight = getSetting(cfg, "colorButtonSelectedBorderBottomRight", colorButtonSelectedBorderBottomRight, "Color: selected button bottom right border");
         colorButtonSelectedFiller = getSetting(cfg, "colorButtonSelectedFiller", colorButtonSelectedFiller, "Color: selected button background");
         colorButtonSelectedFillerGradient1 = getSetting(cfg, "colorButtonSelectedFillerGradient1", colorButtonSelectedFillerGradient1, "Color: selected button background gradient");
         colorButtonSelectedFillerGradient2 = getSetting(cfg, "colorButtonSelectedFillerGradient2", colorButtonSelectedFillerGradient2, "Color: selected button background gradient");
+
+        colorButtonHoveringBorderTopLeft = getSetting(cfg, "colorButtonHoveringBorderTopLeft", colorButtonHoveringBorderTopLeft, "Color: hovering button top left border");
+        colorButtonHoveringBorderBottomRight = getSetting(cfg, "colorButtonHoveringBorderBottomRight", colorButtonHoveringBorderBottomRight, "Color: hovering button bottom right border");
+        colorButtonHoveringFiller = getSetting(cfg, "colorButtonHoveringFiller", colorButtonHoveringFiller, "Color: hovering button background");
+        colorButtonHoveringFillerGradient1 = getSetting(cfg, "colorButtonHoveringFillerGradient1", colorButtonHoveringFillerGradient1, "Color: hovering button background gradient");
+        colorButtonHoveringFillerGradient2 = getSetting(cfg, "colorButtonHoveringFillerGradient2", colorButtonHoveringFillerGradient2, "Color: hovering button background gradient");
     }
 
     private static int getSetting(Configuration cfg, String settingName, int setting, String comment) {

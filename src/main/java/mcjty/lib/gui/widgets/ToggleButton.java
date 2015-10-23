@@ -62,20 +62,21 @@ public class ToggleButton extends Label<ToggleButton> {
         if (isEnabled()) {
             if (pressed) {
                 drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
-                if (checkMarker) {
-                    RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-4, xx+10, yy+bounds.height/2+4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
-                    mc.fontRenderer.drawString("v", xx+3, yy+bounds.height/2-4, StyleConfig.colorToggleTextNormal);
-                }
+            } else if (isHovering()) {
+                drawStyledBoxHovering(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             } else {
                 drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
-                if (checkMarker) {
-                    RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-3, xx+9, yy+bounds.height/2+4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
+            }
+            if (checkMarker) {
+                RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 3, xx + 9, yy + bounds.height / 2 + 4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
+                if (pressed) {
+                    mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal);
                 }
             }
         } else {
             drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             if (checkMarker) {
-                RenderHelper.drawBeveledBox(xx+2, yy+bounds.height/2-4, xx+10, yy+bounds.height/2+4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
+                RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 3, xx + 9, yy + bounds.height / 2 + 4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
                 if (pressed) {
                     mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);
                 }

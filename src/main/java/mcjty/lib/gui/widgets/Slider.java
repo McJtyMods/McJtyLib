@@ -70,6 +70,8 @@ public class Slider extends AbstractWidget<Slider> {
             int first = calculateKnobOffset(divider, size, bounds.width);
             if (dragging) {
                 RenderHelper.drawBeveledBox(xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobDraggingTopLeft, StyleConfig.colorSliderKnobDraggingBottomRight, StyleConfig.colorSliderKnobDraggingFiller);
+            } else if (isHovering()) {
+                RenderHelper.drawBeveledBox(xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobHoveringTopLeft, StyleConfig.colorSliderKnobHoveringBottomRight, StyleConfig.colorSliderKnobHoveringFiller);
             } else {
                 RenderHelper.drawBeveledBox(xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobTopLeft, StyleConfig.colorSliderKnobBottomRight, StyleConfig.colorSliderKnobFiller);
             }
@@ -85,6 +87,8 @@ public class Slider extends AbstractWidget<Slider> {
             int first = calculateKnobOffset(divider, size, bounds.height);
             if (dragging) {
                 RenderHelper.drawBeveledBox(xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobDraggingTopLeft, StyleConfig.colorSliderKnobDraggingBottomRight, StyleConfig.colorSliderKnobDraggingFiller);
+            } else if (isHovering()) {
+                RenderHelper.drawBeveledBox(xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobHoveringTopLeft, StyleConfig.colorSliderKnobHoveringBottomRight, StyleConfig.colorSliderKnobHoveringFiller);
             } else {
                 RenderHelper.drawBeveledBox(xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobTopLeft, StyleConfig.colorSliderKnobBottomRight, StyleConfig.colorSliderKnobFiller);
             }

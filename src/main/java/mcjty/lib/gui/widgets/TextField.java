@@ -125,6 +125,8 @@ public class TextField extends AbstractWidget<TextField> {
         int col = StyleConfig.colorTextFieldFiller;;
         if (window.getTextFocus() == this) {
             col = StyleConfig.colorTextFieldFocusedFiller;
+        } else if (isHovering()) {
+            col = StyleConfig.colorTextFieldHoveringFiller;
         }
 
         RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);

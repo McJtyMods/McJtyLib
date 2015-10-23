@@ -27,6 +27,8 @@ public class Button extends Label<Button> {
         if (isEnabledAndVisible()) {
             if (pressed) {
                 drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+            } else if (isHovering()) {
+                drawStyledBoxHovering(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             } else {
                 drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             }

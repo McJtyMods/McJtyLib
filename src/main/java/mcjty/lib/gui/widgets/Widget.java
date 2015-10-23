@@ -66,6 +66,10 @@ public interface Widget<P extends Widget> {
 
     boolean isEnabledAndVisible();
 
+    P setHovering(boolean hovering);
+
+    boolean isHovering();
+
     /**
      * Make this widget visible/invisible.
      */

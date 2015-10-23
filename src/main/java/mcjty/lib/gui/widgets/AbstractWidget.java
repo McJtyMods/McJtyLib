@@ -22,6 +22,7 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     protected Gui gui;
     private LayoutHint layoutHint = null;
     private boolean enabled = true;
+    private boolean hovering = false;
     protected boolean visible = true;
     protected List<String> tooltips = null;
 
@@ -76,6 +77,17 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     @Override
     public List<String> getTooltips() {
         return tooltips;
+    }
+
+    @Override
+    public boolean isHovering() {
+        return hovering;
+    }
+
+    @Override
+    public P setHovering(boolean hovering) {
+        this.hovering = hovering;
+        return (P) this;
     }
 
     @Override
@@ -253,6 +265,11 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     protected void drawStyledBoxSelected(Window window, int x1, int y1, int x2, int y2) {
         drawStyledBox(window, x1, y1, x2, y2,
                 StyleConfig.colorButtonSelectedBorderTopLeft, StyleConfig.colorButtonSelectedFiller, StyleConfig.colorButtonSelectedFillerGradient1, StyleConfig.colorButtonSelectedFillerGradient2, StyleConfig.colorButtonSelectedBorderBottomRight);
+    }
+
+    protected void drawStyledBoxHovering(Window window, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, x1, y1, x2, y2,
+                StyleConfig.colorButtonHoveringBorderTopLeft, StyleConfig.colorButtonHoveringFiller, StyleConfig.colorButtonHoveringFillerGradient1, StyleConfig.colorButtonHoveringFillerGradient2, StyleConfig.colorButtonHoveringBorderBottomRight);
     }
 
     protected void drawStyledBoxDisabled(Window window, int x1, int y1, int x2, int y2) {

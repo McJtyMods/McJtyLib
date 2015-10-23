@@ -16,6 +16,7 @@ public class Window {
     private final Widget toplevel;
     private final GuiScreen gui;
     private Widget textFocus = null;
+    private Widget hover = null;
     private GuiStyle currentStyle;
 
     public Window(GuiScreen gui, Widget toplevel) {
@@ -35,11 +36,9 @@ public class Window {
     }
 
     public void handleMouseInput() {
-        int x = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
-        int y = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
         int k = Mouse.getEventButton();
         if (k == -1) {
-            mouseMovedOrUp(x, y, k);
+            mouseMovedOrUp(getRelativeX(), getRelativeY(), k);
         }
     }
 
@@ -68,17 +67,26 @@ public class Window {
     }
 
     public void draw() {
+        int x = getRelativeX();
+        int y = getRelativeY();
+
+        if (hover != null) {
+            hover.setHovering(false);
+        }
+        hover = toplevel.getWidgetAtPosition(x, y);
+        if (hover != null) {
+            hover.setHovering(true);
+        }
+
         int dwheel = Mouse.getDWheel();
         if (dwheel != 0) {
-            int x = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
-            int y = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
             toplevel.mouseWheel(dwheel, x, y);
         }
         PlayerPreferencesProperties properties = PlayerPreferencesProperties.getProperties(gui.mc.thePlayer);
         if (properties != null) {
             currentStyle = properties.getPreferencesProperties().getStyle();
         } else {
-            currentStyle = GuiStyle.STYLE_BEVEL;
+            currentStyle = GuiStyle.STYLE_FLAT_GRADIENT;
         }
         toplevel.draw(this, 0, 0);
     }
@@ -88,8 +96,8 @@ public class Window {
     }
 
     public List<String> getTooltips() {
-        int x = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
-        int y = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
+        int x = getRelativeX();
+        int y = getRelativeY();
         if (toplevel.in(x, y) && toplevel.isVisible()) {
             Widget w = toplevel.getWidgetAtPosition(x, y);
             List<String> tooltips = w.getTooltips();
@@ -98,5 +106,13 @@ public class Window {
             }
         }
         return null;
+    }
+
+    private int getRelativeX() {
+        return Mouse.getEventX() * gui.width / gui.mc.displayWidth;
+    }
+
+    private int getRelativeY() {
+        return gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
     }
 }
