@@ -37,7 +37,7 @@ public class ToggleButton extends Label<ToggleButton> {
             return w;
         }
         if (w == -1) {
-            w = mc.fontRenderer.getStringWidth(getText())+6 + (checkMarker ? 9 : 0);
+            w = mc.fontRenderer.getStringWidth(getText())+6 + (checkMarker ? 10 : 0);
         }
         return w;
     }
@@ -68,7 +68,7 @@ public class ToggleButton extends Label<ToggleButton> {
                 drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             }
             if (checkMarker) {
-                RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 3, xx + 9, yy + bounds.height / 2 + 4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
+                RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
                 if (pressed) {
                     mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal);
                 }
@@ -76,7 +76,7 @@ public class ToggleButton extends Label<ToggleButton> {
         } else {
             drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             if (checkMarker) {
-                RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 3, xx + 9, yy + bounds.height / 2 + 4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
+                RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
                 if (pressed) {
                     mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);
                 }

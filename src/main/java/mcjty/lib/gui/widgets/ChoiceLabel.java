@@ -79,7 +79,7 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
             RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleDisabled);
         }
 
-        super.drawOffset(window, x, y, 0, 1);
+        super.drawOffset(window, x, y, -3, 1);
     }
 
     @Override

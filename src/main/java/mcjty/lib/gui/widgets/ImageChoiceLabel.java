@@ -17,12 +17,32 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     private List<ResourceLocation> imageList = new ArrayList<ResourceLocation>();
     private List<Integer> uList = new ArrayList<Integer>();
     private List<Integer> vList = new ArrayList<Integer>();
+    private boolean withBorder = false;
+    private int highlightedChoice = -1;     // If this choice is selected we 'highlight' it (only in combination with withBorder=true)
 
     private int currentChoice = -1;
     private List<ChoiceEvent> choiceEvents = null;
 
     public ImageChoiceLabel(Minecraft mc, Gui gui) {
         super(mc, gui);
+    }
+
+    public boolean isWithBorder() {
+        return withBorder;
+    }
+
+    public ImageChoiceLabel setWithBorder(boolean withBorder) {
+        this.withBorder = withBorder;
+        return this;
+    }
+
+    public int getHighlightedChoice() {
+        return highlightedChoice;
+    }
+
+    public ImageChoiceLabel setHighlightedChoice(int highlightedChoice) {
+        this.highlightedChoice = highlightedChoice;
+        return this;
     }
 
     @Override
@@ -129,4 +149,25 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
         }
     }
 
+    @Override
+    public void draw(Window window, int x, int y) {
+        if (withBorder) {
+            int xx = x + bounds.x;
+            int yy = y + bounds.y;
+
+            if (isEnabled()) {
+                if (currentChoice == highlightedChoice) {
+                    drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                } else if (isHovering()) {
+                    drawStyledBoxHovering(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                } else {
+                    drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                }
+            } else {
+                drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+            }
+        }
+
+        super.draw(window, x, y);
+    }
 }
