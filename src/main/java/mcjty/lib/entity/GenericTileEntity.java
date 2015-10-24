@@ -126,6 +126,11 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return ((float) infused) / GeneralConfig.maxInfuse;
     }
 
+    public boolean canPlayerAccess(EntityPlayer player) {
+        return !isInvalid() && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64D;
+    }
+
+
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
         super.readFromNBT(tagCompound);
