@@ -22,7 +22,6 @@ import java.util.UUID;
 public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler {
 
     private List<SyncedObject> syncedObjects = new ArrayList<SyncedObject>();
-    private Coordinate coordinate;
     private int infused = 0;
 
     private String ownerName = "";
@@ -253,9 +252,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     public Coordinate getCoordinate() {
-        if (coordinate == null) {
-            coordinate = new Coordinate(xCoord, yCoord, zCoord);
-        }
-        return coordinate;
+        return new Coordinate(xCoord, yCoord, zCoord);
     }
 }
