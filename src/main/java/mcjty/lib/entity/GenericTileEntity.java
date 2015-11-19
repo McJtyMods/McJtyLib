@@ -170,8 +170,8 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
      */
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         tagCompound.setInteger("infused", infused);
+        tagCompound.setString("owner", ownerName);
         if (ownerUUID != null) {
-            tagCompound.setString("owner", ownerName);
             tagCompound.setLong("idM", ownerUUID.getMostSignificantBits());
             tagCompound.setLong("idL", ownerUUID.getLeastSignificantBits());
         }
