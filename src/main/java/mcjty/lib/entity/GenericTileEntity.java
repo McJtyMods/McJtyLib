@@ -144,8 +144,8 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
         infused = tagCompound.getInteger("infused");
         ownerName = tagCompound.getString("owner");
-        if (tagCompound.hasKey("ownerM")) {
-            ownerUUID = new UUID(tagCompound.getLong("ownerM"), tagCompound.getLong("ownerL"));
+        if (tagCompound.hasKey("idM")) {
+            ownerUUID = new UUID(tagCompound.getLong("idM"), tagCompound.getLong("idL"));
         } else {
             ownerUUID = null;
         }
@@ -172,8 +172,8 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         tagCompound.setInteger("infused", infused);
         if (ownerUUID != null) {
             tagCompound.setString("owner", ownerName);
-            tagCompound.setLong("ownerM", ownerUUID.getMostSignificantBits());
-            tagCompound.setLong("ownerL", ownerUUID.getLeastSignificantBits());
+            tagCompound.setLong("idM", ownerUUID.getMostSignificantBits());
+            tagCompound.setLong("idL", ownerUUID.getLeastSignificantBits());
         }
         if (securityChannel != -1) {
             tagCompound.setInteger("secChannel", securityChannel);
@@ -189,7 +189,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
             // Already has an owner.
             return false;
         }
-        ownerUUID = player.getPersistentID();
+        ownerUUID = player.getGameProfile().getId();
         ownerName = player.getDisplayName();
         markDirty();
         worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
