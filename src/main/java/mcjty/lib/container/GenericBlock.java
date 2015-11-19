@@ -89,12 +89,17 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
                 currenttip.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
             }
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-                if (GeneralConfig.manageOwnership && genericTileEntity.getOwnerUUID() != null) {
-                    int securityChannel = genericTileEntity.getSecurityChannel();
-                    if (securityChannel == -1) {
-                        currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
-                    } else {
-                        currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
+                if (GeneralConfig.manageOwnership) {
+                    if (genericTileEntity.getOwnerName() != null && !genericTileEntity.getOwnerName().isEmpty()) {
+                        int securityChannel = genericTileEntity.getSecurityChannel();
+                        if (securityChannel == -1) {
+                            currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
+                        } else {
+                            currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
+                        }
+                        if (genericTileEntity.getOwnerUUID() == null) {
+                            currenttip.add(EnumChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                        }
                     }
                 }
             }
@@ -116,7 +121,8 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
                 int pct = infused * 100 / GeneralConfig.maxInfuse;
                 list.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
             }
-            if (GeneralConfig.manageOwnership && tagCompound.hasKey("ownerM")) {
+
+            if (GeneralConfig.manageOwnership && tagCompound.hasKey("owner")) {
                 String owner = tagCompound.getString("owner");
                 int securityChannel = -1;
                 if (tagCompound.hasKey("secChannel")) {
@@ -127,6 +133,10 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
                     list.add(EnumChatFormatting.YELLOW + "Owned by: " + owner);
                 } else {
                     list.add(EnumChatFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")");
+                }
+
+                if (!tagCompound.hasKey("idM")) {
+                    list.add(EnumChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
                 }
             }
         }
