@@ -8,10 +8,10 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -35,9 +35,9 @@ public class RenderHelper {
         GL11.glRotatef(0.0F, 1.0F, 0.0F, 0.0F);
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.rotationPitch = 0.0F;
-        GL11.glTranslatef(0.0F, entity.yOffset, 0.0F);
-        RenderManager.instance.playerViewY = 180F;
-        RenderManager.instance.renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D,
+        GL11.glTranslatef(0.0F, (float)entity.getYOffset(), 0.0F);
+        Minecraft.getMinecraft().getRenderManager().playerViewY = 180F;
+        Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D,
                 0.0F, 1.0F);
         GL11.glPopMatrix();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
@@ -63,7 +63,7 @@ public class RenderHelper {
             renderEntity((Entity) itm, x, y);
             return true;
         }
-        RenderItem itemRender = new RenderItem();
+        RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
         return renderObject(mc, itemRender, x, y, itm, highlight, 200);
     }
 
@@ -82,14 +82,14 @@ public class RenderHelper {
         if (itm instanceof ItemStack) {
             return renderItemStackWithCount(mc, itemRender, (ItemStack) itm, x, y, highlight);
         }
-        if (itm instanceof IIcon) {
-            return renderIcon(mc, itemRender, (IIcon) itm, x, y, highlight);
+        if (itm instanceof TextureAtlasSprite) {
+            return renderIcon(mc, itemRender, (TextureAtlasSprite) itm, x, y, highlight);
         }
         return renderItemStack(mc, itemRender, null, x, y, "", highlight);
     }
 
-    public static boolean renderIcon(Minecraft mc, RenderItem itemRender, IIcon itm, int xo, int yo, boolean highlight) {
-        itemRender.renderIcon(xo, yo, itm, 16, 16);
+    public static boolean renderIcon(Minecraft mc, RenderItem itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
+        //itemRender.renderIcon(xo, yo, itm, 16, 16); //TODO: Make
         return true;
     }
 
@@ -123,8 +123,8 @@ public class RenderHelper {
             short short2 = 240;
             net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
-            itemRender.renderItemAndEffectIntoGUI(mc.fontRenderer, mc.getTextureManager(), itm, x, y);
-            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, mc.getTextureManager(), itm, x, y, txt);
+            itemRender.renderItemAndEffectIntoGUI(itm, x, y);
+            itemRender.renderItemOverlayIntoGUI(mc.fontRendererObj, itm, x, y, txt);
             GL11.glPopMatrix();
             if (isRescaleNormalEnabled) {
                 GL11.glEnable(GL12.GL_RESCALE_NORMAL);
@@ -163,15 +163,15 @@ public class RenderHelper {
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GL11.glShadeModel(GL11.GL_SMOOTH);
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.setColorRGBA_F(f1, f2, f3, f);
-        tessellator.addVertex(x2, y1, zLevel);
-        tessellator.addVertex(x1, y1, zLevel);
-        tessellator.setColorRGBA_F(f5, f6, f7, f4);
-        tessellator.addVertex(x1, y2, zLevel);
-        tessellator.addVertex(x2, y2, zLevel);
-        tessellator.draw();
+        Tessellator tessellator = Tessellator.getInstance();
+        //tessellator.startDrawingQuads(); //TODO
+       // tessellator.setColorRGBA_F(f1, f2, f3, f);
+       // tessellator.addVertex(x2, y1, zLevel);
+       // tessellator.addVertex(x1, y1, zLevel);
+       // tessellator.setColorRGBA_F(f5, f6, f7, f4);
+      //  tessellator.addVertex(x1, y2, zLevel);
+      // tessellator.addVertex(x2, y2, zLevel);
+       // tessellator.draw();
         GL11.glShadeModel(GL11.GL_FLAT);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -199,14 +199,14 @@ public class RenderHelper {
         GL11.glDisable(GL11.GL_ALPHA_TEST);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GL11.glShadeModel(GL11.GL_SMOOTH);
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.setColorRGBA_F(f1, f2, f3, f);
-        tessellator.addVertex(x1, y1, zLevel);
-        tessellator.addVertex(x1, y2, zLevel);
-        tessellator.setColorRGBA_F(f5, f6, f7, f4);
-        tessellator.addVertex(x2, y2, zLevel);
-        tessellator.addVertex(x2, y1, zLevel);
+        Tessellator tessellator = Tessellator.getInstance();
+       // tessellator.startDrawingQuads(); //TODO
+     //   tessellator.setColorRGBA_F(f1, f2, f3, f);
+      //  tessellator.addVertex(x1, y1, zLevel);
+       // tessellator.addVertex(x1, y2, zLevel);
+      //  tessellator.setColorRGBA_F(f5, f6, f7, f4);
+      //  tessellator.addVertex(x2, y2, zLevel);
+     //   tessellator.addVertex(x2, y1, zLevel);
         tessellator.draw();
         GL11.glShadeModel(GL11.GL_FLAT);
         GL11.glDisable(GL11.GL_BLEND);
@@ -356,12 +356,12 @@ public class RenderHelper {
         float zLevel = 0.01f;
         float f = 0.00390625F;
         float f1 = 0.00390625F;
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV((double)(x + 0), (double)(y + height), (double)zLevel, (double)((float)(u + 0) * f), (double)((float)(v + height) * f1));
-        tessellator.addVertexWithUV((double) (x + width), (double) (y + height), (double) zLevel, (double) ((float) (u + width) * f), (double) ((float) (v + height) * f1));
-        tessellator.addVertexWithUV((double) (x + width), (double) (y + 0), (double) zLevel, (double) ((float) (u + width) * f), (double) ((float) (v + 0) * f1));
-        tessellator.addVertexWithUV((double) (x + 0), (double) (y + 0), (double) zLevel, (double) ((float) (u + 0) * f), (double) ((float) (v + 0) * f1));
+        Tessellator tessellator = Tessellator.getInstance();
+       // tessellator.startDrawingQuads(); //TODO
+      //  tessellator.addVertexWithUV((double)(x + 0), (double)(y + height), (double)zLevel, (double)((float)(u + 0) * f), (double)((float)(v + height) * f1));
+       // tessellator.addVertexWithUV((double) (x + width), (double) (y + height), (double) zLevel, (double) ((float) (u + width) * f), (double) ((float) (v + height) * f1));
+      //  tessellator.addVertexWithUV((double) (x + width), (double) (y + 0), (double) zLevel, (double) ((float) (u + width) * f), (double) ((float) (v + 0) * f1));
+      //  tessellator.addVertexWithUV((double) (x + 0), (double) (y + 0), (double) zLevel, (double) ((float) (u + 0) * f), (double) ((float) (v + 0) * f1));
         tessellator.draw();
     }
 
@@ -370,13 +370,13 @@ public class RenderHelper {
 
         rotateToPlayer();
 
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
-        tessellator.addVertexWithUV(-scale, +scale, 0, 0, 1);
-        tessellator.addVertexWithUV(+scale, +scale, 0, 1, 1);
-        tessellator.addVertexWithUV(+scale, -scale, 0, 1, 0);
-        tessellator.draw();
+        Tessellator tessellator = Tessellator.getInstance();
+      //  tessellator.startDrawingQuads(); //TODO
+      //  tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
+      //  tessellator.addVertexWithUV(-scale, +scale, 0, 0, 1);
+      //  tessellator.addVertexWithUV(+scale, +scale, 0, 1, 1);
+      // tessellator.addVertexWithUV(+scale, -scale, 0, 1, 0);
+       // tessellator.draw();
         GL11.glPopMatrix();
     }
 
@@ -389,20 +389,20 @@ public class RenderHelper {
 
         GL11.glRotatef(rot, 0, 0, 1);
 
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
-        tessellator.addVertexWithUV(-scale, +scale, 0, 0, 1);
-        tessellator.addVertexWithUV(+scale, +scale, 0, 1, 1);
-        tessellator.addVertexWithUV(+scale, -scale, 0, 1, 0);
-        tessellator.draw();
+        Tessellator tessellator = Tessellator.getInstance();
+        //tessellator.startDrawingQuads(); //TODO
+       // tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
+        //tessellator.addVertexWithUV(-scale, +scale, 0, 0, 1);
+       // tessellator.addVertexWithUV(+scale, +scale, 0, 1, 1);
+     //  tessellator.addVertexWithUV(+scale, -scale, 0, 1, 0);
+      //  tessellator.draw();
 //        GL11.glPopMatrix();
         GL11.glPopMatrix();
     }
 
     public static void rotateToPlayer() {
-        GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
+        GL11.glRotatef(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+        GL11.glRotatef(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
     }
 
     /**
@@ -425,14 +425,15 @@ public class RenderHelper {
         Vector p3 = Add(E, half);
         Vector p4 = Sub(E, half);
 
-        drawQuad(Tessellator.instance, p1, p3, p4, p2);
+        drawQuad(Tessellator.getInstance(), p1, p3, p4, p2);
     }
 
+    //TODO
     public static void drawQuad(Tessellator tessellator, Vector p1, Vector p2, Vector p3, Vector p4) {
-        tessellator.addVertexWithUV(p1.getX(), p1.getY(), p1.getZ(), 0, 0);
-        tessellator.addVertexWithUV(p2.getX(), p2.getY(), p2.getZ(), 1, 0);
-        tessellator.addVertexWithUV(p3.getX(), p3.getY(), p3.getZ(), 1, 1);
-        tessellator.addVertexWithUV(p4.getX(), p4.getY(), p4.getZ(), 0, 1);
+        //tessellator.addVertexWithUV(p1.getX(), p1.getY(), p1.getZ(), 0, 0);
+        //tessellator.addVertexWithUV(p2.getX(), p2.getY(), p2.getZ(), 1, 0);
+        //tessellator.addVertexWithUV(p3.getX(), p3.getY(), p3.getZ(), 1, 1);
+        //tessellator.addVertexWithUV(p4.getX(), p4.getY(), p4.getZ(), 0, 1);
     }
 
     public static class Vector {

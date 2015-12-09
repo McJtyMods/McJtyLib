@@ -42,7 +42,7 @@ public class Logging {
                 prevTicks = ticks;
                 getInstance().logger.log(Level.INFO, "=== Time " + ticks + " ===");
             }
-            String id = te.xCoord + "," + te.yCoord + "," + te.zCoord + ": ";
+            String id = te.getPos().getX() + "," + te.getPos().getY() + "," + te.getPos().getZ() + ": ";
             getInstance().logger.log(Level.INFO, id + message);
         }
     }

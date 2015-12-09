@@ -1,6 +1,6 @@
 package mcjty.lib.gui;
 
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.events.ButtonEvent;
 import mcjty.lib.gui.layout.PositionalLayout;

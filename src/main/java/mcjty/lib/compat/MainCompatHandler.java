@@ -1,6 +1,6 @@
 package mcjty.lib.compat;
 
-import cpw.mods.fml.common.Loader;
+import net.minecraftforge.fml.common.Loader;
 import mcjty.lib.compat.waila.WailaCompatibility;
 
 /**

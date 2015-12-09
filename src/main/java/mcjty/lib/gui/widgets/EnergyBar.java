@@ -1,12 +1,12 @@
 package mcjty.lib.gui.widgets;
 
-import cofh.api.energy.IEnergyHandler;
+import cofh.nonexistant.api.energy.IEnergyHandler;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +96,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
 
     public int getValue() {
         if (handler != null) {
-            return handler.getEnergyStored(ForgeDirection.DOWN);
+            return handler.getEnergyStored(EnumFacing.DOWN);
         }
         return value;
     }
@@ -108,7 +108,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
 
     public int getMaxValue() {
        if (handler != null) {
-           return handler.getMaxEnergyStored(ForgeDirection.DOWN);
+           return handler.getMaxEnergyStored(EnumFacing.DOWN);
        }
        return maxValue;
     }
@@ -193,7 +193,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             } else {
                 s = currentValue + "/" + maximum;
             }
-            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, textColor);
+            mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.fontRendererObj.FONT_HEIGHT)/2, textColor);
         }
     }
 

@@ -1,8 +1,9 @@
 package mcjty.lib.network;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
@@ -17,6 +18,10 @@ public class PacketServerCommand extends AbstractServerCommand implements IMessa
     public PacketServerCommand() {
     }
 
+    public PacketServerCommand(BlockPos pos, String command, Argument... arguments) {
+        super(pos, command, arguments);
+    }
+
     public PacketServerCommand(int x, int y, int z, String command, Argument... arguments) {
         super(x, y, z, command, arguments);
     }
@@ -24,7 +29,7 @@ public class PacketServerCommand extends AbstractServerCommand implements IMessa
     @Override
     public IMessage onMessage(PacketServerCommand message, MessageContext ctx) {
         EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
-        TileEntity te = playerEntity.worldObj.getTileEntity(message.x, message.y, message.z);
+        TileEntity te = playerEntity.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
         if(!(te instanceof CommandHandler)) {
             Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
             return null;

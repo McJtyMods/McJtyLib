@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Coordinate;
 
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AbstractServerCommand implements IMessage {
+
     protected int x;
     protected int y;
     protected int z;
@@ -111,6 +113,10 @@ public class AbstractServerCommand implements IMessage {
     }
 
     protected AbstractServerCommand() {
+    }
+
+    protected AbstractServerCommand(BlockPos pos, String command, Argument... arguments) {
+        this(pos.getX(), pos.getY(), pos.getZ(), command, arguments);
     }
 
     protected AbstractServerCommand(int x, int y, int z, String command, Argument... arguments) {

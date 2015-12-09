@@ -1,7 +1,7 @@
 package mcjty.lib.entity;
 
-import cofh.api.energy.IEnergyReceiver;
-import net.minecraftforge.common.util.ForgeDirection;
+import cofh.nonexistant.api.energy.IEnergyReceiver;
+import net.minecraft.util.EnumFacing;
 
 public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver {
 
@@ -18,22 +18,22 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
     }
 
     @Override
-    public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate) {
+    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
         return storage.receiveEnergy(maxReceive, simulate);
     }
 
     @Override
-    public int getEnergyStored(ForgeDirection from) {
+    public int getEnergyStored(EnumFacing from) {
         return storage.getEnergyStored();
     }
 
     @Override
-    public int getMaxEnergyStored(ForgeDirection from) {
+    public int getMaxEnergyStored(EnumFacing from) {
         return storage.getMaxEnergyStored();
     }
 
     @Override
-    public boolean canConnectEnergy(ForgeDirection from) {
+    public boolean canConnectEnergy(EnumFacing from) {
         return true;
     }
 

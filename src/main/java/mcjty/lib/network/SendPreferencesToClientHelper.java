@@ -1,16 +1,16 @@
 package mcjty.lib.network;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import mcjty.lib.preferences.PlayerPreferencesProperties;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityClientPlayerMP;
 
 @SideOnly(Side.CLIENT)
 public class SendPreferencesToClientHelper {
 
     public static void setPreferences(PacketSendPreferencesToClient prefs) {
-        EntityClientPlayerMP player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
         PlayerPreferencesProperties properties = PlayerPreferencesProperties.getProperties(player);
         properties.getPreferencesProperties().setBuffXY(prefs.getBuffX(), prefs.getBuffY());
         System.out.println("setPreferences: prefs.getStyle() = " + prefs.getStyle());

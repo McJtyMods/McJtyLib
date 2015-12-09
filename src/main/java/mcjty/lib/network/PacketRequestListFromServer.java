@@ -1,7 +1,8 @@
 package mcjty.lib.network;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import mcjty.lib.varia.Logging;
 import net.minecraft.tileentity.TileEntity;
 
@@ -15,12 +16,17 @@ import java.util.List;
  *
  * The items of this list should implement ByteBufConverter.
  *
- * @param T is the type of the items in the list that is requested from the server
- * @param S is the type of the subclass of this class. i.e. the class you're implementing
- * @param C is the type of the subclass of PacketListFromServer. i.e. the class sent back from the server.
+ * @param <T> is the type of the items in the list that is requested from the server
+ * @param <S> is the type of the subclass of this class. i.e. the class you're implementing
+ * @param <C> is the type of the subclass of PacketListFromServer. i.e. the class sent back from the server.
  */
+
 public abstract class PacketRequestListFromServer<T extends ByteBufConverter, S extends PacketRequestListFromServer, C extends PacketListFromServer<C,T>> extends AbstractServerCommand implements IMessageHandler<S, C> {
     public PacketRequestListFromServer() {
+    }
+
+    public PacketRequestListFromServer(BlockPos pos, String command, Argument... arguments) {
+        super(pos, command, arguments);
     }
 
     public PacketRequestListFromServer(int x, int y, int z, String command, Argument... arguments) {
@@ -29,7 +35,7 @@ public abstract class PacketRequestListFromServer<T extends ByteBufConverter, S 
 
     @Override
     public C onMessage(S message, MessageContext ctx) {
-        TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(message.x, message.y, message.z);
+        TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
         if(!(te instanceof CommandHandler)) {
             Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
             return null;

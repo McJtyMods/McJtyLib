@@ -1,15 +1,18 @@
 package mcjty.lib.varia;
 
+
+import net.minecraft.util.BlockPos;
+
 public class GlobalCoordinate {
-    private final Coordinate coordinate;
+    private final BlockPos coordinate;
     private final int dimension;
 
-    public GlobalCoordinate(Coordinate coordinate, int dimension) {
+    public GlobalCoordinate(BlockPos coordinate, int dimension) {
         this.coordinate = coordinate;
         this.dimension = dimension;
     }
 
-    public Coordinate getCoordinate() {
+    public BlockPos getCoordinate() {
         return coordinate;
     }
 

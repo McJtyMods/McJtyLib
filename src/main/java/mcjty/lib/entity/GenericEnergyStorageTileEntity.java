@@ -1,7 +1,7 @@
 package mcjty.lib.entity;
 
-import cofh.api.energy.EnergyStorage;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import cofh.nonexistant.api.energy.EnergyStorage;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketRequestIntegerFromServer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -71,7 +71,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
             return;
         }
         requestRfDelay = 3;
-        network.sendToServer(new PacketRequestIntegerFromServer(xCoord, yCoord, zCoord,
+        network.sendToServer(new PacketRequestIntegerFromServer(pos,
                 CMD_GETENERGY,
                 CLIENTCMD_GETENERGY));
     }

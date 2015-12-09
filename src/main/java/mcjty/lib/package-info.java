@@ -4,4 +4,4 @@
 @API(apiVersion = McJtyLibVersion.VERSION, owner = "McJty", provides = "McJtyLib")
 package mcjty.lib;
 
-import cpw.mods.fml.common.API;
+import net.minecraftforge.fml.common.API;

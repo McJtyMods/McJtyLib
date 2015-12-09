@@ -1,8 +1,11 @@
 package mcjty.lib.container;
 
-import cofh.api.item.IToolHammer;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import mcp.mobius.waila.api.ITaggedList;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
@@ -16,7 +19,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -25,10 +27,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -37,11 +38,11 @@ import java.util.List;
 public abstract class GenericBlock extends Block implements ITileEntityProvider, WailaInfoProvider {
 
     protected ModBase modBase;
-
+/*
     protected IIcon iconInd;        // The identifying face of the block (front by default but can be different).
     protected IIcon iconSide;
     protected IIcon iconTop;
-    protected IIcon iconBottom;
+    protected IIcon iconBottom;*/
     protected final Class<? extends TileEntity> tileEntityClass;
 
     private boolean creative;
@@ -78,7 +79,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     @SideOnly(Side.CLIENT)
-    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public ITaggedList.ITipList getWailaBody(ItemStack itemStack, ITaggedList.ITipList currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         Block block = accessor.getBlock();
         TileEntity tileEntity = accessor.getTileEntity();
         if (tileEntity instanceof GenericTileEntity) {
@@ -143,8 +144,8 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     @Override
-    public ArrayList<ItemStack> getDrops(World world, int x, int y, int z, int metadata, int fortune) {
-        TileEntity tileEntity = world.getTileEntity(x, y, z);
+    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
+        TileEntity tileEntity = world.getTileEntity(pos);
 
         if (tileEntity instanceof GenericTileEntity) {
             ItemStack stack = new ItemStack(Item.getItemFromBlock(this));
@@ -156,20 +157,20 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             result.add(stack);
             return result;
         } else {
-            return super.getDrops(world, x, y, z, metadata, fortune);
+            return super.getDrops(world, pos, metadata, fortune);
         }
     }
 
     @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
+    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
         if (willHarvest) return true; // If it will harvest, delay deletion of the block until after getDrops
-        return super.removedByPlayer(world, player, x, y, z, willHarvest);
+        return super.removedByPlayer(world, pos, player, willHarvest);
     }
 
     @Override
-    public void harvestBlock(World world, EntityPlayer player, int x, int y, int z, int meta) {
-        super.harvestBlock(world, player, x, y, z, meta);
-        world.setBlockToAir(x, y, z);
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState meta, TileEntity te) {
+        super.harvestBlock(world, player, pos, meta, te);
+        world.setBlockToAir(pos);
     }
 
     @Override
@@ -178,7 +179,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     @Override
-    public TileEntity createTileEntity(World world, int metadata) {
+    public TileEntity createTileEntity(World world, IBlockState metadata) {
         try {
             return tileEntityClass.newInstance();
         } catch (InstantiationException e) {
@@ -189,13 +190,13 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     // This if this block was activated with a wrench
-    private WrenchUsage testWrenchUsage(int x, int y, int z, EntityPlayer player) {
+    private WrenchUsage testWrenchUsage(BlockPos pos, EntityPlayer player) {
         ItemStack itemStack = player.getHeldItem();
         WrenchUsage wrenchUsed = WrenchUsage.NOT;
         if (itemStack != null) {
             Item item = itemStack.getItem();
             if (item != null) {
-                wrenchUsed = getWrenchUsage(x, y, z, player, itemStack, wrenchUsed, item);
+                wrenchUsed = getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
             }
         }
         if (wrenchUsed == WrenchUsage.NORMAL && player.isSneaking()) {
@@ -204,8 +205,8 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         return wrenchUsed;
     }
 
-    protected WrenchUsage getWrenchUsage(int x, int y, int z, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
-        if (item instanceof IToolHammer) {
+    protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
+        /*if (item instanceof IToolHammer) {
             IToolHammer hammer = (IToolHammer) item;
             if (hammer.isUsable(itemStack, player, x, y, z)) {
                 hammer.toolUsed(itemStack, player, x, y, z);
@@ -213,45 +214,45 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             } else {
                 wrenchUsed = WrenchUsage.DISABLED;
             }
-        } else if (WrenchChecker.isAWrench(item)) {
+        } else*/ if (WrenchChecker.isAWrench(item)) {
             wrenchUsed = WrenchUsage.NORMAL;
         }
         return wrenchUsed;
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float sidex, float sidey, float sidez) {
-        WrenchUsage wrenchUsed = testWrenchUsage(x, y, z, player);
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float sidex, float sidey, float sidez) {
+        WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
         switch (wrenchUsed) {
-            case NOT:          return openGui(world, x, y, z, player);
-            case NORMAL:       return wrenchUse(world, x, y, z, player);
-            case SNEAKING:     return wrenchSneak(world, x, y, z, player);
-            case DISABLED:     return wrenchDisabled(world, x, y, z, player);
-            case SELECT:       return wrenchSelect(world, x, y, z, player);
-            case SNEAK_SELECT: return wrenchSneakSelect(world, x, y, z, player);
+            case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player);
+            case NORMAL:       return wrenchUse(world, pos, side,player);
+            case SNEAKING:     return wrenchSneak(world, pos, player);
+            case DISABLED:     return wrenchDisabled(world, pos, player);
+            case SELECT:       return wrenchSelect(world, pos, player);
+            case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player);
         }
         return false;
     }
 
-    protected boolean wrenchUse(World world, int x, int y, int z, EntityPlayer player) {
-        rotateBlock(world, x, y, z);
+    protected boolean wrenchUse(World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
+        //rotateBlock(world, pos); //TODO: re-impl.
         return true;
     }
 
-    protected boolean wrenchSneak(World world, int x, int y, int z, EntityPlayer player) {
-        breakAndRemember(world, player, x, y, z);
+    protected boolean wrenchSneak(World world, BlockPos pos, EntityPlayer player) {
+        breakAndRemember(world, player, pos);
         return true;
     }
 
-    protected boolean wrenchDisabled(World world, int x, int y, int z, EntityPlayer player) {
+    protected boolean wrenchDisabled(World world, BlockPos pos, EntityPlayer player) {
         return false;
     }
 
-    protected boolean wrenchSelect(World world, int x, int y, int z, EntityPlayer player) {
+    protected boolean wrenchSelect(World world, BlockPos pos, EntityPlayer player) {
         return false;
     }
 
-    protected boolean wrenchSneakSelect(World world, int x, int y, int z, EntityPlayer player) {
+    protected boolean wrenchSneakSelect(World world, BlockPos pos, EntityPlayer player) {
         return false;
     }
 
@@ -260,7 +261,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             if (world.isRemote) {
                 return true;
             }
-            TileEntity te = world.getTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
             if (isBlockContainer && !tileEntityClass.isInstance(te)) {
                 return false;
             }
@@ -276,17 +277,17 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         return false;
     }
 
-    protected ForgeDirection getOrientation(int x, int y, int z, EntityLivingBase entityLivingBase) {
+    protected EnumFacing getOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
         if (horizRotation) {
             return BlockTools.determineOrientationHoriz(entityLivingBase);
         } else {
-            return BlockTools.determineOrientation(x, y, z, entityLivingBase);
+            return BlockTools.determineOrientation(pos, entityLivingBase);
         }
     }
 
-    @Override
-    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLivingBase, ItemStack itemStack) {
-        ForgeDirection dir = getOrientation(x, y, z, entityLivingBase);
+    /*@Override
+    public void onBlockPlacedBy(World world, BlockPos pos, EntityLivingBase entityLivingBase, ItemStack itemStack) {
+        EnumFacing dir = getOrientation(x, y, z, entityLivingBase);
         int meta = world.getBlockMetadata(x, y, z);
         if (horizRotation) {
             int power = world.isBlockProvidingPowerTo(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, dir.ordinal());
@@ -295,14 +296,14 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         } else {
             world.setBlockMetadataWithNotify(x, y, z, BlockTools.setOrientation(meta, dir), 2);
         }
-        restoreBlockFromNBT(world, x, y, z, itemStack);
+        restoreBlockFromNBT(world, pos, itemStack);
         if (!world.isRemote && GeneralConfig.manageOwnership) {
-            setOwner(world, x, y, z, entityLivingBase);
+            setOwner(world, pos, entityLivingBase);
         }
-    }
+    }*/
 
-    protected void setOwner(World world, int x, int y, int z, EntityLivingBase entityLivingBase) {
-        TileEntity te = world.getTileEntity(x, y, z);
+    protected void setOwner(World world, BlockPos pos, EntityLivingBase entityLivingBase) {
+        TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity && entityLivingBase instanceof EntityPlayer) {
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
             EntityPlayer player = (EntityPlayer) entityLivingBase;
@@ -312,36 +313,32 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     /**
      * Rotate this block. Typically when a wrench is used on this block.
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     */
-    protected void rotateBlock(World world, int x, int y, int z) {
+     *
+    protected void rotateBlock(World world, BlockPos pos) {
         int meta = world.getBlockMetadata(x, y, z);
         if (horizRotation) {
-            ForgeDirection dir = BlockTools.getOrientationHoriz(meta);
-            dir = dir.getRotation(ForgeDirection.UP);
+            EnumFacing dir = BlockTools.getOrientationHoriz(meta);
+            dir = dir.getRotation(EnumFacing.UP);
             world.setBlockMetadataWithNotify(x, y, z, BlockTools.setOrientationHoriz(meta, dir), 2);
         } else {
-            ForgeDirection dir = BlockTools.getOrientation(meta);
-            dir = dir.getRotation(ForgeDirection.UP);
+            EnumFacing dir = BlockTools.getOrientation(meta);
+            dir = dir.getRotation(EnumFacing.UP);
             world.setBlockMetadataWithNotify(x, y, z, BlockTools.setOrientation(meta, dir), 2);
         }
-    }
+    }*/
 
     @Override
-    public boolean shouldCheckWeakPower(IBlockAccess world, int x, int y, int z, int side) {
+    public boolean shouldCheckWeakPower(IBlockAccess world, BlockPos pos, EnumFacing side) {
         return false;
     }
 
-    /**
+    /*
      * Check the redstone level reaching this block. Correctly checks for horizRotation mode.
      * @param world
      * @param x
      * @param y
      * @param z
-     */
+     *
     protected void checkRedstone(World world, int x, int y, int z) {
         int meta = world.getBlockMetadata(x, y, z);
 //        int powered = world.getStrongestIndirectPower(x, y, z);
@@ -358,15 +355,13 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
      * Check the redstone level reaching this block. This version sends the
      * signal directly to the TE.
      * @param world
-     * @param x
-     * @param y
-     * @param z
+     * @param pos
      */
-    protected void checkRedstoneWithTE(World world, int x, int y, int z) {
+    protected void checkRedstoneWithTE(World world, BlockPos pos) {
 //        int powered = world.getStrongestIndirectPower(x, y, z);
-        TileEntity te = world.getTileEntity(x, y, z);
+        TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
-            int powered = world.getBlockPowerInput(x, y, z);
+            int powered = world.isBlockIndirectlyGettingPowered(pos); //TODO: check
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
             genericTileEntity.setPowered(powered);
         }
@@ -376,9 +371,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
      * Break a block in the world, convert it to an entity and remember all the settings
      * for this block in the itemstack.
      */
-    protected void breakAndRemember(World world, EntityPlayer player, int x, int y, int z) {
+    protected void breakAndRemember(World world, EntityPlayer player, BlockPos pos) {
         if (!world.isRemote) {
-            harvestBlock(world, player, x, y, z, world.getBlockMetadata(x, y, z));
+            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos));
 //            world.setBlockToAir(x, y, z);
         }
     }
@@ -386,22 +381,20 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     /**
      * Restore a block from an itemstack (with NBT).
      * @param world
-     * @param x
-     * @param y
-     * @param z
+     * @param pos
      * @param itemStack
      */
-    protected void restoreBlockFromNBT(World world, int x, int y, int z, ItemStack itemStack) {
+    protected void restoreBlockFromNBT(World world, BlockPos pos, ItemStack itemStack) {
         NBTTagCompound tagCompound = itemStack.getTagCompound();
         if (tagCompound != null) {
-            TileEntity te = world.getTileEntity(x, y, z);
+            TileEntity te = world.getTileEntity(pos);
             if (te instanceof GenericTileEntity) {
                 ((GenericTileEntity)te).readRestorableFromNBT(tagCompound);
             }
         }
     }
 
-    @Override
+  /*  @Override
     public void registerBlockIcons(IIconRegister iconRegister) {
         if (getIdentifyingIconName() != null) {
             iconInd = iconRegister.registerIcon(modBase.getModId() + ":" + getIdentifyingIconName());
@@ -409,7 +402,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         iconSide = iconRegister.registerIcon(modBase.getModId() + ":" + getSideIconName());
         iconTop = iconRegister.registerIcon(modBase.getModId() + ":" + getTopIconName());
         iconBottom = iconRegister.registerIcon(modBase.getModId() + ":" + getBottomIconName());
-    }
+    }*/
 
     public String getSideIconName() {
         if (creative) {
@@ -434,6 +427,17 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             return "machineBottom";
         }
     }
+
+    public EnumFacing getOrientation(int meta) {
+        EnumFacing k;
+        if (horizRotation) {
+            k = BlockTools.getOrientationHoriz(meta);
+        } else {
+            k = BlockTools.getOrientation(meta);
+        }
+        return k;
+    }
+
     /**
      * Return the name of the icon to be used for the front side of the machine.
      */
@@ -460,11 +464,11 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     public GuiContainer createClientGui(EntityPlayer entityPlayer, TileEntity tileEntity) {
         return null;
     }
-
+/*
     @Override
     public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side) {
         int meta = blockAccess.getBlockMetadata(x, y, z);
-        ForgeDirection k = getOrientation(meta);
+        EnumFacing k = getOrientation(meta);
         if (iconInd != null && side == k.ordinal()) {
             return getIconInd(blockAccess, x, y, z, meta);
         } else if (iconTop != null && side == BlockTools.getTopDirection(k).ordinal()) {
@@ -476,23 +480,15 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         }
     }
 
-    public ForgeDirection getOrientation(int meta) {
-        ForgeDirection k;
-        if (horizRotation) {
-            k = BlockTools.getOrientationHoriz(meta);
-        } else {
-            k = BlockTools.getOrientation(meta);
-        }
-        return k;
-    }
+
 
     @Override
     public IIcon getIcon(int side, int meta) {
-        if (iconInd != null && side == ForgeDirection.SOUTH.ordinal()) {
+        if (iconInd != null && side == EnumFacing.SOUTH.ordinal()) {
             return iconInd;
-        } else if (iconTop != null && side == ForgeDirection.UP.ordinal()) {
+        } else if (iconTop != null && side == EnumFacing.UP.ordinal()) {
             return iconTop;
-        } else if (iconBottom != null && side == ForgeDirection.DOWN.ordinal()) {
+        } else if (iconBottom != null && side == EnumFacing.DOWN.ordinal()) {
             return iconBottom;
         } else {
             return iconSide;
@@ -502,15 +498,16 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     public IIcon getIconInd(IBlockAccess blockAccess, int x, int y, int z, int meta) {
         return iconInd;
     }
+*/
 
     @Override
-    public boolean onBlockEventReceived(World world, int x, int y, int z, int eventId, int eventData) {
+    public boolean onBlockEventReceived(World world, BlockPos pos, IBlockState state, int eventId, int eventData) {
         if (isBlockContainer) {
-            super.onBlockEventReceived(world, x, y, z, eventId, eventData);
-            TileEntity tileentity = world.getTileEntity(x, y, z);
+            super.onBlockEventReceived(world, pos, state, eventId, eventData);
+            TileEntity tileentity = world.getTileEntity(pos);
             return tileentity != null && tileentity.receiveClientEvent(eventId, eventData);
         } else {
-            return super.onBlockEventReceived(world, x, y, z, eventId, eventData);
+            return super.onBlockEventReceived(world, pos, state, eventId, eventData);
         }
     }
 }

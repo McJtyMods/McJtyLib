@@ -31,7 +31,7 @@ public class NetworkTools {
         try {
             buf.writeNBTTagCompoundToBuffer(nbt);
             buf.writeInt(itemStack.stackSize);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -1,8 +1,9 @@
 package mcjty.lib.network;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Logging;
 import net.minecraft.client.Minecraft;
@@ -51,6 +52,10 @@ public class PacketIntegerFromServer implements IMessage, IMessageHandler<Packet
     public PacketIntegerFromServer() {
     }
 
+    public PacketIntegerFromServer(BlockPos pos, String command, Integer result) {
+        this(pos.getX(), pos.getY(), pos.getZ(), command, result);
+    }
+
     public PacketIntegerFromServer(int x, int y, int z, String command, Integer result) {
         this.x = x;
         this.y = y;
@@ -61,7 +66,7 @@ public class PacketIntegerFromServer implements IMessage, IMessageHandler<Packet
 
     @Override
     public IMessage onMessage(PacketIntegerFromServer message, MessageContext ctx) {
-        TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(message.x, message.y, message.z);
+        TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(new BlockPos(message.x, message.y, message.z));
         if(!(te instanceof ClientCommandHandler)) {
             Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
             return null;

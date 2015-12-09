@@ -1,10 +1,11 @@
 package mcjty.lib.gui;
 
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.base.ModBase;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
 
+import java.io.IOException;
 import java.util.List;
 
 public class GuiItemScreen extends GuiScreen {
@@ -40,28 +41,28 @@ public class GuiItemScreen extends GuiScreen {
     }
 
     @Override
-    protected void mouseClicked(int x, int y, int button) {
+    protected void mouseClicked(int x, int y, int button) throws IOException {
         super.mouseClicked(x, y, button);
         window.mouseClicked(x, y, button);
         sideWindow.getWindow().mouseClicked(x, y, button);
     }
 
     @Override
-    public void handleMouseInput() {
+    public void handleMouseInput() throws IOException {
         super.handleMouseInput();
         window.handleMouseInput();
         sideWindow.getWindow().handleMouseInput();
     }
 
     @Override
-    protected void mouseMovedOrUp(int x, int y, int button) {
-        super.mouseMovedOrUp(x, y, button);
-        window.mouseMovedOrUp(x, y, button);
-        sideWindow.getWindow().mouseMovedOrUp(x, y, button);
+    protected void mouseReleased(int x, int y, int state) {
+        super.mouseReleased(x, y, state);
+        window.mouseMovedOrUp(x, y, state);
+        sideWindow.getWindow().mouseMovedOrUp(x, y, state);
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) {
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
         super.keyTyped(typedChar, keyCode);
         window.keyTyped(typedChar, keyCode);
     }
@@ -73,13 +74,13 @@ public class GuiItemScreen extends GuiScreen {
         if (tooltips != null) {
             int x = Mouse.getEventX() * width / mc.displayWidth;
             int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-            drawHoveringText(tooltips, x-guiLeft, y-guiTop, mc.fontRenderer);
+            drawHoveringText(tooltips, x-guiLeft, y-guiTop, mc.fontRendererObj);
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
             int x = Mouse.getEventX() * width / mc.displayWidth;
             int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-            drawHoveringText(tooltips, x - guiLeft, y - guiTop, mc.fontRenderer);
+            drawHoveringText(tooltips, x - guiLeft, y - guiTop, mc.fontRendererObj);
         }
     }
 

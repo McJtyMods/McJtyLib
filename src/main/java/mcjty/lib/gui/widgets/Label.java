@@ -36,7 +36,7 @@ public class Label<P extends Label> extends AbstractWidget<P> {
             return w;
         }
         if (w == -1) {
-            w = mc.fontRenderer.getStringWidth(text)+6;
+            w = mc.fontRendererObj.getStringWidth(text)+6;
         }
         return w;
     }
@@ -48,7 +48,7 @@ public class Label<P extends Label> extends AbstractWidget<P> {
             return h;
         }
         if (h == -1) {
-            h = mc.fontRenderer.FONT_HEIGHT+2;
+            h = mc.fontRendererObj.FONT_HEIGHT+2;
         }
         return h;
     }
@@ -118,15 +118,15 @@ public class Label<P extends Label> extends AbstractWidget<P> {
         }
 
         if (text == null) {
-            mc.fontRenderer.drawString("", x+dx+bounds.x, y+dy+bounds.y, col);
+            mc.fontRendererObj.drawString("", x+dx+bounds.x, y+dy+bounds.y, col);
         } else {
-            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
+            mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
         }
     }
 
     private int calculateVerticalOffset() {
         if (verticalAlignment != VerticalAlignment.ALIGN_TOP) {
-            int h = mc.fontRenderer.FONT_HEIGHT;
+            int h = mc.fontRendererObj.FONT_HEIGHT;
             if (verticalAlignment == VerticalAlignment.ALIGN_BOTTOM) {
                 return bounds.height - h;
             } else {
@@ -139,7 +139,7 @@ public class Label<P extends Label> extends AbstractWidget<P> {
 
     private int calculateHorizontalOffset() {
         if (horizontalAlignment != HorizontalAlignment.ALIGH_LEFT) {
-            int w = mc.fontRenderer.getStringWidth(text);
+            int w = mc.fontRendererObj.getStringWidth(text);
             if (horizontalAlignment == HorizontalAlignment.ALIGN_RIGHT) {
                 return bounds.width - w;
             } else {

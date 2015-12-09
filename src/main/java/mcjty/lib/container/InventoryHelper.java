@@ -5,6 +5,7 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 
 import java.util.Map;
 
@@ -33,7 +34,7 @@ public class InventoryHelper {
      * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
      * This version also checks for ISidedInventory if that's implemented by the inventory
      */
-    public static int mergeItemStackSafe(IInventory inventory, int side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+    public static int mergeItemStackSafe(IInventory inventory, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
         if (inventory instanceof ISidedInventory) {
             return mergeItemStackInternal(inventory, (ISidedInventory) inventory, side, result, start, stop, undo);
         } else {
@@ -46,10 +47,10 @@ public class InventoryHelper {
      * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
      */
     public static int mergeItemStack(IInventory inventory, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
-        return mergeItemStackInternal(inventory, null, 0, result, start, stop, undo);
+        return mergeItemStackInternal(inventory, null, null, result, start, stop, undo);
     }
 
-    private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, int side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+    private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
         int k = start;
 
         ItemStack itemstack1;

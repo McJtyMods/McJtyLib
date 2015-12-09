@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
@@ -254,7 +254,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);
+        mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);
     }
 
     private void renderLine(int x, int y, Line line) {
@@ -273,7 +273,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);
+        mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);
     }
 
     private int renderRecipe(int x, int y, Line line) {

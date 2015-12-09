@@ -1,8 +1,9 @@
 package mcjty.lib.network;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Logging;
 import net.minecraft.client.Minecraft;
@@ -15,10 +16,11 @@ import java.util.List;
  * This is typically used in combination with PacketRequestListFromServer although you can also use it standalone.
  * You use this by making a subclass of this class. This implements a message that is sent from the server back to the client.
  *
- * @param S is the type of the subclass of this class. i.e. the class you're implementing
- * @param T is the type of the items in the list that is requested from the server
+ * @param <S> is the type of the subclass of this class. i.e. the class you're implementing
+ * @param <T> is the type of the items in the list that is requested from the server
  */
 public abstract class PacketListFromServer<S extends PacketListFromServer, T extends ByteBufConverter> implements IMessage, IMessageHandler<S, IMessage> {
+
     int x;
     int y;
     int z;
@@ -68,6 +70,10 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T ext
     public PacketListFromServer() {
     }
 
+    public PacketListFromServer(BlockPos pos, String command, List<T> list){
+        this(pos.getX(), pos.getY(), pos.getZ(), command, list);
+    }
+
     public PacketListFromServer(int x, int y, int z, String command, List<T> list) {
         this.x = x;
         this.y = y;
@@ -79,7 +85,7 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T ext
 
     @Override
     public IMessage onMessage(S message, MessageContext ctx) {
-        TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(message.x, message.y, message.z);
+        TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(new BlockPos(message.x, message.y, message.z));
         if(!(te instanceof ClientCommandHandler)) {
             Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
             return null;

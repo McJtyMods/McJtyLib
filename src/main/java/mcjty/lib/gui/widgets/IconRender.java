@@ -4,10 +4,11 @@ import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.util.IIcon;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
 public class IconRender extends AbstractWidget<IconRender> {
-    private IIcon icon = null;
+
+    private TextureAtlasSprite icon = null;
 
     public IconRender(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -15,11 +16,11 @@ public class IconRender extends AbstractWidget<IconRender> {
         setDesiredWidth(16);
     }
 
-    public IIcon getIcon() {
+    public TextureAtlasSprite getIcon() {
         return icon;
     }
 
-    public IconRender setIcon(IIcon icon) {
+    public IconRender setIcon(TextureAtlasSprite icon) {
         this.icon = icon;
         return this;
     }

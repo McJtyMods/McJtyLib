@@ -5,6 +5,7 @@ import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
 import mcjty.lib.varia.Coordinate;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -13,13 +14,14 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ITickable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler {
+public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler, ITickable {
 
     private List<SyncedObject> syncedObjects = new ArrayList<SyncedObject>();
     private int infused = 0;
@@ -32,18 +34,11 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         for (SyncedObject value : syncedObjects) {
             value.setInvalid();
         }
-
-        int oldMeta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-        int newMeta = updateMetaData(oldMeta);
-        if (oldMeta != newMeta) {
-            worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, newMeta, 2);
-        }
-        worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, getBlockType());
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        notifyBlockUpdate();
     }
 
     @Override
-    public void updateEntity() {
+    public void update() {
         if (worldObj.isRemote) {
             checkStateClient();
         } else {
@@ -73,13 +68,14 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     protected void notifyBlockUpdate() {
-        int oldMeta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+        IBlockState ibs = worldObj.getBlockState(pos);
+        int oldMeta = ibs.getBlock().getMetaFromState(ibs);
         int newMeta = updateMetaData(oldMeta);
         if (oldMeta != newMeta) {
-            worldObj.setBlockMetadataWithNotify(xCoord, yCoord, zCoord, newMeta, 2);
+            worldObj.setBlockState(pos, ibs.getBlock().getStateFromMeta(newMeta), 2);
         }
-        worldObj.notifyBlocksOfNeighborChange(xCoord, yCoord, zCoord, getBlockType());
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        worldObj.notifyNeighborsOfStateChange(pos, getBlockType());
+        worldObj.markBlockForUpdate(pos);
     }
 
     protected int updateMetaData(int meta) {
@@ -90,11 +86,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         syncedObjects.add(value);
     }
 
-    @Override
-    public boolean canUpdate() {
-        return true;
-    }
-
     // Called when a slot is changed.
     public void onSlotChanged(int index, ItemStack stack) {
     }
@@ -103,18 +94,18 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public Packet getDescriptionPacket() {
         NBTTagCompound nbtTag = new NBTTagCompound();
         this.writeToNBT(nbtTag);
-        return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 1, nbtTag);
+        return new S35PacketUpdateTileEntity(pos, 1, nbtTag);
     }
 
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
-        readFromNBT(packet.func_148857_g());
+        readFromNBT(packet.getNbtCompound());
     }
 
     public void setInfused(int infused) {
         this.infused = infused;
         markDirty();
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        worldObj.markBlockForUpdate(pos);
     }
 
     public int getInfused() {
@@ -126,7 +117,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     public boolean canPlayerAccess(EntityPlayer player) {
-        return !isInvalid() && player.getDistanceSq(xCoord + 0.5D, yCoord + 0.5D, zCoord + 0.5D) <= 64D;
+        return !isInvalid() && player.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
 
@@ -190,9 +181,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
             return false;
         }
         ownerUUID = player.getGameProfile().getId();
-        ownerName = player.getDisplayName();
+        ownerName = player.getCommandSenderName();
         markDirty();
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        worldObj.markBlockForUpdate(pos);
 
         return true;
     }
@@ -205,13 +196,13 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         ownerName = "";
         securityChannel = -1;
         markDirty();
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        worldObj.markBlockForUpdate(pos);
     }
 
     public void setSecurityChannel(int id) {
         securityChannel = id;
         markDirty();
-        worldObj.markBlockForUpdate(xCoord, yCoord, zCoord);
+        worldObj.markBlockForUpdate(pos);
     }
 
     public int getSecurityChannel() {
@@ -251,7 +242,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return false;
     }
 
+    @Deprecated
     public Coordinate getCoordinate() {
-        return new Coordinate(xCoord, yCoord, zCoord);
+        return new Coordinate(pos);
     }
+
 }

@@ -7,13 +7,14 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraft.util.EnumFacing;
 
 import java.util.Random;
 
-import static net.minecraftforge.common.util.ForgeDirection.*;
+import static net.minecraft.util.EnumFacing.*;
 
 public class BlockTools {
     private static final Random random = new Random();
@@ -28,23 +29,23 @@ public class BlockTools {
     public static final int MASK_REDSTONE_OUT = 0x4;                    // Redstone out
     public static final int MASK_STATE = 0xc;                           // If redstone is not used: state
 
-    public static ForgeDirection getOrientation(int metadata) {
-        return ForgeDirection.getOrientation(metadata & MASK_ORIENTATION);
+    public static EnumFacing getOrientation(int metadata) {
+        return EnumFacing.VALUES[(metadata & MASK_ORIENTATION)];
     }
 
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
-    public static ForgeDirection reorient(ForgeDirection side, int meta) {
+    public static EnumFacing reorient(EnumFacing side, int meta) {
         return reorient(side, getOrientation(meta));
     }
 
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
-    public static ForgeDirection reorientHoriz(ForgeDirection side, int meta) {
+    public static EnumFacing reorientHoriz(EnumFacing side, int meta) {
         return reorient(side, getOrientationHoriz(meta));
     }
 
-    public static ForgeDirection reorient(ForgeDirection side, ForgeDirection blockDirection) {
+    public static EnumFacing reorient(EnumFacing side, EnumFacing blockDirection) {
         switch (blockDirection) {
             case DOWN:
                 switch (side) {
@@ -54,7 +55,7 @@ public class BlockTools {
                     case SOUTH: return DOWN;
                     case WEST: return EAST;
                     case EAST: return WEST;
-                    case UNKNOWN: return side;
+                    default: return side;
                 }
             case UP:
                 switch (side) {
@@ -64,7 +65,7 @@ public class BlockTools {
                     case SOUTH: return DOWN;
                     case WEST: return WEST;
                     case EAST: return EAST;
-                    case UNKNOWN: return side;
+                    default: return side;
                 }
             case NORTH:
                 if (side == DOWN || side == UP) {
@@ -97,43 +98,43 @@ public class BlockTools {
                 } else {
                     return WEST;
                 }
-            case UNKNOWN:
+            default:
                 return side;
         }
-        return side;
+        //return side;
     }
 
-    public static ForgeDirection getTopDirection(ForgeDirection direction) {
+    public static EnumFacing getTopDirection(EnumFacing direction) {
         switch(direction) {
             case DOWN:
-                return ForgeDirection.SOUTH;
+                return EnumFacing.SOUTH;
             case UP:
-                return ForgeDirection.NORTH;
+                return EnumFacing.NORTH;
             default:
-                return ForgeDirection.UP;
+                return EnumFacing.UP;
         }
     }
 
-    public static ForgeDirection getBottomDirection(ForgeDirection direction) {
+    public static EnumFacing getBottomDirection(EnumFacing direction) {
         switch(direction) {
             case DOWN:
-                return ForgeDirection.NORTH;
+                return EnumFacing.NORTH;
             case UP:
-                return ForgeDirection.SOUTH;
+                return EnumFacing.SOUTH;
             default:
                 return DOWN;
         }
     }
 
-    public static int setOrientation(int metadata, ForgeDirection orientation) {
+    public static int setOrientation(int metadata, EnumFacing orientation) {
         return (metadata & ~MASK_ORIENTATION) | orientation.ordinal();
     }
 
-    public static ForgeDirection getOrientationHoriz(int metadata) {
-        return ForgeDirection.getOrientation((metadata & MASK_ORIENTATION_HORIZONTAL)+2);
+    public static EnumFacing getOrientationHoriz(int metadata) {
+        return EnumFacing.VALUES[(metadata & MASK_ORIENTATION_HORIZONTAL)+2];
     }
 
-    public static int setOrientationHoriz(int metadata, ForgeDirection orientation) {
+    public static int setOrientationHoriz(int metadata, EnumFacing orientation) {
         return (metadata & ~MASK_ORIENTATION_HORIZONTAL) | (orientation.ordinal()-2);
     }
 
@@ -181,12 +182,16 @@ public class BlockTools {
         return (metadata & MASK_STATE) >> 2;
     }
 
-    public static ForgeDirection determineOrientation(int x, int y, int z, EntityLivingBase entityLivingBase) {
+    public static EnumFacing determineOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
+        return determineOrientation(pos.getX(), pos.getY(), pos.getZ(), entityLivingBase);
+    }
+
+    public static EnumFacing determineOrientation(int x, int y, int z, EntityLivingBase entityLivingBase) {
         if (MathHelper.abs((float) entityLivingBase.posX - x) < 2.0F && MathHelper.abs((float)entityLivingBase.posZ - z) < 2.0F) {
-            double d0 = entityLivingBase.posY + 1.82D - entityLivingBase.yOffset;
+            double d0 = entityLivingBase.posY + 1.82D - entityLivingBase.getYOffset();
 
             if (d0 - y > 2.0D) {
-                return ForgeDirection.UP;
+                return EnumFacing.UP;
             }
 
             if (y - d0 > 0.0D) {
@@ -194,12 +199,12 @@ public class BlockTools {
             }
         }
         int l = MathHelper.floor_double((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-        return l == 0 ? ForgeDirection.NORTH : (l == 1 ? ForgeDirection.EAST : (l == 2 ? ForgeDirection.SOUTH : (l == 3 ? ForgeDirection.WEST : DOWN)));
+        return l == 0 ? EnumFacing.NORTH : (l == 1 ? EnumFacing.EAST : (l == 2 ? EnumFacing.SOUTH : (l == 3 ? EnumFacing.WEST : DOWN)));
     }
 
-    public static ForgeDirection determineOrientationHoriz(EntityLivingBase entityLivingBase) {
+    public static EnumFacing determineOrientationHoriz(EntityLivingBase entityLivingBase) {
         int l = MathHelper.floor_double((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-        return l == 0 ? ForgeDirection.NORTH : (l == 1 ? ForgeDirection.EAST : (l == 2 ? ForgeDirection.SOUTH : (l == 3 ? ForgeDirection.WEST : DOWN)));
+        return l == 0 ? EnumFacing.NORTH : (l == 1 ? EnumFacing.EAST : (l == 2 ? EnumFacing.SOUTH : (l == 3 ? EnumFacing.WEST : DOWN)));
     }
 
 
@@ -209,8 +214,8 @@ public class BlockTools {
             spawnItemStack(world, x, y, z, itemstack);
             inventory.setInventorySlotContents(i, null);
         }
-
-        world.func_147453_f(x, y, z, block);
+        //TODO: What was this?
+        //world.func_147453_f(x, y, z, block);
     }
 
     public static void spawnItemStack(World world, int x, int y, int z, ItemStack itemstack) {
@@ -244,7 +249,7 @@ public class BlockTools {
 
     public static Block getBlock(ItemStack stack) {
         if (stack.getItem() instanceof ItemBlock) {
-            return ((ItemBlock) stack.getItem()).field_150939_a;
+            return ((ItemBlock) stack.getItem()).getBlock();
         } else {
             return null;
         }
