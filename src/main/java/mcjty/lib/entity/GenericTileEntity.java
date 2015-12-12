@@ -181,7 +181,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
             return false;
         }
         ownerUUID = player.getGameProfile().getId();
-        ownerName = player.getCommandSenderName();
+        ownerName = player.getName();
         markDirty();
         worldObj.markBlockForUpdate(pos);
 
