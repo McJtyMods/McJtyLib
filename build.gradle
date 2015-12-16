@@ -132,6 +132,11 @@ uploadArchives() {
                                 name 'McJty'
                                 roles { role 'developer' }
                             }
+                            developer {
+                                id 'Elec332'
+                                name 'Elec332'
+                                roles { role 'developer' }
+                            }
                         }
                     }
                 }
