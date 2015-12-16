@@ -1,6 +1,6 @@
 package mcjty.lib.entity;
 
-import cofh.nonexistant.api.energy.EnergyStorage;
+import cofh.api.energy.EnergyStorage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketRequestIntegerFromServer;

@@ -1,14 +1,18 @@
 package mcjty.lib.compat.waila;
 
-import mcp.mobius.waila.api.*;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
 import mcjty.lib.container.GenericBlock;
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
+import mcp.mobius.waila.api.IWailaDataProvider;
+import mcp.mobius.waila.api.IWailaRegistrar;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 import java.util.List;
 
@@ -18,17 +22,10 @@ public class WailaCompatibility implements IWailaDataProvider {
 
     private WailaCompatibility() {}
 
-    public static void register(){
-        if (registered)
-            return;
-        registered = true;
-        FMLInterModComms.sendMessage("Waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
-    }
-
     private static boolean registered;
     private static boolean loaded;
 
-    public static void load(IWailaRegistrar registrar) {
+    static void load(IWailaRegistrar registrar) {
         if (!registered){
             throw new RuntimeException("Please register this handler using the provided method.");
         }
@@ -40,8 +37,15 @@ public class WailaCompatibility implements IWailaDataProvider {
         }
     }
 
+    public static void register(){
+        if (registered)
+            return;
+        registered = true;
+        FMLInterModComms.sendMessage("Waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
+    }
+
     @Override
-    public NBTTagCompound getNBTData(TileEntity te, NBTTagCompound tag, IWailaDataAccessorServer dataAccessor) {
+    public NBTTagCompound getNBTData(EntityPlayerMP player, TileEntity te, NBTTagCompound tag, World world, BlockPos pos) {
         return tag;
     }
 
@@ -51,12 +55,12 @@ public class WailaCompatibility implements IWailaDataProvider {
     }
 
     @Override
-    public ITaggedList.ITipList getWailaHead(ItemStack itemStack, ITaggedList.ITipList currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaHead(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         return currenttip;
     }
 
     @Override
-    public ITaggedList.ITipList getWailaBody(ItemStack itemStack, ITaggedList.ITipList currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         Block block = accessor.getBlock();
         if (block instanceof WailaInfoProvider) {
             return ((WailaInfoProvider) block).getWailaBody(itemStack, currenttip, accessor, config);
@@ -65,7 +69,7 @@ public class WailaCompatibility implements IWailaDataProvider {
     }
 
     @Override
-    public ITaggedList.ITipList getWailaTail(ItemStack itemStack, ITaggedList.ITipList currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         return currenttip;
     }
 

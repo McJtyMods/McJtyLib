@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import cofh.nonexistant.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyHandler;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;

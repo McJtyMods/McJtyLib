@@ -79,7 +79,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     @SideOnly(Side.CLIENT)
-    public ITaggedList.ITipList getWailaBody(ItemStack itemStack, ITaggedList.ITipList currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         Block block = accessor.getBlock();
         TileEntity tileEntity = accessor.getTileEntity();
         if (tileEntity instanceof GenericTileEntity) {

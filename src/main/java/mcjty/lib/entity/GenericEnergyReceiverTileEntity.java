@@ -1,6 +1,6 @@
 package mcjty.lib.entity;
 
-import cofh.nonexistant.api.energy.IEnergyReceiver;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.util.EnumFacing;
 
 public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver {
