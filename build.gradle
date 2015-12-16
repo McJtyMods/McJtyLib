@@ -36,7 +36,7 @@ if (ENV.DRONE_BUILD_NUMBER) {
 version += "-SNAPSHOT"
 
 group= "com.github.mcjty" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "mcjtylib"
+archivesBaseName = "mcjtylib188"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
