@@ -8,11 +8,7 @@ import net.minecraft.util.EnumFacing;
 
 @SuppressWarnings("deprecation")
 @Deprecated
-public class Coordinate implements ByteBufConverter {
-    private final int x;
-    private final int y;
-    private final int z;
-
+public class Coordinate extends BlockPos implements ByteBufConverter {
     @Deprecated
     public static final Coordinate INVALID = new Coordinate(-1, -1, -1);
 
@@ -28,19 +24,17 @@ public class Coordinate implements ByteBufConverter {
 
     @Deprecated
     public Coordinate(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        super(x, y, z);
     }
 
     @Deprecated
     public float squaredDistance(Coordinate c) {
-        return (c.x-x) * (c.x-x) + (c.y-y) * (c.y-y) + (c.z-z) * (c.z-z);
+        return (c.getX()-getX()) * (c.getX()-getX()) + (c.getY()-getY()) * (c.getY()-getY()) + (c.getZ()-getZ()) * (c.getZ()-getZ());
     }
 
     @Deprecated
     public float squaredDistance(int x1, int y1, int z1) {
-        return (x1-x) * (x1-x) + (y1-y) * (y1-y) + (z1-z) * (z1-z);
+        return (x1-getX()) * (x1-getX()) + (y1-getY()) * (y1-getY()) + (z1-getZ()) * (z1-getZ());
     }
 
     @Deprecated
@@ -51,76 +45,24 @@ public class Coordinate implements ByteBufConverter {
     @Deprecated
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
+        buf.writeInt(getX());
+        buf.writeInt(getY());
+        buf.writeInt(getZ());
     }
 
     @Deprecated
     public boolean isValid() {
-        return y >= 0;
+        return getY() >= 0;
     }
 
     @Deprecated
-    public Coordinate addDirection(EnumFacing direction) {
-        return new Coordinate(x + direction.getFrontOffsetX(), y + direction.getFrontOffsetY(), z + direction.getFrontOffsetZ());
+    public BlockPos addDirection(EnumFacing direction) {
+        return this.offset(direction);
     }
 
     @Deprecated
     public static Coordinate center(Coordinate c1, Coordinate c2) {
         return new Coordinate((c1.getX() + c2.getX()) / 2, (c1.getY() + c2.getY()) / 2, (c1.getZ() + c2.getZ()) / 2);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Coordinate that = (Coordinate) o;
-
-        if (x != that.x) {
-            return false;
-        }
-        if (y != that.y) {
-            return false;
-        }
-        if (z != that.z) {
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
-        result = 31 * result + z;
-        return result;
-    }
-
-    @Deprecated
-    public int getX() {
-        return x;
-    }
-
-    @Deprecated
-    public int getY() {
-        return y;
-    }
-
-    @Deprecated
-    public int getZ() {
-        return z;
-    }
-
-    @Override
-    public String toString() {
-        return x + "," + y + "," + z;
     }
 
     @Deprecated
