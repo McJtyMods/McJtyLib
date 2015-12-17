@@ -1,6 +1,7 @@
 package mcjty.lib.container;
 
 import mcp.mobius.waila.api.ITaggedList;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
@@ -37,12 +38,9 @@ import java.util.List;
 
 public abstract class GenericBlock extends Block implements ITileEntityProvider, WailaInfoProvider {
 
+    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+
     protected ModBase modBase;
-/*
-    protected IIcon iconInd;        // The identifying face of the block (front by default but can be different).
-    protected IIcon iconSide;
-    protected IIcon iconTop;
-    protected IIcon iconBottom;*/
     protected final Class<? extends TileEntity> tileEntityClass;
 
     private boolean creative;
@@ -285,6 +283,15 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         }
     }
 
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        world.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
+        restoreBlockFromNBT(world, pos, stack);
+        if (!world.isRemote && GeneralConfig.manageOwnership) {
+            setOwner(world, pos, placer);
+        }
+    }
+
     /*@Override
     public void onBlockPlacedBy(World world, BlockPos pos, EntityLivingBase entityLivingBase, ItemStack itemStack) {
         EnumFacing dir = getOrientation(x, y, z, entityLivingBase);
@@ -509,5 +516,24 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         } else {
             return super.onBlockEventReceived(world, pos, state, eventId, eventData);
         }
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(FACING, getFacing(meta));
+    }
+
+    public static EnumFacing getFacing(int meta) {
+        return EnumFacing.values()[meta+2];
+    }
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(FACING).getIndex()-2;
+    }
+
+    @Override
+    protected BlockState createBlockState() {
+        return new BlockState(this, FACING);
     }
 }
