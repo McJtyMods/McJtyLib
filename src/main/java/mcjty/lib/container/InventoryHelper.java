@@ -29,6 +29,12 @@ public class InventoryHelper {
         stacks = newstacks;
     }
 
+    public ItemStack removeStackFromSlot(int index) {
+        ItemStack stack = stacks[index];
+        setStackInSlot(index, null);
+        return stack;
+    }
+
     /**
      * Merges provided ItemStack with the first available one in this inventory. It will return the amount
      * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
