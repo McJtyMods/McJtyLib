@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler, ITickable {
+public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler {
 
     private List<SyncedObject> syncedObjects = new ArrayList<SyncedObject>();
     private int infused = 0;
@@ -37,8 +37,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         notifyBlockUpdate();
     }
 
-    @Override
-    public void update() {
+    public void updateTE() {
         if (worldObj.isRemote) {
             checkStateClient();
         } else {
