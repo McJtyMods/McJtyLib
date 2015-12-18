@@ -33,6 +33,11 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     private UUID ownerUUID = null;
     private int securityChannel = -1;
 
+    public void markDirtyClient() {
+        markDirty();
+        worldObj.markBlockForUpdate(getPos());
+    }
+
     public void setInvalid() {
         for (SyncedObject value : syncedObjects) {
             value.setInvalid();

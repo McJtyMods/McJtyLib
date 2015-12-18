@@ -6,9 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -164,14 +165,14 @@ public class RenderHelper {
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GL11.glShadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
-        //tessellator.startDrawingQuads(); //TODO
-       // tessellator.setColorRGBA_F(f1, f2, f3, f);
-       // tessellator.addVertex(x2, y1, zLevel);
-       // tessellator.addVertex(x1, y1, zLevel);
-       // tessellator.setColorRGBA_F(f5, f6, f7, f4);
-      //  tessellator.addVertex(x1, y2, zLevel);
-      // tessellator.addVertex(x2, y2, zLevel);
-       // tessellator.draw();
+        WorldRenderer renderer = tessellator.getWorldRenderer();
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        renderer.pos(x2, y1, zLevel).color(f1, f2, f3, f).endVertex();
+        renderer.pos(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
+        renderer.pos(x1, y2, zLevel).color(f5, f6, f7, f4).endVertex();
+        renderer.pos(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
+        tessellator.draw();
+
         GL11.glShadeModel(GL11.GL_FLAT);
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -200,13 +201,12 @@ public class RenderHelper {
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GL11.glShadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
-       // tessellator.startDrawingQuads(); //TODO
-     //   tessellator.setColorRGBA_F(f1, f2, f3, f);
-      //  tessellator.addVertex(x1, y1, zLevel);
-       // tessellator.addVertex(x1, y2, zLevel);
-      //  tessellator.setColorRGBA_F(f5, f6, f7, f4);
-      //  tessellator.addVertex(x2, y2, zLevel);
-     //   tessellator.addVertex(x2, y1, zLevel);
+        WorldRenderer renderer = tessellator.getWorldRenderer();
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        renderer.pos(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
+        renderer.pos(x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
+        renderer.pos(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
+        renderer.pos(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
         GL11.glShadeModel(GL11.GL_FLAT);
         GL11.glDisable(GL11.GL_BLEND);

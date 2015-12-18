@@ -345,17 +345,16 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
      * @param x
      * @param y
      * @param z
-     *
-    protected void checkRedstone(World world, int x, int y, int z) {
-        int meta = world.getBlockMetadata(x, y, z);
-//        int powered = world.getStrongestIndirectPower(x, y, z);
-        int powered = world.getBlockPowerInput(x, y, z);
-        if (horizRotation) {
-            meta = BlockTools.setRedstoneSignalIn(meta, powered > 0);
-        } else {
-            meta = BlockTools.setRedstoneSignal(meta, powered > 0);
-        }
-        world.setBlockMetadataWithNotify(x, y, z, meta, 2);
+     */
+    protected void checkRedstone(World world, BlockPos pos) {
+//        IBlockState state = world.getBlockState(pos);
+//        int powered = world.isBlockIndirectlyGettingPowered(pos);
+//        if (horizRotation) {
+//            meta = BlockTools.setRedstoneSignalIn(meta, powered > 0);
+//        } else {
+//            meta = BlockTools.setRedstoneSignal(meta, powered > 0);
+//        }
+//        world.setBlockMetadataWithNotify(x, y, z, meta, 2);
     }
 
     /**
