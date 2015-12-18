@@ -7,6 +7,34 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IChatComponent;
 
 public interface DefaultSidedInventory extends ISidedInventory {
+
+    InventoryHelper getInventoryHelper();
+
+    @Override
+    default int getSizeInventory() {
+        return getInventoryHelper().getCount();
+    }
+
+    @Override
+    default ItemStack getStackInSlot(int index) {
+        return getInventoryHelper().getStackInSlot(index);
+    }
+
+    @Override
+    default ItemStack decrStackSize(int index, int count) {
+        return getInventoryHelper().decrStackSize(index, count);
+    }
+
+    @Override
+    default ItemStack removeStackFromSlot(int index) {
+        return getInventoryHelper().removeStackFromSlot(index);
+    }
+
+    @Override
+    default void setInventorySlotContents(int index, ItemStack stack) {
+        getInventoryHelper().setInventorySlotContents(getInventoryStackLimit(), index, stack);
+    }
+
     @Override
     default int[] getSlotsForFace(EnumFacing side) {
         return new int[0];
