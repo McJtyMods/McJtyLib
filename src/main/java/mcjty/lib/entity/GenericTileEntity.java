@@ -1,6 +1,7 @@
 package mcjty.lib.entity;
 
 import mcjty.lib.base.GeneralConfig;
+import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
@@ -10,11 +11,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
+import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,6 +123,14 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
 
+    protected void readBufferFromNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
+        NBTTagList bufferTagList = tagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0 ; i < bufferTagList.tagCount() ; i++) {
+            NBTTagCompound nbtTagCompound = bufferTagList.getCompoundTagAt(i);
+            inventoryHelper.setStackInSlot(i, ItemStack.loadItemStackFromNBT(nbtTagCompound));
+        }
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
         super.readFromNBT(tagCompound);
@@ -145,6 +156,20 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
             securityChannel = -1;
         }
     }
+
+    protected void writeBufferToNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
+        NBTTagList bufferTagList = new NBTTagList();
+        for (int i = 0 ; i < inventoryHelper.getCount() ; i++) {
+            ItemStack stack = inventoryHelper.getStackInSlot(i);
+            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            if (stack != null) {
+                stack.writeToNBT(nbtTagCompound);
+            }
+            bufferTagList.appendTag(nbtTagCompound);
+        }
+        tagCompound.setTag("Items", bufferTagList);
+    }
+
 
     @Override
     public void writeToNBT(NBTTagCompound tagCompound) {
