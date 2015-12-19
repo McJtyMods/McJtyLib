@@ -30,7 +30,7 @@ public class PacketServerCommand extends AbstractServerCommand {
             return null;
         }
 
-        public void handle(PacketServerCommand message, MessageContext ctx) {
+        private void handle(PacketServerCommand message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
             TileEntity te = playerEntity.worldObj.getTileEntity(message.pos);
             if(!(te instanceof CommandHandler)) {
