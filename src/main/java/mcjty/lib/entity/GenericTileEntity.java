@@ -45,19 +45,12 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         notifyBlockUpdate();
     }
 
-    public void updateTE() {
-        if (worldObj.isRemote) {
-            checkStateClient();
-        } else {
-            checkStateServer();
-        }
-    }
-
     /// Called by GenericBlock.checkRedstoneWithTE() to set the redstone/powered state of this TE.
     public void setPowered(int powered) {
     }
 
     protected void checkStateClient() {
+        // @todo obsolete system?
         // Sync all values from the server.
         boolean syncNeeded = false;
         for (SyncedObject value : syncedObjects) {
@@ -69,9 +62,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         if (syncNeeded) {
             notifyBlockUpdate();
         }
-    }
-
-    protected void checkStateServer() {
     }
 
     protected void notifyBlockUpdate() {
