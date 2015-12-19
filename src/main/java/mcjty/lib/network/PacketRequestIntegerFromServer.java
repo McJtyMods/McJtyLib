@@ -1,11 +1,11 @@
 package mcjty.lib.network;
 
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Logging;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
@@ -37,14 +37,9 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand implem
         this.clientCommand = clientCommand;
     }
 
-    public PacketRequestIntegerFromServer(int x, int y, int z, String command, String clientCommand, Argument... arguments) {
-        super(x, y, z, command, arguments);
-        this.clientCommand = clientCommand;
-    }
-
     @Override
     public PacketIntegerFromServer onMessage(PacketRequestIntegerFromServer message, MessageContext ctx) {
-        TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
+        TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(message.pos);
         if(!(te instanceof CommandHandler)) {
             Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
             return null;
@@ -55,6 +50,6 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand implem
             Logging.log("Command " + message.command + " was not handled!");
             return null;
         }
-        return new PacketIntegerFromServer(message.x, message.y, message.z, message.clientCommand, result);
+        return new PacketIntegerFromServer(message.pos, message.clientCommand, result);
     }
 }

@@ -1,35 +1,29 @@
 package mcjty.lib.network;
 
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Coordinate;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AbstractServerCommand implements IMessage {
 
-    protected int x;
-    protected int y;
-    protected int z;
+    protected BlockPos pos;
     protected String command;
     protected Map<String,Argument> args;
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        x = buf.readInt();
-        y = buf.readInt();
-        z = buf.readInt();
+        pos = NetworkTools.readPos(buf);
         command = NetworkTools.readString(buf);
         args = readArguments(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
+        NetworkTools.writePos(buf, pos);
         NetworkTools.writeString(buf, command);
         writeArguments(buf, args);
     }
@@ -116,13 +110,7 @@ public class AbstractServerCommand implements IMessage {
     }
 
     protected AbstractServerCommand(BlockPos pos, String command, Argument... arguments) {
-        this(pos.getX(), pos.getY(), pos.getZ(), command, arguments);
-    }
-
-    protected AbstractServerCommand(int x, int y, int z, String command, Argument... arguments) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.pos = pos;
         this.command = command;
         if (arguments == null) {
             this.args = null;

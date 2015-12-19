@@ -29,13 +29,9 @@ public abstract class PacketRequestListFromServer<T extends ByteBufConverter, S 
         super(pos, command, arguments);
     }
 
-    public PacketRequestListFromServer(int x, int y, int z, String command, Argument... arguments) {
-        super(x, y, z, command, arguments);
-    }
-
     @Override
     public C onMessage(S message, MessageContext ctx) {
-        TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(new BlockPos(message.x, message.y, message.z));
+        TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(message.pos);
         if(!(te instanceof CommandHandler)) {
             Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
             return null;
@@ -46,8 +42,8 @@ public abstract class PacketRequestListFromServer<T extends ByteBufConverter, S 
             Logging.log("Command " + message.command + " was not handled!");
             return null;
         }
-        return createMessageToClient(message.x, message.y, message.z, list);
+        return createMessageToClient(message.pos, list);
     }
 
-    protected abstract C createMessageToClient(int x, int y, int z, List<T> result);
+    protected abstract C createMessageToClient(BlockPos pos, List<T> result);
 }
