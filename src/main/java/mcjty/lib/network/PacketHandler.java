@@ -25,7 +25,7 @@ public class PacketHandler {
         return packetId++;
     }
 
-    private static void register(Integer id, Class<? extends InfoPacketServer> serverClass, Class<? extends InfoPacketClient> clientClass) {
+    public static void register(Integer id, Class<? extends InfoPacketServer> serverClass, Class<? extends InfoPacketClient> clientClass) {
         serverInfoPackets.put(id, serverClass);
         clientInfoPackets.put(id, clientClass);
         serverInfoPacketsToId.put(serverClass, id);
