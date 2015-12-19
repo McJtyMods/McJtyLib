@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.BlockPos;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -59,6 +60,16 @@ public class NetworkTools {
         if (bytes.length > 0) {
             dataOut.writeBytes(bytes);
         }
+    }
+
+    public static BlockPos readPos(ByteBuf dataIn) {
+        return new BlockPos(dataIn.readInt(), dataIn.readInt(), dataIn.readInt());
+    }
+
+    public static void writePos(ByteBuf dataOut, BlockPos pos) {
+        dataOut.writeInt(pos.getX());
+        dataOut.writeInt(pos.getY());
+        dataOut.writeInt(pos.getZ());
     }
 
     public static <T extends Enum> void writeEnum(ByteBuf buf, T value, T nullValue) {
