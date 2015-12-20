@@ -2,20 +2,19 @@ package mcjty.lib.network.clientinfo;
 
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
+import mcjty.lib.network.NetworkTools;
 import mcjty.lib.network.PacketHandler;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 public class PacketGetInfoFromServer implements IMessage {
 
     private InfoPacketServer packet;
+    private String modid;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -29,19 +28,22 @@ public class PacketGetInfoFromServer implements IMessage {
             throw new RuntimeException(e);
         }
         packet.fromBytes(buf);
+        modid = NetworkTools.readString(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(PacketHandler.getServerInfoPacketId(packet.getClass()));
         packet.toBytes(buf);
+        NetworkTools.writeString(buf, modid);
     }
 
     public PacketGetInfoFromServer() {
     }
 
-    public PacketGetInfoFromServer(InfoPacketServer packet) {
+    public PacketGetInfoFromServer(String modid, InfoPacketServer packet) {
         this.packet = packet;
+        this.modid = modid;
     }
 
     public static class Handler implements IMessageHandler<PacketGetInfoFromServer, IMessage> {
@@ -49,16 +51,14 @@ public class PacketGetInfoFromServer implements IMessage {
         public IMessage onMessage(PacketGetInfoFromServer message, MessageContext ctx) {
             MinecraftServer.getServer().addScheduledTask(()
                     -> message.packet.onMessageServer(ctx.getServerHandler().playerEntity)
-                    .ifPresent(p -> sendReplyToClient(ctx.getServerHandler().getNetworkManager(), p, ctx.getServerHandler().playerEntity)));
+                    .ifPresent(p -> sendReplyToClient(message.modid, p, ctx.getServerHandler().playerEntity)));
             return null;
         }
 
-        private void sendReplyToClient(NetworkManager network, InfoPacketClient reply, EntityPlayerMP player) {
-            Channel channel = network.channel();
-            channel.attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
-            channel.attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
-            channel.writeAndFlush(new PacketReturnInfoToClient(reply)).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-//            network.sendTo(new PacketReturnInfoToClient(reply), player);
+        private void sendReplyToClient(String modid, InfoPacketClient reply, EntityPlayerMP player) {
+            SimpleNetworkWrapper wrapper = PacketHandler.modNetworking.get(modid);
+            PacketReturnInfoToClient msg = new PacketReturnInfoToClient(reply);
+            wrapper.sendTo(msg, player);
         }
     }
 }

@@ -21,6 +21,8 @@ public class PacketHandler {
     private static Map<Class<? extends InfoPacketClient>,Integer> clientInfoPacketsToId = new HashMap<>();
     private static Map<Class<? extends InfoPacketServer>,Integer> serverInfoPacketsToId = new HashMap<>();
 
+    public static Map<String,SimpleNetworkWrapper> modNetworking = new HashMap<>();
+
     public static int nextPacketID() {
         return packetId++;
     }
@@ -53,9 +55,10 @@ public class PacketHandler {
         return ID++;
     }
 
-    public static SimpleNetworkWrapper registerMessages(String channelName) {
+    public static SimpleNetworkWrapper registerMessages(String modid, String channelName) {
         SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
         registerMessages(network);
+        modNetworking.put(modid, network);
         return network;
     }
 
@@ -73,7 +76,7 @@ public class PacketHandler {
         networkWrapper.registerMessage(PacketGetInfoFromServer.Handler.class, PacketGetInfoFromServer.class, nextID(), Side.SERVER);
 
         // Client side
-        networkWrapper.registerMessage(PacketIntegerFromServer.class, PacketIntegerFromServer.class, startIndex++, Side.CLIENT);
+        networkWrapper.registerMessage(PacketIntegerFromServer.Handler.class, PacketIntegerFromServer.class, startIndex++, Side.CLIENT);
         networkWrapper.registerMessage(PacketSendPreferencesToClientHandler.class, PacketSendPreferencesToClient.class, startIndex++, Side.CLIENT);
         networkWrapper.registerMessage(PacketReturnInfoHandler.class, PacketReturnInfoToClient.class, nextID(), Side.CLIENT);
 

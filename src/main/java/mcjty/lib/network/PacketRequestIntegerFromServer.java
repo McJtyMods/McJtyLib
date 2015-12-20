@@ -1,18 +1,15 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.network.FMLOutboundHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
@@ -21,6 +18,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  */
 public class PacketRequestIntegerFromServer extends AbstractServerCommand {
     private String clientCommand;
+    private String modid;
 
     public PacketRequestIntegerFromServer() {
     }
@@ -30,6 +28,7 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand {
         super.fromBytes(buf);
 
         clientCommand = NetworkTools.readString(buf);
+        modid = NetworkTools.readString(buf);
     }
 
     @Override
@@ -37,11 +36,13 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand {
         super.toBytes(buf);
 
         NetworkTools.writeString(buf, clientCommand);
+        NetworkTools.writeString(buf, modid);
     }
 
-    public PacketRequestIntegerFromServer(BlockPos pos, String command, String clientCommand, Argument... arguments) {
+    public PacketRequestIntegerFromServer(String modid, BlockPos pos, String command, String clientCommand, Argument... arguments) {
         super(pos, command, arguments);
         this.clientCommand = clientCommand;
+        this.modid = modid;
     }
 
     public static class Handler implements IMessageHandler<PacketRequestIntegerFromServer, IMessage> {
@@ -63,14 +64,14 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand {
                 Logging.log("Command " + message.command + " was not handled!");
                 return;
             }
-            sendReplyToClient(ctx.getServerHandler().getNetworkManager(), message, result, ctx.getServerHandler().playerEntity);
+
+            sendReplyToClient(message, result, ctx.getServerHandler().playerEntity);
        }
 
-        private void sendReplyToClient(NetworkManager network, PacketRequestIntegerFromServer message, Integer result, EntityPlayerMP player) {
-            Channel channel = network.channel();
-            channel.attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
-            channel.attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
-            channel.writeAndFlush(new PacketIntegerFromServer(message.pos, message.clientCommand, result)).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        private void sendReplyToClient(PacketRequestIntegerFromServer message, Integer result, EntityPlayerMP player) {
+            SimpleNetworkWrapper wrapper = PacketHandler.modNetworking.get(message.modid);
+            PacketIntegerFromServer msg = new PacketIntegerFromServer(message.pos, message.clientCommand, result);
+            wrapper.sendTo(msg, player);
         }
 
     }

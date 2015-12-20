@@ -1,6 +1,7 @@
 package mcjty.lib.entity;
 
 import cofh.api.energy.EnergyStorage;
+import mcjty.lib.network.PacketHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketRequestIntegerFromServer;
@@ -65,13 +66,13 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
     }
 
     // Request the RF from the server. This has to be called on the client side.
-    public void requestRfFromServer(SimpleNetworkWrapper network) {
+    public void requestRfFromServer(String modid) {
         requestRfDelay--;
         if (requestRfDelay > 0) {
             return;
         }
         requestRfDelay = 3;
-        network.sendToServer(new PacketRequestIntegerFromServer(pos,
+        PacketHandler.modNetworking.get(modid).sendToServer(new PacketRequestIntegerFromServer(modid, pos,
                 CMD_GETENERGY,
                 CLIENTCMD_GETENERGY));
     }
