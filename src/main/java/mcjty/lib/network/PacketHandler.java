@@ -69,16 +69,16 @@ public class PacketHandler {
     public static int registerMessages(SimpleNetworkWrapper networkWrapper, int startIndex){
 
         // Server side
-        networkWrapper.registerMessage(PacketSetGuiStyle.class, PacketSetGuiStyle.class, startIndex++, Side.SERVER);
+        networkWrapper.registerMessage(PacketSetGuiStyle.Handler.class, PacketSetGuiStyle.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketServerCommand.Handler.class, PacketServerCommand.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketRequestIntegerFromServer.Handler.class, PacketRequestIntegerFromServer.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketUpdateNBTItem.class, PacketUpdateNBTItem.class, startIndex++, Side.SERVER);
+        networkWrapper.registerMessage(PacketUpdateNBTItem.Handler.class, PacketUpdateNBTItem.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketGetInfoFromServer.Handler.class, PacketGetInfoFromServer.class, nextID(), Side.SERVER);
 
         // Client side
         networkWrapper.registerMessage(PacketIntegerFromServer.Handler.class, PacketIntegerFromServer.class, startIndex++, Side.CLIENT);
-        networkWrapper.registerMessage(PacketSendPreferencesToClientHandler.class, PacketSendPreferencesToClient.class, startIndex++, Side.CLIENT);
-        networkWrapper.registerMessage(PacketReturnInfoHandler.class, PacketReturnInfoToClient.class, nextID(), Side.CLIENT);
+        networkWrapper.registerMessage(PacketSendPreferencesToClient.Handler.class, PacketSendPreferencesToClient.class, startIndex++, Side.CLIENT);
+        networkWrapper.registerMessage(PacketReturnInfoToClient.Handler.class, PacketReturnInfoToClient.class, nextID(), Side.CLIENT);
 
 //        register(nextPacketID(), TankInfoPacketServer.class, TankInfoPacketClient.class);
 

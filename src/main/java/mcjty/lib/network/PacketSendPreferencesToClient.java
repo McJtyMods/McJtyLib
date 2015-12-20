@@ -1,8 +1,11 @@
 package mcjty.lib.network;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.gui.GuiStyle;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketSendPreferencesToClient implements IMessage {
     private int buffX;
@@ -43,4 +46,14 @@ public class PacketSendPreferencesToClient implements IMessage {
     public GuiStyle getStyle() {
         return style;
     }
+
+    public static class Handler implements IMessageHandler<PacketSendPreferencesToClient, IMessage> {
+        @Override
+        public IMessage onMessage(PacketSendPreferencesToClient message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> SendPreferencesToClientHelper.setPreferences(message));
+            return null;
+        }
+
+    }
+
 }

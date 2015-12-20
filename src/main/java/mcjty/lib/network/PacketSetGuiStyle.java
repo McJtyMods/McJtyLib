@@ -1,16 +1,17 @@
 package mcjty.lib.network;
 
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.preferences.PlayerPreferencesProperties;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * Change the GUI style.
  */
-public class PacketSetGuiStyle implements IMessage, IMessageHandler<PacketSetGuiStyle, IMessage> {
+public class PacketSetGuiStyle implements IMessage {
 
     private String style;
 
@@ -31,14 +32,19 @@ public class PacketSetGuiStyle implements IMessage, IMessageHandler<PacketSetGui
         this.style = style;
     }
 
-    @Override
-    public IMessage onMessage(PacketSetGuiStyle message, MessageContext ctx) {
-        EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+    public static class Handler implements IMessageHandler<PacketSetGuiStyle, IMessage> {
+        @Override
+        public IMessage onMessage(PacketSetGuiStyle message, MessageContext ctx) {
+            MinecraftServer.getServer().addScheduledTask(() -> handle(message, ctx));
+            return null;
+        }
 
-        PlayerPreferencesProperties properties = PlayerPreferencesProperties.getProperties(playerEntity);
-        properties.getPreferencesProperties().setStyle(message.style);
+        private void handle(PacketSetGuiStyle message, MessageContext ctx) {
+            EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
 
-        return null;
+            PlayerPreferencesProperties properties = PlayerPreferencesProperties.getProperties(playerEntity);
+            properties.getPreferencesProperties().setStyle(message.style);
+        }
+
     }
-
 }

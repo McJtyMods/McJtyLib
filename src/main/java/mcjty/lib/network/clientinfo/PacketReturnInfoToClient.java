@@ -4,6 +4,8 @@ package mcjty.lib.network.clientinfo;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.network.PacketHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class PacketReturnInfoToClient implements IMessage {
 
@@ -38,5 +40,13 @@ public class PacketReturnInfoToClient implements IMessage {
 
     public PacketReturnInfoToClient(InfoPacketClient packet) {
         this.packet = packet;
+    }
+
+    public static class Handler implements IMessageHandler<PacketReturnInfoToClient, IMessage> {
+        @Override
+        public IMessage onMessage(PacketReturnInfoToClient message, MessageContext ctx) {
+            ReturnInfoHelper.onMessageFromServer(message);
+            return null;
+        }
     }
 }
