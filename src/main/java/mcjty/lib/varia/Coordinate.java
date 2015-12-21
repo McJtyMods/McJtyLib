@@ -28,7 +28,7 @@ public class Coordinate extends BlockPos implements ByteBufConverter {
     }
 
     @Deprecated
-    public float squaredDistance(Coordinate c) {
+    public float squaredDistance(BlockPos c) {
         return (c.getX()-getX()) * (c.getX()-getX()) + (c.getY()-getY()) * (c.getY()-getY()) + (c.getZ()-getZ()) * (c.getZ()-getZ());
     }
 
@@ -38,7 +38,7 @@ public class Coordinate extends BlockPos implements ByteBufConverter {
     }
 
     @Deprecated
-    public static int area(Coordinate c1, Coordinate c2) {
+    public static int area(BlockPos c1, BlockPos c2) {
         return (c2.getX()-c1.getX()+1) * (c2.getY()-c1.getY()+1) * (c2.getZ()-c1.getZ()+1);
     }
 
@@ -61,12 +61,12 @@ public class Coordinate extends BlockPos implements ByteBufConverter {
     }
 
     @Deprecated
-    public static Coordinate center(Coordinate c1, Coordinate c2) {
-        return new Coordinate((c1.getX() + c2.getX()) / 2, (c1.getY() + c2.getY()) / 2, (c1.getZ() + c2.getZ()) / 2);
+    public static BlockPos center(BlockPos c1, BlockPos c2) {
+        return new BlockPos((c1.getX() + c2.getX()) / 2, (c1.getY() + c2.getY()) / 2, (c1.getZ() + c2.getZ()) / 2);
     }
 
     @Deprecated
-    public static Coordinate readFromNBT(NBTTagCompound tagCompound, String tagName) {
+    public static BlockPos readFromNBT(NBTTagCompound tagCompound, String tagName) {
         int[] array = tagCompound.getIntArray(tagName);
         if (array.length == 0) {
             return null;
@@ -76,7 +76,7 @@ public class Coordinate extends BlockPos implements ByteBufConverter {
     }
 
     @Deprecated
-    public static void writeToNBT(NBTTagCompound tagCompound, String tagName, Coordinate coordinate) {
+    public static void writeToNBT(NBTTagCompound tagCompound, String tagName, BlockPos coordinate) {
         if (coordinate == null) {
             tagCompound.setIntArray(tagName, new int[] { });
         } else {
@@ -85,7 +85,7 @@ public class Coordinate extends BlockPos implements ByteBufConverter {
     }
 
     @Deprecated
-    public static NBTTagCompound writeToNBT(Coordinate coordinate) {
+    public static NBTTagCompound writeToNBT(BlockPos coordinate) {
         NBTTagCompound tagCompound = new NBTTagCompound();
         writeToNBT(tagCompound, "c", coordinate);
         return tagCompound;

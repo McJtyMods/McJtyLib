@@ -69,8 +69,8 @@ public class PacketUpdateNBTItem implements IMessage {
                     case TYPE_INTEGER:
                         tagCompound.setInteger(key, entry.getValue().getInteger());
                         break;
-                    case TYPE_COORDINATE:
-                        throw new RuntimeException("Coordinate not supported for PacketUpdateNBTItem!");
+                    case TYPE_BLOCKPOS:
+                        throw new RuntimeException("BlockPos not supported for PacketUpdateNBTItem!");
                     case TYPE_BOOLEAN:
                         tagCompound.setBoolean(key, entry.getValue().getBoolean());
                         break;

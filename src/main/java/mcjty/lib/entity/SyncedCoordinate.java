@@ -2,12 +2,13 @@ package mcjty.lib.entity;
 
 import mcjty.lib.varia.Coordinate;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
 
 public class SyncedCoordinate extends SyncedVersionedObject {
 
-    private Coordinate coordinate;
+    private BlockPos coordinate;
 
-    public SyncedCoordinate(Coordinate coordinate) {
+    public SyncedCoordinate(BlockPos coordinate) {
         this.coordinate = coordinate;
     }
 
@@ -34,11 +35,11 @@ public class SyncedCoordinate extends SyncedVersionedObject {
         tagCompound.setTag(tagName, xCompound);
     }
 
-    public Coordinate getCoordinate() {
+    public BlockPos getCoordinate() {
         return coordinate;
     }
 
-    public void setCoordinate(Coordinate c) {
+    public void setCoordinate(BlockPos c) {
         coordinate = c;
         serverVersion++;
     }

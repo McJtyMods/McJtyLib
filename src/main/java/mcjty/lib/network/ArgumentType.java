@@ -6,7 +6,7 @@ import java.util.Map;
 public enum ArgumentType {
     TYPE_STRING(0),
     TYPE_INTEGER(1),
-    TYPE_COORDINATE(2),
+    TYPE_BLOCKPOS(2),
     TYPE_BOOLEAN(3),
     TYPE_DOUBLE(4);
 

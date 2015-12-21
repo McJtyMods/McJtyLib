@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.varia.Coordinate;
+import net.minecraft.util.BlockPos;
 
 public class Argument {
     private final String name;
@@ -25,8 +26,8 @@ public class Argument {
         this(name, ArgumentType.TYPE_DOUBLE, value);
     }
 
-    public Argument(String name, Coordinate value) {
-        this(name, ArgumentType.TYPE_COORDINATE, value);
+    public Argument(String name, BlockPos value) {
+        this(name, ArgumentType.TYPE_BLOCKPOS, value);
     }
 
     public Argument(String name, boolean value) {

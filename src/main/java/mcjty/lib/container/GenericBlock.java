@@ -1,12 +1,5 @@
 package mcjty.lib.container;
 
-import mcp.mobius.waila.api.ITaggedList;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
@@ -19,6 +12,9 @@ import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,10 +23,13 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -397,40 +396,6 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             if (te instanceof GenericTileEntity) {
                 ((GenericTileEntity)te).readRestorableFromNBT(tagCompound);
             }
-        }
-    }
-
-  /*  @Override
-    public void registerBlockIcons(IIconRegister iconRegister) {
-        if (getIdentifyingIconName() != null) {
-            iconInd = iconRegister.registerIcon(modBase.getModId() + ":" + getIdentifyingIconName());
-        }
-        iconSide = iconRegister.registerIcon(modBase.getModId() + ":" + getSideIconName());
-        iconTop = iconRegister.registerIcon(modBase.getModId() + ":" + getTopIconName());
-        iconBottom = iconRegister.registerIcon(modBase.getModId() + ":" + getBottomIconName());
-    }*/
-
-    public String getSideIconName() {
-        if (creative) {
-            return "machineSideC";
-        } else {
-            return "machineSide";
-        }
-    }
-
-    public String getTopIconName() {
-        if (creative) {
-            return "machineSideC";
-        } else {
-            return "machineTop";
-        }
-    }
-
-    public String getBottomIconName() {
-        if (creative) {
-            return "machineSideC";
-        } else {
-            return "machineBottom";
         }
     }
 

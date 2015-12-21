@@ -45,14 +45,14 @@ public class AbstractServerCommand implements IMessage {
                     case TYPE_INTEGER:
                         args.put(key, new Argument(key, buf.readInt()));
                         break;
-                    case TYPE_COORDINATE:
+                    case TYPE_BLOCKPOS:
                         int cx = buf.readInt();
                         int cy = buf.readInt();
                         int cz = buf.readInt();
                         if (cx == -1 && cy == -1 && cz == -1) {
-                            args.put(key, new Argument(key, (Coordinate) null));
+                            args.put(key, new Argument(key, (BlockPos) null));
                         } else {
-                            args.put(key, new Argument(key, new Coordinate(cx, cy, cz)));
+                            args.put(key, new Argument(key, new BlockPos(cx, cy, cz)));
                         }
                         break;
                     case TYPE_BOOLEAN:
@@ -83,8 +83,8 @@ public class AbstractServerCommand implements IMessage {
                     case TYPE_INTEGER:
                         buf.writeInt(arg.getInteger());
                         break;
-                    case TYPE_COORDINATE:
-                        Coordinate c = arg.getCoordinate();
+                    case TYPE_BLOCKPOS:
+                        BlockPos c = arg.getCoordinate();
                         if (c == null) {
                             buf.writeInt(-1);
                             buf.writeInt(-1);
