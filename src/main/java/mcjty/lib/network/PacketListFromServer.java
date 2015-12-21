@@ -1,13 +1,8 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.varia.Logging;
-import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,25 +63,5 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T ext
         this.command = command;
         this.list = new ArrayList<T>();
         this.list.addAll(list);
-    }
-
-    public class Handler implements IMessageHandler<S, IMessage> {
-        @Override
-        public IMessage onMessage(S message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(S message, MessageContext ctx) {
-            TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(message.pos);
-            if(!(te instanceof ClientCommandHandler)) {
-                Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
-                return;
-            }
-            ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
-            if (!clientCommandHandler.execute(message.command, message.list)) {
-                Logging.log("Command " + message.command + " was not handled!");
-            }
-        }
     }
 }

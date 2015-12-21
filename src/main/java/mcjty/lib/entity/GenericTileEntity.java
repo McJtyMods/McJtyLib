@@ -5,7 +5,6 @@ import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
-import mcjty.lib.varia.Coordinate;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -16,7 +15,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.Constants;
 
 import java.util.ArrayList;
@@ -260,10 +258,4 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public boolean execute(String command, Integer result) {
         return false;
     }
-
-    @Deprecated
-    public Coordinate getCoordinate() {
-        return new Coordinate(pos);
-    }
-
 }

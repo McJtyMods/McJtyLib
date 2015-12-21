@@ -1,6 +1,5 @@
 package mcjty.lib.network;
 
-import mcjty.lib.varia.Coordinate;
 import net.minecraft.util.BlockPos;
 
 public class Argument {
@@ -58,8 +57,8 @@ public class Argument {
         return (Double) value;
     }
 
-    public Coordinate getCoordinate() {
-        return (Coordinate) value;
+    public BlockPos getCoordinate() {
+        return (BlockPos) value;
     }
 
     public boolean getBoolean() {

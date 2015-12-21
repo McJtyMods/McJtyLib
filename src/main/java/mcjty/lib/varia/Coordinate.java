@@ -10,17 +10,7 @@ import net.minecraft.util.EnumFacing;
 @Deprecated
 public class Coordinate extends BlockPos implements ByteBufConverter {
     @Deprecated
-    public static final Coordinate INVALID = new Coordinate(-1, -1, -1);
-
-    @Deprecated
-    public Coordinate(ByteBuf buf) {
-        this(buf.readInt(), buf.readInt(), buf.readInt());
-    }
-
-    @Deprecated
-    public Coordinate(BlockPos pos){
-        this(pos.getX(), pos.getY(), pos.getZ());
-    }
+    public static final BlockPos INVALID = new BlockPos(-1, -1, -1);
 
     @Deprecated
     public Coordinate(int x, int y, int z) {
@@ -91,4 +81,7 @@ public class Coordinate extends BlockPos implements ByteBufConverter {
         return tagCompound;
     }
 
+    public static String toString(BlockPos pos) {
+        return pos.getX() + "," + pos.getY() + "," + pos.getZ();
+    }
 }
