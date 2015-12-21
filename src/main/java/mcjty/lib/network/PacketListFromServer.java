@@ -1,13 +1,13 @@
 package mcjty.lib.network;
 
-import net.minecraft.util.BlockPos;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Logging;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,20 +19,15 @@ import java.util.List;
  * @param <S> is the type of the subclass of this class. i.e. the class you're implementing
  * @param <T> is the type of the items in the list that is requested from the server
  */
-public abstract class PacketListFromServer<S extends PacketListFromServer, T extends ByteBufConverter> implements IMessage, IMessageHandler<S, IMessage> {
+public abstract class PacketListFromServer<S extends PacketListFromServer, T extends ByteBufConverter> implements IMessage {
 
-    int x;
-    int y;
-    int z;
-    List<T> list;
-    String command;
+    public BlockPos pos;
+    public List<T> list;
+    public String command;
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        x = buf.readInt();
-        y = buf.readInt();
-        z = buf.readInt();
-
+        pos = NetworkTools.readPos(buf);
         command = NetworkTools.readString(buf);
 
         int size = buf.readInt();
@@ -51,9 +46,7 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T ext
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(x);
-        buf.writeInt(y);
-        buf.writeInt(z);
+        NetworkTools.writePos(buf, pos);
 
         NetworkTools.writeString(buf, command);
 
@@ -71,30 +64,29 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T ext
     }
 
     public PacketListFromServer(BlockPos pos, String command, List<T> list){
-        this(pos.getX(), pos.getY(), pos.getZ(), command, list);
-    }
-
-    public PacketListFromServer(int x, int y, int z, String command, List<T> list) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        this.pos = pos;
         this.command = command;
         this.list = new ArrayList<T>();
         this.list.addAll(list);
     }
 
-    @Override
-    public IMessage onMessage(S message, MessageContext ctx) {
-        TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(new BlockPos(message.x, message.y, message.z));
-        if(!(te instanceof ClientCommandHandler)) {
-            Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
+    public class Handler implements IMessageHandler<S, IMessage> {
+        @Override
+        public IMessage onMessage(S message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
             return null;
         }
-        ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
-        if (!clientCommandHandler.execute(message.command, message.list)) {
-            Logging.log("Command " + message.command + " was not handled!");
-        }
-        return null;
-    }
 
+        private void handle(S message, MessageContext ctx) {
+            TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(message.pos);
+            if(!(te instanceof ClientCommandHandler)) {
+                Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
+                return;
+            }
+            ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
+            if (!clientCommandHandler.execute(message.command, message.list)) {
+                Logging.log("Command " + message.command + " was not handled!");
+            }
+        }
+    }
 }
