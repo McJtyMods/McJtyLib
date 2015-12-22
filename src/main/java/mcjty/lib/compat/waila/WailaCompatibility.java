@@ -25,7 +25,8 @@ public class WailaCompatibility implements IWailaDataProvider {
     private static boolean registered;
     private static boolean loaded;
 
-    static void load(IWailaRegistrar registrar) {
+    public static void load(IWailaRegistrar registrar) {
+        System.out.println("WailaCompatibility.load");
         if (!registered){
             throw new RuntimeException("Please register this handler using the provided method.");
         }
@@ -38,6 +39,7 @@ public class WailaCompatibility implements IWailaDataProvider {
     }
 
     public static void register(){
+        System.out.println("WailaCompatibility.register");
         if (registered)
             return;
         registered = true;
