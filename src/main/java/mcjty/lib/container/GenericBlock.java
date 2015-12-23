@@ -1,5 +1,6 @@
 package mcjty.lib.container;
 
+import cofh.api.item.IToolHammer;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
@@ -205,15 +206,18 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
-        /*if (item instanceof IToolHammer) {
+        if (item instanceof IToolHammer) {
             IToolHammer hammer = (IToolHammer) item;
+            int x = pos.getX();
+            int y = pos.getY();
+            int z = pos.getZ();
             if (hammer.isUsable(itemStack, player, x, y, z)) {
                 hammer.toolUsed(itemStack, player, x, y, z);
                 wrenchUsed = WrenchUsage.NORMAL;
             } else {
                 wrenchUsed = WrenchUsage.DISABLED;
             }
-        } else*/ if (WrenchChecker.isAWrench(item)) {
+        } else if (WrenchChecker.isAWrench(item)) {
             wrenchUsed = WrenchUsage.NORMAL;
         }
         return wrenchUsed;
@@ -234,7 +238,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     protected boolean wrenchUse(World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
-        //rotateBlock(world, pos); //TODO: re-impl.
+        rotateBlock(world, pos, EnumFacing.UP);
         return true;
     }
 
@@ -322,21 +326,12 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         }
     }
 
-    /**
-     * Rotate this block. Typically when a wrench is used on this block.
-     *
-    protected void rotateBlock(World world, BlockPos pos) {
-        int meta = world.getBlockMetadata(x, y, z);
-        if (horizRotation) {
-            EnumFacing dir = BlockTools.getOrientationHoriz(meta);
-            dir = dir.getRotation(EnumFacing.UP);
-            world.setBlockMetadataWithNotify(x, y, z, BlockTools.setOrientationHoriz(meta, dir), 2);
-        } else {
-            EnumFacing dir = BlockTools.getOrientation(meta);
-            dir = dir.getRotation(EnumFacing.UP);
-            world.setBlockMetadataWithNotify(x, y, z, BlockTools.setOrientation(meta, dir), 2);
-        }
-    }*/
+    @Override
+    public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
+        return super.rotateBlock(world, pos, axis);
+    }
+
+
 
     @Override
     public boolean shouldCheckWeakPower(IBlockAccess world, BlockPos pos, EnumFacing side) {
