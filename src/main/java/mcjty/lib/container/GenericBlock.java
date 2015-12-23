@@ -26,6 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -37,7 +38,8 @@ import java.util.List;
 
 public abstract class GenericBlock extends Block implements ITileEntityProvider, WailaInfoProvider {
 
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
     protected ModBase modBase;
     protected final Class<? extends TileEntity> tileEntityClass;
@@ -284,29 +286,32 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        world.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
+        if (horizRotation) {
+            world.setBlockState(pos, state.withProperty(FACING_HORIZ, placer.getHorizontalFacing().getOpposite()), 2);
+        } else {
+            world.setBlockState(pos, state.withProperty(FACING, getFacingFromEntity(pos, placer)), 2);
+        }
         restoreBlockFromNBT(world, pos, stack);
         if (!world.isRemote && GeneralConfig.manageOwnership) {
             setOwner(world, pos, placer);
         }
     }
 
-    /*@Override
-    public void onBlockPlacedBy(World world, BlockPos pos, EntityLivingBase entityLivingBase, ItemStack itemStack) {
-        EnumFacing dir = getOrientation(x, y, z, entityLivingBase);
-        int meta = world.getBlockMetadata(x, y, z);
-        if (horizRotation) {
-            int power = world.isBlockProvidingPowerTo(x + dir.offsetX, y + dir.offsetY, z + dir.offsetZ, dir.ordinal());
-            meta = BlockTools.setRedstoneSignalIn(meta, power > 0);
-            world.setBlockMetadataWithNotify(x, y, z, BlockTools.setOrientationHoriz(meta, dir), 2);
-        } else {
-            world.setBlockMetadataWithNotify(x, y, z, BlockTools.setOrientation(meta, dir), 2);
+    public static EnumFacing getFacingFromEntity(BlockPos clickedBlock, EntityLivingBase entityIn) {
+        if (MathHelper.abs((float) entityIn.posX - clickedBlock.getX()) < 2.0F && MathHelper.abs((float) entityIn.posZ - clickedBlock.getZ()) < 2.0F) {
+            double d0 = entityIn.posY + entityIn.getEyeHeight();
+
+            if (d0 - clickedBlock.getY() > 2.0D) {
+                return EnumFacing.UP;
+            }
+
+            if (clickedBlock.getY() - d0 > 0.0D) {
+                return EnumFacing.DOWN;
+            }
         }
-        restoreBlockFromNBT(world, pos, itemStack);
-        if (!world.isRemote && GeneralConfig.manageOwnership) {
-            setOwner(world, pos, entityLivingBase);
-        }
-    }*/
+
+        return entityIn.getHorizontalFacing().getOpposite();
+    }
 
     protected void setOwner(World world, BlockPos pos, EntityLivingBase entityLivingBase) {
         TileEntity te = world.getTileEntity(pos);
@@ -484,20 +489,36 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(FACING, getFacing(meta));
+        if (horizRotation) {
+            return getDefaultState().withProperty(FACING_HORIZ, getFacingHoriz(meta));
+        } else {
+            return getDefaultState().withProperty(FACING, getFacing(meta));
+        }
+    }
+
+    public static EnumFacing getFacingHoriz(int meta) {
+        return EnumFacing.values()[meta+2];
     }
 
     public static EnumFacing getFacing(int meta) {
-        return EnumFacing.values()[meta+2];
+        return EnumFacing.values()[meta & 7];
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return state.getValue(FACING).getIndex()-2;
+        if (horizRotation) {
+            return state.getValue(FACING_HORIZ).getIndex()-2;
+        } else {
+            return state.getValue(FACING).getIndex();
+        }
     }
 
     @Override
     protected BlockState createBlockState() {
-        return new BlockState(this, FACING);
+        if (horizRotation) {
+            return new BlockState(this, FACING_HORIZ);
+        } else {
+            return new BlockState(this, FACING);
+        }
     }
 }
