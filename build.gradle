@@ -86,8 +86,6 @@ processResources
 }
 
 uploadArchives() {
-    dependsOn reobf
-
         repositories {
             logger.info('Publishing to files server')
 
