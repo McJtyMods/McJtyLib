@@ -6,6 +6,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ColorChoiceEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import org.lwjgl.input.Keyboard;
 
 import java.util.*;
 
@@ -80,9 +81,16 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
     public Widget mouseClick(Window window, int x, int y, int button) {
         if (isEnabledAndVisible()) {
             int index = colorList.indexOf(currentColor);
-            index++;
-            if (index >= colorList.size()) {
-                index = 0;
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+                index--;
+                if (index < 0) {
+                    index = colorList.size()-1;
+                }
+            } else {
+                index++;
+                if (index >= colorList.size()) {
+                    index = 0;
+                }
             }
             currentColor = colorList.get(index);
             fireChoiceEvents(currentColor);

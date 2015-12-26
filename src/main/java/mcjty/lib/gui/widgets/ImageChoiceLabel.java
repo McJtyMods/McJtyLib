@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,9 +80,16 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         if (isEnabledAndVisible()) {
-            currentChoice++;
-            if (currentChoice >= choiceList.size()) {
-                currentChoice = 0;
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+                currentChoice--;
+                if (currentChoice < 0) {
+                    currentChoice = choiceList.size() - 1;
+                }
+            } else {
+                currentChoice++;
+                if (currentChoice >= choiceList.size()) {
+                    currentChoice = 0;
+                }
             }
             setCurrentChoice(currentChoice);
             fireChoiceEvents(choiceList.get(currentChoice));

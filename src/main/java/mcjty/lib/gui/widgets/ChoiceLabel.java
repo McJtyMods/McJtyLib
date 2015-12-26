@@ -6,6 +6,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import org.lwjgl.input.Keyboard;
 
 import java.util.*;
 
@@ -89,9 +90,16 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            index++;
-            if (index >= choiceList.size()) {
-                index = 0;
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+                index--;
+                if (index < 0) {
+                    index = choiceList.size()-1;
+                }
+            } else {
+                index++;
+                if (index >= choiceList.size()) {
+                    index = 0;
+                }
             }
             currentChoice = choiceList.get(index);
             setText(currentChoice);
