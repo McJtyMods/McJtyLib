@@ -40,11 +40,11 @@ public class InventoryHelper {
      * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
      * This version also checks for ISidedInventory if that's implemented by the inventory
      */
-    public static int mergeItemStackSafe(IInventory inventory, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+    public static int mergeItemStackSafe(IInventory inventory, boolean checkSlots, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
         if (inventory instanceof ISidedInventory) {
-            return mergeItemStackInternal(inventory, (ISidedInventory) inventory, side, result, start, stop, undo);
+            return mergeItemStackInternal(inventory, (ISidedInventory) inventory, checkSlots, side, result, start, stop, undo);
         } else {
-            return mergeItemStackInternal(inventory, null, side, result, start, stop, undo);
+            return mergeItemStackInternal(inventory, null, checkSlots, side, result, start, stop, undo);
         }
     }
 
@@ -52,11 +52,11 @@ public class InventoryHelper {
      * Merges provided ItemStack with the first available one in this inventory. It will return the amount
      * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
      */
-    public static int mergeItemStack(IInventory inventory, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
-        return mergeItemStackInternal(inventory, null, null, result, start, stop, undo);
+    public static int mergeItemStack(IInventory inventory, boolean checkSlots, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+        return mergeItemStackInternal(inventory, null, checkSlots, null, result, start, stop, undo);
     }
 
-    private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+    private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, boolean checkSlots, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
         int k = start;
 
         ItemStack itemstack1;
@@ -66,7 +66,9 @@ public class InventoryHelper {
             while (itemsToPlace > 0 && (k < stop)) {
                 itemstack1 = inventory.getStackInSlot(k);
 
-                if (isItemStackConsideredEqual(result, itemstack1) && (sidedInventory == null || sidedInventory.canInsertItem(k, result, side))) {
+                if (isItemStackConsideredEqual(result, itemstack1)
+                        && (sidedInventory == null || sidedInventory.canInsertItem(k, result, side))
+                        && ((!checkSlots) || inventory.isItemValidForSlot(k, result))) {
                     int l = itemstack1.stackSize + itemsToPlace;
 
                     if (l <= result.getMaxStackSize()) {
@@ -101,7 +103,9 @@ public class InventoryHelper {
             while (k < stop) {
                 itemstack1 = inventory.getStackInSlot(k);
 
-                if (itemstack1 == null && (sidedInventory == null || sidedInventory.canInsertItem(k, result, side))) {
+                if (itemstack1 == null
+                        && (sidedInventory == null || sidedInventory.canInsertItem(k, result, side))
+                        && ((!checkSlots) || inventory.isItemValidForSlot(k, result))) {
                     if (undo != null) {
                         if (!undo.containsKey(k)) {
                             undo.put(k, null);
@@ -227,7 +231,7 @@ public class InventoryHelper {
         for (int i = 0 ; i < max ; i++) {
             ItemStack stack = stacks[i+start];
             if (stack != null) {
-                mergeItemStack(inv, stack, 0, max, null);
+                mergeItemStack(inv, false, stack, 0, max, null);
             }
         }
         for (int i = 0 ; i < max ; i++) {
