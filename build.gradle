@@ -29,7 +29,7 @@ repositories {
     }
 }
 
-version = "1.8.0beta1"
+version = "1.8.8-1.8.1beta1"
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
@@ -37,7 +37,7 @@ if (ENV.DRONE_BUILD_NUMBER) {
 version += "-SNAPSHOT"
 
 group= "com.github.mcjty" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "mcjtylib188"
+archivesBaseName = "mcjtylib"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
