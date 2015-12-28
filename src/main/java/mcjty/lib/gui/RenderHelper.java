@@ -357,11 +357,12 @@ public class RenderHelper {
         float f = 0.00390625F;
         float f1 = 0.00390625F;
         Tessellator tessellator = Tessellator.getInstance();
-       // tessellator.startDrawingQuads(); //TODO
-      //  tessellator.addVertexWithUV((double)(x + 0), (double)(y + height), (double)zLevel, (double)((float)(u + 0) * f), (double)((float)(v + height) * f1));
-       // tessellator.addVertexWithUV((double) (x + width), (double) (y + height), (double) zLevel, (double) ((float) (u + width) * f), (double) ((float) (v + height) * f1));
-      //  tessellator.addVertexWithUV((double) (x + width), (double) (y + 0), (double) zLevel, (double) ((float) (u + width) * f), (double) ((float) (v + 0) * f1));
-      //  tessellator.addVertexWithUV((double) (x + 0), (double) (y + 0), (double) zLevel, (double) ((float) (u + 0) * f), (double) ((float) (v + 0) * f1));
+        WorldRenderer renderer = tessellator.getWorldRenderer();
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        renderer.pos((double)(x + 0), (double)(y + height), (double)zLevel).tex((double)((float)(u + 0) * f), (double)((float)(v + height) * f1)).endVertex();
+        renderer.pos((double) (x + width), (double) (y + height), (double) zLevel).tex((double) ((float) (u + width) * f), (double) ((float) (v + height) * f1)).endVertex();
+        renderer.pos((double) (x + width), (double) (y + 0), (double) zLevel).tex((double) ((float) (u + width) * f), (double) ((float) (v + 0) * f1)).endVertex();
+        renderer.pos((double) (x + 0), (double) (y + 0), (double) zLevel).tex((double) ((float) (u + 0) * f), (double) ((float) (v + 0) * f1)).endVertex();
         tessellator.draw();
     }
 
@@ -371,12 +372,13 @@ public class RenderHelper {
         rotateToPlayer();
 
         Tessellator tessellator = Tessellator.getInstance();
-      //  tessellator.startDrawingQuads(); //TODO
-      //  tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
-      //  tessellator.addVertexWithUV(-scale, +scale, 0, 0, 1);
-      //  tessellator.addVertexWithUV(+scale, +scale, 0, 1, 1);
-      // tessellator.addVertexWithUV(+scale, -scale, 0, 1, 0);
-       // tessellator.draw();
+        WorldRenderer renderer = tessellator.getWorldRenderer();
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        renderer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
+        renderer.pos(-scale, +scale, 0).tex(0, 1).endVertex();;
+        renderer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
+        renderer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
+        tessellator.draw();
         GL11.glPopMatrix();
     }
 
@@ -428,12 +430,12 @@ public class RenderHelper {
         drawQuad(Tessellator.getInstance(), p1, p3, p4, p2);
     }
 
-    //TODO
     public static void drawQuad(Tessellator tessellator, Vector p1, Vector p2, Vector p3, Vector p4) {
-        //tessellator.addVertexWithUV(p1.getX(), p1.getY(), p1.getZ(), 0, 0);
-        //tessellator.addVertexWithUV(p2.getX(), p2.getY(), p2.getZ(), 1, 0);
-        //tessellator.addVertexWithUV(p3.getX(), p3.getY(), p3.getZ(), 1, 1);
-        //tessellator.addVertexWithUV(p4.getX(), p4.getY(), p4.getZ(), 0, 1);
+        WorldRenderer renderer = tessellator.getWorldRenderer();
+        renderer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0, 0).endVertex();
+        renderer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1, 0).endVertex();
+        renderer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1, 1).endVertex();
+        renderer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0, 1).endVertex();
     }
 
     public static class Vector {
