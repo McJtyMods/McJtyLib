@@ -6,11 +6,12 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractWidget<P extends AbstractWidget> implements Widget<P> {
@@ -50,10 +51,10 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     }
 
     protected void drawBox(int xx, int yy, int color) {
-        gui.drawRect(xx, yy, xx, yy + bounds.height, color);
-        gui.drawRect(xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
-        gui.drawRect(xx, yy, xx + bounds.width, yy, color);
-        gui.drawRect(xx, yy + bounds.height, xx + bounds.width, yy + bounds.height, color);
+        Gui.drawRect(xx, yy, xx, yy + bounds.height, color);
+        Gui.drawRect(xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
+        Gui.drawRect(xx, yy, xx + bounds.width, yy, color);
+        Gui.drawRect(xx, yy + bounds.height, xx + bounds.width, yy + bounds.height, color);
     }
 
     @Override
@@ -65,9 +66,7 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     public P setTooltips(String... tooltips) {
         if (tooltips.length > 0) {
             this.tooltips = new ArrayList<String>();
-            for (String s : tooltips) {
-                this.tooltips.add(s);
-            }
+            Collections.addAll(this.tooltips, tooltips);
         } else {
             this.tooltips = null;
         }
@@ -224,7 +223,7 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
         if (!visible) {
             return;
         }
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;

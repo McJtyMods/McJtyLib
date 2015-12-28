@@ -4,6 +4,7 @@ import mcjty.lib.base.StyleConfig;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -14,49 +15,46 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 public class RenderHelper {
     public static float rot = 0.0f;
 
     public static void renderEntity(Entity entity, int xPos, int yPos) {
-        GL11.glPushMatrix();
-        GL11.glColor3f(1F, 1F, 1F);
-        GL11.glEnable(32826 /* GL_RESCALE_NORMAL_EXT */);
-        GL11.glEnable(2903 /* GL_COLOR_MATERIAL */);
-        GL11.glPushMatrix();
-        GL11.glTranslatef(xPos + 8, yPos + 16, 50F);
+        GlStateManager.pushMatrix();
+        GlStateManager.color(1f, 1f, 1f);
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableColorMaterial();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(xPos + 8, yPos + 16, 50F);
         float f1 = 10F;
-        GL11.glScalef(-f1, f1, f1);
-        GL11.glRotatef(180F, 0.0F, 0.0F, 1.0F);
-        GL11.glRotatef(135F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.scale(-f1, f1, f1);
+        GlStateManager.rotate(180F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(135F, 0.0F, 1.0F, 0.0F);
         net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
-        GL11.glRotatef(-135F, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(rot, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(0.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(-135F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(rot, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(0.0F, 1.0F, 0.0F, 0.0F);
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.rotationPitch = 0.0F;
-        GL11.glTranslatef(0.0F, (float)entity.getYOffset(), 0.0F);
+        GlStateManager.translate(0.0F, (float) entity.getYOffset(), 0.0F);
         Minecraft.getMinecraft().getRenderManager().playerViewY = 180F;
-        Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D,
-                0.0F, 1.0F);
-        GL11.glPopMatrix();
+        Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
+        GlStateManager.popMatrix();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
-        GL11.glDisable(32826 /* GL_RESCALE_NORMAL_EXT */);
-        GL11.glTranslatef(0F, 0F, 0.0F);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glEnable(32826 /* GL_RESCALE_NORMAL_EXT */);
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.translate(0F, 0F, 0.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableRescaleNormal();
         int i1 = 240;
         int k1 = 240;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit,
-                i1 / 1.0F, k1 / 1.0F);
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GL11.glDisable(32826 /* GL_RESCALE_NORMAL_EXT */);
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, i1 / 1.0F, k1 / 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.disableRescaleNormal();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        GL11.glDisable(2896 /* GL_LIGHTING */);
-        GL11.glDisable(2929 /* GL_DEPTH_TEST */);
-        GL11.glPopMatrix();
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.popMatrix();
     }
 
     public static boolean renderObject(Minecraft mc, int x, int y, Object itm, boolean highlight) {
@@ -103,41 +101,29 @@ public class RenderHelper {
     }
 
     public static boolean renderItemStack(Minecraft mc, RenderItem itemRender, ItemStack itm, int x, int y, String txt, boolean highlight){
-        GL11.glColor3f(1F, 1F, 1F);
-
-        boolean isLightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
+        GlStateManager.color(1F, 1F, 1F);
 
         boolean rc = false;
         if (highlight){
-            GL11.glDisable(GL11.GL_LIGHTING);
+            GlStateManager.disableLighting();
             drawVerticalGradientRect(x, y, x+16, y+16, 0x80ffffff, 0xffffffff);
         }
         if (itm != null && itm.getItem() != null) {
             rc = true;
-            boolean isRescaleNormalEnabled = GL11.glIsEnabled(GL12.GL_RESCALE_NORMAL);
-            GL11.glPushMatrix();
-            GL11.glTranslatef(0.0F, 0.0F, 32.0F);
-            GL11.glColor4f(1F, 1F, 1F, 1F);
-            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-            GL11.glEnable(GL11.GL_LIGHTING);
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0.0F, 0.0F, 32.0F);
+            GlStateManager.color(1F, 1F, 1F, 1F);
+            GlStateManager.enableRescaleNormal();
+            GlStateManager.enableLighting();
             short short1 = 240;
             short short2 = 240;
             net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
             itemRender.renderItemAndEffectIntoGUI(itm, x, y);
             itemRender.renderItemOverlayIntoGUI(mc.fontRendererObj, itm, x, y, txt);
-            GL11.glPopMatrix();
-            if (isRescaleNormalEnabled) {
-                GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-            } else {
-                GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-            }
-        }
-
-        if (isLightingEnabled) {
-            GL11.glEnable(GL11.GL_LIGHTING);
-        } else {
-            GL11.glDisable(GL11.GL_LIGHTING);
+            GlStateManager.popMatrix();
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.disableLighting();
         }
 
         return rc;
@@ -159,11 +145,11 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer renderer = tessellator.getWorldRenderer();
         renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
@@ -173,10 +159,10 @@ public class RenderHelper {
         renderer.pos(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
 
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     /**
@@ -195,11 +181,11 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_ALPHA_TEST);
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer renderer = tessellator.getWorldRenderer();
         renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
@@ -208,10 +194,10 @@ public class RenderHelper {
         renderer.pos(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
         renderer.pos(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GlStateManager.shadeModel(GL11.GL_FLAT);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
     }
 
     public static void drawHorizontalLine(int x1, int y1, int x2, int color) {
@@ -367,7 +353,7 @@ public class RenderHelper {
     }
 
     public static void renderBillboardQuad(double scale) {
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 
         rotateToPlayer();
 
@@ -379,32 +365,30 @@ public class RenderHelper {
         renderer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
         renderer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
         tessellator.draw();
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
     public static void renderBillboardQuadWithRotation(float rot, double scale) {
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 
         rotateToPlayer();
 
-//        GL11.glPushMatrix();
-
-        GL11.glRotatef(rot, 0, 0, 1);
+        GlStateManager.rotate(rot, 0, 0, 1);
 
         Tessellator tessellator = Tessellator.getInstance();
-        //tessellator.startDrawingQuads(); //TODO
-       // tessellator.addVertexWithUV(-scale, -scale, 0, 0, 0);
-        //tessellator.addVertexWithUV(-scale, +scale, 0, 0, 1);
-       // tessellator.addVertexWithUV(+scale, +scale, 0, 1, 1);
-     //  tessellator.addVertexWithUV(+scale, -scale, 0, 1, 0);
-      //  tessellator.draw();
-//        GL11.glPopMatrix();
-        GL11.glPopMatrix();
+        WorldRenderer renderer = tessellator.getWorldRenderer();
+        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        renderer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
+        renderer.pos(-scale, +scale, 0).tex(0, 1).endVertex();;
+        renderer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
+        renderer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
+        tessellator.draw();
+        GlStateManager.popMatrix();
     }
 
     public static void rotateToPlayer() {
-        GL11.glRotatef(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-        GL11.glRotatef(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
     }
 
     /**

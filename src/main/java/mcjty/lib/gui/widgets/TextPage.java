@@ -1,12 +1,12 @@
 package mcjty.lib.gui.widgets;
 
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.item.Item;
@@ -15,9 +15,9 @@ import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -236,7 +236,7 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     private void renderImage(int x, int y, Line line) {
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(line.resourceLocation);
         gui.drawTexturedModalRect(x+4, y+1, line.u, line.v, 16, 16);
 
@@ -278,11 +278,11 @@ public class TextPage extends AbstractWidget<TextPage> {
 
     private int renderRecipe(int x, int y, Line line) {
         y += 4;
-        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         // @TODO: need support for shapeless and better error checking
         ShapedRecipes shapedRecipes = (ShapedRecipes) line.recipe;
         if (craftingGridImage != null) {
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
             gui.drawTexturedModalRect(25+x, y, craftU, craftV, 19*3, 19*3);
         }
@@ -294,12 +294,12 @@ public class TextPage extends AbstractWidget<TextPage> {
             }
         }
         if (arrowImage != null) {
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(arrowImage);
             gui.drawTexturedModalRect(x+25+67, y+18, arrowU, arrowV, 16, 16);
         }
         if (craftingGridImage != null) {
-            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
             gui.drawTexturedModalRect(x+25+92, y + 16, craftU, craftV, 18, 18);
         }
