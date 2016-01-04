@@ -47,9 +47,6 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     private boolean creative;
 
-    // Set this to true in case horizontal rotation is used (2 bits rotation as opposed to 3).
-    private boolean horizRotation = false;
-
     public GenericBlock(ModBase mod, Material material, Class<? extends TileEntity> tileEntityClass, boolean isContainer) {
         super(material);
         this.modBase = mod;
@@ -61,12 +58,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         setHarvestLevel("pickaxe", 0);
     }
 
+    // Set this to true in case horizontal rotation is used (2 bits rotation as opposed to 3).
     public boolean isHorizRotation() {
-        return horizRotation;
-    }
-
-    public void setHorizRotation(boolean horizRotation) {
-        this.horizRotation = horizRotation;
+        return false;
     }
 
     public boolean isCreative() {
@@ -281,7 +275,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     protected EnumFacing getOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
-        if (horizRotation) {
+        if (isHorizRotation()) {
             return BlockTools.determineOrientationHoriz(entityLivingBase);
         } else {
             return BlockTools.determineOrientation(pos, entityLivingBase);
@@ -290,7 +284,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        if (horizRotation) {
+        if (isHorizRotation()) {
             world.setBlockState(pos, state.withProperty(FACING_HORIZ, placer.getHorizontalFacing().getOpposite()), 2);
         } else {
             world.setBlockState(pos, state.withProperty(FACING, getFacingFromEntity(pos, placer)), 2);
@@ -401,7 +395,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     public EnumFacing getOrientation(int meta) {
         EnumFacing k;
-        if (horizRotation) {
+        if (isHorizRotation()) {
             k = BlockTools.getOrientationHoriz(meta);
         } else {
             k = BlockTools.getOrientation(meta);
@@ -484,7 +478,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        if (horizRotation) {
+        if (isHorizRotation()) {
             return getDefaultState().withProperty(FACING_HORIZ, getFacingHoriz(meta));
         } else {
             return getDefaultState().withProperty(FACING, getFacing(meta));
@@ -501,7 +495,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        if (horizRotation) {
+        if (isHorizRotation()) {
             return state.getValue(FACING_HORIZ).getIndex()-2;
         } else {
             return state.getValue(FACING).getIndex();
@@ -510,7 +504,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     protected BlockState createBlockState() {
-        if (horizRotation) {
+        if (isHorizRotation()) {
             return new BlockState(this, FACING_HORIZ);
         } else {
             return new BlockState(this, FACING);
