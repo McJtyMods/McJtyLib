@@ -29,7 +29,7 @@ repositories {
     }
 }
 
-version = "1.8.9-1.8.1beta3"
+version = "1.8.9-1.8.1beta4"
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
