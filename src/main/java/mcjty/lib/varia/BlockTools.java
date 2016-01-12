@@ -8,9 +8,9 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.util.EnumFacing;
 
 import java.util.Random;
 
@@ -136,42 +136,6 @@ public class BlockTools {
 
     public static int setOrientationHoriz(int metadata, EnumFacing orientation) {
         return (metadata & ~MASK_ORIENTATION_HORIZONTAL) | (orientation.ordinal()-2);
-    }
-
-    public static boolean getRedstoneSignal(int metadata) {
-        return (metadata & MASK_REDSTONE) != 0;
-    }
-
-    public static int setRedstoneSignal(int metadata, boolean signal) {
-        if (signal) {
-            return metadata | MASK_REDSTONE;
-        } else {
-            return metadata & ~MASK_REDSTONE;
-        }
-    }
-
-    public static boolean getRedstoneSignalIn(int metadata) {
-        return (metadata & MASK_REDSTONE_IN) != 0;
-    }
-
-    public static int setRedstoneSignalIn(int metadata, boolean signal) {
-        if (signal) {
-            return metadata | MASK_REDSTONE_IN;
-        } else {
-            return metadata & ~MASK_REDSTONE_IN;
-        }
-    }
-
-    public static boolean getRedstoneSignalOut(int metadata) {
-        return (metadata & MASK_REDSTONE_OUT) != 0;
-    }
-
-    public static int setRedstoneSignalOut(int metadata, boolean signal) {
-        if (signal) {
-            return metadata | MASK_REDSTONE_OUT;
-        } else {
-            return metadata & ~MASK_REDSTONE_OUT;
-        }
     }
 
     public static int setState(int metadata, int value) {

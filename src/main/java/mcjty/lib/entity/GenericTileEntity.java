@@ -26,7 +26,6 @@ import java.util.UUID;
 
 public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler {
 
-    private List<SyncedObject> syncedObjects = new ArrayList<SyncedObject>();
     private int infused = 0;
 
     private String ownerName = "";
@@ -39,9 +38,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     public void setInvalid() {
-        for (SyncedObject value : syncedObjects) {
-            value.setInvalid();
-        }
         notifyBlockUpdate();
     }
 
@@ -52,21 +48,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     /// Called by GenericBlock.checkRedstoneWithTE() to set the redstone/powered state of this TE.
     public void setPowered(int powered) {
-    }
-
-    protected void checkStateClient() {
-        // @todo obsolete system?
-        // Sync all values from the server.
-        boolean syncNeeded = false;
-        for (SyncedObject value : syncedObjects) {
-            if (!value.isClientValueUptodate()) {
-                value.updateClientValue();
-                syncNeeded = true;
-            }
-        }
-        if (syncNeeded) {
-            notifyBlockUpdate();
-        }
     }
 
     protected void notifyBlockUpdate() {
@@ -82,10 +63,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     protected int updateMetaData(int meta) {
         return meta;
-    }
-
-    protected void registerSyncedObject(SyncedObject value) {
-        syncedObjects.add(value);
     }
 
     // Called when a slot is changed.
