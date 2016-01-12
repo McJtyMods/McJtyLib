@@ -19,7 +19,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,10 +36,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         worldObj.markBlockForUpdate(getPos());
     }
 
-    public void setInvalid() {
-        notifyBlockUpdate();
-    }
-
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
         return oldState.getBlock() != newSate.getBlock();
@@ -48,21 +43,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     /// Called by GenericBlock.checkRedstoneWithTE() to set the redstone/powered state of this TE.
     public void setPowered(int powered) {
-    }
-
-    protected void notifyBlockUpdate() {
-        IBlockState ibs = worldObj.getBlockState(pos);
-        int oldMeta = ibs.getBlock().getMetaFromState(ibs);
-        int newMeta = updateMetaData(oldMeta);
-        if (oldMeta != newMeta) {
-            worldObj.setBlockState(pos, ibs.getBlock().getStateFromMeta(newMeta), 2);
-        }
-        worldObj.notifyNeighborsOfStateChange(pos, getBlockType());
-        worldObj.markBlockForUpdate(pos);
-    }
-
-    protected int updateMetaData(int meta) {
-        return meta;
     }
 
     // Called when a slot is changed.
