@@ -104,7 +104,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
 
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack itemStack, EntityPlayer player, List list, boolean whatIsThis) {
+    public void addInformation(ItemStack itemStack, EntityPlayer player, List<String> list, boolean whatIsThis) {
         NBTTagCompound tagCompound = itemStack.getTagCompound();
         if (tagCompound != null) {
             if (tagCompound.hasKey("Energy")) {
