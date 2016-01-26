@@ -63,6 +63,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         return false;
     }
 
+    // Override and return true if this block has no rotation needed (overrides isHorizRotation)
+    public boolean hasNoRotation() { return false; }
+
     public boolean isCreative() {
         return creative;
     }
@@ -275,7 +278,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     protected EnumFacing getOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
-        if (isHorizRotation()) {
+        if (hasNoRotation()) {
+            return null;
+        } else if (isHorizRotation()) {
             return BlockTools.determineOrientationHoriz(entityLivingBase);
         } else {
             return BlockTools.determineOrientation(pos, entityLivingBase);
@@ -284,7 +289,8 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        if (isHorizRotation()) {
+        if (hasNoRotation()) {
+        } else if (isHorizRotation()) {
             world.setBlockState(pos, state.withProperty(FACING_HORIZ, placer.getHorizontalFacing().getOpposite()), 2);
         } else {
             world.setBlockState(pos, state.withProperty(FACING, getFacingFromEntity(pos, placer)), 2);
@@ -395,7 +401,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     public EnumFacing getOrientation(int meta) {
         EnumFacing k;
-        if (isHorizRotation()) {
+        if (hasNoRotation()) {
+            k = null;
+        } else if (isHorizRotation()) {
             k = BlockTools.getOrientationHoriz(meta);
         } else {
             k = BlockTools.getOrientation(meta);
@@ -478,7 +486,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        if (isHorizRotation()) {
+        if (hasNoRotation()) {
+            return getDefaultState();
+        } else if (isHorizRotation()) {
             return getDefaultState().withProperty(FACING_HORIZ, getFacingHoriz(meta));
         } else {
             return getDefaultState().withProperty(FACING, getFacing(meta));
@@ -495,7 +505,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        if (isHorizRotation()) {
+        if (hasNoRotation()) {
+            return 0;
+        } else if (isHorizRotation()) {
             return state.getValue(FACING_HORIZ).getIndex()-2;
         } else {
             return state.getValue(FACING).getIndex();
@@ -504,7 +516,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
 
     @Override
     protected BlockState createBlockState() {
-        if (isHorizRotation()) {
+        if (hasNoRotation()) {
+            return new BlockState(this);
+        } else if (isHorizRotation()) {
             return new BlockState(this, FACING_HORIZ);
         } else {
             return new BlockState(this, FACING);
