@@ -72,4 +72,6 @@ public class AbstractContainerWidget<P extends AbstractContainerWidget> extends 
     public int getChildCount() {
         return children.size();
     }
+
+    public Widget getChild(int index) { return children.get(index); }
 }
