@@ -80,7 +80,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                     l.add(e);
                 }
             } else {
-                current += s;
+                current += c;
             }
             i++;
         }
