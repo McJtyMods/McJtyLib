@@ -7,6 +7,7 @@ import mcjty.lib.gui.layout.LayoutHint;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
@@ -26,6 +27,7 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     private boolean hovering = false;
     protected boolean visible = true;
     protected List<String> tooltips = null;
+    protected List<ItemStack> items = null;
 
     private boolean layoutDirty = true;
     private Object userObject = null;
@@ -65,7 +67,7 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     @Override
     public P setTooltips(String... tooltips) {
         if (tooltips.length > 0) {
-            this.tooltips = new ArrayList<String>();
+            this.tooltips = new ArrayList<>(tooltips.length);
             Collections.addAll(this.tooltips, tooltips);
         } else {
             this.tooltips = null;
@@ -74,8 +76,24 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     }
 
     @Override
+    public P setTooltipItems(ItemStack... items) {
+        if (items.length > 0) {
+            this.items = new ArrayList<>(items.length);
+            Collections.addAll(this.items, items);
+        } else {
+            this.items = Collections.emptyList();
+        }
+        return (P) this;
+    }
+
+    @Override
     public List<String> getTooltips() {
         return tooltips;
+    }
+
+    @Override
+    public List<ItemStack> getTooltipItems() {
+        return items;
     }
 
     @Override

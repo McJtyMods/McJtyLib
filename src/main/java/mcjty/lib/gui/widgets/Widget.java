@@ -2,6 +2,7 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
+import net.minecraft.item.ItemStack;
 
 import java.awt.*;
 import java.util.List;
@@ -55,7 +56,15 @@ public interface Widget<P extends Widget> {
      */
     P setTooltips(String... tooltips);
 
+    /**
+     * Set itemstacks that the tooltips can use with @<index> notation
+     * @return
+     */
+    P setTooltipItems(ItemStack... items);
+
     List<String> getTooltips();
+
+    List<ItemStack> getTooltipItems();
 
     /**
      * Enable or disable mouse interaction with this widget. This is true by default.

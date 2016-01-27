@@ -3,6 +3,7 @@ package mcjty.lib.gui;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.preferences.PlayerPreferencesProperties;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Mouse;
 
 import java.util.List;
@@ -101,6 +102,19 @@ public class Window {
         if (toplevel.in(x, y) && toplevel.isVisible()) {
             Widget w = toplevel.getWidgetAtPosition(x, y);
             List<String> tooltips = w.getTooltips();
+            if (tooltips != null) {
+                return tooltips;
+            }
+        }
+        return null;
+    }
+
+    public List<ItemStack> getTooltipItems() {
+        int x = getRelativeX();
+        int y = getRelativeY();
+        if (toplevel.in(x, y) && toplevel.isVisible()) {
+            Widget w = toplevel.getWidgetAtPosition(x, y);
+            List<ItemStack> tooltips = w.getTooltipItems();
             if (tooltips != null) {
                 return tooltips;
             }
