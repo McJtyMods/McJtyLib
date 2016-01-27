@@ -76,6 +76,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                 i++;
                 int itemIdx = Integer.parseInt(s.substring(i, i + 1));
                 l.add(items.get(itemIdx));
+            } else {
+                current += s;
             }
             i++;
         }
@@ -158,7 +160,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                             font.drawStringWithShadow(s1, (float) curx, (float) yy, -1);
                             curx += font.getStringWidth((String) o);
                         } else {
-                            mcjty.lib.gui.RenderHelper.renderObject(mc, curx+1, yy, (ItemStack) o, false);
+                            mcjty.lib.gui.RenderHelper.renderObject(mc, curx+1, yy, o, false);
                             curx += 20;
                         }
                     }
