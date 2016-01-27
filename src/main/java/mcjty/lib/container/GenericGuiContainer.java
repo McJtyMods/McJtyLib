@@ -75,7 +75,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                 }
                 i++;
                 int itemIdx = Integer.parseInt(s.substring(i, i + 1));
-                l.add(items.get(itemIdx));
+                ItemStack e = items.get(itemIdx);
+                if (e != null) {
+                    l.add(e);
+                }
             } else {
                 current += s;
             }
