@@ -167,7 +167,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                             curx += 20;
                         }
                     }
-                    y += 8;
+                    yy += 8;
                 } else {
                     font.drawStringWithShadow(s1, (float) xx, (float) yy, -1);
                 }
