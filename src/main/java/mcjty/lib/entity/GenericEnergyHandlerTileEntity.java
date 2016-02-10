@@ -1,9 +1,10 @@
 package mcjty.lib.entity;
 
-import cofh.api.energy.IEnergyHandler;
+import cofh.api.energy.IEnergyProvider;
+import cofh.api.energy.IEnergyReceiver;
 import net.minecraft.util.EnumFacing;
 
-public class GenericEnergyHandlerTileEntity extends GenericEnergyStorageTileEntity implements IEnergyHandler {
+public class GenericEnergyHandlerTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, IEnergyProvider {
 
     public GenericEnergyHandlerTileEntity(int maxEnergy, int maxReceive) {
         super(maxEnergy, maxReceive);

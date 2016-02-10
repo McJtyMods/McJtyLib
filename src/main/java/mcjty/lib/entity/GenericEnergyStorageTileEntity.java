@@ -1,9 +1,8 @@
 package mcjty.lib.entity;
 
 import cofh.api.energy.EnergyStorage;
-import mcjty.lib.network.PacketHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.network.Argument;
+import mcjty.lib.network.PacketHandler;
 import mcjty.lib.network.PacketRequestIntegerFromServer;
 import net.minecraft.nbt.NBTTagCompound;
 
