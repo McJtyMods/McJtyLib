@@ -289,7 +289,7 @@ public class TextPage extends AbstractWidget<TextPage> {
         for (int i = 0 ; i < 3 ; i++) {
             for (int j = 0 ; j < 3 ; j++) {
                 if (i < shapedRecipes.recipeWidth && j < shapedRecipes.recipeHeight) {
-                    RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, shapedRecipes.recipeItems[i + j * 3], false);
+                    RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, shapedRecipes.recipeItems[i + j * shapedRecipes.recipeWidth], false);
                 }
             }
         }
@@ -400,7 +400,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                 this.line = line;
             } else {
                 Block block = GameRegistry.findBlock(modBase.getModId(), line.substring(4, end));
-                recipe = findRecipe(new ItemStack(block));
+                recipe = block == null ? null : findRecipe(new ItemStack(block));
                 if (recipe == null) {
                     // Error,
                     this.line = line;
@@ -417,7 +417,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                 this.line = line;
             } else {
                 Item item = GameRegistry.findItem(modBase.getModId(), line.substring(4, end));
-                recipe = findRecipe(new ItemStack(item));
+                recipe = item == null ? null : findRecipe(new ItemStack(item));
                 if (recipe == null) {
                     // Error,
                     this.line = line;
