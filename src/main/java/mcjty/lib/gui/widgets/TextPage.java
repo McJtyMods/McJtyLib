@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.commons.lang3.StringUtils;
@@ -289,7 +290,16 @@ public class TextPage extends AbstractWidget<TextPage> {
         for (int i = 0 ; i < 3 ; i++) {
             for (int j = 0 ; j < 3 ; j++) {
                 if (i < shapedRecipes.recipeWidth && j < shapedRecipes.recipeHeight) {
-                    RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, shapedRecipes.recipeItems[i + j * shapedRecipes.recipeWidth], false);
+                    ItemStack stack = shapedRecipes.recipeItems[i + j * shapedRecipes.recipeWidth];
+                    if (stack != null && stack.getItemDamage() == 32767) {
+                        // Just pick 0 here.
+                        NBTTagCompound tc = stack.getTagCompound();
+                        stack = new ItemStack(stack.getItem(), stack.stackSize, 0);
+                        if (tc != null) {
+                            stack.setTagCompound((NBTTagCompound) tc.copy());
+                        }
+                    }
+                    RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
                 }
             }
         }
