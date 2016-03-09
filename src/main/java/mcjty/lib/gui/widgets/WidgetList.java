@@ -97,6 +97,21 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
+    public Widget getWidgetAtPosition(int x, int y) {
+        x -= bounds.x;
+        y -= bounds.y;
+
+        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
+            Widget child = children.get(i);
+            if (child.in(x, y) && child.isVisible()) {
+                return child.getWidgetAtPosition(x, y);
+            }
+        }
+
+        return this;
+    }
+
+    @Override
     public void draw(Window window, int x, int y) {
         if (!visible) {
             return;
