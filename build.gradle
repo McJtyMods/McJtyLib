@@ -29,7 +29,7 @@ repositories {
     }
 }
 
-version = "1.8.9-1.8.1beta8"
+version = "1.9.0-1.8.1beta8"
 def ENV = System.getenv()
 if (ENV.DRONE_BUILD_NUMBER) {
     version += ".n" + ENV.DRONE_BUILD_NUMBER
@@ -44,15 +44,15 @@ targetCompatibility = 1.8
 
 
 minecraft {
-    version = "1.8.9-11.15.1.1747"
+    version = "1.9-12.16.0.1766-1.9"
     runDir = "run"
-    mappings = "snapshot_20160217"
+    mappings = "snapshot_20160318"
     useDepAts = true
 }
 
 dependencies {
-    deobfCompile "mcp.mobius.waila:Waila:1.6.0-B3_1.8.8"
-    deobfCompile "mezz.jei:jei_1.8.8:2.8.3.39"
+    //deobfCompile "mcp.mobius.waila:Waila:1.6.0-B3_1.8.8"
+    deobfCompile "mezz.jei:jei_1.9:3.0.2.164"
 }
 
 task deobfJar(type: Jar) {

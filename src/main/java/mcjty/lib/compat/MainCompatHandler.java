@@ -9,9 +9,10 @@ import mcjty.lib.compat.waila.WailaCompatibility;
 public class MainCompatHandler {
 
     public static void registerWaila(){
-        if (Loader.isModLoaded("Waila")){
-            WailaCompatibility.register();
-        }
+        //@todo
+//        if (Loader.isModLoaded("Waila")){
+//            WailaCompatibility.register();
+//        }
     }
 
 }

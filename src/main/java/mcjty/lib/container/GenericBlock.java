@@ -8,13 +8,12 @@ import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.WrenchChecker;
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.EntityLivingBase;
@@ -24,15 +23,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +53,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         this.creative = false;
         this.tileEntityClass = tileEntityClass;
         setHardness(2.0f);
-        setStepSound(soundTypeMetal);
+        setSoundType(SoundType.METAL);
         setHarvestLevel("pickaxe", 0);
     }
 
@@ -74,36 +73,37 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         this.creative = creative;
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        Block block = accessor.getBlock();
-        TileEntity tileEntity = accessor.getTileEntity();
-        if (tileEntity instanceof GenericTileEntity) {
-            GenericTileEntity genericTileEntity = (GenericTileEntity) tileEntity;
-            if (block instanceof Infusable) {
-                int infused = genericTileEntity.getInfused();
-                int pct = infused * 100 / GeneralConfig.maxInfuse;
-                currenttip.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
-            }
-            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-                if (GeneralConfig.manageOwnership) {
-                    if (genericTileEntity.getOwnerName() != null && !genericTileEntity.getOwnerName().isEmpty()) {
-                        int securityChannel = genericTileEntity.getSecurityChannel();
-                        if (securityChannel == -1) {
-                            currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
-                        } else {
-                            currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
-                        }
-                        if (genericTileEntity.getOwnerUUID() == null) {
-                            currenttip.add(EnumChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
-                        }
-                    }
-                }
-            }
-        }
-        return currenttip;
-    }
+    // @todo
+//    @Override
+//    @SideOnly(Side.CLIENT)
+//    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+//        Block block = accessor.getBlock();
+//        TileEntity tileEntity = accessor.getTileEntity();
+//        if (tileEntity instanceof GenericTileEntity) {
+//            GenericTileEntity genericTileEntity = (GenericTileEntity) tileEntity;
+//            if (block instanceof Infusable) {
+//                int infused = genericTileEntity.getInfused();
+//                int pct = infused * 100 / GeneralConfig.maxInfuse;
+//                currenttip.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
+//            }
+//            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+//                if (GeneralConfig.manageOwnership) {
+//                    if (genericTileEntity.getOwnerName() != null && !genericTileEntity.getOwnerName().isEmpty()) {
+//                        int securityChannel = genericTileEntity.getSecurityChannel();
+//                        if (securityChannel == -1) {
+//                            currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
+//                        } else {
+//                            currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
+//                        }
+//                        if (genericTileEntity.getOwnerUUID() == null) {
+//                            currenttip.add(EnumChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return currenttip;
+//    }
 
 
     @SideOnly(Side.CLIENT)
@@ -112,12 +112,12 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         if (tagCompound != null) {
             if (tagCompound.hasKey("Energy")) {
                 int energy = tagCompound.getInteger("Energy");
-                list.add(EnumChatFormatting.GREEN + "Energy: " + energy + " rf");
+                list.add(TextFormatting.GREEN + "Energy: " + energy + " rf");
             }
             if (this instanceof Infusable) {
                 int infused = tagCompound.getInteger("infused");
                 int pct = infused * 100 / GeneralConfig.maxInfuse;
-                list.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
+                list.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
             }
 
             if (GeneralConfig.manageOwnership && tagCompound.hasKey("owner")) {
@@ -128,13 +128,13 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
                 }
 
                 if (securityChannel == -1) {
-                    list.add(EnumChatFormatting.YELLOW + "Owned by: " + owner);
+                    list.add(TextFormatting.YELLOW + "Owned by: " + owner);
                 } else {
-                    list.add(EnumChatFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")");
+                    list.add(TextFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")");
                 }
 
                 if (!tagCompound.hasKey("idM")) {
-                    list.add(EnumChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                    list.add(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
                 }
             }
         }
@@ -159,14 +159,14 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     @Override
-    public boolean removedByPlayer(World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
+    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
         if (willHarvest) return true; // If it will harvest, delay deletion of the block until after getDrops
-        return super.removedByPlayer(world, pos, player, willHarvest);
+        return super.removedByPlayer(state, world, pos, player, willHarvest);
     }
 
     @Override
-    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState meta, TileEntity te) {
-        super.harvestBlock(world, player, pos, meta, te);
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, TileEntity te, ItemStack stack) {
+        super.harvestBlock(world, player, pos, state, te, stack);
         world.setBlockToAir(pos);
     }
 
@@ -179,16 +179,14 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     public TileEntity createTileEntity(World world, IBlockState metadata) {
         try {
             return tileEntityClass.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
 
     // This if this block was activated with a wrench
     private WrenchUsage testWrenchUsage(BlockPos pos, EntityPlayer player) {
-        ItemStack itemStack = player.getHeldItem();
+        ItemStack itemStack = player.getHeldItem(EnumHand.MAIN_HAND);
         WrenchUsage wrenchUsed = WrenchUsage.NOT;
         if (itemStack != null) {
             Item item = itemStack.getItem();
@@ -221,7 +219,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float sidex, float sidey, float sidez) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
         WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
         switch (wrenchUsed) {
             case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player);
@@ -332,9 +330,8 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
 
-
     @Override
-    public boolean shouldCheckWeakPower(IBlockAccess world, BlockPos pos, EnumFacing side) {
+    public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
         return false;
     }
 
@@ -378,7 +375,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
      */
     protected void breakAndRemember(World world, EntityPlayer player, BlockPos pos) {
         if (!world.isRemote) {
-            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos));
+            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos), null);
 //            world.setBlockToAir(x, y, z);
         }
     }
@@ -515,13 +512,13 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     @Override
-    protected BlockState createBlockState() {
+    protected BlockStateContainer createBlockState() {
         if (hasNoRotation()) {
-            return new BlockState(this);
+            return new BlockStateContainer(this);
         } else if (isHorizRotation()) {
-            return new BlockState(this, FACING_HORIZ);
+            return new BlockStateContainer(this, FACING_HORIZ);
         } else {
-            return new BlockState(this, FACING);
+            return new BlockStateContainer(this, FACING);
         }
     }
 }

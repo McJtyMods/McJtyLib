@@ -4,11 +4,7 @@ import mcjty.lib.base.StyleConfig;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.entity.RenderItem;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -38,7 +34,7 @@ public class RenderHelper {
         entity.rotationPitch = 0.0F;
         GlStateManager.translate(0.0F, (float) entity.getYOffset(), 0.0F);
         Minecraft.getMinecraft().getRenderManager().playerViewY = 180F;
-        Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F);
+        Minecraft.getMinecraft().getRenderManager().doRenderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
         GlStateManager.popMatrix();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
@@ -151,12 +147,12 @@ public class RenderHelper {
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer renderer = tessellator.getWorldRenderer();
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        renderer.pos(x2, y1, zLevel).color(f1, f2, f3, f).endVertex();
-        renderer.pos(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
-        renderer.pos(x1, y2, zLevel).color(f5, f6, f7, f4).endVertex();
-        renderer.pos(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        buffer.pos(x2, y1, zLevel).color(f1, f2, f3, f).endVertex();
+        buffer.pos(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
+        buffer.pos(x1, y2, zLevel).color(f5, f6, f7, f4).endVertex();
+        buffer.pos(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
 
         GlStateManager.shadeModel(GL11.GL_FLAT);
@@ -187,12 +183,12 @@ public class RenderHelper {
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer renderer = tessellator.getWorldRenderer();
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        renderer.pos(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
-        renderer.pos(x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
-        renderer.pos(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
-        renderer.pos(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        buffer.pos(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
+        buffer.pos(x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
+        buffer.pos(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
+        buffer.pos(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
@@ -343,12 +339,12 @@ public class RenderHelper {
         float f = 0.00390625F;
         float f1 = 0.00390625F;
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer renderer = tessellator.getWorldRenderer();
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        renderer.pos((double)(x + 0), (double)(y + height), (double)zLevel).tex((double)((float)(u + 0) * f), (double)((float)(v + height) * f1)).endVertex();
-        renderer.pos((double) (x + width), (double) (y + height), (double) zLevel).tex((double) ((float) (u + width) * f), (double) ((float) (v + height) * f1)).endVertex();
-        renderer.pos((double) (x + width), (double) (y + 0), (double) zLevel).tex((double) ((float) (u + width) * f), (double) ((float) (v + 0) * f1)).endVertex();
-        renderer.pos((double) (x + 0), (double) (y + 0), (double) zLevel).tex((double) ((float) (u + 0) * f), (double) ((float) (v + 0) * f1)).endVertex();
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos((double) (x + 0), (double) (y + height), (double) zLevel).tex((double)((float)(u + 0) * f), (double)((float)(v + height) * f1)).endVertex();
+        buffer.pos((double) (x + width), (double) (y + height), (double) zLevel).tex((double) ((float) (u + width) * f), (double) ((float) (v + height) * f1)).endVertex();
+        buffer.pos((double) (x + width), (double) (y + 0), (double) zLevel).tex((double) ((float) (u + width) * f), (double) ((float) (v + 0) * f1)).endVertex();
+        buffer.pos((double) (x + 0), (double) (y + 0), (double) zLevel).tex((double) ((float) (u + 0) * f), (double) ((float) (v + 0) * f1)).endVertex();
         tessellator.draw();
     }
 
@@ -358,12 +354,12 @@ public class RenderHelper {
         rotateToPlayer();
 
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer renderer = tessellator.getWorldRenderer();
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        renderer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
-        renderer.pos(-scale, +scale, 0).tex(0, 1).endVertex();;
-        renderer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
-        renderer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
+        buffer.pos(-scale, +scale, 0).tex(0, 1).endVertex();;
+        buffer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
+        buffer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
         tessellator.draw();
         GlStateManager.popMatrix();
     }
@@ -376,12 +372,12 @@ public class RenderHelper {
         GlStateManager.rotate(rot, 0, 0, 1);
 
         Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer renderer = tessellator.getWorldRenderer();
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        renderer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
-        renderer.pos(-scale, +scale, 0).tex(0, 1).endVertex();;
-        renderer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
-        renderer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
+        buffer.pos(-scale, +scale, 0).tex(0, 1).endVertex();;
+        buffer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
+        buffer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
         tessellator.draw();
         GlStateManager.popMatrix();
     }
@@ -415,11 +411,11 @@ public class RenderHelper {
     }
 
     public static void drawQuad(Tessellator tessellator, Vector p1, Vector p2, Vector p3, Vector p4) {
-        WorldRenderer renderer = tessellator.getWorldRenderer();
-        renderer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0, 0).endVertex();
-        renderer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1, 0).endVertex();
-        renderer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1, 1).endVertex();
-        renderer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0, 1).endVertex();
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0, 0).endVertex();
+        buffer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1, 0).endVertex();
+        buffer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1, 1).endVertex();
+        buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0, 1).endVertex();
     }
 
     public static class Vector {

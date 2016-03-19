@@ -13,9 +13,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
@@ -33,7 +33,10 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     public void markDirtyClient() {
         markDirty();
-        worldObj.markBlockForUpdate(getPos());
+        if (worldObj != null) {
+            IBlockState state = worldObj.getBlockState(getPos());
+            worldObj.notifyBlockUpdate(getPos(), state, state, 3);
+        }
     }
 
     @Override
@@ -53,18 +56,17 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public Packet getDescriptionPacket() {
         NBTTagCompound nbtTag = new NBTTagCompound();
         this.writeToNBT(nbtTag);
-        return new S35PacketUpdateTileEntity(pos, 1, nbtTag);
+        return new SPacketUpdateTileEntity(pos, 1, nbtTag);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
         readFromNBT(packet.getNbtCompound());
     }
 
     public void setInfused(int infused) {
         this.infused = infused;
-        markDirty();
-        worldObj.markBlockForUpdate(pos);
+        markDirtyClient();
     }
 
     public int getInfused() {
@@ -163,8 +165,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         }
         ownerUUID = player.getGameProfile().getId();
         ownerName = player.getName();
-        markDirty();
-        worldObj.markBlockForUpdate(pos);
+        markDirtyClient();
 
         return true;
     }
@@ -176,14 +177,12 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         ownerUUID = null;
         ownerName = "";
         securityChannel = -1;
-        markDirty();
-        worldObj.markBlockForUpdate(pos);
+        markDirtyClient();
     }
 
     public void setSecurityChannel(int id) {
         securityChannel = id;
-        markDirty();
-        worldObj.markBlockForUpdate(pos);
+        markDirtyClient();
     }
 
     public int getSecurityChannel() {

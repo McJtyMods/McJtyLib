@@ -1,6 +1,6 @@
 package mcjty.lib.network;
 
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class Argument {
     private final String name;

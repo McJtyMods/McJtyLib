@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * Make a subclass of this class to implement a command that can be sent from the client (typically in a GUI)

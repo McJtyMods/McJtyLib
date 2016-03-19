@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class BlockPosTools {
     public static final BlockPos INVALID = new BlockPos(-1, -1, -1);

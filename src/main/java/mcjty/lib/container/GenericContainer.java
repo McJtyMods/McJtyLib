@@ -3,6 +3,7 @@ package mcjty.lib.container;
 import com.google.common.collect.Range;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -268,14 +269,16 @@ public class GenericContainer extends Container {
         return result;
     }
 
+
     @Override
-    public ItemStack slotClick(int index, int button, int mode, EntityPlayer player) {
+    // slotClick (@todo)
+    public ItemStack func_184996_a(int index, int button, ClickType mode, EntityPlayer player) {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.getHasStack()) {
                 slot.putStack(null);
             }
         }
-        return super.slotClick(index, button, mode, player);
+        return super.func_184996_a(index, button, mode, player);
     }
 }

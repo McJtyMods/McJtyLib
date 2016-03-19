@@ -2,9 +2,9 @@ package mcjty.lib.varia;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatStyle;
-import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -58,10 +58,10 @@ public class Logging {
     }
 
     public static void message(EntityPlayer player, String message) {
-        player.addChatComponentMessage(new ChatComponentText(message));
+        player.addChatComponentMessage(new TextComponentString(message));
     }
 
     public static void warn(EntityPlayer player, String message) {
-        player.addChatComponentMessage(new ChatComponentText(message).setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
+        player.addChatComponentMessage(new TextComponentString(message).setChatStyle(new Style().setColor(TextFormatting.RED)));
     }
 }

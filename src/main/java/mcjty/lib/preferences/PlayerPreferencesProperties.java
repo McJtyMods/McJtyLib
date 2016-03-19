@@ -17,8 +17,10 @@ public class PlayerPreferencesProperties implements IExtendedEntityProperties {
     }
 
     public static PlayerPreferencesProperties getProperties(EntityPlayer player) {
-        IExtendedEntityProperties properties = player.getExtendedProperties(ID);
-        return (PlayerPreferencesProperties) properties;
+        //@todo
+//        IExtendedEntityProperties properties = player.getExtendedProperties(ID);
+//        return (PlayerPreferencesProperties) properties;
+        return null;
     }
 
     public void tick(SimpleNetworkWrapper network) {
