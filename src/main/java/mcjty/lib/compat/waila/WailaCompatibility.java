@@ -5,6 +5,10 @@ import mcjty.lib.container.GenericBlock;
 //import mcp.mobius.waila.api.IWailaDataAccessor;
 //import mcp.mobius.waila.api.IWailaDataProvider;
 //import mcp.mobius.waila.api.IWailaRegistrar;
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
+import mcp.mobius.waila.api.IWailaDataProvider;
+import mcp.mobius.waila.api.IWailaRegistrar;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -16,7 +20,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 import java.util.List;
 
-public class WailaCompatibility {/*implements IWailaDataProvider {
+public class WailaCompatibility implements IWailaDataProvider {
 
     public static final WailaCompatibility INSTANCE = new WailaCompatibility();
 
@@ -74,5 +78,5 @@ public class WailaCompatibility {/*implements IWailaDataProvider {
     public List<String> getWailaTail(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         return currenttip;
     }
-*/
+
 }
