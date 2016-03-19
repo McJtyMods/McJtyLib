@@ -33,7 +33,7 @@ public class GuiSideWindow {
     }
 
     public void initGui(final ModBase modBase, final SimpleNetworkWrapper network, final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
-        style = PlayerPreferencesProperties.getProperties(mc.thePlayer).getPreferencesProperties().getStyle();
+        style = PlayerPreferencesProperties.getProperties(mc.thePlayer).getStyle();
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
                 setTooltips("Open manual").

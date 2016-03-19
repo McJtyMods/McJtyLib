@@ -1,5 +1,6 @@
 package mcjty.lib.network;
 
+import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -11,9 +12,9 @@ public class SendPreferencesToClientHelper {
 
     public static void setPreferences(PacketSendPreferencesToClient prefs) {
         EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
-        PlayerPreferencesProperties properties = PlayerPreferencesProperties.getProperties(player);
-        properties.getPreferencesProperties().setBuffXY(prefs.getBuffX(), prefs.getBuffY());
+        PreferencesProperties properties = PlayerPreferencesProperties.getProperties(player);
+        properties.setBuffXY(prefs.getBuffX(), prefs.getBuffY());
         System.out.println("setPreferences: prefs.getStyle() = " + prefs.getStyle());
-        properties.getPreferencesProperties().setStyle(prefs.getStyle().getStyle());
+        properties.setStyle(prefs.getStyle().getStyle());
     }
 }

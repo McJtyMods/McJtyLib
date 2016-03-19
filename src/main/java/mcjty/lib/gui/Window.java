@@ -2,6 +2,7 @@ package mcjty.lib.gui;
 
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.preferences.PlayerPreferencesProperties;
+import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Mouse;
@@ -83,9 +84,9 @@ public class Window {
         if (dwheel != 0) {
             toplevel.mouseWheel(dwheel, x, y);
         }
-        PlayerPreferencesProperties properties = PlayerPreferencesProperties.getProperties(gui.mc.thePlayer);
+        PreferencesProperties properties = PlayerPreferencesProperties.getProperties(gui.mc.thePlayer);
         if (properties != null) {
-            currentStyle = properties.getPreferencesProperties().getStyle();
+            currentStyle = properties.getStyle();
         } else {
             currentStyle = GuiStyle.STYLE_FLAT_GRADIENT;
         }
