@@ -8,6 +8,8 @@ import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.WrenchChecker;
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -32,6 +34,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,37 +76,37 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         this.creative = creative;
     }
 
-    // @todo
-//    @Override
-//    @SideOnly(Side.CLIENT)
-//    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-//        Block block = accessor.getBlock();
-//        TileEntity tileEntity = accessor.getTileEntity();
-//        if (tileEntity instanceof GenericTileEntity) {
-//            GenericTileEntity genericTileEntity = (GenericTileEntity) tileEntity;
-//            if (block instanceof Infusable) {
-//                int infused = genericTileEntity.getInfused();
-//                int pct = infused * 100 / GeneralConfig.maxInfuse;
-//                currenttip.add(EnumChatFormatting.YELLOW + "Infused: " + pct + "%");
-//            }
-//            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-//                if (GeneralConfig.manageOwnership) {
-//                    if (genericTileEntity.getOwnerName() != null && !genericTileEntity.getOwnerName().isEmpty()) {
-//                        int securityChannel = genericTileEntity.getSecurityChannel();
-//                        if (securityChannel == -1) {
-//                            currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
-//                        } else {
-//                            currenttip.add(EnumChatFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
-//                        }
-//                        if (genericTileEntity.getOwnerUUID() == null) {
-//                            currenttip.add(EnumChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return currenttip;
-//    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+        Block block = accessor.getBlock();
+        TileEntity tileEntity = accessor.getTileEntity();
+        if (tileEntity instanceof GenericTileEntity) {
+            GenericTileEntity genericTileEntity = (GenericTileEntity) tileEntity;
+            if (block instanceof Infusable) {
+                int infused = genericTileEntity.getInfused();
+                int pct = infused * 100 / GeneralConfig.maxInfuse;
+                currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
+            }
+            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+                if (GeneralConfig.manageOwnership) {
+                    if (genericTileEntity.getOwnerName() != null && !genericTileEntity.getOwnerName().isEmpty()) {
+                        int securityChannel = genericTileEntity.getSecurityChannel();
+                        if (securityChannel == -1) {
+                            currenttip.add(TextFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
+                        } else {
+                            currenttip.add(TextFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
+                        }
+                        if (genericTileEntity.getOwnerUUID() == null) {
+                            currenttip.add(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                        }
+                    }
+                }
+            }
+        }
+        return currenttip;
+    }
 
 
     @SideOnly(Side.CLIENT)
