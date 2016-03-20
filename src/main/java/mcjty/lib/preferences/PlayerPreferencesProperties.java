@@ -1,6 +1,7 @@
 package mcjty.lib.preferences;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
@@ -12,10 +13,10 @@ public class PlayerPreferencesProperties {
         return player.getCapability(PREFERENCES_CAPABILITY, null);
     }
 
-    public static void tick(EntityPlayer player, SimpleNetworkWrapper network) {
+    public static void tick(EntityPlayerMP player, SimpleNetworkWrapper network) {
         PreferencesProperties properties = getProperties(player);
         if (properties != null) {
-            properties.tick(network);
+            properties.tick(player, network);
         }
     }
 }

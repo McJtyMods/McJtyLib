@@ -1,19 +1,16 @@
 package mcjty.lib.preferences;
 
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 public class PreferencesProperties {
 
     private static final int DEFAULT_BUFFX = 2;
     private static final int DEFAULT_BUFFY = 2;
     private static final GuiStyle DEFAULT_STYLE = GuiStyle.STYLE_FLAT_GRADIENT;
-
-    private Entity entity = null;
 
     private int buffX = DEFAULT_BUFFX;
     private int buffY = DEFAULT_BUFFY;
@@ -24,19 +21,15 @@ public class PreferencesProperties {
     public PreferencesProperties() {
     }
 
-    public void setEntity(Entity entity) {
-        this.entity = entity;
-    }
-
-    public void tick(SimpleNetworkWrapper network) {
+    public void tick(EntityPlayerMP player, SimpleNetworkWrapper network) {
         if (dirty) {
-            syncToClient(network);
+            syncToClient(player, network);
         }
     }
 
-    private void syncToClient(SimpleNetworkWrapper network) {
+    private void syncToClient(EntityPlayerMP player, SimpleNetworkWrapper network) {
         System.out.println("syncToClient: style = " + style);
-        network.sendTo(new PacketSendPreferencesToClient(buffX, buffY, style), (EntityPlayerMP) entity);
+        network.sendTo(new PacketSendPreferencesToClient(buffX, buffY, style), player);
         dirty = false;
     }
 
