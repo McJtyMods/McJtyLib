@@ -3,10 +3,12 @@ package mcjty.lib.preferences;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 public class PlayerPreferencesProperties {
 
+    @CapabilityInject(PreferencesProperties.class)
     public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
 
     public static PreferencesProperties getProperties(EntityPlayer player) {
