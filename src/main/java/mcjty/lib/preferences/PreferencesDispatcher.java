@@ -1,5 +1,6 @@
 package mcjty.lib.preferences;
 
+import mcjty.lib.McJtyLib;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
@@ -8,16 +9,20 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {
 
-    private PreferencesProperties properties = new PreferencesProperties();
+    public PreferencesDispatcher(){
+        properties = new PreferencesProperties();
+    }
+
+    private final PreferencesProperties properties;
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        return capability == PlayerPreferencesProperties.PREFERENCES_CAPABILITY;
+        return capability == McJtyLib.PREFERENCES_CAPABILITY;
     }
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        return capability == PlayerPreferencesProperties.PREFERENCES_CAPABILITY ? (T) properties : null;
+        return capability == McJtyLib.PREFERENCES_CAPABILITY ? McJtyLib.PREFERENCES_CAPABILITY.cast(properties) : null;
     }
 
     @Override
@@ -31,4 +36,5 @@ public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializa
     public void deserializeNBT(NBTTagCompound nbt) {
         properties.loadNBTData(nbt);
     }
+
 }

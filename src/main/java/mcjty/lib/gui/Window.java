@@ -1,7 +1,7 @@
 package mcjty.lib.gui;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.preferences.PlayerPreferencesProperties;
 import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -84,7 +84,7 @@ public class Window {
         if (dwheel != 0) {
             toplevel.mouseWheel(dwheel, x, y);
         }
-        PreferencesProperties properties = PlayerPreferencesProperties.getProperties(gui.mc.thePlayer);
+        PreferencesProperties properties = McJtyLib.getPreferencesProperties(gui.mc.thePlayer);
         if (properties != null) {
             currentStyle = properties.getStyle();
         } else {

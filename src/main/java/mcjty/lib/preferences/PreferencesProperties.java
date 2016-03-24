@@ -1,10 +1,10 @@
 package mcjty.lib.preferences;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 public class PreferencesProperties {
 
@@ -21,15 +21,15 @@ public class PreferencesProperties {
     public PreferencesProperties() {
     }
 
-    public void tick(EntityPlayerMP player, SimpleNetworkWrapper network) {
+    public void tick(EntityPlayerMP player) {
         if (dirty) {
-            syncToClient(player, network);
+            syncToClient(player);
         }
     }
 
-    private void syncToClient(EntityPlayerMP player, SimpleNetworkWrapper network) {
+    private void syncToClient(EntityPlayerMP player) {
         System.out.println("syncToClient: style = " + style);
-        network.sendTo(new PacketSendPreferencesToClient(buffX, buffY, style), player);
+        McJtyLib.networkHandler.sendTo(new PacketSendPreferencesToClient(buffX, buffY, style), player);
         dirty = false;
     }
 
@@ -93,4 +93,5 @@ public class PreferencesProperties {
     public int getBuffY() {
         return buffY;
     }
+
 }
