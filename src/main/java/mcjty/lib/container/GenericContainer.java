@@ -271,14 +271,13 @@ public class GenericContainer extends Container {
 
 
     @Override
-    // slotClick (@todo)
-    public ItemStack func_184996_a(int index, int button, ClickType mode, EntityPlayer player) {
+    public ItemStack slotClick(int index, int button, ClickType mode, EntityPlayer player) {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.getHasStack()) {
                 slot.putStack(null);
             }
         }
-        return super.func_184996_a(index, button, mode, player);
+        return super.slotClick(index, button, mode, player);
     }
 }
