@@ -1,24 +1,25 @@
 package mcjty.lib.container;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.gui.GuiSideWindow;
 import mcjty.lib.gui.Window;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketServerCommand;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class GenericGuiContainer<T extends GenericTileEntity> extends GuiContainer {
@@ -37,6 +38,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         this.network = network;
         this.tileEntity = tileEntity;
         sideWindow = new GuiSideWindow(manual, manualNode);
+    }
+
+    public List<Rectangle> getSideWindowBounds() {
+        return Collections.singletonList(sideWindow.getWindow().getToplevel().getBounds());
     }
 
     @Override
