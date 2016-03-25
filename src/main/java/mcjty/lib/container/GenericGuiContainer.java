@@ -17,8 +17,10 @@ import net.minecraft.inventory.Container;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class GenericGuiContainer<T extends GenericTileEntity> extends GuiContainer {
@@ -238,5 +240,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     protected void sendServerCommand(SimpleNetworkWrapper network, String command, Argument... arguments) {
         network.sendToServer(new PacketServerCommand(tileEntity.getPos(), command, arguments));
+    }
+
+    public List<Rectangle> getSideWindowBounds() {
+        return Collections.singletonList(sideWindow.getWindow().getToplevel().getBounds());
     }
 }
