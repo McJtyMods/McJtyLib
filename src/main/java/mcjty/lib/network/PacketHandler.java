@@ -76,10 +76,7 @@ public class PacketHandler {
 
         // Client side
         networkWrapper.registerMessage(PacketIntegerFromServer.Handler.class, PacketIntegerFromServer.class, startIndex++, Side.CLIENT);
-        //networkWrapper.registerMessage(PacketSendPreferencesToClient.Handler.class, PacketSendPreferencesToClient.class, startIndex++, Side.CLIENT);
         networkWrapper.registerMessage(PacketReturnInfoToClient.Handler.class, PacketReturnInfoToClient.class, nextID(), Side.CLIENT);
-
-//        register(nextPacketID(), TankInfoPacketServer.class, TankInfoPacketClient.class);
 
         return startIndex;
     }

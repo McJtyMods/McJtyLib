@@ -23,13 +23,14 @@ import net.minecraftforge.fml.relauncher.Side;
 @SuppressWarnings("unused")
 public class McJtyLib {
 
-    public static final String VERSION = "1.9.0-1.8.1beta9";
+    public static final String VERSION = "1.9.0-1.8.1beta10";
     public static final String OWNER = "McJty", PROVIDES = "McJtyLib";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
 
     @CapabilityInject(PreferencesProperties.class)
     public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
+
     public static SimpleNetworkWrapper networkHandler;
     private static boolean init;
 

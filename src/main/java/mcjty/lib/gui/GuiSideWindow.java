@@ -1,7 +1,6 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.events.ButtonEvent;
 import mcjty.lib.gui.layout.PositionalLayout;
@@ -12,6 +11,7 @@ import mcjty.lib.network.PacketSetGuiStyle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 import java.awt.*;
 
@@ -33,6 +33,7 @@ public class GuiSideWindow {
     }
 
     public void initGui(final ModBase modBase, final SimpleNetworkWrapper network, final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
+        style = McJtyLib.getPreferencesProperties(mc.thePlayer).getStyle();
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
                 setTooltips("Open manual").
@@ -46,7 +47,7 @@ public class GuiSideWindow {
                 addButtonEvent(new ButtonEvent() {
                     @Override
                     public void buttonClicked(Widget parent) {
-                        changeStyle(network);
+                        changeStyle(McJtyLib.networkHandler);
                     }
                 });
         setStyleTooltip();
