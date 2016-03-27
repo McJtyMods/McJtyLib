@@ -62,6 +62,6 @@ public class Logging {
     }
 
     public static void warn(EntityPlayer player, String message) {
-        player.addChatComponentMessage(new TextComponentString(message).setChatStyle(new Style().setColor(TextFormatting.RED)));
+        player.addChatComponentMessage(new TextComponentString(message).setStyle(new Style().setColor(TextFormatting.RED)));
     }
 }
