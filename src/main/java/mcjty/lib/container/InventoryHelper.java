@@ -6,6 +6,11 @@ import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 import java.util.Map;
 
@@ -34,6 +39,32 @@ public class InventoryHelper {
         setStackInSlot(index, null);
         return stack;
     }
+
+    /**
+     * Insert an item into an inventory at the given direction. Supports IItemHandler as
+     * well as IInventory. Returns an itemstack with whatever could not be inserted or null
+     * on succcess.
+     */
+    public static ItemStack insertItem(World world, BlockPos pos, EnumFacing direction, ItemStack s) {
+        TileEntity te = world.getTileEntity(pos.offset(direction));
+        if (te != null) {
+            if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())) {
+                IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
+                s = ItemHandlerHelper.insertItem(capability, s, false);
+                if (s == null) {
+                    return null;
+                }
+            } else if (te instanceof IInventory) {
+                int i = mergeItemStackSafe((IInventory) te, true, direction.getOpposite(), s, 0, ((IInventory) te).getSizeInventory(), null);
+                if (i == 0) {
+                    return null;
+                }
+                s.stackSize = i;
+            }
+        }
+        return s;
+    }
+
 
     /**
      * Merges provided ItemStack with the first available one in this inventory. It will return the amount
