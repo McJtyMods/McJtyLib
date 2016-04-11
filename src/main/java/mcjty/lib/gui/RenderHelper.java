@@ -348,6 +348,23 @@ public class RenderHelper {
         tessellator.draw();
     }
 
+    public static void renderBillboardQuadBright(double scale) {
+        int brightness = 240;
+        int b1 = brightness >> 16 & 65535;
+        int b2 = brightness & 65535;
+        GlStateManager.pushMatrix();
+        RenderHelper.rotateToPlayer();
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+        buffer.pos(-scale, -scale, 0.0D).tex(0.0D, 0.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(-scale, scale, 0.0D).tex(0.0D, 1.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(scale, scale, 0.0D).tex(1.0D, 1.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(scale, -scale, 0.0D).tex(1.0D, 0.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        tessellator.draw();
+        GlStateManager.popMatrix();
+    }
+
     public static void renderBillboardQuad(double scale) {
         GlStateManager.pushMatrix();
 
@@ -410,12 +427,16 @@ public class RenderHelper {
         drawQuad(Tessellator.getInstance(), p1, p3, p4, p2);
     }
 
-    public static void drawQuad(Tessellator tessellator, Vector p1, Vector p2, Vector p3, Vector p4) {
+    private static void drawQuad(Tessellator tessellator, Vector p1, Vector p2, Vector p3, Vector p4) {
+        int brightness = 240;
+        int b1 = brightness >> 16 & 65535;
+        int b2 = brightness & 65535;
+
         VertexBuffer buffer = tessellator.getBuffer();
-        buffer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0, 0).endVertex();
-        buffer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1, 0).endVertex();
-        buffer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1, 1).endVertex();
-        buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0, 1).endVertex();
+        buffer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0.0D, 0.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1.0D, 0.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1.0D, 1.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0.0D, 1.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
     }
 
     public static class Vector {
