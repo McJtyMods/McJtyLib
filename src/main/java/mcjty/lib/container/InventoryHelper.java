@@ -12,7 +12,11 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InventoryHelper {
     private final TileEntity tileEntity;
@@ -64,6 +68,69 @@ public class InventoryHelper {
         }
         return s;
     }
+
+    private static boolean insertItemsItemHandlerWithUndo(IItemHandler dest, List<ItemStack> stacks, boolean simulate) {
+        if (dest == null || stacks == null || stacks.isEmpty()) {
+            return true;
+        }
+        if (stacks.size() == 1) {
+            // More optimal case
+            ItemStack stack = stacks.get(0);
+            stack = ItemHandlerHelper.insertItem(dest, stack, simulate);
+            return stack == null;
+        }
+
+        List<ItemStack> s = stacks.stream().map(ItemStack::copy).collect(Collectors.toList());
+        for (int i = 0; i < dest.getSlots(); i++) {
+            boolean empty = true;
+            for (int j = 0 ; j < stacks.size() ; j++) {
+                ItemStack stack = dest.insertItem(i, s.get(j), simulate);
+                if (stack != null && stack.stackSize > 0) {
+                    empty = false;
+                }
+                s.set(j, stack);
+            }
+            if (empty) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
+    /**
+     * Insert multiple items in an inventory. If it didn't work nothing happens and false
+     * is returned. No items will be inserted in that case.
+     */
+    public static boolean insertItemsAtomic(List<ItemStack> items, TileEntity te, EnumFacing side) {
+        if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)) {
+            IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
+            if (!insertItemsItemHandlerWithUndo(capability, items, true)) {
+                return false;
+            }
+            insertItemsItemHandlerWithUndo(capability, items, false);
+        } else if (te instanceof IInventory) {
+            IInventory inventory = (IInventory) te;
+            Map<Integer, ItemStack> undo = new HashMap<>();
+            for (ItemStack item : items) {
+                int remaining = InventoryHelper.mergeItemStackSafe(inventory, false, EnumFacing.DOWN, item, 0, inventory.getSizeInventory(), undo);
+                if (remaining > 0) {
+                    undo(undo, inventory);
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static void undo(Map<Integer,ItemStack> undo, IInventory inventory) {
+        for (Map.Entry<Integer, ItemStack> entry : undo.entrySet()) {
+            inventory.setInventorySlotContents(entry.getKey(), entry.getValue());
+        }
+    }
+
 
 
     /**
