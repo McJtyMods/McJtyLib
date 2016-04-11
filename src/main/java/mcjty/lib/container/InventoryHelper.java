@@ -98,20 +98,12 @@ public class InventoryHelper {
         return false;
     }
 
-
-
     /**
      * Insert multiple items in an inventory. If it didn't work nothing happens and false
      * is returned. No items will be inserted in that case.
      */
     public static boolean insertItemsAtomic(List<ItemStack> items, TileEntity te, EnumFacing side) {
-        if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)) {
-            IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
-            if (!insertItemsItemHandlerWithUndo(capability, items, true)) {
-                return false;
-            }
-            insertItemsItemHandlerWithUndo(capability, items, false);
-        } else if (te instanceof IInventory) {
+        if (te instanceof IInventory) {
             IInventory inventory = (IInventory) te;
             Map<Integer, ItemStack> undo = new HashMap<>();
             for (ItemStack item : items) {
@@ -121,6 +113,12 @@ public class InventoryHelper {
                     return false;
                 }
             }
+        } else if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)) {
+            IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
+            if (!insertItemsItemHandlerWithUndo(capability, items, true)) {
+                return false;
+            }
+            insertItemsItemHandlerWithUndo(capability, items, false);
         }
         return true;
     }
