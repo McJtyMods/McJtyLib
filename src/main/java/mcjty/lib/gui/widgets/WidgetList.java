@@ -291,6 +291,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             }
         }
     }
+
     @Override
     public WidgetList removeChild(Widget child) {
         int index = children.indexOf(child);
