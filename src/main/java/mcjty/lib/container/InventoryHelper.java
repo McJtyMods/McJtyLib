@@ -50,16 +50,17 @@ public class InventoryHelper {
      * on succcess.
      */
     public static ItemStack insertItem(World world, BlockPos pos, EnumFacing direction, ItemStack s) {
-        TileEntity te = world.getTileEntity(pos.offset(direction));
+        TileEntity te = world.getTileEntity(direction == null ? pos : pos.offset(direction));
         if (te != null) {
-            if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite())) {
-                IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite());
+            EnumFacing opposite = direction == null ? null : direction.getOpposite();
+            if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite)) {
+                IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite);
                 s = ItemHandlerHelper.insertItem(capability, s, false);
                 if (s == null) {
                     return null;
                 }
             } else if (te instanceof IInventory) {
-                int i = mergeItemStackSafe((IInventory) te, true, direction.getOpposite(), s, 0, ((IInventory) te).getSizeInventory(), null);
+                int i = mergeItemStackSafe((IInventory) te, true, opposite, s, 0, ((IInventory) te).getSizeInventory(), null);
                 if (i == 0) {
                     return null;
                 }
