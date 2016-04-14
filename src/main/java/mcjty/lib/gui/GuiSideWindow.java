@@ -37,19 +37,9 @@ public class GuiSideWindow {
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
                 setTooltips("Open manual").
-                addButtonEvent(new ButtonEvent() {
-                    @Override
-                    public void buttonClicked(Widget parent) {
-                        help(modBase, mc);
-                    }
-                });
+                addButtonEvent(parent -> help(modBase, mc));
         guiButton = new Button(mc, gui).setText("s").setLayoutHint(new PositionalLayout.PositionalHint(1, 19, 16, 16)).
-                addButtonEvent(new ButtonEvent() {
-                    @Override
-                    public void buttonClicked(Widget parent) {
-                        changeStyle(McJtyLib.networkHandler);
-                    }
-                });
+                addButtonEvent(parent -> changeStyle(McJtyLib.networkHandler));
         setStyleTooltip();
         Panel sidePanel = new Panel(mc, gui).setLayout(new PositionalLayout()).addChild(guiButton).addChild(helpButton);
         sideLeft = guiLeft + xSize;

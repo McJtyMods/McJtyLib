@@ -1,8 +1,6 @@
 package mcjty.lib.base;
 
-import mcjty.lib.gui.GuiStyle;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 
 public interface ModBase {
     String getModId();
