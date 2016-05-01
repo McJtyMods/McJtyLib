@@ -126,7 +126,8 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
-        inv.setInventorySlotContents(slot, stack);
+        int i = getSlot(inv, slot);
+        inv.setInventorySlotContents(i, stack);
     }
 
     @Override
