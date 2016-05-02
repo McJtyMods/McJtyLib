@@ -1,12 +1,15 @@
 package mcjty.lib.container;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -16,7 +19,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class InventoryHelper {
     private final TileEntity tileEntity;
@@ -43,6 +49,97 @@ public class InventoryHelper {
         setStackInSlot(index, null);
         return stack;
     }
+
+    /**
+     * Handle a slot from an inventory and consume it
+     * @param tileEntity
+     * @param slot
+     * @param consumer
+     */
+    public static void handleSlot(TileEntity tileEntity, int slot, Consumer<ItemStack> consumer) {
+        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            ItemStack item = capability.getStackInSlot(slot);
+            if (item != null) {
+                ItemStack stack = capability.extractItem(slot, item.stackSize, false);
+                consumer.accept(stack);
+            }
+        } else if (tileEntity instanceof IInventory) {
+            IInventory inventory = (IInventory) tileEntity;
+            ItemStack item = inventory.getStackInSlot(slot);
+            if (item != null) {
+                ItemStack stack = inventory.decrStackSize(slot, item.stackSize);
+                consumer.accept(stack);
+            }
+        }
+    }
+
+    public static boolean isInventory(TileEntity te) {
+        if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            return true;
+        } else if (te instanceof IInventory) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Return a stream of items in an inventory matching the predicate
+     * @param tileEntity
+     * @param predicate
+     * @return
+     */
+    public static Stream<ItemStack> getItems(TileEntity tileEntity, Predicate<ItemStack> predicate) {
+        Stream.Builder<ItemStack> builder = Stream.builder();
+
+        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            for (int i = 0 ; i < capability.getSlots() ; i++) {
+                ItemStack itemStack = capability.getStackInSlot(i);
+                if (itemStack != null && predicate.test(itemStack)) {
+                    builder.add(itemStack);
+                }
+            }
+        } else if (tileEntity instanceof IInventory) {
+            IInventory inventory = (IInventory) tileEntity;
+            for (int i = 0 ; i < inventory.getSizeInventory() ; i++) {
+                ItemStack itemStack = inventory.getStackInSlot(i);
+                if (itemStack != null && predicate.test(itemStack)) {
+                    builder.add(itemStack);
+                }
+            }
+        }
+        return builder.build();
+    }
+
+    /**
+     * Inject a module that the player is holding into the appropriate slots (slots are from start to stop inclusive both ends)
+     * @return true if successful
+     */
+    public static boolean installModule(EntityPlayer player, ItemStack heldItem, EnumHand hand, BlockPos pos, int start, int stop) {
+        World world = player.getEntityWorld();
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof IInventory) {
+            IInventory inventory = (IInventory) te;
+            for (int i = start ; i <= stop  ; i++) {
+                if (inventory.getStackInSlot(i) == null) {
+                    ItemStack copy = heldItem.copy();
+                    copy.stackSize = 1;
+                    inventory.setInventorySlotContents(i, copy);
+                    heldItem.stackSize--;
+                    if (heldItem.stackSize == 0) {
+                        player.setHeldItem(hand, null);
+                    }
+                    if (world.isRemote) {
+                        player.addChatComponentMessage(new TextComponentString("Installed module"));
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Insert an item into an inventory at the given direction. Supports IItemHandler as
