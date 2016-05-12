@@ -7,7 +7,7 @@ public class BlockMeta {
     private final Block block;
     private final byte meta;
 
-    public static final BlockMeta STONE = new BlockMeta(Blocks.stone, 0);
+    public static final BlockMeta STONE = new BlockMeta(Blocks.STONE, 0);
 
     public BlockMeta(Block block, byte meta) {
         this.block = block;
@@ -42,7 +42,7 @@ public class BlockMeta {
 
     @Override
     public int hashCode() {
-        int result = Block.blockRegistry.getIDForObject(block);
+        int result = Block.REGISTRY.getIDForObject(block);
         result = 31 * result + meta;
         return result;
     }
