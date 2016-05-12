@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 public class ContainerFactory {
-    private Map<Integer,SlotDefinition> indexToType = new HashMap<Integer, SlotDefinition>();
-    private Map<SlotDefinition,SlotRanges> slotRangesMap = new HashMap<SlotDefinition,SlotRanges>();
-    private List<SlotFactory> slots = new ArrayList<SlotFactory>();
+    private Map<Integer,SlotDefinition> indexToType = new HashMap<>();
+    private Map<SlotDefinition,SlotRanges> slotRangesMap = new HashMap<>();
+    private List<SlotFactory> slots = new ArrayList<>();
 
     public static final String CONTAINER_PLAYER = "player";
 
