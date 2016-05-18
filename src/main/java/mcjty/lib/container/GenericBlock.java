@@ -8,6 +8,10 @@ import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.WrenchChecker;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.IProbeInfoAccessor;
+import mcjty.theoneprobe.api.ProbeMode;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
@@ -32,6 +36,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
@@ -39,7 +44,9 @@ import org.lwjgl.input.Keyboard;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GenericBlock extends Block implements ITileEntityProvider, WailaInfoProvider {
+@Optional.InterfaceList({
+        @Optional.Interface(iface = "mcjty.theoneprobe.api.IProbeInfoAccessor", modid = "theoneprobe")})
+public abstract class GenericBlock extends Block implements ITileEntityProvider, WailaInfoProvider, IProbeInfoAccessor {
 
     public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
@@ -76,6 +83,35 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         this.creative = creative;
     }
 
+    @Optional.Method(modid = "theoneprobe")
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        BlockPos pos = data.getPos();
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
+            if (blockState.getBlock() instanceof Infusable) {
+                int infused = genericTileEntity.getInfused();
+                int pct = infused * 100 / GeneralConfig.maxInfuse;
+                probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
+            }
+            if (mode == ProbeMode.EXTENDED) {
+                if (GeneralConfig.manageOwnership) {
+                    if (genericTileEntity.getOwnerName() != null && !genericTileEntity.getOwnerName().isEmpty()) {
+                        int securityChannel = genericTileEntity.getSecurityChannel();
+                        if (securityChannel == -1) {
+                            probeInfo.text(TextFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
+                        } else {
+                            probeInfo.text(TextFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
+                        }
+                        if (genericTileEntity.getOwnerUUID() == null) {
+                            probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @Override
     @SideOnly(Side.CLIENT)
