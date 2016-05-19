@@ -43,7 +43,6 @@ public class WailaCompatibility implements IWailaDataProvider {
     }
 
     public static void register(){
-        System.out.println("WailaCompatibility.register");
         if (registered)
             return;
         registered = true;
