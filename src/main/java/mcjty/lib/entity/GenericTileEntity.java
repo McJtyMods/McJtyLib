@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,8 +53,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public void onSlotChanged(int index, ItemStack stack) {
     }
 
+    @Nullable
     @Override
-    public Packet getDescriptionPacket() {
+    public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound nbtTag = new NBTTagCompound();
         this.writeToNBT(nbtTag);
         return new SPacketUpdateTileEntity(pos, 1, nbtTag);
@@ -131,9 +133,10 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
 
     @Override
-    public void writeToNBT(NBTTagCompound tagCompound) {
+    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
         super.writeToNBT(tagCompound);
         writeRestorableToNBT(tagCompound);
+        return tagCompound;
     }
 
     /**

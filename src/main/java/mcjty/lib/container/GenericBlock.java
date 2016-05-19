@@ -470,50 +470,15 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     public GuiContainer createClientGui(EntityPlayer entityPlayer, TileEntity tileEntity) {
         return null;
     }
-/*
-    @Override
-    public IIcon getIcon(IBlockAccess blockAccess, int x, int y, int z, int side) {
-        int meta = blockAccess.getBlockMetadata(x, y, z);
-        EnumFacing k = getOrientation(meta);
-        if (iconInd != null && side == k.ordinal()) {
-            return getIconInd(blockAccess, x, y, z, meta);
-        } else if (iconTop != null && side == BlockTools.getTopDirection(k).ordinal()) {
-            return iconTop;
-        } else if (iconBottom != null && side ==  BlockTools.getBottomDirection(k).ordinal()) {
-            return iconBottom;
-        } else {
-            return iconSide;
-        }
-    }
-
-
 
     @Override
-    public IIcon getIcon(int side, int meta) {
-        if (iconInd != null && side == EnumFacing.SOUTH.ordinal()) {
-            return iconInd;
-        } else if (iconTop != null && side == EnumFacing.UP.ordinal()) {
-            return iconTop;
-        } else if (iconBottom != null && side == EnumFacing.DOWN.ordinal()) {
-            return iconBottom;
-        } else {
-            return iconSide;
-        }
-    }
-
-    public IIcon getIconInd(IBlockAccess blockAccess, int x, int y, int z, int meta) {
-        return iconInd;
-    }
-*/
-
-    @Override
-    public boolean onBlockEventReceived(World world, BlockPos pos, IBlockState state, int eventId, int eventData) {
+    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
         if (isBlockContainer) {
-            super.onBlockEventReceived(world, pos, state, eventId, eventData);
-            TileEntity tileentity = world.getTileEntity(pos);
-            return tileentity != null && tileentity.receiveClientEvent(eventId, eventData);
+            super.eventReceived(state, worldIn, pos, id, param);
+            TileEntity tileentity = worldIn.getTileEntity(pos);
+            return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
         } else {
-            return super.onBlockEventReceived(world, pos, state, eventId, eventData);
+            return super.eventReceived(state, worldIn, pos, id, param);
         }
     }
 
