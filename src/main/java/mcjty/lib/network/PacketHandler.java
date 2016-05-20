@@ -1,6 +1,9 @@
 package mcjty.lib.network;
 
-import mcjty.lib.network.clientinfo.*;
+import mcjty.lib.network.clientinfo.InfoPacketClient;
+import mcjty.lib.network.clientinfo.InfoPacketServer;
+import mcjty.lib.network.clientinfo.PacketGetInfoFromServer;
+import mcjty.lib.network.clientinfo.PacketReturnInfoToClient;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -77,6 +80,7 @@ public class PacketHandler {
         // Client side
         networkWrapper.registerMessage(PacketIntegerFromServer.Handler.class, PacketIntegerFromServer.class, startIndex++, Side.CLIENT);
         networkWrapper.registerMessage(PacketReturnInfoToClient.Handler.class, PacketReturnInfoToClient.class, nextID(), Side.CLIENT);
+        networkWrapper.registerMessage(PacketSendGuiData.Handler.class, PacketSendGuiData.class, startIndex++, Side.CLIENT);
 
         return startIndex;
     }
