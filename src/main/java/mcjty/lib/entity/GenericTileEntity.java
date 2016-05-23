@@ -83,6 +83,13 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return !isInvalid() && player.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
+    @Override
+    public NBTTagCompound getUpdateTag() {
+        NBTTagCompound updateTag = super.getUpdateTag();
+        writeClientDataToNBT(updateTag);
+        return updateTag;
+    }
+
     /**
      * For compatibility reasons this calls writeToNBT() but for
      * efficiency reasons you should override this in your tile
