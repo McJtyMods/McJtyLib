@@ -1,13 +1,15 @@
 package mcjty.lib.container;
 
 import com.google.common.collect.Range;
+import mcjty.lib.network.PacketSendGuiData;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -279,5 +281,16 @@ public class GenericContainer extends Container {
             }
         }
         return super.slotClick(index, button, mode, player);
+    }
+
+    // Call this in your detectAndSendChanges() implementation when you find one
+    // of the fields you need in the GUI has changed
+    protected void notifyPlayerOfChanges(SimpleNetworkWrapper wrapper, World world, BlockPos pos) {
+        for (ICrafting listener : this.listeners) {
+            if (listener instanceof EntityPlayerMP) {
+                EntityPlayerMP player = (EntityPlayerMP) listener;
+                wrapper.sendTo(new PacketSendGuiData(world, pos), player);
+            }
+        }
     }
 }

@@ -141,6 +141,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
 
+    @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack itemStack, EntityPlayer player, List<String> list, boolean advancedToolTip) {
         NBTTagCompound tagCompound = itemStack.getTagCompound();

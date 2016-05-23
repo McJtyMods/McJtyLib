@@ -55,13 +55,13 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     @Override
     public Packet getDescriptionPacket() {
         NBTTagCompound nbtTag = new NBTTagCompound();
-        this.writeToNBT(nbtTag);
+        this.writeClientDataToNBT(nbtTag);
         return new SPacketUpdateTileEntity(pos, 1, nbtTag);
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
-        readFromNBT(packet.getNbtCompound());
+        readClientDataFromNBT(packet.getNbtCompound());
     }
 
     public void setInfused(int infused) {
@@ -81,6 +81,38 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return !isInvalid() && player.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
+    /**
+     * For compatibility reasons this calls writeToNBT() but for
+     * efficiency reasons you should override this in your tile
+     * entity to only write what you need on the client.
+     * @param tagCompound
+     */
+    public void writeClientDataToNBT(NBTTagCompound tagCompound) {
+        writeToNBT(tagCompound);
+    }
+
+    /**
+     * For compatibility reasons this calls readFromNBT() but for
+     * efficiency reasons you should override this in your tile
+     * entity to only read what you need on the client.
+     * @param tagCompound
+     */
+    public void readClientDataFromNBT(NBTTagCompound tagCompound) {
+        readFromNBT(tagCompound);
+    }
+
+    /**
+     * GUI Data sync
+     */
+    public void syncDataForGUI(Object[] data) {
+    }
+
+    /**
+     * GUI Data sync. Supported types: Integer, Long, Float, String, Byte, Boolean
+     */
+    public Object[] getDataForGUI() {
+        return new Object[0];
+    }
 
     protected void readBufferFromNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
         NBTTagList bufferTagList = tagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
@@ -128,7 +160,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         }
         tagCompound.setTag("Items", bufferTagList);
     }
-
 
     @Override
     public void writeToNBT(NBTTagCompound tagCompound) {
