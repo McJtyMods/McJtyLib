@@ -286,7 +286,7 @@ public class GenericContainer extends Container {
     // Call this in your detectAndSendChanges() implementation when you find one
     // of the fields you need in the GUI has changed
     protected void notifyPlayerOfChanges(SimpleNetworkWrapper wrapper, World world, BlockPos pos) {
-        for (ICrafting listener : this.listeners) {
+        for (IContainerListener listener : this.listeners) {
             if (listener instanceof EntityPlayerMP) {
                 EntityPlayerMP player = (EntityPlayerMP) listener;
                 wrapper.sendTo(new PacketSendGuiData(world, pos), player);
