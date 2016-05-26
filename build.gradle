@@ -85,6 +85,53 @@ processResources
     }
 }
 
+
+task("uploadJars", dependsOn: "reobf") {
+    description = "uploads JARs"
+    if (System.getenv("local_maven") != null) {
+        apply plugin: 'maven'
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    repository(url: "file://" + System.getenv("local_maven"))
+                    pom {
+                        groupId = project.group
+                        version = project.version
+                        artifactId = project.archivesBaseName
+                        project {
+                            name project.archivesBaseName
+                            packaging 'jar'
+                            description 'McJtyLib'
+                            scm {
+                                url 'https://github.com/McJty/McJtyLib'
+                                connection 'scm:git:git@github.com:McJty/McJtyLib.git'
+                                developerConnection 'scm:git:git@github.com:McJty/McJtyLib.git'
+                            }
+                            issueManagement {
+                                system 'github'
+                                url 'https://github.com/McJty/McJtyLib/issues'
+                            }
+                            licenses {
+                                license {
+                                    name 'MIT'
+                                    distribution 'repo'
+                                }
+                            }
+                            developers {
+                                developer {
+                                    id 'McJty'
+                                    name 'McJty'
+                                    roles { role 'developer' }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 uploadArchives() {
         repositories {
             logger.info('Publishing to files server')
