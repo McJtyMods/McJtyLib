@@ -14,10 +14,10 @@ import java.util.Map;
 public class PacketHandler {
 
     /* Make sure this number is higher than the amount of packets registered by default*/
-    private static int ID = 12;
+    public static final int INTERNAL_PACKETS = 12;
 
     // For the client-info packet system:
-    private static int packetId = 0;
+    private static int packetId = INTERNAL_PACKETS;
 
     private static Map<Integer,Class<? extends InfoPacketClient>> clientInfoPackets = new HashMap<>();
     private static Map<Integer,Class<? extends InfoPacketServer>> serverInfoPackets = new HashMap<>();
@@ -53,8 +53,9 @@ public class PacketHandler {
         return clientInfoPacketsToId.get(clazz);
     }
 
+    @Deprecated
     public static int nextID() {
-        return ID++;
+        return nextPacketID();
     }
 
     public static SimpleNetworkWrapper registerMessages(String modid, String channelName) {
