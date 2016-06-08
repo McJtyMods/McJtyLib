@@ -6,6 +6,7 @@ import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -43,6 +44,12 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
         return oldState.getBlock() != newSate.getBlock();
+    }
+
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+    }
+
+    public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
     }
 
     /// Called by GenericBlock.checkRedstoneWithTE() to set the redstone/powered state of this TE.

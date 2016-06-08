@@ -76,9 +76,57 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         return creative;
     }
 
+    public boolean needsRedstoneCheck() {
+        return false;
+    }
+
+    public boolean hasRedstoneOutput() {
+        return false;
+    }
+
+    protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return -1;
+    }
+
+    @Override
+    public boolean canProvidePower(IBlockState state) {
+        return hasRedstoneOutput();
+    }
+
+    @Override
+    public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return getRedstoneOutput(state, world, pos, side);
+    }
+
+    @Override
+    public int getStrongPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return getRedstoneOutput(state, world, pos, side);
+    }
+
     public void setCreative(boolean creative) {
         this.creative = creative;
     }
+
+    @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+        if (needsRedstoneCheck()) {
+            checkRedstoneWithTE(world, pos);
+        }
+    }
+
+    @Override
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            if (!world.isRemote) {
+                GenericTileEntity genericTileEntity = (GenericTileEntity) te;
+                genericTileEntity.onBlockBreak(world, pos, state);
+            }
+        }
+
+        super.breakBlock(world, pos, state);
+    }
+
 
     @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
@@ -332,6 +380,12 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         restoreBlockFromNBT(world, pos, stack);
         if (!world.isRemote && GeneralConfig.manageOwnership) {
             setOwner(world, pos, placer);
+        }
+
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
+            genericTileEntity.onBlockPlacedBy(world, pos, state, placer, stack);
         }
     }
 
