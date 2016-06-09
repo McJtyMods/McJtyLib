@@ -40,7 +40,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     private UUID ownerUUID = null;
     private int securityChannel = -1;
 
-    private RedstoneMode rsMode = null;   // Default unused
+    private RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     private int powerLevel = 0;
 
     public void markDirtyClient() {
@@ -97,9 +97,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     // Use redstone mode and input power to decide if this is enabled or not
     public boolean isMachineEnabled() {
-        if (rsMode == null) {
-            return true;
-        }
         if (rsMode != RedstoneMode.REDSTONE_IGNORED) {
             boolean rs = powerLevel > 0;
             if (rsMode == RedstoneMode.REDSTONE_OFFREQUIRED && rs) {
