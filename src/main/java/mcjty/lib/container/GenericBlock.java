@@ -2,6 +2,7 @@ package mcjty.lib.container;
 
 import cofh.api.item.IToolHammer;
 import mcjty.lib.api.Infusable;
+import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
@@ -103,15 +104,15 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         return getRedstoneOutput(state, world, pos, side);
     }
 
-    public void setCreative(boolean creative) {
-        this.creative = creative;
-    }
-
     @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
         if (needsRedstoneCheck()) {
             checkRedstoneWithTE(world, pos);
         }
+    }
+
+    public void setCreative(boolean creative) {
+        this.creative = creative;
     }
 
     @Override
@@ -313,8 +314,28 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             case SELECT:       return wrenchSelect(world, pos, player);
             case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player);
         }
+        return handleModule(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+    }
+
+    protected IModuleSupport getModuleSupport() {
+        return null;
+    }
+
+    public boolean handleModule(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (heldItem != null) {
+            IModuleSupport support = getModuleSupport();
+            if (support != null) {
+                if (support.isModule(heldItem)) {
+                    if (InventoryHelper.installModule(player, heldItem, hand, pos, support.getFirstSlot(), support.getLastSlot())) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
+
+
 
     protected boolean wrenchUse(World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
         rotateBlock(world, pos, EnumFacing.UP);
