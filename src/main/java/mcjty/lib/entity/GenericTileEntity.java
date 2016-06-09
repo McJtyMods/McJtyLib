@@ -1,24 +1,31 @@
 package mcjty.lib.entity;
 
 import mcjty.lib.base.GeneralConfig;
+import mcjty.lib.container.GenericBlock;
 import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
+import mcjty.lib.varia.CustomSidedInvWrapper;
+import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -32,6 +39,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     private String ownerName = "";
     private UUID ownerUUID = null;
     private int securityChannel = -1;
+
+    private RedstoneMode rsMode = null;   // Default unused
+    private int powerLevel = 0;
 
     public void markDirtyClient() {
         markDirty();
@@ -52,9 +62,56 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
     }
 
+    // ------------------------------------------------------
+    // Redstone
+
+    protected boolean needsRedstoneMode() {
+        return false;
+    }
+
+    private boolean supportsRedstoneInput() {
+        return getBlockType() instanceof GenericBlock && ((GenericBlock) getBlockType()).needsRedstoneCheck();
+    }
+
+
     /// Called by GenericBlock.checkRedstoneWithTE() to set the redstone/powered state of this TE.
+    @Deprecated
     public void setPowered(int powered) {
     }
+
+    public void setPowerInput(int powered) {
+        if (powerLevel != powered) {
+            powerLevel = powered;
+            markDirty();
+        }
+    }
+
+    public RedstoneMode getRSMode() {
+        return rsMode;
+    }
+
+    public void setRSMode(RedstoneMode redstoneMode) {
+        this.rsMode = redstoneMode;
+        markDirtyClient();
+    }
+
+    // Use redstone mode and input power to decide if this is enabled or not
+    public boolean isMachineEnabled() {
+        if (rsMode == null) {
+            return true;
+        }
+        if (rsMode != RedstoneMode.REDSTONE_IGNORED) {
+            boolean rs = powerLevel > 0;
+            if (rsMode == RedstoneMode.REDSTONE_OFFREQUIRED && rs) {
+                return false;
+            } else if (rsMode == RedstoneMode.REDSTONE_ONREQUIRED && !rs) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // ------------------------------------------------------
 
     // Called when a slot is changed.
     public void onSlotChanged(int index, ItemStack stack) {
@@ -141,6 +198,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
         super.readFromNBT(tagCompound);
+        if (supportsRedstoneInput()) {
+            powerLevel = tagCompound.getByte("powered");
+        }
         readRestorableFromNBT(tagCompound);
     }
 
@@ -150,6 +210,11 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
      * @param tagCompound
      */
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
+        if (needsRedstoneMode()) {
+            int m = tagCompound.getByte("rsMode");
+            rsMode = RedstoneMode.values()[m];
+        }
+
         infused = tagCompound.getInteger("infused");
         ownerName = tagCompound.getString("owner");
         if (tagCompound.hasKey("idM")) {
@@ -180,6 +245,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
         super.writeToNBT(tagCompound);
+        if (supportsRedstoneInput()) {
+            tagCompound.setByte("powered", (byte) powerLevel);
+        }
         writeRestorableToNBT(tagCompound);
         return tagCompound;
     }
@@ -191,6 +259,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
      * @param tagCompound
      */
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
+        if (needsRedstoneMode()) {
+            tagCompound.setByte("rsMode", (byte) rsMode.ordinal());
+        }
         tagCompound.setInteger("infused", infused);
         tagCompound.setString("owner", ownerName);
         if (ownerUUID != null) {
@@ -269,4 +340,38 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public boolean execute(String command, Integer result) {
         return false;
     }
+
+
+    protected boolean needsCustomInvWrapper() {
+        return false;
+    }
+
+    private IItemHandler invHandler = null;
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        if (needsCustomInvWrapper()) {
+            if (invHandler == null) {
+                invHandler = new CustomSidedInvWrapper((ISidedInventory) this);
+            }
+            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+                return true;
+            }
+        }
+        return super.hasCapability(capability, facing);
+    }
+
+    @Override
+    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing) {
+        if (needsCustomInvWrapper()) {
+            if (invHandler == null) {
+                invHandler = new CustomSidedInvWrapper((ISidedInventory) this);
+            }
+            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+                return (T) invHandler;
+            }
+        }
+        return super.getCapability(capability, facing);
+    }
+
 }

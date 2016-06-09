@@ -107,7 +107,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
         if (needsRedstoneCheck()) {
-            checkRedstoneWithTE(world, pos);
+            checkRedstone(world, pos);
         }
     }
 
@@ -446,22 +446,13 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         return false;
     }
 
-    /*
-     * Check the redstone level reaching this block. Correctly checks for horizRotation mode.
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     */
     protected void checkRedstone(World world, BlockPos pos) {
-//        IBlockState state = world.getBlockState(pos);
-//        int powered = world.isBlockIndirectlyGettingPowered(pos);
-//        if (horizRotation) {
-//            meta = BlockTools.setRedstoneSignalIn(meta, powered > 0);
-//        } else {
-//            meta = BlockTools.setRedstoneSignal(meta, powered > 0);
-//        }
-//        world.setBlockMetadataWithNotify(x, y, z, meta, 2);
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            int powered = world.isBlockIndirectlyGettingPowered(pos); //TODO: check
+            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
+            genericTileEntity.setPowerInput(powered);
+        }
     }
 
     /**
@@ -470,6 +461,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
      * @param world
      * @param pos
      */
+    @Deprecated
     protected void checkRedstoneWithTE(World world, BlockPos pos) {
 //        int powered = world.getStrongestIndirectPower(x, y, z);
         TileEntity te = world.getTileEntity(pos);
