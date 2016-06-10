@@ -1,7 +1,6 @@
 package mcjty.lib.entity;
 
 import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.container.GenericBlock;
 import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
@@ -67,10 +66,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     protected boolean needsRedstoneMode() {
         return false;
-    }
-
-    private boolean supportsRedstoneInput() {
-        return getBlockType() instanceof GenericBlock && ((GenericBlock) getBlockType()).needsRedstoneCheck();
     }
 
     public void setPowerInput(int powered) {
@@ -189,9 +184,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     @Override
     public void readFromNBT(NBTTagCompound tagCompound) {
         super.readFromNBT(tagCompound);
-        if (supportsRedstoneInput()) {
-            powerLevel = tagCompound.getByte("powered");
-        }
+        powerLevel = tagCompound.getByte("powered");
         readRestorableFromNBT(tagCompound);
     }
 
@@ -236,7 +229,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
         super.writeToNBT(tagCompound);
-        if (supportsRedstoneInput()) {
+        if (powerLevel > 0) {
             tagCompound.setByte("powered", (byte) powerLevel);
         }
         writeRestorableToNBT(tagCompound);
