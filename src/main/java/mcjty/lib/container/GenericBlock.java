@@ -456,23 +456,6 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     /**
-     * Check the redstone level reaching this block. This version sends the
-     * signal directly to the TE.
-     * @param world
-     * @param pos
-     */
-    @Deprecated
-    protected void checkRedstoneWithTE(World world, BlockPos pos) {
-//        int powered = world.getStrongestIndirectPower(x, y, z);
-        TileEntity te = world.getTileEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            int powered = world.isBlockIndirectlyGettingPowered(pos); //TODO: check
-            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-            genericTileEntity.setPowered(powered);
-        }
-    }
-
-    /**
      * Break a block in the world, convert it to an entity and remember all the settings
      * for this block in the itemstack.
      */

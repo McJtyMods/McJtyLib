@@ -73,12 +73,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return getBlockType() instanceof GenericBlock && ((GenericBlock) getBlockType()).needsRedstoneCheck();
     }
 
-
-    /// Called by GenericBlock.checkRedstoneWithTE() to set the redstone/powered state of this TE.
-    @Deprecated
-    public void setPowered(int powered) {
-    }
-
     public void setPowerInput(int powered) {
         if (powerLevel != powered) {
             powerLevel = powered;
