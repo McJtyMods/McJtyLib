@@ -47,7 +47,7 @@ public abstract class GenericModBlock<T extends GenericTileEntity, C extends Con
                            String name, boolean isContainer) {
         super(mod, material, tileEntityClass, isContainer);
         this.containerClass = containerClass;
-        setUnlocalizedName(name);
+        setUnlocalizedName(mod.getModId() + "." + name);
         setRegistryName(name);
         GameRegistry.register(this);
         if (itemBlockClass != null) {
