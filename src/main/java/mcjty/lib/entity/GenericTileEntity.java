@@ -40,8 +40,8 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     private UUID ownerUUID = null;
     private int securityChannel = -1;
 
-    private RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
-    private int powerLevel = 0;
+    protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
+    protected int powerLevel = 0;
 
     public void markDirtyClient() {
         markDirty();
