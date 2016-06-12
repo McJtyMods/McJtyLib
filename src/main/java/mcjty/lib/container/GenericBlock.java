@@ -1,14 +1,17 @@
 package mcjty.lib.container;
 
 import cofh.api.item.IToolHammer;
-import mcjty.lib.api.Infusable;
 import mcjty.lib.api.IModuleSupport;
+import mcjty.lib.api.Infusable;
+import mcjty.lib.api.smartwrench.SmartWrench;
+import mcjty.lib.api.smartwrench.SmartWrenchMode;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
+import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -23,10 +26,13 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -37,33 +43,75 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GenericBlock extends Block implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider {
+public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends Block implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider {
 
     public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
     protected ModBase modBase;
     protected final Class<? extends TileEntity> tileEntityClass;
+    private final Class<? extends C> containerClass;
 
     private boolean creative;
 
-    public GenericBlock(ModBase mod, Material material, Class<? extends TileEntity> tileEntityClass, boolean isContainer) {
-        super(material);
+    private void init(ModBase mod, boolean isContainer) {
         this.modBase = mod;
         this.isBlockContainer = isContainer;
         this.creative = false;
-        this.tileEntityClass = tileEntityClass;
         setHardness(2.0f);
         setSoundType(SoundType.METAL);
         setHarvestLevel("pickaxe", 0);
     }
+
+    public GenericBlock(ModBase mod,
+                           Material material,
+                           Class<? extends T> tileEntityClass,
+                           Class<? extends C> containerClass,
+                           String name, boolean isContainer) {
+        this(mod, material, tileEntityClass, containerClass, GenericItemBlock.class, name, isContainer);
+    }
+
+    public GenericBlock(ModBase mod,
+                           Material material,
+                           Class<? extends T> tileEntityClass,
+                           Class<? extends C> containerClass,
+                           Class<? extends ItemBlock> itemBlockClass,
+                           String name, boolean isContainer) {
+        super(material);
+        init(mod, isContainer);
+        this.tileEntityClass = tileEntityClass;
+        this.containerClass = containerClass;
+        setUnlocalizedName(mod.getModId() + "." + name);
+        setRegistryName(name);
+        GameRegistry.register(this);
+        if (itemBlockClass != null) {
+            GameRegistry.register(createItemBlock(itemBlockClass), getRegistryName());
+        }
+        GameRegistry.registerTileEntityWithAlternatives(tileEntityClass, mod.getModId() + "_" + name, name);
+    }
+
+    private ItemBlock createItemBlock(Class<? extends ItemBlock> itemBlockClass) {
+        try {
+            Class<?>[] ctorArgClasses = new Class<?>[1];
+            ctorArgClasses[0] = Block.class;
+            Constructor<? extends ItemBlock> itemCtor = itemBlockClass.getConstructor(ctorArgClasses);
+            return itemCtor.newInstance(this);
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     // Set this to true in case horizontal rotation is used (2 bits rotation as opposed to 3).
     public boolean isHorizRotation() {
@@ -285,7 +333,7 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         return wrenchUsed;
     }
 
-    protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
+    private WrenchUsage getWrenchUsageInt(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
         if (item instanceof IToolHammer) {
             IToolHammer hammer = (IToolHammer) item;
             int x = pos.getX();
@@ -302,6 +350,26 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
         }
         return wrenchUsed;
     }
+
+    protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
+        WrenchUsage usage = getWrenchUsageInt(pos, player, itemStack, wrenchUsed, item);
+        if (item instanceof IToolHammer && usage == WrenchUsage.DISABLED) {
+            // It is still possible it is a smart wrench.
+            if (item instanceof SmartWrench) {
+                SmartWrench smartWrench = (SmartWrench) item;
+                SmartWrenchMode mode = smartWrench.getMode(itemStack);
+                if (mode.equals(SmartWrenchMode.MODE_SELECT)) {
+                    if (player.isSneaking()) {
+                        usage = WrenchUsage.SNEAK_SELECT;
+                    } else {
+                        usage = WrenchUsage.SELECT;
+                    }
+                }
+            }
+        }
+        return usage;
+    }
+
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -373,10 +441,6 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             player.openGui(modBase, getGuiID(), world, x, y, z);
             return true;
         }
-        return false;
-    }
-
-    protected boolean checkAccess(World world, EntityPlayer player, TileEntity te) {
         return false;
     }
 
@@ -495,31 +559,9 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
     }
 
     /**
-     * Return the name of the icon to be used for the front side of the machine.
-     */
-    public String getIdentifyingIconName() {
-        return null;
-    }
-
-    /**
      * Return the id of the gui to use for this block.
      */
     public abstract int getGuiID();
-
-    /**
-     * Return a server side container for opening the GUI.
-     */
-    public Container createServerContainer(EntityPlayer entityPlayer, TileEntity tileEntity) {
-        return new EmptyContainer(entityPlayer);
-    }
-
-    /**
-     * Return a client side gui for this block.
-     */
-    @SideOnly(Side.CLIENT)
-    public GuiContainer createClientGui(EntityPlayer entityPlayer, TileEntity tileEntity) {
-        return null;
-    }
 
     @Override
     public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
@@ -572,4 +614,65 @@ public abstract class GenericBlock extends Block implements ITileEntityProvider,
             return new BlockStateContainer(this, FACING);
         }
     }
+
+    @SideOnly(Side.CLIENT)
+    public void initModel() {
+        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
+    }
+
+    @SideOnly(Side.CLIENT)
+    public Class<? extends GenericGuiContainer> getGuiClass() {
+        return null;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public GuiContainer createClientGui(EntityPlayer entityPlayer, TileEntity tileEntity) {
+        T inventory = (T) tileEntity;
+        C container;
+        GenericGuiContainer gui;
+        try {
+            Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
+            container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? inventory : null);
+            Constructor<? extends GenericGuiContainer> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
+            gui = guiConstructor.newInstance(inventory, container);
+            return gui;
+        } catch (Exception e) {
+            Logging.logError("Severe exception during creation of gui!");
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Container createServerContainer(EntityPlayer entityPlayer, TileEntity tileEntity) {
+        T inventory = (T) tileEntity;
+        C container;
+        try {
+            Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
+            container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? inventory : null);
+            return container;
+        } catch (Exception e) {
+            Logging.logError("Severe exception during creation of gui!");
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected boolean checkAccess(World world, EntityPlayer player, TileEntity te) {
+//        if (te instanceof GenericTileEntity) {
+//            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
+//            if ((!SecurityTools.isPrivileged(player, world)) && (!player.getPersistentID().equals(genericTileEntity.getOwnerUUID()))) {
+//                int securityChannel = genericTileEntity.getSecurityChannel();
+//                if (securityChannel != -1) {
+//                    SecurityChannels securityChannels = SecurityChannels.getChannels(world);
+//                    SecurityChannels.SecurityChannel channel = securityChannels.getChannel(securityChannel);
+//                    boolean playerListed = channel.getPlayers().contains(player.getDisplayNameString());
+//                    if (channel.isWhitelist() != playerListed) {
+//                        Logging.message(player, TextFormatting.RED + "You have no permission to use this block!");
+//                        return true;
+//                    }
+//                }
+//            }
+//        }
+        // @todo, security system from RFTools should be accessed here
+        return false;
+    }
+
 }
