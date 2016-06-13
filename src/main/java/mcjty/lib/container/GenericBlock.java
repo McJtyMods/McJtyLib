@@ -373,6 +373,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (handleModule(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)) {
+            return true;
+        }
         WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
         switch (wrenchUsed) {
             case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player);
@@ -382,7 +385,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             case SELECT:       return wrenchSelect(world, pos, player);
             case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player);
         }
-        return handleModule(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ);
+        return false;
     }
 
     protected IModuleSupport getModuleSupport() {
