@@ -1,6 +1,7 @@
 package mcjty.lib.container;
 
 import cofh.api.item.IToolHammer;
+import crazypants.enderio.api.redstone.IRedstoneConnectable;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.api.smartwrench.SmartWrench;
@@ -54,7 +55,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends Block implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider {
+public abstract class GenericBlock<T extends GenericTileEntity, C extends Container>
+        extends Block
+        implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider, IRedstoneConnectable {
 
     public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
@@ -131,6 +134,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     public boolean hasRedstoneOutput() {
         return false;
+    }
+
+    @Override
+    public boolean shouldRedstoneConduitConnect(World world, int x, int y, int z, EnumFacing from) {
+        return needsRedstoneCheck() || hasRedstoneOutput();
     }
 
     protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
