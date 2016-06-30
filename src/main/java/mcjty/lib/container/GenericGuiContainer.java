@@ -234,10 +234,24 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         sideWindow.getWindow().mouseMovedOrUp(x, y, state);
     }
 
+    public Window getWindow() {
+        return window;
+    }
+
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         if (!window.keyTyped(typedChar, keyCode)) {
             super.keyTyped(typedChar, keyCode);
+        }
+    }
+
+    public void keyTypedFromEvent(char typedChar, int keyCode) {
+        if (!window.keyTyped(typedChar, keyCode)) {
+            try {
+                super.keyTyped(typedChar, keyCode);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
