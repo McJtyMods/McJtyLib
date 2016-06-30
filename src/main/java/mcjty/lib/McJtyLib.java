@@ -1,18 +1,14 @@
 package mcjty.lib;
 
-import mcjty.lib.container.GenericGuiContainer;
-import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -23,7 +19,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
-import org.lwjgl.input.Keyboard;
 
 /**
  * Created by Elec332 on 24-3-2016.
@@ -43,7 +38,7 @@ public class McJtyLib {
     private static boolean init;
 
     public static void preInit(FMLPreInitializationEvent event){
-        if (init){
+        if (init) {
             return;
         }
         registerCapabilities();
@@ -81,25 +76,6 @@ public class McJtyLib {
                 }
             }
         }
-
-        @SubscribeEvent
-        public void onKeyboardInput(GuiScreenEvent.KeyboardInputEvent.Pre event) {
-            if (event.getGui() instanceof GenericGuiContainer) {
-                GenericGuiContainer container = (GenericGuiContainer) event.getGui();
-                Widget focus = container.getWindow().getTextFocus();
-                if (focus != null) {
-                    event.setCanceled(true);
-
-                    char c0 = Keyboard.getEventCharacter();
-
-                    if (Keyboard.getEventKey() == 0 && c0 >= 32 || Keyboard.getEventKeyState()) {
-                        container.keyTypedFromEvent(c0, Keyboard.getEventKey());
-                        Minecraft.getMinecraft().dispatchKeypresses();
-                    }
-                }
-            }
-        }
-
     }
 
     private static void registerCapabilities(){
