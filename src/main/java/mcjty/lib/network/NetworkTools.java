@@ -62,6 +62,32 @@ public class NetworkTools {
         }
     }
 
+    public static String readStringUTF8(ByteBuf dataIn) {
+        int s = dataIn.readInt();
+        if (s == -1) {
+            return null;
+        }
+        if (s == 0) {
+            return "";
+        }
+        byte[] dst = new byte[s];
+        dataIn.readBytes(dst);
+        return new String(dst, java.nio.charset.StandardCharsets.UTF_8);
+    }
+
+    public static void writeStringUTF8(ByteBuf dataOut, String str) {
+        if (str == null) {
+            dataOut.writeInt(-1);
+            return;
+        }
+        byte[] bytes = str.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        dataOut.writeInt(bytes.length);
+        if (bytes.length > 0) {
+            dataOut.writeBytes(bytes);
+        }
+    }
+
+
     public static BlockPos readPos(ByteBuf dataIn) {
         return new BlockPos(dataIn.readInt(), dataIn.readInt(), dataIn.readInt());
     }
