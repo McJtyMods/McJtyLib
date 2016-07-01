@@ -95,7 +95,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         return l;
     }
 
-    private void drawHoveringText(List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
+    protected void drawHoveringText(List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
         if (!textLines.isEmpty()) {
             GlStateManager.disableRescaleNormal();
             net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
@@ -255,7 +255,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         }
     }
 
-    protected void sendServerCommand(SimpleNetworkWrapper network, String command, Argument... arguments) {
+    public void sendServerCommand(SimpleNetworkWrapper network, String command, Argument... arguments) {
         network.sendToServer(new PacketServerCommand(tileEntity.getPos(), command, arguments));
     }
 }
