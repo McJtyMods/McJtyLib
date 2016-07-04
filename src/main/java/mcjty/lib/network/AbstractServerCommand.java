@@ -10,6 +10,7 @@ import java.util.Map;
 public class AbstractServerCommand implements IMessage {
 
     protected BlockPos pos;
+    protected Integer dimensionId;
     protected String command;
     protected Map<String,Argument> args;
 
@@ -18,6 +19,11 @@ public class AbstractServerCommand implements IMessage {
         pos = NetworkTools.readPos(buf);
         command = NetworkTools.readString(buf);
         args = readArguments(buf);
+        if (buf.readBoolean()) {
+            dimensionId = buf.readInt();
+        } else {
+            dimensionId = null;
+        }
     }
 
     @Override
@@ -25,6 +31,12 @@ public class AbstractServerCommand implements IMessage {
         NetworkTools.writePos(buf, pos);
         NetworkTools.writeString(buf, command);
         writeArguments(buf, args);
+        if (dimensionId != null) {
+            buf.writeBoolean(true);
+            buf.writeInt(dimensionId);
+        } else {
+            buf.writeBoolean(false);
+        }
     }
 
     public static Map<String,Argument> readArguments(ByteBuf buf) {

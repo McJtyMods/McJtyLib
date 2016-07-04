@@ -4,6 +4,8 @@ import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -21,6 +23,12 @@ public class PacketServerCommand extends AbstractServerCommand {
 
     public PacketServerCommand(BlockPos pos, String command, Argument... arguments) {
         super(pos, command, arguments);
+        this.dimensionId = null;
+    }
+
+    public PacketServerCommand(BlockPos pos, Integer dimensionId, String command, Argument... arguments) {
+        super(pos, command, arguments);
+        this.dimensionId = dimensionId;
     }
 
     public static class Handler implements IMessageHandler<PacketServerCommand, IMessage> {
@@ -32,7 +40,16 @@ public class PacketServerCommand extends AbstractServerCommand {
 
         private void handle(PacketServerCommand message, MessageContext ctx) {
             EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
-            TileEntity te = playerEntity.worldObj.getTileEntity(message.pos);
+            World world;
+            if (message.dimensionId == null) {
+                world = playerEntity.worldObj;
+            } else {
+                world = DimensionManager.getWorld(message.dimensionId);
+            }
+            if (world == null) {
+                return;
+            }
+            TileEntity te = world.getTileEntity(message.pos);
             if(!(te instanceof CommandHandler)) {
                 Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                 return;
