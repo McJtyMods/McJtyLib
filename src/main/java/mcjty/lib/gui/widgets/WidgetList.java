@@ -24,6 +24,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     private List<SelectionEvent> selectionEvents = null;
     private Set<Integer> hilightedRows = new HashSet<Integer>();
     private boolean noselection = false;
+    private boolean invisibleselection = false;
     private int leftMargin = 2;
     private int topMargin = 1;
 
@@ -74,6 +75,15 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         return propagateEventsToChildren;
     }
 
+    public boolean isInvisibleSelection() {
+        return invisibleselection;
+    }
+
+    public WidgetList setInvisibleSelection(boolean invisibleselection) {
+        this.invisibleselection = invisibleselection;
+        return this;
+    }
+
     public WidgetList setNoSelectionMode(boolean m) {
         this.noselection = m;
         return this;
@@ -101,6 +111,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         x -= bounds.x;
         y -= bounds.y;
 
+        doLayout();
         for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
             Widget child = children.get(i);
             if (child.in(x, y) && child.isVisible()) {
@@ -109,6 +120,16 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         return this;
+    }
+
+    private void doLayout() {
+        int top = 0;
+        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
+            Widget child = children.get(i);
+            int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
+            child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
+            top += rh;
+        }
     }
 
     @Override
@@ -134,12 +155,14 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             if (top + rh-1 < bounds.height-3) {
                 RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh - 1, xx + bounds.width - 7, StyleConfig.colorListSeparatorLine);
             }
-            if (i == selected && hilighted) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListSelectedHighlightedGradient1, StyleConfig.colorListSelectedHighlightedGradient2);
-            } else if (i == selected) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListSelectedGradient1, StyleConfig.colorListSelectedGradient2);        // 0xff515151
-            } else if (hilighted) {
-                RenderHelper.drawHorizontalGradientRect(xx, yy + top+1, xx + bounds.width - 5, yy + top + rh-2, StyleConfig.colorListHighlightedGradient1, StyleConfig.colorListHighlightedGradient2);
+            if (!invisibleselection) {
+                if (i == selected && hilighted) {
+                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedHighlightedGradient1, StyleConfig.colorListSelectedHighlightedGradient2);
+                } else if (i == selected) {
+                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedGradient1, StyleConfig.colorListSelectedGradient2);        // 0xff515151
+                } else if (hilighted) {
+                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListHighlightedGradient1, StyleConfig.colorListHighlightedGradient2);
+                }
             }
             if (isEnabledAndVisible()) {
                 child.draw(window, xx, yy);

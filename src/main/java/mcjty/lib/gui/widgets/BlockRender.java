@@ -5,6 +5,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.BlockRenderEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     private int offsetX = 0;
     private int offsetY = 0;
     private long prevTime = -1;
+    private boolean hilightOnHover = false;
     private List<BlockRenderEvent> selectionEvents = null;
 
     public Object getRenderItem() {
@@ -49,6 +51,15 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return this;
     }
 
+    public boolean isHilightOnHover() {
+        return hilightOnHover;
+    }
+
+    public BlockRender setHilightOnHover(boolean hilightOnHover) {
+        this.hilightOnHover = hilightOnHover;
+        return this;
+    }
+
     @Override
     public void draw(Window window, int x, int y) {
         if (!visible) {
@@ -56,7 +67,18 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         }
         super.draw(window, x, y);
         if (renderItem != null) {
-            RenderHelper.renderObject(mc, x + bounds.x + offsetX, y + bounds.y + offsetY, renderItem, false);
+            int xx = x + bounds.x + offsetX;
+            int yy = y + bounds.y + offsetY;
+            RenderHelper.renderObject(mc, xx, yy, renderItem, false);
+            if (hilightOnHover && isHovering()) {
+                GlStateManager.disableLighting();
+                GlStateManager.disableDepth();
+                GlStateManager.colorMask(true, true, true, false);
+                RenderHelper.drawVerticalGradientRect(xx, yy, xx + 16, yy + 16, -2130706433, -2130706433);
+                GlStateManager.colorMask(true, true, true, true);
+//                GlStateManager.enableLighting();
+                GlStateManager.enableDepth();
+            }
         }
     }
 

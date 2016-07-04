@@ -23,6 +23,16 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
+    public Widget getWidgetAtPosition(int x, int y) {
+        if (isDirty()) {
+            layout.doLayout(children, bounds.width, bounds.height);
+            markClean();
+        }
+
+        return super.getWidgetAtPosition(x, y);
+    }
+
+    @Override
     public void draw(Window window, int x, int y) {
         if (!visible) {
             return;
