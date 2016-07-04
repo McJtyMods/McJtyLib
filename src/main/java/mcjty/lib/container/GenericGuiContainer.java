@@ -256,6 +256,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     }
 
     public void sendServerCommand(SimpleNetworkWrapper network, String command, Argument... arguments) {
-        network.sendToServer(new PacketServerCommand(tileEntity.getPos(), command, arguments));
+        network.sendToServer(new PacketServerCommand(tileEntity.getPos(), null, command, arguments));
+    }
+
+    public void sendServerCommand(SimpleNetworkWrapper network, int dimensionId, String command, Argument... arguments) {
+        network.sendToServer(new PacketServerCommand(tileEntity.getPos(), dimensionId, command, arguments));
     }
 }
