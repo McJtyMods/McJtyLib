@@ -57,21 +57,54 @@ public class InventoryHelper {
      * @param consumer
      */
     public static void handleSlot(TileEntity tileEntity, int slot, Consumer<ItemStack> consumer) {
+        handleSlot(tileEntity, slot, -1, consumer);
+    }
+
+    /**
+     * Handle a slot from an inventory and consume it
+     * @param tileEntity
+     * @param slot
+     * @param amount (use -1 for entire stack)
+     * @param consumer
+     */
+    public static void handleSlot(TileEntity tileEntity, int slot, int amount, Consumer<ItemStack> consumer) {
         if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
             IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
             ItemStack item = capability.getStackInSlot(slot);
             if (item != null) {
-                ItemStack stack = capability.extractItem(slot, item.stackSize, false);
+                if (amount == -1) {
+                    amount = item.stackSize;
+                }
+                ItemStack stack = capability.extractItem(slot, amount, false);
                 consumer.accept(stack);
             }
         } else if (tileEntity instanceof IInventory) {
             IInventory inventory = (IInventory) tileEntity;
             ItemStack item = inventory.getStackInSlot(slot);
             if (item != null) {
-                ItemStack stack = inventory.decrStackSize(slot, item.stackSize);
+                if (amount == -1) {
+                    amount = item.stackSize;
+                }
+                ItemStack stack = inventory.decrStackSize(slot, amount);
                 consumer.accept(stack);
             }
         }
+    }
+
+    /**
+     * Get a slot
+     * @param tileEntity
+     * @param slot
+     */
+    public static ItemStack getSlot(TileEntity tileEntity, int slot) {
+        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            return capability.getStackInSlot(slot);
+        } else if (tileEntity instanceof IInventory) {
+            IInventory inventory = (IInventory) tileEntity;
+            return inventory.getStackInSlot(slot);
+        }
+        return null;
     }
 
     public static boolean isInventory(TileEntity te) {
