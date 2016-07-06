@@ -76,7 +76,9 @@ public class InventoryHelper {
                     amount = item.stackSize;
                 }
                 ItemStack stack = capability.extractItem(slot, amount, false);
-                consumer.accept(stack);
+                if (stack != null) {
+                    consumer.accept(stack);
+                }
             }
         } else if (tileEntity instanceof IInventory) {
             IInventory inventory = (IInventory) tileEntity;
@@ -86,7 +88,9 @@ public class InventoryHelper {
                     amount = item.stackSize;
                 }
                 ItemStack stack = inventory.decrStackSize(slot, amount);
-                consumer.accept(stack);
+                if (stack != null) {
+                    consumer.accept(stack);
+                }
             }
         }
     }
