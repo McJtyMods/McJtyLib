@@ -80,7 +80,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
             return stack;
         }
 
-        if (!inv.isItemValidForSlot(slot, stack) || !inv.canInsertItem(slot, stack, facing)) {
+        if (!inv.isItemValidForSlot(slot, stack) || (facing != null && !inv.canInsertItem(slot, stack, facing))) {
             return stack;
         }
 
@@ -161,7 +161,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
             return null;
         }
 
-        if (!inv.canExtractItem(slot1, stackInSlot, facing)) {
+        if (facing != null && !inv.canExtractItem(slot1, stackInSlot, facing)) {
             return null;
         }
 
