@@ -336,7 +336,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (needsCustomInvWrapper()) {
             if (invHandler == null) {
-                invHandler = new CustomSidedInvWrapper((ISidedInventory) this);
+                invHandler = new CustomSidedInvWrapper((ISidedInventory) this, facing);
             }
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
                 return true;
@@ -346,10 +346,10 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     @Override
-    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, net.minecraft.util.EnumFacing facing) {
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         if (needsCustomInvWrapper()) {
             if (invHandler == null) {
-                invHandler = new CustomSidedInvWrapper((ISidedInventory) this);
+                invHandler = new CustomSidedInvWrapper((ISidedInventory) this, facing);
             }
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
                 return (T) invHandler;
