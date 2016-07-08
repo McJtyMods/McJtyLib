@@ -2,25 +2,23 @@ package mcjty.lib.varia;
 
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class CustomSidedInvWrapper implements IItemHandlerModifiable {
+/**
+ * Works on a ISidedInventory but just passes null to the side so only
+ * one instance is needed for side == null as well as the six sides
+ */
+public class NullSidedInvWrapper implements IItemHandlerModifiable {
     private final ISidedInventory inv;
-    private final EnumFacing facing;
 
     // This version allows a 'null' facing
-    public CustomSidedInvWrapper(ISidedInventory inv, EnumFacing facing) {
+    public NullSidedInvWrapper(ISidedInventory inv) {
         this.inv = inv;
-        this.facing = facing;
     }
 
-    public static int getSlot(ISidedInventory inv, int slot, EnumFacing facing) {
-        if (facing == null) {
-            return slot;
-        }
-        int[] slots = inv.getSlotsForFace(facing);
+    public static int getSlot(ISidedInventory inv, int slot) {
+        int[] slots = inv.getSlotsForFace(null);
         if (slot < slots.length) {
             return slots[slot];
         }
@@ -36,7 +34,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
             return false;
         }
 
-        CustomSidedInvWrapper that = (CustomSidedInvWrapper) o;
+        NullSidedInvWrapper that = (NullSidedInvWrapper) o;
 
         if (inv != null ? !inv.equals(that.inv) : that.inv != null) {
             return false;
@@ -47,23 +45,17 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
 
     @Override
     public int hashCode() {
-        int result = inv != null ? inv.hashCode() : 0;
-        result = 31 * result + (facing != null ? facing.hashCode() : 0);
-        return result;
+        return inv != null ? inv.hashCode() : 0;
     }
 
     @Override
     public int getSlots() {
-        if (facing == null) {
-            return inv.getSizeInventory();
-        } else {
-            return inv.getSlotsForFace(facing).length;
-        }
+        return inv.getSlotsForFace(null).length;
     }
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        int i = getSlot(inv, slot, facing);
+        int i = getSlot(inv, slot);
         return i == -1 ? null : inv.getStackInSlot(i);
     }
 
@@ -74,13 +66,13 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
             return null;
         }
 
-        slot = getSlot(inv, slot, facing);
+        slot = getSlot(inv, slot);
 
         if (slot == -1) {
             return stack;
         }
 
-        if (!inv.isItemValidForSlot(slot, stack) || (facing != null && !inv.canInsertItem(slot, stack, facing))) {
+        if (!inv.isItemValidForSlot(slot, stack) || !inv.canInsertItem(slot, stack, null)) {
             return stack;
         }
 
@@ -139,7 +131,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
 
     @Override
     public void setStackInSlot(int slot, ItemStack stack) {
-        int i = getSlot(inv, slot, facing);
+        int i = getSlot(inv, slot);
         inv.setInventorySlotContents(i, stack);
     }
 
@@ -149,7 +141,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
             return null;
         }
 
-        int slot1 = getSlot(inv, slot, facing);
+        int slot1 = getSlot(inv, slot);
 
         if (slot1 == -1) {
             return null;
@@ -161,7 +153,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
             return null;
         }
 
-        if (facing != null && !inv.canExtractItem(slot1, stackInSlot, facing)) {
+        if (!inv.canExtractItem(slot1, stackInSlot, null)) {
             return null;
         }
 

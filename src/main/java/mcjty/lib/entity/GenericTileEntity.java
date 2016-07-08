@@ -5,12 +5,13 @@ import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
-import mcjty.lib.varia.CustomSidedInvWrapper;
+import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -25,6 +26,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -330,14 +332,12 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return false;
     }
 
-    private IItemHandler invHandler = null;
+    protected IItemHandler invHandlerNull;
+    protected IItemHandler invHandlerSided;
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
         if (needsCustomInvWrapper()) {
-            if (invHandler == null) {
-                invHandler = new CustomSidedInvWrapper((ISidedInventory) this, facing);
-            }
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
                 return true;
             }
@@ -347,12 +347,19 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (needsCustomInvWrapper()) {
-            if (invHandler == null) {
-                invHandler = new CustomSidedInvWrapper((ISidedInventory) this, facing);
-            }
-            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-                return (T) invHandler;
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            if (needsCustomInvWrapper()) {
+                if (facing == null) {
+                    if (invHandlerNull == null) {
+                        invHandlerNull = new InvWrapper((IInventory) this);
+                    }
+                    return (T) invHandlerNull;
+                } else {
+                    if (invHandlerSided == null) {
+                        invHandlerSided = new NullSidedInvWrapper((ISidedInventory) this);
+                    }
+                    return (T) invHandlerSided;
+                }
             }
         }
         return super.getCapability(capability, facing);
