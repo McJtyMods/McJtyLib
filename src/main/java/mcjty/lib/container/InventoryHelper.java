@@ -92,6 +92,41 @@ public class InventoryHelper {
     }
 
     /**
+     * Extract itemstack out of a slot and return a new stack
+     * @param tileEntity
+     * @param slot
+     * @param amount
+     */
+    public static ItemStack extractItem(TileEntity tileEntity, int slot, int amount) {
+        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            return capability.extractItem(slot, amount, false);
+        } else if (tileEntity instanceof IInventory) {
+            IInventory inventory = (IInventory) tileEntity;
+            return inventory.decrStackSize(slot, amount);
+        }
+        return null;
+    }
+
+    /**
+     * Get the size of the inventory
+     * @param tileEntity
+     */
+    public static int getInventorySize(TileEntity tileEntity) {
+        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            if (capability == null) {
+                return 0;
+            }
+            return capability.getSlots();
+        } else if (tileEntity instanceof IInventory) {
+            IInventory inventory = (IInventory) tileEntity;
+            return inventory.getSizeInventory();
+        }
+        return 0;
+    }
+
+    /**
      * Get a slot
      * @param tileEntity
      * @param slot
