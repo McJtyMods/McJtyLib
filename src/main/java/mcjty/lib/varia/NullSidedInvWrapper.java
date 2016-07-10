@@ -5,10 +5,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class CustomSidedInvWrapper implements IItemHandlerModifiable {
+/**
+ * Works on a ISidedInventory but just passes null to the side so only
+ * one instance is needed for side == null as well as the six sides
+ */
+public class NullSidedInvWrapper implements IItemHandlerModifiable {
     private final ISidedInventory inv;
 
-    public CustomSidedInvWrapper(ISidedInventory inv) {
+    // This version allows a 'null' facing
+    public NullSidedInvWrapper(ISidedInventory inv) {
         this.inv = inv;
     }
 
@@ -29,7 +34,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
             return false;
         }
 
-        CustomSidedInvWrapper that = (CustomSidedInvWrapper) o;
+        NullSidedInvWrapper that = (NullSidedInvWrapper) o;
 
         if (inv != null ? !inv.equals(that.inv) : that.inv != null) {
             return false;
@@ -61,17 +66,17 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
             return null;
         }
 
-        int slot1 = getSlot(inv, slot);
+        slot = getSlot(inv, slot);
 
-        if (slot1 == -1) {
+        if (slot == -1) {
             return stack;
         }
 
-        if (!inv.isItemValidForSlot(slot1, stack) || !inv.canInsertItem(slot1, stack, null)) {
+        if (!inv.isItemValidForSlot(slot, stack) || !inv.canInsertItem(slot, stack, null)) {
             return stack;
         }
 
-        ItemStack stackInSlot = inv.getStackInSlot(slot1);
+        ItemStack stackInSlot = inv.getStackInSlot(slot);
 
         int m;
         if (stackInSlot != null) {
@@ -85,7 +90,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
                 if (!simulate) {
                     ItemStack copy = stack.copy();
                     copy.stackSize += stackInSlot.stackSize;
-                    inv.setInventorySlotContents(slot1, copy);
+                    inv.setInventorySlotContents(slot, copy);
                 }
 
                 return null;
@@ -95,7 +100,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
                 if (!simulate) {
                     ItemStack copy = stack.splitStack(m);
                     copy.stackSize += stackInSlot.stackSize;
-                    inv.setInventorySlotContents(slot1, copy);
+                    inv.setInventorySlotContents(slot, copy);
                     return stack;
                 } else {
                     stack.stackSize -= m;
@@ -108,7 +113,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    inv.setInventorySlotContents(slot1, stack.splitStack(m));
+                    inv.setInventorySlotContents(slot, stack.splitStack(m));
                     return stack;
                 } else {
                     stack.stackSize -= m;
@@ -116,7 +121,7 @@ public class CustomSidedInvWrapper implements IItemHandlerModifiable {
                 }
             } else {
                 if (!simulate) {
-                    inv.setInventorySlotContents(slot1, stack);
+                    inv.setInventorySlotContents(slot, stack);
                 }
                 return null;
             }
