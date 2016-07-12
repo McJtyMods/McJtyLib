@@ -289,6 +289,8 @@ public class InventoryHelper {
                 return false;
             }
             insertItemsItemHandlerWithUndo(capability, items, false);
+        } else {
+            return false;
         }
         return true;
     }
