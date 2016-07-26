@@ -27,6 +27,10 @@ repositories {
     maven { // JEI
         url "http://dvs1.progwml6.com/files/maven"
     }
+    maven { // TOP
+        name 'tterrag maven'
+        url "http://maven.tterrag.com/"
+    }
 }
 
 version = "1.10-1.9.8"
@@ -51,8 +55,9 @@ minecraft {
 }
 
 dependencies {
-    deobfCompile "mcp.mobius.waila:Waila:1.7.0-B2_1.9"
-    deobfCompile "mezz.jei:jei_1.9.4:3.4.0.202"
+    deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
+    deobfCompile "mezz.jei:jei_1.10.2:3.7.3.223"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe:1.10-1.0.12-25"
 }
 
 task deobfJar(type: Jar) {
