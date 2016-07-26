@@ -1,17 +1,25 @@
 package mcjty.test;
 
-import mcjty.lib.container.EmptyContainer;
 import mcjty.lib.container.GenericBlock;
+import mcjty.lib.container.GenericGuiContainer;
 import net.minecraft.block.material.Material;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TestBlock extends GenericBlock<TestTileEntity, EmptyContainer> {
+public class TestBlock extends GenericBlock<TestTileEntity, TestContainer> {
 
     public TestBlock() {
-        super(TestMod.instance, Material.IRON, TestTileEntity.class, EmptyContainer.class, "testblock", false);
+        super(TestMod.instance, Material.IRON, TestTileEntity.class, TestContainer.class, "testblock", true);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public Class<? extends GenericGuiContainer> getGuiClass() {
+        return TestGui.class;
     }
 
     @Override
     public int getGuiID() {
-        return 0;
+        return TestMod.TESTGUI;
     }
 }
