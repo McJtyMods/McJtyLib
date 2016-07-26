@@ -344,11 +344,8 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private WrenchUsage getWrenchUsageInt(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
         if (item instanceof IToolHammer) {
             IToolHammer hammer = (IToolHammer) item;
-            int x = pos.getX();
-            int y = pos.getY();
-            int z = pos.getZ();
-            if (hammer.isUsable(itemStack, player, x, y, z)) {
-                hammer.toolUsed(itemStack, player, x, y, z);
+            if (hammer.isUsable(itemStack, player, pos)) {
+                hammer.toolUsed(itemStack, player, pos);
                 wrenchUsed = WrenchUsage.NORMAL;
             } else {
                 wrenchUsed = WrenchUsage.DISABLED;
