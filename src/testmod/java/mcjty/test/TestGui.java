@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class TestGui extends GenericGuiContainer<TestTileEntity> {
     public static final int WIDTH = 256;
-    public static final int HEIGHT = 236;
+    public static final int HEIGHT = 234;
 
     private static final ResourceLocation iconLocation = new ResourceLocation(TestMod.MODID, "textures/gui/testgui.png");
 
