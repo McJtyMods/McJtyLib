@@ -1,6 +1,7 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.gui.GuiScreen;
@@ -20,10 +21,20 @@ public class Window {
     private Widget textFocus = null;
     private Widget hover = null;
     private GuiStyle currentStyle;
+    private IconManager iconManager;
+
 
     public Window(GuiScreen gui, Widget toplevel) {
         this.gui = gui;
         this.toplevel = toplevel;
+    }
+
+    public void setIconManager(IconManager iconManager) {
+        this.iconManager = iconManager;
+    }
+
+    public IconManager getIconManager() {
+        return iconManager;
     }
 
     public Widget getToplevel() {

@@ -3,6 +3,7 @@ package mcjty.test;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.Window;
+import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.layout.VerticalLayout;
@@ -25,6 +26,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     private static final ResourceLocation sideBackground = new ResourceLocation(TestMod.MODID, "textures/gui/sidegui.png");
 
     private Window sideWindow;
+    private IconManager iconManager;
 
     public TestGui(TestTileEntity tileEntity, TestContainer container) {
         super(TestMod.instance, TestMod.network, tileEntity, container, 0, "testblock");
@@ -51,6 +53,10 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         Panel sidePanel = new Panel(mc, this).setLayout(new PositionalLayout()).setBackground(sideBackground);
         sidePanel.setBounds(new Rectangle(guiLeft-SIDEWIDTH, guiTop, SIDEWIDTH, ySize));
         sideWindow = new Window(this, sidePanel);
+
+        iconManager = new IconManager();
+        window.setIconManager(iconManager);
+        sideWindow.setIconManager(iconManager);
     }
 
     private Panel setupControlPanel() {
