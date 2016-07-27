@@ -54,7 +54,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         sidePanel.setBounds(new Rectangle(guiLeft-SIDEWIDTH, guiTop, SIDEWIDTH, ySize));
         sideWindow = new Window(this, sidePanel);
 
-        iconManager = new IconManager();
+        iconManager = new IconManager(this);
         window.setIconManager(iconManager);
         sideWindow.setIconManager(iconManager);
     }
