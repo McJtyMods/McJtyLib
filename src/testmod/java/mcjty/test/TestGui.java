@@ -3,7 +3,9 @@ package mcjty.test;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.Window;
+import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.icons.IconManager;
+import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.layout.VerticalLayout;
@@ -13,7 +15,6 @@ import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.*;
 import mcjty.lib.gui.widgets.TextField;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 
@@ -39,24 +40,27 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     public void initGui() {
         super.initGui();
 
+        // --- Main window ---
         Panel editorPanel = setupEditorPanel();
-        Panel listPanel = setupListPanel();
         Panel controlPanel = setupControlPanel();
-
         Panel toplevel = new Panel(mc, this).setLayout(new PositionalLayout()).setBackground(mainBackground)
                 .addChild(editorPanel)
-                .addChild(listPanel)
                 .addChild(controlPanel);
         toplevel.setBounds(new Rectangle(guiLeft, guiTop, xSize, ySize));
         window = new Window(this, toplevel);
 
-        Panel sidePanel = new Panel(mc, this).setLayout(new PositionalLayout()).setBackground(sideBackground);
+        // --- Side window ---
+        Panel listPanel = setupListPanel();
+        Panel sidePanel = new Panel(mc, this).setLayout(new PositionalLayout()).setBackground(sideBackground)
+                .addChild(listPanel);
         sidePanel.setBounds(new Rectangle(guiLeft-SIDEWIDTH, guiTop, SIDEWIDTH, ySize));
         sideWindow = new Window(this, sidePanel);
+    }
 
-        iconManager = new IconManager(this);
-        window.setIconManager(iconManager);
-        sideWindow.setIconManager(iconManager);
+    @Override
+    protected void registerWindows(WindowManager mgr) {
+        super.registerWindows(mgr);
+        mgr.addWindow(sideWindow);
     }
 
     private Panel setupControlPanel() {
@@ -67,60 +71,54 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     }
 
     private Panel setupListPanel() {
-        WidgetList list = new WidgetList(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 43, 118));
+        WidgetList list = new WidgetList(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 62, 220));
         Slider slider = new Slider(mc, this)
                 .setVertical()
                 .setScrollable(list)
-                .setLayoutHint(new PositionalLayout.PositionalHint(43, 0, 9, 118));
+                .setLayoutHint(new PositionalLayout.PositionalHint(62, 0, 9, 220));
 
-        return new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(200, 5, 50, 118))
+        return new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 72, 220))
                 .addChild(list)
                 .addChild(slider);
 //                .setFilledRectThickness(-2)
 //                .setFilledBackground(StyleConfig.colorListBackground);
     }
 
-    private Panel setupEditorPanel() {
-        Label slotLabel = (Label) new Label(mc, this).setText("Slot:").setDesiredHeight(14);
-        TextField slotInfo = new TextField(mc, this).setText("<var 3>").setDesiredHeight(14);
-        Button slotButton = new Button(mc, this).setText("...").setDesiredHeight(14);
+    private Panel createValuePanel(String labelName, String tempDefault) {
+        Label label = (Label) new Label(mc, this)
+                .setText(labelName)
+                .setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
+                .setDesiredHeight(13)
+                .setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 55, 13));
+        TextField field = new TextField(mc, this)
+                .setText(tempDefault)
+                .setDesiredHeight(13)
+                .setLayoutHint(new PositionalLayout.PositionalHint(0, 12, 49, 13));
+        Button button = new Button(mc, this)
+                .setText("...")
+                .setDesiredHeight(13)
+                .setLayoutHint(new PositionalLayout.PositionalHint(50, 12, 11, 13));
 
-        Label amountLabel = (Label)new Label(mc, this).setText("Amount:").setDesiredHeight(14);
-        TextField amountInfo = new TextField(mc, this).setText("<64>").setDesiredHeight(14);
-        Button amountButton = new Button(mc, this).setText("...").setDesiredHeight(14);
-
-        return new Panel(mc, this).setLayout(new HorizontalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(4, 127, 249, 26))
-                .addChild(slotLabel)
-                .addChild(slotInfo)
-                .addChild(slotButton)
-                .addChild(amountLabel)
-                .addChild(amountInfo)
-                .addChild(amountButton)
-                .setFilledRectThickness(-2)
-                .setFilledBackground(StyleConfig.colorListBackground);
+        return new Panel(mc, this).setLayout(new PositionalLayout())
+                .addChild(label)
+                .addChild(field)
+                .addChild(button)
+                .setDesiredWidth(62);
     }
 
-    @Override
-    protected void drawGuiContainerForegroundLayer(int i, int i2) {
-        int x = Mouse.getEventX() * width / mc.displayWidth;
-        int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+    private Panel setupEditorPanel() {
+        Panel slotPanel = createValuePanel("Slot:", "<var 3>");
+        Panel amountPanel = createValuePanel("Amount:", "<64>");
 
-        java.util.List<String> tooltips = sideWindow.getTooltips();
-        if (tooltips != null) {
-            drawHoveringText(tooltips, window.getTooltipItems(), x - guiLeft, y - guiTop, mc.fontRendererObj);
-        }
-
-        super.drawGuiContainerForegroundLayer(i, i2);
+        return new Panel(mc, this).setLayout(new HorizontalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(4, 123, 249, 30))
+                .addChild(slotPanel)
+                .addChild(amountPanel)
+                .setFilledRectThickness(-1)
+                .setFilledBackground(StyleConfig.colorListBackground);
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         drawWindow();
-    }
-
-    @Override
-    protected void drawWindow() {
-        super.drawWindow();
-        sideWindow.draw();
     }
 }

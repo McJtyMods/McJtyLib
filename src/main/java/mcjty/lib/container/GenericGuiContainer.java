@@ -4,6 +4,7 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.gui.GuiSideWindow;
 import mcjty.lib.gui.Window;
+import mcjty.lib.gui.WindowManager;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketServerCommand;
 import net.minecraft.client.gui.FontRenderer;
@@ -28,6 +29,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     protected SimpleNetworkWrapper network;
 
     protected Window window;
+    private WindowManager windowManager;
     protected final T tileEntity;
 
     private GuiSideWindow sideWindow;
@@ -50,20 +52,34 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         sideWindow.initGui(modBase, network, mc, this, guiLeft, guiTop, xSize, ySize);
     }
 
+    /**
+     * Override this method to register your own windows to the window manager.
+     * @param mgr
+     */
+    protected void registerWindows(WindowManager mgr) {
+    }
+
+    protected WindowManager getWindowManager() {
+        if (windowManager == null) {
+            windowManager = new WindowManager(this);
+            windowManager.addWindow(sideWindow.getWindow());
+            windowManager.addWindow(window);
+            registerWindows(windowManager);
+        }
+        return windowManager;
+    }
+
     @Override
     protected void drawGuiContainerForegroundLayer(int i, int i2) {
         int x = Mouse.getEventX() * width / mc.displayWidth;
         int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
 
-        List<String> tooltips = window.getTooltips();
-        if (tooltips != null) {
-            drawHoveringText(tooltips, window.getTooltipItems(), x - guiLeft, y - guiTop, mc.fontRendererObj);
-        }
-
-        tooltips = sideWindow.getWindow().getTooltips();
-        if (tooltips != null) {
-            drawHoveringText(tooltips, window.getTooltipItems(), x - guiLeft, y - guiTop, mc.fontRendererObj);
-        }
+        getWindowManager().stream().forEach(w -> {
+            List<String> tooltips = w.getTooltips();
+            if (tooltips != null) {
+                drawHoveringText(tooltips, w.getTooltipItems(), x - guiLeft, y - guiTop, mc.fontRendererObj);
+            }
+        });
         RenderHelper.enableGUIStandardItemLighting();
     }
 
@@ -195,8 +211,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
 
     protected void drawWindow() {
-        window.draw();
-        sideWindow.getWindow().draw();
+        getWindowManager().stream().forEach(w -> w.draw());
     }
 
     @Override
@@ -213,15 +228,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     @Override
     protected void mouseClicked(int x, int y, int button) throws IOException {
         super.mouseClicked(x, y, button);
-        window.mouseClicked(x, y, button);
-        sideWindow.getWindow().mouseClicked(x, y, button);
+        getWindowManager().stream().forEach(w -> w.mouseClicked(x, y, button));
     }
 
     @Override
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
-        window.handleMouseInput();
-        sideWindow.getWindow().handleMouseInput();
+        getWindowManager().stream().forEach(Window::handleMouseInput);
     }
 
     /*
@@ -230,8 +243,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     @Override
     protected void mouseReleased(int x, int y, int state) {
         super.mouseReleased(x, y, state);
-        window.mouseMovedOrUp(x, y, state);
-        sideWindow.getWindow().mouseMovedOrUp(x, y, state);
+        getWindowManager().stream().forEach(w -> w.mouseMovedOrUp(x, y, state));
     }
 
     public Window getWindow() {
@@ -240,13 +252,15 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        if (!window.keyTyped(typedChar, keyCode)) {
+        boolean b = getWindowManager().stream().allMatch(w -> !w.keyTyped(typedChar, keyCode));
+        if (b) {
             super.keyTyped(typedChar, keyCode);
         }
     }
 
     public void keyTypedFromEvent(char typedChar, int keyCode) {
-        if (!window.keyTyped(typedChar, keyCode)) {
+        boolean b = getWindowManager().stream().allMatch(w -> !w.keyTyped(typedChar, keyCode));
+        if (b) {
             try {
                 super.keyTyped(typedChar, keyCode);
             } catch (IOException e) {
