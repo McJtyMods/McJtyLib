@@ -1,6 +1,8 @@
 package mcjty.lib.gui.icons;
 
 import mcjty.lib.gui.WindowManager;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
 
@@ -18,12 +20,25 @@ public class IconManager {
         this.windowManager = windowManager;
     }
 
-    public void startDragging(IIcon icon) {
+    public void startDragging(IIcon icon, int iconX, int iconY) {
         draggingIcon = icon;
+        System.out.println("getRelativeX() = " + getRelativeX());
+        dx = iconX;
+        dy = iconY;
     }
 
     public void stopDragging() {
         draggingIcon = null;
+    }
+
+    public boolean isDragging() {
+        return draggingIcon != null;
+    }
+
+    public void draw(Minecraft mc, Gui gui) {
+        if (draggingIcon != null) {
+            draggingIcon.draw(mc, gui, getRelativeX() - dx, getRelativeY() - dy);
+        }
     }
 
     private int getRelativeX() {

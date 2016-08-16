@@ -90,7 +90,7 @@ public class RenderHelper {
     }
 
     public static boolean renderIcon(Minecraft mc, RenderItem itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
-        //itemRender.renderIcon(xo, yo, itm, 16, 16); //TODO: Make
+        //itemRender.draw(xo, yo, itm, 16, 16); //TODO: Make
         return true;
     }
 

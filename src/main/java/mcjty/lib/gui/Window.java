@@ -20,11 +20,19 @@ public class Window {
     private Widget textFocus = null;
     private Widget hover = null;
     private GuiStyle currentStyle;
-
+    private WindowManager windowManager;
 
     public Window(GuiScreen gui, Widget toplevel) {
         this.gui = gui;
         this.toplevel = toplevel;
+    }
+
+    public WindowManager getWindowManager() {
+        return windowManager;
+    }
+
+    public void setWindowManager(WindowManager windowManager) {
+        this.windowManager = windowManager;
     }
 
     public Widget getToplevel() {

@@ -211,7 +211,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
 
     protected void drawWindow() {
-        getWindowManager().stream().forEach(w -> w.draw());
+        getWindowManager().draw();
     }
 
     @Override

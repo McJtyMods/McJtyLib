@@ -1,6 +1,5 @@
 package mcjty.lib.gui.icons;
 
-import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -32,7 +31,7 @@ public class ImageIcon implements IIcon {
     }
 
     @Override
-    public void draw(Minecraft mc, Gui gui, Window window, int x, int y) {
+    public void draw(Minecraft mc, Gui gui, int x, int y) {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(image);
         gui.drawTexturedModalRect(x, y, u, v, width, height);

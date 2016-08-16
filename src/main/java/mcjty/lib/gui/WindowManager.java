@@ -1,6 +1,7 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.gui.icons.IconManager;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
 import java.util.ArrayList;
@@ -25,12 +26,22 @@ public class WindowManager {
         return gui;
     }
 
+    public IconManager getIconManager() {
+        return iconManager;
+    }
+
     public WindowManager addWindow(Window w) {
         windows.add(w);
+        w.setWindowManager(this);
         return this;
     }
 
     public Stream<Window> stream() {
         return windows.stream();
+    }
+
+    public void draw() {
+        windows.stream().forEach(w -> w.draw());
+        iconManager.draw(Minecraft.getMinecraft(), gui);
     }
 }

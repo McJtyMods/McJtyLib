@@ -5,6 +5,7 @@ import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.icons.IconManager;
+import mcjty.lib.gui.icons.ImageIcon;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
@@ -25,9 +26,12 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
     private static final ResourceLocation mainBackground = new ResourceLocation(TestMod.MODID, "textures/gui/testgui.png");
     private static final ResourceLocation sideBackground = new ResourceLocation(TestMod.MODID, "textures/gui/sidegui.png");
+    private static final ResourceLocation icons = new ResourceLocation(TestMod.MODID, "textures/gui/icons.png");
 
     private Window sideWindow;
     private IconManager iconManager;
+    private IconHolder iconHolder1;
+    private IconHolder iconHolder2;
 
     public TestGui(TestTileEntity tileEntity, TestContainer container) {
         super(TestMod.instance, TestMod.network, tileEntity, container, 0, "testblock");
@@ -43,9 +47,11 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         // --- Main window ---
         Panel editorPanel = setupEditorPanel();
         Panel controlPanel = setupControlPanel();
+        Panel gridPanel = setupGridPanel();
         Panel toplevel = new Panel(mc, this).setLayout(new PositionalLayout()).setBackground(mainBackground)
                 .addChild(editorPanel)
-                .addChild(controlPanel);
+                .addChild(controlPanel)
+                .addChild(gridPanel);
         toplevel.setBounds(new Rectangle(guiLeft, guiTop, xSize, ySize));
         window = new Window(this, toplevel);
 
@@ -61,6 +67,19 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     protected void registerWindows(WindowManager mgr) {
         super.registerWindows(mgr);
         mgr.addWindow(sideWindow);
+    }
+
+    private Panel setupGridPanel() {
+        iconHolder1 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(140, 40, 21, 21));
+        iconHolder1.setIcon(new ImageIcon().setDimensions(19, 19).setImage(icons, 0, 0))
+                .setBorder(1);
+
+        iconHolder2 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(162, 40, 21, 21))
+                .setBorder(1);
+
+        return new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 246, 113))
+                .addChild(iconHolder1)
+                .addChild(iconHolder2);
     }
 
     private Panel setupControlPanel() {
