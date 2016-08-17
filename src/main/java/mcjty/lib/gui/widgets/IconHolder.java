@@ -14,6 +14,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
     private IIcon icon;
     private int border = 0;
+    private boolean makeCopy = false;
 
     public IconHolder(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -37,6 +38,15 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return this;
     }
 
+    public boolean isMakeCopy() {
+        return makeCopy;
+    }
+
+    public IconHolder setMakeCopy(boolean makeCopy) {
+        this.makeCopy = makeCopy;
+        return this;
+    }
+
     @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         if (isEnabledAndVisible()) {
@@ -46,7 +56,12 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                     IconManager iconManager = window.getWindowManager().getIconManager();
                     Rectangle windowBounds = window.getToplevel().getBounds();
                     iconManager.startDragging(icon, this, x - this.bounds.x, y - this.bounds.y);
-                    icon = null;
+                    if (makeCopy) {
+                        // @todo
+                        icon = null;
+                    } else {
+                        icon = null;
+                    }
                 }
             }
 //            fireChoiceEvents(choiceList.get(currentChoice));

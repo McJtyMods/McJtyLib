@@ -32,6 +32,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     private IconManager iconManager;
     private IconHolder iconHolder1;
     private IconHolder iconHolder2;
+    private IconHolder iconHolder3;
 
     public TestGui(TestTileEntity tileEntity, TestContainer container) {
         super(TestMod.instance, TestMod.network, tileEntity, container, 0, "testblock");
@@ -70,16 +71,23 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     }
 
     private Panel setupGridPanel() {
-        iconHolder1 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(140, 40, 21, 21));
+
+        int leftx = 40;
+        int topy = 40;
+        iconHolder1 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx, topy, 21, 21));
         iconHolder1.setIcon(new ImageIcon().setDimensions(19, 19).setImage(icons, 0, 0))
                 .setBorder(1);
 
-        iconHolder2 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(162, 40, 21, 21))
+        iconHolder2 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx +22, topy, 21, 21))
+                .setBorder(1);
+
+        iconHolder3 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx +22+22, topy, 21, 21))
                 .setBorder(1);
 
         return new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 246, 113))
                 .addChild(iconHolder1)
-                .addChild(iconHolder2);
+                .addChild(iconHolder2)
+                .addChild(iconHolder3);
     }
 
     private Panel setupControlPanel() {
@@ -90,11 +98,30 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     }
 
     private Panel setupListPanel() {
-        WidgetList list = new WidgetList(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 62, 220));
+        WidgetList list = new WidgetList(mc, this)
+                .setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 62, 220))
+                .setPropagateEventsToChildren(true);
         Slider slider = new Slider(mc, this)
                 .setVertical()
                 .setScrollable(list)
                 .setLayoutHint(new PositionalLayout.PositionalHint(62, 0, 9, 220));
+
+        int x = 0;
+        for (int i = 0 ; i < 13 ; i++) {
+            Panel childPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setVerticalMargin(0)).setDesiredHeight(23);
+            IconHolder holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21);
+            holder.setIcon(new ImageIcon().setDimensions(19, 19).setImage(icons, i*19, x*2*19))
+                    .setMakeCopy(true)
+                    .setBorder(1);
+            childPanel.addChild(holder);
+            holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21);
+            holder.setIcon(new ImageIcon().setDimensions(19, 19).setImage(icons, i*19, x*2*19+19))
+                    .setMakeCopy(true)
+                    .setBorder(1);
+            childPanel.addChild(holder);
+
+            list.addChild(childPanel);
+        }
 
         return new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 72, 220))
                 .addChild(list)
