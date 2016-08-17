@@ -100,7 +100,8 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     private Panel setupListPanel() {
         WidgetList list = new WidgetList(mc, this)
                 .setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 62, 220))
-                .setPropagateEventsToChildren(true);
+                .setPropagateEventsToChildren(true)
+                .setRowheight(23);
         Slider slider = new Slider(mc, this)
                 .setVertical()
                 .setScrollable(list)
@@ -108,7 +109,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
         int x = 0;
         for (int i = 0 ; i < 13 ; i++) {
-            Panel childPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setVerticalMargin(0)).setDesiredHeight(23);
+            Panel childPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setVerticalMargin(0)).setDesiredHeight(21);
             IconHolder holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21);
             holder.setIcon(new ImageIcon().setDimensions(19, 19).setImage(icons, i*19, x*2*19))
                     .setMakeCopy(true)
