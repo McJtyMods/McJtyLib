@@ -440,6 +440,19 @@ public class RenderHelper {
     }
 
     /**
+     * Draw a beveled box. x2 and y2 are not included.
+     */
+    public static void drawFlatBox(int x1, int y1, int x2, int y2, int border, int fill) {
+        if (fill != -1) {
+            Gui.drawRect(x1+1, y1+1, x2-1, y2-1, fill);
+        }
+        drawHorizontalLine(x1, y1, x2-1, border);
+        drawVerticalLine(x1, y1, y2-1, border);
+        drawVerticalLine(x2-1, y1, y2-1, border);
+        drawHorizontalLine(x1, y2-1, x2, border);
+    }
+
+    /**
      * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height
      */
     public static void drawTexturedModalRect(int x, int y, int u, int v, int width, int height) {

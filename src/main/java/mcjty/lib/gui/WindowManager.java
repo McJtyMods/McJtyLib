@@ -4,6 +4,7 @@ import mcjty.lib.gui.icons.IconManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -43,5 +44,20 @@ public class WindowManager {
     public void draw() {
         windows.stream().forEach(w -> w.draw());
         iconManager.draw(Minecraft.getMinecraft(), gui);
+    }
+
+    public void mouseClicked(int x, int y, int button) throws IOException {
+        windows.stream().forEach(w -> w.mouseClicked(x, y, button));
+    }
+
+    public void handleMouseInput() throws IOException {
+        windows.stream().forEach(Window::handleMouseInput);
+    }
+
+    public void mouseReleased(int x, int y, int state) {
+        if (iconManager.isDragging()) {
+            iconManager.stopDragging(x, y);
+        }
+        windows.stream().forEach(w -> w.mouseMovedOrUp(x, y, state));
     }
 }

@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
@@ -44,12 +45,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 if (icon != null) {
                     IconManager iconManager = window.getWindowManager().getIconManager();
                     Rectangle windowBounds = window.getToplevel().getBounds();
-                    System.out.println("x = " + x);
-                    System.out.println("windowBounds.x = " + windowBounds.x);
-                    System.out.println("bounds.x = " + bounds.x);
-                    iconManager.startDragging(icon,
-                            x - this.bounds.x,// + windowBounds.x,
-                            y - this.bounds.y);// + windowBounds.y);
+                    iconManager.startDragging(icon, this, x - this.bounds.x, y - this.bounds.y);
                     icon = null;
                 }
             }
@@ -70,7 +66,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         int yy = y + bounds.y;
 
         if (border > 0) {
-            drawBox(xx, yy, 0xffffffff);
+            RenderHelper.drawFlatBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffffffff, -1);
         }
 
         if (icon != null) {

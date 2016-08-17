@@ -228,13 +228,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     @Override
     protected void mouseClicked(int x, int y, int button) throws IOException {
         super.mouseClicked(x, y, button);
-        getWindowManager().stream().forEach(w -> w.mouseClicked(x, y, button));
+        getWindowManager().mouseClicked(x, y, button);
     }
 
     @Override
     public void handleMouseInput() throws IOException {
         super.handleMouseInput();
-        getWindowManager().stream().forEach(Window::handleMouseInput);
+        getWindowManager().handleMouseInput();
     }
 
     /*
@@ -243,7 +243,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     @Override
     protected void mouseReleased(int x, int y, int state) {
         super.mouseReleased(x, y, state);
-        getWindowManager().stream().forEach(w -> w.mouseMovedOrUp(x, y, state));
+        getWindowManager().mouseReleased(x, y, state);
     }
 
     public Window getWindow() {

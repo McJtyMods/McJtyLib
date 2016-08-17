@@ -39,6 +39,14 @@ public class Window {
         return toplevel;
     }
 
+    public Widget getWidgetAtPosition(int x, int y) {
+        if (toplevel.in(x, y) && toplevel.isVisible()) {
+            return toplevel.getWidgetAtPosition(x, y);
+        } else {
+            return null;
+        }
+    }
+
     public void mouseClicked(int x, int y, int button) {
         textFocus = null;
         if (toplevel.in(x, y) && toplevel.isVisible()) {
