@@ -21,6 +21,8 @@ public class IconManager {
     private int x;
     private int y;
 
+    private boolean clickHoldToDrag = false;
+
     public IconManager(WindowManager windowManager) {
         this.windowManager = windowManager;
     }
@@ -30,6 +32,27 @@ public class IconManager {
         this.origin = origin;
         this.dx = iconX;
         this.dy = iconY;
+    }
+
+    public boolean isClickHoldToDrag() {
+        return clickHoldToDrag;
+    }
+
+    public void setClickHoldToDrag(boolean clickHoldToDrag) {
+        this.clickHoldToDrag = clickHoldToDrag;
+    }
+
+    public void cancelDragging() {
+        if (draggingIcon == null) {
+            return;
+        }
+
+        if (origin != null) {
+            // We assume this always works
+            origin.setIcon(draggingIcon);
+        }
+        draggingIcon = null;
+        origin = null;
     }
 
     public void stopDragging(int x, int y) {

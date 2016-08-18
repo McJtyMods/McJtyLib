@@ -47,6 +47,14 @@ public class WindowManager {
     }
 
     public void mouseClicked(int x, int y, int button) throws IOException {
+        if ((!iconManager.isClickHoldToDrag()) && iconManager.isDragging()) {
+            if (button == 1) {
+                iconManager.cancelDragging();
+            } else {
+                iconManager.stopDragging(x, y);
+            }
+            return;
+        }
         windows.stream().forEach(w -> w.mouseClicked(x, y, button));
     }
 
@@ -55,7 +63,7 @@ public class WindowManager {
     }
 
     public void mouseReleased(int x, int y, int state) {
-        if (iconManager.isDragging()) {
+        if (iconManager.isClickHoldToDrag() && iconManager.isDragging()) {
             iconManager.stopDragging(x, y);
         }
         windows.stream().forEach(w -> w.mouseMovedOrUp(x, y, state));

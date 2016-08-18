@@ -71,7 +71,6 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                     }
                 }
             }
-//            fireChoiceEvents(choiceList.get(currentChoice));
         }
         return null;
     }
