@@ -74,9 +74,9 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
         int leftx = 40;
         int topy = 40;
-        iconHolder1 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx, topy, 21, 21));
-        iconHolder1.setIcon(new ImageIcon("t1").setDimensions(19, 19).setImage(icons, 0, 0))
+        iconHolder1 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx, topy, 21, 21))
                 .setBorder(1);
+        iconHolder1.setIcon(new ImageIcon("t1").setDimensions(19, 19).setImage(icons, 0, 0));
 
         iconHolder2 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx +22, topy, 21, 21))
                 .setBorder(1);
@@ -112,15 +112,15 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         int x = 0;
         for (int i = 0 ; i < 13 ; i++) {
             Panel childPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setVerticalMargin(0)).setDesiredHeight(21);
-            IconHolder holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21);
-            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(19, 19).setImage(icons, i*19, x*2*19))
+            IconHolder holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21)
                     .setMakeCopy(true)
                     .setBorder(1);
+            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(19, 19).setImage(icons, i*19, x*2*19));
             childPanel.addChild(holder);
-            holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21);
-            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(19, 19).setImage(icons, i*19, x*2*19+19))
+            holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21)
                     .setMakeCopy(true)
                     .setBorder(1);
+            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(19, 19).setImage(icons, i*19, x*2*19+19));
             childPanel.addChild(holder);
 
             list.addChild(childPanel);

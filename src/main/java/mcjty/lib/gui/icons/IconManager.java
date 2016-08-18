@@ -40,10 +40,16 @@ public class IconManager {
         IconHolder iconHolder = findClosestIconHolder(x, y);
         if (iconHolder == null || iconHolder.getIcon() != null) {
             if (origin != null) {
+                // We assume this always works
                 origin.setIcon(draggingIcon);
             }
         } else {
-            iconHolder.setIcon(draggingIcon);
+            if (!iconHolder.setIcon(draggingIcon)) {
+                if (origin != null) {
+                    // Set it back, it wasn't accepted
+                    origin.setIcon(draggingIcon);
+                }
+            }
         }
 
         draggingIcon = null;
