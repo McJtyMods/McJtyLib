@@ -12,9 +12,14 @@ public class ImageIcon implements IIcon {
     private int v;
     private int width;
     private int height;
+    private final String id;
 
     public ResourceLocation getImage() {
         return image;
+    }
+
+    public ImageIcon(String id) {
+        this.id = id;
     }
 
     public ImageIcon setImage(ResourceLocation image, int u, int v) {
@@ -35,5 +40,15 @@ public class ImageIcon implements IIcon {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(image);
         gui.drawTexturedModalRect(x, y, u, v, width, height);
+    }
+
+    @Override
+    public String getID() {
+        return id;
+    }
+
+    @Override
+    public IIcon clone() {
+        return new ImageIcon(id).setImage(image, u, v).setDimensions(width, height);
     }
 }

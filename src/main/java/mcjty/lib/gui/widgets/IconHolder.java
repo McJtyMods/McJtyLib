@@ -55,11 +55,10 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 if (icon != null) {
                     IconManager iconManager = window.getWindowManager().getIconManager();
                     Rectangle windowBounds = window.getToplevel().getBounds();
-                    iconManager.startDragging(icon, this, x - this.bounds.x, y - this.bounds.y);
                     if (makeCopy) {
-                        // @todo
-                        icon = null;
+                        iconManager.startDragging(icon.clone(), this, x - this.bounds.x, y - this.bounds.y);
                     } else {
+                        iconManager.startDragging(icon, this, x - this.bounds.x, y - this.bounds.y);
                         icon = null;
                     }
                 }

@@ -38,7 +38,7 @@ public class IconManager {
         }
 
         IconHolder iconHolder = findClosestIconHolder(x, y);
-        if (iconHolder == null) {
+        if (iconHolder == null || iconHolder.getIcon() != null) {
             if (origin != null) {
                 origin.setIcon(draggingIcon);
             }

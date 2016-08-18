@@ -25,6 +25,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     private Set<Integer> hilightedRows = new HashSet<Integer>();
     private boolean noselection = false;
     private boolean invisibleselection = false;
+    private boolean drawHorizontalLines = true;
     private int leftMargin = 2;
     private int topMargin = 1;
 
@@ -41,6 +42,15 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     // Setting rowheight to -1 will use variable height depending on the desired height of every row
     public WidgetList setRowheight(int rowheight) {
         this.rowheight = rowheight;
+        return this;
+    }
+
+    public boolean isDrawHorizontalLines() {
+        return drawHorizontalLines;
+    }
+
+    public WidgetList setDrawHorizontalLines(boolean drawHorizontalLines) {
+        this.drawHorizontalLines = drawHorizontalLines;
         return this;
     }
 
@@ -152,7 +162,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             boolean hilighted = hilightedRows.contains(i);
-            if (top + rh-1 < bounds.height-3) {
+            if ((top + rh-1 < bounds.height-3) && drawHorizontalLines) {
                 RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh - 1, xx + bounds.width - 7, StyleConfig.colorListSeparatorLine);
             }
             if (!invisibleselection) {
