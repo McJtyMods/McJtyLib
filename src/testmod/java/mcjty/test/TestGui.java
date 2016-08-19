@@ -11,9 +11,9 @@ import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.layout.VerticalLayout;
 import mcjty.lib.gui.widgets.Button;
+import mcjty.lib.gui.widgets.*;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
-import mcjty.lib.gui.widgets.*;
 import mcjty.lib.gui.widgets.TextField;
 import net.minecraft.util.ResourceLocation;
 
@@ -146,6 +146,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         Button button = new Button(mc, this)
                 .setText("...")
                 .setDesiredHeight(13)
+                .addButtonEvent(w -> openValueEditor())
                 .setLayoutHint(new PositionalLayout.PositionalHint(50, 12, 11, 13));
 
         return new Panel(mc, this).setLayout(new PositionalLayout())
@@ -153,6 +154,18 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
                 .addChild(field)
                 .addChild(button)
                 .setDesiredWidth(62);
+    }
+
+    private void openValueEditor() {
+        Panel panel = new Panel(mc, this)
+                .setLayout(new VerticalLayout())
+                .setFilledBackground(0xff666666, 0xffaaaaaa);
+        panel.setBounds(new Rectangle(50, 50, 200, 100));
+        Window modalWindow = getWindowManager().createModalWindow(panel);
+        panel.addChild(new Label(mc, this).setText("Label"));
+        panel.addChild(new Button(mc, this)
+                .addButtonEvent(w -> getWindowManager().closeWindow(modalWindow))
+                .setText("Close"));
     }
 
     private Panel setupEditorPanel() {

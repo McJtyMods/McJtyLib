@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Use a window manager if you need multipole windows and/or want icon support
@@ -21,6 +22,7 @@ public class WindowManager {
     private final GuiScreen gui;
 
     private List<Window> windows = new ArrayList<>();
+    private List<Window> modalWindows = new ArrayList<>();
 
     public WindowManager(GuiScreen gui) {
         this.gui = gui;
@@ -40,16 +42,48 @@ public class WindowManager {
         return this;
     }
 
+    public WindowManager addModalWindow(Window w) {
+        modalWindows.add(w);
+        w.setWindowManager(this);
+        return this;
+    }
+
+    public Window createModalWindow(Widget topLevel) {
+        Window w = new Window(gui, topLevel);
+        addModalWindow(w);
+        return w;
+    }
+
+    public void closeWindow(Window window) {
+        if (windows.contains(window)) {
+            windows.remove(window);
+        } else if (modalWindows.contains(window)) {
+            modalWindows.remove(window);
+        }
+    }
+
     public void draw() {
         windows.stream().forEach(w -> w.draw());
+        modalWindows.stream().forEach(w -> w.draw());
         iconManager.draw(Minecraft.getMinecraft(), gui);
+    }
+
+    private Stream<Window> getInteractableWindows() {
+        if (modalWindows.isEmpty()) {
+            return windows.stream();
+        } else {
+            Window window = modalWindows.get(modalWindows.size() - 1);
+            return Stream.<Window> builder()
+                    .add(window)
+                    .build();
+        }
     }
 
     public void drawTooltips() {
         int x = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
         int y = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
 
-        windows.stream().forEach(w -> {
+        getInteractableWindows().forEach(w -> {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 GenericGuiContainer gui = (GenericGuiContainer) this.gui;
@@ -75,21 +109,21 @@ public class WindowManager {
             }
             return;
         }
-        windows.stream().forEach(w -> w.mouseClicked(x, y, button));
+        getInteractableWindows().forEach(w -> w.mouseClicked(x, y, button));
     }
 
     public void handleMouseInput() throws IOException {
-        windows.stream().forEach(Window::handleMouseInput);
+        getInteractableWindows().forEach(Window::handleMouseInput);
     }
 
     public void mouseReleased(int x, int y, int state) {
         if (iconManager.isClickHoldToDrag() && iconManager.isDragging()) {
             iconManager.stopDragging(x, y);
         }
-        windows.stream().forEach(w -> w.mouseMovedOrUp(x, y, state));
+        getInteractableWindows().forEach(w -> w.mouseMovedOrUp(x, y, state));
     }
 
     public boolean keyTyped(char typedChar, int keyCode) throws IOException {
-        return windows.stream().allMatch(w -> !w.keyTyped(typedChar, keyCode));
+        return getInteractableWindows().allMatch(w -> !w.keyTyped(typedChar, keyCode));
     }
 }
