@@ -10,12 +10,10 @@ import mcjty.lib.network.PacketServerCommand;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.io.IOException;
@@ -54,6 +52,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     /**
      * Override this method to register your own windows to the window manager.
+     *
      * @param mgr
      */
     protected void registerWindows(WindowManager mgr) {
@@ -71,16 +70,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     @Override
     protected void drawGuiContainerForegroundLayer(int i, int i2) {
-        int x = Mouse.getEventX() * width / mc.displayWidth;
-        int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-
-        getWindowManager().stream().forEach(w -> {
-            List<String> tooltips = w.getTooltips();
-            if (tooltips != null) {
-                drawHoveringText(tooltips, w.getTooltipItems(), x - guiLeft, y - guiTop, mc.fontRendererObj);
-            }
-        });
-        RenderHelper.enableGUIStandardItemLighting();
+        getWindowManager().drawTooltips();
     }
 
     private List parseString(String s, List<ItemStack> items) {
@@ -111,7 +101,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         return l;
     }
 
-    protected void drawHoveringText(List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
+    public void drawHoveringText(List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
         if (!textLines.isEmpty()) {
             GlStateManager.disableRescaleNormal();
             net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
@@ -184,7 +174,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                             font.drawStringWithShadow(s1, (float) curx, (float) yy, -1);
                             curx += font.getStringWidth((String) o);
                         } else {
-                            mcjty.lib.gui.RenderHelper.renderObject(mc, curx+1, yy, o, false);
+                            mcjty.lib.gui.RenderHelper.renderObject(mc, curx + 1, yy, o, false);
                             curx += 20;
                         }
                     }
@@ -252,20 +242,20 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        boolean b = getWindowManager().stream().allMatch(w -> !w.keyTyped(typedChar, keyCode));
+        boolean b = getWindowManager().keyTyped(typedChar, keyCode);
         if (b) {
             super.keyTyped(typedChar, keyCode);
         }
     }
 
     public void keyTypedFromEvent(char typedChar, int keyCode) {
-        boolean b = getWindowManager().stream().allMatch(w -> !w.keyTyped(typedChar, keyCode));
-        if (b) {
-            try {
+        try {
+            boolean b = getWindowManager().keyTyped(typedChar, keyCode);
+            if (b) {
                 super.keyTyped(typedChar, keyCode);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

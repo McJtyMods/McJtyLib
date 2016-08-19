@@ -80,10 +80,7 @@ public class IconManager {
     }
 
     private IconHolder findClosestIconHolder(int x, int y) {
-        Optional<Widget> widget = windowManager.stream()
-                .map(w -> w.getWidgetAtPosition(x, y))
-                .filter(w -> w != null)
-                .findFirst();
+        Optional<Widget> widget = windowManager.findWidgetAtPosition(x, y);
         if (widget.isPresent() && widget.get() instanceof IconHolder) {
             return (IconHolder) widget.get();
         }
