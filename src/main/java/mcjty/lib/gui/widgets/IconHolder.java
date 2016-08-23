@@ -87,7 +87,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         int yy = y + bounds.y;
 
         if (border > 0) {
-            RenderHelper.drawFlatBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xffffffff, -1);
+            RenderHelper.drawFlatBox(xx, yy, xx + bounds.width, yy + bounds.height, 0xffffffff, -1);
         }
 
         if (icon != null) {

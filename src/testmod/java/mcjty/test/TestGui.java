@@ -30,9 +30,6 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
     private Window sideWindow;
     private IconManager iconManager;
-    private IconHolder iconHolder1;
-    private IconHolder iconHolder2;
-    private IconHolder iconHolder3;
 
     public TestGui(TestTileEntity tileEntity, TestContainer container) {
         super(TestMod.instance, TestMod.network, tileEntity, container, 0, "testblock");
@@ -72,22 +69,18 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
     private Panel setupGridPanel() {
 
-        int leftx = 40;
-        int topy = 40;
-        iconHolder1 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx, topy, 21, 21))
-                .setBorder(1);
-        iconHolder1.setIcon(new ImageIcon("t1").setDimensions(19, 19).setImage(icons, 0, 0));
+        Panel panel = new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 246, 113));
 
-        iconHolder2 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx +22, topy, 21, 21))
-                .setBorder(1);
+        int leftx = 0;
+        int topy = 0;
+        for (int x = 0 ; x < 13 ; x++) {
+            for (int y = 0 ; y < 6 ; y++) {
+                IconHolder holder = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx + x*19, topy + y*19, 18, 18)).setBorder(1);
+                panel.addChild(holder);
+            }
+        }
 
-        iconHolder3 = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx +22+22, topy, 21, 21))
-                .setBorder(1);
-
-        return new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 246, 113))
-                .addChild(iconHolder1)
-                .addChild(iconHolder2)
-                .addChild(iconHolder3);
+        return panel;
     }
 
     private Panel setupControlPanel() {
@@ -103,24 +96,28 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
                 .setPropagateEventsToChildren(true)
                 .setInvisibleSelection(true)
                 .setDrawHorizontalLines(false)
-                .setRowheight(23);
+                .setRowheight(18);
         Slider slider = new Slider(mc, this)
                 .setVertical()
                 .setScrollable(list)
                 .setLayoutHint(new PositionalLayout.PositionalHint(62, 0, 9, 220));
 
         int x = 0;
-        for (int i = 0 ; i < 13 ; i++) {
-            Panel childPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setVerticalMargin(0)).setDesiredHeight(21);
-            IconHolder holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21)
-                    .setMakeCopy(true)
-                    .setBorder(1);
-            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(19, 19).setImage(icons, i*19, x*2*19));
+        for (int i = 0 ; i < 16 ; i++) {
+            Panel childPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setVerticalMargin(1).setSpacing(1).setHorizontalMargin(1)).setDesiredHeight(17);
+            IconHolder holder = new IconHolder(mc, this).setDesiredWidth(16).setDesiredHeight(16)
+                    .setMakeCopy(true);
+            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(16, 16).setImage(icons, i*16, x*2*16));
             childPanel.addChild(holder);
-            holder = new IconHolder(mc, this).setDesiredWidth(21).setDesiredHeight(21)
-                    .setMakeCopy(true)
-                    .setBorder(1);
-            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(19, 19).setImage(icons, i*19, x*2*19+19));
+
+            holder = new IconHolder(mc, this).setDesiredWidth(16).setDesiredHeight(16)
+                    .setMakeCopy(true);
+            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(16, 16).setImage(icons, i*16, x*2*16+16));
+            childPanel.addChild(holder);
+
+            holder = new IconHolder(mc, this).setDesiredWidth(16).setDesiredHeight(16)
+                    .setMakeCopy(true);
+            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(16, 16).setImage(icons, i*16, x*2*16+16));
             childPanel.addChild(holder);
 
             list.addChild(childPanel);
