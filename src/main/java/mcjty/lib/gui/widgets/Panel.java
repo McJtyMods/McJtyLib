@@ -54,6 +54,19 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
+    public void drawPhase2(Window window, int x, int y) {
+        if (!visible) {
+            return;
+        }
+        super.drawPhase2(window, x, y);
+        int xx = x + bounds.x;
+        int yy = y + bounds.y;
+        for (Widget child : children) {
+            child.drawPhase2(window, xx, yy);
+        }
+    }
+
+    @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         super.mouseClick(window, x, y, button);
 

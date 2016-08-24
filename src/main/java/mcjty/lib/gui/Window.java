@@ -35,6 +35,10 @@ public class Window {
         this.windowManager = windowManager;
     }
 
+    public boolean isWidgetOnWindow(Widget w) {
+        return toplevel.containsWidget(w);
+    }
+
     public Widget getToplevel() {
         return toplevel;
     }
@@ -71,6 +75,14 @@ public class Window {
     }
 
     public void setTextFocus(Widget focus) {
+        if (windowManager != null) {
+            windowManager.clearFocus();
+        }
+        textFocus = focus;
+    }
+
+    // Package visible for the WindowManager
+    void setFocus(Widget focus) {
         textFocus = focus;
     }
 
@@ -108,6 +120,7 @@ public class Window {
             currentStyle = GuiStyle.STYLE_FLAT_GRADIENT;
         }
         toplevel.draw(this, 0, 0);
+        toplevel.drawPhase2(this, 0, 0);
     }
 
     public GuiStyle getCurrentStyle() {

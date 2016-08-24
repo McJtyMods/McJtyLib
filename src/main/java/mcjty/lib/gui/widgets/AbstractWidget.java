@@ -46,6 +46,10 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     // Flat gradient:   vvvvvvvv
     // Thick:           vv
 
+    @Override
+    public boolean containsWidget(Widget w) {
+        return w == this;
+    }
 
     protected AbstractWidget(Minecraft mc, Gui gui) {
         this.mc = mc;
@@ -317,6 +321,11 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
     @Override
     public void draw(Window window, int x, int y) {
         drawBackground(x, y);
+    }
+
+    @Override
+    public void drawPhase2(Window window, int x, int y) {
+
     }
 
     @Override

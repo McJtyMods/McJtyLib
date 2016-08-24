@@ -24,6 +24,8 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     public static final int WIDTH = 256;
     public static final int HEIGHT = 236;
 
+    public static int ICONSIZE = 20;
+
     private static final ResourceLocation mainBackground = new ResourceLocation(TestMod.MODID, "textures/gui/testgui.png");
     private static final ResourceLocation sideBackground = new ResourceLocation(TestMod.MODID, "textures/gui/sidegui.png");
     private static final ResourceLocation icons = new ResourceLocation(TestMod.MODID, "textures/gui/icons.png");
@@ -65,20 +67,49 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     protected void registerWindows(WindowManager mgr) {
         super.registerWindows(mgr);
         mgr.addWindow(sideWindow);
+        mgr.getIconManager().setClickHoldToDrag(true);
     }
 
     private Panel setupGridPanel() {
 
-        Panel panel = new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 246, 113));
+        Panel panel = new Panel(mc, this).setLayout(new PositionalLayout())
+                .setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 246, 113));
 
-        int leftx = 0;
-        int topy = 0;
-        for (int x = 0 ; x < 13 ; x++) {
-            for (int y = 0 ; y < 6 ; y++) {
-                IconHolder holder = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx + x*19, topy + y*19, 18, 18)).setBorder(1);
-                panel.addChild(holder);
+        WidgetList list = new WidgetList(mc, this)
+                .setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 236, 113))
+                .setPropagateEventsToChildren(true)
+                .setInvisibleSelection(true)
+                .setDrawHorizontalLines(false)
+                .setRowheight(ICONSIZE+1);
+        Slider slider = new Slider(mc, this)
+                .setVertical()
+                .setScrollable(list)
+                .setLayoutHint(new PositionalLayout.PositionalHint(237, 0, 9, 113));
+
+        for (int y = 0 ; y < 10 ; y++) {
+            Panel rowPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setSpacing(-1).setHorizontalMargin(0).setVerticalMargin(0));
+            for (int x = 0 ; x < 11 ; x++) {
+                IconHolder holder = new IconHolder(mc, this)
+                        .setDesiredWidth(ICONSIZE+2)
+                        .setDesiredHeight(ICONSIZE+2)
+                        .setBorder(1)
+                        .setBorderColor(0xff777777)
+                        .setSelectable(true);
+                rowPanel.addChild(holder);
             }
+            list.addChild(rowPanel);
         }
+
+//        int leftx = 0;
+//        int topy = 0;
+//        for (int x = 0 ; x < 13 ; x++) {
+//            for (int y = 0 ; y < 6 ; y++) {
+//                IconHolder holder = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx + x*19, topy + y*19, 18, 18)).setBorder(1);
+//                panel.addChild(holder);
+//            }
+//        }
+
+        panel.addChild(list).addChild(slider);
 
         return panel;
     }
@@ -96,7 +127,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
                 .setPropagateEventsToChildren(true)
                 .setInvisibleSelection(true)
                 .setDrawHorizontalLines(false)
-                .setRowheight(18);
+                .setRowheight(ICONSIZE+2);
         Slider slider = new Slider(mc, this)
                 .setVertical()
                 .setScrollable(list)
@@ -104,20 +135,20 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
         int x = 0;
         for (int i = 0 ; i < 16 ; i++) {
-            Panel childPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setVerticalMargin(1).setSpacing(1).setHorizontalMargin(1)).setDesiredHeight(17);
-            IconHolder holder = new IconHolder(mc, this).setDesiredWidth(16).setDesiredHeight(16)
+            Panel childPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setVerticalMargin(1).setSpacing(1).setHorizontalMargin(1)).setDesiredHeight(ICONSIZE+1);
+            IconHolder holder = new IconHolder(mc, this).setDesiredWidth(ICONSIZE).setDesiredHeight(ICONSIZE)
                     .setMakeCopy(true);
-            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(16, 16).setImage(icons, i*16, x*2*16));
+            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(ICONSIZE, ICONSIZE).setImage(icons, i*ICONSIZE, x*2*ICONSIZE));
             childPanel.addChild(holder);
 
-            holder = new IconHolder(mc, this).setDesiredWidth(16).setDesiredHeight(16)
+            holder = new IconHolder(mc, this).setDesiredWidth(ICONSIZE).setDesiredHeight(ICONSIZE)
                     .setMakeCopy(true);
-            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(16, 16).setImage(icons, i*16, x*2*16+16));
+            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(ICONSIZE, ICONSIZE).setImage(icons, i*ICONSIZE, x*2*ICONSIZE+ICONSIZE));
             childPanel.addChild(holder);
 
-            holder = new IconHolder(mc, this).setDesiredWidth(16).setDesiredHeight(16)
+            holder = new IconHolder(mc, this).setDesiredWidth(ICONSIZE).setDesiredHeight(ICONSIZE)
                     .setMakeCopy(true);
-            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(16, 16).setImage(icons, i*16, x*2*16+16));
+            holder.setIcon(new ImageIcon(String.valueOf(i)).setDimensions(ICONSIZE, ICONSIZE).setImage(icons, i*ICONSIZE, x*2*ICONSIZE+ICONSIZE));
             childPanel.addChild(holder);
 
             list.addChild(childPanel);

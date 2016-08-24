@@ -49,6 +49,19 @@ public class AbstractContainerWidget<P extends AbstractContainerWidget> extends 
         return false;
     }
 
+    @Override
+    public boolean containsWidget(Widget w) {
+        if (w == this) {
+            return true;
+        }
+        for (Widget child : children) {
+            if (child.containsWidget(w)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public P addChild(Widget child) {
         if (child == null) {
             throw new RuntimeException("THIS IS NOT POSSIBLE!");

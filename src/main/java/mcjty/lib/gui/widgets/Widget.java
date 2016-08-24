@@ -20,6 +20,12 @@ public interface Widget<P extends Widget> {
     }
 
     /**
+     * Return true if this widget is equal to the parameter widget or if the parameter
+     * widget is contained in this widget.
+     */
+    boolean containsWidget(Widget w);
+
+    /**
      * Set the actual bounds for this widget. These coordinates are relative to the parents
      * coordinate system. This function is typically called by the parent of this widget
      * and should only be used by the application for the toplevel widget.
@@ -112,6 +118,12 @@ public interface Widget<P extends Widget> {
      * the top/left x,y of this widget itself.
      */
     void draw(Window window, int x, int y);
+
+    /**
+     * After the window has been drawn this is called again to give widgets a chance
+     * to render additional stuff that has to be rendered on top of the rest
+     */
+    void drawPhase2(Window window, int x, int y);
 
     /**
      * Handle a mouse click for this widget. This widget does not have to check if the coordinate is

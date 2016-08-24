@@ -15,9 +15,14 @@ import java.util.List;
 public class IconHolder extends AbstractWidget<IconHolder> {
 
     private IIcon icon;
-    private int border = 0;
     private boolean makeCopy = false;
     private List<IconEvent> iconEvents = null;
+
+    private boolean selectable = false;
+
+    private int border = 0;
+    private Integer borderColor = null;
+    private Integer selectedBorderColor = 0xffffffff;
 
     public IconHolder(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -44,6 +49,33 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return this;
     }
 
+    public Integer getBorderColor() {
+        return borderColor;
+    }
+
+    public IconHolder setBorderColor(Integer borderColor) {
+        this.borderColor = borderColor;
+        return this;
+    }
+
+    public Integer getSelectedBorderColor() {
+        return selectedBorderColor;
+    }
+
+    public IconHolder setSelectedBorderColor(Integer selectedBorderColor) {
+        this.selectedBorderColor = selectedBorderColor;
+        return this;
+    }
+
+    public boolean isSelectable() {
+        return selectable;
+    }
+
+    public IconHolder setSelectable(boolean selectable) {
+        this.selectable = selectable;
+        return this;
+    }
+
     public boolean isMakeCopy() {
         return makeCopy;
     }
@@ -58,14 +90,19 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         if (isEnabledAndVisible()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
             } else {
+                if (selectable) {
+                    window.setTextFocus(this);
+                }
                 if (icon != null) {
                     if (fireIconLeaves(icon)) {
                         IconManager iconManager = window.getWindowManager().getIconManager();
                         Rectangle windowBounds = window.getToplevel().getBounds();
+                        int dx = x - this.bounds.x - border;
+                        int dy = y - this.bounds.y - border;
                         if (makeCopy) {
-                            iconManager.startDragging(icon.clone(), this, x - this.bounds.x, y - this.bounds.y);
+                            iconManager.startDragging(icon.clone(), this, dx, dy);
                         } else {
-                            iconManager.startDragging(icon, this, x - this.bounds.x, y - this.bounds.y);
+                            iconManager.startDragging(icon, this, dx, dy);
                             icon = null;
                         }
                     }
@@ -87,11 +124,28 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         int yy = y + bounds.y;
 
         if (border > 0) {
-            RenderHelper.drawFlatBox(xx, yy, xx + bounds.width, yy + bounds.height, 0xffffffff, -1);
+            if (borderColor != null) {
+                if ((!selectable) || window.getTextFocus() != this) {
+                    RenderHelper.drawFlatBox(xx, yy, xx + bounds.width, yy + bounds.height, borderColor, -1);
+                }
+            }
         }
 
         if (icon != null) {
             icon.draw(mc, gui, xx+border, yy+border);
+        }
+    }
+
+    @Override
+    public void drawPhase2(Window window, int x, int y) {
+        if (!visible) {
+            return;
+        }
+        super.drawPhase2(window, x, y);
+        if (border > 0 && selectable && selectedBorderColor != null && window.getTextFocus() == this) {
+            int xx = x + bounds.x;
+            int yy = y + bounds.y;
+            RenderHelper.drawFlatBox(xx, yy, xx + bounds.width, yy + bounds.height, selectedBorderColor, -1);
         }
     }
 

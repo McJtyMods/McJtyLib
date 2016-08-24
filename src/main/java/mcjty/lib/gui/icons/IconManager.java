@@ -30,8 +30,8 @@ public class IconManager {
     public void startDragging(IIcon icon, IconHolder origin, int iconX, int iconY) {
         this.draggingIcon = icon;
         this.origin = origin;
-        this.dx = iconX;
-        this.dy = iconY;
+        this.dx = iconX - 2;
+        this.dy = iconY - 1;
     }
 
     public boolean isClickHoldToDrag() {
@@ -71,6 +71,10 @@ public class IconManager {
                 if (origin != null) {
                     // Set it back, it wasn't accepted
                     origin.setIcon(draggingIcon);
+                }
+            } else {
+                if (iconHolder.isSelectable()) {
+                    windowManager.setFocus(iconHolder);
                 }
             }
         }

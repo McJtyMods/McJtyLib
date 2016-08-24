@@ -187,6 +187,27 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
+    public void drawPhase2(Window window, int x, int y) {
+        if (!visible) {
+            return;
+        }
+
+        super.drawPhase2(window, x, y);
+        int xx = x + bounds.x + leftMargin;
+        int yy = y + bounds.y + topMargin;
+        int top = 0;        // Margin@@@?
+//        drawBox(xx, yy, 0xffff0000);
+
+        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
+            Widget child = children.get(i);
+            int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
+            if (isEnabledAndVisible()) {
+                child.drawPhase2(window, xx, yy);
+            }
+            top += rh;
+        }}
+
+    @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         if (!isEnabledAndVisible()) {
             return null;

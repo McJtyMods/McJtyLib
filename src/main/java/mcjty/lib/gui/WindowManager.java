@@ -36,6 +36,18 @@ public class WindowManager {
         return iconManager;
     }
 
+    public void clearFocus() {
+        Stream.concat(windows.stream(), modalWindows.stream()).forEach(w -> w.setFocus(null));
+    }
+
+    public void setFocus(Widget w) {
+        clearFocus();
+        Stream.concat(windows.stream(), modalWindows.stream())
+                .filter(window -> window.isWidgetOnWindow(w))
+                .findFirst()
+                .ifPresent(window -> window.setTextFocus(w));
+    }
+
     public WindowManager addWindow(Window w) {
         windows.add(w);
         w.setWindowManager(this);
