@@ -5,6 +5,9 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ImageIcon implements IIcon {
 
     private ResourceLocation image = null;
@@ -14,12 +17,57 @@ public class ImageIcon implements IIcon {
     private int height;
     private final String id;
 
+    private List<IIcon> overlays;
+
     public ResourceLocation getImage() {
         return image;
     }
 
     public ImageIcon(String id) {
         this.id = id;
+    }
+
+    @Override
+    public void addOverlay(IIcon icon) {
+        if (overlays == null) {
+            overlays = new ArrayList<>();
+        }
+        overlays.add(icon);
+    }
+
+    @Override
+    public void removeOverlay(String id) {
+        if (overlays == null) {
+            return;
+        }
+        IIcon toRemove = null;
+        for (IIcon icon : overlays) {
+            if (id.equals(icon.getID())) {
+                toRemove = icon;
+                break;
+            }
+        }
+        if (toRemove != null) {
+            overlays.remove(toRemove);
+        }
+    }
+
+    @Override
+    public boolean hasOverlay(String id) {
+        if (overlays == null) {
+            return false;
+        }
+        for (IIcon icon : overlays) {
+            if (id.equals(icon.getID())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void clearOverlays() {
+        overlays = null;
     }
 
     public ImageIcon setImage(ResourceLocation image, int u, int v) {
@@ -40,6 +88,11 @@ public class ImageIcon implements IIcon {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(image);
         gui.drawTexturedModalRect(x, y, u, v, width, height);
+        if (overlays != null) {
+            for (IIcon icon : overlays) {
+                icon.draw(mc, gui, x, y);
+            }
+        }
     }
 
     @Override

@@ -19,8 +19,6 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     private boolean makeCopy = false;
     private List<IconEvent> iconEvents = null;
 
-    private List<IIcon> overlayIcons = new ArrayList<>();
-
     private boolean selectable = false;
 
     private int border = 0;
@@ -38,23 +36,9 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     public boolean setIcon(IIcon icon) {
         if (fireIconArrived(icon)) {
             this.icon = icon;
-            overlayIcons.clear();
             return true;
         }
         return false;
-    }
-
-    public void addOverlayIcon(IIcon icon) {
-        overlayIcons.add(icon);
-    }
-
-    public void removeOverlayIcon(String id) {
-        for (IIcon iIcon : new ArrayList<>(overlayIcons)) {
-            if (id.equals(iIcon.getID())) {
-                overlayIcons.remove(iIcon);
-                return;
-            }
-        }
     }
 
     public int getBorder() {
@@ -116,7 +100,6 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                     if (fireIconClicked(icon, dx, dy)) {
                         if (fireIconLeaves(icon)) {
                             IconManager iconManager = window.getWindowManager().getIconManager();
-                            Rectangle windowBounds = window.getToplevel().getBounds();
                             if (makeCopy) {
                                 iconManager.startDragging(icon.clone(), this, dx, dy);
                             } else {
@@ -152,10 +135,6 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
         if (icon != null) {
             icon.draw(mc, gui, xx+border, yy+border);
-            for (IIcon i : overlayIcons) {
-                i.draw(mc, gui, xx+border, yy+border);
-            }
-
         }
     }
 
