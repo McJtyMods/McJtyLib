@@ -4,6 +4,8 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
+import mcjty.lib.gui.events.IconEvent;
+import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.icons.ImageIcon;
 import mcjty.lib.gui.layout.HorizontalAlignment;
@@ -94,7 +96,28 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
                         .setDesiredHeight(ICONSIZE+2)
                         .setBorder(1)
                         .setBorderColor(0xff777777)
-                        .setSelectable(true);
+                        .setSelectable(true)
+                        .addIconEvent(new IconEvent() {
+                            @Override
+                            public boolean iconArrives(IconHolder parent, IIcon icon) {
+                                return true;
+                            }
+
+                            @Override
+                            public boolean iconLeaves(IconHolder parent, IIcon icon) {
+                                return true;
+                            }
+
+                            @Override
+                            public boolean iconClicked(IconHolder parent, IIcon icon, int dx, int dy) {
+//                                if (dy <= 3 && dx >= 8 && dx <= 11) {
+//                                    parent.removeOverlayIcon("on");
+//                                    parent.addOverlayIcon(new ImageIcon("on"), );
+//                                }
+                                System.out.println("dx = " + dx + "," + dy);
+                                return true;
+                            }
+                        });
                 rowPanel.addChild(holder);
             }
             list.addChild(rowPanel);

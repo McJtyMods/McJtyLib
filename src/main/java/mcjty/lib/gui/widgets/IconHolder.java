@@ -10,6 +10,7 @@ import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class IconHolder extends AbstractWidget<IconHolder> {
@@ -17,6 +18,8 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     private IIcon icon;
     private boolean makeCopy = false;
     private List<IconEvent> iconEvents = null;
+
+    private List<IIcon> overlayIcons = new ArrayList<>();
 
     private boolean selectable = false;
 
@@ -35,9 +38,23 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     public boolean setIcon(IIcon icon) {
         if (fireIconArrived(icon)) {
             this.icon = icon;
+            overlayIcons.clear();
             return true;
         }
         return false;
+    }
+
+    public void addOverlayIcon(IIcon icon) {
+        overlayIcons.add(icon);
+    }
+
+    public void removeOverlayIcon(String id) {
+        for (IIcon iIcon : new ArrayList<>(overlayIcons)) {
+            if (id.equals(iIcon.getID())) {
+                overlayIcons.remove(iIcon);
+                return;
+            }
+        }
     }
 
     public int getBorder() {
@@ -94,16 +111,18 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                     window.setTextFocus(this);
                 }
                 if (icon != null) {
-                    if (fireIconLeaves(icon)) {
-                        IconManager iconManager = window.getWindowManager().getIconManager();
-                        Rectangle windowBounds = window.getToplevel().getBounds();
-                        int dx = x - this.bounds.x - border;
-                        int dy = y - this.bounds.y - border;
-                        if (makeCopy) {
-                            iconManager.startDragging(icon.clone(), this, dx, dy);
-                        } else {
-                            iconManager.startDragging(icon, this, dx, dy);
-                            icon = null;
+                    int dx = x - this.bounds.x - border;
+                    int dy = y - this.bounds.y - border;
+                    if (fireIconClicked(icon, dx, dy)) {
+                        if (fireIconLeaves(icon)) {
+                            IconManager iconManager = window.getWindowManager().getIconManager();
+                            Rectangle windowBounds = window.getToplevel().getBounds();
+                            if (makeCopy) {
+                                iconManager.startDragging(icon.clone(), this, dx, dy);
+                            } else {
+                                iconManager.startDragging(icon, this, dx, dy);
+                                icon = null;
+                            }
                         }
                     }
                 }
@@ -133,6 +152,10 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
         if (icon != null) {
             icon.draw(mc, gui, xx+border, yy+border);
+            for (IIcon i : overlayIcons) {
+                i.draw(mc, gui, xx+border, yy+border);
+            }
+
         }
     }
 
@@ -147,6 +170,14 @@ public class IconHolder extends AbstractWidget<IconHolder> {
             int yy = y + bounds.y;
             RenderHelper.drawFlatBox(xx, yy, xx + bounds.width, yy + bounds.height, selectedBorderColor, -1);
         }
+    }
+
+    public IconHolder addIconEvent(IconEvent event) {
+        if (iconEvents == null) {
+            iconEvents = new ArrayList<>();
+        }
+        iconEvents.add(event);
+        return this;
     }
 
     private boolean fireIconArrived(IIcon icon) {
@@ -165,6 +196,18 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         if (iconEvents != null) {
             for (IconEvent event : iconEvents) {
                 boolean b = event.iconLeaves(this, icon);
+                if (!b) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean fireIconClicked(IIcon icon, int dx, int dy) {
+        if (iconEvents != null) {
+            for (IconEvent event : iconEvents) {
+                boolean b = event.iconClicked(this, icon, dx, dy);
                 if (!b) {
                     return false;
                 }

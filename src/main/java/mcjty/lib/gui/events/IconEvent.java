@@ -10,4 +10,7 @@ public interface IconEvent {
 
     /// Return false if you don't want the icon to go away
     boolean iconLeaves(IconHolder parent, IIcon icon);
+
+    /// Fires if the icon is clicked. Return false if you don't want any further processing
+    boolean iconClicked(IconHolder parent, IIcon icon, int dx, int dy);
 }
