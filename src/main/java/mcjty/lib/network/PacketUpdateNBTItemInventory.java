@@ -24,7 +24,7 @@ public class PacketUpdateNBTItemInventory implements IMessage {
     public void fromBytes(ByteBuf buf) {
         pos = NetworkTools.readPos(buf);
         slotIndex = buf.readInt();
-        NetworkTools.readTag(buf);
+        tagCompound = NetworkTools.readTag(buf);
     }
 
     @Override
