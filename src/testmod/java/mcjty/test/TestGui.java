@@ -110,10 +110,15 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
                             @Override
                             public boolean iconClicked(IconHolder parent, IIcon icon, int dx, int dy) {
-//                                if (dy <= 3 && dx >= 8 && dx <= 11) {
-//                                    parent.removeOverlayIcon("on");
-//                                    parent.addOverlayIcon(new ImageIcon("on"), );
-//                                }
+                                if (dy <= 3 && dx >= 10 && dx <= 14) {
+                                    handleIconOverlay(icon, "top", 0, 5);
+                                } else if (dy >= ICONSIZE-3 && dx >= 10 && dx <= 14) {
+                                    handleIconOverlay(icon, "bot", 2, 5);
+                                } else if (dx <= 3 && dy >= 10 && dy <= 14) {
+                                    handleIconOverlay(icon, "lef", 3, 5);
+                                } else if (dx >= ICONSIZE-3 && dy >= 10 && dy <= 14) {
+                                    handleIconOverlay(icon, "rig", 1, 5);
+                                }
                                 System.out.println("dx = " + dx + "," + dy);
                                 return true;
                             }
@@ -135,6 +140,17 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         panel.addChild(list).addChild(slider);
 
         return panel;
+    }
+
+    private void handleIconOverlay(IIcon icon, String prefix, int u, int v) {
+        if (icon.hasOverlay(prefix+"_red")) {
+            icon.removeOverlay(prefix+"_red");
+            icon.addOverlay(new ImageIcon(prefix+"_green").setDimensions(ICONSIZE, ICONSIZE).setImage(icons, u*ICONSIZE, (v+1)*ICONSIZE));
+        } else if (icon.hasOverlay(prefix+"_green")) {
+            icon.removeOverlay(prefix+"_green");
+        } else {
+            icon.addOverlay(new ImageIcon(prefix+"_red").setDimensions(ICONSIZE, ICONSIZE).setImage(icons, u*ICONSIZE, v*ICONSIZE));
+        }
     }
 
     private Panel setupControlPanel() {

@@ -10,6 +10,14 @@ public interface IIcon {
      */
     void draw(Minecraft mc, Gui gui, int x, int y);
 
+    void addOverlay(IIcon icon);
+
+    void removeOverlay(String id);
+
+    void clearOverlays();
+
+    boolean hasOverlay(String id);
+
     // Make a copy of this icon
     IIcon clone();
 
