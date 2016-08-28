@@ -2,14 +2,15 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.IconEvent;
+import mcjty.lib.gui.events.IconArrivesEvent;
+import mcjty.lib.gui.events.IconClickedEvent;
+import mcjty.lib.gui.events.IconLeavesEvent;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,9 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
     private IIcon icon;
     private boolean makeCopy = false;
-    private List<IconEvent> iconEvents = null;
+    private List<IconArrivesEvent> iconArrivesEvents = null;
+    private List<IconLeavesEvent> iconLeavesEvents = null;
+    private List<IconClickedEvent> iconClickedEvents = null;
 
     private boolean selectable = false;
 
@@ -134,7 +137,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         }
 
         if (icon != null) {
-            icon.draw(mc, gui, xx+border, yy+border);
+            icon.draw(mc, gui, xx + border, yy + border);
         }
     }
 
@@ -151,17 +154,17 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         }
     }
 
-    public IconHolder addIconEvent(IconEvent event) {
-        if (iconEvents == null) {
-            iconEvents = new ArrayList<>();
+    public IconHolder addIconArrivesEvent(IconArrivesEvent event) {
+        if (iconArrivesEvents == null) {
+            iconArrivesEvents = new ArrayList<>();
         }
-        iconEvents.add(event);
+        iconArrivesEvents.add(event);
         return this;
     }
 
     private boolean fireIconArrived(IIcon icon) {
-        if (iconEvents != null) {
-            for (IconEvent event : iconEvents) {
+        if (iconArrivesEvents != null) {
+            for (IconArrivesEvent event : iconArrivesEvents) {
                 boolean b = event.iconArrives(this, icon);
                 if (!b) {
                     return false;
@@ -171,9 +174,18 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return true;
     }
 
+    public IconHolder addIconLeavesEvent(IconLeavesEvent event) {
+        if (iconLeavesEvents == null) {
+            iconLeavesEvents = new ArrayList<>();
+        }
+        iconLeavesEvents.add(event);
+        return this;
+    }
+
+
     private boolean fireIconLeaves(IIcon icon) {
-        if (iconEvents != null) {
-            for (IconEvent event : iconEvents) {
+        if (iconLeavesEvents != null) {
+            for (IconLeavesEvent event : iconLeavesEvents) {
                 boolean b = event.iconLeaves(this, icon);
                 if (!b) {
                     return false;
@@ -183,9 +195,18 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return true;
     }
 
+    public IconHolder addIconClickedEvent(IconClickedEvent event) {
+        if (iconClickedEvents == null) {
+            iconClickedEvents = new ArrayList<>();
+        }
+        iconClickedEvents.add(event);
+        return this;
+    }
+
+
     private boolean fireIconClicked(IIcon icon, int dx, int dy) {
-        if (iconEvents != null) {
-            for (IconEvent event : iconEvents) {
+        if (iconClickedEvents != null) {
+            for (IconClickedEvent event : iconClickedEvents) {
                 boolean b = event.iconClicked(this, icon, dx, dy);
                 if (!b) {
                     return false;
