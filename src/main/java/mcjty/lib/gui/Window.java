@@ -57,7 +57,10 @@ public class Window {
     }
 
     public void mouseClicked(int x, int y, int button) {
-        textFocus = null;
+        if (textFocus != null) {
+            textFocus = null;
+            fireFocusEvents(null);
+        }
         if (toplevel.in(x, y) && toplevel.isVisible()) {
             toplevel.mouseClick(this, x, y, button);
         }
@@ -83,13 +86,15 @@ public class Window {
         if (windowManager != null) {
             windowManager.clearFocus();
         }
-        textFocus = focus;
-        fireFocusEvents(focus);
+        setFocus(focus);
     }
 
     // Package visible for the WindowManager
     void setFocus(Widget focus) {
-        textFocus = focus;
+        if (textFocus != focus) {
+            textFocus = focus;
+            fireFocusEvents(focus);
+        }
     }
 
     public Widget getTextFocus() {
