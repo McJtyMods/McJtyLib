@@ -3,6 +3,8 @@ package mcjty.lib.gui.icons;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
+import java.util.Map;
+
 public interface IIcon {
 
     /**
@@ -17,6 +19,14 @@ public interface IIcon {
     void clearOverlays();
 
     boolean hasOverlay(String id);
+
+    void addData(String name, Object data);
+
+    void removeData(String name);
+
+    void clearData();
+
+    Map<String, Object> getData();
 
     // Make a copy of this icon
     IIcon clone();

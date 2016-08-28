@@ -6,7 +6,9 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ImageIcon implements IIcon {
 
@@ -18,6 +20,7 @@ public class ImageIcon implements IIcon {
     private final String id;
 
     private List<IIcon> overlays;
+    private Map<String, Object> dataMap;
 
     public ResourceLocation getImage() {
         return image;
@@ -70,6 +73,32 @@ public class ImageIcon implements IIcon {
         overlays = null;
     }
 
+    @Override
+    public void addData(String name, Object data) {
+        if (dataMap == null) {
+            dataMap = new HashMap<>();
+        }
+        dataMap.put(name, data);
+    }
+
+    @Override
+    public void removeData(String name) {
+        if (dataMap == null) {
+            return;
+        }
+        dataMap.remove(name);
+    }
+
+    @Override
+    public void clearData() {
+        dataMap = null;
+    }
+
+    @Override
+    public Map<String, Object> getData() {
+        return dataMap;
+    }
+
     public ImageIcon setImage(ResourceLocation image, int u, int v) {
         this.image = image;
         this.u = u;
@@ -102,6 +131,18 @@ public class ImageIcon implements IIcon {
 
     @Override
     public IIcon clone() {
-        return new ImageIcon(id).setImage(image, u, v).setDimensions(width, height);
+        ImageIcon imageIcon = new ImageIcon(id)
+                .setImage(image, u, v)
+                .setDimensions(width, height);
+        if (overlays != null) {
+            imageIcon.overlays = new ArrayList<>();
+            for (IIcon icon : overlays) {
+                imageIcon.overlays.add(icon.clone());
+            }
+        }
+        if (dataMap != null) {
+            imageIcon.dataMap = new HashMap<>(dataMap);
+        }
+        return imageIcon;
     }
 }
