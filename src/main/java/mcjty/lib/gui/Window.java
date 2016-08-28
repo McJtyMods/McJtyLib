@@ -1,12 +1,14 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Mouse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +23,9 @@ public class Window {
     private Widget hover = null;
     private GuiStyle currentStyle;
     private WindowManager windowManager;
+
+    private List<FocusEvent> focusEvents = null;
+
 
     public Window(GuiScreen gui, Widget toplevel) {
         this.gui = gui;
@@ -79,6 +84,7 @@ public class Window {
             windowManager.clearFocus();
         }
         textFocus = focus;
+        fireFocusEvents(focus);
     }
 
     // Package visible for the WindowManager
@@ -159,5 +165,22 @@ public class Window {
 
     private int getRelativeY() {
         return gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
+    }
+
+    public Window addFocusEvent(FocusEvent event) {
+        if (focusEvents == null) {
+            focusEvents = new ArrayList<>();
+        }
+        focusEvents.add(event);
+        return this;
+    }
+
+
+    private void fireFocusEvents(Widget widget) {
+        if (focusEvents != null) {
+            for (FocusEvent event : focusEvents) {
+                event.focus(this, widget);
+            }
+        }
     }
 }

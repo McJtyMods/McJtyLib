@@ -5,7 +5,7 @@ import java.util.Map;
 
 public enum SmartWrenchMode {
     MODE_WRENCH("w", "wrench"),
-    MODE_SELECT("s", "select");
+    MODE_SELECT("s", "focus");
 
     private static Map<String,SmartWrenchMode> codeToMode = new HashMap<String, SmartWrenchMode>();
 

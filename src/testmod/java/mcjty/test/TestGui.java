@@ -4,6 +4,7 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
+import mcjty.lib.gui.events.IconClickedEvent;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.icons.ImageIcon;
@@ -96,31 +97,18 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
                         .setBorder(1)
                         .setBorderColor(0xff777777)
                         .setSelectable(true)
-                        .addIconEvent(new IconEvent() {
-                            @Override
-                            public boolean iconArrives(IconHolder parent, IIcon icon) {
-                                return true;
+                        .addIconClickedEvent((parent, icon, dx, dy) -> {
+                            if (dy <= 3 && dx >= 10 && dx <= 14) {
+                                handleIconOverlay(icon, "top", 0, 5);
+                            } else if (dy >= ICONSIZE-3 && dx >= 10 && dx <= 14) {
+                                handleIconOverlay(icon, "bot", 2, 5);
+                            } else if (dx <= 3 && dy >= 10 && dy <= 14) {
+                                handleIconOverlay(icon, "lef", 3, 5);
+                            } else if (dx >= ICONSIZE-3 && dy >= 10 && dy <= 14) {
+                                handleIconOverlay(icon, "rig", 1, 5);
                             }
-
-                            @Override
-                            public boolean iconLeaves(IconHolder parent, IIcon icon) {
-                                return true;
-                            }
-
-                            @Override
-                            public boolean iconClicked(IconHolder parent, IIcon icon, int dx, int dy) {
-                                if (dy <= 3 && dx >= 10 && dx <= 14) {
-                                    handleIconOverlay(icon, "top", 0, 5);
-                                } else if (dy >= ICONSIZE-3 && dx >= 10 && dx <= 14) {
-                                    handleIconOverlay(icon, "bot", 2, 5);
-                                } else if (dx <= 3 && dy >= 10 && dy <= 14) {
-                                    handleIconOverlay(icon, "lef", 3, 5);
-                                } else if (dx >= ICONSIZE-3 && dy >= 10 && dy <= 14) {
-                                    handleIconOverlay(icon, "rig", 1, 5);
-                                }
-                                System.out.println("dx = " + dx + "," + dy);
-                                return true;
-                            }
+                            System.out.println("dx = " + dx + "," + dy);
+                            return true;
                         });
                 rowPanel.addChild(holder);
             }

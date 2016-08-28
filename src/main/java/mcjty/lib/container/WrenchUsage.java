@@ -5,6 +5,6 @@ public enum WrenchUsage {
     NORMAL,             // Normal wrench usage
     SNEAKING,           // Sneaking mode with wrench
     DISABLED,           // It is a wrench but it is disabled
-    SELECT,             // In select mode (smart wrench only)
-    SNEAK_SELECT,       // Sneak select mode (smart wrench only)
+    SELECT,             // In focus mode (smart wrench only)
+    SNEAK_SELECT,       // Sneak focus mode (smart wrench only)
 }
