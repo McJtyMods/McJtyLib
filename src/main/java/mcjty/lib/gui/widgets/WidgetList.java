@@ -254,6 +254,22 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     @Override
     public void mouseRelease(int x, int y, int button) {
+        if (!isEnabledAndVisible()) {
+            return;
+        }
+        if (noselection) {
+            return;
+        }
+
+        if (propagateEventsToChildren && selected != -1) {
+            Widget child = children.get(selected);
+            int xx = x-bounds.x;
+            int yy = y-bounds.y;
+            if (child.in(xx, yy) && child.isVisible()) {
+                child.mouseRelease(xx, yy, button);
+            }
+        }
+
         super.mouseRelease(x, y, button);
     }
 
