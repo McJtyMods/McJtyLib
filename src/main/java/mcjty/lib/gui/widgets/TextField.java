@@ -3,6 +3,7 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
+import mcjty.lib.gui.events.TextEnterEvent;
 import mcjty.lib.gui.events.TextEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -16,6 +17,7 @@ public class TextField extends AbstractWidget<TextField> {
     private int cursor = 0;
     private int startOffset = 0;        // Start character where we are displaying
     private List<TextEvent> textEvents = null;
+    private List<TextEnterEvent> textEnterEvents = null;
 
     public TextField(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -58,6 +60,7 @@ public class TextField extends AbstractWidget<TextField> {
         }
         if (isEnabledAndVisible()) {
             if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
+                fireTextEnterEvents(text);
 //                window.setTextFocus(null);
                 return false;
             } else if (keyCode == Keyboard.KEY_BACK) {
@@ -145,7 +148,7 @@ public class TextField extends AbstractWidget<TextField> {
 
     public TextField addTextEvent(TextEvent event) {
         if (textEvents == null) {
-            textEvents = new ArrayList<TextEvent>();
+            textEvents = new ArrayList<>();
         }
         textEvents.add(event);
         return this;
@@ -164,4 +167,28 @@ public class TextField extends AbstractWidget<TextField> {
             }
         }
     }
+
+    public TextField addTextEnterEvent(TextEnterEvent event) {
+        if (textEnterEvents == null) {
+            textEnterEvents = new ArrayList<>();
+        }
+        textEnterEvents.add(event);
+        return this;
+    }
+
+    public void removeTextEnterEvent(TextEnterEvent event) {
+        if (textEnterEvents != null) {
+            textEnterEvents.remove(event);
+        }
+    }
+
+    private void fireTextEnterEvents(String newText) {
+        if (textEnterEvents != null) {
+            for (TextEnterEvent event : textEnterEvents) {
+                event.textEntered(this, newText);
+            }
+        }
+    }
+
+
 }
