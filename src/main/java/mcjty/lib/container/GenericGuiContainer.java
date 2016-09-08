@@ -38,6 +38,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         this.network = network;
         this.tileEntity = tileEntity;
         sideWindow = new GuiSideWindow(manual, manualNode);
+        windowManager = null;
     }
 
     public List<Rectangle> getSideWindowBounds() {
@@ -46,6 +47,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     @Override
     public void initGui() {
+        windowManager = null;
         super.initGui();
         sideWindow.initGui(modBase, network, mc, this, guiLeft, guiTop, xSize, ySize);
     }

@@ -235,10 +235,10 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         if (propagateEventsToChildren && selected != -1) {
-            Widget child = children.get(selected);
+            Widget child = getSelectedWidgetSafe();
             int xx = x-bounds.x;
             int yy = y-bounds.y;
-            if (child.in(xx, yy) && child.isVisible()) {
+            if (child != null && child.in(xx, yy) && child.isVisible()) {
                 child.mouseClick(window, xx, yy, button);
             }
         }
@@ -262,15 +262,23 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         if (propagateEventsToChildren && selected != -1) {
-            Widget child = children.get(selected);
+            Widget child = getSelectedWidgetSafe();
             int xx = x-bounds.x;
             int yy = y-bounds.y;
-            if (child.in(xx, yy) && child.isVisible()) {
+            if (child != null && child.in(xx, yy) && child.isVisible()) {
                 child.mouseRelease(xx, yy, button);
             }
         }
 
         super.mouseRelease(x, y, button);
+    }
+
+    private Widget getSelectedWidgetSafe() {
+        if (selected < children.size()) {
+            return children.get(selected);
+        } else {
+            return null;
+        }
     }
 
     @Override
