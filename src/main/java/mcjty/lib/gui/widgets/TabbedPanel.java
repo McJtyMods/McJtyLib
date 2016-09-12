@@ -48,7 +48,13 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
 
     @Override
     public Widget getWidgetAtPosition(int x, int y) {
-        return current == null ? this : current;
+        if (current == null) {
+            return this;
+        }
+        x -= bounds.x;
+        y -= bounds.y;
+
+        return current.getWidgetAtPosition(x, y);
     }
 
     @Override
