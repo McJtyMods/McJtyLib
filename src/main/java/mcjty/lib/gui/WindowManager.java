@@ -24,6 +24,10 @@ public class WindowManager {
     private List<Window> windows = new ArrayList<>();
     private List<Window> modalWindows = new ArrayList<>();
 
+    // If -1 it is not this window manager that manages the mousewheel but
+    // the window itself
+    private int mouseWheel = -1;
+
     public WindowManager(GuiScreen gui) {
         this.gui = gui;
     }
@@ -74,7 +78,12 @@ public class WindowManager {
         }
     }
 
+    public int getMouseWheel() {
+        return mouseWheel;
+    }
+
     public void draw() {
+        mouseWheel = Mouse.getDWheel();
         windows.stream().forEach(w -> w.draw());
         modalWindows.stream().forEach(w -> w.draw());
         iconManager.draw(Minecraft.getMinecraft(), gui);

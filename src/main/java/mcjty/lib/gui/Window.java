@@ -120,7 +120,15 @@ public class Window {
             hover.setHovering(true);
         }
 
-        int dwheel = Mouse.getDWheel();
+        int dwheel;
+        if (windowManager == null) {
+            dwheel = Mouse.getDWheel();
+        } else {
+            dwheel = windowManager.getMouseWheel();
+            if (dwheel == -1) {
+                dwheel = Mouse.getDWheel();
+            }
+        }
         if (dwheel != 0) {
             toplevel.mouseWheel(dwheel, x, y);
         }
