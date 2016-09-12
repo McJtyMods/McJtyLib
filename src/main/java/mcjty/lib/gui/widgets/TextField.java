@@ -18,9 +18,19 @@ public class TextField extends AbstractWidget<TextField> {
     private int startOffset = 0;        // Start character where we are displaying
     private List<TextEvent> textEvents = null;
     private List<TextEnterEvent> textEnterEvents = null;
+    private boolean editable = true;
 
     public TextField(Minecraft mc, Gui gui) {
         super(mc, gui);
+    }
+
+    public boolean isEditable() {
+        return editable;
+    }
+
+    public TextField setEditable(boolean editable) {
+        this.editable = editable;
+        return this;
     }
 
     public String getText() {
@@ -41,7 +51,7 @@ public class TextField extends AbstractWidget<TextField> {
 
     @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
-        if (isEnabledAndVisible()) {
+        if (isEnabledAndVisible() && editable) {
             window.setTextFocus(this);
             if (button == 1) {
                 setText("");
@@ -58,7 +68,7 @@ public class TextField extends AbstractWidget<TextField> {
         if (rc) {
             return true;
         }
-        if (isEnabledAndVisible()) {
+        if (isEnabledAndVisible() && editable) {
             if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
                 fireTextEnterEvents(text);
 //                window.setTextFocus(null);
@@ -135,7 +145,11 @@ public class TextField extends AbstractWidget<TextField> {
         RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
 
         if (isEnabled()) {
-            mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff000000);
+            if (isEditable()) {
+                mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff000000);
+            } else {
+                mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff333333);
+            }
         } else {
             mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xffa0a0a0);
         }
