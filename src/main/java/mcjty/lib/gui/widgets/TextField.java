@@ -190,7 +190,7 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
-    public TextField addTextArrowEvent(TextSpecialKeyEvent event) {
+    public TextField addSpecialKeyEvent(TextSpecialKeyEvent event) {
         if (textSpecialKeyEvents == null) {
             textSpecialKeyEvents = new ArrayList<>();
         }
