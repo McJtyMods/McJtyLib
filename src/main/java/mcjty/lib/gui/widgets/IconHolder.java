@@ -4,6 +4,7 @@ import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.IconArrivesEvent;
 import mcjty.lib.gui.events.IconClickedEvent;
+import mcjty.lib.gui.events.IconHoverEvent;
 import mcjty.lib.gui.events.IconLeavesEvent;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
@@ -21,6 +22,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     private List<IconArrivesEvent> iconArrivesEvents = null;
     private List<IconLeavesEvent> iconLeavesEvents = null;
     private List<IconClickedEvent> iconClickedEvents = null;
+    private List<IconHoverEvent> iconHoverEvents = null;
 
     private boolean selectable = false;
 
@@ -87,6 +89,15 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     public IconHolder setMakeCopy(boolean makeCopy) {
         this.makeCopy = makeCopy;
         return this;
+    }
+
+    @Override
+    public void mouseMove(int x, int y) {
+        if (isEnabledAndVisible()) {
+            int dx = x - this.bounds.x - border;
+            int dy = y - this.bounds.y - border;
+            fireIconHover(icon, dx, dy);
+        }
     }
 
     @Override
@@ -214,5 +225,22 @@ public class IconHolder extends AbstractWidget<IconHolder> {
             }
         }
         return true;
+    }
+
+    public IconHolder addIconHoverEvent(IconHoverEvent event) {
+        if (iconHoverEvents == null) {
+            iconHoverEvents = new ArrayList<>();
+        }
+        iconHoverEvents.add(event);
+        return this;
+    }
+
+
+    private void fireIconHover(IIcon icon, int dx, int dy) {
+        if (iconHoverEvents != null) {
+            for (IconHoverEvent event : iconHoverEvents) {
+                event.hover(this, icon, dx, dy);
+            }
+        }
     }
 }

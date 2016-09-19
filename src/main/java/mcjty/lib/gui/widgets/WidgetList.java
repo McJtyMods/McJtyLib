@@ -208,6 +208,38 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }}
 
     @Override
+    public void mouseMove(int x, int y) {
+        if (!isEnabledAndVisible()) {
+            return;
+        }
+
+        if (noselection) {
+            return;
+        }
+
+        int newSelected = -1;
+        int top = bounds.y;        // Margin@@@?
+
+        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
+            int rh = rowheight == -1 ? children.get(i).getDesiredHeight() : rowheight;
+            Rectangle r = new Rectangle(bounds.x, top, bounds.width, rh);
+            if (r.contains(x, y)) {
+                newSelected = i;
+                break;
+            }
+            top += rh;
+        }
+        if (propagateEventsToChildren && newSelected != -1) {
+            Widget child = getSelectedWidgetSafe(newSelected);
+            int xx = x-bounds.x;
+            int yy = y-bounds.y;
+            if (child != null && child.in(xx, yy) && child.isVisible()) {
+                child.mouseMove(xx, yy);
+            }
+        }
+    }
+
+    @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         if (!isEnabledAndVisible()) {
             return null;
@@ -235,7 +267,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         if (propagateEventsToChildren && selected != -1) {
-            Widget child = getSelectedWidgetSafe();
+            Widget child = getSelectedWidgetSafe(selected);
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
@@ -262,7 +294,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         if (propagateEventsToChildren && selected != -1) {
-            Widget child = getSelectedWidgetSafe();
+            Widget child = getSelectedWidgetSafe(selected);
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
@@ -273,9 +305,9 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         super.mouseRelease(x, y, button);
     }
 
-    private Widget getSelectedWidgetSafe() {
-        if (selected < children.size()) {
-            return children.get(selected);
+    private Widget getSelectedWidgetSafe(int sel) {
+        if (sel < children.size()) {
+            return children.get(sel);
         } else {
             return null;
         }
