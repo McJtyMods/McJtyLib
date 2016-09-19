@@ -3,7 +3,7 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.TextArrowEvent;
+import mcjty.lib.gui.events.TextSpecialKeyEvent;
 import mcjty.lib.gui.events.TextEnterEvent;
 import mcjty.lib.gui.events.TextEvent;
 import net.minecraft.client.Minecraft;
@@ -19,7 +19,7 @@ public class TextField extends AbstractWidget<TextField> {
     private int startOffset = 0;        // Start character where we are displaying
     private List<TextEvent> textEvents = null;
     private List<TextEnterEvent> textEnterEvents = null;
-    private List<TextArrowEvent> textArrowEvents = null;
+    private List<TextSpecialKeyEvent> textSpecialKeyEvents = null;
     private boolean editable = true;
 
     public TextField(Minecraft mc, Gui gui) {
@@ -94,6 +94,8 @@ public class TextField extends AbstractWidget<TextField> {
                 fireArrowDownEvents();
             } else if (keyCode == Keyboard.KEY_UP) {
                 fireArrowUpEvents();
+            } else if (keyCode == Keyboard.KEY_TAB) {
+                fireTabEvents();
             } else if (keyCode == Keyboard.KEY_LEFT) {
                 if (cursor > 0) {
                     cursor--;
@@ -188,30 +190,37 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
-    public TextField addTextArrowEvent(TextArrowEvent event) {
-        if (textArrowEvents == null) {
-            textArrowEvents = new ArrayList<>();
+    public TextField addTextArrowEvent(TextSpecialKeyEvent event) {
+        if (textSpecialKeyEvents == null) {
+            textSpecialKeyEvents = new ArrayList<>();
         }
-        textArrowEvents.add(event);
+        textSpecialKeyEvents.add(event);
         return this;
     }
 
     private void fireArrowUpEvents() {
-        if (textArrowEvents != null) {
-            for (TextArrowEvent event : textArrowEvents) {
+        if (textSpecialKeyEvents != null) {
+            for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
                 event.arrowUp(this);
             }
         }
     }
 
     private void fireArrowDownEvents() {
-        if (textArrowEvents != null) {
-            for (TextArrowEvent event : textArrowEvents) {
+        if (textSpecialKeyEvents != null) {
+            for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
                 event.arrowDown(this);
             }
         }
     }
 
+    private void fireTabEvents() {
+        if (textSpecialKeyEvents != null) {
+            for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
+                event.tab(this);
+            }
+        }
+    }
 
     public TextField addTextEnterEvent(TextEnterEvent event) {
         if (textEnterEvents == null) {
