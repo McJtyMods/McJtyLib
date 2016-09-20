@@ -32,6 +32,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     private GuiSideWindow sideWindow;
 
+    public int getGuiLeft() {
+        return guiLeft;
+    }
+
+    public int getGuiTop() {
+        return guiTop;
+    }
+
     public GenericGuiContainer(ModBase mod, SimpleNetworkWrapper network, T tileEntity, Container container, int manual, String manualNode) {
         super(container);
         this.modBase = mod;
