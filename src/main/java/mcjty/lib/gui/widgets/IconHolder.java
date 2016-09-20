@@ -2,10 +2,7 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.IconArrivesEvent;
-import mcjty.lib.gui.events.IconClickedEvent;
-import mcjty.lib.gui.events.IconHoverEvent;
-import mcjty.lib.gui.events.IconLeavesEvent;
+import mcjty.lib.gui.events.*;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
 import net.minecraft.client.Minecraft;
@@ -22,6 +19,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     private List<IconArrivesEvent> iconArrivesEvents = null;
     private List<IconLeavesEvent> iconLeavesEvents = null;
     private List<IconClickedEvent> iconClickedEvents = null;
+    private List<IconHolderClickedEvent> iconHolderClickedEvents = null;
     private List<IconHoverEvent> iconHoverEvents = null;
 
     private boolean selectable = false;
@@ -108,9 +106,10 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 if (selectable) {
                     window.setTextFocus(this);
                 }
+                int dx = x - this.bounds.x - border;
+                int dy = y - this.bounds.y - border;
+                fireIconHolderClicked(icon, dx, dy);
                 if (icon != null) {
-                    int dx = x - this.bounds.x - border;
-                    int dy = y - this.bounds.y - border;
                     if (fireIconClicked(icon, dx, dy)) {
                         if (fireIconLeaves(icon)) {
                             IconManager iconManager = window.getWindowManager().getIconManager();
@@ -225,6 +224,23 @@ public class IconHolder extends AbstractWidget<IconHolder> {
             }
         }
         return true;
+    }
+
+    public IconHolder addIconHolderClickedEvent(IconHolderClickedEvent event) {
+        if (iconHolderClickedEvents == null) {
+            iconHolderClickedEvents = new ArrayList<>();
+        }
+        iconHolderClickedEvents.add(event);
+        return this;
+    }
+
+
+    private void fireIconHolderClicked(IIcon icon, int dx, int dy) {
+        if (iconHolderClickedEvents != null) {
+            for (IconHolderClickedEvent event : iconHolderClickedEvents) {
+                event.holderClicked(this, icon, dx, dy);
+            }
+        }
     }
 
     public IconHolder addIconHoverEvent(IconHoverEvent event) {
