@@ -51,6 +51,9 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
         if (current == null) {
             return this;
         }
+
+        setChildBounds();
+
         x -= bounds.x;
         y -= bounds.y;
 
@@ -67,21 +70,27 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
         int yy = y + bounds.y;
         drawBox(xx, yy, 0xffff0000);
 
-        if (isDirty()) {
-            for (Widget child : children) {
-                child.setBounds(new Rectangle(0, 0, getBounds().width, getBounds().height));
-            }
-            markClean();
-        }
+        setChildBounds();
 
         if (current != null) {
             current.draw(window, xx, yy);
         }
     }
 
+    private void setChildBounds() {
+        if (isDirty()) {
+            for (Widget child : children) {
+                child.setBounds(new Rectangle(0, 0, getBounds().width, getBounds().height));
+            }
+            markClean();
+        }
+    }
+
     @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         super.mouseClick(window, x, y, button);
+
+        setChildBounds();
 
         x -= bounds.x;
         y -= bounds.y;
@@ -98,6 +107,9 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     @Override
     public void mouseRelease(int x, int y, int button) {
         super.mouseRelease(x, y, button);
+
+        setChildBounds();
+
         x -= bounds.x;
         y -= bounds.y;
 
@@ -109,6 +121,8 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     @Override
     public void mouseMove(int x, int y) {
         super.mouseMove(x, y);
+
+        setChildBounds();
 
         x -= bounds.x;
         y -= bounds.y;
