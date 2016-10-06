@@ -12,11 +12,13 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class RenderHelper {
     public static float rot = 0.0f;
@@ -608,6 +610,36 @@ public class RenderHelper {
     }
     private static Vector Mul(Vector a, float f) {
         return new Vector(a.x * f, a.y * f, a.z * f);
+    }
+
+    public static void renderHighLightedBlocksOutline(VertexBuffer buffer, float mx, float my, float mz, float r, float g, float b, float a) {
+        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
     }
 
 
