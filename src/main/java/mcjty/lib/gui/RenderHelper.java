@@ -8,13 +8,17 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
@@ -85,6 +89,9 @@ public class RenderHelper {
         if (itm instanceof ItemStack) {
             return renderItemStackWithCount(mc, itemRender, (ItemStack) itm, x, y, highlight);
         }
+        if (itm instanceof FluidStack) {
+            return renderFluidStack(mc, (FluidStack) itm, x, y, highlight);
+        }
         if (itm instanceof TextureAtlasSprite) {
             return renderIcon(mc, itemRender, (TextureAtlasSprite) itm, x, y, highlight);
         }
@@ -95,6 +102,56 @@ public class RenderHelper {
         //itemRender.draw(xo, yo, itm, 16, 16); //TODO: Make
         return true;
     }
+
+    public static boolean renderFluidStack(Minecraft mc, FluidStack fluidStack, int x, int y, boolean highlight) {
+        Fluid fluid = fluidStack.getFluid();
+        if (fluid == null) {
+            return false;
+        }
+
+        TextureMap textureMapBlocks = mc.getTextureMapBlocks();
+        ResourceLocation fluidStill = fluid.getStill();
+        TextureAtlasSprite fluidStillSprite = null;
+        if (fluidStill != null) {
+            fluidStillSprite = textureMapBlocks.getTextureExtry(fluidStill.toString());
+        }
+        if (fluidStillSprite == null) {
+            fluidStillSprite = textureMapBlocks.getMissingSprite();
+        }
+
+        int fluidColor = fluid.getColor(fluidStack);
+        mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        setGLColorFromInt(fluidColor);
+        drawFluidTexture(x, y, fluidStillSprite, 100);
+
+        return true;
+    }
+
+    private static void drawFluidTexture(double xCoord, double yCoord, TextureAtlasSprite textureSprite, double zLevel) {
+        double uMin = (double) textureSprite.getMinU();
+        double uMax = (double) textureSprite.getMaxU();
+        double vMin = (double) textureSprite.getMinV();
+        double vMax = (double) textureSprite.getMaxV();
+
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer vertexBuffer = tessellator.getBuffer();
+        vertexBuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        vertexBuffer.pos(xCoord, yCoord + 16, zLevel).tex(uMin, vMax).endVertex();
+        vertexBuffer.pos(xCoord + 16, yCoord + 16, zLevel).tex(uMax, vMax).endVertex();
+        vertexBuffer.pos(xCoord + 16, yCoord, zLevel).tex(uMax, vMin).endVertex();
+        vertexBuffer.pos(xCoord, yCoord, zLevel).tex(uMin, vMin).endVertex();
+        tessellator.draw();
+    }
+
+
+    private static void setGLColorFromInt(int color) {
+        float red = (color >> 16 & 0xFF) / 255.0F;
+        float green = (color >> 8 & 0xFF) / 255.0F;
+        float blue = (color & 0xFF) / 255.0F;
+
+        GlStateManager.color(red, green, blue, 1.0F);
+    }
+
 
     public static boolean renderItemStackWithCount(Minecraft mc, RenderItem itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
         int size = itm.stackSize;
