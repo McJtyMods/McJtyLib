@@ -241,7 +241,7 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
         }
     }
 
-    protected void drawBackground(int x, int y) {
+    protected void drawBackground(int x, int y, int w, int h) {
         if (!visible) {
             return;
         }
@@ -252,25 +252,32 @@ public abstract class AbstractWidget<P extends AbstractWidget> implements Widget
         if (background1 != null) {
             mc.getTextureManager().bindTexture(background1);
             if (background2 == null) {
-                gui.drawTexturedModalRect(xx, yy, 0, 0, bounds.width, bounds.height);
+                gui.drawTexturedModalRect(xx, yy, 0, 0, w, h);
             } else {
                 if (background2Horizontal) {
-                    gui.drawTexturedModalRect(xx, yy, 0, 0, backgroundOffset, bounds.height);
+                    gui.drawTexturedModalRect(xx, yy, 0, 0, backgroundOffset, h);
                     mc.getTextureManager().bindTexture(background2);
-                    gui.drawTexturedModalRect(xx + backgroundOffset, yy, 0, 0, bounds.width - backgroundOffset, bounds.height);
+                    gui.drawTexturedModalRect(xx + backgroundOffset, yy, 0, 0, w - backgroundOffset, h);
                 } else {
-                    gui.drawTexturedModalRect(xx, yy, 0, 0, bounds.width, backgroundOffset);
+                    gui.drawTexturedModalRect(xx, yy, 0, 0, w, backgroundOffset);
                     mc.getTextureManager().bindTexture(background2);
-                    gui.drawTexturedModalRect(xx, yy + backgroundOffset, 0, 0, bounds.width, bounds.height - backgroundOffset);
+                    gui.drawTexturedModalRect(xx, yy + backgroundOffset, 0, 0, w, h - backgroundOffset);
                 }
             }
         } else if (filledRectThickness > 0) {
-            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledRectThickness, StyleConfig.colorBackgroundBevelBright, StyleConfig.colorBackgroundBevelDark, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
+            RenderHelper.drawThickBeveledBox(xx, yy, xx + w - 1, yy + h - 1, filledRectThickness, StyleConfig.colorBackgroundBevelBright, StyleConfig.colorBackgroundBevelDark, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
         } else if (filledRectThickness < 0) {
-            RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, -filledRectThickness, StyleConfig.colorBackgroundBevelDark, StyleConfig.colorBackgroundBevelBright, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
+            RenderHelper.drawThickBeveledBox(xx, yy, xx + w - 1, yy + h - 1, -filledRectThickness, StyleConfig.colorBackgroundBevelDark, StyleConfig.colorBackgroundBevelBright, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
         } else if (filledBackground != -1) {
-            RenderHelper.drawHorizontalGradientRect(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, filledBackground, filledBackground2 == -1 ? filledBackground : filledBackground2);
+            RenderHelper.drawHorizontalGradientRect(xx, yy, xx + w - 1, yy + h - 1, filledBackground, filledBackground2 == -1 ? filledBackground : filledBackground2);
         }
+    }
+
+    protected void drawBackground(int x, int y) {
+        if (!visible) {
+            return;
+        }
+        drawBackground(x, y, bounds.width, bounds.height);
     }
 
     protected void drawStyledBoxNormal(Window window, int x1, int y1, int x2, int y2) {

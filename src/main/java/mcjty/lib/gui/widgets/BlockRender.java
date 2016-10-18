@@ -1,11 +1,16 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.BlockRenderEvent;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +21,8 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     private int offsetY = 0;
     private long prevTime = -1;
     private boolean hilightOnHover = false;
+    private boolean showLabel = false;
+    private int labelColor = StyleConfig.colorTextNormal;
     private List<BlockRenderEvent> selectionEvents = null;
 
     public Object getRenderItem() {
@@ -31,6 +38,24 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         super(mc, gui);
         setDesiredHeight(16);
         setDesiredWidth(16);
+    }
+
+    public boolean isShowLabel() {
+        return showLabel;
+    }
+
+    public BlockRender setShowLabel(boolean showLabel) {
+        this.showLabel = showLabel;
+        return this;
+    }
+
+    public int getLabelColor() {
+        return labelColor;
+    }
+
+    public BlockRender setLabelColor(int labelColor) {
+        this.labelColor = labelColor;
+        return this;
     }
 
     public int getOffsetX() {
@@ -65,7 +90,11 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         if (!visible) {
             return;
         }
-        super.draw(window, x, y);
+        if (showLabel) {
+            drawBackground(x, y, bounds.height, bounds.height);
+        } else {
+            super.draw(window, x, y);
+        }
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
             int yy = y + bounds.y + offsetY;
@@ -78,6 +107,24 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 GlStateManager.colorMask(true, true, true, true);
 //                GlStateManager.enableLighting();
                 GlStateManager.enableDepth();
+            }
+
+            if (showLabel) {
+                String name;
+                if (renderItem instanceof ItemStack) {
+                    name = ((ItemStack) renderItem).getDisplayName();
+                } else if (renderItem instanceof FluidStack) {
+                    name = ((FluidStack) renderItem).getLocalizedName();
+                } else if (renderItem instanceof Item) {
+                    name = new ItemStack((Item) renderItem).getDisplayName();
+                } else if (renderItem instanceof Block) {
+                    name = new ItemStack((Block) renderItem).getDisplayName();
+                } else {
+                    name = "";
+                }
+                int h = mc.fontRendererObj.FONT_HEIGHT;
+                int dy = (bounds.height - h)/2;
+                mc.fontRendererObj.drawString(name, xx+20, yy + dy, labelColor);
             }
         }
     }
