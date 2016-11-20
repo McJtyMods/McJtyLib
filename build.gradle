@@ -31,6 +31,9 @@ repositories {
         name 'tterrag maven'
         url "http://maven.tterrag.com/"
     }
+    maven { // OC Repo
+        url "http://maven.cil.li/"
+    }
 }
 
 version = "1.10-2.2.0"
@@ -58,6 +61,7 @@ dependencies {
     deobfCompile "mcp.mobius.waila:Waila:1.7.0-B3_1.9.4"
     deobfCompile "mezz.jei:jei_1.10.2:3.7.3.223"
     deobfCompile "mcjty.theoneprobe:TheOneProbe:1.10-1.0.12-25"
+    compile "li.cil.oc:OpenComputers:MC1.10.2-1.6.+:api"
 }
 
 task deobfJar(type: Jar) {
