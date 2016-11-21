@@ -1,7 +1,9 @@
 package mcjty.lib.container;
 
 import com.google.common.collect.Range;
+import mcjty.lib.inventory.InventoryTools;
 import mcjty.lib.network.PacketSendGuiData;
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -37,7 +39,7 @@ public class GenericContainer extends Container {
     @Override
     public boolean canInteractWith(EntityPlayer entityPlayer) {
         for (IInventory inventory : inventories.values()) {
-            if (!inventory.isUseableByPlayer(entityPlayer)) {
+            if (!InventoryTools.isUsable(entityPlayer, inventory)) {
                 return false;
             }
         }
@@ -173,17 +175,17 @@ public class GenericContainer extends Container {
                 Logging.log("Weird slot at index: " + index);
             }
 
-            if (origStack.stackSize == 0) {
-                slot.putStack(null);
+            if (ItemStackTools.isEmpty(origStack)) {
+                slot.putStack(ItemStackTools.getEmptyStack());
             } else {
                 slot.onSlotChanged();
             }
 
-            if (origStack.stackSize == itemstack.stackSize) {
+            if (ItemStackTools.getStackSize(origStack) == ItemStackTools.getStackSize(itemstack)) {
                 return null;
             }
 
-            slot.onPickupFromSlot(player, origStack);
+            InventoryTools.onPickup(slot, player, origStack);
         }
 
         return itemstack;
@@ -204,23 +206,23 @@ public class GenericContainer extends Container {
 
         if (par1ItemStack.isStackable()) {
 
-            while (par1ItemStack.stackSize > 0 && (!reverseOrder && checkIndex < toIndex || reverseOrder && checkIndex >= fromIndex)) {
+            while (ItemStackTools.isValid(par1ItemStack) && (!reverseOrder && checkIndex < toIndex || reverseOrder && checkIndex >= fromIndex)) {
                 slot = this.inventorySlots.get(checkIndex);
                 itemstack1 = slot.getStack();
 
-                if (itemstack1 != null && itemstack1.getItem() == par1ItemStack.getItem() && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
+                if (ItemStackTools.isValid(itemstack1) && itemstack1.getItem() == par1ItemStack.getItem() && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
                         && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack)) {
 
-                    int mergedSize = itemstack1.stackSize + par1ItemStack.stackSize;
+                    int mergedSize = ItemStackTools.getStackSize(itemstack1) + ItemStackTools.getStackSize(par1ItemStack);
                     int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getSlotStackLimit());
                     if (mergedSize <= maxStackSize) {
-                        par1ItemStack.stackSize = 0;
-                        itemstack1.stackSize = mergedSize;
+                        par1ItemStack = ItemStackTools.getEmptyStack();
+                        ItemStackTools.setStackSize(itemstack1, mergedSize);
                         slot.onSlotChanged();
                         result = true;
-                    } else if (itemstack1.stackSize < maxStackSize) {
-                        par1ItemStack.stackSize -= maxStackSize - itemstack1.stackSize;
-                        itemstack1.stackSize = maxStackSize;
+                    } else if (ItemStackTools.getStackSize(itemstack1) < maxStackSize) {
+                        ItemStackTools.incStackSize(par1ItemStack, -(maxStackSize - ItemStackTools.getStackSize(itemstack1)));
+                        ItemStackTools.setStackSize(itemstack1, maxStackSize);
                         slot.onSlotChanged();
                         result = true;
                     }
@@ -234,7 +236,7 @@ public class GenericContainer extends Container {
             }
         }
 
-        if (par1ItemStack.stackSize > 0) {
+        if (ItemStackTools.isValid(par1ItemStack)) {
             if (reverseOrder) {
                 checkIndex = toIndex - 1;
             } else {
@@ -245,16 +247,16 @@ public class GenericContainer extends Container {
                 slot = this.inventorySlots.get(checkIndex);
                 itemstack1 = slot.getStack();
 
-                if (itemstack1 == null && slot.isItemValid(par1ItemStack)) {
+                if (ItemStackTools.isEmpty(itemstack1) && slot.isItemValid(par1ItemStack)) {
                     ItemStack in = par1ItemStack.copy();
-                    in.stackSize = Math.min(in.stackSize, slot.getSlotStackLimit());
+                    ItemStackTools.setStackSize(in, Math.min(ItemStackTools.getStackSize(in), slot.getSlotStackLimit()));
 
                     slot.putStack(in);
                     slot.onSlotChanged();
-                    if (in.stackSize >= par1ItemStack.stackSize) {
-                        par1ItemStack.stackSize = 0;
+                    if (ItemStackTools.getStackSize(in) >= ItemStackTools.getStackSize(par1ItemStack)) {
+                        ItemStackTools.makeEmpty(par1ItemStack);
                     } else {
-                        par1ItemStack.stackSize -= in.stackSize;
+                        ItemStackTools.incStackSize(par1ItemStack, -ItemStackTools.getStackSize(in));
                     }
                     result = true;
                     break;

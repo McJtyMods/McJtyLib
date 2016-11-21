@@ -42,7 +42,7 @@ public class PacketServerCommand extends AbstractServerCommand {
             EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
             World world;
             if (message.dimensionId == null) {
-                world = playerEntity.worldObj;
+                world = playerEntity.getEntityWorld();
             } else {
                 world = DimensionManager.getWorld(message.dimensionId);
             }

@@ -1,5 +1,6 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -7,8 +8,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -162,12 +163,12 @@ public class BlockTools {
                 return DOWN;
             }
         }
-        int l = MathHelper.floor_double((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+        int l = MathTools.floor((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
         return l == 0 ? EnumFacing.NORTH : (l == 1 ? EnumFacing.EAST : (l == 2 ? EnumFacing.SOUTH : (l == 3 ? EnumFacing.WEST : DOWN)));
     }
 
     public static EnumFacing determineOrientationHoriz(EntityLivingBase entityLivingBase) {
-        int l = MathHelper.floor_double((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+        int l = MathTools.floor((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
         return l == 0 ? EnumFacing.NORTH : (l == 1 ? EnumFacing.EAST : (l == 2 ? EnumFacing.SOUTH : (l == 3 ? EnumFacing.WEST : DOWN)));
     }
 
@@ -189,14 +190,14 @@ public class BlockTools {
             EntityItem entityitem;
 
             float f2 = random.nextFloat() * 0.8F + 0.1F;
-            while (itemstack.stackSize > 0) {
+            while (ItemStackTools.getStackSize(itemstack) > 0) {
                 int j = random.nextInt(21) + 10;
 
-                if (j > itemstack.stackSize) {
-                    j = itemstack.stackSize;
+                if (j > ItemStackTools.getStackSize(itemstack)) {
+                    j = ItemStackTools.getStackSize(itemstack);
                 }
 
-                itemstack.stackSize -= j;
+                ItemStackTools.incStackSize(itemstack, -j);
                 entityitem = new EntityItem(world, (x + f), (y + f1), (z + f2), new ItemStack(itemstack.getItem(), j, itemstack.getItemDamage()));
                 float f3 = 0.05F;
                 entityitem.motionX = ((float)random.nextGaussian() * f3);
@@ -206,7 +207,7 @@ public class BlockTools {
                 if (itemstack.hasTagCompound()) {
                     entityitem.getEntityItem().setTagCompound((NBTTagCompound)itemstack.getTagCompound().copy());
                 }
-                world.spawnEntityInWorld(entityitem);
+                mcjty.lib.tools.WorldTools.spawnEntity(world, entityitem);
             }
         }
     }

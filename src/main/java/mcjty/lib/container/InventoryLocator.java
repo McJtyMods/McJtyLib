@@ -1,5 +1,7 @@
 package mcjty.lib.container;
 
+import mcjty.lib.tools.ItemStackTools;
+import mcjty.lib.tools.WorldTools;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -81,9 +83,9 @@ public class InventoryLocator {
                 if (inventory != null) {
                     int amount = InventoryHelper.mergeItemStackSafe(inventory, false, getInventorySide(), stack, 0, inventory.getSizeInventory(), null);
                     if (amount == 0) {
-                        stack = null;
+                        stack = ItemStackTools.getEmptyStack();
                     } else {
-                        stack.stackSize = amount;
+                        ItemStackTools.setStackSize(stack, amount);
                     }
                 }
             }
@@ -91,7 +93,7 @@ public class InventoryLocator {
 
         if (stack != null) {
             EntityItem entityItem = new EntityItem(worldObj, pos.getX(), pos.getY(), pos.getZ(), stack);
-            worldObj.spawnEntityInWorld(entityItem);
+            WorldTools.spawnEntity(worldObj, entityItem);
         }
     }
 

@@ -15,7 +15,7 @@ public class TestTileEntity extends GenericTileEntity implements DefaultSidedInv
     }
 
     @Override
-    public boolean isUseableByPlayer(EntityPlayer player) {
+    public boolean isUsable(EntityPlayer player) {
         return canPlayerAccess(player);
     }
 }

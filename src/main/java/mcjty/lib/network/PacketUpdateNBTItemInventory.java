@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -51,12 +52,12 @@ public class PacketUpdateNBTItemInventory implements IMessage {
         }
 
         private void handle(PacketUpdateNBTItemInventory message, MessageContext ctx) {
-            World world = ctx.getServerHandler().playerEntity.worldObj;
+            World world = ctx.getServerHandler().playerEntity.getEntityWorld();
             TileEntity te = world.getTileEntity(message.pos);
             if (te instanceof IInventory) {
                 IInventory inv = (IInventory) te;
                 ItemStack stack = inv.getStackInSlot(message.slotIndex);
-                if (stack != null) {
+                if (ItemStackTools.isValid(stack)) {
                     stack.setTagCompound(message.tagCompound);
                 }
             }

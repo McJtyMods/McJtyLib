@@ -8,6 +8,7 @@ import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.api.smartwrench.SmartWrenchMode;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.block.CompatBlock;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
@@ -56,7 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container>
-        extends Block
+        extends CompatBlock
         implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider, IRedstoneConnectable {
 
     public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -161,7 +162,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
+    protected void clOnNeighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
         if (needsRedstoneCheck()) {
             checkRedstone(world, pos);
         }
@@ -375,9 +376,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return usage;
     }
 
-
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    protected boolean clOnBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        ItemStack heldItem = player.getHeldItem(hand);
         if (handleModule(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)) {
             return true;
         }

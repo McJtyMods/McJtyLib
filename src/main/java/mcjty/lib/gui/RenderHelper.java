@@ -1,6 +1,9 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.tools.ItemStackTools;
+import mcjty.lib.tools.MinecraftTools;
+import mcjty.lib.varia.MathTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -13,16 +16,13 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import java.util.List;
 
 public class RenderHelper {
     public static float rot = 0.0f;
@@ -154,7 +154,7 @@ public class RenderHelper {
 
 
     public static boolean renderItemStackWithCount(Minecraft mc, RenderItem itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
-        int size = itm.stackSize;
+        int size = ItemStackTools.getStackSize(itm);
         String amount;
         if (size <= 1) {
             amount = "";
@@ -184,7 +184,7 @@ public class RenderHelper {
             GlStateManager.disableLighting();
             drawVerticalGradientRect(x, y, x+16, y+16, 0x80ffffff, 0xffffffff);
         }
-        if (itm != null && itm.getItem() != null) {
+        if (ItemStackTools.isValid(itm) && itm.getItem() != null) {
             rc = true;
             GlStateManager.pushMatrix();
             GlStateManager.translate(0.0F, 0.0F, 32.0F);
@@ -206,16 +206,18 @@ public class RenderHelper {
         return rc;
     }
 
+
     /**
      * Renders the stack size and/or damage bar for the given ItemStack.
      */
     private static void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
                                                 int scaled) {
         if (stack != null) {
-            if (stack.stackSize != 1 || text != null) {
-                String s = text == null ? String.valueOf(stack.stackSize) : text;
-                if (text == null && stack.stackSize < 1) {
-                    s = TextFormatting.RED + String.valueOf(stack.stackSize);
+            int stackSize = ItemStackTools.getStackSize(stack);
+            if (stackSize != 1 || text != null) {
+                String s = text == null ? String.valueOf(stackSize) : text;
+                if (text == null && stackSize < 1) {
+                    s = TextFormatting.RED + String.valueOf(stackSize);
                 }
 
                 GlStateManager.disableLighting();
@@ -262,7 +264,7 @@ public class RenderHelper {
                 GlStateManager.enableDepth();
             }
 
-            EntityPlayerSP entityplayersp = Minecraft.getMinecraft().thePlayer;
+            EntityPlayerSP entityplayersp = MinecraftTools.getPlayer(Minecraft.getMinecraft());
             float f = entityplayersp == null ? 0.0F : entityplayersp.getCooldownTracker().getCooldown(stack.getItem(), Minecraft.getMinecraft().getRenderPartialTicks());
 
             if (f > 0.0F) {
@@ -271,7 +273,7 @@ public class RenderHelper {
                 GlStateManager.disableTexture2D();
                 Tessellator tessellator1 = Tessellator.getInstance();
                 VertexBuffer vertexbuffer1 = tessellator1.getBuffer();
-                draw(vertexbuffer1, xPosition, yPosition + MathHelper.floor_float(16.0F * (1.0F - f)), 16, MathHelper.ceiling_float_int(16.0F * f), 255, 255, 255, 127);
+                draw(vertexbuffer1, xPosition, yPosition + MathTools.floor(16.0F * (1.0F - f)), 16, MathTools.ceiling(16.0F * f), 255, 255, 255, 127);
                 GlStateManager.enableTexture2D();
                 GlStateManager.enableLighting();
                 GlStateManager.enableDepth();

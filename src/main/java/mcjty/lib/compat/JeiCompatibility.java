@@ -28,6 +28,12 @@ public class JeiCompatibility extends BlankModPlugin {
 				GenericGuiContainer<?> container = (GenericGuiContainer<?>) guiContainer;
 				return container.getSideWindowBounds();
 			}
+
+			@Nullable
+			@Override
+			public Object getIngredientUnderMouse(GenericGuiContainer guiContainer, int mouseX, int mouseY) {
+				return null;
+			}
 		});
 	}
 }

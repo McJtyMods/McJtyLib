@@ -5,6 +5,7 @@ import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.state.IBlockState;
@@ -46,9 +47,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     public void markDirtyClient() {
         markDirty();
-        if (worldObj != null) {
-            IBlockState state = worldObj.getBlockState(getPos());
-            worldObj.notifyBlockUpdate(getPos(), state, state, 3);
+        if (getWorld() != null) {
+            IBlockState state = getWorld().getBlockState(getPos());
+            getWorld().notifyBlockUpdate(getPos(), state, state, 3);
         }
     }
 
@@ -179,7 +180,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         NBTTagList bufferTagList = tagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < bufferTagList.tagCount() ; i++) {
             NBTTagCompound nbtTagCompound = bufferTagList.getCompoundTagAt(i);
-            inventoryHelper.setStackInSlot(i, ItemStack.loadItemStackFromNBT(nbtTagCompound));
+            inventoryHelper.setStackInSlot(i, ItemStackTools.loadFromNBT(nbtTagCompound));
         }
     }
 

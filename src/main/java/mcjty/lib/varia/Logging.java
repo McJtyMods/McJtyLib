@@ -1,5 +1,6 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.tools.ChatTools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.Style;
@@ -58,10 +59,10 @@ public class Logging {
     }
 
     public static void message(EntityPlayer player, String message) {
-        player.addChatComponentMessage(new TextComponentString(message));
+        ChatTools.addChatMessage(player, new TextComponentString(message));
     }
 
     public static void warn(EntityPlayer player, String message) {
-        player.addChatComponentMessage(new TextComponentString(message).setStyle(new Style().setColor(TextFormatting.RED)));
+        ChatTools.addChatMessage(player, new TextComponentString(message).setStyle(new Style().setColor(TextFormatting.RED)));
     }
 }

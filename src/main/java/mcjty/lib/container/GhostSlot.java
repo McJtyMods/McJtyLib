@@ -1,5 +1,6 @@
 package mcjty.lib.container;
 
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -36,8 +37,8 @@ public class GhostSlot extends Slot {
 
     @Override
     public void putStack(ItemStack stack) {
-        if (stack != null) {
-            stack.stackSize = 1;
+        if (ItemStackTools.isValid(stack)) {
+            ItemStackTools.setStackSize(stack, 1);
         }
         inventory.setInventorySlotContents(getSlotIndex(), stack);
         onSlotChanged();

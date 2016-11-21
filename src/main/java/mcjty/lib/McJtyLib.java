@@ -60,7 +60,7 @@ public class McJtyLib {
 
         @SubscribeEvent
         public void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
-            if (event.phase == TickEvent.Phase.START && !event.player.worldObj.isRemote) {
+            if (event.phase == TickEvent.Phase.START && !event.player.getEntityWorld().isRemote) {
                 PreferencesProperties preferencesProperties = getPreferencesProperties(event.player);
                 preferencesProperties.tick((EntityPlayerMP) event.player);
             }

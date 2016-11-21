@@ -3,6 +3,7 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -16,7 +17,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 
@@ -294,9 +295,9 @@ public class TextPage extends AbstractWidget<TextPage> {
                     if (stack != null && stack.getItemDamage() == 32767) {
                         // Just pick 0 here.
                         NBTTagCompound tc = stack.getTagCompound();
-                        stack = new ItemStack(stack.getItem(), stack.stackSize, 0);
+                        stack = new ItemStack(stack.getItem(), ItemStackTools.getStackSize(stack), 0);
                         if (tc != null) {
-                            stack.setTagCompound((NBTTagCompound) tc.copy());
+                            stack.setTagCompound(tc.copy());
                         }
                     }
                     RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
@@ -409,7 +410,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                 // Error, just put in the entire line
                 this.line = line;
             } else {
-                Block block = GameRegistry.findBlock(modBase.getModId(), line.substring(4, end));
+                Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(modBase.getModId(), line.substring(4, end)));
                 recipe = block == null ? null : findRecipe(new ItemStack(block));
                 if (recipe == null) {
                     // Error,
@@ -426,7 +427,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                 // Error, just put in the entire line
                 this.line = line;
             } else {
-                Item item = GameRegistry.findItem(modBase.getModId(), line.substring(4, end));
+                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(modBase.getModId(), line.substring(4, end)));
                 recipe = item == null ? null : findRecipe(new ItemStack(item));
                 if (recipe == null) {
                     // Error,
