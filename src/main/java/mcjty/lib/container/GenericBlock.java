@@ -8,7 +8,7 @@ import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.api.smartwrench.SmartWrenchMode;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.block.CompatBlock;
+import mcjty.lib.compat.CompatBlock;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;

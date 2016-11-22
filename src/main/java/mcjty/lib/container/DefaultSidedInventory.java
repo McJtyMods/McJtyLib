@@ -1,6 +1,6 @@
 package mcjty.lib.container;
 
-import mcjty.lib.inventory.CompatSidedInventory;
+import mcjty.lib.compat.CompatSidedInventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;

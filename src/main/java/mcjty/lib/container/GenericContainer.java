@@ -1,7 +1,7 @@
 package mcjty.lib.container;
 
 import com.google.common.collect.Range;
-import mcjty.lib.inventory.InventoryTools;
+import mcjty.lib.tools.InventoryTools;
 import mcjty.lib.network.PacketSendGuiData;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.Logging;
