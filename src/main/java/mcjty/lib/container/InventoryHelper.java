@@ -36,13 +36,13 @@ public class InventoryHelper {
     public InventoryHelper(TileEntity tileEntity, ContainerFactory containerFactory, int count) {
         this.tileEntity = tileEntity;
         this.containerFactory = containerFactory;
-        stacks = (ItemStackList) ItemStackList.withSize(count, ItemStackTools.getEmptyStack());
+        stacks = ItemStackList.create(count);
         this.count = count;
     }
 
     public void setNewCount(int newcount) {
         this.count = newcount;
-        ItemStackList newstacks = (ItemStackList) ItemStackList.withSize(newcount, ItemStackTools.getEmptyStack());
+        ItemStackList newstacks = ItemStackList.create(newcount);
         for (int i = 0 ; i < Math.min(stacks.size(), newstacks.size()) ; i++) {
             newstacks.set(i, stacks.get(i));
         }
