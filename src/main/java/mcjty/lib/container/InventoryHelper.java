@@ -516,4 +516,21 @@ public class InventoryHelper {
             stacks.set(i+start, stack);
         }
     }
+
+    public static void compactStacks(ItemStack[] stacks, int start, int max) {
+        InventoryBasic inv = new InventoryBasic("temp", true, max);
+        for (int i = 0 ; i < max ; i++) {
+            ItemStack stack = stacks[i+start];
+            if (ItemStackTools.isValid(stack)) {
+                mergeItemStack(inv, false, stack, 0, max, null);
+            }
+        }
+        for (int i = 0 ; i < max ; i++) {
+            ItemStack stack = inv.getStackInSlot(i);
+            if (ItemStackTools.isValid(stack) && ItemStackTools.getStackSize(stack) == 0) {
+                stack = ItemStackTools.getEmptyStack();
+            }
+            stacks[i+start] = stack;
+        }
+    }
 }
