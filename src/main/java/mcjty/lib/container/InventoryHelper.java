@@ -114,7 +114,7 @@ public class InventoryHelper {
             IInventory inventory = (IInventory) tileEntity;
             return inventory.decrStackSize(slot, amount);
         }
-        return null;
+        return ItemStackTools.getEmptyStack();
     }
 
     /**
@@ -148,7 +148,7 @@ public class InventoryHelper {
             IInventory inventory = (IInventory) tileEntity;
             return inventory.getStackInSlot(slot);
         }
-        return null;
+        return ItemStackTools.getEmptyStack();
     }
 
     public static boolean isInventory(TileEntity te) {
@@ -220,7 +220,7 @@ public class InventoryHelper {
 
     /**
      * Insert an item into an inventory at the given direction. Supports IItemHandler as
-     * well as IInventory. Returns an itemstack with whatever could not be inserted or null
+     * well as IInventory. Returns an itemstack with whatever could not be inserted or empty item
      * on succcess.
      */
     @Nullable
@@ -382,7 +382,7 @@ public class InventoryHelper {
                         && ((!checkSlots) || inventory.isItemValidForSlot(k, result))) {
                     if (undo != null) {
                         if (!undo.containsKey(k)) {
-                            undo.put(k, null);
+                            undo.put(k, ItemStackTools.getEmptyStack());
                         }
                     }
                     ItemStack copy = result.copy();
@@ -463,7 +463,7 @@ public class InventoryHelper {
                 tileEntity.markDirty();
                 return its;
             }
-            return null;
+            return ItemStackTools.getEmptyStack();
         }
     }
 

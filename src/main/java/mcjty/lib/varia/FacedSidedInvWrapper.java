@@ -75,7 +75,7 @@ public class FacedSidedInvWrapper implements IItemHandlerModifiable {
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 
-        if (stack == null) {
+        if (ItemStackTools.isEmpty(stack)) {
             return ItemStackTools.getEmptyStack();
         }
 

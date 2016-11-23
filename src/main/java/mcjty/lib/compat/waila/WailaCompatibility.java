@@ -5,6 +5,7 @@ import mcjty.lib.container.GenericBlock;
 //import mcp.mobius.waila.api.IWailaDataAccessor;
 //import mcp.mobius.waila.api.IWailaDataProvider;
 //import mcp.mobius.waila.api.IWailaRegistrar;
+import mcjty.lib.tools.ItemStackTools;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -56,7 +57,7 @@ public class WailaCompatibility implements IWailaDataProvider {
 
     @Override
     public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        return null;
+        return ItemStackTools.getEmptyStack();
     }
 
     @Override

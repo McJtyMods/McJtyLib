@@ -66,7 +66,7 @@ public class NetworkTools {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return ItemStackTools.getEmptyStack();
     }
 
     /// This function supports itemstacks with more then 64 items.

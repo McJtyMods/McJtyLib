@@ -72,7 +72,7 @@ public class InventoryLocator {
     public void ejectStack(World worldObj, BlockPos pos, ItemStack stack, BlockPos thisCoordinate, EnumFacing[] directions) {
         for (EnumFacing dir : directions) {
             IItemHandler handler = getItemHandlerAtDirection(worldObj, thisCoordinate, dir);
-            if (stack == null) {
+            if (ItemStackTools.isEmpty(stack)) {
                 break;
             }
 
@@ -91,7 +91,7 @@ public class InventoryLocator {
             }
         }
 
-        if (stack != null) {
+        if (ItemStackTools.isValid(stack)) {
             EntityItem entityItem = new EntityItem(worldObj, pos.getX(), pos.getY(), pos.getZ(), stack);
             WorldTools.spawnEntity(worldObj, entityItem);
         }
