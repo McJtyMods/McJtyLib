@@ -1,5 +1,6 @@
 package mcjty.lib.container;
 
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
@@ -18,7 +19,7 @@ public class GhostOutputSlot extends Slot {
 
     @Override
     public ItemStack decrStackSize(int amount) {
-        return null;
+        return ItemStackTools.getEmptyStack();
     }
 
     @Override

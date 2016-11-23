@@ -1,6 +1,7 @@
 package mcjty.lib.container;
 
 import mcjty.lib.tools.ChatTools;
+import mcjty.lib.tools.ItemStackList;
 import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -29,28 +30,27 @@ import java.util.stream.Stream;
 public class InventoryHelper {
     private final TileEntity tileEntity;
     private final ContainerFactory containerFactory;
-    private ItemStack stacks[];
+    private ItemStackList stacks;
     private int count;
 
     public InventoryHelper(TileEntity tileEntity, ContainerFactory containerFactory, int count) {
         this.tileEntity = tileEntity;
         this.containerFactory = containerFactory;
-        stacks = new ItemStack[count];
-        for (int i = 0 ; i < count ; i++) {
-            stacks[i] = ItemStackTools.getEmptyStack();
-        }
+        stacks = (ItemStackList) ItemStackList.withSize(count, ItemStackTools.getEmptyStack());
         this.count = count;
     }
 
     public void setNewCount(int newcount) {
         this.count = newcount;
-        ItemStack newstacks[] = new ItemStack[newcount];
-        System.arraycopy(stacks, 0, newstacks, 0, Math.min(stacks.length, newstacks.length));
+        ItemStackList newstacks = (ItemStackList) ItemStackList.withSize(newcount, ItemStackTools.getEmptyStack());
+        for (int i = 0 ; i < Math.min(stacks.size(), newstacks.size()) ; i++) {
+            newstacks.set(i, stacks.get(i));
+        }
         stacks = newstacks;
     }
 
     public ItemStack removeStackFromSlot(int index) {
-        ItemStack stack = stacks[index];
+        ItemStack stack = stacks.get(index);
         setStackInSlot(index, ItemStackTools.getEmptyStack());
         return stack;
     }
@@ -409,11 +409,11 @@ public class InventoryHelper {
     }
 
     public ItemStack getStackInSlot(int index) {
-        if (index >= stacks.length) {
+        if (index >= stacks.size()) {
             return ItemStackTools.getEmptyStack();
         }
 
-        return stacks[index];
+        return stacks.get(index);
     }
 
     /**
@@ -422,43 +422,43 @@ public class InventoryHelper {
      * @param stack
      */
     public void setStackInSlot(int index, ItemStack stack) {
-        if (index >= stacks.length) {
+        if (index >= stacks.size()) {
             return;
         }
-        stacks[index] = stack;
+        stacks.set(index, stack);
     }
 
     public boolean containsItem(int index) {
-        if (index >= stacks.length) {
+        if (index >= stacks.size()) {
             return false;
         }
-        return ItemStackTools.isValid(stacks[index]);
+        return ItemStackTools.isValid(stacks.get(index));
     }
 
     public ItemStack decrStackSize(int index, int amount) {
-        if (index >= stacks.length) {
+        if (index >= stacks.size()) {
             return ItemStackTools.getEmptyStack();
         }
 
         if (containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index)) {
-            ItemStack old = stacks[index];
-            stacks[index] = ItemStackTools.getEmptyStack();
+            ItemStack old = stacks.get(index);
+            stacks.set(index, ItemStackTools.getEmptyStack());
             if (ItemStackTools.isEmpty(old)) {
                 return ItemStackTools.getEmptyStack();
             }
             ItemStackTools.makeEmpty(old);
             return old;
         } else {
-            if (ItemStackTools.isValid(stacks[index])) {
-                if (ItemStackTools.getStackSize(stacks[index]) <= amount) {
-                    ItemStack old = stacks[index];
-                    stacks[index] = null;
+            if (ItemStackTools.isValid(stacks.get(index))) {
+                if (ItemStackTools.getStackSize(stacks.get(index)) <= amount) {
+                    ItemStack old = stacks.get(index);
+                    stacks.set(index, ItemStackTools.getEmptyStack());
                     tileEntity.markDirty();
                     return old;
                 }
-                ItemStack its = stacks[index].splitStack(amount);
-                if (ItemStackTools.isEmpty(stacks[index])) {
-                    stacks[index] = ItemStackTools.getEmptyStack();
+                ItemStack its = stacks.get(index).splitStack(amount);
+                if (ItemStackTools.isEmpty(stacks.get(index))) {
+                    stacks.set(index, ItemStackTools.getEmptyStack());
                 }
                 tileEntity.markDirty();
                 return its;
@@ -468,27 +468,27 @@ public class InventoryHelper {
     }
 
     public void setInventorySlotContents(int stackLimit, int index, ItemStack stack) {
-        if (index >= stacks.length) {
+        if (index >= stacks.size()) {
             return;
         }
 
         if (containerFactory.isGhostSlot(index)) {
             if (ItemStackTools.isValid(stack)) {
-                stacks[index] = stack.copy();
+                stacks.set(index, stack.copy());
                 if (index < 9) {
-                    ItemStackTools.setStackSize(stacks[index], 1);
+                    ItemStackTools.setStackSize(stacks.get(index), 1);
                 }
             } else {
-                stacks[index] = ItemStackTools.getEmptyStack();
+                stacks.set(index, ItemStackTools.getEmptyStack());
             }
         } else if (containerFactory.isGhostOutputSlot(index)) {
             if (ItemStackTools.isValid(stack)) {
-                stacks[index] = stack.copy();
+                stacks.set(index, stack.copy());
             } else {
-                stacks[index] = ItemStackTools.getEmptyStack();
+                stacks.set(index, ItemStackTools.getEmptyStack());
             }
         } else {
-            stacks[index] = stack;
+            stacks.set(index, stack);
             if (ItemStackTools.isValid(stack) && ItemStackTools.getStackSize(stack) > stackLimit) {
                 ItemStackTools.setStackSize(stack, stackLimit);
             }
@@ -500,10 +500,10 @@ public class InventoryHelper {
         compactStacks(helper.stacks, start, max);
     }
 
-    public static void compactStacks(ItemStack[] stacks, int start, int max) {
+    public static void compactStacks(List<ItemStack> stacks, int start, int max) {
         InventoryBasic inv = new InventoryBasic("temp", true, max);
         for (int i = 0 ; i < max ; i++) {
-            ItemStack stack = stacks[i+start];
+            ItemStack stack = stacks.get(i+start);
             if (ItemStackTools.isValid(stack)) {
                 mergeItemStack(inv, false, stack, 0, max, null);
             }
@@ -513,7 +513,7 @@ public class InventoryHelper {
             if (ItemStackTools.isValid(stack) && ItemStackTools.getStackSize(stack) == 0) {
                 stack = ItemStackTools.getEmptyStack();
             }
-            stacks[i+start] = stack;
+            stacks.set(i+start, stack);
         }
     }
 }

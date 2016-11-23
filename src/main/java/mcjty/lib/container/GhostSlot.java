@@ -22,7 +22,7 @@ public class GhostSlot extends Slot {
 
     @Override
     public ItemStack decrStackSize(int amount) {
-        return null;
+        return ItemStackTools.getEmptyStack();
     }
 
     @Override

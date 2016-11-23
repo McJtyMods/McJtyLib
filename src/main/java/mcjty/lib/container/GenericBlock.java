@@ -12,6 +12,7 @@ import mcjty.lib.compat.CompatBlock;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
@@ -292,7 +293,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             ((GenericTileEntity)tileEntity).writeRestorableToNBT(tagCompound);
 
             stack.setTagCompound(tagCompound);
-            ArrayList<ItemStack> result = new ArrayList<ItemStack>();
+            List<ItemStack> result = new ArrayList<>();
             result.add(stack);
             return result;
         } else {
@@ -330,7 +331,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private WrenchUsage testWrenchUsage(BlockPos pos, EntityPlayer player) {
         ItemStack itemStack = player.getHeldItem(EnumHand.MAIN_HAND);
         WrenchUsage wrenchUsed = WrenchUsage.NOT;
-        if (itemStack != null) {
+        if (ItemStackTools.isValid(itemStack)) {
             Item item = itemStack.getItem();
             if (item != null) {
                 wrenchUsed = getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
@@ -399,7 +400,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     public boolean handleModule(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (heldItem != null) {
+        if (ItemStackTools.isValid(heldItem)) {
             IModuleSupport support = getModuleSupport();
             if (support != null) {
                 if (support.isModule(heldItem)) {

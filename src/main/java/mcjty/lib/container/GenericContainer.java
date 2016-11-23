@@ -130,7 +130,7 @@ public class GenericContainer extends Container {
 
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int index) {
-        ItemStack itemstack = null;
+        ItemStack itemstack = ItemStackTools.getEmptyStack();
         Slot slot = this.inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack()) {
@@ -140,7 +140,7 @@ public class GenericContainer extends Container {
             if (factory.isSpecificItemSlot(index)) {
                 if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERINV, true)) {
                     if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERHOTBAR, false)) {
-                        return null;
+                        return ItemStackTools.getEmptyStack();
                     }
                 }
                 slot.onSlotChange(origStack, itemstack);
@@ -148,18 +148,18 @@ public class GenericContainer extends Container {
                 if (!mergeItemStacks(origStack, index, SlotType.SLOT_SPECIFICITEM, false)) {
                     if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERINV, true)) {
                         if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERHOTBAR, false)) {
-                            return null;
+                            return ItemStackTools.getEmptyStack();
                         }
                     }
                 }
                 slot.onSlotChange(origStack, itemstack);
             } else if (factory.isGhostSlot(index) || factory.isGhostOutputSlot(index)) {
-                return null; // @@@ Right?
+                return ItemStackTools.getEmptyStack();
             } else if (factory.isPlayerInventorySlot(index)) {
                 if (!mergeItemStacks(origStack, index, SlotType.SLOT_SPECIFICITEM, false)) {
                     if (!mergeItemStacks(origStack, index, SlotType.SLOT_INPUT, false)) {
                         if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERHOTBAR, false)) {
-                            return null;
+                            return ItemStackTools.getEmptyStack();
                         }
                     }
                 }
@@ -167,7 +167,7 @@ public class GenericContainer extends Container {
                 if (!mergeItemStacks(origStack, index, SlotType.SLOT_SPECIFICITEM, false)) {
                     if (!mergeItemStacks(origStack, index, SlotType.SLOT_INPUT, false)) {
                         if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERINV, false)) {
-                            return null;
+                            return ItemStackTools.getEmptyStack();
                         }
                     }
                 }
@@ -182,7 +182,7 @@ public class GenericContainer extends Container {
             }
 
             if (ItemStackTools.getStackSize(origStack) == ItemStackTools.getStackSize(itemstack)) {
-                return null;
+                return ItemStackTools.getEmptyStack();
             }
 
             InventoryTools.onPickup(slot, player, origStack);
@@ -279,7 +279,7 @@ public class GenericContainer extends Container {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.getHasStack()) {
-                slot.putStack(null);
+                slot.putStack(ItemStackTools.getEmptyStack());
             }
         }
         return super.slotClick(index, button, mode, player);

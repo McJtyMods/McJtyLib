@@ -69,14 +69,14 @@ public class FacedSidedInvWrapper implements IItemHandlerModifiable {
     @Override
     public ItemStack getStackInSlot(int slot) {
         int i = getSlot(inv, slot, facing);
-        return i == -1 ? null : inv.getStackInSlot(i);
+        return i == -1 ? ItemStackTools.getEmptyStack() : inv.getStackInSlot(i);
     }
 
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 
         if (stack == null) {
-            return null;
+            return ItemStackTools.getEmptyStack();
         }
 
         slot = getSlot(inv, slot, facing);

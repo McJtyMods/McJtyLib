@@ -221,7 +221,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         for (int i = 0 ; i < inventoryHelper.getCount() ; i++) {
             ItemStack stack = inventoryHelper.getStackInSlot(i);
             NBTTagCompound nbtTagCompound = new NBTTagCompound();
-            if (stack != null) {
+            if (ItemStackTools.isValid(stack)) {
                 stack.writeToNBT(nbtTagCompound);
             }
             bufferTagList.appendTag(nbtTagCompound);

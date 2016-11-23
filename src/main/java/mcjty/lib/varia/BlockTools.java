@@ -7,7 +7,6 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -177,14 +176,14 @@ public class BlockTools {
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack itemstack = inventory.getStackInSlot(i);
             spawnItemStack(world, x, y, z, itemstack);
-            inventory.setInventorySlotContents(i, null);
+            inventory.setInventorySlotContents(i, ItemStackTools.getEmptyStack());
         }
         //TODO: What was this?
         //world.func_147453_f(x, y, z, block);
     }
 
     public static void spawnItemStack(World world, int x, int y, int z, ItemStack itemstack) {
-        if (itemstack != null) {
+        if (ItemStackTools.isValid(itemstack)) {
             float f = random.nextFloat() * 0.8F + 0.1F;
             float f1 = random.nextFloat() * 0.8F + 0.1F;
             EntityItem entityitem;
@@ -205,7 +204,7 @@ public class BlockTools {
                 entityitem.motionZ = ((float)random.nextGaussian() * f3);
 
                 if (itemstack.hasTagCompound()) {
-                    entityitem.getEntityItem().setTagCompound((NBTTagCompound)itemstack.getTagCompound().copy());
+                    entityitem.getEntityItem().setTagCompound(itemstack.getTagCompound().copy());
                 }
                 mcjty.lib.tools.WorldTools.spawnEntity(world, entityitem);
             }
