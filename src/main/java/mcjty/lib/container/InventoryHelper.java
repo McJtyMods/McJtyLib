@@ -353,7 +353,7 @@ public class InventoryHelper {
                             }
                         }
                         itemsToPlace = 0;
-                        ItemStackTools.setStackSize(itemstack1, 1);
+                        ItemStackTools.setStackSize(itemstack1, l);
                         inventory.markDirty();
                     } else if (ItemStackTools.getStackSize(itemstack1) < result.getMaxStackSize()) {
                         if (undo != null) {
