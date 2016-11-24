@@ -477,7 +477,7 @@ public class TextPage extends AbstractWidget<TextPage> {
         for (IRecipe recipe : recipes) {
             if (recipe instanceof ShapedRecipes) {
                 ItemStack recipeOutput = recipe.getRecipeOutput();
-                if (recipeOutput != null && recipeOutput.isItemEqual(item)) {
+                if (ItemStackTools.isValid(recipeOutput) && recipeOutput.isItemEqual(item)) {
                     return recipe;
                 }
             }
@@ -486,7 +486,7 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     public static class Page {
-        final List<Line> lines = new ArrayList<Line>();
+        final List<Line> lines = new ArrayList<>();
 
         public boolean isEmpty() {
             return lines.isEmpty();

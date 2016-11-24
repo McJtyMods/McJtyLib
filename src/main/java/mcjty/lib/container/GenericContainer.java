@@ -1,8 +1,8 @@
 package mcjty.lib.container;
 
 import com.google.common.collect.Range;
-import mcjty.lib.tools.InventoryTools;
 import mcjty.lib.network.PacketSendGuiData;
+import mcjty.lib.tools.InventoryTools;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayer;
@@ -202,7 +202,7 @@ public class GenericContainer extends Container {
         }
 
         Slot slot;
-        ItemStack itemstack1;
+        ItemStack itemstack1 = ItemStackTools.getEmptyStack();
 
         if (par1ItemStack.isStackable()) {
 

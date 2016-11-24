@@ -333,7 +333,7 @@ public class InventoryHelper {
     private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, boolean checkSlots, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
         int k = start;
 
-        ItemStack itemstack1;
+        ItemStack itemstack1 = ItemStackTools.getEmptyStack();
         int itemsToPlace = ItemStackTools.getStackSize(result);
 
         if (result.isStackable()) {

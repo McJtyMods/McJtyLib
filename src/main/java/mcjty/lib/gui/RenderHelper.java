@@ -212,7 +212,7 @@ public class RenderHelper {
      */
     private static void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
                                                 int scaled) {
-        if (stack != null) {
+        if (ItemStackTools.isValid(stack)) {
             int stackSize = ItemStackTools.getStackSize(stack);
             if (stackSize != 1 || text != null) {
                 String s = text == null ? String.valueOf(stackSize) : text;

@@ -7,6 +7,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketServerCommand;
+import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -97,7 +98,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                 i++;
                 int itemIdx = Integer.parseInt(s.substring(i, i + 1));
                 ItemStack e = items.get(itemIdx);
-                if (e != null) {
+                if (ItemStackTools.isValid(e)) {
                     l.add(e);
                 }
             } else {
