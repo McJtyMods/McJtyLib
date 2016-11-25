@@ -8,6 +8,7 @@ import mcjty.lib.network.CommandHandler;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
+import mcjty.typed.Type;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -310,9 +311,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return false;
     }
 
-    @Override
     @Nonnull
-    public List executeWithResultList(String command, Map<String, Argument> args) {
+    @Override
+    public <T> List<T> executeWithResultList(String command, Map<String, Argument> args, Type<T> type) {
         return Collections.emptyList();
     }
 

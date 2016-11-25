@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.varia.Logging;
+import mcjty.typed.Type;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -19,7 +20,10 @@ import java.util.List;
  */
 public abstract class PacketRequestServerListHandler<M extends PacketRequestServerList, T> implements IMessageHandler<M, IMessage> {
 
-    public PacketRequestServerListHandler() {
+    private final Type<T> type;
+
+    public PacketRequestServerListHandler(Type<T> type) {
+        this.type = type;
     }
 
     @Override
@@ -35,11 +39,7 @@ public abstract class PacketRequestServerListHandler<M extends PacketRequestServ
             return;
         }
         CommandHandler commandHandler = (CommandHandler) te;
-        List<T> list = (List<T>) commandHandler.executeWithResultList(message.command, message.args);
-        if (list.isEmpty()) {
-            Logging.log("Command " + message.command + " was not handled!");
-            return;
-        }
+        List<T> list = commandHandler.executeWithResultList(message.command, message.args, type);
         sendToClient(message.pos, list, ctx);
     }
 
