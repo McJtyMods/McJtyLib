@@ -323,7 +323,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     @Override
-    public boolean execute(String command, List list) {
+    public <T> boolean execute(String command, List<T> list, Type<T> type) {
         return false;
     }
 

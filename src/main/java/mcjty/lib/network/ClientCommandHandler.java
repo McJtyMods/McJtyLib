@@ -1,5 +1,7 @@
 package mcjty.lib.network;
 
+import mcjty.typed.Type;
+
 import java.util.List;
 
 /**
@@ -8,7 +10,7 @@ import java.util.List;
  */
 public interface ClientCommandHandler {
     /// Return true if command was handled correctly. False if not.
-    boolean execute(String command, List list);
+    <T> boolean execute(String command, List<T> list, Type<T> type);
 
     /// Return true if command was handled correctly. False if not.
     boolean execute(String command, Integer result);
