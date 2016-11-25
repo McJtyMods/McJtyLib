@@ -101,23 +101,6 @@ public class InventoryHelper {
     }
 
     /**
-     * Extract itemstack out of a slot and return a new stack
-     * @param tileEntity
-     * @param slot
-     * @param amount
-     */
-    public static ItemStack extractItem(TileEntity tileEntity, int slot, int amount) {
-        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            return capability.extractItem(slot, amount, false);
-        } else if (tileEntity instanceof IInventory) {
-            IInventory inventory = (IInventory) tileEntity;
-            return inventory.decrStackSize(slot, amount);
-        }
-        return ItemStackTools.getEmptyStack();
-    }
-
-    /**
      * Get the size of the inventory
      * @param tileEntity
      */
@@ -133,22 +116,6 @@ public class InventoryHelper {
             return inventory.getSizeInventory();
         }
         return 0;
-    }
-
-    /**
-     * Get a slot
-     * @param tileEntity
-     * @param slot
-     */
-    public static ItemStack getSlot(TileEntity tileEntity, int slot) {
-        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            return capability.getStackInSlot(slot);
-        } else if (tileEntity instanceof IInventory) {
-            IInventory inventory = (IInventory) tileEntity;
-            return inventory.getStackInSlot(slot);
-        }
-        return ItemStackTools.getEmptyStack();
     }
 
     public static boolean isInventory(TileEntity te) {
