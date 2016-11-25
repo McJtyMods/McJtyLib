@@ -33,7 +33,7 @@ public class Logging {
     }
 
     public static void logError(String msg) {
-        getInstance().logger.log(Level.ERROR, msg);
+        getLogger().log(Level.ERROR, msg);
     }
 
     public static void log(World world, TileEntity te, String message) {
@@ -46,6 +46,14 @@ public class Logging {
             String id = te.getPos().getX() + "," + te.getPos().getY() + "," + te.getPos().getZ() + ": ";
             getInstance().logger.log(Level.INFO, id + message);
         }
+    }
+
+    public static Logger getLogger() {
+        return getInstance().logger;
+    }
+
+    public static void logError(String msg, Throwable e) {
+        getLogger().error(msg, e);
     }
 
     public static void log(String message) {
