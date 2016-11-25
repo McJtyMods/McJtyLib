@@ -1,6 +1,7 @@
 package mcjty.typed;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * A Type object represents a given type.
@@ -31,6 +32,15 @@ public final class Type<V> {
     @Nonnull
     public Class<V> getType() {
         return type;
+    }
+
+    @Nonnull
+    public List<V> convert(@Nonnull List list) {
+        return (List<V>) list;
+    }
+
+    public V convert(Object o) {
+        return (V) o;
     }
 
     @Override
