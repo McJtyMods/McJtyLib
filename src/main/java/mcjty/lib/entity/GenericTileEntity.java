@@ -29,7 +29,9 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -309,8 +311,9 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     @Override
+    @Nonnull
     public List executeWithResultList(String command, Map<String, Argument> args) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

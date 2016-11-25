@@ -2,6 +2,7 @@ package mcjty.lib.network;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public interface CommandHandler {
     boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args);
 
     /// Return the result which will be sent back to the client. Returns nulli f command was not handled.
+    @Nonnull
     List executeWithResultList(String command, Map<String, Argument> args);
 
     /// Return a numeric result which will be sent back to the client. Returns null if command was not handled.
