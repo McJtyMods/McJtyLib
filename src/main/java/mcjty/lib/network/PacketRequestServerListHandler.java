@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -35,12 +36,12 @@ public abstract class PacketRequestServerListHandler<M extends PacketRequestServ
         }
         CommandHandler commandHandler = (CommandHandler) te;
         List<T> list = (List<T>) commandHandler.executeWithResultList(message.command, message.args);
-        if (list == null) {
+        if (list.isEmpty()) {
             Logging.log("Command " + message.command + " was not handled!");
             return;
         }
         sendToClient(message.pos, list, ctx);
     }
 
-    protected abstract void sendToClient(BlockPos pos, List<T> list, MessageContext ctx);
+    protected abstract void sendToClient(BlockPos pos, @Nonnull List<T> list, MessageContext ctx);
 }
