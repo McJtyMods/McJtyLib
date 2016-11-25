@@ -216,7 +216,7 @@ public class GenericContainer extends Container {
                     int mergedSize = ItemStackTools.getStackSize(itemstack1) + ItemStackTools.getStackSize(par1ItemStack);
                     int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getSlotStackLimit());
                     if (mergedSize <= maxStackSize) {
-                        par1ItemStack = ItemStackTools.getEmptyStack();
+                        ItemStackTools.makeEmpty(par1ItemStack);
                         ItemStackTools.setStackSize(itemstack1, mergedSize);
                         slot.onSlotChanged();
                         result = true;
