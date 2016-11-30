@@ -1,12 +1,13 @@
 package mcjty.lib.container;
 
+import mcjty.lib.compat.CompatSlot;
 import mcjty.lib.entity.GenericTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-public class CraftingSlot extends Slot {
+public class CraftingSlot extends CompatSlot {
     private final GenericCrafter crafter;
 
     public CraftingSlot(IInventory inventory, int index, int x, int y, GenericCrafter crafter) {
@@ -29,8 +30,8 @@ public class CraftingSlot extends Slot {
     }
 
     @Override
-    public ItemStack onTake(EntityPlayer player, ItemStack stack) {
+    protected ItemStack onPickup(EntityPlayer player, ItemStack stack) {
         crafter.craftItem();
-        return super.onTake(player, stack);
+        return super.onPickup(player, stack);
     }
 }
