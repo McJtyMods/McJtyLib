@@ -14,7 +14,7 @@ import java.util.List;
  * @param <S> is the type of the subclass of this class. i.e. the class you're implementing
  * @param <T> is the type of the items in the list that is requested from the server
  */
-public abstract class PacketListFromServer<S extends PacketListFromServer, T extends ByteBufConverter> implements IMessage {
+public abstract class PacketListFromServer<S extends PacketListFromServer, T> implements IMessage {
 
     public BlockPos pos;
     public List<T> list;
@@ -39,6 +39,8 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T ext
 
     protected abstract T createItem(ByteBuf buf);
 
+    protected abstract void writeItemToBuf(ByteBuf buf, T item);
+
     @Override
     public void toBytes(ByteBuf buf) {
         NetworkTools.writePos(buf, pos);
@@ -50,7 +52,7 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T ext
         } else {
             buf.writeInt(list.size());
             for (T item : list) {
-                item.toBytes(buf);
+                writeItemToBuf(buf, item);
             }
         }
     }
