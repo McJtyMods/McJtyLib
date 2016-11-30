@@ -5,9 +5,10 @@ import net.minecraft.client.gui.Gui;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class AbstractContainerWidget<P extends AbstractContainerWidget> extends AbstractWidget<P> {
-    protected ArrayList<Widget> children = new ArrayList<Widget>();
+    protected List<Widget> children = new ArrayList<>();
 
     public AbstractContainerWidget(Minecraft mc, Gui gui) {
         super(mc, gui);

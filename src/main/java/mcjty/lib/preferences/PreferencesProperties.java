@@ -28,7 +28,6 @@ public class PreferencesProperties {
     }
 
     private void syncToClient(EntityPlayerMP player) {
-        System.out.println("syncToClient: style = " + style);
         McJtyLib.networkHandler.sendTo(new PacketSendPreferencesToClient(buffX, buffY, style), player);
         dirty = false;
     }

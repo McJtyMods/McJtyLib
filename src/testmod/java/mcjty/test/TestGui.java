@@ -4,7 +4,6 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
-import mcjty.lib.gui.events.IconClickedEvent;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.icons.ImageIcon;
@@ -107,7 +106,6 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
                             } else if (dx >= ICONSIZE-3 && dy >= 10 && dy <= 14) {
                                 handleIconOverlay(icon, "rig", 1, 5);
                             }
-                            System.out.println("dx = " + dx + "," + dy);
                             return true;
                         });
                 rowPanel.addChild(holder);

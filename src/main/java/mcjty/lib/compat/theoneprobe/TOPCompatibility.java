@@ -14,8 +14,9 @@ public class TOPCompatibility {
     private static boolean registered;
 
     public static void register() {
-        if (registered)
+        if (registered) {
             return;
+        }
         registered = true;
         FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "mcjty.lib.compat.theoneprobe.TOPCompatibility$GetTheOneProbe");
     }

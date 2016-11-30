@@ -2,11 +2,9 @@ package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.gui.events.ButtonEvent;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Panel;
-import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.tools.MinecraftTools;
 import net.minecraft.client.Minecraft;

@@ -44,7 +44,7 @@ public class PacketSendGuiData implements IMessage {
         public boolean match(Object o) {
             return clazz.isInstance(o);
         }
-    };
+    }
 
 
     private static final Map<Integer,Entry> CLASS_MAP = new HashMap<>();

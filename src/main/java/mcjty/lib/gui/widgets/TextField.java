@@ -143,7 +143,7 @@ public class TextField extends AbstractWidget<TextField> {
 
         ensureVisible();
 
-        int col = StyleConfig.colorTextFieldFiller;;
+        int col = StyleConfig.colorTextFieldFiller;
         if (window.getTextFocus() == this) {
             col = StyleConfig.colorTextFieldFocusedFiller;
         } else if (isHovering()) {

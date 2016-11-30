@@ -111,6 +111,7 @@ public class TestMod implements ModBase {
         }
     }
 
+    @SuppressWarnings("EmptyClass")
     public static class ServerProxy extends CommonProxy {
 
     }

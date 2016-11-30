@@ -29,13 +29,21 @@ public class BlockMeta {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         BlockMeta blockMeta = (BlockMeta) o;
 
-        if (meta != blockMeta.meta) return false;
-        if (!block.equals(blockMeta.block)) return false;
+        if (meta != blockMeta.meta) {
+            return false;
+        }
+        if (!block.equals(blockMeta.block)) {
+            return false;
+        }
 
         return true;
     }

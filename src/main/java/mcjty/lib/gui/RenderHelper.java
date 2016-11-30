@@ -556,9 +556,9 @@ public class RenderHelper {
         VertexBuffer buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         buffer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
-        buffer.pos(-scale, +scale, 0).tex(0, 1).endVertex();;
-        buffer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
-        buffer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
+        buffer.pos(-scale, +scale, 0).tex(0, 1).endVertex();
+        buffer.pos(+scale, +scale, 0).tex(1, 1).endVertex();
+        buffer.pos(+scale, -scale, 0).tex(1, 0).endVertex();
         tessellator.draw();
         GlStateManager.popMatrix();
     }
@@ -574,9 +574,9 @@ public class RenderHelper {
         VertexBuffer buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         buffer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
-        buffer.pos(-scale, +scale, 0).tex(0, 1).endVertex();;
-        buffer.pos(+scale, +scale, 0).tex(1, 1).endVertex();;
-        buffer.pos(+scale, -scale, 0).tex(1, 0).endVertex();;
+        buffer.pos(-scale, +scale, 0).tex(0, 1).endVertex();
+        buffer.pos(+scale, +scale, 0).tex(1, 1).endVertex();
+        buffer.pos(+scale, -scale, 0).tex(1, 0).endVertex();
         tessellator.draw();
         GlStateManager.popMatrix();
     }

@@ -4,6 +4,7 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.tools.ItemStackTools;
+import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -122,9 +123,9 @@ public class TextPage extends AbstractWidget<TextPage> {
             newPage(page);
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Logging.logError("Error reading manual text", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logging.logError("Error reading manual text", e);
         }
         showCurrentPage();
         return this;
@@ -157,12 +158,16 @@ public class TextPage extends AbstractWidget<TextPage> {
             for (Link link : links) {
                 if (tabCounter == 0) {
                     if (link.y1 <= y && y <= link.y2) {
-                        if (gotoLink(link)) return this;
+                        if (gotoLink(link)) {
+                            return this;
+                        }
                     }
                 } else {
                     int t = x < getBounds().width / 2 ? 0 : 1;
                     if (link.y1 <= y && y <= link.y2 && link.tab == t) {
-                        if (gotoLink(link)) return this;
+                        if (gotoLink(link)) {
+                            return this;
+                        }
                     }
                 }
             }

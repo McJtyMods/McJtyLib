@@ -303,7 +303,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, EntityPlayer player, boolean willHarvest) {
-        if (willHarvest) return true; // If it will harvest, delay deletion of the block until after getDrops
+        if (willHarvest) {
+            return true; // If it will harvest, delay deletion of the block until after getDrops
+        }
         return super.removedByPlayer(state, world, pos, player, willHarvest);
     }
 
@@ -446,8 +448,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             if (isBlockContainer && !tileEntityClass.isInstance(te)) {
                 return false;
             }
-            if (checkAccess(world, player, te))
+            if (checkAccess(world, player, te)) {
                 return true;
+            }
             player.openGui(modBase, getGuiID(), world, x, y, z);
             return true;
         }

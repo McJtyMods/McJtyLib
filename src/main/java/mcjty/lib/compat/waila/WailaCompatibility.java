@@ -31,7 +31,6 @@ public class WailaCompatibility implements IWailaDataProvider {
     private static boolean loaded;
 
     public static void load(IWailaRegistrar registrar) {
-        System.out.println("WailaCompatibility.load");
         if (!registered){
             throw new RuntimeException("Please register this handler using the provided method.");
         }
@@ -44,8 +43,9 @@ public class WailaCompatibility implements IWailaDataProvider {
     }
 
     public static void register(){
-        if (registered)
+        if (registered) {
             return;
+        }
         registered = true;
         FMLInterModComms.sendMessage("Waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
     }

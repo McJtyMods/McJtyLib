@@ -3,6 +3,7 @@ package mcjty.lib.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.tools.PacketBufferTools;
+import mcjty.lib.varia.Logging;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -20,7 +21,7 @@ public class NetworkTools {
             NBTTagCompound nbt = PacketBufferTools.readCompoundTag(buf);
             return FluidStack.loadFluidStackFromNBT(nbt);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logging.logError("Error reading fluid stack", e);
         }
         return null;
     }
@@ -32,7 +33,7 @@ public class NetworkTools {
         try {
             PacketBufferTools.writeCompoundTag(buf, nbt);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logging.logError("Error writing fluid stack", e);
         }
     }
 
@@ -41,7 +42,7 @@ public class NetworkTools {
         try {
             return PacketBufferTools.readCompoundTag(buf);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logging.logError("Error reading tag", e);
         }
         return null;
     }
@@ -51,7 +52,7 @@ public class NetworkTools {
         try {
             PacketBufferTools.writeCompoundTag(buf, tag);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logging.logError("Error writing tag", e);
         }
     }
 
@@ -64,7 +65,7 @@ public class NetworkTools {
             ItemStackTools.setStackSize(stack, buf.readInt());
             return stack;
         } catch (IOException e) {
-            e.printStackTrace();
+            Logging.logError("Error reading item stack", e);
         }
         return ItemStackTools.getEmptyStack();
     }
@@ -78,7 +79,7 @@ public class NetworkTools {
             PacketBufferTools.writeCompoundTag(buf, nbt);
             buf.writeInt(ItemStackTools.getStackSize(itemStack));
         } catch (Exception e) {
-            e.printStackTrace();
+            Logging.logError("Error writing item stack", e);
         }
     }
 
