@@ -1,5 +1,6 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.compat.CompatItemHandlerModifiable;
 import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -11,7 +12,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
  * Works on a ISidedInventory. Uses normal IInventory methods if side == null
  * and otherwise the correct sided api from ISidedInventory
  */
-public class FacedSidedInvWrapper implements IItemHandlerModifiable {
+public class FacedSidedInvWrapper implements CompatItemHandlerModifiable {
     private final ISidedInventory inv;
     private final EnumFacing facing;
 
@@ -182,5 +183,10 @@ public class FacedSidedInvWrapper implements IItemHandlerModifiable {
             int m = Math.min(ItemStackTools.getStackSize(stackInSlot), amount);
             return inv.decrStackSize(slot1, m);
         }
+    }
+
+    @Override
+    public int getSlotMaxLimit() {
+        return 64;
     }
 }

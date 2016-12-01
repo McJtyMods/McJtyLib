@@ -1,16 +1,16 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.compat.CompatItemHandlerModifiable;
 import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 /**
  * Works on a ISidedInventory but just passes null to the side so only
  * one instance is needed for side == null as well as the six sides
  */
-public class NullSidedInvWrapper implements IItemHandlerModifiable {
+public class NullSidedInvWrapper implements CompatItemHandlerModifiable {
     private final ISidedInventory inv;
 
     // This version allows a 'null' facing
@@ -170,5 +170,10 @@ public class NullSidedInvWrapper implements IItemHandlerModifiable {
             int m = Math.min(ItemStackTools.getStackSize(stackInSlot), amount);
             return inv.decrStackSize(slot1, m);
         }
+    }
+
+    @Override
+    public int getSlotMaxLimit() {
+        return 64;
     }
 }
