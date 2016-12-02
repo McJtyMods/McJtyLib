@@ -445,9 +445,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                 return true;
             }
             TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-            if (isBlockContainer && !tileEntityClass.isInstance(te)) {
-                return false;
-            }
+//            if (isBlockContainer && !tileEntityClass.isInstance(te)) {
+//                return false;
+//            }
             if (checkAccess(world, player, te)) {
                 return true;
             }
