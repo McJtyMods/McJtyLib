@@ -538,7 +538,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
      */
     protected void breakAndRemember(World world, EntityPlayer player, BlockPos pos) {
         if (!world.isRemote) {
-            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos), null);
+            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos), ItemStackTools.getEmptyStack());
 //            world.setBlockToAir(x, y, z);
         }
     }

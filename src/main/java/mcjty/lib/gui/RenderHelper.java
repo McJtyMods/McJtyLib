@@ -78,7 +78,7 @@ public class RenderHelper {
         itemRender.zLevel = lvl;
 
         if (itm==null) {
-            return renderItemStack(mc, itemRender, null, x, y, "", highlight);
+            return renderItemStack(mc, itemRender, ItemStackTools.getEmptyStack(), x, y, "", highlight);
         }
         if (itm instanceof Item) {
             return renderItemStack(mc, itemRender, new ItemStack((Item) itm, 1), x, y, "", highlight);
@@ -95,7 +95,7 @@ public class RenderHelper {
         if (itm instanceof TextureAtlasSprite) {
             return renderIcon(mc, itemRender, (TextureAtlasSprite) itm, x, y, highlight);
         }
-        return renderItemStack(mc, itemRender, null, x, y, "", highlight);
+        return renderItemStack(mc, itemRender, ItemStackTools.getEmptyStack(), x, y, "", highlight);
     }
 
     public static boolean renderIcon(Minecraft mc, RenderItem itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
