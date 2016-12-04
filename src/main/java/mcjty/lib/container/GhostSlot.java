@@ -31,6 +31,11 @@ public class GhostSlot extends Slot {
     }
 
     @Override
+    public int getItemStackLimit(ItemStack stack) {
+        return 1;
+    }
+
+    @Override
     public boolean isItemValid(ItemStack stack) {
         return true;
     }

@@ -281,8 +281,18 @@ public class GenericContainer extends Container {
             if (slot.getHasStack()) {
                 slot.putStack(ItemStackTools.getEmptyStack());
             }
+
+            ItemStack clickedWith = player.inventory.getItemStack();
+            if (ItemStackTools.isValid(clickedWith)) {
+                ItemStack copy = clickedWith.copy();
+                ItemStackTools.setStackSize(copy, 1);
+                slot.putStack(copy);
+            }
+            detectAndSendChanges();
+            return ItemStackTools.getEmptyStack();
+        } else {
+            return super.slotClick(index, button, mode, player);
         }
-        return super.slotClick(index, button, mode, player);
     }
 
     // Call this in your detectAndSendChanges() implementation when you find one
