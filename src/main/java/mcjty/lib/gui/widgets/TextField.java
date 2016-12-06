@@ -71,9 +71,11 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            if (keyCode == Keyboard.KEY_RETURN || keyCode == Keyboard.KEY_ESCAPE) {
+            if (keyCode == Keyboard.KEY_RETURN) {
                 fireTextEnterEvents(text);
 //                window.setTextFocus(null);
+                return false;
+            } else if (keyCode == Keyboard.KEY_ESCAPE) {
                 return false;
             } else if (keyCode == Keyboard.KEY_BACK) {
                 if (!text.isEmpty() && cursor > 0) {
