@@ -1,6 +1,6 @@
 [
 {
-  "modid": "mcjtylib",
+  "modid": "mcjtylib_ng",
   "name": "McJtyLib",
   "description": "McJtyLib library for RFTools, Deep Resonance, ...",
   "version": "${version}",
