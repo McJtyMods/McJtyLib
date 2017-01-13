@@ -32,7 +32,7 @@ public class WailaCompatibility implements IWailaDataProvider {
 
     public static void load(IWailaRegistrar registrar) {
         if (!registered){
-            throw new RuntimeException("Please register this handler using the provided method.");
+            throw new RuntimeException("Please register this handler using the provided method");
         }
         if (!loaded) {
             registrar.registerHeadProvider(INSTANCE, GenericBlock.class);
