@@ -469,9 +469,8 @@ public class TrueTypeFont {
                             floatObject.storedY);
                     if (d > 0) totalwidth += (floatObject.width - c) * d;
                 }
-                i += d;
-
             }
+            i += d;
         }
         //Tessellator.getInstance().draw();
         GlStateManager.glEnd();
