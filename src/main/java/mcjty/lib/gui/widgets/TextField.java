@@ -3,13 +3,18 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.TextSpecialKeyEvent;
 import mcjty.lib.gui.events.TextEnterEvent;
 import mcjty.lib.gui.events.TextEvent;
+import mcjty.lib.gui.events.TextSpecialKeyEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +76,18 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            if (keyCode == Keyboard.KEY_RETURN) {
+            if (keyCode == Keyboard.KEY_V && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL))) {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                String data = "";
+                try {
+                    data = (String) clipboard.getData(DataFlavor.stringFlavor);
+                } catch (UnsupportedFlavorException e) {
+                } catch (IOException e) {
+                }
+                text = text.substring(0, cursor) + data + text.substring(cursor);
+                cursor += data.length();
+                fireTextEvents(text);
+            } else if (keyCode == Keyboard.KEY_RETURN) {
                 fireTextEnterEvents(text);
 //                window.setTextFocus(null);
                 return false;
