@@ -1,5 +1,6 @@
 package mcjty.lib.font;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -31,6 +32,8 @@ public class TrueTypeFont {
             ALIGN_LEFT = 0,
             ALIGN_RIGHT = 1,
             ALIGN_CENTER = 2;
+
+
     /**
      * Array that holds necessary information about the font characters
      */
@@ -285,11 +288,11 @@ public class TrueTypeFont {
 
     public float getWidth(String whatchars) {
         float totalwidth = 0;
-        FloatObject floatObject = null;
         int currentChar = 0;
         float lastWidth = -10f;
         for (int i = 0; i < whatchars.length(); i++) {
             currentChar = whatchars.charAt(i);
+            FloatObject floatObject;
             if (currentChar < 256) {
                 floatObject = charArray[currentChar];
             } else {
@@ -362,33 +365,52 @@ public class TrueTypeFont {
     }
 
 
-    public void drawString(float x, float y, String whatchars, float scaleX, float scaleY, float yoffset, float... rgba) {
+    public void drawString(float x, float y, String text, float scaleX, float scaleY, float yoffset, float... rgba) {
         if (rgba.length == 0) rgba = new float[]{1f, 1f, 1f, 1f};
-        drawString(x, y, whatchars, 0, whatchars.length() - 1, scaleX, scaleY, ALIGN_LEFT, yoffset, rgba);
+        drawString(x, y, text, scaleX, scaleY, ALIGN_LEFT, yoffset, rgba);
     }
 
-    public void drawString(float x, float y, String whatchars, float scaleX, float scaleY, int format, float yoffset, float... rgba) {
-        if (rgba.length == 0) rgba = new float[]{1f, 1f, 1f, 1f};
-
-        drawString(x, y, whatchars, 0, whatchars.length() - 1, scaleX, scaleY, format, yoffset, rgba);
-    }
-
-
-    public void drawString(float x, float y, String whatchars, int startIndex, int endIndex, float scaleX, float scaleY, int format, float yoffset, float... rgba) {
+    public void drawString(float x, float y, String text, float scaleX, float scaleY, int format, float yoffset, float... rgba) {
         if (rgba.length == 0) rgba = new float[]{1f, 1f, 1f, 1f};
         GlStateManager.pushMatrix();
         GlStateManager.scale(-scaleX, -scaleY, 1.0f);
         GlStateManager.rotate(180, 0, 1, 0);
         GlStateManager.translate(0, yoffset, 0);
 
-        FloatObject floatObject = null;
+        GlStateManager.bindTexture(fontTextureID);
+        GlStateManager.glBegin(GL11.GL_QUADS);
+
+        int i = text.indexOf(167);
+        while (i != -1 && i + 1 < text.length()) {
+            String left = text.substring(0, i);
+            if (!left.isEmpty()) {
+                drawTextInternal(x, y, left, scaleX, scaleY, format, rgba);
+                x += getWidth(left);
+            }
+            int colorCode = Minecraft.getMinecraft().fontRendererObj.getColorCode(text.charAt(i + 1));//fmt.getColorIndex());
+            if (colorCode != -1) {
+                float r = (colorCode >> 16) / 255.0F;
+                float g = (colorCode >> 8 & 255) / 255.0F;
+                float b = (colorCode & 255) / 255.0F;
+                rgba = new float[]{r, g, b, rgba[3]};
+            }
+            text = text.substring(i+2);
+            i = text.indexOf(167);
+        }
+        drawTextInternal(x, y, text, scaleX, scaleY, format, rgba);
+
+        GlStateManager.glEnd();
+
+        GlStateManager.popMatrix();
+    }
+
+    private void drawTextInternal(float x, float y, String whatchars, float scaleX, float scaleY, int format, float[] rgba) {
         int charCurrent;
 
-
+        int endIndex = whatchars.length() - 1;
         float totalwidth = 0;
-        int i = startIndex, d, c;
+        int i = 0, d, c;
         float startY = 0;
-
 
         switch (format) {
             case ALIGN_RIGHT: {
@@ -402,9 +424,10 @@ public class TrueTypeFont {
                 break;
             }
             case ALIGN_CENTER: {
-                for (int l = startIndex; l <= endIndex; l++) {
+                for (int l = 0; l <= endIndex; l++) {
                     charCurrent = whatchars.charAt(l);
                     if (charCurrent == '\n') break;
+                    FloatObject floatObject;
                     if (charCurrent < 256) {
                         floatObject = charArray[charCurrent];
                     } else {
@@ -422,17 +445,13 @@ public class TrueTypeFont {
             }
 
         }
-//        GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
-        GlStateManager.bindTexture(fontTextureID);
-        //WorldRenderer worldRenderer = Tessellator.getInstance().getWorldRenderer();
-        //worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        GlStateManager.glBegin(GL11.GL_QUADS);
         if (rgba.length == 4)
             //worldRenderer.color(rgba[0], rgba[1], rgba[2], rgba[3]);
             GlStateManager.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-        while (i >= startIndex && i <= endIndex) {
+        while (i >= 0 && i <= endIndex) {
 
             charCurrent = whatchars.charAt(i);
+            FloatObject floatObject;
             if (charCurrent < 256) {
                 floatObject = charArray[charCurrent];
             } else {
@@ -472,11 +491,6 @@ public class TrueTypeFont {
             }
             i += d;
         }
-        //Tessellator.getInstance().draw();
-        GlStateManager.glEnd();
-
-        GlStateManager.popMatrix();
-//        GlStateManager.cullFace(GlStateManager.CullFace.BACK);
     }
 
     public static int loadImage(BufferedImage bufferedImage) {
