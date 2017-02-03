@@ -6,6 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.common.Loader;
 
 public class EnergyTools {
 
@@ -49,11 +50,36 @@ public class EnergyTools {
         return te instanceof IEnergyHandler || (te != null && te.hasCapability(CapabilityEnergy.ENERGY, null));
     }
 
+    private static boolean draconic = false;
+    private static boolean mekanism = false;
+    private static boolean enderio = false;
+
+    private static boolean checkMods = true;
+
+    private static void doCheckMods() {
+        if (checkMods) {
+            draconic = Loader.isModLoaded("draconicevolution");
+            mekanism = Loader.isModLoaded("mekanism") || Loader.isModLoaded("Mekanism");
+            enderio = Loader.isModLoaded("EnderIO") || Loader.isModLoaded("enderio");
+            checkMods = false;
+        }
+    }
+
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
     public static EnergyLevelMulti getEnergyLevelMulti(TileEntity tileEntity) {
         long maxEnergyStored;
         long energyStored;
-        if (tileEntity instanceof IEnergyHandler) {
+        doCheckMods();
+        if (draconic && EnergySupportDraconic.isDraconicEnergyTile(tileEntity)) {
+            maxEnergyStored = EnergySupportDraconic.getMaxEnergy(tileEntity);
+            energyStored = EnergySupportDraconic.getCurrentEnergy(tileEntity);
+        } else if (mekanism && EnergySupportMekanism.isMekanismTileEntity(tileEntity)) {
+            maxEnergyStored = EnergySupportMekanism.getMaxEnergy(tileEntity);
+            energyStored = EnergySupportMekanism.getCurrentEnergy(tileEntity);
+        } else if (enderio && EnergySupportEnderIO.isEnderioTileEntity(tileEntity)) {
+            maxEnergyStored = EnergySupportEnderIO.getMaxEnergy(tileEntity);
+            energyStored = EnergySupportEnderIO.getCurrentEnergy(tileEntity);
+        } else if (tileEntity instanceof IEnergyHandler) {
             IEnergyHandler handler = (IEnergyHandler) tileEntity;
             maxEnergyStored = handler.getMaxEnergyStored(EnumFacing.DOWN);
             energyStored = handler.getEnergyStored(EnumFacing.DOWN);
