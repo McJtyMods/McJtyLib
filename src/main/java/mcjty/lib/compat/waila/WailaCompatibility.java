@@ -1,5 +1,6 @@
 package mcjty.lib.compat.waila;
 
+import mcjty.lib.CompatLayer;
 import mcjty.lib.container.GenericBlock;
 //import mcp.mobius.waila.api.IWailaConfigHandler;
 //import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -47,7 +48,11 @@ public class WailaCompatibility implements IWailaDataProvider {
             return;
         }
         registered = true;
-        FMLInterModComms.sendMessage("Waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
+        if (CompatLayer.isV10()) {
+            FMLInterModComms.sendMessage("Waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
+        } else {
+            FMLInterModComms.sendMessage("waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
+        }
     }
 
     @Override
