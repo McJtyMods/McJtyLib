@@ -44,16 +44,6 @@ public class DumpItemNBT {
     }
 
     // Use client-side
-    public static void dumpItem(@Nullable SimpleNetworkWrapper network, @Nonnull ItemStack item, boolean verbose) {
-        String output = DumpItemNBT.dumpItemNBT(item, verbose);
-        Logging.getLogger().log(Level.INFO, "### Client side ###");
-        Logging.getLogger().log(Level.INFO, output);
-        if (network != null) {
-            network.sendToServer(new PacketDumpItemInfo(item, verbose));
-        }
-    }
-
-    // Use client-side
     public static void dumpHeldItem(@Nullable SimpleNetworkWrapper network, @Nonnull EntityPlayer player, boolean verbose) {
         ItemStack item = player.getHeldItemMainhand();
         if (ItemStackTools.isEmpty(item)) {
@@ -63,7 +53,7 @@ public class DumpItemNBT {
         Logging.getLogger().log(Level.INFO, "### Client side ###");
         Logging.getLogger().log(Level.INFO, output);
         if (network != null) {
-            network.sendToServer(new PacketDumpItemInfo(item, verbose));
+            network.sendToServer(new PacketDumpItemInfo(verbose));
         }
     }
 }

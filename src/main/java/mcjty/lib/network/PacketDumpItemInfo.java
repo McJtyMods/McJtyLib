@@ -1,10 +1,9 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.debugtools.DumpItemNBT;
+import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -17,26 +16,22 @@ import org.apache.logging.log4j.Level;
  */
 public class PacketDumpItemInfo implements IMessage {
 
-    private ItemStack item;
     private boolean verbose;
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        item = NetworkTools.readItemStack(buf);
         verbose = buf.readBoolean();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        NetworkTools.writeItemStack(buf, item);
         buf.writeBoolean(verbose);
     }
 
     public PacketDumpItemInfo() {
     }
 
-    public PacketDumpItemInfo(ItemStack item, boolean verbose) {
-        this.item = item;
+    public PacketDumpItemInfo(boolean verbose) {
         this.verbose = verbose;
     }
 
@@ -48,9 +43,12 @@ public class PacketDumpItemInfo implements IMessage {
         }
 
         private void handle(PacketDumpItemInfo message, MessageContext ctx) {
-            String output = DumpItemNBT.dumpItemNBT(message.item, message.verbose);
-            Logging.getLogger().log(Level.INFO, "### Server side ###");
-            Logging.getLogger().log(Level.INFO, output);
+            ItemStack item = ctx.getServerHandler().playerEntity.getHeldItemMainhand();
+            if (ItemStackTools.isValid(item)) {
+                String output = DumpItemNBT.dumpItemNBT(item, message.verbose);
+                Logging.getLogger().log(Level.INFO, "### Server side ###");
+                Logging.getLogger().log(Level.INFO, output);
+            }
         }
     }
 }
