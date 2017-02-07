@@ -3,6 +3,10 @@ package mcjty.lib.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpBlockNBT;
 import mcjty.lib.varia.Logging;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.UserListOps;
+import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
@@ -52,10 +56,17 @@ public class PacketDumpBlockInfo implements IMessage {
         }
 
         private void handle(PacketDumpBlockInfo message, MessageContext ctx) {
-            World world = DimensionManager.getWorld(message.dimid);
-            String output = DumpBlockNBT.dumpBlockNBT(world, message.pos, message.verbose);
-            Logging.getLogger().log(Level.INFO, "### Server side ###");
-            Logging.getLogger().log(Level.INFO, output);
+            EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            MinecraftServer server = player.getEntityWorld().getMinecraftServer();
+            UserListOps oppedPlayers = server.getPlayerList().getOppedPlayers();
+            UserListOpsEntry entry = oppedPlayers.getEntry(player.getGameProfile());
+            int perm = entry == null ? server.getOpPermissionLevel() : entry.getPermissionLevel();
+            if (perm >= 1) {
+                World world = DimensionManager.getWorld(message.dimid);
+                String output = DumpBlockNBT.dumpBlockNBT(world, message.pos, message.verbose);
+                Logging.getLogger().log(Level.INFO, "### Server side ###");
+                Logging.getLogger().log(Level.INFO, output);
+            }
         }
     }
 }
