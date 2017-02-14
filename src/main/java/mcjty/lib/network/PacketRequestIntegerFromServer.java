@@ -53,7 +53,7 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand {
         }
 
         private void handle(PacketRequestIntegerFromServer message, MessageContext ctx) {
-            TileEntity te = ctx.getServerHandler().playerEntity.getEntityWorld().getTileEntity(message.pos);
+            TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             if(!(te instanceof CommandHandler)) {
                 Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                 return;
@@ -65,7 +65,7 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand {
                 return;
             }
 
-            sendReplyToClient(message, result, ctx.getServerHandler().playerEntity);
+            sendReplyToClient(message, result, ctx.getServerHandler().player);
        }
 
         private void sendReplyToClient(PacketRequestIntegerFromServer message, Integer result, EntityPlayerMP player) {

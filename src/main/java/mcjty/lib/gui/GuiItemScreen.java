@@ -74,13 +74,13 @@ public class GuiItemScreen extends GuiScreen {
         if (tooltips != null) {
             int x = Mouse.getEventX() * width / mc.displayWidth;
             int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-            drawHoveringText(tooltips, x-guiLeft, y-guiTop, mc.fontRendererObj);
+            drawHoveringText(tooltips, x-guiLeft, y-guiTop, mc.fontRenderer);
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
             int x = Mouse.getEventX() * width / mc.displayWidth;
             int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
-            drawHoveringText(tooltips, x - guiLeft, y - guiTop, mc.fontRendererObj);
+            drawHoveringText(tooltips, x - guiLeft, y - guiTop, mc.fontRenderer);
         }
     }
 

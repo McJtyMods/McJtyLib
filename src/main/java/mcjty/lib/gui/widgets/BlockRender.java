@@ -122,9 +122,9 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 } else {
                     name = "";
                 }
-                int h = mc.fontRendererObj.FONT_HEIGHT;
+                int h = mc.fontRenderer.FONT_HEIGHT;
                 int dy = (bounds.height - h)/2;
-                mc.fontRendererObj.drawString(name, xx+20, yy + dy, labelColor);
+                mc.fontRenderer.drawString(name, xx+20, yy + dy, labelColor);
             }
         }
     }

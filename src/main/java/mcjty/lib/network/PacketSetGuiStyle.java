@@ -41,7 +41,7 @@ public class PacketSetGuiStyle implements IMessage {
         }
 
         private void handle(PacketSetGuiStyle message, MessageContext ctx) {
-            EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
 
             PreferencesProperties properties = McJtyLib.getPreferencesProperties(playerEntity);
             properties.setStyle(message.style);

@@ -52,7 +52,7 @@ public class PacketUpdateNBTItemInventory implements IMessage {
         }
 
         private void handle(PacketUpdateNBTItemInventory message, MessageContext ctx) {
-            World world = ctx.getServerHandler().playerEntity.getEntityWorld();
+            World world = ctx.getServerHandler().player.getEntityWorld();
             TileEntity te = world.getTileEntity(message.pos);
             if (te instanceof IInventory) {
                 IInventory inv = (IInventory) te;

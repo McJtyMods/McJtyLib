@@ -108,7 +108,7 @@ public class WindowManager {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 GenericGuiContainer gui = (GenericGuiContainer) this.gui;
-                gui.drawHoveringText(tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.mc.fontRendererObj);
+                gui.drawHoveringText(tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.mc.fontRenderer);
             }
         });
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();

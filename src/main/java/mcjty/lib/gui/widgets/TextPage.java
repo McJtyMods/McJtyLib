@@ -261,7 +261,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);
+        mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);
     }
 
     private void renderLine(int x, int y, Line line) {
@@ -280,7 +280,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);
+        mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);
     }
 
     private int renderRecipe(int x, int y, Line line) {

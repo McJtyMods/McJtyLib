@@ -51,7 +51,7 @@ public class HudRenderHelper {
         GlStateManager.disableBlend();
         GlStateManager.disableLighting();
 
-        renderText(Minecraft.getMinecraft().fontRendererObj, messages, 11, scale);
+        renderText(Minecraft.getMinecraft().fontRenderer, messages, 11, scale);
         Minecraft.getMinecraft().entityRenderer.enableLightmap();
 
 //        RenderHelper.enableStandardItemLighting();

@@ -39,7 +39,7 @@ public class PacketServerCommand extends AbstractServerCommand {
         }
 
         private void handle(PacketServerCommand message, MessageContext ctx) {
-            EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             World world;
             if (message.dimensionId == null) {
                 world = playerEntity.getEntityWorld();

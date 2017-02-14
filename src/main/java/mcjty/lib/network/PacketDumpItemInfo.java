@@ -47,7 +47,7 @@ public class PacketDumpItemInfo implements IMessage {
         }
 
         private void handle(PacketDumpItemInfo message, MessageContext ctx) {
-            EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            EntityPlayerMP player = ctx.getServerHandler().player;
             MinecraftServer server = player.getEntityWorld().getMinecraftServer();
             UserListOps oppedPlayers = server.getPlayerList().getOppedPlayers();
             UserListOpsEntry entry = oppedPlayers.getEntry(player.getGameProfile());

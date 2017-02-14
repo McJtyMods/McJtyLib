@@ -52,7 +52,7 @@ public class PacketUpdateNBTItem implements IMessage {
         }
 
         private void handle(PacketUpdateNBTItem message, MessageContext ctx) {
-            EntityPlayerMP playerEntity = ctx.getServerHandler().playerEntity;
+            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
             ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
             if (ItemStackTools.isEmpty(heldItem)) {
                 return;

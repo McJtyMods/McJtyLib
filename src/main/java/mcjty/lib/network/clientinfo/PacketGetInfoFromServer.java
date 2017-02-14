@@ -50,8 +50,8 @@ public class PacketGetInfoFromServer implements IMessage {
         @Override
         public IMessage onMessage(PacketGetInfoFromServer message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(()
-                    -> message.packet.onMessageServer(ctx.getServerHandler().playerEntity)
-                    .ifPresent(p -> sendReplyToClient(message.modid, p, ctx.getServerHandler().playerEntity)));
+                    -> message.packet.onMessageServer(ctx.getServerHandler().player)
+                    .ifPresent(p -> sendReplyToClient(message.modid, p, ctx.getServerHandler().player)));
             return null;
         }
 

@@ -135,7 +135,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private int calculateVerticalOffset() {
-        int h = mc.fontRendererObj.FONT_HEIGHT;
+        int h = mc.fontRenderer.FONT_HEIGHT;
         return (bounds.height - h)/2;
     }
 
@@ -143,10 +143,10 @@ public class TextField extends AbstractWidget<TextField> {
         if (cursor < startOffset) {
             startOffset = cursor;
         } else {
-            int w = mc.fontRendererObj.getStringWidth(text.substring(startOffset, cursor));
+            int w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
             while (w > bounds.width-12) {
                 startOffset++;
-                w = mc.fontRendererObj.getStringWidth(text.substring(startOffset, cursor));
+                w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
             }
         }
     }
@@ -172,16 +172,16 @@ public class TextField extends AbstractWidget<TextField> {
 
         if (isEnabled()) {
             if (isEditable()) {
-                mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff000000);
+                mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff000000);
             } else {
-                mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff333333);
+                mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff333333);
             }
         } else {
-            mc.fontRendererObj.drawString(mc.fontRendererObj.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xffa0a0a0);
+            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xffa0a0a0);
         }
 
         if (window.getTextFocus() == this) {
-            int w = mc.fontRendererObj.getStringWidth(text.substring(startOffset, cursor));
+            int w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
             Gui.drawRect(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }

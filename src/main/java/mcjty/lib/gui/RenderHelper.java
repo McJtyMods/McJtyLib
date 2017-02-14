@@ -196,8 +196,8 @@ public class RenderHelper {
             net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
             OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
             itemRender.renderItemAndEffectIntoGUI(itm, x, y);
-            renderItemOverlayIntoGUI(mc.fontRendererObj, itm, x, y, txt, txt.length() - 2);
-//            itemRender.renderItemOverlayIntoGUI(mc.fontRendererObj, itm, x, y, txt);
+            renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt, txt.length() - 2);
+//            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
             GlStateManager.popMatrix();
             GlStateManager.disableRescaleNormal();
             GlStateManager.disableLighting();
