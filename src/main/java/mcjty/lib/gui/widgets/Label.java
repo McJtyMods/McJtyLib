@@ -16,6 +16,9 @@ public class Label<P extends Label> extends AbstractWidget<P> {
     private VerticalAlignment verticalAlignment = VerticalAlignment.ALIGN_CENTER;
     private boolean dynamic = false;        // The size of this label is dynamic and not based on the contents
 
+    private int txtDx = 0;
+    private int txtDy = 0;
+
     public Label(Minecraft mc, Gui gui) {
         super(mc, gui);
     }
@@ -59,6 +62,12 @@ public class Label<P extends Label> extends AbstractWidget<P> {
 
     public P setText(String text) {
         this.text = text;
+        return (P) this;
+    }
+
+    public P setTextOffset(int ox, int oy) {
+        txtDx = ox;
+        txtDy = oy;
         return (P) this;
     }
 
@@ -109,8 +118,8 @@ public class Label<P extends Label> extends AbstractWidget<P> {
         }
         super.draw(window, x, y);
 
-        int dx = calculateHorizontalOffset() + offsetx;
-        int dy = calculateVerticalOffset() + offsety;
+        int dx = calculateHorizontalOffset() + offsetx + txtDx;
+        int dy = calculateVerticalOffset() + offsety + txtDy;
 
         int col = color;
         if (!isEnabled()) {
