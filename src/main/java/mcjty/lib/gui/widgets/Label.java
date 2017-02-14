@@ -24,6 +24,8 @@ public class Label<P extends Label> extends AbstractWidget<P> {
     private ResourceLocation image = null;
     private int u;
     private int v;
+    private int iw;
+    private int ih;
 
 
     public Label(Minecraft mc, Gui gui) {
@@ -34,10 +36,12 @@ public class Label<P extends Label> extends AbstractWidget<P> {
         return image;
     }
 
-    public P setImage(ResourceLocation image, int u, int v) {
+    public P setImage(ResourceLocation image, int u, int v, int iw, int ih) {
         this.image = image;
         this.u = u;
         this.v = v;
+        this.iw = iw;
+        this.ih = ih;
         return (P) this;
     }
 
@@ -142,9 +146,9 @@ public class Label<P extends Label> extends AbstractWidget<P> {
         if (image != null) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(image);
-            int xx = x + bounds.x;
-            int yy = y + bounds.y;
-            gui.drawTexturedModalRect(xx, yy, u, v, bounds.width, bounds.height);
+            int xx = x + bounds.x + (bounds.width-iw) / 2;
+            int yy = y + bounds.y + (bounds.height-ih) / 2;
+            gui.drawTexturedModalRect(xx, yy, u, v, iw, ih);
         }
 
         int col = color;
