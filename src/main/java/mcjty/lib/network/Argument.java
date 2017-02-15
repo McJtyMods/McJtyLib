@@ -1,5 +1,6 @@
 package mcjty.lib.network;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
 public class Argument {
@@ -33,6 +34,10 @@ public class Argument {
         this(name, ArgumentType.TYPE_BOOLEAN, value);
     }
 
+    public Argument(String name, ItemStack value) {
+        this(name, ArgumentType.TYPE_STACK, value);
+    }
+
     public String getName() {
         return name;
     }
@@ -60,6 +65,8 @@ public class Argument {
     public BlockPos getCoordinate() {
         return (BlockPos) value;
     }
+
+    public ItemStack getStack() {return (ItemStack) value; }
 
     public boolean getBoolean() {
         return (Boolean) value;
