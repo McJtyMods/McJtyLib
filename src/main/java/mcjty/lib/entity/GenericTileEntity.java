@@ -56,6 +56,12 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         }
     }
 
+    public void markDirtyQuick() {
+        if (getWorld() != null) {
+            getWorld().markChunkDirty(this.pos, this);
+        }
+    }
+
     @Override
     public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
         return oldState.getBlock() != newSate.getBlock();
