@@ -599,11 +599,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     public static EnumFacing getFacingHoriz(int meta) {
-        return EnumFacing.values()[meta+2];
+        return EnumFacing.VALUES[meta+2];
     }
 
     public static EnumFacing getFacing(int meta) {
-        return EnumFacing.values()[meta & 7];
+        return EnumFacing.VALUES[meta & 7];
     }
 
     @Override
