@@ -104,7 +104,12 @@ public class TextPage extends AbstractWidget<TextPage> {
         TextPage.Page page = new TextPage.Page();
         try {
             IResourceManager resourceManager = mc.getResourceManager();
-            IResource iresource = resourceManager.getResource(manualResource);
+            IResource iresource;
+            try {
+                iresource = resourceManager.getResource(manualResource);
+            } catch (Exception e) {
+                iresource = resourceManager.getResource(new ResourceLocation(manualResource.getResourceDomain(), "text/manual.txt"));
+            }
             InputStream inputstream = iresource.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, "UTF-8"));
             String line = br.readLine();
