@@ -108,7 +108,8 @@ public class TextPage extends AbstractWidget<TextPage> {
             try {
                 iresource = resourceManager.getResource(manualResource);
             } catch (Exception e) {
-                iresource = resourceManager.getResource(new ResourceLocation(manualResource.getResourceDomain(), "text/manual.txt"));
+                String fallBackPath = manualResource.getResourcePath().replaceAll("-([a-z\\-]{2,6})_?([a-z]{0,3})", "");
+                iresource = resourceManager.getResource(new ResourceLocation(manualResource.getResourceDomain(), fallBackPath));
             }
             InputStream inputstream = iresource.getInputStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, "UTF-8"));
