@@ -247,10 +247,18 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return currenttip;
     }
 
+    @Override
+    public void clAddInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+        addInformation(stack, playerIn, tooltip, advanced);
+    }
 
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack itemStack, EntityPlayer player, List<String> list, boolean advancedToolTip) {
+        intAddInformation(itemStack, list);
+    }
+
+    private void intAddInformation(ItemStack itemStack, List<String> list) {
         NBTTagCompound tagCompound = itemStack.getTagCompound();
         if (tagCompound != null) {
             if (tagCompound.hasKey("Energy")) {

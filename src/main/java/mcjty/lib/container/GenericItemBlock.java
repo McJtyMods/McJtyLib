@@ -17,9 +17,8 @@ public class GenericItemBlock extends CompatItemBlock {
 
 
     @Override
-    public void addInformation(ItemStack itemStack, EntityPlayer player, List<String> list, boolean advancedToolTip) {
-//        super.addInformation(itemStack, player, list, advancedToolTip);
-        genericBlock.addInformation(itemStack, player, list, advancedToolTip);
+    public void clAddInformation(ItemStack itemStack, EntityPlayer player, List<String> list, boolean advancedToolTip) {
+        genericBlock.clAddInformation(itemStack, player, list, advancedToolTip);
     }
 
 }
