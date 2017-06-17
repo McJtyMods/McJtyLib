@@ -5,7 +5,6 @@ import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.typed.Type;
@@ -189,7 +188,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         NBTTagList bufferTagList = tagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < bufferTagList.tagCount() ; i++) {
             NBTTagCompound nbtTagCompound = bufferTagList.getCompoundTagAt(i);
-            inventoryHelper.setStackInSlot(i, ItemStackTools.loadFromNBT(nbtTagCompound));
+            inventoryHelper.setStackInSlot(i, new ItemStack(nbtTagCompound));
         }
     }
 
@@ -230,7 +229,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         for (int i = 0 ; i < inventoryHelper.getCount() ; i++) {
             ItemStack stack = inventoryHelper.getStackInSlot(i);
             NBTTagCompound nbtTagCompound = new NBTTagCompound();
-            if (ItemStackTools.isValid(stack)) {
+            if (!stack.isEmpty()) {
                 stack.writeToNBT(nbtTagCompound);
             }
             bufferTagList.appendTag(nbtTagCompound);

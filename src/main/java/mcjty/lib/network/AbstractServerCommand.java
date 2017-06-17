@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.tools.ItemStackTools;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
@@ -77,7 +77,7 @@ public class AbstractServerCommand implements IMessage {
                         if (buf.readBoolean()) {
                             args.put(key, new Argument(key, NetworkTools.readItemStack(buf)));
                         } else {
-                            args.put(key, new Argument(key, ItemStackTools.getEmptyStack()));
+                            args.put(key, new Argument(key, ItemStack.EMPTY));
                         }
                         break;
                 }
@@ -121,7 +121,7 @@ public class AbstractServerCommand implements IMessage {
                         buf.writeDouble(arg.getDouble());
                         break;
                     case TYPE_STACK:
-                        if (ItemStackTools.isEmpty(arg.getStack())) {
+                        if (arg.getStack().isEmpty()) {
                             buf.writeBoolean(false);
                         } else {
                             buf.writeBoolean(true);

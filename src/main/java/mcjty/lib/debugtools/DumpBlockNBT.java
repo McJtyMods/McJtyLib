@@ -65,7 +65,7 @@ public class DumpBlockNBT {
         Vec3d start = player.getPositionEyes(1.0f);
         Vec3d vec31 = player.getLook(1.0f);
         float dist = 20;
-        Vec3d end = start.addVector(vec31.xCoord * dist, vec31.yCoord * dist, vec31.zCoord * dist);
+        Vec3d end = start.addVector(vec31.x * dist, vec31.y * dist, vec31.z * dist);
         RayTraceResult result = player.getEntityWorld().rayTraceBlocks(start, end, liquids);
         if (result == null || result.typeOfHit != RayTraceResult.Type.BLOCK) {
             return;

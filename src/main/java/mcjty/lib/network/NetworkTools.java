@@ -1,8 +1,6 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.tools.ItemStackTools;
-import mcjty.lib.tools.PacketBufferTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,7 +16,7 @@ public class NetworkTools {
     public static FluidStack readFluidStack(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
         try {
-            NBTTagCompound nbt = PacketBufferTools.readCompoundTag(buf);
+            NBTTagCompound nbt = buf.readCompoundTag();
             return FluidStack.loadFluidStackFromNBT(nbt);
         } catch (IOException e) {
             Logging.logError("Error reading fluid stack", e);
@@ -31,7 +29,7 @@ public class NetworkTools {
         NBTTagCompound nbt = new NBTTagCompound();
         fluidStack.writeToNBT(nbt);
         try {
-            PacketBufferTools.writeCompoundTag(buf, nbt);
+            buf.writeCompoundTag(nbt);
         } catch (Exception e) {
             Logging.logError("Error writing fluid stack", e);
         }
@@ -40,7 +38,7 @@ public class NetworkTools {
     public static NBTTagCompound readTag(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
         try {
-            return PacketBufferTools.readCompoundTag(buf);
+            return buf.readCompoundTag();
         } catch (IOException e) {
             Logging.logError("Error reading tag", e);
         }
@@ -50,7 +48,7 @@ public class NetworkTools {
     public static void writeTag(ByteBuf dataOut, NBTTagCompound tag) {
         PacketBuffer buf = new PacketBuffer(dataOut);
         try {
-            PacketBufferTools.writeCompoundTag(buf, tag);
+            buf.writeCompoundTag(tag);
         } catch (Exception e) {
             Logging.logError("Error writing tag", e);
         }
@@ -60,14 +58,19 @@ public class NetworkTools {
     public static ItemStack readItemStack(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
         try {
-            NBTTagCompound nbt = PacketBufferTools.readCompoundTag(buf);
-            ItemStack stack = ItemStackTools.loadFromNBT(nbt);
-            ItemStackTools.setStackSize(stack, buf.readInt());
+            NBTTagCompound nbt = buf.readCompoundTag();
+            ItemStack stack = new ItemStack(nbt);
+            int amount = buf.readInt();
+            if (amount <= 0) {
+                stack.setCount(0);
+            } else {
+                stack.setCount(amount);
+            }
             return stack;
         } catch (IOException e) {
             Logging.logError("Error reading item stack", e);
         }
-        return ItemStackTools.getEmptyStack();
+        return ItemStack.EMPTY;
     }
 
     /// This function supports itemstacks with more then 64 items.
@@ -76,8 +79,8 @@ public class NetworkTools {
         NBTTagCompound nbt = new NBTTagCompound();
         itemStack.writeToNBT(nbt);
         try {
-            PacketBufferTools.writeCompoundTag(buf, nbt);
-            buf.writeInt(ItemStackTools.getStackSize(itemStack));
+            buf.writeCompoundTag(nbt);
+            buf.writeInt(itemStack.getCount());
         } catch (Exception e) {
             Logging.logError("Error writing item stack", e);
         }

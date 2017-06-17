@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -13,10 +12,8 @@ import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
@@ -302,16 +299,17 @@ public class TextPage extends AbstractWidget<TextPage> {
         for (int i = 0 ; i < 3 ; i++) {
             for (int j = 0 ; j < 3 ; j++) {
                 if (i < shapedRecipes.recipeWidth && j < shapedRecipes.recipeHeight) {
-                    ItemStack stack = shapedRecipes.recipeItems[i + j * shapedRecipes.recipeWidth];
-                    if (stack != null && stack.getItemDamage() == 32767) {
-                        // Just pick 0 here.
-                        NBTTagCompound tc = stack.getTagCompound();
-                        stack = new ItemStack(stack.getItem(), ItemStackTools.getStackSize(stack), 0);
-                        if (tc != null) {
-                            stack.setTagCompound(tc.copy());
-                        }
-                    }
-                    RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
+                    // @todo
+//                    ItemStack stack = shapedRecipes.recipeItems[i + j * shapedRecipes.recipeWidth];
+//                    if (stack != null && stack.getItemDamage() == 32767) {
+//                        // Just pick 0 here.
+//                        NBTTagCompound tc = stack.getTagCompound();
+//                        stack = new ItemStack(stack.getItem(), ItemStackTools.getStackSize(stack), 0);
+//                        if (tc != null) {
+//                            stack.setTagCompound(tc.copy());
+//                        }
+//                    }
+//                    RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
                 }
             }
         }
@@ -484,15 +482,16 @@ public class TextPage extends AbstractWidget<TextPage> {
         if (item == null) {
             return null;
         }
-        List<IRecipe> recipes = CraftingManager.getInstance().getRecipeList();
-        for (IRecipe recipe : recipes) {
-            if (recipe instanceof ShapedRecipes) {
-                ItemStack recipeOutput = recipe.getRecipeOutput();
-                if (ItemStackTools.isValid(recipeOutput) && recipeOutput.isItemEqual(item)) {
-                    return recipe;
-                }
-            }
-        }
+        //@todo
+//        List<IRecipe> recipes = CraftingManager.getInstance().getRecipeList();
+//        for (IRecipe recipe : recipes) {
+//            if (recipe instanceof ShapedRecipes) {
+//                ItemStack recipeOutput = recipe.getRecipeOutput();
+//                if (ItemStackTools.isValid(recipeOutput) && recipeOutput.isItemEqual(item)) {
+//                    return recipe;
+//                }
+//            }
+//        }
         return null;
     }
 

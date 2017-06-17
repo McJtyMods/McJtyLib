@@ -2,7 +2,6 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpItemNBT;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -54,7 +53,7 @@ public class PacketDumpItemInfo implements IMessage {
             int perm = entry == null ? server.getOpPermissionLevel() : entry.getPermissionLevel();
             if (perm >= 1) {
                 ItemStack item = player.getHeldItemMainhand();
-                if (ItemStackTools.isValid(item)) {
+                if (!item.isEmpty()) {
                     String output = DumpItemNBT.dumpItemNBT(item, message.verbose);
                     Logging.getLogger().log(Level.INFO, "### Server side ###");
                     Logging.getLogger().log(Level.INFO, output);

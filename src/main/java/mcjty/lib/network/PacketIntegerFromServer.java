@@ -1,7 +1,6 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.tools.MinecraftTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
@@ -61,7 +60,7 @@ public class PacketIntegerFromServer implements IMessage {
         }
 
         private void handle(PacketIntegerFromServer message, MessageContext ctx) {
-            TileEntity te = MinecraftTools.getWorld(Minecraft.getMinecraft()).getTileEntity(message.pos);
+            TileEntity te = Minecraft.getMinecraft().world.getTileEntity(message.pos);
             if(!(te instanceof ClientCommandHandler)) {
                 Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
                 return;

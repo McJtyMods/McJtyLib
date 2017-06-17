@@ -1,8 +1,8 @@
 package mcjty.lib.gui;
 
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
@@ -14,7 +14,7 @@ public class RenderGlowEffect {
      * for glowing should be bound before calling this.
      */
     public static void renderGlow(Tessellator tessellator, double x, double y, double z) {
-        VertexBuffer buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.getBuffer();
         GlStateManager.pushMatrix();
         GlStateManager.translate(x, y, z);
 
@@ -44,7 +44,7 @@ public class RenderGlowEffect {
             new Quad(new Vt(1, 0, 0), new Vt(1, 1, 0), new Vt(1, 1, 1), new Vt(1, 0, 1)),       // EAST
     };
 
-    public static void addSideFullTexture(VertexBuffer buffer, int side, float mult, float offset) {
+    public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset) {
         int brightness = 240;
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;

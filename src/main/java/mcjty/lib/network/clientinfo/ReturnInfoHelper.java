@@ -2,7 +2,6 @@ package mcjty.lib.network.clientinfo;
 
 
 
-import mcjty.lib.tools.MinecraftTools;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -11,6 +10,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ReturnInfoHelper {
     public static void onMessageFromServer(PacketReturnInfoToClient message) {
         Minecraft.getMinecraft().addScheduledTask(() -> message.getPacket().onMessageClient(
-                MinecraftTools.getPlayer(Minecraft.getMinecraft())));
+                Minecraft.getMinecraft().player));
     }
 }

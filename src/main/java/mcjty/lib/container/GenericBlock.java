@@ -8,11 +8,9 @@ import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.api.smartwrench.SmartWrenchMode;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.compat.CompatBlock;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
@@ -25,11 +23,15 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -41,6 +43,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
@@ -52,13 +56,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public abstract class GenericBlock<T extends GenericTileEntity, C extends Container>
-        extends CompatBlock
+public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends Block
         implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider, IRedstoneConnectable {
 
     public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -69,6 +74,14 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private final Class<? extends C> containerClass;
 
     private boolean creative;
+
+    public static boolean activateBlock(Block block, World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        return block.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
+    }
+
+    public static Collection<IProperty<?>> getPropertyKeys(IBlockState state) {
+        return state.getPropertyKeys();
+    }
 
     private void init(ModBase mod, boolean isContainer) {
         this.modBase = mod;
@@ -162,13 +175,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return getRedstoneOutput(state, world, pos, side);
     }
 
-    @Override
-    protected void clOnNeighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn) {
-        if (needsRedstoneCheck()) {
-            checkRedstone(world, pos);
-        }
-    }
-
     public void setCreative(boolean creative) {
         this.creative = creative;
     }
@@ -247,15 +253,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return currenttip;
     }
 
-    @Override
-    public void clAddInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
-        addInformation(stack, playerIn, tooltip, advanced);
-    }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack itemStack, EntityPlayer player, List<String> list, boolean advancedToolTip) {
-        intAddInformation(itemStack, list);
+    public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced) {
+        intAddInformation(stack, tooltip);
     }
 
     private void intAddInformation(ItemStack itemStack, List<String> list) {
@@ -341,7 +343,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private WrenchUsage testWrenchUsage(BlockPos pos, EntityPlayer player) {
         ItemStack itemStack = player.getHeldItem(EnumHand.MAIN_HAND);
         WrenchUsage wrenchUsed = WrenchUsage.NOT;
-        if (ItemStackTools.isValid(itemStack)) {
+        if (!itemStack.isEmpty()) {
             Item item = itemStack.getItem();
             if (item != null) {
                 wrenchUsed = getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
@@ -388,7 +390,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    protected boolean clOnBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack heldItem = player.getHeldItem(hand);
         if (handleModule(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)) {
             return true;
@@ -410,7 +412,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     public boolean handleModule(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (ItemStackTools.isValid(heldItem)) {
+        if (!heldItem.isEmpty()) {
             IModuleSupport support = getModuleSupport();
             if (support != null) {
                 if (support.isModule(heldItem)) {
@@ -546,7 +548,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
      */
     protected void breakAndRemember(World world, EntityPlayer player, BlockPos pos) {
         if (!world.isRemote) {
-            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos), ItemStackTools.getEmptyStack());
+            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos), ItemStack.EMPTY);
 //            world.setBlockToAir(x, y, z);
         }
     }
@@ -695,5 +697,4 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         // @todo, security system from RFTools should be accessed here
         return false;
     }
-
 }

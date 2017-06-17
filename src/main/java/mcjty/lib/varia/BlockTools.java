@@ -1,6 +1,5 @@
 package mcjty.lib.varia;
 
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -176,27 +175,28 @@ public class BlockTools {
         for (int i = 0; i < inventory.getSizeInventory(); ++i) {
             ItemStack itemstack = inventory.getStackInSlot(i);
             spawnItemStack(world, x, y, z, itemstack);
-            inventory.setInventorySlotContents(i, ItemStackTools.getEmptyStack());
+            inventory.setInventorySlotContents(i, ItemStack.EMPTY);
         }
         //TODO: What was this?
         //world.func_147453_f(x, y, z, block);
     }
 
     public static void spawnItemStack(World world, int x, int y, int z, ItemStack itemstack) {
-        if (ItemStackTools.isValid(itemstack)) {
+        if (!itemstack.isEmpty()) {
             float f = random.nextFloat() * 0.8F + 0.1F;
             float f1 = random.nextFloat() * 0.8F + 0.1F;
             EntityItem entityitem;
 
             float f2 = random.nextFloat() * 0.8F + 0.1F;
-            while (ItemStackTools.getStackSize(itemstack) > 0) {
+            while (itemstack.getCount() > 0) {
                 int j = random.nextInt(21) + 10;
 
-                if (j > ItemStackTools.getStackSize(itemstack)) {
-                    j = ItemStackTools.getStackSize(itemstack);
+                if (j > itemstack.getCount()) {
+                    j = itemstack.getCount();
                 }
 
-                ItemStackTools.incStackSize(itemstack, -j);
+                int amount = -j;
+                itemstack.grow(amount);
                 entityitem = new EntityItem(world, (x + f), (y + f1), (z + f2), new ItemStack(itemstack.getItem(), j, itemstack.getItemDamage()));
                 float f3 = 0.05F;
                 entityitem.motionX = ((float)random.nextGaussian() * f3);
@@ -204,9 +204,9 @@ public class BlockTools {
                 entityitem.motionZ = ((float)random.nextGaussian() * f3);
 
                 if (itemstack.hasTagCompound()) {
-                    entityitem.getEntityItem().setTagCompound(itemstack.getTagCompound().copy());
+                    entityitem.getItem().setTagCompound(itemstack.getTagCompound().copy());
                 }
-                mcjty.lib.tools.WorldTools.spawnEntity(world, entityitem);
+                world.spawnEntity(entityitem);
             }
         }
     }

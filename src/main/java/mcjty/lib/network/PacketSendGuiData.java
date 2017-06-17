@@ -2,7 +2,6 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.entity.GenericTileEntity;
-import mcjty.lib.tools.MinecraftTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
@@ -117,7 +116,7 @@ public class PacketSendGuiData implements IMessage {
         }
 
         private void handle(PacketSendGuiData message, MessageContext ctx) {
-            WorldClient world = MinecraftTools.getWorld(Minecraft.getMinecraft());
+            WorldClient world = Minecraft.getMinecraft().world;
             if (world.provider.getDimension() == message.dimId) {
                 TileEntity te = world.getTileEntity(message.pos);
                 if (te instanceof GenericTileEntity) {

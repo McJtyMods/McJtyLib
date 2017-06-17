@@ -2,7 +2,6 @@ package mcjty.lib.debugtools;
 
 import com.google.gson.*;
 import mcjty.lib.network.PacketDumpItemInfo;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -16,7 +15,7 @@ import javax.annotation.Nullable;
 public class DumpItemNBT {
 
     public static String dumpItemNBT(@Nonnull ItemStack item, boolean verbose) {
-        if (ItemStackTools.isEmpty(item)) {
+        if (item.isEmpty()) {
             return "<null>";
         }
 
@@ -46,7 +45,7 @@ public class DumpItemNBT {
     // Use client-side
     public static void dumpHeldItem(@Nullable SimpleNetworkWrapper network, @Nonnull EntityPlayer player, boolean verbose) {
         ItemStack item = player.getHeldItemMainhand();
-        if (ItemStackTools.isEmpty(item)) {
+        if (item.isEmpty()) {
             return;
         }
         String output = DumpItemNBT.dumpItemNBT(item, verbose);

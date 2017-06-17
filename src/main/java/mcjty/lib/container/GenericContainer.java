@@ -2,8 +2,6 @@ package mcjty.lib.container;
 
 import com.google.common.collect.Range;
 import mcjty.lib.network.PacketSendGuiData;
-import mcjty.lib.tools.InventoryTools;
-import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -39,7 +37,7 @@ public class GenericContainer extends Container {
     @Override
     public boolean canInteractWith(EntityPlayer entityPlayer) {
         for (IInventory inventory : inventories.values()) {
-            if (!InventoryTools.isUsable(entityPlayer, inventory)) {
+            if (!inventory.isUsableByPlayer(entityPlayer)) {
                 return false;
             }
         }
@@ -130,7 +128,7 @@ public class GenericContainer extends Container {
 
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int index) {
-        ItemStack itemstack = ItemStackTools.getEmptyStack();
+        ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
         if (slot != null && slot.getHasStack()) {
@@ -140,7 +138,7 @@ public class GenericContainer extends Container {
             if (factory.isSpecificItemSlot(index)) {
                 if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERINV, true)) {
                     if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERHOTBAR, false)) {
-                        return ItemStackTools.getEmptyStack();
+                        return ItemStack.EMPTY;
                     }
                 }
                 slot.onSlotChange(origStack, itemstack);
@@ -148,18 +146,18 @@ public class GenericContainer extends Container {
                 if (!mergeItemStacks(origStack, index, SlotType.SLOT_SPECIFICITEM, false)) {
                     if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERINV, true)) {
                         if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERHOTBAR, false)) {
-                            return ItemStackTools.getEmptyStack();
+                            return ItemStack.EMPTY;
                         }
                     }
                 }
                 slot.onSlotChange(origStack, itemstack);
             } else if (factory.isGhostSlot(index) || factory.isGhostOutputSlot(index)) {
-                return ItemStackTools.getEmptyStack();
+                return ItemStack.EMPTY;
             } else if (factory.isPlayerInventorySlot(index)) {
                 if (!mergeItemStacks(origStack, index, SlotType.SLOT_SPECIFICITEM, false)) {
                     if (!mergeItemStacks(origStack, index, SlotType.SLOT_INPUT, false)) {
                         if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERHOTBAR, false)) {
-                            return ItemStackTools.getEmptyStack();
+                            return ItemStack.EMPTY;
                         }
                     }
                 }
@@ -167,7 +165,7 @@ public class GenericContainer extends Container {
                 if (!mergeItemStacks(origStack, index, SlotType.SLOT_SPECIFICITEM, false)) {
                     if (!mergeItemStacks(origStack, index, SlotType.SLOT_INPUT, false)) {
                         if (!mergeItemStacks(origStack, index, SlotType.SLOT_PLAYERINV, false)) {
-                            return ItemStackTools.getEmptyStack();
+                            return ItemStack.EMPTY;
                         }
                     }
                 }
@@ -175,17 +173,17 @@ public class GenericContainer extends Container {
                 Logging.log("Weird slot at index: " + index);
             }
 
-            if (ItemStackTools.isEmpty(origStack)) {
-                slot.putStack(ItemStackTools.getEmptyStack());
+            if (origStack.isEmpty()) {
+                slot.putStack(ItemStack.EMPTY);
             } else {
                 slot.onSlotChanged();
             }
 
-            if (ItemStackTools.getStackSize(origStack) == ItemStackTools.getStackSize(itemstack)) {
-                return ItemStackTools.getEmptyStack();
+            if (origStack.getCount() == itemstack.getCount()) {
+                return ItemStack.EMPTY;
             }
 
-            InventoryTools.onPickup(slot, player, origStack);
+            slot.onTake(player, origStack);
         }
 
         return itemstack;
@@ -202,27 +200,36 @@ public class GenericContainer extends Container {
         }
 
         Slot slot;
-        ItemStack itemstack1 = ItemStackTools.getEmptyStack();
+        ItemStack itemstack1 = ItemStack.EMPTY;
 
         if (par1ItemStack.isStackable()) {
 
-            while (ItemStackTools.isValid(par1ItemStack) && (!reverseOrder && checkIndex < toIndex || reverseOrder && checkIndex >= fromIndex)) {
+            while (!par1ItemStack.isEmpty() && (!reverseOrder && checkIndex < toIndex || reverseOrder && checkIndex >= fromIndex)) {
                 slot = this.inventorySlots.get(checkIndex);
                 itemstack1 = slot.getStack();
 
-                if (ItemStackTools.isValid(itemstack1) && itemstack1.getItem() == par1ItemStack.getItem() && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
+                if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem() && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
                         && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack)) {
 
-                    int mergedSize = ItemStackTools.getStackSize(itemstack1) + ItemStackTools.getStackSize(par1ItemStack);
+                    int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();
                     int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getSlotStackLimit());
                     if (mergedSize <= maxStackSize) {
-                        ItemStackTools.makeEmpty(par1ItemStack);
-                        ItemStackTools.setStackSize(itemstack1, mergedSize);
+                        par1ItemStack.setCount(0);
+                        if (mergedSize <= 0) {
+                            itemstack1.setCount(0);
+                        } else {
+                            itemstack1.setCount(mergedSize);
+                        }
                         slot.onSlotChanged();
                         result = true;
-                    } else if (ItemStackTools.getStackSize(itemstack1) < maxStackSize) {
-                        ItemStackTools.incStackSize(par1ItemStack, -(maxStackSize - ItemStackTools.getStackSize(itemstack1)));
-                        ItemStackTools.setStackSize(itemstack1, maxStackSize);
+                    } else if (itemstack1.getCount() < maxStackSize) {
+                        int amount = -(maxStackSize - itemstack1.getCount());
+                        par1ItemStack.grow(amount);
+                        if (maxStackSize <= 0) {
+                            itemstack1.setCount(0);
+                        } else {
+                            itemstack1.setCount(maxStackSize);
+                        }
                         slot.onSlotChanged();
                         result = true;
                     }
@@ -236,7 +243,7 @@ public class GenericContainer extends Container {
             }
         }
 
-        if (ItemStackTools.isValid(par1ItemStack)) {
+        if (!par1ItemStack.isEmpty()) {
             if (reverseOrder) {
                 checkIndex = toIndex - 1;
             } else {
@@ -247,16 +254,22 @@ public class GenericContainer extends Container {
                 slot = this.inventorySlots.get(checkIndex);
                 itemstack1 = slot.getStack();
 
-                if (ItemStackTools.isEmpty(itemstack1) && slot.isItemValid(par1ItemStack)) {
+                if (itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
                     ItemStack in = par1ItemStack.copy();
-                    ItemStackTools.setStackSize(in, Math.min(ItemStackTools.getStackSize(in), slot.getSlotStackLimit()));
+                    int amount1 = Math.min(in.getCount(), slot.getSlotStackLimit());
+                    if (amount1 <= 0) {
+                        in.setCount(0);
+                    } else {
+                        in.setCount(amount1);
+                    }
 
                     slot.putStack(in);
                     slot.onSlotChanged();
-                    if (ItemStackTools.getStackSize(in) >= ItemStackTools.getStackSize(par1ItemStack)) {
-                        ItemStackTools.makeEmpty(par1ItemStack);
+                    if (in.getCount() >= par1ItemStack.getCount()) {
+                        par1ItemStack.setCount(0);
                     } else {
-                        ItemStackTools.incStackSize(par1ItemStack, -ItemStackTools.getStackSize(in));
+                        int amount = -in.getCount();
+                        par1ItemStack.grow(amount);
                     }
                     result = true;
                     break;
@@ -279,17 +292,21 @@ public class GenericContainer extends Container {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.getHasStack()) {
-                slot.putStack(ItemStackTools.getEmptyStack());
+                slot.putStack(ItemStack.EMPTY);
             }
 
             ItemStack clickedWith = player.inventory.getItemStack();
-            if (ItemStackTools.isValid(clickedWith)) {
+            if (!clickedWith.isEmpty()) {
                 ItemStack copy = clickedWith.copy();
-                ItemStackTools.setStackSize(copy, 1);
+                if (1 <= 0) {
+                    copy.setCount(0);
+                } else {
+                    copy.setCount(1);
+                }
                 slot.putStack(copy);
             }
             detectAndSendChanges();
-            return ItemStackTools.getEmptyStack();
+            return ItemStack.EMPTY;
         } else {
             return super.slotClick(index, button, mode, player);
         }

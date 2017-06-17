@@ -1,13 +1,15 @@
 package mcjty.lib.container;
 
-import mcjty.lib.compat.CompatItemBlock;
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class GenericItemBlock extends CompatItemBlock {
+public class GenericItemBlock extends ItemBlock {
     private final GenericBlock genericBlock;
 
     public GenericItemBlock(Block block) {
@@ -17,8 +19,8 @@ public class GenericItemBlock extends CompatItemBlock {
 
 
     @Override
-    public void clAddInformation(ItemStack itemStack, EntityPlayer player, List<String> list, boolean advancedToolTip) {
-        genericBlock.clAddInformation(itemStack, player, list, advancedToolTip);
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+        genericBlock.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
 }

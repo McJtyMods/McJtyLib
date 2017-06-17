@@ -4,7 +4,6 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.tools.MinecraftTools;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Mouse;
@@ -133,7 +132,7 @@ public class Window {
         if (dwheel != 0) {
             toplevel.mouseWheel(dwheel, x, y);
         }
-        PreferencesProperties properties = McJtyLib.getPreferencesProperties(MinecraftTools.getPlayer(gui.mc));
+        PreferencesProperties properties = McJtyLib.getPreferencesProperties(gui.mc.player);
         if (properties != null) {
             currentStyle = properties.getStyle();
         } else {

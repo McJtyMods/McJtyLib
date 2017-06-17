@@ -1,7 +1,6 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -57,7 +56,7 @@ public class PacketUpdateNBTItemInventory implements IMessage {
             if (te instanceof IInventory) {
                 IInventory inv = (IInventory) te;
                 ItemStack stack = inv.getStackInSlot(message.slotIndex);
-                if (ItemStackTools.isValid(stack)) {
+                if (!stack.isEmpty()) {
                     stack.setTagCompound(message.tagCompound);
                 }
             }

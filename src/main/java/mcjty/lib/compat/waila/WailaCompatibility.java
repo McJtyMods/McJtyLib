@@ -1,12 +1,6 @@
 package mcjty.lib.compat.waila;
 
-import mcjty.lib.CompatLayer;
 import mcjty.lib.container.GenericBlock;
-//import mcp.mobius.waila.api.IWailaConfigHandler;
-//import mcp.mobius.waila.api.IWailaDataAccessor;
-//import mcp.mobius.waila.api.IWailaDataProvider;
-//import mcp.mobius.waila.api.IWailaRegistrar;
-import mcjty.lib.tools.ItemStackTools;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -21,6 +15,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 import java.util.List;
+
+//import mcp.mobius.waila.api.IWailaConfigHandler;
+//import mcp.mobius.waila.api.IWailaDataAccessor;
+//import mcp.mobius.waila.api.IWailaDataProvider;
+//import mcp.mobius.waila.api.IWailaRegistrar;
 
 public class WailaCompatibility implements IWailaDataProvider {
 
@@ -48,11 +47,7 @@ public class WailaCompatibility implements IWailaDataProvider {
             return;
         }
         registered = true;
-        if (CompatLayer.isV10()) {
-            FMLInterModComms.sendMessage("Waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
-        } else {
-            FMLInterModComms.sendMessage("waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
-        }
+        FMLInterModComms.sendMessage("waila", "register", "mcjty.lib.compat.waila.WailaCompatibility.load");
     }
 
     @Override
@@ -62,7 +57,7 @@ public class WailaCompatibility implements IWailaDataProvider {
 
     @Override
     public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        return ItemStackTools.getEmptyStack();
+        return ItemStack.EMPTY;
     }
 
     @Override
