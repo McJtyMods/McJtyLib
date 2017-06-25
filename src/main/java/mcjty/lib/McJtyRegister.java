@@ -23,28 +23,34 @@ public class McJtyRegister {
         blocks.add(new MBlock(block, mod, itemBlockClass, tileEntityClass));
     }
 
-    public static void registerLater(Item item) {
-        items.add(new MItem(item));
+    public static void registerLater(Item item, ModBase mod) {
+        items.add(new MItem(item, mod));
     }
 
-    public static void registerBlocks(IForgeRegistry<Block> registry) {
+    public static void registerBlocks(ModBase mod, IForgeRegistry<Block> registry) {
         for (MBlock mBlock : blocks) {
-            registry.register(mBlock.getBlock());
-            if (mBlock.getTileEntityClass() != null) {
-                GameRegistry.registerTileEntity(mBlock.getTileEntityClass(), mBlock.getMod() + "_" + mBlock.getBlock().getRegistryName().getResourcePath());
+            if (mBlock.getMod().getModId().equals(mod.getModId())) {
+                registry.register(mBlock.getBlock());
+                if (mBlock.getTileEntityClass() != null) {
+                    GameRegistry.registerTileEntity(mBlock.getTileEntityClass(), mBlock.getMod() + "_" + mBlock.getBlock().getRegistryName().getResourcePath());
+                }
             }
         }
     }
 
-    public static void registerItems(IForgeRegistry<Item> registry) {
+    public static void registerItems(ModBase mod, IForgeRegistry<Item> registry) {
         for (MItem item : items) {
-            registry.register(item.getItem());
+            if (item.getMod().getModId().equals(mod.getModId())) {
+                registry.register(item.getItem());
+            }
         }
         for (MBlock mBlock : blocks) {
             if (mBlock.getItemBlockClass() != null) {
-                ItemBlock itemBlock = createItemBlock(mBlock.getBlock(), mBlock.getItemBlockClass());
-                itemBlock.setRegistryName(mBlock.getBlock().getRegistryName());
-                registry.register(itemBlock);
+                if (mBlock.getMod().getModId().equals(mod.getModId())) {
+                    ItemBlock itemBlock = createItemBlock(mBlock.getBlock(), mBlock.getItemBlockClass());
+                    itemBlock.setRegistryName(mBlock.getBlock().getRegistryName());
+                    registry.register(itemBlock);
+                }
             }
         }
     }
@@ -94,13 +100,19 @@ public class McJtyRegister {
 
     private static class MItem {
         private final Item item;
+        private final ModBase mod;
 
-        public MItem(Item item) {
+        public MItem(Item item, ModBase mod) {
             this.item = item;
+            this.mod = mod;
         }
 
         public Item getItem() {
             return item;
+        }
+
+        public ModBase getMod() {
+            return mod;
         }
     }
 }
