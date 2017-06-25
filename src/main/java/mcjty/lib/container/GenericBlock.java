@@ -2,6 +2,7 @@ package mcjty.lib.container;
 
 import cofh.api.item.IToolHammer;
 import crazypants.enderio.api.redstone.IRedstoneConnectable;
+import mcjty.lib.McJtyRegister;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.api.smartwrench.SmartWrench;
@@ -30,8 +31,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -43,22 +42,18 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -112,24 +107,8 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         this.containerClass = containerClass;
         setUnlocalizedName(mod.getModId() + "." + name);
         setRegistryName(name);
-        GameRegistry.register(this);
-        if (itemBlockClass != null) {
-            GameRegistry.register(createItemBlock(itemBlockClass), getRegistryName());
-        }
-        GameRegistry.registerTileEntityWithAlternatives(tileEntityClass, mod.getModId() + "_" + name, name);
+        McJtyRegister.registerLater(this, mod, itemBlockClass, tileEntityClass);
     }
-
-    private ItemBlock createItemBlock(Class<? extends ItemBlock> itemBlockClass) {
-        try {
-            Class<?>[] ctorArgClasses = new Class<?>[1];
-            ctorArgClasses[0] = Block.class;
-            Constructor<? extends ItemBlock> itemCtor = itemBlockClass.getConstructor(ctorArgClasses);
-            return itemCtor.newInstance(this);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     // Set this to true in case horizontal rotation is used (2 bits rotation as opposed to 3).
     public boolean isHorizRotation() {
