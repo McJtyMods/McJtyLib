@@ -68,6 +68,7 @@ public class GuiItemScreen extends GuiScreen {
     }
 
     public void drawWindow() {
+        drawDefaultBackground();
         window.draw();
         sideWindow.getWindow().draw();
         List<String> tooltips = window.getTooltips();

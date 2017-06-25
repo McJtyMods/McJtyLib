@@ -211,6 +211,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
 
     protected void drawWindow() {
+        drawDefaultBackground();
         getWindowManager().draw();
     }
 
