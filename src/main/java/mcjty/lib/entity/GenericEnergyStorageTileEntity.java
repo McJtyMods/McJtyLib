@@ -1,6 +1,5 @@
 package mcjty.lib.entity;
 
-import cofh.api.energy.EnergyStorage;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.network.PacketRequestIntegerFromServer;
@@ -13,7 +12,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
     public static final String CMD_GETENERGY = "getEnergy";
     public static final String CLIENTCMD_GETENERGY = "getEnergy";
 
-    protected EnergyStorage storage;
+    protected McJtyEnergyStorage storage;
 
     private static int currentRF = 0;
 
@@ -24,12 +23,12 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
     }
 
     public GenericEnergyStorageTileEntity(int maxEnergy, int maxReceive) {
-        storage = new EnergyStorage(maxEnergy);
+        storage = new McJtyEnergyStorage(maxEnergy);
         storage.setMaxReceive(maxReceive);
     }
 
     public GenericEnergyStorageTileEntity(int maxEnergy, int maxReceive, int maxExtract) {
-        storage = new EnergyStorage(maxEnergy);
+        storage = new McJtyEnergyStorage(maxEnergy);
         storage.setMaxReceive(maxReceive);
         storage.setMaxExtract(maxExtract);
     }

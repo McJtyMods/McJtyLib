@@ -1,12 +1,11 @@
 package mcjty.lib.gui.widgets;
 
-import cofh.api.energy.IEnergyHandler;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.util.EnumFacing;
+import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     private int spacerColor = StyleConfig.colorEnergyBarSpacer;
     private int textColor = StyleConfig.colorEnergyBarText;
     private boolean horizontal = false;
-    private IEnergyHandler handler = null;
+    private IEnergyStorage handler = null;
     private boolean showText = true;
     private boolean showRfPerTick = false;
     private int rfPerTick = 0;
@@ -37,12 +36,12 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return horizontal;
     }
 
-    public EnergyBar setHandler(IEnergyHandler handler) {
+    public EnergyBar setHandler(IEnergyStorage handler) {
         this.handler = handler;
         return this;
     }
 
-    public IEnergyHandler getHandler() {
+    public IEnergyStorage getHandler() {
         return handler;
     }
 
@@ -96,7 +95,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
 
     public int getValue() {
         if (handler != null) {
-            return handler.getEnergyStored(EnumFacing.DOWN);
+            return handler.getEnergyStored();
         }
         return value;
     }
@@ -108,7 +107,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
 
     public int getMaxValue() {
        if (handler != null) {
-           return handler.getMaxEnergyStored(EnumFacing.DOWN);
+           return handler.getMaxEnergyStored();
        }
        return maxValue;
     }

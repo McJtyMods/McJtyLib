@@ -15,6 +15,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -37,6 +38,7 @@ public class McJtyLib {
 
     public static SimpleNetworkWrapper networkHandler;
     private static boolean init;
+    public static boolean redstoneflux;
 
     public static void preInit(FMLPreInitializationEvent event){
         if (init) {
@@ -48,6 +50,7 @@ public class McJtyLib {
         networkHandler.registerMessage(PacketSetGuiStyle.Handler.class, PacketSetGuiStyle.class, 1, Side.SERVER);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         init = true;
+        redstoneflux = Loader.isModLoaded("redstoneflux");
     }
 
     public static PreferencesProperties getPreferencesProperties(EntityPlayer player) {
