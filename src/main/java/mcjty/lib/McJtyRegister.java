@@ -32,7 +32,7 @@ public class McJtyRegister {
             if (mBlock.getMod().getModId().equals(mod.getModId())) {
                 registry.register(mBlock.getBlock());
                 if (mBlock.getTileEntityClass() != null) {
-                    GameRegistry.registerTileEntity(mBlock.getTileEntityClass(), mBlock.getMod() + "_" + mBlock.getBlock().getRegistryName().getResourcePath());
+                    GameRegistry.registerTileEntity(mBlock.getTileEntityClass(), mBlock.getMod().getModId() + "_" + mBlock.getBlock().getRegistryName().getResourcePath());
                 }
             }
         }
