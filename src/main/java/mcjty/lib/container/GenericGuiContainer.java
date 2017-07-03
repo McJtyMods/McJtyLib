@@ -225,6 +225,12 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     }
 
     @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
+    }
+
+    @Override
     public boolean doesGuiPauseGame() {
         return false;
     }
