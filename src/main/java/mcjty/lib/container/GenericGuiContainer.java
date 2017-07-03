@@ -7,6 +7,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketServerCommand;
+import mcjty.lib.varia.Logging;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -50,6 +51,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     }
 
     public List<Rectangle> getSideWindowBounds() {
+        if (sideWindow.getWindow() == null || sideWindow.getWindow().getToplevel() == null) {
+            try {
+                throw new RuntimeException("Internal error! getSideWindowBounds() called before initGui!");
+            } catch (RuntimeException e) {
+                Logging.logError("Internal error! getSideWindowBounds() called before initGui!", e);
+                return Collections.emptyList();
+            }
+        }
         return Collections.singletonList(sideWindow.getWindow().getToplevel().getBounds());
     }
 
