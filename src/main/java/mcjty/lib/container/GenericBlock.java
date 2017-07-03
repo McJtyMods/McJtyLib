@@ -273,6 +273,14 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        if (needsRedstoneCheck()) {
+            checkRedstone(world, pos);
+        }
+    }
+
+
+    @Override
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
         TileEntity tileEntity = world.getTileEntity(pos);
 
