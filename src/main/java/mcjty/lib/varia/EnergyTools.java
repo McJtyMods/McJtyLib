@@ -86,8 +86,8 @@ public class EnergyTools {
             maxEnergyStored = EnergySupportEnderIO.getMaxEnergy(tileEntity);
             energyStored = EnergySupportEnderIO.getCurrentEnergy(tileEntity);
         } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
-            maxEnergyStored = RedstoneFluxCompatibility.getEnergy(tileEntity);
-            energyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity);
+            maxEnergyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity);
+            energyStored = RedstoneFluxCompatibility.getEnergy(tileEntity);
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, null);
             maxEnergyStored = energy.getMaxEnergyStored();
@@ -103,8 +103,8 @@ public class EnergyTools {
         int maxEnergyStored;
         int energyStored;
         if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
-            maxEnergyStored = RedstoneFluxCompatibility.getEnergy(tileEntity);
-            energyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity);
+            maxEnergyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity);
+            energyStored = RedstoneFluxCompatibility.getEnergy(tileEntity);
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, null);
             maxEnergyStored = energy.getMaxEnergyStored();
