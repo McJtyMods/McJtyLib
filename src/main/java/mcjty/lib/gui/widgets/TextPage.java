@@ -13,9 +13,13 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.oredict.ShapedOreRecipe;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 
@@ -290,26 +294,45 @@ public class TextPage extends AbstractWidget<TextPage> {
         y += 4;
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         // @TODO: need support for shapeless and better error checking
-        ShapedRecipes shapedRecipes = (ShapedRecipes) line.recipe;
+
         if (craftingGridImage != null) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
             gui.drawTexturedModalRect(25+x, y, craftU, craftV, 19*3, 19*3);
         }
+        int w;
+        int h;
+        NonNullList<Ingredient> ingredients;
+        if (line.recipe instanceof ShapedRecipes) {
+            w = ((ShapedRecipes) line.recipe).getWidth();
+            h = ((ShapedRecipes) line.recipe).getHeight();
+            ingredients = line.recipe.getIngredients();
+        } else if (line.recipe instanceof ShapedOreRecipe) {
+            w = ((ShapedOreRecipe) line.recipe).getWidth();
+            h = ((ShapedOreRecipe) line.recipe).getHeight();
+            ingredients = line.recipe.getIngredients();
+        } else {
+            w = 0;
+            h = 0;
+            ingredients = null;
+        }
+
         for (int i = 0 ; i < 3 ; i++) {
             for (int j = 0 ; j < 3 ; j++) {
-                if (i < shapedRecipes.recipeWidth && j < shapedRecipes.recipeHeight) {
-                    // @todo
-//                    ItemStack stack = shapedRecipes.recipeItems[i + j * shapedRecipes.recipeWidth];
-//                    if (stack != null && stack.getItemDamage() == 32767) {
-//                        // Just pick 0 here.
-//                        NBTTagCompound tc = stack.getTagCompound();
-//                        stack = new ItemStack(stack.getItem(), ItemStackTools.getStackSize(stack), 0);
-//                        if (tc != null) {
-//                            stack.setTagCompound(tc.copy());
-//                        }
-//                    }
-//                    RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
+                if (i < w && j < h) {
+                    Ingredient ingredient = ingredients.get(i + j * w);
+                    if (ingredient.getMatchingStacks().length > 0) {
+                        ItemStack stack = ingredient.getMatchingStacks()[0];
+                        if (stack != null && stack.getItemDamage() == 32767) {
+                            // Just pick 0 here.
+                            NBTTagCompound tc = stack.getTagCompound();
+                            stack = new ItemStack(stack.getItem(), stack.getCount(), 0);
+                            if (tc != null) {
+                                stack.setTagCompound(tc.copy());
+                            }
+                        }
+                        RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
+                    }
                 }
             }
         }
@@ -323,7 +346,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             mc.getTextureManager().bindTexture(craftingGridImage);
             gui.drawTexturedModalRect(x+25+92, y + 16, craftU, craftV, 18, 18);
         }
-        RenderHelper.renderObject(mc, x+25+93, y + 17, shapedRecipes.getRecipeOutput(), false);
+        RenderHelper.renderObject(mc, x+25+93, y + 17, line.recipe.getRecipeOutput(), false);
         y -= 4;
         return y;
     }
@@ -441,7 +464,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                 if (recipe == null) {
                     // Error,
                     this.line = line;
-                } else if (!(recipe instanceof ShapedRecipes)) {
+                } else if (!(recipe instanceof ShapedRecipes) && !(recipe instanceof ShapedOreRecipe)) {
                     recipe = null;
                     // Error,
                     this.line = line;
@@ -482,16 +505,15 @@ public class TextPage extends AbstractWidget<TextPage> {
         if (item == null) {
             return null;
         }
-        //@todo
-//        List<IRecipe> recipes = CraftingManager.getInstance().getRecipeList();
-//        for (IRecipe recipe : recipes) {
-//            if (recipe instanceof ShapedRecipes) {
-//                ItemStack recipeOutput = recipe.getRecipeOutput();
-//                if (ItemStackTools.isValid(recipeOutput) && recipeOutput.isItemEqual(item)) {
-//                    return recipe;
-//                }
-//            }
-//        }
+        for (Map.Entry<ResourceLocation, IRecipe> entry : ForgeRegistries.RECIPES.getEntries()) {
+            IRecipe recipe = entry.getValue();
+            if (recipe instanceof ShapedRecipes || recipe instanceof ShapedOreRecipe) {
+                ItemStack recipeOutput = recipe.getRecipeOutput();
+                if (!recipeOutput.isEmpty() && recipeOutput.isItemEqual(item)) {
+                    return recipe;
+                }
+            }
+        }
         return null;
     }
 
