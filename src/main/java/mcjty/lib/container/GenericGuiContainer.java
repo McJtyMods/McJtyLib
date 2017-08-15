@@ -51,6 +51,12 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     }
 
     public List<Rectangle> getSideWindowBounds() {
+        if (sideWindow.getWindow() == null) {
+            return Collections.emptyList();
+        }
+        if (sideWindow.getWindow().getToplevel() == null) {
+            return Collections.emptyList();
+        }
         return Collections.singletonList(sideWindow.getWindow().getToplevel().getBounds());
     }
 
