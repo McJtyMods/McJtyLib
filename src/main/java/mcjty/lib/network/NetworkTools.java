@@ -135,13 +135,11 @@ public class NetworkTools {
 
 
     public static BlockPos readPos(ByteBuf dataIn) {
-        return new BlockPos(dataIn.readInt(), dataIn.readInt(), dataIn.readInt());
+        return BlockPos.fromLong(dataIn.readLong());
     }
 
     public static void writePos(ByteBuf dataOut, BlockPos pos) {
-        dataOut.writeInt(pos.getX());
-        dataOut.writeInt(pos.getY());
-        dataOut.writeInt(pos.getZ());
+        dataOut.writeLong(pos.toLong());
     }
 
     public static <T extends Enum> void writeEnum(ByteBuf buf, T value, T nullValue) {
