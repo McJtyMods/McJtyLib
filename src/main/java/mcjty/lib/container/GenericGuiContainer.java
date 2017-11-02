@@ -131,7 +131,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
             int linesWithItemStacks = 0;
             for (String s : textLines) {
                 int j;
-                if (s.contains("@") && !items.isEmpty()) {
+                if (s != null && items != null && s.contains("@") && !items.isEmpty()) {
                     linesWithItemStacks++;
                     List list = parseString(s, items);
                     j = 0;
@@ -185,7 +185,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
             for (int k1 = 0; k1 < textLines.size(); ++k1) {
                 String s1 = textLines.get(k1);
-                if (s1.contains("@") && !items.isEmpty()) {
+                if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
                     List list = parseString(s1, items);
                     int curx = xx;
                     for (Object o : list) {
