@@ -62,6 +62,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         return Collections.singletonList(sideWindow.getWindow().getToplevel().getBounds());
     }
 
+
     @Override
     public void initGui() {
         windowManager = null;
