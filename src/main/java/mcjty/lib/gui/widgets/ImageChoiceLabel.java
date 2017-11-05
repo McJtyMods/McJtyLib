@@ -80,7 +80,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         if (isEnabledAndVisible()) {
-            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                 currentChoice--;
                 if (currentChoice < 0) {
                     currentChoice = choiceList.size() - 1;
