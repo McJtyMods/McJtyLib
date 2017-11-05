@@ -90,7 +90,7 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                 index--;
                 if (index < 0) {
                     index = choiceList.size()-1;
