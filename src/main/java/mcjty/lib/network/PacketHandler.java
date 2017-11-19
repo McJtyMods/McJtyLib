@@ -75,8 +75,8 @@ public class PacketHandler {
        // networkWrapper.registerMessage(PacketSetGuiStyle.Handler.class, PacketSetGuiStyle.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketServerCommand.Handler.class, PacketServerCommand.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketRequestIntegerFromServer.Handler.class, PacketRequestIntegerFromServer.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketUpdateNBTItem.Handler.class, PacketUpdateNBTItem.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketUpdateNBTItemInventory.Handler.class, PacketUpdateNBTItemInventory.class, startIndex++, Side.SERVER);
+//        networkWrapper.registerMessage(PacketUpdateNBTItem.Handler.class, PacketUpdateNBTItem.class, startIndex++, Side.SERVER);
+//        networkWrapper.registerMessage(PacketUpdateNBTItemInventory.Handler.class, PacketUpdateNBTItemInventory.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketGetInfoFromServer.Handler.class, PacketGetInfoFromServer.class, nextID(), Side.SERVER);
         networkWrapper.registerMessage(PacketDumpItemInfo.Handler.class, PacketDumpItemInfo.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketDumpBlockInfo.Handler.class, PacketDumpBlockInfo.class, startIndex++, Side.SERVER);
