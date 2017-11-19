@@ -1,6 +1,5 @@
 package mcjty.lib.network;
 
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,7 +21,7 @@ public class PacketUpdateNBTItemHandler<T extends PacketUpdateNBTItem> implement
     private void handle(T message, MessageContext ctx) {
         EntityPlayerMP playerEntity = ctx.getServerHandler().player;
         ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-        if (ItemStackTools.isEmpty(heldItem)) {
+        if (heldItem.isEmpty()) {
             return;
         }
         // To avoid people messing with packets

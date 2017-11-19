@@ -1,6 +1,5 @@
 package mcjty.lib.network;
 
-import mcjty.lib.tools.ItemStackTools;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -26,7 +25,7 @@ public class PacketUpdateNBTItemInventoryHandler<T extends PacketUpdateNBTItemIn
             }
             IInventory inv = (IInventory) te;
             ItemStack stack = inv.getStackInSlot(message.slotIndex);
-            if (ItemStackTools.isValid(stack)) {
+            if (!stack.isEmpty()) {
                 stack.setTagCompound(message.tagCompound);
             }
         }
