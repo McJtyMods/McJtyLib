@@ -16,10 +16,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 /**
  * This is a packet that can be used to update the NBT of an item in an inventory.
  */
-public class PacketUpdateNBTItemInventory implements IMessage {
-    private BlockPos pos;
-    private int slotIndex;
-    private NBTTagCompound tagCompound;
+public abstract class PacketUpdateNBTItemInventory implements IMessage {
+    public BlockPos pos;
+    public int slotIndex;
+    public NBTTagCompound tagCompound;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -35,6 +35,8 @@ public class PacketUpdateNBTItemInventory implements IMessage {
         NetworkTools.writeTag(buf, tagCompound);
     }
 
+    protected abstract boolean isValidBlock(World world, BlockPos pos, TileEntity tileEntity);
+
     public PacketUpdateNBTItemInventory() {
     }
 
@@ -42,27 +44,6 @@ public class PacketUpdateNBTItemInventory implements IMessage {
         this.pos = pos;
         this.slotIndex = slotIndex;
         this.tagCompound = tagCompound;
-    }
-
-    public static class Handler implements IMessageHandler<PacketUpdateNBTItemInventory, IMessage> {
-        @Override
-        public IMessage onMessage(PacketUpdateNBTItemInventory message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketUpdateNBTItemInventory message, MessageContext ctx) {
-            World world = ctx.getServerHandler().player.getEntityWorld();
-            TileEntity te = world.getTileEntity(message.pos);
-            if (te instanceof IInventory) {
-                IInventory inv = (IInventory) te;
-                ItemStack stack = inv.getStackInSlot(message.slotIndex);
-                if (ItemStackTools.isValid(stack)) {
-                    stack.setTagCompound(message.tagCompound);
-                }
-            }
-        }
-
     }
 
 }

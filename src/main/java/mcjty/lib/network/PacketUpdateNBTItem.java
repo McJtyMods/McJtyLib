@@ -17,8 +17,8 @@ import java.util.Map;
 /**
  * This is a packet that can be used to update the NBT on the held item of a player.
  */
-public class PacketUpdateNBTItem implements IMessage {
-    private Map<String,Argument> args;
+public abstract class PacketUpdateNBTItem implements IMessage {
+    public Map<String,Argument> args;
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -44,45 +44,6 @@ public class PacketUpdateNBTItem implements IMessage {
         }
     }
 
-    public static class Handler implements IMessageHandler<PacketUpdateNBTItem, IMessage> {
-        @Override
-        public IMessage onMessage(PacketUpdateNBTItem message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketUpdateNBTItem message, MessageContext ctx) {
-            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
-            ItemStack heldItem = playerEntity.getHeldItem(EnumHand.MAIN_HAND);
-            if (ItemStackTools.isEmpty(heldItem)) {
-                return;
-            }
-            NBTTagCompound tagCompound = heldItem.getTagCompound();
-            if (tagCompound == null) {
-                tagCompound = new NBTTagCompound();
-                heldItem.setTagCompound(tagCompound);
-            }
-            for (Map.Entry<String, Argument> entry : message.args.entrySet()) {
-                String key = entry.getKey();
-                switch (entry.getValue().getType()) {
-                    case TYPE_STRING:
-                        tagCompound.setString(key, entry.getValue().getString());
-                        break;
-                    case TYPE_INTEGER:
-                        tagCompound.setInteger(key, entry.getValue().getInteger());
-                        break;
-                    case TYPE_BLOCKPOS:
-                        throw new RuntimeException("BlockPos not supported for PacketUpdateNBTItem!");
-                    case TYPE_BOOLEAN:
-                        tagCompound.setBoolean(key, entry.getValue().getBoolean());
-                        break;
-                    case TYPE_DOUBLE:
-                        tagCompound.setDouble(key, entry.getValue().getDouble());
-                        break;
-                }
-            }
-        }
-
-    }
+    protected abstract boolean isValidItem(ItemStack stack);
 
 }
