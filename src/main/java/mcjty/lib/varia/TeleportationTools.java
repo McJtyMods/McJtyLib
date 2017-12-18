@@ -24,11 +24,17 @@ public class TeleportationTools {
     public static void performTeleport(EntityPlayer player, int dimension, double destX, double destY, double destZ, @Nullable EnumFacing direction) {
         int oldId = player.getEntityWorld().provider.getDimension();
 
+        float rotationYaw = player.rotationYaw;
+        float rotationPitch = player.rotationPitch;
+
         if (oldId != dimension) {
             teleportToDimension(player, dimension, destX, destY, destZ);
         }
         if (direction != null) {
             fixOrientation(player, destX, destY, destZ, direction);
+        } else {
+            player.rotationYaw = rotationYaw;
+            player.rotationPitch = rotationPitch;
         }
         player.setPositionAndUpdate(destX, destY, destZ);
     }
@@ -91,6 +97,9 @@ public class TeleportationTools {
             performTeleport((EntityPlayer) entity, destWorld.provider.getDimension(), newX, newY, newZ, facing);
             return entity;
         } else {
+            float rotationYaw = entity.rotationYaw;
+            float rotationPitch = entity.rotationPitch;
+
             if (world.provider.getDimension() != destWorld.provider.getDimension()) {
                 NBTTagCompound tagCompound = new NBTTagCompound();
                 entity.writeToNBT(tagCompound);
@@ -102,7 +111,12 @@ public class TeleportationTools {
 
                 Entity newEntity = EntityList.newEntity(entityClass, destWorld);
                 newEntity.readFromNBT(tagCompound);
-                fixOrientation(newEntity, newX, newY, newZ, facing);
+                if (facing != null) {
+                    fixOrientation(newEntity, newX, newY, newZ, facing);
+                } else {
+                    newEntity.rotationYaw = rotationYaw;
+                    newEntity.rotationPitch = rotationPitch;
+                }
                 newEntity.setLocationAndAngles(newX, newY, newZ, newEntity.rotationYaw, newEntity.rotationPitch);
                 boolean flag = newEntity.forceSpawn;
                 newEntity.forceSpawn = true;
@@ -116,7 +130,12 @@ public class TeleportationTools {
                 ((WorldServer)destWorld).resetUpdateEntityTick();
                 return newEntity;
             } else {
-                fixOrientation(entity, newX, newY, newZ, facing);
+                if (facing != null) {
+                    fixOrientation(entity, newX, newY, newZ, facing);
+                } else {
+                    entity.rotationYaw = rotationYaw;
+                    entity.rotationPitch = rotationPitch;
+                }
                 entity.setLocationAndAngles(newX, newY, newZ, entity.rotationYaw, entity.rotationPitch);
                 destWorld.updateEntityWithOptionalForce(entity, false);
                 return entity;
