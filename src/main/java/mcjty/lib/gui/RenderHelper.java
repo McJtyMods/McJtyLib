@@ -26,14 +26,18 @@ public class RenderHelper {
     public static float rot = 0.0f;
 
     public static void renderEntity(Entity entity, int xPos, int yPos) {
+        float f1 = 10F;
+        renderEntity(entity, xPos, yPos, f1);
+    }
+
+    public static void renderEntity(Entity entity, int xPos, int yPos, float scale) {
         GlStateManager.pushMatrix();
         GlStateManager.color(1f, 1f, 1f);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableColorMaterial();
         GlStateManager.pushMatrix();
         GlStateManager.translate(xPos + 8, yPos + 16, 50F);
-        float f1 = 10F;
-        GlStateManager.scale(-f1, f1, f1);
+        GlStateManager.scale(-scale, scale, scale);
         GlStateManager.rotate(180F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate(135F, 0.0F, 1.0F, 0.0F);
         net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
@@ -516,8 +520,8 @@ public class RenderHelper {
      */
     public static void drawTexturedModalRect(int x, int y, int u, int v, int width, int height) {
         float zLevel = 0.01f;
-        float f = 0.00390625F;
-        float f1 = 0.00390625F;
+        float f = (1/256.0f);
+        float f1 = (1/256.0f);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -583,6 +587,65 @@ public class RenderHelper {
         GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
     }
+
+    public static int renderText(Minecraft mc, int x, int y, String txt) {
+        GlStateManager.color(1.0F, 1.0F, 1.0F);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0.0F, 0.0F, 32.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableLighting();
+        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.disableBlend();
+        int width = mc.fontRenderer.getStringWidth(txt);
+        mc.fontRenderer.drawStringWithShadow(txt, x, y, 16777215);
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        // Fixes opaque cooldown overlay a bit lower
+        // TODO: check if enabled blending still screws things up down the line.
+        GlStateManager.enableBlend();
+
+
+        GlStateManager.popMatrix();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableLighting();
+
+        return width;
+    }
+
+    public static int renderText(Minecraft mc, int x, int y, String txt, int color) {
+        GlStateManager.color(1.0F, 1.0F, 1.0F);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(0.0F, 0.0F, 32.0F);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableLighting();
+        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+
+        GlStateManager.disableLighting();
+        GlStateManager.disableDepth();
+        GlStateManager.disableBlend();
+        int width = mc.fontRenderer.getStringWidth(txt);
+        mc.fontRenderer.drawString(txt, x, y, color);
+        GlStateManager.enableLighting();
+        GlStateManager.enableDepth();
+        // Fixes opaque cooldown overlay a bit lower
+        // TODO: check if enabled blending still screws things up down the line.
+        GlStateManager.enableBlend();
+
+
+        GlStateManager.popMatrix();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.disableLighting();
+
+        return width;
+    }
+
 
     /**
      * Draw a beam with some thickness.
