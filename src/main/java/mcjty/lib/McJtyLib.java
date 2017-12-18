@@ -1,5 +1,6 @@
 package mcjty.lib;
 
+import mcjty.lib.base.ModBase;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
@@ -22,6 +23,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.util.HashMap;
+
 /**
  * Created by Elec332 on 24-3-2016.
  */
@@ -39,6 +42,17 @@ public class McJtyLib {
     public static SimpleNetworkWrapper networkHandler;
     private static boolean init;
     public static boolean redstoneflux;
+
+    private final static HashMap<String, ModBase> mods = new HashMap<>();
+
+    public static void preInit(FMLPreInitializationEvent event, ModBase base) {
+        mods.put(base.getModId(), base);
+        preInit(event);
+    }
+
+    public static ModBase getMod(String modid) {
+        return mods.get(modid);
+    }
 
     public static void preInit(FMLPreInitializationEvent event){
         if (init) {
