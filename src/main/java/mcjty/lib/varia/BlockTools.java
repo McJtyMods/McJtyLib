@@ -7,6 +7,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -218,4 +219,21 @@ public class BlockTools {
             return null;
         }
     }
+
+    public static String getModid(ItemStack stack) {
+        if (!stack.isEmpty()) {
+            return stack.getItem().getRegistryName().getResourceDomain();
+        } else {
+            return "";
+        }
+    }
+
+    public static String getModidForBlock(Block block) {
+        ResourceLocation nameForObject = block.getRegistryName();
+        if (nameForObject == null) {
+            return "?";
+        }
+        return nameForObject.getResourceDomain();
+    }
+
 }
