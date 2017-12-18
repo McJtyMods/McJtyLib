@@ -4,10 +4,12 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -254,4 +256,15 @@ public class BlockTools {
         return nameForObject.getResourceDomain();
     }
 
+    public static void placeStackAt(EntityPlayer player, ItemStack blockStack, World world, BlockPos pos) {
+        if (blockStack.getItem() instanceof ItemBlock) {
+            Block block = ((ItemBlock) blockStack.getItem()).getBlock();
+            IBlockState stateForPlacement = block.getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, EnumHand.MAIN_HAND);
+            world.setBlockState(pos, stateForPlacement, 3);
+            SoundTools.playSound(world, block.getSoundType().getPlaceSound(), pos.getX(), pos.getY(), pos.getZ(), 1.0f, 1.0f);
+        } else {
+            player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
+            blockStack.getItem().onItemUse(player, world, pos, EnumHand.MAIN_HAND, EnumFacing.UP, 0, 0, 0);
+        }
+    }
 }
