@@ -1,6 +1,7 @@
 package mcjty.lib.varia;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
@@ -33,16 +34,27 @@ public class BlockTools {
         return EnumFacing.VALUES[(metadata & MASK_ORIENTATION)];
     }
 
+    public static EnumFacing getOrientation(IBlockState state) {
+        int meta = state.getBlock().getMetaFromState(state);
+        return getOrientation(meta);
+    }
+
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
     public static EnumFacing reorient(EnumFacing side, int meta) {
         return reorient(side, getOrientation(meta));
+    }
+    public static EnumFacing reorient(EnumFacing side, IBlockState state) {
+        return reorient(side, getOrientation(state));
     }
 
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
     public static EnumFacing reorientHoriz(EnumFacing side, int meta) {
         return reorient(side, getOrientationHoriz(meta));
+    }
+    public static EnumFacing reorientHoriz(EnumFacing side, IBlockState state) {
+        return reorient(side, getOrientationHoriz(state));
     }
 
     public static EnumFacing reorient(EnumFacing side, EnumFacing blockDirection) {
@@ -133,6 +145,12 @@ public class BlockTools {
     public static EnumFacing getOrientationHoriz(int metadata) {
         return EnumFacing.VALUES[(metadata & MASK_ORIENTATION_HORIZONTAL)+2];
     }
+
+    public static EnumFacing getOrientationHoriz(IBlockState state) {
+        int metadata = state.getBlock().getMetaFromState(state);
+        return getOrientationHoriz(metadata);
+    }
+
 
     public static int setOrientationHoriz(int metadata, EnumFacing orientation) {
         return (metadata & ~MASK_ORIENTATION_HORIZONTAL) | (orientation.ordinal()-2);
