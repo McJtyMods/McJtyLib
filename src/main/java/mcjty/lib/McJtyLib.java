@@ -26,7 +26,7 @@ import net.minecraftforge.fml.relauncher.Side;
 @SuppressWarnings("unused")
 public class McJtyLib {
 
-    public static final String VERSION = "2.5.0";
+    public static final String VERSION = "2.5.1";
     public static final String OWNER = "McJty", PROVIDES = "mcjtylib_ng";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
