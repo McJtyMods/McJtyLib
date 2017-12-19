@@ -6,6 +6,8 @@ import mcjty.lib.gui.GuiSideWindow;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.network.Argument;
+import mcjty.lib.network.Arguments;
+import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommand;
 import mcjty.lib.varia.Logging;
 import net.minecraft.client.gui.FontRenderer;
@@ -16,7 +18,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
+import javax.annotation.Nonnull;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -293,4 +296,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     public void sendServerCommand(SimpleNetworkWrapper network, int dimensionId, String command, Argument... arguments) {
         network.sendToServer(new PacketServerCommand(tileEntity.getPos(), dimensionId, command, arguments));
     }
+
+    public void sendServerCommand(String modid, String command, @Nonnull Arguments arguments) {
+        network.sendToServer(new PacketSendServerCommand(modid, command, arguments));
+    }
+
+    public void sendServerCommand(String modid, String command) {
+        network.sendToServer(new PacketSendServerCommand(modid, command, Arguments.EMPTY));
+    }
+
 }
