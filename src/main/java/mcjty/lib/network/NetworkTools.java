@@ -9,7 +9,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class NetworkTools {
 
@@ -134,6 +136,20 @@ public class NetworkTools {
         if (bytes.length > 0) {
             dataOut.writeBytes(bytes);
         }
+    }
+
+    public static void writeStringList(ByteBuf dataOut, List<String> list) {
+        dataOut.writeInt(list.size());
+        list.stream().forEach(s -> writeStringUTF8(dataOut, s));
+    }
+
+    public static List<String> readStringList(ByteBuf dataIn) {
+        int size = dataIn.readInt();
+        List<String> list = new ArrayList<>(size);
+        for (int i = 0 ; i < size ; i++) {
+            list.add(readStringUTF8(dataIn));
+        }
+        return list;
     }
 
 
