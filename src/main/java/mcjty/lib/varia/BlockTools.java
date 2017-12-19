@@ -257,6 +257,15 @@ public class BlockTools {
         return nameForObject.getResourceDomain();
     }
 
+    public static String getReadableName(World world, BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+        return getReadableName(state.getBlock().getItem(world, pos, state));
+    }
+
+    public static String getReadableName(ItemStack stack) {
+        return stack.getDisplayName();
+    }
+
     public static IBlockState placeStackAt(EntityPlayer player, ItemStack blockStack, World world, BlockPos pos) {
         if (blockStack.getItem() instanceof ItemBlock) {
             ItemBlock itemBlock = (ItemBlock) blockStack.getItem();

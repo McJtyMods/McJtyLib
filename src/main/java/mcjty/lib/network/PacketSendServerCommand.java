@@ -2,15 +2,12 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
-import mcjty.lib.base.ModBase;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class PacketSendServerCommand implements IMessage {
 
@@ -49,8 +46,7 @@ public class PacketSendServerCommand implements IMessage {
         }
 
         private void handle(PacketSendServerCommand message, MessageContext ctx) {
-            ModBase mod = McJtyLib.getMod(message.modid);
-            mod.handleCommand(ctx.getServerHandler().player, message.command, message.arguments);
+            McJtyLib.handleCommand(message.modid, message.command, ctx.getServerHandler().player, message.arguments);
         }
     }
 }
