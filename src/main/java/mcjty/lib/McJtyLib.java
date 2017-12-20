@@ -47,13 +47,26 @@ public class McJtyLib {
     public static boolean redstoneflux;
 
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
+    private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
 
     public static void registerCommand(String modid, String id, IServerCommand command) {
         serverCommands.put(Pair.of(modid, id), command);
     }
 
+    public static void registerClientCommand(String modid, String id, IServerCommand command) {
+        clientCommands.put(Pair.of(modid, id), command);
+    }
+
     public static boolean handleCommand(String modid, String id, EntityPlayer player, Arguments arguments) {
         IServerCommand command = serverCommands.get(Pair.of(modid, id));
+        if (command == null) {
+            return false;
+        }
+        return command.execute(player, arguments);
+    }
+
+    public static boolean handleClientCommand(String modid, String id, EntityPlayer player, Arguments arguments) {
+        IServerCommand command = clientCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;
         }

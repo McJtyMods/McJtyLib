@@ -85,6 +85,7 @@ public class PacketHandler {
         networkWrapper.registerMessage(PacketDumpBlockInfo.Handler.class, PacketDumpBlockInfo.class, startIndex++, Side.SERVER);
 
         // Client side
+        networkWrapper.registerMessage(PacketSendClientCommand.Handler.class, PacketSendClientCommand.class, startIndex++, Side.CLIENT);
         networkWrapper.registerMessage(PacketIntegerFromServer.Handler.class, PacketIntegerFromServer.class, startIndex++, Side.CLIENT);
         networkWrapper.registerMessage(PacketReturnInfoToClient.Handler.class, PacketReturnInfoToClient.class, nextID(), Side.CLIENT);
         networkWrapper.registerMessage(PacketSendGuiData.Handler.class, PacketSendGuiData.class, startIndex++, Side.CLIENT);
