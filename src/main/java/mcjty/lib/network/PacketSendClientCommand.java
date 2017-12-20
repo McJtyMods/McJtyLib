@@ -1,12 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.McJtyLib;
-import mcjty.lib.varia.Logging;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nonnull;
 
@@ -15,6 +10,19 @@ public class PacketSendClientCommand implements IMessage {
     private String modid;
     private String command;
     private Arguments arguments;
+
+
+    public String getModid() {
+        return modid;
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public Arguments getArguments() {
+        return arguments;
+    }
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -39,18 +47,4 @@ public class PacketSendClientCommand implements IMessage {
         this.arguments = arguments;
     }
 
-    public static class Handler implements IMessageHandler<PacketSendClientCommand, IMessage> {
-        @Override
-        public IMessage onMessage(PacketSendClientCommand message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketSendClientCommand message, MessageContext ctx) {
-            boolean result = McJtyLib.handleClientCommand(message.modid, message.command, Minecraft.getMinecraft().player, message.arguments);
-            if (!result) {
-                Logging.logError("Error handling client command '" + message.command + "' for mod '" + message.modid + "'!");
-            }
-        }
-    }
 }
