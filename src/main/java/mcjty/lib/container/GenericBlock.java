@@ -25,7 +25,6 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -58,21 +57,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends Block
+public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends BaseBlock
         implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider, IRedstoneConnectable {
-
-    public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
-    public static final PropertyDirection FACING = PropertyDirection.create("facing");
 
     protected ModBase modBase;
     protected final Class<? extends TileEntity> tileEntityClass;
     private final Class<? extends C> containerClass;
 
     private boolean creative;
-
-    public static boolean activateBlock(Block block, World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return block.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
-    }
 
     public static Collection<IProperty<?>> getPropertyKeys(IBlockState state) {
         return state.getPropertyKeys();
