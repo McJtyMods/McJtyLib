@@ -130,10 +130,10 @@ public class RenderHelper {
     }
 
     private static void drawFluidTexture(double xCoord, double yCoord, TextureAtlasSprite textureSprite, double zLevel) {
-        double uMin = (double) textureSprite.getMinU();
-        double uMax = (double) textureSprite.getMaxU();
-        double vMin = (double) textureSprite.getMinV();
-        double vMax = (double) textureSprite.getMaxV();
+        double uMin = textureSprite.getMinU();
+        double uMax = textureSprite.getMaxU();
+        double vMin = textureSprite.getMinV();
+        double vMax = textureSprite.getMaxV();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexBuffer = tessellator.getBuffer();
@@ -525,10 +525,24 @@ public class RenderHelper {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        buffer.pos((double) (x + 0), (double) (y + height), (double) zLevel).tex((double)((float)(u + 0) * f), (double)((float)(v + height) * f1)).endVertex();
-        buffer.pos((double) (x + width), (double) (y + height), (double) zLevel).tex((double) ((float) (u + width) * f), (double) ((float) (v + height) * f1)).endVertex();
-        buffer.pos((double) (x + width), (double) (y + 0), (double) zLevel).tex((double) ((float) (u + width) * f), (double) ((float) (v + 0) * f1)).endVertex();
-        buffer.pos((double) (x + 0), (double) (y + 0), (double) zLevel).tex((double) ((float) (u + 0) * f), (double) ((float) (v + 0) * f1)).endVertex();
+        buffer.pos((x + 0), (y + height), zLevel).tex(((u + 0) * f), ((v + height) * f1)).endVertex();
+        buffer.pos((x + width), (y + height), zLevel).tex(((u + width) * f), ((v + height) * f1)).endVertex();
+        buffer.pos((x + width), (y + 0), zLevel).tex(((u + width) * f), ((v + 0) * f1)).endVertex();
+        buffer.pos((x + 0), (y + 0), zLevel).tex(((u + 0) * f), ((v + 0) * f1)).endVertex();
+        tessellator.draw();
+    }
+
+    public static void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int totw, int toth) {
+        float f = 1.0f/totw;
+        float f1 = 1.0f/toth;
+        double zLevel = 50;
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder vertexbuffer = tessellator.getBuffer();
+        vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        vertexbuffer.pos((x + 0), (y + height), zLevel).tex(((textureX + 0) *  f), ((textureY + height) * f1)).endVertex();
+        vertexbuffer.pos((x + width), (y + height), zLevel).tex(((textureX + width) * f), ((textureY + height) * f1)).endVertex();
+        vertexbuffer.pos((x + width), (y + 0), zLevel).tex(((textureX + width) * f), ((textureY + 0) * f1)).endVertex();
+        vertexbuffer.pos((x + 0), (y + 0), zLevel).tex(((textureX + 0) * f), ((textureY + 0) * f1)).endVertex();
         tessellator.draw();
     }
 
