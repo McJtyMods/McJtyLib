@@ -39,6 +39,7 @@ public class BaseBlock extends Block {
                         String name,
                         Class<? extends ItemBlock> itemBlockClass) {
         super(material);
+        this.modBase = mod;
         this.creative = false;
         setHardness(2.0f);
         setSoundType(SoundType.METAL);
