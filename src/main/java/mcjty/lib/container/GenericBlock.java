@@ -73,7 +73,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         this.hasTileEntity = isContainer;
         this.tileEntityClass = tileEntityClass;
         this.containerClass = containerClass;
-        McJtyRegister.registerLater(this, mod, itemBlockClass, tileEntityClass);
+        McJtyRegister.registerLater(this, tileEntityClass);
     }
 
     public boolean needsRedstoneCheck() {

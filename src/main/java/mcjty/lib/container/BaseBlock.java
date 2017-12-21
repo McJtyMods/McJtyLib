@@ -46,6 +46,7 @@ public class BaseBlock extends Block {
         setHarvestLevel("pickaxe", 0);
         setUnlocalizedName(mod.getModId() + "." + name);
         setRegistryName(name);
+        McJtyRegister.registerLater(this, mod, itemBlockClass);
     }
 
     public void setCreative(boolean creative) {

@@ -12,15 +12,22 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class McJtyRegister {
 
     private static final List<MBlock> blocks = new ArrayList<>();
+    private static final Map<Block,MTile> tiles = new HashMap<>();
     private static final List<MItem> items = new ArrayList<>();
 
-    public static void registerLater(Block block, ModBase mod, @Nullable Class<? extends ItemBlock> itemBlockClass, @Nullable Class<? extends TileEntity> tileEntityClass) {
-        blocks.add(new MBlock(block, mod, itemBlockClass, tileEntityClass));
+    public static void registerLater(Block block, ModBase mod, @Nullable Class<? extends ItemBlock> itemBlockClass) {
+        blocks.add(new MBlock(block, mod, itemBlockClass));
+    }
+
+    public static void registerLater(Block block, @Nullable Class<? extends TileEntity> tileEntityClass) {
+        tiles.put(block, new MTile(tileEntityClass));
     }
 
     public static void registerLater(Item item, ModBase mod) {
@@ -31,8 +38,12 @@ public class McJtyRegister {
         for (MBlock mBlock : blocks) {
             if (mBlock.getMod().getModId().equals(mod.getModId())) {
                 registry.register(mBlock.getBlock());
-                if (mBlock.getTileEntityClass() != null) {
-                    GameRegistry.registerTileEntity(mBlock.getTileEntityClass(), mBlock.getMod().getModId() + "_" + mBlock.getBlock().getRegistryName().getResourcePath());
+                if (tiles.containsKey(mBlock.getBlock())) {
+                    MTile tile = tiles.get(mBlock.getBlock());
+                    if (tile.getTileEntityClass() == null) {
+                        throw new RuntimeException("Bad tile entity registration for block: " + mBlock.getBlock().getRegistryName().toString());
+                    }
+                    GameRegistry.registerTileEntity(tile.getTileEntityClass(), mBlock.getMod().getModId() + "_" + mBlock.getBlock().getRegistryName().getResourcePath());
                 }
             }
         }
@@ -67,18 +78,27 @@ public class McJtyRegister {
         }
     }
 
+    private static class MTile {
+        private final Class<? extends TileEntity> tileEntityClass;
+
+        public MTile(Class<? extends TileEntity> tileEntityClass) {
+            this.tileEntityClass = tileEntityClass;
+        }
+
+        public Class<? extends TileEntity> getTileEntityClass() {
+            return tileEntityClass;
+        }
+    }
 
     private static class MBlock {
         private final Block block;
         private final ModBase mod;
         private final Class<? extends ItemBlock> itemBlockClass;
-        private final Class<? extends TileEntity> tileEntityClass;
 
-        public MBlock(Block block, ModBase mod, Class<? extends ItemBlock> itemBlockClass, Class<? extends TileEntity> tileEntityClass) {
+        public MBlock(Block block, ModBase mod, Class<? extends ItemBlock> itemBlockClass) {
             this.block = block;
             this.mod = mod;
             this.itemBlockClass = itemBlockClass;
-            this.tileEntityClass = tileEntityClass;
         }
 
         public Block getBlock() {
@@ -91,10 +111,6 @@ public class McJtyRegister {
 
         public Class<? extends ItemBlock> getItemBlockClass() {
             return itemBlockClass;
-        }
-
-        public Class<? extends TileEntity> getTileEntityClass() {
-            return tileEntityClass;
         }
     }
 
