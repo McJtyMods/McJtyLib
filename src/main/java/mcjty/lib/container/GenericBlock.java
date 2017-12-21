@@ -2,6 +2,7 @@ package mcjty.lib.container;
 
 import cofh.api.item.IToolHammer;
 import crazypants.enderio.api.redstone.IRedstoneConnectable;
+import mcjty.lib.McJtyRegister;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.api.smartwrench.SmartWrench;
@@ -72,6 +73,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         this.hasTileEntity = isContainer;
         this.tileEntityClass = tileEntityClass;
         this.containerClass = containerClass;
+        McJtyRegister.registerLater(this, mod, itemBlockClass, tileEntityClass);
     }
 
     public boolean needsRedstoneCheck() {
