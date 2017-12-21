@@ -2,7 +2,6 @@ package mcjty.lib.container;
 
 import cofh.api.item.IToolHammer;
 import crazypants.enderio.api.redstone.IRedstoneConnectable;
-import mcjty.lib.McJtyRegister;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.api.smartwrench.SmartWrench;
@@ -12,7 +11,6 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
-import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -22,13 +20,9 @@ import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,11 +36,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
@@ -54,30 +46,13 @@ import org.lwjgl.input.Keyboard;
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends BaseBlock
         implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider, IRedstoneConnectable {
 
-    protected ModBase modBase;
     protected final Class<? extends TileEntity> tileEntityClass;
     private final Class<? extends C> containerClass;
-
-    private boolean creative;
-
-    public static Collection<IProperty<?>> getPropertyKeys(IBlockState state) {
-        return state.getPropertyKeys();
-    }
-
-    private void init(ModBase mod, boolean isContainer) {
-        this.modBase = mod;
-        this.hasTileEntity = isContainer;
-        this.creative = false;
-        setHardness(2.0f);
-        setSoundType(SoundType.METAL);
-        setHarvestLevel("pickaxe", 0);
-    }
 
     public GenericBlock(ModBase mod,
                            Material material,
@@ -93,25 +68,10 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                            Class<? extends C> containerClass,
                            Class<? extends ItemBlock> itemBlockClass,
                            String name, boolean isContainer) {
-        super(material);
-        init(mod, isContainer);
+        super(mod, material, name, itemBlockClass);
+        this.hasTileEntity = isContainer;
         this.tileEntityClass = tileEntityClass;
         this.containerClass = containerClass;
-        setUnlocalizedName(mod.getModId() + "." + name);
-        setRegistryName(name);
-        McJtyRegister.registerLater(this, mod, itemBlockClass, tileEntityClass);
-    }
-
-    // Set this to true in case horizontal rotation is used (2 bits rotation as opposed to 3).
-    public boolean isHorizRotation() {
-        return false;
-    }
-
-    // Override and return true if this block has no rotation needed (overrides isHorizRotation)
-    public boolean hasNoRotation() { return false; }
-
-    public boolean isCreative() {
-        return creative;
     }
 
     public boolean needsRedstoneCheck() {
@@ -144,10 +104,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     @Override
     public int getStrongPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
         return getRedstoneOutput(state, world, pos, side);
-    }
-
-    public void setCreative(boolean creative) {
-        this.creative = creative;
     }
 
     @Override
@@ -446,24 +402,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return false;
     }
 
-    protected EnumFacing getOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
-        if (hasNoRotation()) {
-            return null;
-        } else if (isHorizRotation()) {
-            return BlockTools.determineOrientationHoriz(entityLivingBase);
-        } else {
-            return BlockTools.determineOrientation(pos, entityLivingBase);
-        }
-    }
-
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-        if (hasNoRotation()) {
-        } else if (isHorizRotation()) {
-            world.setBlockState(pos, state.withProperty(FACING_HORIZ, placer.getHorizontalFacing().getOpposite()), 2);
-        } else {
-            world.setBlockState(pos, state.withProperty(FACING, getFacingFromEntity(pos, placer)), 2);
-        }
+        super.onBlockPlacedBy(world, pos, state, placer, stack);
         restoreBlockFromNBT(world, pos, stack);
         if (!world.isRemote && GeneralConfig.manageOwnership) {
             setOwner(world, pos, placer);
@@ -476,22 +417,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
-    public static EnumFacing getFacingFromEntity(BlockPos clickedBlock, EntityLivingBase entityIn) {
-        if (MathHelper.abs((float) entityIn.posX - clickedBlock.getX()) < 2.0F && MathHelper.abs((float) entityIn.posZ - clickedBlock.getZ()) < 2.0F) {
-            double d0 = entityIn.posY + entityIn.getEyeHeight();
-
-            if (d0 - clickedBlock.getY() > 2.0D) {
-                return EnumFacing.UP;
-            }
-
-            if (clickedBlock.getY() - d0 > 0.0D) {
-                return EnumFacing.DOWN;
-            }
-        }
-
-        return entityIn.getHorizontalFacing().getOpposite();
-    }
-
     protected void setOwner(World world, BlockPos pos, EntityLivingBase entityLivingBase) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity && entityLivingBase instanceof EntityPlayer) {
@@ -500,12 +425,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             genericTileEntity.setOwner(player);
         }
     }
-
-    @Override
-    public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
-        return super.rotateBlock(world, pos, axis);
-    }
-
 
     @Override
     public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
@@ -548,18 +467,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
-    public EnumFacing getOrientation(int meta) {
-        EnumFacing k;
-        if (hasNoRotation()) {
-            k = null;
-        } else if (isHorizRotation()) {
-            k = BlockTools.getOrientationHoriz(meta);
-        } else {
-            k = BlockTools.getOrientation(meta);
-        }
-        return k;
-    }
-
     /**
      * Return the id of the gui to use for this block.
      */
@@ -574,52 +481,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         } else {
             return super.eventReceived(state, worldIn, pos, id, param);
         }
-    }
-
-    @Override
-    public IBlockState getStateFromMeta(int meta) {
-        if (hasNoRotation()) {
-            return getDefaultState();
-        } else if (isHorizRotation()) {
-            return getDefaultState().withProperty(FACING_HORIZ, getFacingHoriz(meta));
-        } else {
-            return getDefaultState().withProperty(FACING, getFacing(meta));
-        }
-    }
-
-    public static EnumFacing getFacingHoriz(int meta) {
-        return EnumFacing.VALUES[meta+2];
-    }
-
-    public static EnumFacing getFacing(int meta) {
-        return EnumFacing.VALUES[meta & 7];
-    }
-
-    @Override
-    public int getMetaFromState(IBlockState state) {
-        if (hasNoRotation()) {
-            return 0;
-        } else if (isHorizRotation()) {
-            return state.getValue(FACING_HORIZ).getIndex()-2;
-        } else {
-            return state.getValue(FACING).getIndex();
-        }
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState() {
-        if (hasNoRotation()) {
-            return new BlockStateContainer(this);
-        } else if (isHorizRotation()) {
-            return new BlockStateContainer(this, FACING_HORIZ);
-        } else {
-            return new BlockStateContainer(this, FACING);
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
     @SideOnly(Side.CLIENT)
