@@ -1,6 +1,6 @@
 package mcjty.lib.compat.waila;
 
-import mcjty.lib.container.GenericBlock;
+import mcjty.lib.container.BaseBlock;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
@@ -35,9 +35,9 @@ public class WailaCompatibility implements IWailaDataProvider {
             throw new RuntimeException("Please register this handler using the provided method");
         }
         if (!loaded) {
-            registrar.registerHeadProvider(INSTANCE, GenericBlock.class);
-            registrar.registerBodyProvider(INSTANCE, GenericBlock.class);
-            registrar.registerTailProvider(INSTANCE, GenericBlock.class);
+            registrar.registerHeadProvider(INSTANCE, BaseBlock.class);
+            registrar.registerBodyProvider(INSTANCE, BaseBlock.class);
+            registrar.registerTailProvider(INSTANCE, BaseBlock.class);
             loaded = true;
         }
     }

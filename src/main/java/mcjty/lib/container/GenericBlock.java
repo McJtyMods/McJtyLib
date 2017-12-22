@@ -9,8 +9,6 @@ import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.api.smartwrench.SmartWrenchMode;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
-import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
@@ -50,7 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends BaseBlock
-        implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider, IRedstoneConnectable {
+        implements ITileEntityProvider, IRedstoneConnectable {
 
     protected final Class<? extends TileEntity> tileEntityClass;
     private final Class<? extends C> containerClass;
@@ -124,6 +122,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
         BlockPos pos = data.getPos();
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
@@ -154,6 +153,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     @Override
     @SideOnly(Side.CLIENT)
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+        currenttip = super.getWailaBody(itemStack, currenttip, accessor, config);
         Block block = accessor.getBlock();
         TileEntity tileEntity = accessor.getTileEntity();
         if (tileEntity instanceof GenericTileEntity) {

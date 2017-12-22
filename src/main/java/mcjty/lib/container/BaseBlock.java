@@ -2,7 +2,14 @@ package mcjty.lib.container;
 
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
+import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.varia.OrientationTools;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -25,8 +32,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Collection;
+import java.util.List;
 
-public class BaseBlock extends Block {
+public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider {
 
     protected ModBase modBase;
     private boolean creative;
@@ -185,4 +193,13 @@ public class BaseBlock extends Block {
         ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
+    @Override
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+        return currenttip;
+    }
 }
