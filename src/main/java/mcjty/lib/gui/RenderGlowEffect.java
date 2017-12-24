@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
 
 public class RenderGlowEffect {
@@ -44,19 +45,26 @@ public class RenderGlowEffect {
             new Quad(new Vt(1, 0, 0), new Vt(1, 1, 0), new Vt(1, 1, 1), new Vt(1, 0, 1)),       // EAST
     };
 
+    public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset, Vec3d offs) {
+        int brightness = 240;
+        int b1 = brightness >> 16 & 65535;
+        int b2 = brightness & 65535;
+        Quad quad = quads[side];
+        buffer.pos(offs.x + quad.v1.x * mult + offset, offs.y + quad.v1.y * mult + offset, offs.z + quad.v1.z * mult + offset).tex((float) 0, (float) 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(offs.x + quad.v2.x * mult + offset, offs.y + quad.v2.y * mult + offset, offs.z + quad.v2.z * mult + offset).tex((float) 0, (float) 1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(offs.x + quad.v3.x * mult + offset, offs.y + quad.v3.y * mult + offset, offs.z + quad.v3.z * mult + offset).tex((float) 1, (float) 1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(offs.x + quad.v4.x * mult + offset, offs.y + quad.v4.y * mult + offset, offs.z + quad.v4.z * mult + offset).tex((float) 1, (float) 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+    }
+
     public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset) {
         int brightness = 240;
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;
-        float u1 = 0;
-        float v1 = 0;
-        float u2 = 1;
-        float v2 = 1;
         Quad quad = quads[side];
-        buffer.pos(quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).tex(u1, v1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).tex(u1, v2).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(quad.v3.x * mult + offset, quad.v3.y * mult + offset, quad.v3.z * mult + offset).tex(u2, v2).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(quad.v4.x * mult + offset, quad.v4.y * mult + offset, quad.v4.z * mult + offset).tex(u2, v1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).tex((float) 0, (float) 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).tex((float) 0, (float) 1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(quad.v3.x * mult + offset, quad.v3.y * mult + offset, quad.v3.z * mult + offset).tex((float) 1, (float) 1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(quad.v4.x * mult + offset, quad.v4.y * mult + offset, quad.v4.z * mult + offset).tex((float) 1, (float) 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
     }
 
     private static class Vt {
