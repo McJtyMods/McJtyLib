@@ -10,6 +10,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
 
 import java.util.Set;
@@ -49,11 +50,92 @@ public class BlockOutlineRenderer {
         GlStateManager.popMatrix();
     }
 
+    /**
+     * This method translates GL state relative to player position
+     */
+    public static void renderOutlines(EntityPlayerSP p, Set<BlockPos> coordinates, int r, int g, int b, float partialTicks) {
+        double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
+        double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
+        double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
+
+        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+        Minecraft.getMinecraft().entityRenderer.disableLightmap();
+        GlStateManager.disableDepth();
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableLighting();
+        GlStateManager.disableAlpha();
+        GlStateManager.depthMask(false);
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
+
+        renderOutlines(coordinates, r, g, b, 4);
+
+        GlStateManager.popMatrix();
+
+        Minecraft.getMinecraft().entityRenderer.enableLightmap();
+        GlStateManager.enableTexture2D();
+    }
+
 
     /**
      * This method expects the GL state matrix to be translated to relative player position already
      * (player.lastTickPos + (player.pos - player.lastTickPos)* partialTicks)
-     * @param pos
+     */
+    public static void renderOutlines(Set<BlockPos> coordinates, int r, int g, int b, int thickness) {
+        Tessellator tessellator = Tessellator.getInstance();
+
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
+
+//        GlStateManager.color(r / 255.0f, g / 255.0f, b / 255.0f);
+        GL11.glLineWidth(thickness);
+
+        for (BlockPos coordinate : coordinates) {
+            float x = coordinate.getX();
+            float y = coordinate.getY();
+            float z = coordinate.getZ();
+
+            renderHighLightedBlocksOutline(buffer, x, y, z, r / 255.0f, g / 255.0f, b / 255.0f, 1.0f); // .02f
+        }
+        tessellator.draw();
+    }
+
+    public static void renderHighLightedBlocksOutline(BufferBuilder buffer, float mx, float my, float mz, float r, float g, float b, float a) {
+        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+
+        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
+    }
+
+
+
+    /**
+     * This method expects the GL state matrix to be translated to relative player position already
+     * (player.lastTickPos + (player.pos - player.lastTickPos)* partialTicks)
      */
     public static void renderBoxOutline(BlockPos pos) {
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
