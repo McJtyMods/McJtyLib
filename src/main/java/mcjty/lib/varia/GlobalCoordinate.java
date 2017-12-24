@@ -11,6 +11,10 @@ public class GlobalCoordinate extends BlockPos {
         this.dimension = dimension;
     }
 
+    public BlockPos getCoordinate() {
+        return this;
+    }
+
     public int getDimension() {
         return dimension;
     }
