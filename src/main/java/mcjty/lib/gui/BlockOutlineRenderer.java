@@ -19,7 +19,7 @@ public class BlockOutlineRenderer {
     /**
      * This method translates GL state relative to player position
      */
-    private static void renderHilightedBlock(BlockPos c, float partialTicks) {
+    public static void renderHilightedBlock(BlockPos c, float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
 
         EntityPlayerSP p = mc.player;
@@ -55,7 +55,7 @@ public class BlockOutlineRenderer {
      * (player.lastTickPos + (player.pos - player.lastTickPos)* partialTicks)
      * @param pos
      */
-    private static void renderBoxOutline(BlockPos pos) {
+    public static void renderBoxOutline(BlockPos pos) {
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
         Minecraft.getMinecraft().entityRenderer.disableLightmap();
         GlStateManager.disableTexture2D();
@@ -82,7 +82,7 @@ public class BlockOutlineRenderer {
     /**
      * This method translates GL state relative to player position
      */
-    private static void renderHighlightedBlocks(EntityPlayerSP p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
+    public static void renderHighlightedBlocks(EntityPlayerSP p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
