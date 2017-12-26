@@ -68,18 +68,10 @@ public class EntityTools {
         } else {
             clazz = ForgeRegistries.ENTITIES.getValue(new ResourceLocation(mobId)).getEntityClass();
         }
-        EntityLiving entityLiving = null;
         try {
-            entityLiving = (EntityLiving) clazz.getConstructor(World.class).newInstance(world);
-        } catch (InstantiationException e) {
-            return null;
-        } catch (IllegalAccessException e) {
-            return null;
-        } catch (InvocationTargetException e) {
-            return null;
-        } catch (NoSuchMethodException e) {
+            return (EntityLiving) clazz.getConstructor(World.class).newInstance(world);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             return null;
         }
-        return entityLiving;
     }
 }

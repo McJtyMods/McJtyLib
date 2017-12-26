@@ -22,6 +22,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
+import java.io.IOException;
 
 public class FontLoader {
 
@@ -37,7 +38,7 @@ public class FontLoader {
             font = new Font(name, type, (int) defSize);
             font = font.deriveFont(defSize);
             out = new TrueTypeFont(font, antialias);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
         return out;
@@ -58,7 +59,7 @@ public class FontLoader {
             font = Font.createFont(type, Minecraft.getMinecraft().getResourceManager().getResource(res).getInputStream());
             font = font.deriveFont(defSize);
             out = new TrueTypeFont(font, antialias, additionalChars);
-        } catch (Exception e) {
+        } catch (RuntimeException | FontFormatException | IOException e) {
             e.printStackTrace();
         }
         return out;

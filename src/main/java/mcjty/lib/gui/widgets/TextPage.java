@@ -108,7 +108,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             IResource iresource;
             try {
                 iresource = resourceManager.getResource(manualResource);
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 String fallBackPath = manualResource.getResourcePath().replaceAll("-([a-z\\-]{2,6})_?([a-z]{0,3})", "");
                 iresource = resourceManager.getResource(new ResourceLocation(manualResource.getResourceDomain(), fallBackPath));
             }
@@ -129,8 +129,6 @@ public class TextPage extends AbstractWidget<TextPage> {
             }
             newPage(page);
 
-        } catch (FileNotFoundException e) {
-            Logging.logError("Error reading manual text", e);
         } catch (IOException e) {
             Logging.logError("Error reading manual text", e);
         }
@@ -484,18 +482,15 @@ public class TextPage extends AbstractWidget<TextPage> {
                 String[] split = StringUtils.split(substring, ',');
                 u = 0;
                 v = 0;
-                try {
-                    u = Integer.parseInt(split[1]);
-                    v = Integer.parseInt(split[2]);
-                } catch (IndexOutOfBoundsException e) {
-                } catch (NumberFormatException e) {
+                if(split.length > 2) {
+                    try {
+                        u = Integer.parseInt(split[1]);
+                        v = Integer.parseInt(split[2]);
+                    } catch (NumberFormatException e) {
+                    }
                 }
                 resourceLocation = new ResourceLocation(modBase.getModId(), split[0]);
-                try {
-                    this.line = split[3];
-                } catch (IndexOutOfBoundsException e) {
-                    this.line = "<error>";
-                }
+                this.line = split.length > 3 ? split[3] : "<error>";
                 height = 16+2;
             }
         }

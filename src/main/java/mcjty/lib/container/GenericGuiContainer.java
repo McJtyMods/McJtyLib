@@ -21,6 +21,7 @@ import org.lwjgl.input.Keyboard;
 import javax.annotation.Nonnull;
 import java.awt.Rectangle;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,12 +58,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     public List<Rectangle> getSideWindowBounds() {
         if (sideWindow.getWindow() == null || sideWindow.getWindow().getToplevel() == null) {
-            try {
-                throw new RuntimeException("Internal error! getSideWindowBounds() called before initGui!");
-            } catch (RuntimeException e) {
-                Logging.logError("Internal error! getSideWindowBounds() called before initGui!", e);
-                return Collections.emptyList();
-            }
+            Logging.getLogger().error(new RuntimeException("Internal error! getSideWindowBounds() called before initGui!"));
+            return Collections.emptyList();
         }
         return Collections.singletonList(sideWindow.getWindow().getToplevel().getBounds());
     }
@@ -281,13 +278,12 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     }
 
     public void keyTypedFromEvent(char typedChar, int keyCode) {
-        try {
-            boolean b = getWindowManager().keyTyped(typedChar, keyCode);
-            if (b) {
+        if (getWindowManager().keyTyped(typedChar, keyCode)) {
+            try {
                 super.keyTyped(typedChar, keyCode);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

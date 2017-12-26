@@ -17,9 +17,7 @@ public class PacketReturnInfoToClient implements IMessage {
         Class<? extends InfoPacketClient> clazz = PacketHandler.getClientInfoPacket(id);
         try {
             packet = clazz.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
         packet.fromBytes(buf);

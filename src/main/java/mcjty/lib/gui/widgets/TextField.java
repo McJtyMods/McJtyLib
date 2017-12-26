@@ -81,8 +81,7 @@ public class TextField extends AbstractWidget<TextField> {
                 String data = "";
                 try {
                     data = (String) clipboard.getData(DataFlavor.stringFlavor);
-                } catch (UnsupportedFlavorException e) {
-                } catch (IOException e) {
+                } catch (UnsupportedFlavorException | IOException e) {
                 }
                 text = text.substring(0, cursor) + data + text.substring(cursor);
                 cursor += data.length();

@@ -22,9 +22,7 @@ public class PacketGetInfoFromServer implements IMessage {
         Class<? extends InfoPacketServer> clazz = PacketHandler.getServerInfoPacket(id);
         try {
             packet = clazz.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
         packet.fromBytes(buf);

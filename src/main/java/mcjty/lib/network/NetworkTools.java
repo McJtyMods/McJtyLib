@@ -32,7 +32,7 @@ public class NetworkTools {
         fluidStack.writeToNBT(nbt);
         try {
             buf.writeCompoundTag(nbt);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             Logging.logError("Error writing fluid stack", e);
         }
     }
@@ -51,7 +51,7 @@ public class NetworkTools {
         PacketBuffer buf = new PacketBuffer(dataOut);
         try {
             buf.writeCompoundTag(tag);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             Logging.logError("Error writing tag", e);
         }
     }
@@ -83,7 +83,7 @@ public class NetworkTools {
         try {
             buf.writeCompoundTag(nbt);
             buf.writeInt(itemStack.getCount());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             Logging.logError("Error writing item stack", e);
         }
     }

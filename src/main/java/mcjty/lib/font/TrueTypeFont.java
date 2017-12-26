@@ -249,7 +249,7 @@ public class TrueTypeFont {
 
             //.getTexture(font.toString(), imgTemp);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             System.err.println("Failed to create font.");
             e.printStackTrace();
         }
@@ -552,7 +552,7 @@ public class TrueTypeFont {
             GLU.gluBuild2DMipmaps(GL11.GL_TEXTURE_2D, internalFormat, width, height, format, GL11.GL_UNSIGNED_BYTE, byteBuffer);
             return textureId.get(0);
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             e.printStackTrace();
         }
 

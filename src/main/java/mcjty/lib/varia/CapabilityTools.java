@@ -15,7 +15,7 @@ public class CapabilityTools {
                 return true;
             }
             return false;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             reportWrongBlock(tileEntity, e);
             return false;
         }
@@ -24,7 +24,7 @@ public class CapabilityTools {
     public static IItemHandler getItemCapabilitySafe(TileEntity tileEntity) {
         try {
             return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             reportWrongBlock(tileEntity, e);
             return null;
         }
@@ -40,7 +40,7 @@ public class CapabilityTools {
                 return capability;
             }
             return null;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             reportWrongBlock(tileEntity, e);
             return null;
         }
@@ -49,7 +49,7 @@ public class CapabilityTools {
     public static IFluidHandler getFluidCapabilitySafe(TileEntity tileEntity) {
         try {
             return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             reportWrongBlock(tileEntity, e);
             return null;
         }

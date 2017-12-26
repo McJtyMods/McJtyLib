@@ -44,6 +44,7 @@ import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -501,7 +502,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             Constructor<? extends GenericGuiContainer> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
             gui = guiConstructor.newInstance(inventory, container);
             return gui;
-        } catch (Exception e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             Logging.logError("Severe exception during creation of gui!");
             throw new RuntimeException(e);
         }
@@ -514,7 +515,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
             container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? inventory : null);
             return container;
-        } catch (Exception e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             Logging.logError("Severe exception during creation of gui!");
             throw new RuntimeException(e);
         }
