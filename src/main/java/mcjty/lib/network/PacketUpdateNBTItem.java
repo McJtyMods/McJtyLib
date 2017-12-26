@@ -30,7 +30,7 @@ public abstract class PacketUpdateNBTItem implements IMessage {
         if (arguments == null) {
             this.args = null;
         } else {
-            args = new HashMap<String, Argument>(arguments.length);
+            args = new HashMap<>(arguments.length);
             for (Argument arg : arguments) {
                 args.put(arg.getName(), arg);
             }

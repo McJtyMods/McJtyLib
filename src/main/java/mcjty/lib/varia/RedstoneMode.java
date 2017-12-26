@@ -8,7 +8,7 @@ public enum RedstoneMode {
     REDSTONE_OFFREQUIRED("Off"),
     REDSTONE_ONREQUIRED("On");
 
-    private static final Map<String,RedstoneMode> modeToMode = new HashMap<String, RedstoneMode>();
+    private static final Map<String,RedstoneMode> modeToMode = new HashMap<>();
 
     private final String description;
 

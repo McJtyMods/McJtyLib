@@ -9,7 +9,7 @@ import java.util.List;
 public final class Type<V> {
 
     // Root
-    public static final Type<Object> OBJECT = new Type<Object>(Object.class);
+    public static final Type<Object> OBJECT = new Type<>(Object.class);
 
     // Basic
     public static final Type<Integer> INTEGER = create(Integer.class);
@@ -26,7 +26,7 @@ public final class Type<V> {
 
     @Nonnull
     public static <V> Type<V> create(@Nonnull final Class<? super V> type) {
-        return new Type<V>((Class<V>) type);
+        return new Type<>((Class<V>) type);
     }
 
     @Nonnull

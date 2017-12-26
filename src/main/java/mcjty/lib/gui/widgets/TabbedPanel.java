@@ -11,7 +11,7 @@ import java.util.Map;
 public class TabbedPanel extends AbstractContainerWidget<Panel> {
 
     private Widget current = null;
-    private Map<String,Widget> pages = new HashMap<String, Widget>();
+    private Map<String,Widget> pages = new HashMap<>();
 
     public TabbedPanel(Minecraft mc, Gui gui) {
         super(mc, gui);

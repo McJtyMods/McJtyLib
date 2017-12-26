@@ -42,7 +42,7 @@ public class TrueTypeFont {
     /**
      * Map of user defined font characters (Character <-> IntObject)
      */
-    private Map customChars = new HashMap();
+    private Map<Character, FloatObject> customChars = new HashMap<>();
 
     /**
      * Boolean flag on whether AntiAliasing is enabled or not

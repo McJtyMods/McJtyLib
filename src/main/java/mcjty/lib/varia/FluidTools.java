@@ -89,11 +89,7 @@ public class FluidTools {
     @Nonnull
     public static ItemStack drainContainer(@Nonnull ItemStack container) {
         ItemStack empty = container.copy();
-        if (1 <= 0) {
-            empty.setCount(0);
-        } else {
-            empty.setCount(1);
-        }
+        empty.setCount(1);
         IFluidHandlerItem fluidHandler = FluidUtil.getFluidHandler(empty);
         if (fluidHandler == null) {
             return ItemStack.EMPTY;

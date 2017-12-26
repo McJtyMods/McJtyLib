@@ -98,7 +98,7 @@ public class ToggleButton extends Label<ToggleButton> {
 
     public ToggleButton addButtonEvent(ButtonEvent event) {
         if (buttonEvents == null) {
-            buttonEvents = new ArrayList<ButtonEvent>();
+            buttonEvents = new ArrayList<>();
         }
         buttonEvents.add(event);
         return this;

@@ -12,7 +12,7 @@ public enum ArgumentType {
     TYPE_STACK(5);
 
     private final int index;
-    private static final Map<Integer, ArgumentType> mapping = new HashMap<Integer, ArgumentType>();
+    private static final Map<Integer, ArgumentType> mapping = new HashMap<>();
 
     static {
         for (ArgumentType type : values()) {

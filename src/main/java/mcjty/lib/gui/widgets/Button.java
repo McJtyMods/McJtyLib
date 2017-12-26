@@ -61,7 +61,7 @@ public class Button extends Label<Button> {
 
     public Button addButtonEvent(ButtonEvent event) {
         if (buttonEvents == null) {
-            buttonEvents = new ArrayList<ButtonEvent>();
+            buttonEvents = new ArrayList<>();
         }
         buttonEvents.add(event);
         return this;

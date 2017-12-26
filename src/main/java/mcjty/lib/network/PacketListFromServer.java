@@ -27,7 +27,7 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T> im
 
         int size = buf.readInt();
         if (size != -1) {
-            list = new ArrayList<T>(size);
+            list = new ArrayList<>(size);
             for (int i = 0 ; i < size ; i++) {
                 T item = createItem(buf);
                 list.add(item);
@@ -63,7 +63,7 @@ public abstract class PacketListFromServer<S extends PacketListFromServer, T> im
     public PacketListFromServer(BlockPos pos, String command, List<T> list){
         this.pos = pos;
         this.command = command;
-        this.list = new ArrayList<T>();
+        this.list = new ArrayList<>();
         this.list.addAll(list);
     }
 }

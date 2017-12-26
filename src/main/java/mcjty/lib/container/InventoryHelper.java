@@ -167,14 +167,9 @@ public class InventoryHelper {
             for (int i = start ; i <= stop  ; i++) {
                 if (inventory.getStackInSlot(i).isEmpty()) {
                     ItemStack copy = heldItem.copy();
-                    if (1 <= 0) {
-                        copy.setCount(0);
-                    } else {
-                        copy.setCount(1);
-                    }
+                    copy.setCount(1);
                     inventory.setInventorySlotContents(i, copy);
-                    int amount = -1;
-                    heldItem.grow(amount);
+                    heldItem.shrink(1);
                     if (heldItem.isEmpty()) {
                         player.setHeldItem(hand, ItemStack.EMPTY);
                     }
@@ -467,15 +462,11 @@ public class InventoryHelper {
 
         if (containerFactory.isGhostSlot(index)) {
             if (!stack.isEmpty()) {
-                stacks.set(index, stack.copy());
+                ItemStack stack1 = stack.copy();
                 if (index < 9) {
-                    ItemStack stack1 = stacks.get(index);
-                    if (1 <= 0) {
-                        stack1.setCount(0);
-                    } else {
-                        stack1.setCount(1);
-                    }
+                    stack1.setCount(1);
                 }
+                stacks.set(index, stack1);
             } else {
                 stacks.set(index, ItemStack.EMPTY);
             }

@@ -7,7 +7,7 @@ public enum SmartWrenchMode {
     MODE_WRENCH("w", "wrench"),
     MODE_SELECT("s", "focus");
 
-    private static Map<String,SmartWrenchMode> codeToMode = new HashMap<String, SmartWrenchMode>();
+    private static Map<String,SmartWrenchMode> codeToMode = new HashMap<>();
 
     private final String code;
     private final String name;

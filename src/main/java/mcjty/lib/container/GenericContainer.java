@@ -298,11 +298,7 @@ public class GenericContainer extends Container {
             ItemStack clickedWith = player.inventory.getItemStack();
             if (!clickedWith.isEmpty()) {
                 ItemStack copy = clickedWith.copy();
-                if (1 <= 0) {
-                    copy.setCount(0);
-                } else {
-                    copy.setCount(1);
-                }
+                copy.setCount(1);
                 slot.putStack(copy);
             }
             detectAndSendChanges();

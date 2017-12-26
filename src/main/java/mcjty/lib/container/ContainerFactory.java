@@ -30,9 +30,9 @@ public class ContainerFactory {
             return;
         }
         slotsSetup = true;
-        List<Integer> s = new ArrayList<Integer>();
-        List<Integer> si = new ArrayList<Integer>();
-        List<Integer> so = new ArrayList<Integer>();
+        List<Integer> s = new ArrayList<>();
+        List<Integer> si = new ArrayList<>();
+        List<Integer> so = new ArrayList<>();
         int index = 0;
         for (SlotFactory slotFactory : slots) {
             if (slotFactory.getSlotType() == SlotType.SLOT_INPUT) {

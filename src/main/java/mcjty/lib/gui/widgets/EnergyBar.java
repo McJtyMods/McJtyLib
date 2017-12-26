@@ -58,7 +58,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     public List<String> getTooltips() {
         if (tooltips == null) {
             String s = getValue() + " / " + getMaxValue();
-            List<String> tt = new ArrayList<String>();
+            List<String> tt = new ArrayList<>();
             tt.add(s);
             return tt;
         } else {

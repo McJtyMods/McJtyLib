@@ -150,7 +150,7 @@ public class Window {
         int x = getRelativeX();
         int y = getRelativeY();
         if (toplevel.in(x, y) && toplevel.isVisible()) {
-            Widget w = toplevel.getWidgetAtPosition(x, y);
+            Widget<?> w = toplevel.getWidgetAtPosition(x, y);
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 return tooltips;
@@ -163,7 +163,7 @@ public class Window {
         int x = getRelativeX();
         int y = getRelativeY();
         if (toplevel.in(x, y) && toplevel.isVisible()) {
-            Widget w = toplevel.getWidgetAtPosition(x, y);
+            Widget<?> w = toplevel.getWidgetAtPosition(x, y);
             List<ItemStack> tooltips = w.getTooltipItems();
             if (tooltips != null) {
                 return tooltips;

@@ -31,12 +31,12 @@ import java.util.Map;
 
 public class TextPage extends AbstractWidget<TextPage> {
     private ModBase modBase;
-    private final List<Page> pages = new ArrayList<Page>();
-    private final Map<String,Integer> nodes = new HashMap<String, Integer>();
+    private final List<Page> pages = new ArrayList<>();
+    private final Map<String,Integer> nodes = new HashMap<>();
 
     private int pageIndex = 0;
-    private final List<Line> lines = new ArrayList<Line>();
-    private final List<Link> links = new ArrayList<Link>();
+    private final List<Line> lines = new ArrayList<>();
+    private final List<Link> links = new ArrayList<>();
 
     private ResourceLocation arrowImage = null;
     private int arrowU;

@@ -22,7 +22,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     private long prevTime = -1;
     private boolean propagateEventsToChildren = false;
     private List<SelectionEvent> selectionEvents = null;
-    private Set<Integer> hilightedRows = new HashSet<Integer>();
+    private Set<Integer> hilightedRows = new HashSet<>();
     private boolean noselection = false;
     private boolean invisibleselection = false;
     private boolean drawHorizontalLines = true;
@@ -374,7 +374,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     public WidgetList addSelectionEvent(SelectionEvent event) {
         if (selectionEvents == null) {
-            selectionEvents = new ArrayList<SelectionEvent> ();
+            selectionEvents = new ArrayList<> ();
         }
         selectionEvents.add(event);
         return this;
@@ -406,7 +406,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     public WidgetList removeChild(Widget child) {
         int index = children.indexOf(child);
         if (index != -1) {
-            Set<Integer> newHighlights = new HashSet<Integer>();
+            Set<Integer> newHighlights = new HashSet<>();
             for (Integer i : hilightedRows) {
                 if (i < index) {
                     newHighlights.add(i);

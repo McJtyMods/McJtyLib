@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -107,7 +106,7 @@ public class WindowManager {
         getInteractableWindows().forEach(w -> {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
-                GenericGuiContainer gui = (GenericGuiContainer) this.gui;
+                GenericGuiContainer<?> gui = (GenericGuiContainer<?>) this.gui;
                 gui.drawHoveringText(tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.mc.fontRenderer);
             }
         });
@@ -121,7 +120,7 @@ public class WindowManager {
                 .findFirst();
     }
 
-    public void mouseClicked(int x, int y, int button) throws IOException {
+    public void mouseClicked(int x, int y, int button) {
         if ((!iconManager.isClickHoldToDrag()) && iconManager.isDragging()) {
             if (button == 1) {
                 iconManager.cancelDragging();
@@ -133,7 +132,7 @@ public class WindowManager {
         getInteractableWindows().forEach(w -> w.mouseClicked(x, y, button));
     }
 
-    public void handleMouseInput() throws IOException {
+    public void handleMouseInput() {
         getInteractableWindows().forEach(Window::handleMouseInput);
     }
 
@@ -144,7 +143,7 @@ public class WindowManager {
         getInteractableWindows().forEach(w -> w.mouseMovedOrUp(x, y, state));
     }
 
-    public boolean keyTyped(char typedChar, int keyCode) throws IOException {
+    public boolean keyTyped(char typedChar, int keyCode) {
         return getInteractableWindows().allMatch(w -> !w.keyTyped(typedChar, keyCode));
     }
 }

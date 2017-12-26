@@ -36,10 +36,12 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     private GuiSideWindow sideWindow;
 
+    @Override
     public int getGuiLeft() {
         return guiLeft;
     }
 
+    @Override
     public int getGuiTop() {
         return guiTop;
     }
@@ -96,8 +98,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         getWindowManager().drawTooltips();
     }
 
-    private List parseString(String s, List<ItemStack> items) {
-        List l = new ArrayList<>();
+    private List<Object> parseString(String s, List<ItemStack> items) {
+        List<Object> l = new ArrayList<>();
         String current = "";
         int i = 0;
         while (i < s.length()) {

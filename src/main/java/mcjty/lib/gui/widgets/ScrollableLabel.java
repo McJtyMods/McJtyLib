@@ -96,7 +96,7 @@ public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollabl
 
     public ScrollableLabel addValueEvent(ValueEvent event) {
         if (valueEvents == null) {
-            valueEvents = new ArrayList<ValueEvent>();
+            valueEvents = new ArrayList<>();
         }
         valueEvents.add(event);
         return this;

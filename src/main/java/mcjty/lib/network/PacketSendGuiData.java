@@ -46,7 +46,7 @@ public class PacketSendGuiData implements IMessage {
     }
 
 
-    private static final Map<Integer,Entry> CLASS_MAP = new HashMap<>();
+    private static final Map<Integer,Entry<?>> CLASS_MAP = new HashMap<>();
     static {
         int id = 0;
         CLASS_MAP.put(id++, Entry.of(Integer.class, ByteBuf::readInt, p -> p.getLeft().writeInt(p.getRight())));
@@ -77,7 +77,7 @@ public class PacketSendGuiData implements IMessage {
         buf.writeShort(data.length);
         for (Object o : data) {
             boolean ok = false;
-            for (Map.Entry<Integer, Entry> entry : CLASS_MAP.entrySet()) {
+            for (Map.Entry<Integer, Entry<?>> entry : CLASS_MAP.entrySet()) {
                 Entry triple = entry.getValue();
                 if (triple.match(o)) {
                     buf.writeByte(entry.getKey());

@@ -13,11 +13,11 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
-    private List<String> choiceList = new ArrayList<String>();
-    private List<List<String>> tooltipList = new ArrayList<List<String>>();
-    private List<ResourceLocation> imageList = new ArrayList<ResourceLocation>();
-    private List<Integer> uList = new ArrayList<Integer>();
-    private List<Integer> vList = new ArrayList<Integer>();
+    private List<String> choiceList = new ArrayList<>();
+    private List<List<String>> tooltipList = new ArrayList<>();
+    private List<ResourceLocation> imageList = new ArrayList<>();
+    private List<Integer> uList = new ArrayList<>();
+    private List<Integer> vList = new ArrayList<>();
     private boolean withBorder = false;
     private int highlightedChoice = -1;     // If this choice is selected we 'highlight' it (only in combination with withBorder=true)
 
@@ -137,7 +137,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
 
     public ImageChoiceLabel addChoiceEvent(ChoiceEvent event) {
         if (choiceEvents == null) {
-            choiceEvents = new ArrayList<ChoiceEvent>();
+            choiceEvents = new ArrayList<>();
         }
         choiceEvents.add(event);
         return this;

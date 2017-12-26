@@ -46,7 +46,7 @@ public class AbstractServerCommand implements IMessage {
         if (size == 0) {
             args = null;
         } else {
-            args = new HashMap<String,Argument>(size);
+            args = new HashMap<>(size);
             for (int i = 0 ; i < size ; i++) {
                 String key = NetworkTools.readString(buf);
                 ArgumentType type = ArgumentType.getType(buf.readByte());
@@ -142,7 +142,7 @@ public class AbstractServerCommand implements IMessage {
         if (arguments == null) {
             this.args = null;
         } else {
-            args = new HashMap<String, Argument>(arguments.length);
+            args = new HashMap<>(arguments.length);
             for (Argument arg : arguments) {
                 args.put(arg.getName(), arg);
             }

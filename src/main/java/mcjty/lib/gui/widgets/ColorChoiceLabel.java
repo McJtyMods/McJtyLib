@@ -11,8 +11,8 @@ import org.lwjgl.input.Keyboard;
 import java.util.*;
 
 public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
-    private List<Integer> colorList = new ArrayList<Integer>();
-    private Map<Integer,List<String>> tooltipMap = new HashMap<Integer, List<String>>();
+    private List<Integer> colorList = new ArrayList<>();
+    private Map<Integer,List<String>> tooltipMap = new HashMap<>();
     private Integer currentColor = null;
     private List<ColorChoiceEvent> choiceEvents = null;
 
@@ -100,7 +100,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
 
     public ColorChoiceLabel addChoiceEvent(ColorChoiceEvent event) {
         if (choiceEvents == null) {
-            choiceEvents = new ArrayList<ColorChoiceEvent>();
+            choiceEvents = new ArrayList<>();
         }
         choiceEvents.add(event);
         return this;
