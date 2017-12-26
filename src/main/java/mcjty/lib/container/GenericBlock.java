@@ -50,7 +50,7 @@ import java.util.List;
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends BaseBlock
         implements ITileEntityProvider, IRedstoneConnectable {
 
-    protected final Class<? extends TileEntity> tileEntityClass;
+    protected final Class<? extends T> tileEntityClass;
     private final Class<? extends C> containerClass;
 
     public GenericBlock(ModBase mod,
