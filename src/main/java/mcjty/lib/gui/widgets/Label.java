@@ -9,7 +9,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
-public class Label<P extends Label> extends AbstractWidget<P> {
+public class Label<P extends Label<P>> extends AbstractWidget<P> {
 
     private String text;
     private int color = StyleConfig.colorTextNormal;

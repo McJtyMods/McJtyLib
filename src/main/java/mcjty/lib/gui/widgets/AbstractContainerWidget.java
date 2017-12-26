@@ -7,7 +7,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractContainerWidget<P extends AbstractContainerWidget> extends AbstractWidget<P> {
+public class AbstractContainerWidget<P extends AbstractContainerWidget<P>> extends AbstractWidget<P> {
     protected List<Widget> children = new ArrayList<>();
 
     public AbstractContainerWidget(Minecraft mc, Gui gui) {

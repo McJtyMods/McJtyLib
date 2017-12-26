@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class SlotDefinition {
     private final SlotType type;
     private final ItemStack[] itemStacks;
-    private final Class itemClass;
+    private final Class<?> itemClass;
 
     public SlotDefinition(SlotType type, ItemStack... itemStacks) {
         this.type = type;
@@ -15,10 +15,10 @@ public class SlotDefinition {
         this.itemClass = null;
     }
 
-    public SlotDefinition(SlotType type, Class itemClass) {
+    public SlotDefinition(SlotType type, Class<?> itemClass) {
         this.type = type;
         this.itemStacks = new ItemStack[0];
-        this.itemClass = itemClass;
+        this.itemClass = itemClass; // TODO see if this can be changed to Class<? extends Item>
     }
 
     public SlotType getType() {

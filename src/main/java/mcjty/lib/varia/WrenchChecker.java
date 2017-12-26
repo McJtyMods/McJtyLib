@@ -7,7 +7,7 @@ import java.util.List;
 
 public class WrenchChecker {
 
-    private static List<Class> wrenchClasses=new ArrayList<>();
+    private static List<Class<?>> wrenchClasses=new ArrayList<>();
 
     public static void init() {
         for (String className : new String[] {

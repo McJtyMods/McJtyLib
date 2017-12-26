@@ -5,7 +5,7 @@ import mcjty.lib.gui.widgets.Widget;
 import java.awt.*;
 import java.util.Collection;
 
-public abstract class AbstractLayout<P extends AbstractLayout> implements Layout {
+public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Layout {
     private int spacing = 5;
     private int horizontalMargin = 5;
     private int verticalMargin = 2;

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class AbstractWidget<P extends AbstractWidget> implements Widget<P> {
+public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Widget<P> {
 
     protected Rectangle bounds;
     protected int desiredWidth = SIZE_UNKNOWN;

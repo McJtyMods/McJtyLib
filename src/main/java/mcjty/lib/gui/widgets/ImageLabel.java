@@ -6,7 +6,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
-public class ImageLabel<P extends ImageLabel> extends AbstractWidget<P> {
+public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
     private ResourceLocation image = null;
     private int u;
     private int v;

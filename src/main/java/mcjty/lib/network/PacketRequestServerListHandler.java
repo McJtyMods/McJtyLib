@@ -18,7 +18,7 @@ import java.util.List;
  * @param <M> is the type of the PacketRequestServerList instance
  * @param <T> is the type of the items in the list that is requested from the server
  */
-public abstract class PacketRequestServerListHandler<M extends PacketRequestServerList, T> implements IMessageHandler<M, IMessage> {
+public abstract class PacketRequestServerListHandler<M extends PacketRequestServerList<T>, T> implements IMessageHandler<M, IMessage> {
 
     private final Type<T> type;
 
