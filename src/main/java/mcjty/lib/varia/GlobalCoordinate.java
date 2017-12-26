@@ -3,16 +3,17 @@ package mcjty.lib.varia;
 
 import net.minecraft.util.math.BlockPos;
 
-public class GlobalCoordinate extends BlockPos {
+public class GlobalCoordinate {
+    private final BlockPos coordinate;
     private final int dimension;
 
     public GlobalCoordinate(BlockPos coordinate, int dimension) {
-        super(coordinate);
+        this.coordinate = coordinate;
         this.dimension = dimension;
     }
 
     public BlockPos getCoordinate() {
-        return this;
+        return coordinate;
     }
 
     public int getDimension() {
@@ -22,19 +23,20 @@ public class GlobalCoordinate extends BlockPos {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof GlobalCoordinate)) return false;
-        if (!super.equals(o)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         GlobalCoordinate that = (GlobalCoordinate) o;
 
-        return dimension == that.dimension;
+        if (dimension != that.dimension) return false;
+        return coordinate != null ? coordinate.equals(that.coordinate) : that.coordinate == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
+        int result = coordinate != null ? coordinate.hashCode() : 0;
         result = 31 * result + dimension;
         return result;
     }
 }
+
