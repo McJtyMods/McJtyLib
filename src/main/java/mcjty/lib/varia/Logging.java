@@ -2,7 +2,6 @@ package mcjty.lib.varia;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
@@ -67,20 +66,10 @@ public class Logging {
     }
 
     public static void message(EntityPlayer player, String message) {
-        ITextComponent component = new TextComponentString(message);
-        if (player instanceof EntityPlayer) {
-            ((EntityPlayer) player).sendStatusMessage(component, false);
-        } else {
-            player.sendMessage(component);
-        }
+        player.sendStatusMessage(new TextComponentString(message), false);
     }
 
     public static void warn(EntityPlayer player, String message) {
-        ITextComponent component = new TextComponentString(message).setStyle(new Style().setColor(TextFormatting.RED));
-        if (player instanceof EntityPlayer) {
-            ((EntityPlayer) player).sendStatusMessage(component, false);
-        } else {
-            player.sendMessage(component);
-        }
+        player.sendStatusMessage(new TextComponentString(message).setStyle(new Style().setColor(TextFormatting.RED)), false);
     }
 }
