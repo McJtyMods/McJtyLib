@@ -229,7 +229,6 @@ public class TextPage extends AbstractWidget<TextPage> {
         tabCounter = 0;
         y += 3;
         int starty = y;
-        int dx;
         for (Line line : lines) {
             if (line.isNexttab()) {
                 y = starty;

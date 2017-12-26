@@ -296,7 +296,7 @@ public class TrueTypeFont {
             if (currentChar < 256) {
                 floatObject = charArray[currentChar];
             } else {
-                floatObject = (FloatObject) customChars.get(new Character((char) currentChar));
+                floatObject = customChars.get(new Character((char) currentChar));
             }
 
             if (floatObject != null) {
@@ -431,7 +431,7 @@ public class TrueTypeFont {
                     if (charCurrent < 256) {
                         floatObject = charArray[charCurrent];
                     } else {
-                        floatObject = (FloatObject) customChars.get((char) charCurrent);
+                        floatObject = customChars.get((char) charCurrent);
                     }
                     totalwidth += floatObject.width - correctL;
                 }
@@ -455,7 +455,7 @@ public class TrueTypeFont {
             if (charCurrent < 256) {
                 floatObject = charArray[charCurrent];
             } else {
-                floatObject = (FloatObject) customChars.get(new Character((char) charCurrent));
+                floatObject = customChars.get(new Character((char) charCurrent));
             }
 
             if (floatObject != null) {
@@ -470,7 +470,7 @@ public class TrueTypeFont {
                             if (charCurrent < 256) {
                                 floatObject = charArray[charCurrent];
                             } else {
-                                floatObject = (FloatObject) customChars.get(new Character((char) charCurrent));
+                                floatObject = customChars.get(new Character((char) charCurrent));
                             }
                             totalwidth += floatObject.width - correctL;
                         }

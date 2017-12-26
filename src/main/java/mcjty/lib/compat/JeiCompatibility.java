@@ -25,7 +25,7 @@ public class JeiCompatibility extends BlankModPlugin {
 			@Nullable
 			@Override
 			public List<Rectangle> getGuiExtraAreas(GenericGuiContainer guiContainer) {
-				GenericGuiContainer<?> container = (GenericGuiContainer<?>) guiContainer;
+				GenericGuiContainer<?> container = guiContainer;
 				return container.getSideWindowBounds();
 			}
 

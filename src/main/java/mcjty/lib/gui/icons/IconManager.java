@@ -18,8 +18,6 @@ public class IconManager {
     private IconHolder origin;
     private int dx;
     private int dy;
-    private int x;
-    private int y;
 
     private boolean clickHoldToDrag = false;
 

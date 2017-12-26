@@ -14,7 +14,7 @@ public class MathTools {
 
     public static int floor(double value) {
         int i = (int) value;
-        return value < (double) i ? i - 1 : i;
+        return value < i ? i - 1 : i;
     }
 
 }

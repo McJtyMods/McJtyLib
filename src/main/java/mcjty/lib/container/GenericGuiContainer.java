@@ -193,7 +193,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                     int curx = xx;
                     for (Object o : list) {
                         if (o instanceof String) {
-                            font.drawStringWithShadow(s1, (float) curx, (float) yy, -1);
+                            font.drawStringWithShadow(s1, curx, yy, -1);
                             curx += font.getStringWidth((String) o);
                         } else {
                             mcjty.lib.gui.RenderHelper.renderObject(mc, curx + 1, yy, o, false);
@@ -202,7 +202,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                     }
                     yy += 8;
                 } else {
-                    font.drawStringWithShadow(s1, (float) xx, (float) yy, -1);
+                    font.drawStringWithShadow(s1, xx, yy, -1);
                 }
 
                 if (k1 == 0) {
