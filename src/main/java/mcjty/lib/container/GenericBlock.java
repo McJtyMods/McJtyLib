@@ -487,7 +487,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @SideOnly(Side.CLIENT)
-    public Class<? extends GenericGuiContainer> getGuiClass() {
+    public Class<? extends GenericGuiContainer<T>> getGuiClass() {
         return null;
     }
 
@@ -495,11 +495,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     public GuiContainer createClientGui(EntityPlayer entityPlayer, TileEntity tileEntity) {
         T inventory = (T) tileEntity;
         C container;
-        GenericGuiContainer gui;
+        GenericGuiContainer<T> gui;
         try {
             Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
             container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? (IInventory)inventory : null);
-            Constructor<? extends GenericGuiContainer> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
+            Constructor<? extends GenericGuiContainer<T>> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
             gui = guiConstructor.newInstance(inventory, container);
             return gui;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
