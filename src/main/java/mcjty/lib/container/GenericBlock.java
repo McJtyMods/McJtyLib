@@ -498,7 +498,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         GenericGuiContainer gui;
         try {
             Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
-            container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? inventory : null);
+            container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? (IInventory)inventory : null);
             Constructor<? extends GenericGuiContainer> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
             gui = guiConstructor.newInstance(inventory, container);
             return gui;
@@ -513,7 +513,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         C container;
         try {
             Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
-            container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? inventory : null);
+            container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? (IInventory)inventory : null);
             return container;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             Logging.logError("Severe exception during creation of gui!");
