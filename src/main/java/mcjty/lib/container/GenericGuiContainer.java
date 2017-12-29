@@ -146,8 +146,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
             for (String s : textLines) {
                 int j;
                 if (s != null && items != null && s.contains("@") && !items.isEmpty()) {
-                    linesWithItemStacks++;
                     List<Object> list = parseString(s, items);
+                    if(list.size() > 1) {
+                        ++linesWithItemStacks;
+                    }
                     j = 0;
                     for (Object o : list) {
                         if (o instanceof String) {
@@ -212,7 +214,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                             curx += 20;
                         }
                     }
-                    yy += 8;
+                    if(list.size() > 1) {
+                        yy += 8;
+                    }
                 } else {
                     font.drawStringWithShadow(s1, xx, yy, -1);
                 }
