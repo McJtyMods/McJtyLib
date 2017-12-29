@@ -95,21 +95,34 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         getWindowManager().drawTooltips();
     }
 
-    private List<Object> parseString(String s, List<ItemStack> items) {
+    public static String escapeString(String s) {
+        return s.replace("@", "@@");
+    }
+
+    private static List<Object> parseString(String s, List<ItemStack> items) {
         List<Object> l = new ArrayList<>();
         String current = "";
         for (int i = 0; i < s.length(); ++i) {
             String c = s.substring(i, i + 1);
             if ("@".equals(c)) {
-                if (!current.isEmpty()) {
-                    l.add(current);
-                    current = "";
-                }
-                i++;
-                int itemIdx = Integer.parseInt(s.substring(i, i + 1));
-                ItemStack e = items.get(itemIdx);
-                if (!e.isEmpty()) {
-                    l.add(e);
+                ++i;
+                int itemIdx = s.charAt(i) - '0';
+                if(itemIdx == '@' - '0') {
+                    // @@ becomes a literal @
+                    current += "@";
+                } else if(itemIdx < 0 || itemIdx > 9) {
+                    // probably forgot to escape something
+                    throw new IllegalArgumentException(s);
+                } else {
+                    // replace it with the corresponding item
+                    if (!current.isEmpty()) {
+                        l.add(current);
+                        current = "";
+                    }
+                    ItemStack e = items.get(itemIdx);
+                    if (!e.isEmpty()) {
+                        l.add(e);
+                    }
                 }
             } else {
                 current += c;
@@ -191,8 +204,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                     int curx = xx;
                     for (Object o : list) {
                         if (o instanceof String) {
-                            font.drawStringWithShadow(s1, curx, yy, -1);
-                            curx += font.getStringWidth((String) o);
+                            String s2 = (String)o;
+                            font.drawStringWithShadow(s2, curx, yy, -1);
+                            curx += font.getStringWidth(s2);
                         } else {
                             mcjty.lib.gui.RenderHelper.renderObject(mc, curx + 1, yy, o, false);
                             curx += 20;
