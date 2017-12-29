@@ -8,7 +8,7 @@ import net.minecraft.client.gui.Gui;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Button extends Label<Button> {
+public class Button extends AbstractLabel<Button> {
     private List<ButtonEvent> buttonEvents = null;
     private boolean pressed = false;
 
