@@ -8,7 +8,7 @@ import net.minecraft.client.gui.Gui;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollable {
+public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements Scrollable {
     private int realmin = 0;
     private int realmax = 100;
     private int first = 0;
