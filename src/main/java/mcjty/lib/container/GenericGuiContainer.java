@@ -147,16 +147,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                 int j;
                 if (s != null && items != null && s.contains("@") && !items.isEmpty()) {
                     List<Object> list = parseString(s, items);
-                    if(list.size() > 1) {
-                        ++linesWithItemStacks;
-                    }
+                    boolean lineHasItemStacks = false;
                     j = 0;
                     for (Object o : list) {
                         if (o instanceof String) {
                             j += font.getStringWidth((String) o);
                         } else {
                             j += 20;    // ItemStack
+                            lineHasItemStacks = true;
                         }
+                    }
+                    if(lineHasItemStacks) {
+                        ++linesWithItemStacks;
                     }
 
                 } else {
@@ -204,6 +206,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                 if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
                     List<Object> list = parseString(s1, items);
                     int curx = xx;
+                    boolean lineHasItemStacks = false;
                     for (Object o : list) {
                         if (o instanceof String) {
                             String s2 = (String)o;
@@ -212,9 +215,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                         } else {
                             mcjty.lib.gui.RenderHelper.renderObject(mc, curx + 1, yy, o, false);
                             curx += 20;
+                            lineHasItemStacks = true;
                         }
                     }
-                    if(list.size() > 1) {
+                    if(lineHasItemStacks) {
                         yy += 8;
                     }
                 } else {
