@@ -98,8 +98,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     private List<Object> parseString(String s, List<ItemStack> items) {
         List<Object> l = new ArrayList<>();
         String current = "";
-        int i = 0;
-        while (i < s.length()) {
+        for (int i = 0; i < s.length(); ++i) {
             String c = s.substring(i, i + 1);
             if ("@".equals(c)) {
                 if (!current.isEmpty()) {
@@ -115,7 +114,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
             } else {
                 current += c;
             }
-            i++;
         }
         if (!current.isEmpty()) {
             l.add(current);
