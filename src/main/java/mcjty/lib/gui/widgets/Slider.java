@@ -149,6 +149,31 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
+    public boolean mouseWheel(int amount, int x, int y) {
+        int first = scrollable.getFirstSelected();
+
+        int divider = scrollable.getMaximum() - scrollable.getCountSelected();
+        if (divider <= 0) {
+            first = 0;
+        } else {
+            if (amount > 0) {
+                first -= 3;
+            } else if (amount < 0) {
+                first += 3;
+            }
+        }
+        if (first > divider) {
+            first = divider;
+        }
+        if (first < 0) {
+            first = 0;
+        }
+
+        scrollable.setFirstSelected(first);
+        return true;
+    }
+
+    @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         super.mouseClick(window, x, y, button);
         dragging = true;
