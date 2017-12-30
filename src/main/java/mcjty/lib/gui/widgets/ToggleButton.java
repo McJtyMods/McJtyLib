@@ -12,7 +12,7 @@ import java.util.List;
 
 import static mcjty.lib.base.StyleConfig.*;
 
-public class ToggleButton extends AbstractLabel<ToggleButton> {
+public class ToggleButton extends Label<ToggleButton> {
     private List<ButtonEvent> buttonEvents = null;
     private boolean pressed = false;
     private boolean checkMarker = false;

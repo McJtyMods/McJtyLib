@@ -10,7 +10,7 @@ import org.lwjgl.input.Keyboard;
 
 import java.util.*;
 
-public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
+public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
     private List<Integer> colorList = new ArrayList<>();
     private Map<Integer,List<String>> tooltipMap = new HashMap<>();
     private Integer currentColor = null;

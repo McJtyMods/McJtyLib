@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
+public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     private List<String> choiceList = new ArrayList<>();
     private List<List<String>> tooltipList = new ArrayList<>();
     private List<ResourceLocation> imageList = new ArrayList<>();
