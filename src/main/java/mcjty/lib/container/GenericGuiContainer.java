@@ -5,21 +5,28 @@ import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.gui.GuiSideWindow;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
+import mcjty.lib.gui.widgets.BlockRender;
+import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.Arguments;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommand;
 import mcjty.lib.varia.Logging;
+import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.inventory.Container;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -251,7 +258,66 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
+        drawStackTooltips(mouseX, mouseY);
     }
+
+    /**
+     * Draw tooltips for itemstacks that are in BlockRender widgets
+     */
+    protected void drawStackTooltips(int mouseX, int mouseY) {
+        int x = Mouse.getEventX() * width / mc.displayWidth;
+        int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+        Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
+        if (widget instanceof BlockRender) {
+            BlockRender blockRender = (BlockRender) widget;
+            Object renderItem = blockRender.getRenderItem();
+            ItemStack itemStack;
+            if (renderItem instanceof ItemStack) {
+                itemStack = (ItemStack) renderItem;
+            } else if (renderItem instanceof Block) {
+                itemStack = new ItemStack((Block) renderItem);
+            } else if (renderItem instanceof Item) {
+                itemStack = new ItemStack((Item) renderItem);
+            } else {
+                itemStack = ItemStack.EMPTY;
+            }
+            if (!itemStack.isEmpty()) {
+                customRenderToolTip(blockRender, itemStack, mouseX, mouseY);
+            }
+        }
+    }
+
+    protected List<String> addCustomLines(List<String> oldList, BlockRender blockRender, ItemStack stack) {
+        return oldList;
+    }
+
+    protected void customRenderToolTip(BlockRender blockRender, ItemStack stack, int x, int y) {
+        List<String> list;
+        if (stack.getItem() == null) {
+            // Protection for bad itemstacks
+            list = new ArrayList<>();
+        } else {
+            ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
+            list = stack.getTooltip(this.mc.player, flag);
+        }
+
+        for (int i = 0; i < list.size(); ++i) {
+            if (i == 0) {
+                list.set(i, stack.getRarity().rarityColor + list.get(i));
+            } else {
+                list.set(i, TextFormatting.GRAY + list.get(i));
+            }
+        }
+
+        list = addCustomLines(list, blockRender, stack);
+
+        FontRenderer font = null;
+        if (stack.getItem() != null) {
+            font = stack.getItem().getFontRenderer(stack);
+        }
+        this.drawHoveringText(list, x, y, (font == null ? fontRenderer : font));
+    }
+
 
     @Override
     public boolean doesGuiPauseGame() {
