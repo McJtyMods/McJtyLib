@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -103,35 +104,41 @@ public class TextPage extends AbstractWidget<TextPage> {
 
     public TextPage setText(ResourceLocation manualResource) {
         TextPage.Page page = new TextPage.Page();
+        IResourceManager resourceManager = mc.getResourceManager();
+        IResource iresource = null;
         try {
-            IResourceManager resourceManager = mc.getResourceManager();
-            IResource iresource;
             try {
                 iresource = resourceManager.getResource(manualResource);
-            } catch (RuntimeException e) {
+            } catch (FileNotFoundException e) {
                 String fallBackPath = manualResource.getResourcePath().replaceAll("-([a-z\\-]{2,6})_?([a-z]{0,3})", "");
                 iresource = resourceManager.getResource(new ResourceLocation(manualResource.getResourceDomain(), fallBackPath));
             }
-            InputStream inputstream = iresource.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(inputstream, "UTF-8"));
-            String line = br.readLine();
-            while (line != null) {
-                if (line.startsWith("{------")) {
-                    newPage(page);
-                    page = new TextPage.Page();
-                } else {
-                    Line l = page.addLine(modBase, line);
-                    if (l.isNode()) {
-                        nodes.put(l.node, pages.size());
+            try(BufferedReader br = new BufferedReader(new InputStreamReader(iresource.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("{------")) {
+                        newPage(page);
+                        page = new TextPage.Page();
+                    } else {
+                        Line l = page.addLine(modBase, line);
+                        if (l.isNode()) {
+                            nodes.put(l.node, pages.size());
+                        }
                     }
                 }
-                line = br.readLine();
             }
-            newPage(page);
-
         } catch (IOException e) {
-            Logging.logError("Error reading manual text", e);
+            throw new UncheckedIOException("Error reading manual text", e);
+        } finally {
+            if(iresource != null) {
+                try {
+                    iresource.close();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
         }
+        newPage(page);
         showCurrentPage();
         return this;
     }
