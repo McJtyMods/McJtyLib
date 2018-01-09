@@ -102,41 +102,36 @@ public class TextPage extends AbstractWidget<TextPage> {
         return pages.size();
     }
 
+    private IResource getBestLanguageManual(ResourceLocation manualResource) throws IOException {
+        IResourceManager resourceManager = mc.getResourceManager();
+        try {
+            return resourceManager.getResource(manualResource);
+        } catch (FileNotFoundException e) {
+            String fallBackPath = manualResource.getResourcePath().replaceAll("-([a-z\\-]{2,6})_?([a-z]{0,3})", "");
+            return resourceManager.getResource(new ResourceLocation(manualResource.getResourceDomain(), fallBackPath));
+        }
+    }
+
     public TextPage setText(ResourceLocation manualResource) {
         TextPage.Page page = new TextPage.Page();
-        IResourceManager resourceManager = mc.getResourceManager();
-        IResource iresource = null;
-        try {
-            try {
-                iresource = resourceManager.getResource(manualResource);
-            } catch (FileNotFoundException e) {
-                String fallBackPath = manualResource.getResourcePath().replaceAll("-([a-z\\-]{2,6})_?([a-z]{0,3})", "");
-                iresource = resourceManager.getResource(new ResourceLocation(manualResource.getResourceDomain(), fallBackPath));
-            }
-            try(BufferedReader br = new BufferedReader(new InputStreamReader(iresource.getInputStream(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    if (line.startsWith("{------")) {
-                        newPage(page);
-                        page = new TextPage.Page();
-                    } else {
-                        Line l = page.addLine(modBase, line);
-                        if (l.isNode()) {
-                            nodes.put(l.node, pages.size());
-                        }
+        try (
+                IResource iresource = getBestLanguageManual(manualResource);
+                BufferedReader br = new BufferedReader(new InputStreamReader(iresource.getInputStream(), StandardCharsets.UTF_8))
+        ) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.startsWith("{------")) {
+                    newPage(page);
+                    page = new TextPage.Page();
+                } else {
+                    Line l = page.addLine(modBase, line);
+                    if (l.isNode()) {
+                        nodes.put(l.node, pages.size());
                     }
                 }
             }
         } catch (IOException e) {
             throw new UncheckedIOException("Error reading manual text", e);
-        } finally {
-            if(iresource != null) {
-                try {
-                    iresource.close();
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            }
         }
         newPage(page);
         showCurrentPage();
