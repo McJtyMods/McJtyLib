@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
-import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -159,7 +158,7 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public TextPage mouseClick(Window window, int x, int y, int button) {
         if (isEnabledAndVisible()) {
             window.setTextFocus(this);
             for (Link link : links) {
@@ -307,8 +306,8 @@ public class TextPage extends AbstractWidget<TextPage> {
             h = ((ShapedRecipes) line.recipe).getHeight();
             ingredients = line.recipe.getIngredients();
         } else if (line.recipe instanceof ShapedOreRecipe) {
-            w = ((ShapedOreRecipe) line.recipe).getWidth();
-            h = ((ShapedOreRecipe) line.recipe).getHeight();
+            w = ((ShapedOreRecipe) line.recipe).getRecipeWidth();
+            h = ((ShapedOreRecipe) line.recipe).getRecipeHeight();
             ingredients = line.recipe.getIngredients();
         } else {
             w = 0;
