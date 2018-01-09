@@ -37,9 +37,9 @@ public final class Type<V> {
     @Nonnull
     public List<V> convert(@Nonnull List<?> list) {
         for(Object o : list) {
-            if(o == null) continue;
-            if(type.isInstance(o)) break;
-            throw new ClassCastException("Cannot cast List<? super " + o.getClass().getName() + "> to List<" + type.getName() + ">");
+            if(o != null && !type.isInstance(o)) {
+                throw new ClassCastException("Cannot cast List<? super " + o.getClass().getName() + "> to List<" + type.getName() + ">");
+            }
         }
         return (List<V>) list;
     }
