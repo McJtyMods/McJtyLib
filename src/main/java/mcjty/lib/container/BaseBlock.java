@@ -91,8 +91,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return state.withProperty(FACING_HORIZ, placer.getHorizontalFacing().getOpposite());
             case ROTATION:
                 return state.withProperty(FACING, OrientationTools.getFacingFromEntity(pos, placer));
+            default:
+                return state;
         }
-        return state;
     }
 
     protected EnumFacing getOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
@@ -101,10 +102,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return OrientationTools.determineOrientationHoriz(entityLivingBase);
             case ROTATION:
                 return OrientationTools.determineOrientation(pos, entityLivingBase);
-            case NONE:
+            default:
                 return null;
         }
-        return null;
     }
 
     public EnumFacing getFrontDirection(IBlockState state) {
@@ -113,10 +113,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return state.getValue(FACING_HORIZ);
             case ROTATION:
                 return state.getValue(FACING);
-            case NONE:
+            default:
                 return EnumFacing.NORTH;
         }
-        return EnumFacing.NORTH;
     }
 
     public EnumFacing getRightDirection(IBlockState state) {
@@ -128,20 +127,14 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public static EnumFacing getFrontDirection(RotationType metaUsage, IBlockState state) {
-        EnumFacing orientation;
         switch (metaUsage) {
             case HORIZROTATION:
-                orientation = OrientationTools.getOrientationHoriz(state);
-                break;
+                return OrientationTools.getOrientationHoriz(state);
             case ROTATION:
-                orientation = OrientationTools.getOrientation(state);
-                break;
-            case NONE:
+                return OrientationTools.getOrientation(state);
             default:
-                orientation = EnumFacing.SOUTH;
-                break;
+                return EnumFacing.SOUTH;
         }
-        return orientation;
     }
 
     @Override
@@ -151,10 +144,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return getDefaultState().withProperty(FACING_HORIZ, EnumFacing.VALUES[meta + 2]);
             case ROTATION:
                 return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta & 7]);
-            case NONE:
+            default:
                 return getDefaultState();
         }
-        return getDefaultState();
     }
 
     @Override
@@ -164,10 +156,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return state.getValue(FACING_HORIZ).getIndex()-2;
             case ROTATION:
                 return state.getValue(FACING).getIndex();
-            case NONE:
+            default:
                 return 0;
         }
-        return 0;
     }
 
     @Override
@@ -177,10 +168,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return new BlockStateContainer(this, FACING_HORIZ);
             case ROTATION:
                 return new BlockStateContainer(this, FACING);
-            case NONE:
+            default:
                 return super.createBlockState();
         }
-        return super.createBlockState();
     }
 
     @SideOnly(Side.CLIENT)
