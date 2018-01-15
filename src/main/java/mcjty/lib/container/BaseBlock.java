@@ -83,22 +83,17 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return RotationType.ROTATION;
     }
 
-
-
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        IBlockState state = super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
         switch (getRotationType()) {
             case HORIZROTATION:
-                world.setBlockState(pos, state.withProperty(FACING_HORIZ, placer.getHorizontalFacing().getOpposite()), 2);
-                break;
+                return state.withProperty(FACING_HORIZ, placer.getHorizontalFacing().getOpposite());
             case ROTATION:
-                world.setBlockState(pos, state.withProperty(FACING, OrientationTools.getFacingFromEntity(pos, placer)), 2);
-                break;
-            case NONE:
-                break;
+                return state.withProperty(FACING, OrientationTools.getFacingFromEntity(pos, placer));
         }
+        return state;
     }
-
 
     protected EnumFacing getOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
         switch (getRotationType()) {
