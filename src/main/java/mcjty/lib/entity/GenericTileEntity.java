@@ -77,8 +77,8 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     @Override
     public void onLoad() {
         Block block = getBlockType();
-        if(block instanceof GenericBlock && ((GenericBlock<?, ?>)block).needsRedstoneCheck()) {
-            setPowerInput(world.isBlockIndirectlyGettingPowered(pos));
+        if(block instanceof GenericBlock) {
+            ((GenericBlock<?, ?>)block).checkRedstoneIfNecessary(world, pos);
         }
     }
 

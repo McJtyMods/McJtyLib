@@ -225,9 +225,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        if (needsRedstoneCheck()) {
-            checkRedstone(world, pos);
-        }
+        checkRedstoneIfNecessary(world, pos);
     }
 
 
@@ -440,6 +438,12 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             int powered = world.isBlockIndirectlyGettingPowered(pos); //TODO: check
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
             genericTileEntity.setPowerInput(powered);
+        }
+    }
+
+    public void checkRedstoneIfNecessary(World world, BlockPos pos) {
+        if (needsRedstoneCheck()) {
+            checkRedstone(world, pos);
         }
     }
 
