@@ -1,6 +1,7 @@
 package mcjty.lib.entity;
 
 import mcjty.lib.base.GeneralConfig;
+import mcjty.lib.container.GenericBlock;
 import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
@@ -8,6 +9,7 @@ import mcjty.lib.network.CommandHandler;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.typed.Type;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -70,6 +72,14 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     }
 
     public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
+    }
+
+    @Override
+    public void onLoad() {
+        Block block = getBlockType();
+        if(block instanceof GenericBlock && ((GenericBlock<?, ?>)block).needsRedstoneCheck()) {
+            setPowerInput(world.isBlockIndirectlyGettingPowered(pos));
+        }
     }
 
     // ------------------------------------------------------
