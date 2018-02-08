@@ -89,7 +89,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     @Optional.Method(modid = "enderio")
-    public boolean shouldRedstoneConduitConnect(World world, int x, int y, int z, EnumFacing from) {
+    public boolean shouldRedstoneConduitConnect(World world, BlockPos pos, EnumFacing from) {
         return needsRedstoneCheck() || hasRedstoneOutput();
     }
 
