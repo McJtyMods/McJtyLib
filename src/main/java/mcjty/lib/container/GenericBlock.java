@@ -49,6 +49,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Optional.InterfaceList({
+        @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "enderio"),
+})
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends BaseBlock
         implements ITileEntityProvider, IRedstoneConnectable {
 
@@ -85,6 +88,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
+    @Optional.Method(modid = "enderio")
     public boolean shouldRedstoneConduitConnect(World world, int x, int y, int z, EnumFacing from) {
         return needsRedstoneCheck() || hasRedstoneOutput();
     }
