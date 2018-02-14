@@ -231,9 +231,10 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
-        checkRedstoneIfNecessary(world, pos);
+        if (needsRedstoneCheck()) {
+            checkRedstone(world, pos);
+        }
     }
-
 
     @Override
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
@@ -422,6 +423,10 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
             genericTileEntity.onBlockPlacedBy(world, pos, state, placer, stack);
         }
+
+        if (needsRedstoneCheck()) {
+            checkRedstone(world, pos);
+        }
     }
 
     protected void setOwner(World world, BlockPos pos, EntityLivingBase entityLivingBase) {
@@ -444,12 +449,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             int powered = world.isBlockIndirectlyGettingPowered(pos); //TODO: check
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
             genericTileEntity.setPowerInput(powered);
-        }
-    }
-
-    public void checkRedstoneIfNecessary(World world, BlockPos pos) {
-        if (needsRedstoneCheck()) {
-            checkRedstone(world, pos);
         }
     }
 

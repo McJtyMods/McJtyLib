@@ -74,14 +74,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
     }
 
-    @Override
-    public void onLoad() {
-        Block block = getBlockType();
-        if(block instanceof GenericBlock) {
-            ((GenericBlock<?, ?>)block).checkRedstoneIfNecessary(world, pos);
-        }
-    }
-
     // ------------------------------------------------------
     // Redstone
 
