@@ -32,7 +32,7 @@ import net.minecraftforge.fml.relauncher.Side;
         version = McJtyLib.VERSION)
 public class McJtyLib {
 
-    public static final String VERSION = "2.5.2";
+    public static final String VERSION = "2.5.3";
     public static final String PROVIDES = "mcjtylib_ng";
     public static final String COMPATLAYER_VER = "0.3.1";
 
