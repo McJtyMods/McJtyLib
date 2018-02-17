@@ -1,7 +1,6 @@
 package mcjty.lib.container;
 
 import cofh.api.item.IToolHammer;
-import crazypants.enderio.api.redstone.IRedstoneConnectable;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.api.smartwrench.SmartWrench;
@@ -12,6 +11,7 @@ import mcjty.lib.compat.CompatBlock;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.integration.enderio.CompatRedstoneConnectable;
 import mcjty.lib.tools.ItemStackTools;
 import mcjty.lib.varia.BlockTools;
 import mcjty.lib.varia.Logging;
@@ -58,12 +58,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Optional.InterfaceList({
-        @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "EnderIO"),
-})
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container>
         extends CompatBlock
-        implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider, IRedstoneConnectable {
+        implements ITileEntityProvider, WailaInfoProvider, TOPInfoProvider, CompatRedstoneConnectable {
 
     public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
