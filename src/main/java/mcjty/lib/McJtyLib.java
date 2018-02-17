@@ -14,6 +14,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -24,10 +25,13 @@ import net.minecraftforge.fml.relauncher.Side;
  * Created by Elec332 on 24-3-2016.
  */
 @SuppressWarnings("unused")
+@Mod(modid = McJtyLib.PROVIDES, name = "McJtyLib",
+        acceptedMinecraftVersions = "[1.10,1.12)",
+        version = McJtyLib.VERSION)
 public class McJtyLib {
 
     public static final String VERSION = "2.5.2";
-    public static final String OWNER = "McJty", PROVIDES = "mcjtylib_ng";
+    public static final String PROVIDES = "mcjtylib_ng";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
 
