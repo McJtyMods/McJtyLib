@@ -26,12 +26,15 @@ import net.minecraftforge.fml.relauncher.Side;
  */
 @SuppressWarnings("unused")
 @Mod(modid = McJtyLib.PROVIDES, name = "McJtyLib",
+        dependencies =
+                        "required-after:compatlayer@[" + McJtyLib.COMPATLAYER_VER + ",)",
         acceptedMinecraftVersions = "[1.10,1.12)",
         version = McJtyLib.VERSION)
 public class McJtyLib {
 
     public static final String VERSION = "2.5.2";
     public static final String PROVIDES = "mcjtylib_ng";
+    public static final String COMPATLAYER_VER = "0.3.1";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
 
