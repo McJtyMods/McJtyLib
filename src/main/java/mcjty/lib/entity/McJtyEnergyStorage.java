@@ -22,13 +22,13 @@ public class McJtyEnergyStorage extends EnergyStorage {
     }
 
     public void modifyEnergyStored(int energy) {
-        this.energy += energy;
-
-        if (this.energy > capacity) {
-            this.energy = capacity;
-        } else if (this.energy < 0) {
-            this.energy = 0;
+        if (energy > capacity - this.energy) {
+            energy = capacity - this.energy;
+        } else if (energy < -this.energy) {
+            energy = -this.energy;
         }
+
+        this.energy += energy;
     }
 
     public void setMaxReceive(int max) {
