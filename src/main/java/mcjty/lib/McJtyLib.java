@@ -38,7 +38,7 @@ import java.util.Map;
         version = McJtyLib.VERSION)
 public class McJtyLib {
 
-    public static final String VERSION = "2.6.4";
+    public static final String VERSION = "2.6.5";
     public static final String PROVIDES = "mcjtylib_ng";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
