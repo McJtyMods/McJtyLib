@@ -1,13 +1,14 @@
 package mcjty.lib.container;
 
-import cofh.api.item.IToolHammer;
 import crazypants.enderio.api.redstone.IRedstoneConnectable;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
@@ -312,14 +313,8 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                 case MODE_SELECT: return player.isSneaking() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
                 default:          throw new RuntimeException("SmartWrench in unknown mode!");
             }
-        } else if (item instanceof IToolHammer) {
-            IToolHammer hammer = (IToolHammer) item;
-            if (hammer.isUsable(itemStack, player, pos)) {
-                hammer.toolUsed(itemStack, player, pos);
-                return WrenchUsage.NORMAL;
-            } else {
-                return WrenchUsage.DISABLED;
-            }
+        } else if (McJtyLib.cofhapiitem && CofhApiItemCompatibility.isToolHammer(item)) {
+            return CofhApiItemCompatibility.getWrenchUsage(item, itemStack, player, pos);
         } else if (WrenchChecker.isAWrench(item)) {
             return WrenchUsage.NORMAL;
         }
