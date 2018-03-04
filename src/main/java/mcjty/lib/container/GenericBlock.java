@@ -298,38 +298,32 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return wrenchUsed;
     }
 
-    private WrenchUsage getWrenchUsageInt(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
+    protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
         if (item instanceof IToolHammer) {
             IToolHammer hammer = (IToolHammer) item;
             if (hammer.isUsable(itemStack, player, pos)) {
                 hammer.toolUsed(itemStack, player, pos);
-                wrenchUsed = WrenchUsage.NORMAL;
+                return WrenchUsage.NORMAL;
             } else {
-                wrenchUsed = WrenchUsage.DISABLED;
-            }
-        } else if (WrenchChecker.isAWrench(item)) {
-            wrenchUsed = WrenchUsage.NORMAL;
-        }
-        return wrenchUsed;
-    }
-
-    protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
-        WrenchUsage usage = getWrenchUsageInt(pos, player, itemStack, wrenchUsed, item);
-        if (item instanceof IToolHammer && usage == WrenchUsage.DISABLED) {
-            // It is still possible it is a smart wrench.
-            if (item instanceof SmartWrench) {
-                SmartWrench smartWrench = (SmartWrench) item;
-                SmartWrenchMode mode = smartWrench.getMode(itemStack);
-                if (mode.equals(SmartWrenchMode.MODE_SELECT)) {
-                    if (player.isSneaking()) {
-                        usage = WrenchUsage.SNEAK_SELECT;
-                    } else {
-                        usage = WrenchUsage.SELECT;
+                // It is still possible it is a smart wrench.
+                if (item instanceof SmartWrench) {
+                    SmartWrench smartWrench = (SmartWrench) item;
+                    SmartWrenchMode mode = smartWrench.getMode(itemStack);
+                    if (mode.equals(SmartWrenchMode.MODE_SELECT)) {
+                        if (player.isSneaking()) {
+                            return WrenchUsage.SNEAK_SELECT;
+                        } else {
+                            return WrenchUsage.SELECT;
+                        }
                     }
+                } else {
+                    return WrenchUsage.DISABLED;
                 }
             }
+        } else if (WrenchChecker.isAWrench(item)) {
+            return WrenchUsage.NORMAL;
         }
-        return usage;
+        return wrenchUsed;
     }
 
     @Override
