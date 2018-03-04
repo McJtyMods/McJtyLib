@@ -10,6 +10,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.fixes.EntityId;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.EntityEntry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.lang.reflect.InvocationTargetException;
@@ -46,11 +48,11 @@ public class EntityTools {
      * Get the localized name of an entity based on class
      */
     public static String findEntityLocNameByClass(Class<? extends Entity> clazz) {
-        String nameByClass = findEntityIdByClass(clazz);
-        if (nameByClass == null) {
+        EntityEntry entry = EntityRegistry.getEntry(clazz);
+        if (entry == null) {
             return null;
         }
-        return I18n.translateToLocal(nameByClass);
+        return I18n.translateToLocal("entity." + entry.getName() + ".name");
     }
 
 
