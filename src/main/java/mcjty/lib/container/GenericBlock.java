@@ -6,7 +6,6 @@ import mcjty.lib.McJtyRegister;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.api.smartwrench.SmartWrench;
-import mcjty.lib.api.smartwrench.SmartWrenchMode;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.entity.GenericTileEntity;
@@ -299,26 +298,19 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     protected WrenchUsage getWrenchUsage(BlockPos pos, EntityPlayer player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
-        if (item instanceof IToolHammer) {
+        if (item instanceof SmartWrench) {
+            switch(((SmartWrench)item).getMode(itemStack)) {
+                case MODE_WRENCH: return WrenchUsage.NORMAL;
+                case MODE_SELECT: return player.isSneaking() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
+                default:          throw new RuntimeException("SmartWrench in unknown mode!");
+            }
+        } else if (item instanceof IToolHammer) {
             IToolHammer hammer = (IToolHammer) item;
             if (hammer.isUsable(itemStack, player, pos)) {
                 hammer.toolUsed(itemStack, player, pos);
                 return WrenchUsage.NORMAL;
             } else {
-                // It is still possible it is a smart wrench.
-                if (item instanceof SmartWrench) {
-                    SmartWrench smartWrench = (SmartWrench) item;
-                    SmartWrenchMode mode = smartWrench.getMode(itemStack);
-                    if (mode.equals(SmartWrenchMode.MODE_SELECT)) {
-                        if (player.isSneaking()) {
-                            return WrenchUsage.SNEAK_SELECT;
-                        } else {
-                            return WrenchUsage.SELECT;
-                        }
-                    }
-                } else {
-                    return WrenchUsage.DISABLED;
-                }
+                return WrenchUsage.DISABLED;
             }
         } else if (WrenchChecker.isAWrench(item)) {
             return WrenchUsage.NORMAL;
