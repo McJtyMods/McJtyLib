@@ -92,19 +92,9 @@ public class BlockTools {
         return stack.getDisplayName();
     }
 
+    @Deprecated
     public static IBlockState placeStackAt(EntityPlayer player, ItemStack blockStack, World world, BlockPos pos) {
-        if (blockStack.getItem() instanceof ItemBlock) {
-            ItemBlock itemBlock = (ItemBlock) blockStack.getItem();
-            Block block = itemBlock.getBlock();
-            IBlockState stateForPlacement = block.getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, EnumHand.MAIN_HAND);
-            itemBlock.placeBlockAt(blockStack, player, world, pos, EnumFacing.UP, 0, 0, 0, stateForPlacement);
-            return stateForPlacement;
-        } else {
-            player.setHeldItem(EnumHand.MAIN_HAND, blockStack);
-            player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            blockStack.getItem().onItemUse(player, world, pos, EnumHand.MAIN_HAND, EnumFacing.UP, 0, 0, 0);
-            return world.getBlockState(pos);
-        }
+        return placeStackAt(player, blockStack, world, pos, null);
     }
 
     public static IBlockState placeStackAt(EntityPlayer player, ItemStack blockStack, World world, BlockPos pos, @Nullable IBlockState origState) {
