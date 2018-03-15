@@ -100,9 +100,8 @@ public class BlockTools {
     public static IBlockState placeStackAt(EntityPlayer player, ItemStack blockStack, World world, BlockPos pos, @Nullable IBlockState origState) {
         if (blockStack.getItem() instanceof ItemBlock) {
             ItemBlock itemBlock = (ItemBlock) blockStack.getItem();
-            Block block = itemBlock.getBlock();
             if (origState == null) {
-                origState = block.getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, EnumHand.MAIN_HAND);
+                origState = itemBlock.getBlock().getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, EnumHand.MAIN_HAND);
             }
             itemBlock.placeBlockAt(blockStack, player, world, pos, EnumFacing.UP, 0, 0, 0, origState);
             return origState;
