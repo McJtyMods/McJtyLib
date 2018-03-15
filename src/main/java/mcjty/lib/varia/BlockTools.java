@@ -109,7 +109,7 @@ public class BlockTools {
         } else {
             player.setHeldItem(EnumHand.MAIN_HAND, blockStack);
             player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            blockStack.getItem().onItemUse(player, world, pos, EnumHand.MAIN_HAND, EnumFacing.UP, 0, 0, 0);
+            blockStack.getItem().onItemUse(player, world, pos.down(), EnumHand.MAIN_HAND, EnumFacing.UP, 0, 0, 0);
             return world.getBlockState(pos);
         }
     }
