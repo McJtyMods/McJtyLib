@@ -1,6 +1,7 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.api.power.IBigPower;
 import mcjty.lib.compat.RedstoneFluxCompatibility;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -88,6 +89,9 @@ public class EnergyTools {
         } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
             maxEnergyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity);
             energyStored = RedstoneFluxCompatibility.getEnergy(tileEntity);
+        } else if (tileEntity instanceof IBigPower) {
+            maxEnergyStored = ((IBigPower) tileEntity).getBigMaxEnergy();
+            energyStored = ((IBigPower) tileEntity).getBigEnergy();
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, null);
             maxEnergyStored = energy.getMaxEnergyStored();
