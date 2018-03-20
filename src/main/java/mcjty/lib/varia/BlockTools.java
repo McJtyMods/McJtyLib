@@ -103,7 +103,9 @@ public class BlockTools {
             if (origState == null) {
                 origState = itemBlock.getBlock().getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, EnumHand.MAIN_HAND);
             }
-            itemBlock.placeBlockAt(blockStack, player, world, pos, EnumFacing.UP, 0, 0, 0, origState);
+            if (itemBlock.placeBlockAt(blockStack, player, world, pos, EnumFacing.UP, 0, 0, 0, origState)) {
+                blockStack.shrink(1);
+            }
             return origState;
         } else {
             player.setHeldItem(EnumHand.MAIN_HAND, blockStack);
