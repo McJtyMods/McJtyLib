@@ -33,6 +33,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
@@ -45,7 +46,6 @@ import org.lwjgl.input.Keyboard;
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Optional.InterfaceList({
@@ -236,7 +236,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
+    public void getDrops(NonNullList<ItemStack> result, IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
         TileEntity tileEntity = world.getTileEntity(pos);
 
         if (tileEntity instanceof GenericTileEntity) {
@@ -245,11 +245,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             ((GenericTileEntity)tileEntity).writeRestorableToNBT(tagCompound);
 
             stack.setTagCompound(tagCompound);
-            List<ItemStack> result = new ArrayList<>();
             result.add(stack);
-            return result;
         } else {
-            return super.getDrops(world, pos, metadata, fortune);
+            super.getDrops(result, world, pos, metadata, fortune);
         }
     }
 
