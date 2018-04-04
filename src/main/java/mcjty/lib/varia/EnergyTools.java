@@ -59,7 +59,6 @@ public class EnergyTools {
 
     private static boolean draconic = false;
     private static boolean mekanism = false;
-    private static boolean enderio = false;
 
     private static boolean checkMods = true;
 
@@ -67,7 +66,6 @@ public class EnergyTools {
         if (checkMods) {
             draconic = Loader.isModLoaded("draconicevolution");
             mekanism = Loader.isModLoaded("mekanism") || Loader.isModLoaded("Mekanism");
-            enderio = Loader.isModLoaded("EnderIO") || Loader.isModLoaded("enderio");
             checkMods = false;
         }
     }
@@ -83,9 +81,6 @@ public class EnergyTools {
         } else if (mekanism && EnergySupportMekanism.isMekanismTileEntity(tileEntity)) {
             maxEnergyStored = EnergySupportMekanism.getMaxEnergy(tileEntity);
             energyStored = EnergySupportMekanism.getCurrentEnergy(tileEntity);
-        } else if (enderio && EnergySupportEnderIO.isEnderioTileEntity(tileEntity)) {
-            maxEnergyStored = EnergySupportEnderIO.getMaxEnergy(tileEntity);
-            energyStored = EnergySupportEnderIO.getCurrentEnergy(tileEntity);
         } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
             maxEnergyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity);
             energyStored = RedstoneFluxCompatibility.getEnergy(tileEntity);
