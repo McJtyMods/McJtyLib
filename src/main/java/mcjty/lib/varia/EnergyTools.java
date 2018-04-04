@@ -65,7 +65,7 @@ public class EnergyTools {
     private static void doCheckMods() {
         if (checkMods) {
             draconic = Loader.isModLoaded("draconicevolution");
-            mekanism = Loader.isModLoaded("mekanism") || Loader.isModLoaded("Mekanism");
+            mekanism = Loader.isModLoaded("mekanism");
             checkMods = false;
         }
     }
