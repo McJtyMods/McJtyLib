@@ -75,7 +75,10 @@ public class EnergyTools {
         long maxEnergyStored;
         long energyStored;
         doCheckMods();
-        if (draconic && EnergySupportDraconic.isDraconicEnergyTile(tileEntity)) {
+        if (tileEntity instanceof IBigPower) {
+            maxEnergyStored = ((IBigPower) tileEntity).getBigMaxEnergy();
+            energyStored = ((IBigPower) tileEntity).getBigEnergy();
+        } else if (draconic && EnergySupportDraconic.isDraconicEnergyTile(tileEntity)) {
             maxEnergyStored = EnergySupportDraconic.getMaxEnergy(tileEntity);
             energyStored = EnergySupportDraconic.getCurrentEnergy(tileEntity);
         } else if (mekanism && EnergySupportMekanism.isMekanismTileEntity(tileEntity)) {
@@ -84,9 +87,6 @@ public class EnergyTools {
         } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
             maxEnergyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity);
             energyStored = RedstoneFluxCompatibility.getEnergy(tileEntity);
-        } else if (tileEntity instanceof IBigPower) {
-            maxEnergyStored = ((IBigPower) tileEntity).getBigMaxEnergy();
-            energyStored = ((IBigPower) tileEntity).getBigEnergy();
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, null);
             maxEnergyStored = energy.getMaxEnergyStored();
