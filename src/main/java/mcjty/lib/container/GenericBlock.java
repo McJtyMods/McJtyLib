@@ -43,13 +43,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 @Optional.InterfaceList({
-        @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "EnderIO"),
+        @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "enderio"),
 })
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends BaseBlock
         implements ITileEntityProvider, IRedstoneConnectable {
@@ -86,9 +87,17 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return false;
     }
 
-    @Override
+    /**
+     * @deprecated override {@link #shouldRedstoneConduitConnect(World, BlockPos, EnumFacing)} instead
+     */
+    @Deprecated
     public boolean shouldRedstoneConduitConnect(World world, int x, int y, int z, EnumFacing from) {
         return needsRedstoneCheck() || hasRedstoneOutput();
+    }
+
+    @Override
+    public boolean shouldRedstoneConduitConnect(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EnumFacing from) {
+        return shouldRedstoneConduitConnect(world, pos.getX(), pos.getY(), pos.getZ(), from);
     }
 
     protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
