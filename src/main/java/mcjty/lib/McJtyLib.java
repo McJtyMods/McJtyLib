@@ -35,7 +35,8 @@ import java.util.Map;
 @SuppressWarnings("unused")
 @Mod(modid = McJtyLib.PROVIDES, name = "McJtyLib",
         acceptedMinecraftVersions = "[1.12,1.13)",
-        version = McJtyLib.VERSION)
+        version = McJtyLib.VERSION,
+        dependencies = "after:enderio@[5.0.21,)")
 public class McJtyLib {
 
     public static final String VERSION = "2.6.7";
