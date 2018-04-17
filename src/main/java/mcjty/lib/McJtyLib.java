@@ -39,7 +39,7 @@ import java.util.Map;
         dependencies = "after:enderio@[5.0.21,)")
 public class McJtyLib {
 
-    public static final String VERSION = "2.6.7";
+    public static final String VERSION = "2.6.8";
     public static final String PROVIDES = "mcjtylib_ng";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
