@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.varia.Logging;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -154,11 +155,21 @@ public class NetworkTools {
 
 
     public static BlockPos readPos(ByteBuf dataIn) {
-        return BlockPos.fromLong(dataIn.readLong());
+        if (GeneralConfig.tallChunkFriendly) {
+            return new BlockPos(dataIn.readInt(), dataIn.readInt(), dataIn.readInt());
+        } else {
+            return BlockPos.fromLong(dataIn.readLong());
+        }
     }
 
     public static void writePos(ByteBuf dataOut, BlockPos pos) {
-        dataOut.writeLong(pos.toLong());
+        if (GeneralConfig.tallChunkFriendly) {
+            dataOut.writeInt(pos.getX());
+            dataOut.writeInt(pos.getY());
+            dataOut.writeInt(pos.getZ());
+        } else {
+            dataOut.writeLong(pos.toLong());
+        }
     }
 
     public static <T extends Enum<T>> void writeEnum(ByteBuf buf, T value, T nullValue) {

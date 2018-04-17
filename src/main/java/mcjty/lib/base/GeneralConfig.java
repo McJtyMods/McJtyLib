@@ -16,10 +16,13 @@ public class GeneralConfig {
     private static Configuration mainConfig;
 
     public static boolean manageOwnership = true;
+    public static boolean tallChunkFriendly = false;
 
     public static void init(Configuration cfg) {
         manageOwnership = cfg.get(CATEGORY_GENERAL, "manageOwnership", manageOwnership,
                 "If true then blocks using mcjtylib will have ownership tagged on them (useful for the rftools security manager)").getBoolean();
+        tallChunkFriendly = cfg.get(CATEGORY_GENERAL, "tallChunkFriendly", tallChunkFriendly,
+                "If true then mods using McJtyLib might try to be as friendly as possible to mods that support very tall chunks (taller then 256). No guarantees however! Set to false for more optimal performance").getBoolean();
         maxInfuse = cfg.get(CATEGORY_GENERAL, "maxInfuse", maxInfuse,
                 "The maximum amount of dimensional shards that can be infused in a single machine").getInt();
     }
