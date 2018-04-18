@@ -99,6 +99,10 @@ public class WindowManager {
         }
     }
 
+    public Stream<Window> getModalWindows() {
+        return modalWindows.stream();
+    }
+
     public void drawTooltips() {
         int x = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
         int y = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;

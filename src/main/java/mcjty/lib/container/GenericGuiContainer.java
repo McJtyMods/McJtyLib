@@ -18,6 +18,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
@@ -26,7 +27,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -259,6 +260,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
         drawStackTooltips(mouseX, mouseY);
+    }
+
+    @Override
+    public void drawSlot(Slot slotIn) {
+        if (windowManager.getModalWindows().anyMatch(window -> {
+            int xPos = slotIn.xPos;
+            int yPos = slotIn.yPos;
+            return window.getToplevel().getBounds().intersects(new Rectangle(xPos, yPos, 18, 18));
+        })) {
+            return;
+        }
+        super.drawSlot(slotIn);
     }
 
     /**
