@@ -88,20 +88,20 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
         if (isEnabledAndVisible()) {
             createColorSelectorWindow(window, x, y);
 
-            int index = colorList.indexOf(currentColor);
-            if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-                index--;
-                if (index < 0) {
-                    index = colorList.size()-1;
-                }
-            } else {
-                index++;
-                if (index >= colorList.size()) {
-                    index = 0;
-                }
-            }
-            currentColor = colorList.get(index);
-            fireChoiceEvents(currentColor);
+//            int index = colorList.indexOf(currentColor);
+//            if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+//                index--;
+//                if (index < 0) {
+//                    index = colorList.size()-1;
+//                }
+//            } else {
+//                index++;
+//                if (index >= colorList.size()) {
+//                    index = 0;
+//                }
+//            }
+//            currentColor = colorList.get(index);
+//            fireChoiceEvents(currentColor);
         }
         return null;
     }
