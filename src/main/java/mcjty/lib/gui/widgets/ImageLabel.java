@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
+    private boolean dragging = false;
     private ResourceLocation image = null;
     private int u;
     private int v;
@@ -48,25 +49,49 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
     @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         if (isEnabledAndVisible()) {
+            dragging = true;
             int u = x - bounds.x;
             int v = y - bounds.y;
-            if (bufferedImage == null) {
-                try {
-                    IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(image);
-                    bufferedImage = ImageIO.read(resource.getInputStream());
-                } catch (IOException e) {
-                }
-            }
-
-            int color = 0;
-            if (bufferedImage != null) {
-                color = bufferedImage.getRGB(u, v);
-            }
-
-            fireImageEvents(u, v, color);
+            fireImageEvents(u, v, pickColor(u, v));
             return this;
         }
         return null;
+    }
+
+    @Override
+    public void mouseMove(int x, int y) {
+        if (dragging && isEnabledAndVisible()) {
+            int u = x - bounds.x;
+            int v = y - bounds.y;
+            fireImageEvents(u, v, pickColor(u, v));
+        }
+    }
+
+    @Override
+    public void mouseRelease(int x, int y, int button) {
+        super.mouseRelease(x, y, button);
+        if (dragging) {
+            dragging = false;
+            int u = x - bounds.x;
+            int v = y - bounds.y;
+            fireImageEvents(u, v, pickColor(u, v));
+        }
+    }
+
+    private int pickColor(int u, int v) {
+        if (bufferedImage == null) {
+            try {
+                IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(image);
+                bufferedImage = ImageIO.read(resource.getInputStream());
+            } catch (IOException e) {
+            }
+        }
+
+        int color = 0;
+        if (bufferedImage != null) {
+            color = bufferedImage.getRGB(u, v);
+        }
+        return color;
     }
 
 
