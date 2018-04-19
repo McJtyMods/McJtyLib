@@ -127,6 +127,9 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
 
     private void fireImageEvents(int u, int v, int color) {
         if (imageEvents != null) {
+            if (u < 0 || v < 0 || u >= txtWidth || v >= txtHeight) {
+                return;
+            }
             for (ImageEvent event : imageEvents) {
                 event.imageClicked(this, u, v, color);
             }
