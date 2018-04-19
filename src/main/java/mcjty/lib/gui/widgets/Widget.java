@@ -2,6 +2,7 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
+import mcjty.lib.gui.layout.PositionalLayout;
 import net.minecraft.item.ItemStack;
 
 import java.awt.*;
@@ -182,6 +183,13 @@ public interface Widget<P extends Widget> {
      * @return this widget
      */
     P setLayoutHint(LayoutHint hint);
+
+    /**
+     * Conveniance for the positional layout
+     */
+    default P setLayoutHint(int x, int y, int width, int height) {
+        return setLayoutHint(new PositionalLayout.PositionalHint(x, y, width, height));
+    }
 
     LayoutHint getLayoutHint();
 
