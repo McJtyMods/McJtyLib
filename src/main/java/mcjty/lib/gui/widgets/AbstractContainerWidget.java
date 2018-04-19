@@ -63,6 +63,13 @@ public class AbstractContainerWidget<P extends AbstractContainerWidget<P>> exten
         return false;
     }
 
+    public P addChildren(Widget... children) {
+        for (Widget child : children) {
+            addChild(child);
+        }
+        return (P) this;
+    }
+
     public P addChild(Widget child) {
         if (child == null) {
             throw new RuntimeException("THIS IS NOT POSSIBLE!");
