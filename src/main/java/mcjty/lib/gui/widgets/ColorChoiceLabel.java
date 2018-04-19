@@ -118,6 +118,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
         red.setText(String.valueOf((color >> 16) & 255));
         green.setText(String.valueOf((color >> 8) & 255));
         blue.setText(String.valueOf(color & 255));
+        current.setColor(calculateContrastingColor(color));
         current.setFilledBackground(0xff000000 | color);
     }
 
@@ -126,6 +127,18 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
         int g = parseIntSafe(green.getText());
         int b = parseIntSafe(blue.getText());
         return (r << 16) + (g << 8) + b;
+    }
+
+    private int calculateContrastingColor(int color) {
+        int red = (color >> 16) & 255;
+        int green = (color >> 8) & 255;
+        int blue = color & 255;
+
+        red = (red+128) & 255;
+        green = (green+128) & 255;
+        blue = (blue+128) & 255;
+
+        return (red << 16) + (green << 8) + blue;
     }
 
     private void createColorSelectorWindow(Window window, int x, int y) {
@@ -139,10 +152,10 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
         int wy = (int) (window.getToplevel().getBounds().getY() + 20);
         modalDialog.setBounds(new Rectangle(wx, wy, 240, 160));
 
-        Label l = new Label<>(mc, gui).setText("Current:").setLayoutHint(new PositionalLayout.PositionalHint(5, 90, 50, 15));
-        Button current = new Button(mc, gui).setLayoutHint(new PositionalLayout.PositionalHint(5, 108, 95, 30))
+        Button current = new Button(mc, gui).setLayoutHint(new PositionalLayout.PositionalHint(5, 108, 95, 27))
+                .setText("Current")
+                .setColor(calculateContrastingColor(currentColor))
                 .setFilledBackground(0xff000000 | currentColor);
-
 
         TextField red = new TextField(mc, gui)
                 .setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 30, 15));
@@ -154,16 +167,19 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
 
         red.addTextEnterEvent((parent, newText) -> {
             currentColor = getInputColor(red, green, blue);
+            current.setColor(calculateContrastingColor(currentColor));
             current.setFilledBackground(0xff000000 | currentColor);
             fireChoiceEvents(currentColor);
         });
         green.addTextEnterEvent((parent, newText) -> {
             currentColor = getInputColor(red, green, blue);
+            current.setColor(calculateContrastingColor(currentColor));
             current.setFilledBackground(0xff000000 | currentColor);
             fireChoiceEvents(currentColor);
         });
         blue.addTextEnterEvent((parent, newText) -> {
             currentColor = getInputColor(red, green, blue);
+            current.setColor(calculateContrastingColor(currentColor));
             current.setFilledBackground(0xff000000 | currentColor);
             fireChoiceEvents(currentColor);
         });
@@ -194,7 +210,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
                 .setLayoutHint(new PositionalLayout.PositionalHint(90, 140, 60, 15))
                 .setText("Close");
 
-        modalDialog.addChildren(close, colors, red, green, blue, l, current);
+        modalDialog.addChildren(close, colors, red, green, blue, current);
 
         Window modalWindow = window.getWindowManager().createModalWindow(modalDialog);
         colors.addImageEvent((parent, u, v, color) -> {
