@@ -265,14 +265,27 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     @Override
     public void drawSlot(Slot slotIn) {
         // Prevent slots from being rendered if they are (partially) covered by a modal window
-        if (windowManager.getModalWindows().anyMatch(window -> {
+        if (!isPartiallyCoveredByModalWindow(slotIn)) {
+            super.drawSlot(slotIn);
+        }
+    }
+
+    @Override
+    public boolean isMouseOverSlot(Slot slotIn, int mouseX, int mouseY) {
+        // Prevent slots from being hoverable if they are (partially) covered by a modal window
+        if (isPartiallyCoveredByModalWindow(slotIn)) {
+            return false;
+        } else {
+            return super.isMouseOverSlot(slotIn, mouseX, mouseY);
+        }
+    }
+
+    private boolean isPartiallyCoveredByModalWindow(Slot slotIn) {
+        return windowManager.getModalWindows().anyMatch(window -> {
             int xPos = slotIn.xPos;
             int yPos = slotIn.yPos;
             return window.getToplevel().getBounds().intersects(new Rectangle(xPos, yPos, 18, 18));
-        })) {
-            return;
-        }
-        super.drawSlot(slotIn);
+        });
     }
 
     /**
