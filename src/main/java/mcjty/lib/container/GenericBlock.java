@@ -37,18 +37,20 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.ChunkCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.function.BiFunction;
 
 @Optional.InterfaceList({
         @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "enderio"),
@@ -57,7 +59,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         implements ITileEntityProvider, IRedstoneConnectable {
 
     protected final Class<? extends T> tileEntityClass;
+    private final BiFunction<EntityPlayer, TileEntity, C> containerFactory;
     private final Class<? extends C> containerClass;
+
+    @SideOnly(Side.CLIENT)
+    private Class<? extends GenericGuiContainer> guiClass;
 
     public GenericBlock(ModBase mod,
                            Material material,
@@ -68,15 +74,36 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     public GenericBlock(ModBase mod,
-                           Material material,
-                           Class<? extends T> tileEntityClass,
-                           Class<? extends C> containerClass,
-                           Class<? extends ItemBlock> itemBlockClass,
-                           String name, boolean isContainer) {
+                        Material material,
+                        Class<? extends T> tileEntityClass,
+                        Class<? extends C> containerClass,
+                        Class<? extends ItemBlock> itemBlockClass,
+                        String name, boolean isContainer) {
+        this(mod, material, tileEntityClass, containerClass, (player, inventory) -> {
+            C container;
+            try {
+                Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
+                container = constructor.newInstance(player, inventory instanceof IInventory ? (IInventory)inventory : null);
+                return container;
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                Logging.logError("Severe exception during creation of gui!");
+                throw new RuntimeException(e);
+            }
+        }, itemBlockClass, name, isContainer);
+    }
+
+    public GenericBlock(ModBase mod,
+                        Material material,
+                        Class<? extends T> tileEntityClass,
+                        Class<? extends C> containerClass,
+                        BiFunction<EntityPlayer, TileEntity, C> containerFactory,
+                        Class<? extends ItemBlock> itemBlockClass,
+                        String name, boolean isContainer) {
         super(mod, material, name, itemBlockClass);
         this.hasTileEntity = isContainer;
         this.tileEntityClass = tileEntityClass;
         this.containerClass = containerClass;
+        this.containerFactory = containerFactory;
         McJtyRegister.registerLater(this, tileEntityClass);
     }
 
@@ -143,26 +170,8 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-            if (blockState.getBlock() instanceof Infusable) {
-                int infused = genericTileEntity.getInfused();
-                int pct = infused * 100 / GeneralConfig.maxInfuse;
-                probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
-            }
-            if (mode == ProbeMode.EXTENDED) {
-                if (GeneralConfig.manageOwnership) {
-                    if (genericTileEntity.getOwnerName() != null && !genericTileEntity.getOwnerName().isEmpty()) {
-                        int securityChannel = genericTileEntity.getSecurityChannel();
-                        if (securityChannel == -1) {
-                            probeInfo.text(TextFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
-                        } else {
-                            probeInfo.text(TextFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
-                        }
-                        if (genericTileEntity.getOwnerUUID() == null) {
-                            probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
-                        }
-                    }
-                }
-            }
+            genericTileEntity.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+
         }
     }
 
@@ -171,30 +180,10 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     @Optional.Method(modid = "waila")
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         currenttip = super.getWailaBody(itemStack, currenttip, accessor, config);
-        Block block = accessor.getBlock();
         TileEntity tileEntity = accessor.getTileEntity();
         if (tileEntity instanceof GenericTileEntity) {
             GenericTileEntity genericTileEntity = (GenericTileEntity) tileEntity;
-            if (block instanceof Infusable) {
-                int infused = genericTileEntity.getInfused();
-                int pct = infused * 100 / GeneralConfig.maxInfuse;
-                currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
-            }
-            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-                if (GeneralConfig.manageOwnership) {
-                    if (genericTileEntity.getOwnerName() != null && !genericTileEntity.getOwnerName().isEmpty()) {
-                        int securityChannel = genericTileEntity.getSecurityChannel();
-                        if (securityChannel == -1) {
-                            currenttip.add(TextFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName());
-                        } else {
-                            currenttip.add(TextFormatting.YELLOW + "Owned by: " + genericTileEntity.getOwnerName() + " (channel " + securityChannel + ")");
-                        }
-                        if (genericTileEntity.getOwnerUUID() == null) {
-                            currenttip.add(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
-                        }
-                    }
-                }
-            }
+            genericTileEntity.addWailaBody(itemStack, currenttip, accessor, config);
         }
         return currenttip;
     }
@@ -202,11 +191,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced) {
+    public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag flags) {
         intAddInformation(stack, tooltip);
     }
 
-    private void intAddInformation(ItemStack itemStack, List<String> list) {
+    protected void intAddInformation(ItemStack itemStack, List<String> list) {
         NBTTagCompound tagCompound = itemStack.getTagCompound();
         if (tagCompound != null) {
             if (tagCompound.hasKey("Energy")) {
@@ -486,7 +475,12 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @SideOnly(Side.CLIENT)
     public Class<? extends GenericGuiContainer> getGuiClass() {
-        return null;
+        return guiClass;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void setGuiClass(Class<? extends GenericGuiContainer> guiClass) {
+        this.guiClass = guiClass;
     }
 
     @SideOnly(Side.CLIENT)
@@ -495,8 +489,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         C container;
         GenericGuiContainer gui;
         try {
-            Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
-            container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? (IInventory)inventory : null);
+            container = containerFactory.apply(entityPlayer, tileEntity);
             Constructor<? extends GenericGuiContainer> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
             gui = guiConstructor.newInstance(inventory, container);
             return gui;
@@ -507,35 +500,22 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     public Container createServerContainer(EntityPlayer entityPlayer, TileEntity tileEntity) {
-        T inventory = (T) tileEntity;
-        C container;
-        try {
-            Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
-            container = constructor.newInstance(entityPlayer, inventory instanceof IInventory ? (IInventory)inventory : null);
-            return container;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            Logging.logError("Severe exception during creation of gui!");
-            throw new RuntimeException(e);
+        return containerFactory.apply(entityPlayer, tileEntity);
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
+        TileEntity te = world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            return ((GenericTileEntity) te).getActualState(state);
         }
+        return super.getActualState(state, world, pos);
     }
 
     protected boolean checkAccess(World world, EntityPlayer player, TileEntity te) {
-//        if (te instanceof GenericTileEntity) {
-//            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-//            if ((!SecurityTools.isPrivileged(player, world)) && (!player.getPersistentID().equals(genericTileEntity.getOwnerUUID()))) {
-//                int securityChannel = genericTileEntity.getSecurityChannel();
-//                if (securityChannel != -1) {
-//                    SecurityChannels securityChannels = SecurityChannels.getChannels(world);
-//                    SecurityChannels.SecurityChannel channel = securityChannels.getChannel(securityChannel);
-//                    boolean playerListed = channel.getPlayers().contains(player.getDisplayNameString());
-//                    if (channel.isWhitelist() != playerListed) {
-//                        Logging.message(player, TextFormatting.RED + "You have no permission to use this block!");
-//                        return true;
-//                    }
-//                }
-//            }
-//        }
-        // @todo, security system from RFTools should be accessed here
+        if (te instanceof GenericTileEntity) {
+            ((GenericTileEntity) te).checkAccess(player);
+        }
         return false;
     }
 }

@@ -1,14 +1,19 @@
 package mcjty.lib.entity;
 
+import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.container.GenericBlock;
 import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
 import mcjty.typed.Type;
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -24,12 +29,18 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
+import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -157,6 +168,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
      * For compatibility reasons this calls writeToNBT() but for
      * efficiency reasons you should override this in your tile
      * entity to only write what you need on the client.
+     *
      * @param tagCompound
      */
     public void writeClientDataToNBT(NBTTagCompound tagCompound) {
@@ -167,6 +179,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
      * For compatibility reasons this calls readFromNBT() but for
      * efficiency reasons you should override this in your tile
      * entity to only read what you need on the client.
+     *
      * @param tagCompound
      */
     public void readClientDataFromNBT(NBTTagCompound tagCompound) {
@@ -188,7 +201,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     protected void readBufferFromNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
         NBTTagList bufferTagList = tagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0 ; i < bufferTagList.tagCount() ; i++) {
+        for (int i = 0; i < bufferTagList.tagCount(); i++) {
             NBTTagCompound nbtTagCompound = bufferTagList.getCompoundTagAt(i);
             inventoryHelper.setStackInSlot(i, new ItemStack(nbtTagCompound));
         }
@@ -204,6 +217,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     /**
      * Override this method to recover all information that you want
      * to recover from an ItemBlock in the player's inventory.
+     *
      * @param tagCompound
      */
     public void readRestorableFromNBT(NBTTagCompound tagCompound) {
@@ -228,7 +242,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     protected void writeBufferToNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
         NBTTagList bufferTagList = new NBTTagList();
-        for (int i = 0 ; i < inventoryHelper.getCount() ; i++) {
+        for (int i = 0; i < inventoryHelper.getCount(); i++) {
             ItemStack stack = inventoryHelper.getStackInSlot(i);
             NBTTagCompound nbtTagCompound = new NBTTagCompound();
             if (!stack.isEmpty()) {
@@ -253,6 +267,7 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
      * Override this method to store all information that you want
      * to store in an ItemBlock in the player's inventory (when the block
      * is picked up with a wrench).
+     *
      * @param tagCompound
      */
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
@@ -375,6 +390,68 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
             }
         }
         return super.getCapability(capability, facing);
+    }
+
+    public boolean checkAccess(EntityPlayer player) {
+        return false;
+    }
+
+    @Optional.Method(modid = "theoneprobe")
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        if (blockState.getBlock() instanceof Infusable) {
+            int infused = getInfused();
+            int pct = infused * 100 / GeneralConfig.maxInfuse;
+            probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
+        }
+        if (mode == ProbeMode.EXTENDED) {
+            if (GeneralConfig.manageOwnership) {
+                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
+                    int securityChannel = getSecurityChannel();
+                    if (securityChannel == -1) {
+                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
+                    } else {
+                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName() + " (channel " + securityChannel + ")");
+                    }
+                    if (getOwnerUUID() == null) {
+                        probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                    }
+                }
+            }
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Optional.Method(modid = "waila")
+    public void addWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+        Block block = accessor.getBlock();
+        if (block instanceof Infusable) {
+            int infused = getInfused();
+            int pct = infused * 100 / GeneralConfig.maxInfuse;
+            currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
+        }
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (GeneralConfig.manageOwnership) {
+                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
+                    int securityChannel = getSecurityChannel();
+                    if (securityChannel == -1) {
+                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
+                    } else {
+                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName() + " (channel " + securityChannel + ")");
+                    }
+                    if (getOwnerUUID() == null) {
+                        currenttip.add(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                    }
+                }
+            }
+        }
+    }
+
+    public IBlockState getActualState(IBlockState state) {
+        return state;
+    }
+
+    public int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        return -1;
     }
 
 }

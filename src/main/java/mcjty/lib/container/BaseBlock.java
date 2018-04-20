@@ -62,8 +62,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         McJtyRegister.registerLater(this, mod, itemBlockClass);
     }
 
-    public void setCreative(boolean creative) {
+    public BaseBlock setCreative(boolean creative) {
         this.creative = creative;
+        return this;
     }
 
     public boolean isCreative() {
@@ -166,16 +167,24 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
     }
 
+    protected IProperty<?>[] getProperties() {
+        return getProperties(getRotationType());
+    }
+
+    public static IProperty<?>[] getProperties(RotationType rotationType) {
+        switch (rotationType) {
+            case HORIZROTATION:
+                return new IProperty[] { FACING_HORIZ };
+            case ROTATION:
+                return new IProperty[] { FACING };
+            default:
+                return new IProperty[0];
+        }
+    }
+
     @Override
     protected BlockStateContainer createBlockState() {
-        switch (getRotationType()) {
-            case HORIZROTATION:
-                return new BlockStateContainer(this, FACING_HORIZ);
-            case ROTATION:
-                return new BlockStateContainer(this, FACING);
-            default:
-                return super.createBlockState();
-        }
+        return new BlockStateContainer(this, getProperties());
     }
 
     @SideOnly(Side.CLIENT)
