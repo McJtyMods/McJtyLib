@@ -28,6 +28,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockAccess;
@@ -454,4 +455,10 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return -1;
     }
 
+    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
+    }
+
+    public void rotateBlock(EnumFacing axis) {
+
+    }
 }

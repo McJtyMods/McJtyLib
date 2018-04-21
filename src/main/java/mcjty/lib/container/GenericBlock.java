@@ -246,6 +246,8 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
             stack.setTagCompound(tagCompound);
             result.add(stack);
+
+            ((GenericTileEntity) tileEntity).getDrops(result, world, pos, metadata, fortune);
         } else {
             super.getDrops(result, world, pos, metadata, fortune);
         }
@@ -346,7 +348,15 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return false;
     }
 
-
+    @Override
+    public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
+        boolean rc = super.rotateBlock(world, pos, axis);
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (tileEntity instanceof GenericTileEntity) {
+            ((GenericTileEntity) tileEntity).rotateBlock(axis);
+        }
+        return rc;
+    }
 
     protected boolean wrenchUse(World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
         rotateBlock(world, pos, EnumFacing.UP);
