@@ -10,6 +10,7 @@ public class ContainerFactory {
     private Map<SlotDefinition,SlotRanges> slotRangesMap = new HashMap<>();
     private List<SlotFactory> slots = new ArrayList<>();
 
+    public static final String CONTAINER_CONTAINER = "container";
     public static final String CONTAINER_PLAYER = "player";
 
     private boolean slotsSetup = false;

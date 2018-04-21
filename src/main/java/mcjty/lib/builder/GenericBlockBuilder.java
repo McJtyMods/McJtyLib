@@ -75,7 +75,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity, C extends Containe
         GenericBlock<T, C> block = new GenericBlock<T, C>(mod, material, tileEntityClass, containerClass,
                 (player, tileEntity) -> {
                     GenericContainer c = new GenericContainer(containerFactory);
-                    c.addInventory("container", (IInventory) tileEntity);
+                    c.addInventory(ContainerFactory.CONTAINER_CONTAINER, (IInventory) tileEntity);
                     c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
                     c.generateSlots();
                     return (C) c;
