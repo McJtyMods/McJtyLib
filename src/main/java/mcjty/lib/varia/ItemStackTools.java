@@ -2,7 +2,11 @@ package mcjty.lib.varia;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.oredict.OreDictionary;
@@ -10,6 +14,10 @@ import net.minecraftforge.oredict.OreDictionary;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class ItemStackTools {
 
@@ -75,4 +83,25 @@ public class ItemStackTools {
     public static List<ItemStack> getOres(String name, boolean alwaysCreateEntry) {
         return OreDictionary.getOres(name, alwaysCreateEntry);
     }
+
+    @Nonnull
+    public static Optional<NBTTagCompound> getTag(@Nonnull ItemStack stack) {
+        return Optional.ofNullable(stack.getTagCompound());
+    }
+
+    @Nonnull
+    public static <R> R mapTag(@Nonnull ItemStack stack, Function<NBTTagCompound,R> mapping, @Nonnull R def) {
+        if (stack.hasTagCompound()) {
+            return mapping.apply(stack.getTagCompound());
+        } else {
+            return def;
+        }
+    }
+
+    @Nonnull
+    public static Stream<NBTBase> getListStream(NBTTagCompound compound, String tag) {
+        NBTTagList list = compound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+        return StreamSupport.stream(list.spliterator(), false);
+    }
+
 }
