@@ -13,23 +13,30 @@ public class ContainerFactory {
     public static final String CONTAINER_CONTAINER = "container";
     public static final String CONTAINER_PLAYER = "player";
 
+    private boolean setupDone = false;
     private boolean slotsSetup = false;
     private int[] accessibleSlots;
     private int[] accessibleInputSlots;
     private int[] accessibleOutputSlots;
 
     public ContainerFactory() {
-        setup();
     }
 
     protected void setup() {
+    }
 
+    public void doSetup() {
+        if (!setupDone) {
+            setupDone = true;
+            setup();
+        }
     }
 
     protected void setupAccessibleSlots() {
         if (slotsSetup) {
             return;
         }
+        doSetup();
         slotsSetup = true;
         List<Integer> s = new ArrayList<>();
         List<Integer> si = new ArrayList<>();

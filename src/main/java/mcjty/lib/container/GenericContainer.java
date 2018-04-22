@@ -24,6 +24,7 @@ public class GenericContainer extends Container {
 
     public GenericContainer(ContainerFactory factory) {
         this.factory = factory;
+        factory.doSetup();
     }
 
     public void addInventory(String name, IInventory inventory) {
