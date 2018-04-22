@@ -359,7 +359,14 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     protected boolean wrenchUse(World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
-        rotateBlock(world, pos, EnumFacing.UP);
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (tileEntity instanceof GenericTileEntity) {
+            if (!((GenericTileEntity) tileEntity).wrenchUse(world, pos, side, player)) {
+                rotateBlock(world, pos, EnumFacing.UP);
+            }
+        } else {
+            rotateBlock(world, pos, EnumFacing.UP);
+        }
         return true;
     }
 
@@ -434,9 +441,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     protected void checkRedstone(World world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
-            int powered = world.isBlockIndirectlyGettingPowered(pos); //TODO: check
-            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-            genericTileEntity.setPowerInput(powered);
+            ((GenericTileEntity) te).checkRedstone(world, pos);
         }
     }
 

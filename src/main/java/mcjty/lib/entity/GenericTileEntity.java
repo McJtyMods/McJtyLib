@@ -93,6 +93,12 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return false;
     }
 
+    public void checkRedstone(World world, BlockPos pos) {
+        int powered = world.isBlockIndirectlyGettingPowered(pos); //TODO: check
+        setPowerInput(powered);
+    }
+
+
     public void setPowerInput(int powered) {
         if (powerLevel != powered) {
             powerLevel = powered;
@@ -460,5 +466,12 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     public void rotateBlock(EnumFacing axis) {
 
+    }
+
+    /**
+     * Return false if this was not handled here. In that case the default rotateBlock() will be done
+     */
+    public boolean wrenchUse(World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
+        return false;
     }
 }
