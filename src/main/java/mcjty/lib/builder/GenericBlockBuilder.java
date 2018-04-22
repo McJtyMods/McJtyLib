@@ -2,12 +2,14 @@ package mcjty.lib.builder;
 
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.container.*;
+import mcjty.lib.container.ContainerFactory;
+import mcjty.lib.container.EmptyContainerFactory;
+import mcjty.lib.container.GenericBlock;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.entity.GenericTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -26,10 +28,9 @@ import java.util.List;
 /**
  * Build blocks using this class
  */
-public class GenericBlockBuilder<T extends GenericTileEntity, C extends Container> extends BaseBlockBuilder<GenericBlockBuilder<T, C>> {
+public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockBuilder<GenericBlockBuilder<T>> {
 
     private Class<T> tileEntityClass;
-    private Class<C> containerClass;
     private ContainerFactory containerFactory;
 
     private IModuleSupport moduleSupport;
@@ -40,43 +41,41 @@ public class GenericBlockBuilder<T extends GenericTileEntity, C extends Containe
         super(mod, registryName);
     }
 
-    public GenericBlockBuilder<T, C> tileEntityClass(Class<T> tileEntityClass) {
+    public GenericBlockBuilder<T> tileEntityClass(Class<T> tileEntityClass) {
         this.tileEntityClass = tileEntityClass;
         return this;
     }
 
-    public GenericBlockBuilder<T, C> container(Class<C> containerClass, ContainerFactory containerFactory) {
-        this.containerClass = containerClass;
+    public GenericBlockBuilder<T> container(ContainerFactory containerFactory) {
         this.containerFactory = containerFactory;
         return this;
     }
 
-    public GenericBlockBuilder<T, C> emptyContainer(Class<C> containerClass) {
-        this.containerClass = containerClass;
+    public GenericBlockBuilder<T> emptyContainer() {
         this.containerFactory = EmptyContainerFactory.getInstance();
         return this;
     }
 
-    public GenericBlockBuilder<T, C> moduleSupport(IModuleSupport moduleSupport) {
+    public GenericBlockBuilder<T> moduleSupport(IModuleSupport moduleSupport) {
         this.moduleSupport = moduleSupport;
         return this;
     }
 
-    public GenericBlockBuilder<T, C> guiId(int id) {
+    public GenericBlockBuilder<T> guiId(int id) {
         this.guiId = id;
         return this;
     }
 
 
     @Override
-    public GenericBlock<T, C> build() {
+    public GenericBlock<T, GenericContainer> build() {
         IProperty<?>[] properties = calculateProperties();
         boolean needsRedstoneCheck = flags.contains(BlockFlags.REDSTONE_CHECK);
         boolean hasRedstoneOutput = flags.contains(BlockFlags.REDSTONE_OUTPUT);
         IRedstoneGetter getter = getRedstoneGetter(hasRedstoneOutput);
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
 
-        GenericBlock<T, C> block = new GenericBlock<T, C>(mod, material, tileEntityClass, containerClass,
+        GenericBlock<T, GenericContainer> block = new GenericBlock<T, GenericContainer>(mod, material, tileEntityClass, GenericContainer.class,
                 (player, tileEntity) -> {
                     GenericContainer c = new GenericContainer(containerFactory);
                     if (tileEntity instanceof IInventory) {
@@ -84,7 +83,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity, C extends Containe
                     }
                     c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
                     c.generateSlots();
-                    return (C) c;
+                    return (GenericContainer) c;
                 },
                 itemBlockClass, registryName, true) {
             @Override
@@ -158,11 +157,5 @@ public class GenericBlockBuilder<T extends GenericTileEntity, C extends Containe
             };
         }
         return getter;
-    }
-
-    private static void test() {
-        GenericBlock<GenericTileEntity, Container> b = new GenericBlockBuilder<>(null, "X")
-                .information("test")
-                .build();
     }
 }

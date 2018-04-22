@@ -3,7 +3,6 @@ package mcjty.lib.builder;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.entity.GenericTileEntity;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.inventory.Container;
 
 public class GenericBlockBuilderFactory {
 
@@ -19,8 +18,8 @@ public class GenericBlockBuilderFactory {
         return this;
     }
 
-    public <T extends GenericTileEntity, C extends Container> GenericBlockBuilder<T, C> builder(String registryName) {
-        return new GenericBlockBuilder<T, C>(mod, registryName)
+    public <T extends GenericTileEntity> GenericBlockBuilder<T> builder(String registryName) {
+        return new GenericBlockBuilder<T>(mod, registryName)
                 .creativeTabs(creativeTabs);
     }
 }
