@@ -2,9 +2,7 @@ package mcjty.lib.builder;
 
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.container.ContainerFactory;
-import mcjty.lib.container.GenericBlock;
-import mcjty.lib.container.GenericContainer;
+import mcjty.lib.container.*;
 import mcjty.lib.entity.GenericTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -50,6 +48,12 @@ public class GenericBlockBuilder<T extends GenericTileEntity, C extends Containe
     public GenericBlockBuilder<T, C> container(Class<C> containerClass, ContainerFactory containerFactory) {
         this.containerClass = containerClass;
         this.containerFactory = containerFactory;
+        return this;
+    }
+
+    public GenericBlockBuilder<T, C> emptyContainer(Class<C> containerClass) {
+        this.containerClass = containerClass;
+        this.containerFactory = EmptyContainerFactory.getInstance();
         return this;
     }
 
