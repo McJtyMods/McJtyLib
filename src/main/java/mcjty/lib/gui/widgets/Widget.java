@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
@@ -19,6 +20,10 @@ public interface Widget<P extends Widget> {
         DIMENSION_WIDTH,
         DIMENSION_HEIGHT
     }
+
+    String getName();
+
+    P setName(String name);
 
     /**
      * Return true if this widget is equal to the parameter widget or if the parameter
@@ -199,4 +204,8 @@ public interface Widget<P extends Widget> {
     P setUserObject(Object obj);
 
     Object getUserObject();
+
+    void readFromJSon(JsonObject object);
+
+    JsonObject writeToJSon();
 }

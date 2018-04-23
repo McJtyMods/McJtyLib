@@ -1,5 +1,7 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
@@ -30,6 +32,9 @@ import java.util.List;
 import java.util.Map;
 
 public class TextPage extends AbstractWidget<TextPage> {
+
+    public static final String TYPE_TEXTPAGE = "textpage";
+
     private ModBase modBase;
     private final List<Page> pages = new ArrayList<>();
     private final Map<String,Integer> nodes = new HashMap<>();
@@ -540,4 +545,17 @@ public class TextPage extends AbstractWidget<TextPage> {
         }
     }
 
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_TEXTPAGE));
+        // @todo
+        return object;
+    }
 }

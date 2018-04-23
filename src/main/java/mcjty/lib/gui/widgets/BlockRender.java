@@ -1,9 +1,13 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.BlockRenderEvent;
+import mcjty.lib.varia.ItemStackTools;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -16,13 +20,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlockRender extends AbstractWidget<BlockRender> {
+
+    public static final String TYPE_BLOCKRENDER = "blockrender";
+
+    public static final int DEFAULT_OFFSET = 0;
+    public static final boolean DEFAULT_HILIGHT_ON_HOVER = false;
+    public static final boolean DEFAULT_SHOW_LABEL = false;
+
     private Object renderItem = null;
-    private int offsetX = 0;
-    private int offsetY = 0;
+    private int offsetX = DEFAULT_OFFSET;
+    private int offsetY = DEFAULT_OFFSET;
     private long prevTime = -1;
-    private boolean hilightOnHover = false;
-    private boolean showLabel = false;
-    private int labelColor = StyleConfig.colorTextNormal;
+    private boolean hilightOnHover = DEFAULT_HILIGHT_ON_HOVER;
+    private boolean showLabel = DEFAULT_SHOW_LABEL;
+    private Integer labelColor = null;
     private List<BlockRenderEvent> selectionEvents = null;
 
     public Object getRenderItem() {
@@ -50,7 +61,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     public int getLabelColor() {
-        return labelColor;
+        return labelColor == null ? StyleConfig.colorTextNormal : labelColor;
     }
 
     public BlockRender setLabelColor(int labelColor) {
@@ -124,7 +135,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 }
                 int h = mc.fontRenderer.FONT_HEIGHT;
                 int dy = (bounds.height - h)/2;
-                mc.fontRenderer.drawString(name, xx+20, yy + dy, labelColor);
+                mc.fontRenderer.drawString(name, xx+20, yy + dy, getLabelColor());
             }
         }
     }
@@ -171,5 +182,40 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 event.doubleClick(this);
             }
         }
+    }
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        offsetX = JSonTools.get(object, "offsetx", DEFAULT_OFFSET);
+        offsetY = JSonTools.get(object, "offsetY", DEFAULT_OFFSET);
+        hilightOnHover = JSonTools.get(object, "highlighthover", DEFAULT_HILIGHT_ON_HOVER);
+        showLabel = JSonTools.get(object, "showlabel", DEFAULT_SHOW_LABEL);
+        if (object.has("itemstack")) {
+            renderItem = ItemStackTools.jsonToItemStack(object.getAsJsonObject("itemstack"));
+        }
+        if (object.has("labelcolor")) {
+            labelColor = object.get("labelcolor").getAsInt();
+        }
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_BLOCKRENDER));
+        JSonTools.put(object, "offsetx", offsetX, DEFAULT_OFFSET);
+        JSonTools.put(object, "offsety", offsetY, DEFAULT_OFFSET);
+        JSonTools.put(object, "highlighthover", hilightOnHover, DEFAULT_HILIGHT_ON_HOVER);
+        JSonTools.put(object, "showlabel", showLabel, DEFAULT_SHOW_LABEL);
+        if (renderItem != null) {
+            if (renderItem instanceof ItemStack) {
+                object.add("itemstack", ItemStackTools.itemStackToJson((ItemStack) renderItem));
+            }
+            // @todo other types
+        }
+        if (labelColor != null) {
+            object.add("labelcolor", new JsonPrimitive(labelColor));
+        }
+        return object;
     }
 }

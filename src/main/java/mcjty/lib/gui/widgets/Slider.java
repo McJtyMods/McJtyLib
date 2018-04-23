@@ -1,17 +1,27 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
 public class Slider extends AbstractWidget<Slider> {
+
+    public static final String TYPE_SLIDER = "slider";
+
+    public static final boolean DEFAULT_HORIZONTAL = false;
+    public static final int DEFAULT_MINIMUM_KNOBSIZE = 4;
+
     private boolean dragging = false;
-    private int dx, dy;
-    private boolean horizontal = false;
-    private int minimumKnobSize = 4;
+    private int dx;
+    private int dy;
+    private boolean horizontal = DEFAULT_HORIZONTAL;
+    private int minimumKnobSize = DEFAULT_MINIMUM_KNOBSIZE;
 
     private Scrollable scrollable;
 
@@ -212,5 +222,22 @@ public class Slider extends AbstractWidget<Slider> {
             updateScrollable(x, y);
 //            System.out.println("x = " + x + "," + y);
         }
+    }
+
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        horizontal = JSonTools.get(object, "horizontal", DEFAULT_HORIZONTAL);
+        minimumKnobSize = JSonTools.get(object, "minimumknob", DEFAULT_MINIMUM_KNOBSIZE);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_SLIDER));
+        JSonTools.put(object, "horizontal", horizontal, DEFAULT_HORIZONTAL);
+        JSonTools.put(object, "minimumknob", minimumKnobSize, DEFAULT_MINIMUM_KNOBSIZE);
+        return object;
     }
 }

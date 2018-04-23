@@ -1,14 +1,17 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.SelectionEvent;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -16,18 +19,29 @@ import java.util.Set;
 
 
 public class WidgetList extends AbstractContainerWidget<WidgetList> implements Scrollable {
-    private int rowheight = 16;
+
+    public static final String TYPE_WIDGETLIST = "widgetlist";
+
+    public static final int DEFAULT_ROWHEIGHT = 16;
+    public static final boolean DEFAULT_PROPAGATE = false;
+    public static final boolean DEFAULT_NOSELECTION = false;
+    public static final boolean DEFAULT_INVISIBLE_SELECTION = false;
+    public static final boolean DEFAULT_DRAW_HORIZONTAL_LINES = true;
+    public static final int DEFAULT_LEFT_MARGIN = 2;
+    public static final int DEFAULT_TOP_MARGIN = 1;
+
+    private int rowheight = DEFAULT_ROWHEIGHT;
     private int first = 0;
     private int selected = -1;
     private long prevTime = -1;
-    private boolean propagateEventsToChildren = false;
+    private boolean propagateEventsToChildren = DEFAULT_PROPAGATE;
     private List<SelectionEvent> selectionEvents = null;
     private Set<Integer> hilightedRows = new HashSet<>();
-    private boolean noselection = false;
-    private boolean invisibleselection = false;
-    private boolean drawHorizontalLines = true;
-    private int leftMargin = 2;
-    private int topMargin = 1;
+    private boolean noselection = DEFAULT_NOSELECTION;
+    private boolean invisibleselection = DEFAULT_INVISIBLE_SELECTION;
+    private boolean drawHorizontalLines = DEFAULT_DRAW_HORIZONTAL_LINES;
+    private int leftMargin = DEFAULT_LEFT_MARGIN;
+    private int topMargin = DEFAULT_TOP_MARGIN;
 
     public WidgetList(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -122,8 +136,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         y -= bounds.y;
 
         doLayout();
-        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
-            Widget child = children.get(i);
+        for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
+            Widget child = getChildren().get(i);
             if (child.in(x, y) && child.isVisible()) {
                 return child.getWidgetAtPosition(x, y);
             }
@@ -134,8 +148,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     private void doLayout() {
         int top = 0;
-        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
-            Widget child = children.get(i);
+        for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
+            Widget child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             top += rh;
@@ -157,8 +171,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         int top = 0;        // Margin@@@?
 //        drawBox(xx, yy, 0xffff0000);
 
-        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
-            Widget child = children.get(i);
+        for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
+            Widget child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             boolean hilighted = hilightedRows.contains(i);
@@ -198,8 +212,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         int top = 0;        // Margin@@@?
 //        drawBox(xx, yy, 0xffff0000);
 
-        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
-            Widget child = children.get(i);
+        for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
+            Widget child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             if (isEnabledAndVisible()) {
                 child.drawPhase2(window, xx, yy);
@@ -220,8 +234,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         int newSelected = -1;
         int top = bounds.y;        // Margin@@@?
 
-        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
-            int rh = rowheight == -1 ? children.get(i).getDesiredHeight() : rowheight;
+        for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
+            int rh = rowheight == -1 ? getChildren().get(i).getDesiredHeight() : rowheight;
             Rectangle r = new Rectangle(bounds.x, top, bounds.width, rh);
             if (r.contains(x, y)) {
                 newSelected = i;
@@ -252,8 +266,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         int newSelected = -1;
         int top = bounds.y;        // Margin@@@?
 
-        for (int i = first ; i < first+getCountSelected() && i < children.size(); i++) {
-            int rh = rowheight == -1 ? children.get(i).getDesiredHeight() : rowheight;
+        for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
+            int rh = rowheight == -1 ? getChildren().get(i).getDesiredHeight() : rowheight;
             Rectangle r = new Rectangle(bounds.x, top, bounds.width, rh);
             if (r.contains(x, y)) {
                 newSelected = i;
@@ -306,8 +320,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     private Widget getSelectedWidgetSafe(int sel) {
-        if (sel < children.size()) {
-            return children.get(sel);
+        if (sel < getChildren().size()) {
+            return getChildren().get(sel);
         } else {
             return null;
         }
@@ -337,7 +351,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     @Override
     public int getMaximum() {
-        return children.size();
+        return getChildren().size();
     }
 
     @Override
@@ -350,8 +364,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         } else {
             int totalh = 0;
             int cnt = 0;
-            for (int i = first; i < children.size(); i++) {
-                int rh = children.get(i).getDesiredHeight();
+            for (int i = first; i < getChildren().size(); i++) {
+                int rh = getChildren().get(i).getDesiredHeight();
                 if (totalh + rh > bounds.height) {
                     break;
                 }
@@ -404,7 +418,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
     @Override
     public WidgetList removeChild(Widget child) {
-        int index = children.indexOf(child);
+        int index = getChildren().indexOf(child);
         if (index != -1) {
             Set<Integer> newHighlights = new HashSet<>();
             for (Integer i : hilightedRows) {
@@ -423,5 +437,32 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     public void removeChildren() {
         super.removeChildren();
         hilightedRows.clear();
+    }
+
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        rowheight = JSonTools.get(object, "rowheight", DEFAULT_ROWHEIGHT);
+        propagateEventsToChildren = JSonTools.get(object, "propagate", DEFAULT_PROPAGATE);
+        noselection = JSonTools.get(object, "noselection", DEFAULT_NOSELECTION);
+        invisibleselection = JSonTools.get(object, "invisibleselection", DEFAULT_INVISIBLE_SELECTION);
+        drawHorizontalLines = JSonTools.get(object, "horizontallines", DEFAULT_DRAW_HORIZONTAL_LINES);
+        leftMargin = JSonTools.get(object, "leftmargin", DEFAULT_LEFT_MARGIN);
+        topMargin = JSonTools.get(object, "topmargin", DEFAULT_TOP_MARGIN);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_WIDGETLIST));
+        JSonTools.put(object, "rowheight", rowheight, DEFAULT_ROWHEIGHT);
+        JSonTools.put(object, "propagate", propagateEventsToChildren, DEFAULT_PROPAGATE);
+        JSonTools.put(object, "noselection", noselection, DEFAULT_NOSELECTION);
+        JSonTools.put(object, "invisibleselection", invisibleselection, DEFAULT_INVISIBLE_SELECTION);
+        JSonTools.put(object, "horizontallines", drawHorizontalLines, DEFAULT_DRAW_HORIZONTAL_LINES);
+        JSonTools.put(object, "leftmargin", leftMargin, DEFAULT_LEFT_MARGIN);
+        JSonTools.put(object, "topmargin", topMargin, DEFAULT_TOP_MARGIN);
+        return object;
     }
 }

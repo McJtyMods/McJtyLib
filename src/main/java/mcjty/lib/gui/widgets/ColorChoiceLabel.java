@@ -1,9 +1,14 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ColorChoiceEvent;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
@@ -11,6 +16,9 @@ import org.lwjgl.input.Keyboard;
 import java.util.*;
 
 public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
+
+    public static final String TYPE_COLORCHOICELABEL = "colorchoicelabel";
+
     private List<Integer> colorList = new ArrayList<>();
     private Map<Integer,List<String>> tooltipMap = new HashMap<>();
     private Integer currentColor = null;
@@ -118,5 +126,36 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
                 event.choiceChanged(this, color);
             }
         }
+    }
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        JsonArray array = object.getAsJsonArray("choices");
+        for (JsonElement element : array) {
+            JsonObject o = element.getAsJsonObject();
+            Integer choice = o.get("choice").getAsInt();
+            colorList.add(choice);
+            List<String> tooltips = JSonTools.getStringList(o, "tooltips");
+            if (tooltips != null) {
+                tooltipMap.put(choice, tooltips);
+            }
+        }
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_COLORCHOICELABEL));
+
+        JsonArray array = new JsonArray();
+        object.add("choices", array);
+        for (Integer s : colorList) {
+            JsonObject o = new JsonObject();
+            array.add(o);
+            o.add("choice", new JsonPrimitive(s));
+            JSonTools.putStringList(o, "tooltips", tooltipMap.get(s));
+        }
+        return object;
     }
 }

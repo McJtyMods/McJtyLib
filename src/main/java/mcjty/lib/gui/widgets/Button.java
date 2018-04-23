@@ -1,5 +1,7 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
 import net.minecraft.client.Minecraft;
@@ -9,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Button extends Label<Button> {
+
+    public static final String TYPE_BUTTON = "button";
+
     private List<ButtonEvent> buttonEvents = null;
     private boolean pressed = false;
 
@@ -79,5 +84,17 @@ public class Button extends Label<Button> {
                 event.buttonClicked(this);
             }
         }
+    }
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_BUTTON));
+        return object;
     }
 }

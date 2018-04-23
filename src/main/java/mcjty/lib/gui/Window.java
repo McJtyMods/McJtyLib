@@ -1,13 +1,23 @@
 package mcjty.lib.gui;
 
+import com.google.gson.*;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.events.FocusEvent;
+import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.gui.widgets.WidgetRepository;
 import mcjty.lib.preferences.PreferencesProperties;
+import mcjty.lib.varia.Logging;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.IResource;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +40,32 @@ public class Window {
     public Window(GuiScreen gui, Widget toplevel) {
         this.gui = gui;
         this.toplevel = toplevel;
+    }
+
+    public Window(GuiScreen gui, ResourceLocation guiDescription) {
+        this.gui = gui;
+        try {
+            IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(guiDescription);
+            try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+                JsonParser parser = new JsonParser();
+                JsonElement element = parser.parse(br);
+                JsonObject object = element.getAsJsonObject();
+                String type = object.get("type").getAsString();
+                toplevel = WidgetRepository.createWidget(type, Minecraft.getMinecraft(), gui);
+                toplevel.readFromJSon(object);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        Keyboard.enableRepeatEvents(true);
+    }
+
+    public Widget findChild(String name) {
+        Widget widget = ((AbstractContainerWidget) toplevel).findChildRecursive(name);
+        if (widget == null) {
+            Logging.logError("Could not find widget '" + name + "'!");
+        }
+        return widget;
     }
 
     public WindowManager getWindowManager() {
@@ -102,6 +138,19 @@ public class Window {
     }
 
     public boolean keyTyped(char typedChar, int keyCode) {
+        if (keyCode == Keyboard.KEY_F12) {
+            JsonObject jsonObject = toplevel.writeToJSon();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            try {
+                try(PrintWriter writer = new PrintWriter(new File("output.json"))) {
+                    writer.print(gson.toJson(jsonObject));
+                    writer.flush();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+        }
         if (textFocus != null) {
             return textFocus.keyTyped(this, typedChar, keyCode);
         }

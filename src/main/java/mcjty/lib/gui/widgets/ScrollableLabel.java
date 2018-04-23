@@ -1,7 +1,10 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.events.ValueEvent;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -9,10 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollable {
-    private int realmin = 0;
-    private int realmax = 100;
+
+    public static final String TYPE_SCROLLABLELABEL = "scrollablelabel";
+
+    public static final int DEFAULT_REALMIN = 0;
+    public static final int DEFAULT_REALMAX = 100;
+    public static final String DEFAULT_SUFFIX = "";
+
+    private int realmin = DEFAULT_REALMIN;
+    private int realmax = DEFAULT_REALMAX;
     private int first = 0;
-    private String suffix = "";
+    private String suffix = DEFAULT_SUFFIX;
     private List<ValueEvent> valueEvents = null;
 
     public ScrollableLabel(Minecraft mc, Gui gui) {
@@ -116,4 +126,22 @@ public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollabl
         }
     }
 
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        suffix = JSonTools.get(object, "suffix", DEFAULT_SUFFIX);
+        realmin = JSonTools.get(object, "realmin", DEFAULT_REALMIN);
+        realmax = JSonTools.get(object, "realmax", DEFAULT_REALMAX);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_SCROLLABLELABEL));
+        JSonTools.put(object, "suffix", suffix, DEFAULT_SUFFIX);
+        JSonTools.put(object, "realmin", realmin, DEFAULT_REALMIN);
+        JSonTools.put(object, "realmax", realmax, DEFAULT_REALMAX);
+        return object;
+    }
 }

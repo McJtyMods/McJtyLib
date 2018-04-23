@@ -1,9 +1,12 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -11,12 +14,18 @@ import net.minecraft.util.ResourceLocation;
 
 public class Label<P extends Label<P>> extends AbstractWidget<P> {
 
+    public static final String TYPE_LABEL = "label";
+
+    public static final HorizontalAlignment DEFAULT_HORIZONTAL_ALIGN = HorizontalAlignment.ALIGN_CENTER;
+    public static final VerticalAlignment DEFAULT_VERTICAL_ALIGN = VerticalAlignment.ALIGN_CENTER;
+    public static final boolean DEFAULT_DYNAMIC = false;
+
     private String text;
-    private int color = StyleConfig.colorTextNormal;
-    private int disabledColor = StyleConfig.colorTextDisabled;
-    private HorizontalAlignment horizontalAlignment = HorizontalAlignment.ALIGN_CENTER;
-    private VerticalAlignment verticalAlignment = VerticalAlignment.ALIGN_CENTER;
-    private boolean dynamic = false;        // The size of this label is dynamic and not based on the contents
+    private Integer color = null;
+    private Integer disabledColor = null;
+    private HorizontalAlignment horizontalAlignment = DEFAULT_HORIZONTAL_ALIGN;
+    private VerticalAlignment verticalAlignment = DEFAULT_VERTICAL_ALIGN;
+    private boolean dynamic = DEFAULT_DYNAMIC;        // The size of this label is dynamic and not based on the contents
 
     private int txtDx = 0;
     private int txtDy = 0;
@@ -94,7 +103,7 @@ public class Label<P extends Label<P>> extends AbstractWidget<P> {
     }
 
     public int getColor() {
-        return color;
+        return color == null ? StyleConfig.colorTextNormal : color;
     }
 
     public P setColor(int color) {
@@ -103,7 +112,7 @@ public class Label<P extends Label<P>> extends AbstractWidget<P> {
     }
 
     public int getDisabledColor() {
-        return disabledColor;
+        return disabledColor == null ? StyleConfig.colorTextDisabled : disabledColor;
     }
 
     public P setDisabledColor(int disabledColor) {
@@ -151,9 +160,9 @@ public class Label<P extends Label<P>> extends AbstractWidget<P> {
             gui.drawTexturedModalRect(xx, yy, u, v, iw, ih);
         }
 
-        int col = color;
+        int col = getColor();
         if (!isEnabled()) {
-            col = disabledColor;
+            col = getDisabledColor();
         }
 
         if (text == null) {
@@ -187,5 +196,38 @@ public class Label<P extends Label<P>> extends AbstractWidget<P> {
         } else {
             return 0;
         }
+    }
+
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        text = object.get("text").getAsString();
+        if (object.has("color")) {
+            color = object.get("color").getAsInt();
+        }
+        if (object.has("disabledcolor")) {
+            disabledColor = object.get("disabledcolor").getAsInt();
+        }
+        horizontalAlignment = HorizontalAlignment.getByName(JSonTools.get(object, "horizalign", DEFAULT_HORIZONTAL_ALIGN.name()));
+        verticalAlignment = VerticalAlignment.getByName(JSonTools.get(object, "vertalign", DEFAULT_VERTICAL_ALIGN.name()));
+        dynamic = JSonTools.get(object, "dynamic", DEFAULT_DYNAMIC);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_LABEL));
+        object.add("text", new JsonPrimitive(text));
+        if (color != null) {
+            object.add("color", new JsonPrimitive(color));
+        }
+        if (disabledColor != null) {
+            object.add("disabledcolor", new JsonPrimitive(disabledColor));
+        }
+        JSonTools.put(object, "horizalign", horizontalAlignment.name(), DEFAULT_HORIZONTAL_ALIGN.name());
+        JSonTools.put(object, "vertalign", verticalAlignment.name(), DEFAULT_VERTICAL_ALIGN.name());
+        JSonTools.put(object, "dynamic", dynamic, DEFAULT_DYNAMIC);
+        return object;
     }
 }

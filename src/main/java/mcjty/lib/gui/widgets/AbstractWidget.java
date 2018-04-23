@@ -1,21 +1,34 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
+import mcjty.lib.gui.layout.PositionalLayout;
+import mcjty.lib.varia.ItemStackTools;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.lang3.StringUtils;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Widget<P> {
+
+    public static final int DEFAULT_BACKGROUND_OFFSET = 256;
+    public static final int DEFAULT_FILLED_RECT_THICKNESS = 0;
+    public static final int DEFAULT_FILLED_BACKGROUND = -1;
+    public static final boolean DEFAULT_BACKGROUND_HORIZONTAL = true;
 
     protected Rectangle bounds;
     protected int desiredWidth = SIZE_UNKNOWN;
@@ -28,17 +41,18 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     protected boolean visible = true;
     protected List<String> tooltips = null;
     protected List<ItemStack> items = null;
+    protected String name;
 
     private boolean layoutDirty = true;
     private Object userObject = null;
 
     private ResourceLocation background1 = null;
     private ResourceLocation background2 = null;
-    private boolean background2Horizontal = true;
-    private int backgroundOffset = 256;
-    private int filledRectThickness = 0;
-    private int filledBackground = -1;
-    private int filledBackground2 = -1;
+    private boolean background2Horizontal = DEFAULT_BACKGROUND_HORIZONTAL;
+    private int backgroundOffset = DEFAULT_BACKGROUND_OFFSET;
+    private int filledRectThickness = DEFAULT_FILLED_RECT_THICKNESS;
+    private int filledBackground = DEFAULT_FILLED_BACKGROUND;
+    private int filledBackground2 = DEFAULT_FILLED_BACKGROUND;
 
     // Bevel:           vvv
     // Bevel gradient:  vvvv
@@ -54,6 +68,17 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     protected AbstractWidget(Minecraft mc, Gui gui) {
         this.mc = mc;
         this.gui = gui;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public P setName(String name) {
+        this.name = name;
+        return (P) this;
     }
 
     protected void drawBox(int xx, int yy, int color) {
@@ -394,5 +419,95 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     public P setUserObject(Object obj) {
         userObject = obj;
         return (P) this;
+    }
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        if (object.has("name")) {
+            name = object.get("name").getAsString();
+        }
+        if (object.has("desiredwidth")) {
+            desiredWidth = object.get("desiredwidth").getAsInt();
+        }
+        if (object.has("desiredheight")) {
+            desiredHeight = object.get("desiredheight").getAsInt();
+        }
+
+        tooltips = JSonTools.getStringList(object, "tooltips");
+
+        if (object.has("items")) {
+            JsonArray array = object.get("items").getAsJsonArray();
+            items = new ArrayList<>(array.size());
+            for (JsonElement element : array) {
+                items.add(ItemStackTools.jsonToItemStack(element.getAsJsonObject()));
+            }
+        }
+        if (object.has("poshint")) {
+            String str = object.get("poshint").getAsString();
+            String[] split = StringUtils.split(str, ',');
+            setLayoutHint(new PositionalLayout.PositionalHint(
+                    Integer.parseInt(split[0]),
+                    Integer.parseInt(split[1]),
+                    Integer.parseInt(split[2]),
+                    Integer.parseInt(split[3])
+            ));
+        }
+        if (object.has("bg")) {
+            JsonObject bg = object.getAsJsonObject("bg");
+            if (bg.has("bg1")) {
+                background1 = new ResourceLocation(bg.get("bg1").getAsString());
+            }
+            if (bg.has("bg2")) {
+                background2 = new ResourceLocation(bg.get("bg2").getAsString());
+            }
+            background2Horizontal = JSonTools.get(bg, "horiz", DEFAULT_BACKGROUND_HORIZONTAL);
+            backgroundOffset = JSonTools.get(bg, "offset", DEFAULT_BACKGROUND_OFFSET);
+            filledRectThickness = JSonTools.get(bg, "thickness", DEFAULT_FILLED_RECT_THICKNESS);
+            filledBackground = JSonTools.get(bg, "filled1", DEFAULT_FILLED_BACKGROUND);
+            filledBackground2 = JSonTools.get(bg, "filled2", DEFAULT_FILLED_BACKGROUND);
+        }
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = new JsonObject();
+        if (name != null) {
+            object.add("name", new JsonPrimitive(name));
+        }
+
+        if (desiredWidth != SIZE_UNKNOWN) {
+            object.add("desiredwidth", new JsonPrimitive(desiredWidth));
+        }
+        if (desiredHeight != SIZE_UNKNOWN) {
+            object.add("desiredheight", new JsonPrimitive(desiredHeight));
+        }
+
+        JSonTools.putStringList(object, "tooltips", tooltips);
+
+        if (items != null) {
+            JsonArray array = new JsonArray();
+            for (ItemStack stack : items) {
+                array.add(ItemStackTools.itemStackToJson(stack));
+            }
+            object.add("items", array);
+        }
+        if (layoutHint instanceof PositionalLayout.PositionalHint) {
+            PositionalLayout.PositionalHint hint = (PositionalLayout.PositionalHint) layoutHint;
+            object.add("poshint", new JsonPrimitive(hint.getX()+","+hint.getY()+","+hint.getWidth()+","+hint.getHeight()));
+        }
+        JsonObject bg = new JsonObject();
+        object.add("bg", bg);
+        if (background1 != null) {
+            bg.add("bg1", new JsonPrimitive(background1.toString()));
+        }
+        if (background2 != null) {
+            bg.add("bg2", new JsonPrimitive(background2.toString()));
+        }
+        JSonTools.put(bg, "horiz", background2Horizontal, DEFAULT_BACKGROUND_HORIZONTAL);
+        JSonTools.put(bg, "offset", backgroundOffset, DEFAULT_BACKGROUND_OFFSET);
+        JSonTools.put(bg, "thickness", filledRectThickness, DEFAULT_FILLED_RECT_THICKNESS);
+        JSonTools.put(bg, "filled1", filledBackground, DEFAULT_FILLED_BACKGROUND);
+        JSonTools.put(bg, "filled2", filledBackground2, DEFAULT_FILLED_BACKGROUND);
+        return object;
     }
 }

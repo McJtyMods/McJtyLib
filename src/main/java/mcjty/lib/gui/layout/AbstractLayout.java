@@ -6,12 +6,18 @@ import java.awt.*;
 import java.util.Collection;
 
 public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Layout {
-    private int spacing = 5;
-    private int horizontalMargin = 5;
-    private int verticalMargin = 2;
+    public static final int DEFAULT_SPACING = 5;
+    public static final int DEFAULT_HORIZONTAL_MARGIN = 5;
+    public static final int DEFAULT_VERTICAL_MARGIN = 2;
+    public static final HorizontalAlignment DEFAULT_HORIZONTAL_ALIGN = HorizontalAlignment.ALIGN_CENTER;
+    public static final VerticalAlignment DEFAULT_VERTICAL_ALIGN = VerticalAlignment.ALIGN_CENTER;
 
-    private HorizontalAlignment horizontalAlignment = HorizontalAlignment.ALIGN_CENTER;
-    private VerticalAlignment verticalAlignment = VerticalAlignment.ALIGN_CENTER;
+    private int spacing = DEFAULT_SPACING;
+    private int horizontalMargin = DEFAULT_HORIZONTAL_MARGIN;
+    private int verticalMargin = DEFAULT_VERTICAL_MARGIN;
+
+    private HorizontalAlignment horizontalAlignment = DEFAULT_HORIZONTAL_ALIGN;
+    private VerticalAlignment verticalAlignment = DEFAULT_VERTICAL_ALIGN;
 
     /**
      * Calculate the size of the widgets which don't have a fixed size.

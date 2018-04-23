@@ -1,8 +1,11 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -11,16 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnergyBar extends AbstractWidget<EnergyBar> {
+
+    public static final String TYPE_ENERGYBAR = "energybar";
+
+    public static final boolean DEFAULT_HORIZONTAL = false;
+    public static final boolean DEFAULT_SHOWTEXT = true;
+    public static final boolean DEFAULT_SHOWRFPERTICK = false;
+
     private int value;
     private int maxValue;
-    private int energyOnColor = StyleConfig.colorEnergyBarHighEnergy;
-    private int energyOffColor = StyleConfig.colorEnergyBarLowEnergy;
-    private int spacerColor = StyleConfig.colorEnergyBarSpacer;
-    private int textColor = StyleConfig.colorEnergyBarText;
-    private boolean horizontal = false;
+    private Integer energyOnColor = null;
+    private Integer energyOffColor = null;
+    private Integer spacerColor = null;
+    private Integer textColor = null;
+    private boolean horizontal = DEFAULT_HORIZONTAL;
     private IEnergyStorage handler = null;
-    private boolean showText = true;
-    private boolean showRfPerTick = false;
+    private boolean showText = DEFAULT_SHOWTEXT;
+    private boolean showRfPerTick = DEFAULT_SHOWRFPERTICK;
     private int rfPerTick = 0;
 
     public EnergyBar(Minecraft mc, Gui gui) {
@@ -118,7 +128,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     public int getEnergyOnColor() {
-        return energyOnColor;
+        return energyOnColor == null ? StyleConfig.colorEnergyBarHighEnergy : energyOnColor;
     }
 
     public EnergyBar setEnergyOnColor(int energyOnColor) {
@@ -127,7 +137,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     public int getEnergyOffColor() {
-        return energyOffColor;
+        return energyOffColor == null ? StyleConfig.colorEnergyBarLowEnergy : energyOffColor;
     }
 
     public EnergyBar setEnergyOffColor(int leftColor) {
@@ -136,7 +146,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     public int getSpacerColor() {
-        return spacerColor;
+        return spacerColor == null ? StyleConfig.colorEnergyBarSpacer : spacerColor;
     }
 
     public EnergyBar setSpacerColor(int rightColor) {
@@ -145,7 +155,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     public int getTextColor() {
-        return textColor;
+        return textColor == null ? StyleConfig.colorEnergyBarText : textColor;
     }
 
     public EnergyBar setTextColor(int textColor) {
@@ -192,7 +202,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             } else {
                 s = currentValue + "/" + maximum;
             }
-            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, textColor);
+            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, getTextColor());
         }
     }
 
@@ -200,12 +210,12 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         int color;
         if (on) {
             if (cur < pos + total) {
-                color = energyOnColor;
+                color = getEnergyOnColor();
             } else {
-                color = energyOffColor;
+                color = getEnergyOffColor();
             }
         } else {
-            color = spacerColor;
+            color = getSpacerColor();
         }
         return color;
     }
@@ -214,14 +224,57 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         int color;
         if (on) {
             if (cur < pos + total) {
-                color = energyOnColor;
+                color = getEnergyOnColor();
             } else {
-                color = energyOffColor;
+                color = getEnergyOffColor();
             }
         } else {
-            color = spacerColor;
+            color = getSpacerColor();
         }
         return color;
+    }
+
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        if (object.has("energyoncolor")) {
+            energyOnColor = object.get("energyoncolor").getAsInt();
+        }
+        if (object.has("energyoffcolor")) {
+            energyOffColor = object.get("energyoffcolor").getAsInt();
+        }
+        if (object.has("spacercolor")) {
+            spacerColor = object.get("spacercolor").getAsInt();
+        }
+        if (object.has("textcolor")) {
+            textColor = object.get("textcolor").getAsInt();
+        }
+        horizontal = JSonTools.get(object, "horizontal", DEFAULT_HORIZONTAL);
+        showText = JSonTools.get(object, "showtext", DEFAULT_SHOWTEXT);
+        showRfPerTick = JSonTools.get(object, "showrfpertick", DEFAULT_SHOWRFPERTICK);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_ENERGYBAR));
+        if (energyOnColor != null) {
+            object.add("energyoncolor", new JsonPrimitive(energyOnColor));
+        }
+        if (energyOffColor != null) {
+            object.add("energyoffcolor", new JsonPrimitive(energyOffColor));
+        }
+        if (spacerColor != null) {
+            object.add("spacercolor", new JsonPrimitive(spacerColor));
+        }
+        if (textColor != null) {
+            object.add("textcolor", new JsonPrimitive(textColor));
+        }
+        JSonTools.put(object, "horizontal", horizontal, DEFAULT_HORIZONTAL);
+        JSonTools.put(object, "showtext", showText, DEFAULT_SHOWTEXT);
+        JSonTools.put(object, "showrfpertick", horizontal, DEFAULT_SHOWRFPERTICK);
+        return object;
     }
 }
 

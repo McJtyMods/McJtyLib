@@ -1,9 +1,12 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -13,9 +16,14 @@ import java.util.List;
 import static mcjty.lib.base.StyleConfig.*;
 
 public class ToggleButton extends Label<ToggleButton> {
+
+    public static final String TYPE_TOGGLEBUTTON = "togglebutton";
+
+    public static final boolean DEFAULT_CHECKMARKER = false;
+
     private List<ButtonEvent> buttonEvents = null;
     private boolean pressed = false;
-    private boolean checkMarker = false;
+    private boolean checkMarker = DEFAULT_CHECKMARKER;
 
     public ToggleButton(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -116,5 +124,20 @@ public class ToggleButton extends Label<ToggleButton> {
                 event.buttonClicked(this);
             }
         }
+    }
+
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        checkMarker = JSonTools.get(object, "check", DEFAULT_CHECKMARKER);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_TOGGLEBUTTON));
+        JSonTools.put(object, "check", checkMarker, DEFAULT_CHECKMARKER);
+        return object;
     }
 }

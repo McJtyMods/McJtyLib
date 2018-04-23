@@ -1,5 +1,7 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
@@ -17,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ColorSelector extends Label<ColorSelector> {
+
+    public static final String TYPE_COLORSELECTOR = "colorselector";
+
     private Integer currentColor = null;
     private List<ColorChoiceEvent> choiceEvents = null;
 
@@ -198,5 +203,17 @@ public class ColorSelector extends Label<ColorSelector> {
                 event.choiceChanged(this, color);
             }
         }
+    }
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_COLORSELECTOR));
+        return object;
     }
 }

@@ -1,16 +1,19 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.TextEnterEvent;
 import mcjty.lib.gui.events.TextEvent;
 import mcjty.lib.gui.events.TextSpecialKeyEvent;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
+import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -19,13 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TextField extends AbstractWidget<TextField> {
+
+    public static final String TYPE_TEXTFIELD = "textfield";
+
+    public static final boolean DEFAULT_EDITABLE = true;
+
     private String text = "";
     private int cursor = 0;
     private int startOffset = 0;        // Start character where we are displaying
     private List<TextEvent> textEvents = null;
     private List<TextEnterEvent> textEnterEvents = null;
     private List<TextSpecialKeyEvent> textSpecialKeyEvents = null;
-    private boolean editable = true;
+    private boolean editable = DEFAULT_EDITABLE;
 
     public TextField(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -250,7 +258,7 @@ public class TextField extends AbstractWidget<TextField> {
     public void removeTextEnterEvent(TextEnterEvent event) {
         if (textEnterEvents != null) {
             textEnterEvents.remove(event);
-        }
+        };
     }
 
     private void fireTextEnterEvents(String newText) {
@@ -261,5 +269,19 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        editable = JSonTools.get(object, "editable", DEFAULT_EDITABLE);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_TEXTFIELD));
+        JSonTools.put(object, "editable", editable, DEFAULT_EDITABLE);
+        return object;
+    }
 
 }

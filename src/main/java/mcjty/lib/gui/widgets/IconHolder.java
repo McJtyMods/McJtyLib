@@ -1,10 +1,13 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.*;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
+import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
@@ -14,6 +17,12 @@ import java.util.List;
 
 public class IconHolder extends AbstractWidget<IconHolder> {
 
+    public static final String TYPE_ICONHOLDER = "iconholder";
+
+    public static final boolean DEFAULT_SELECTABLE = false;
+    public static final int DEFAULT_BORDER = 0;
+    public static final int DEFAULT_SELECTED_BORDER_COLOR = 0xffffffff;
+
     private IIcon icon;
     private boolean makeCopy = false;
     private List<IconArrivesEvent> iconArrivesEvents = null;
@@ -22,11 +31,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     private List<IconHolderClickedEvent> iconHolderClickedEvents = null;
     private List<IconHoverEvent> iconHoverEvents = null;
 
-    private boolean selectable = false;
+    private boolean selectable = DEFAULT_SELECTABLE;
 
-    private int border = 0;
+    private int border = DEFAULT_BORDER;
     private Integer borderColor = null;
-    private Integer selectedBorderColor = 0xffffffff;
+    private Integer selectedBorderColor = DEFAULT_SELECTED_BORDER_COLOR;
 
     public IconHolder(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -258,5 +267,24 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 event.hover(this, icon, dx, dy);
             }
         }
+    }
+
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        selectable = JSonTools.get(object, "selectable", DEFAULT_SELECTABLE);
+        border = JSonTools.get(object, "border", DEFAULT_BORDER);
+        selectedBorderColor = JSonTools.get(object, "selectedbordercolor", DEFAULT_SELECTED_BORDER_COLOR);
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_ICONHOLDER));
+        JSonTools.put(object, "selectable", selectable, DEFAULT_SELECTABLE);
+        JSonTools.put(object, "border", border, DEFAULT_BORDER);
+        JSonTools.put(object, "selectedbordercolor", selectedBorderColor, DEFAULT_SELECTED_BORDER_COLOR);
+        return object;
     }
 }

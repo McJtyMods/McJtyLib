@@ -1,14 +1,18 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AbstractContainerWidget<P extends AbstractContainerWidget<P>> extends AbstractWidget<P> {
-    protected List<Widget> children = new ArrayList<>();
+
+    private final List<Widget> children = new ArrayList<>();
 
     public AbstractContainerWidget(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -94,5 +98,59 @@ public class AbstractContainerWidget<P extends AbstractContainerWidget<P>> exten
         return children.size();
     }
 
+    public List<Widget> getChildren() {
+        return children;
+    }
+
     public Widget getChild(int index) { return children.get(index); }
+
+    public Widget findChild(String name) {
+        for (Widget child : children) {
+            if (name.equals(child.getName())) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    public Widget findChildRecursive(String name) {
+        for (Widget child : children) {
+            if (name.equals(child.getName())) {
+                return child;
+            }
+            if (child instanceof AbstractContainerWidget) {
+                Widget widget = ((AbstractContainerWidget) child).findChildRecursive(name);
+                if (widget != null) {
+                    return widget;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        if (object.has("children")) {
+            JsonArray array = object.getAsJsonArray("children");
+            children.clear();
+            for (JsonElement element : array) {
+                JsonObject co = element.getAsJsonObject();
+                String type = co.get("type").getAsString();
+                Widget widget = WidgetRepository.createWidget(type, mc, gui);
+                widget.readFromJSon(co);
+            }
+        }
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        JsonArray array = new JsonArray();
+        object.add("children", array);
+        for (Widget child : children) {
+            array.add(child.writeToJSon());
+        }
+        return object;
+    }
 }

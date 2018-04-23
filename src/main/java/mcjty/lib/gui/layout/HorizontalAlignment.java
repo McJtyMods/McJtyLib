@@ -3,5 +3,14 @@ package mcjty.lib.gui.layout;
 public enum HorizontalAlignment {
     ALIGH_LEFT,
     ALIGN_RIGHT,
-    ALIGN_CENTER
+    ALIGN_CENTER;
+
+    public static HorizontalAlignment getByName(String name) {
+        for (HorizontalAlignment alignment : values()) {
+            if (name.equals(alignment.name())) {
+                return alignment;
+            }
+        }
+        return null;
+    }
 }

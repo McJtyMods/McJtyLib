@@ -1,5 +1,9 @@
 package mcjty.lib.gui.widgets;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -9,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TabbedPanel extends AbstractContainerWidget<Panel> {
+
+    public static final String TYPE_TABBEDPANEL = "tabbedpanel";
 
     private Widget current = null;
     private Map<String,Widget> pages = new HashMap<>();
@@ -79,7 +85,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
 
     private void setChildBounds() {
         if (isDirty()) {
-            for (Widget child : children) {
+            for (Widget child : getChildren()) {
                 child.setBounds(new Rectangle(0, 0, getBounds().width, getBounds().height));
             }
             markClean();
@@ -130,5 +136,38 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
         if (current != null) {
             current.mouseMove(x, y);
         }
+    }
+
+
+    @Override
+    public void readFromJSon(JsonObject object) {
+        super.readFromJSon(object);
+        JsonArray array = object.getAsJsonArray("pages");
+        for (JsonElement element : array) {
+            JsonObject o = element.getAsJsonObject();
+            String page = o.get("page").getAsString();
+            String widgetName = o.get("widget").getAsString();
+            Widget child = findChild(widgetName);
+            if (child != null) {
+                pages.put(page, child);
+            }
+        }
+    }
+
+    @Override
+    public JsonObject writeToJSon() {
+        JsonObject object = super.writeToJSon();
+        object.add("type", new JsonPrimitive(TYPE_TABBEDPANEL));
+
+        JsonArray array = new JsonArray();
+        object.add("pages", array);
+        for (Map.Entry<String, Widget> entry : pages.entrySet()) {
+            JsonObject o = new JsonObject();
+            array.add(o);
+            o.add("page", new JsonPrimitive(entry.getKey()));
+            o.add("widget", new JsonPrimitive(entry.getValue().getName()));
+        }
+
+        return object;
     }
 }
