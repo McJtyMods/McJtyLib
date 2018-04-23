@@ -139,6 +139,7 @@ public class AbstractContainerWidget<P extends AbstractContainerWidget<P>> exten
                 String type = co.get("type").getAsString();
                 Widget widget = WidgetRepository.createWidget(type, mc, gui);
                 widget.readFromJSon(co);
+                children.add(widget);
             }
         }
     }
