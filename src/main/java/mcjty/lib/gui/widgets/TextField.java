@@ -1,14 +1,12 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.TextEnterEvent;
 import mcjty.lib.gui.events.TextEvent;
 import mcjty.lib.gui.events.TextSpecialKeyEvent;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
@@ -269,19 +267,20 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
-
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        editable = JSonTools.get(object, "editable", DEFAULT_EDITABLE);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        editable = GuiParser.get(command, "editable", DEFAULT_EDITABLE);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_TEXTFIELD));
-        JSonTools.put(object, "editable", editable, DEFAULT_EDITABLE);
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        GuiParser.put(command, "editable", editable, DEFAULT_EDITABLE);
     }
 
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_TEXTFIELD);
+    }
 }

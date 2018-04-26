@@ -1,13 +1,11 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.*;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
@@ -271,20 +269,23 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        selectable = JSonTools.get(object, "selectable", DEFAULT_SELECTABLE);
-        border = JSonTools.get(object, "border", DEFAULT_BORDER);
-        selectedBorderColor = JSonTools.get(object, "selectedbordercolor", DEFAULT_SELECTED_BORDER_COLOR);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        selectable = GuiParser.get(command, "selectable", DEFAULT_SELECTABLE);
+        border = GuiParser.get(command, "border", DEFAULT_BORDER);
+        selectedBorderColor = GuiParser.get(command, "selectedbordercolor", DEFAULT_SELECTED_BORDER_COLOR);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_ICONHOLDER));
-        JSonTools.put(object, "selectable", selectable, DEFAULT_SELECTABLE);
-        JSonTools.put(object, "border", border, DEFAULT_BORDER);
-        JSonTools.put(object, "selectedbordercolor", selectedBorderColor, DEFAULT_SELECTED_BORDER_COLOR);
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        GuiParser.put(command, "selectable", selectable, DEFAULT_SELECTABLE);
+        GuiParser.put(command, "border", border, DEFAULT_BORDER);
+        GuiParser.put(command, "selectedbordercolor", selectedBorderColor, DEFAULT_SELECTED_BORDER_COLOR);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_ICONHOLDER);
     }
 }

@@ -1,14 +1,11 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -140,34 +137,19 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
 
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        JsonArray array = object.getAsJsonArray("pages");
-        for (JsonElement element : array) {
-            JsonObject o = element.getAsJsonObject();
-            String page = o.get("page").getAsString();
-            String widgetName = o.get("widget").getAsString();
-            Widget child = findChild(widgetName);
-            if (child != null) {
-                pages.put(page, child);
-            }
-        }
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        // @todo
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_TABBEDPANEL));
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        // @todo
+    }
 
-        JsonArray array = new JsonArray();
-        object.add("pages", array);
-        for (Map.Entry<String, Widget> entry : pages.entrySet()) {
-            JsonObject o = new JsonObject();
-            array.add(o);
-            o.add("page", new JsonPrimitive(entry.getKey()));
-            o.add("widget", new JsonPrimitive(entry.getValue().getName()));
-        }
-
-        return object;
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_TABBEDPANEL);
     }
 }

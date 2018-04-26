@@ -1,10 +1,8 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.events.ValueEvent;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -126,22 +124,24 @@ public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollabl
         }
     }
 
-
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        suffix = JSonTools.get(object, "suffix", DEFAULT_SUFFIX);
-        realmin = JSonTools.get(object, "realmin", DEFAULT_REALMIN);
-        realmax = JSonTools.get(object, "realmax", DEFAULT_REALMAX);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        suffix = GuiParser.get(command, "suffix", DEFAULT_SUFFIX);
+        realmin = GuiParser.get(command, "realmin", DEFAULT_REALMIN);
+        realmax = GuiParser.get(command, "realmax", DEFAULT_REALMAX);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_SCROLLABLELABEL));
-        JSonTools.put(object, "suffix", suffix, DEFAULT_SUFFIX);
-        JSonTools.put(object, "realmin", realmin, DEFAULT_REALMIN);
-        JSonTools.put(object, "realmax", realmax, DEFAULT_REALMAX);
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        GuiParser.put(command, "suffix", suffix, DEFAULT_SUFFIX);
+        GuiParser.put(command, "realmin", realmin, DEFAULT_REALMIN);
+        GuiParser.put(command, "realmax", realmax, DEFAULT_REALMAX);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_SCROLLABLELABEL);
     }
 }

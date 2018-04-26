@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
@@ -42,15 +41,7 @@ public class IconRender extends AbstractWidget<IconRender> {
 
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-    }
-
-    @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_ICONRENDER));
-        // @todo
-        return object;
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_ICONRENDER);
     }
 }

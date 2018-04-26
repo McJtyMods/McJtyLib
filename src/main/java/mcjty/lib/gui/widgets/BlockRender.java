@@ -1,13 +1,11 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.varia.ItemStackTools;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -185,37 +183,37 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        offsetX = JSonTools.get(object, "offsetx", DEFAULT_OFFSET);
-        offsetY = JSonTools.get(object, "offsetY", DEFAULT_OFFSET);
-        hilightOnHover = JSonTools.get(object, "highlighthover", DEFAULT_HILIGHT_ON_HOVER);
-        showLabel = JSonTools.get(object, "showlabel", DEFAULT_SHOW_LABEL);
-        if (object.has("itemstack")) {
-            renderItem = ItemStackTools.jsonToItemStack(object.getAsJsonObject("itemstack"));
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        command.findCommand("offset").ifPresent(cmd -> {
+            offsetX = cmd.getOptionalPar(0, DEFAULT_OFFSET);
+            offsetY = cmd.getOptionalPar(1, DEFAULT_OFFSET);
+        });
+        hilightOnHover = GuiParser.get(command, "highlighthover", DEFAULT_HILIGHT_ON_HOVER);
+        showLabel = GuiParser.get(command, "showlabel", DEFAULT_SHOW_LABEL);
+        labelColor = GuiParser.get(command, "labelColor", null);
+        command.findCommand("render").ifPresent(cmd -> renderItem = ItemStackTools.guiCommandToItemStack(cmd));
+    }
+
+    @Override
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        if (offsetX != DEFAULT_OFFSET || offsetY != DEFAULT_OFFSET) {
+            command.command(new GuiParser.GuiCommand("offset").parameter(offsetX).parameter(offsetY));
         }
-        if (object.has("labelcolor")) {
-            labelColor = object.get("labelcolor").getAsInt();
+        GuiParser.put(command, "highlighthover", hilightOnHover, DEFAULT_HILIGHT_ON_HOVER);
+        GuiParser.put(command, "showlabel", showLabel, DEFAULT_SHOW_LABEL);
+        GuiParser.put(command, "labelColor", labelColor, null);
+        if (renderItem != null) {
+            if (renderItem instanceof ItemStack) {
+                command.command(ItemStackTools.itemStackToGuiCommand("render", (ItemStack) renderItem));
+            }
+            // @todo other types
         }
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_BLOCKRENDER));
-        JSonTools.put(object, "offsetx", offsetX, DEFAULT_OFFSET);
-        JSonTools.put(object, "offsety", offsetY, DEFAULT_OFFSET);
-        JSonTools.put(object, "highlighthover", hilightOnHover, DEFAULT_HILIGHT_ON_HOVER);
-        JSonTools.put(object, "showlabel", showLabel, DEFAULT_SHOW_LABEL);
-        if (renderItem != null) {
-            if (renderItem instanceof ItemStack) {
-                object.add("itemstack", ItemStackTools.itemStackToJson((ItemStack) renderItem));
-            }
-            // @todo other types
-        }
-        if (labelColor != null) {
-            object.add("labelcolor", new JsonPrimitive(labelColor));
-        }
-        return object;
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_BLOCKRENDER);
     }
 }

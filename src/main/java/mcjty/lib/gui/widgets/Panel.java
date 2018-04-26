@@ -1,10 +1,8 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.*;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -127,45 +125,46 @@ public class Panel extends AbstractContainerWidget<Panel> {
 
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        if (object.has("layout")) {
-            String l = object.get("layout").getAsString();
-            if ("horizontal".equals(l)) {
-                layout = new HorizontalLayout();
-            } else if ("vertical".equals(l)) {
-                layout = new VerticalLayout();
-            } else {
-                layout = new PositionalLayout();
-            }
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        String l = command.getOptionalPar(1, "");
+        if ("horizontal".equals(l)) {
+            layout = new HorizontalLayout();
+        } else if ("vertical".equals(l)) {
+            layout = new VerticalLayout();
+        } else {
+            layout = new PositionalLayout();
+        }
+        AbstractLayout abstractLayout = (AbstractLayout) layout;
+        abstractLayout.setSpacing(GuiParser.get(command, "spacing", AbstractLayout.DEFAULT_SPACING));
+        abstractLayout.setHorizontalAlignment(HorizontalAlignment.getByName(GuiParser.get(command, "horizalign", AbstractLayout.DEFAULT_HORIZONTAL_ALIGN.name())));
+        abstractLayout.setVerticalAlignment(VerticalAlignment.getByName(GuiParser.get(command, "vertalign", AbstractLayout.DEFAULT_VERTICAL_ALIGN.name())));
+        abstractLayout.setHorizontalMargin(GuiParser.get(command, "horizmargin", AbstractLayout.DEFAULT_HORIZONTAL_MARGIN));
+        abstractLayout.setVerticalMargin(GuiParser.get(command, "vertmargin", AbstractLayout.DEFAULT_VERTICAL_MARGIN));
+    }
+
+    @Override
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        if (layout instanceof HorizontalLayout) {
+            command.parameter("horizontal");
+        } else if (layout instanceof VerticalLayout) {
+            command.parameter("vertical");
+        } else if (layout instanceof PositionalLayout) {
+            command.parameter("positional");
+        }
+        if (layout instanceof AbstractLayout) {
             AbstractLayout abstractLayout = (AbstractLayout) layout;
-            abstractLayout.setSpacing(JSonTools.get(object, "spacing", AbstractLayout.DEFAULT_SPACING));
-            abstractLayout.setHorizontalAlignment(HorizontalAlignment.getByName(JSonTools.get(object, "horizalign", AbstractLayout.DEFAULT_HORIZONTAL_ALIGN.name())));
-            abstractLayout.setVerticalAlignment(VerticalAlignment.getByName(JSonTools.get(object, "vertalign", AbstractLayout.DEFAULT_VERTICAL_ALIGN.name())));
-            abstractLayout.setHorizontalMargin(JSonTools.get(object, "horizmargin", AbstractLayout.DEFAULT_HORIZONTAL_MARGIN));
-            abstractLayout.setVerticalMargin(JSonTools.get(object, "vertmargin", AbstractLayout.DEFAULT_VERTICAL_MARGIN));
+            GuiParser.put(command, "spacing", abstractLayout.getSpacing(), AbstractLayout.DEFAULT_SPACING);
+            GuiParser.put(command, "horizalign", abstractLayout.getHorizontalAlignment().name(), AbstractLayout.DEFAULT_HORIZONTAL_ALIGN.name());
+            GuiParser.put(command, "vertalign", abstractLayout.getVerticalAlignment().name(), AbstractLayout.DEFAULT_VERTICAL_ALIGN.name());
+            GuiParser.put(command, "horizmargin", abstractLayout.getHorizontalMargin(), AbstractLayout.DEFAULT_HORIZONTAL_MARGIN);
+            GuiParser.put(command, "vertmargin", abstractLayout.getVerticalMargin(), AbstractLayout.DEFAULT_VERTICAL_MARGIN);
         }
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_PANEL));
-        if (layout instanceof HorizontalLayout) {
-            object.add("layout", new JsonPrimitive("horizontal"));
-        } else if (layout instanceof VerticalLayout) {
-            object.add("layout", new JsonPrimitive("vertical"));
-        } else if (layout instanceof PositionalLayout) {
-            object.add("layout", new JsonPrimitive("positional"));
-        }
-        if (layout instanceof AbstractLayout) {
-            AbstractLayout abstractLayout = (AbstractLayout) layout;
-            JSonTools.put(object, "spacing", abstractLayout.getSpacing(), AbstractLayout.DEFAULT_SPACING);
-            JSonTools.put(object, "horizalign", abstractLayout.getHorizontalAlignment().name(), AbstractLayout.DEFAULT_HORIZONTAL_ALIGN.name());
-            JSonTools.put(object, "vertalign", abstractLayout.getVerticalAlignment().name(), AbstractLayout.DEFAULT_VERTICAL_ALIGN.name());
-            JSonTools.put(object, "horizmargin", abstractLayout.getHorizontalMargin(), AbstractLayout.DEFAULT_HORIZONTAL_MARGIN);
-            JSonTools.put(object, "vertmargin", abstractLayout.getVerticalMargin(), AbstractLayout.DEFAULT_VERTICAL_MARGIN);
-        }
-        return object;
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_PANEL);
     }
 }

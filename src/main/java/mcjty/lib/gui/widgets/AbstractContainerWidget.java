@@ -1,8 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import mcjty.lib.gui.GuiParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -10,7 +8,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractContainerWidget<P extends AbstractContainerWidget<P>> extends AbstractWidget<P> {
+public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<P>> extends AbstractWidget<P> {
 
     private final List<Widget> children = new ArrayList<>();
 
@@ -129,29 +127,23 @@ public class AbstractContainerWidget<P extends AbstractContainerWidget<P>> exten
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        if (object.has("children")) {
-            JsonArray array = object.getAsJsonArray("children");
-            children.clear();
-            for (JsonElement element : array) {
-                JsonObject co = element.getAsJsonObject();
-                String type = co.get("type").getAsString();
-                Widget widget = WidgetRepository.createWidget(type, mc, gui);
-                widget.readFromJSon(co);
-                children.add(widget);
-            }
-        }
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        command.commands().forEach(cmd -> {
+            String type = cmd.getId();
+            Widget widget = WidgetRepository.createWidget(type, mc, gui);
+            widget.readFromGuiCommand(cmd);
+            children.add(widget);
+        });
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        JsonArray array = new JsonArray();
-        object.add("children", array);
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
         for (Widget child : children) {
-            array.add(child.writeToJSon());
+            GuiParser.GuiCommand childCommand = child.createGuiCommand();
+            child.fillGuiCommand(childCommand);
+            command.command(childCommand);
         }
-        return object;
     }
 }

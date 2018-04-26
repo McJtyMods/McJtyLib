@@ -1,12 +1,10 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -200,34 +198,29 @@ public class Label<P extends Label<P>> extends AbstractWidget<P> {
 
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        text = object.get("text").getAsString();
-        if (object.has("color")) {
-            color = object.get("color").getAsInt();
-        }
-        if (object.has("disabledcolor")) {
-            disabledColor = object.get("disabledcolor").getAsInt();
-        }
-        horizontalAlignment = HorizontalAlignment.getByName(JSonTools.get(object, "horizalign", DEFAULT_HORIZONTAL_ALIGN.name()));
-        verticalAlignment = VerticalAlignment.getByName(JSonTools.get(object, "vertalign", DEFAULT_VERTICAL_ALIGN.name()));
-        dynamic = JSonTools.get(object, "dynamic", DEFAULT_DYNAMIC);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        text = command.getOptionalPar(1, "");
+        color = GuiParser.get(command, "color", null);
+        disabledColor = GuiParser.get(command, "disabledcolor", null);
+        horizontalAlignment = HorizontalAlignment.getByName(GuiParser.get(command, "horizalign", DEFAULT_HORIZONTAL_ALIGN.name()));
+        verticalAlignment = VerticalAlignment.getByName(GuiParser.get(command, "vertalign", DEFAULT_VERTICAL_ALIGN.name()));
+        dynamic = GuiParser.get(command, "dynamic", DEFAULT_DYNAMIC);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_LABEL));
-        object.add("text", new JsonPrimitive(text));
-        if (color != null) {
-            object.add("color", new JsonPrimitive(color));
-        }
-        if (disabledColor != null) {
-            object.add("disabledcolor", new JsonPrimitive(disabledColor));
-        }
-        JSonTools.put(object, "horizalign", horizontalAlignment.name(), DEFAULT_HORIZONTAL_ALIGN.name());
-        JSonTools.put(object, "vertalign", verticalAlignment.name(), DEFAULT_VERTICAL_ALIGN.name());
-        JSonTools.put(object, "dynamic", dynamic, DEFAULT_DYNAMIC);
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        command.parameter(text);
+        GuiParser.put(command, "color", color, null);
+        GuiParser.put(command, "disabledcolor", disabledColor, null);
+        GuiParser.put(command, "horizalign", horizontalAlignment.name(), DEFAULT_HORIZONTAL_ALIGN.name());
+        GuiParser.put(command, "vertalign", verticalAlignment.name(), DEFAULT_VERTICAL_ALIGN.name());
+        GuiParser.put(command, "dynamic", dynamic, DEFAULT_DYNAMIC);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_LABEL);
     }
 }

@@ -1,9 +1,8 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ColorChoiceEvent;
@@ -206,14 +205,18 @@ public class ColorSelector extends Label<ColorSelector> {
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_COLORSELECTOR));
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        command.removeParameter(1); // We don't need the name as set by the label
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_COLORSELECTOR);
     }
 }

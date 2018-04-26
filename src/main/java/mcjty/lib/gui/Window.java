@@ -1,6 +1,5 @@
 package mcjty.lib.gui;
 
-import com.google.gson.*;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
@@ -47,12 +46,12 @@ public class Window {
         try {
             IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(guiDescription);
             try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-                JsonParser parser = new JsonParser();
-                JsonElement element = parser.parse(br);
-                JsonObject object = element.getAsJsonObject();
-                String type = object.get("type").getAsString();
+                GuiParser.GuiCommand command = GuiParser.parse(br);
+                String type = command.getId();
                 toplevel = WidgetRepository.createWidget(type, Minecraft.getMinecraft(), gui);
-                toplevel.readFromJSon(object);
+                toplevel.readFromGuiCommand(command);
+            } catch (GuiParser.ParserException e) {
+                throw new RuntimeException(e);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -139,17 +138,16 @@ public class Window {
 
     public boolean keyTyped(char typedChar, int keyCode) {
         if (keyCode == Keyboard.KEY_F12) {
-            JsonObject jsonObject = toplevel.writeToJSon();
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            GuiParser.GuiCommand command = toplevel.createGuiCommand();
+            toplevel.fillGuiCommand(command);
             try {
-                try(PrintWriter writer = new PrintWriter(new File("output.json"))) {
-                    writer.print(gson.toJson(jsonObject));
+                try(PrintWriter writer = new PrintWriter(new File("output.gui"))) {
+                    command.write(writer, 0);
                     writer.flush();
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-
         }
         if (textFocus != null) {
             return textFocus.keyTyped(this, typedChar, keyCode);

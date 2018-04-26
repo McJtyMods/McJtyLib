@@ -1,22 +1,18 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
+import mcjty.lib.gui.GuiParser.GuiCommand;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.varia.ItemStackTools;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import org.apache.commons.lang3.StringUtils;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -422,92 +418,79 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        if (object.has("name")) {
-            name = object.get("name").getAsString();
+    public void readFromGuiCommand(GuiCommand command) {
+        name = command.getOptionalPar(0, null);
+        if (name != null && name.isEmpty()) {
+            name = null;
         }
-        if (object.has("desiredwidth")) {
-            desiredWidth = object.get("desiredwidth").getAsInt();
-        }
-        if (object.has("desiredheight")) {
-            desiredHeight = object.get("desiredheight").getAsInt();
-        }
-
-        tooltips = JSonTools.getStringList(object, "tooltips");
-
-        if (object.has("items")) {
-            JsonArray array = object.get("items").getAsJsonArray();
-            items = new ArrayList<>(array.size());
-            for (JsonElement element : array) {
-                items.add(ItemStackTools.jsonToItemStack(element.getAsJsonObject()));
+        command.findCommand("desired").ifPresent(cmd -> {
+            desiredWidth = cmd.getOptionalPar(0, SIZE_UNKNOWN);
+            desiredHeight = cmd.getOptionalPar(1, SIZE_UNKNOWN);
+        });
+        command.findCommand("tooltips").ifPresent(cmd -> {
+            tooltips = new ArrayList<String>();
+            for (Object par : cmd.getParameters()) {
+                tooltips.add(par.toString());
             }
-        }
-        if (object.has("poshint")) {
-            String str = object.get("poshint").getAsString();
-            String[] split = StringUtils.split(str, ',');
-            setLayoutHint(new PositionalLayout.PositionalHint(
-                    Integer.parseInt(split[0]),
-                    Integer.parseInt(split[1]),
-                    Integer.parseInt(split[2]),
-                    Integer.parseInt(split[3])
-            ));
-        }
-        if (object.has("bg")) {
-            JsonObject bg = object.getAsJsonObject("bg");
-            if (bg.has("bg1")) {
-                background1 = new ResourceLocation(bg.get("bg1").getAsString());
+        });
+        command.findCommand("items").ifPresent(cmd -> {
+            items = new ArrayList<ItemStack>();
+            for (GuiCommand itemCmd : cmd.getGuiCommands()) {
+                items.add(ItemStackTools.guiCommandToItemStack(itemCmd));
             }
-            if (bg.has("bg2")) {
-                background2 = new ResourceLocation(bg.get("bg2").getAsString());
-            }
-            background2Horizontal = JSonTools.get(bg, "horiz", DEFAULT_BACKGROUND_HORIZONTAL);
-            backgroundOffset = JSonTools.get(bg, "offset", DEFAULT_BACKGROUND_OFFSET);
-            filledRectThickness = JSonTools.get(bg, "thickness", DEFAULT_FILLED_RECT_THICKNESS);
-            filledBackground = JSonTools.get(bg, "filled1", DEFAULT_FILLED_BACKGROUND);
-            filledBackground2 = JSonTools.get(bg, "filled2", DEFAULT_FILLED_BACKGROUND);
-        }
+        });
+        command.findCommand("hint").ifPresent(cmd -> setLayoutHint(new PositionalLayout.PositionalHint(
+                cmd.getOptionalPar(0, 0),
+                cmd.getOptionalPar(1, 0),
+                cmd.getOptionalPar(2, 40),
+                cmd.getOptionalPar(3, 40)
+        )));
+        command.findCommand("bg1").ifPresent(cmd -> background1 = new ResourceLocation(cmd.getOptionalPar(0, "")));
+        command.findCommand("bg2").ifPresent(cmd -> background2 = new ResourceLocation(cmd.getOptionalPar(0, "")));
+        background2Horizontal = GuiParser.get(command, "bghoriz", DEFAULT_BACKGROUND_HORIZONTAL);
+        backgroundOffset = GuiParser.get(command, "bgoffset", DEFAULT_BACKGROUND_OFFSET);
+        filledRectThickness = GuiParser.get(command, "bgthickness", DEFAULT_FILLED_RECT_THICKNESS);
+        filledBackground = GuiParser.get(command, "bgfilled1", DEFAULT_FILLED_BACKGROUND);
+        filledBackground2 = GuiParser.get(command, "bgfilled2", DEFAULT_FILLED_BACKGROUND);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = new JsonObject();
-        if (name != null) {
-            object.add("name", new JsonPrimitive(name));
+    public void fillGuiCommand(GuiCommand command) {
+        command.parameter(name != null ? name : "");
+        if (desiredWidth != SIZE_UNKNOWN || desiredHeight != SIZE_UNKNOWN) {
+            command.command(new GuiCommand("desired").parameter(desiredWidth).parameter(desiredHeight));
         }
 
-        if (desiredWidth != SIZE_UNKNOWN) {
-            object.add("desiredwidth", new JsonPrimitive(desiredWidth));
-        }
-        if (desiredHeight != SIZE_UNKNOWN) {
-            object.add("desiredheight", new JsonPrimitive(desiredHeight));
-        }
-
-        JSonTools.putStringList(object, "tooltips", tooltips);
-
-        if (items != null) {
-            JsonArray array = new JsonArray();
-            for (ItemStack stack : items) {
-                array.add(ItemStackTools.itemStackToJson(stack));
-            }
-            object.add("items", array);
-        }
         if (layoutHint instanceof PositionalLayout.PositionalHint) {
             PositionalLayout.PositionalHint hint = (PositionalLayout.PositionalHint) layoutHint;
-            object.add("poshint", new JsonPrimitive(hint.getX()+","+hint.getY()+","+hint.getWidth()+","+hint.getHeight()));
+            command.command(new GuiCommand("hint").parameter(hint.getX()).parameter(hint.getY()).parameter(hint.getWidth()).parameter(hint.getHeight()));
         }
-        JsonObject bg = new JsonObject();
-        object.add("bg", bg);
+
+        if (tooltips != null && !tooltips.isEmpty()) {
+            GuiCommand ttCmd = new GuiCommand("tooltips");
+            command.command(ttCmd);
+            for (String s : tooltips) {
+                ttCmd.parameter(s);
+            }
+        }
+
+        if (items != null && !items.isEmpty()) {
+            GuiCommand itemsCmd = new GuiCommand("items");
+            command.command(itemsCmd);
+            for (ItemStack stack : this.items) {
+                itemsCmd.command(ItemStackTools.itemStackToGuiCommand("item", stack));
+            }
+        }
         if (background1 != null) {
-            bg.add("bg1", new JsonPrimitive(background1.toString()));
+            command.command(new GuiCommand("bg1").parameter(background1.toString()));
         }
         if (background2 != null) {
-            bg.add("bg2", new JsonPrimitive(background2.toString()));
+            command.command(new GuiCommand("bg2").parameter(background2.toString()));
         }
-        JSonTools.put(bg, "horiz", background2Horizontal, DEFAULT_BACKGROUND_HORIZONTAL);
-        JSonTools.put(bg, "offset", backgroundOffset, DEFAULT_BACKGROUND_OFFSET);
-        JSonTools.put(bg, "thickness", filledRectThickness, DEFAULT_FILLED_RECT_THICKNESS);
-        JSonTools.put(bg, "filled1", filledBackground, DEFAULT_FILLED_BACKGROUND);
-        JSonTools.put(bg, "filled2", filledBackground2, DEFAULT_FILLED_BACKGROUND);
-        return object;
+        GuiParser.put(command, "bghoriz", background2Horizontal, DEFAULT_BACKGROUND_HORIZONTAL);
+        GuiParser.put(command, "bgoffset", backgroundOffset, DEFAULT_BACKGROUND_OFFSET);
+        GuiParser.put(command, "bgthickness", filledRectThickness, DEFAULT_FILLED_RECT_THICKNESS);
+        GuiParser.put(command, "bgfilled1", filledBackground, DEFAULT_FILLED_BACKGROUND);
+        GuiParser.put(command, "bgfilled2", filledBackground2, DEFAULT_FILLED_BACKGROUND);
     }
 }

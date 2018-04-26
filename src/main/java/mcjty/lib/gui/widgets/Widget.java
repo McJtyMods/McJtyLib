@@ -1,12 +1,12 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
 import net.minecraft.item.ItemStack;
 
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.List;
 
 /**
@@ -205,7 +205,9 @@ public interface Widget<P extends Widget> {
 
     Object getUserObject();
 
-    void readFromJSon(JsonObject object);
+    void readFromGuiCommand(GuiParser.GuiCommand command);
 
-    JsonObject writeToJSon();
+    GuiParser.GuiCommand createGuiCommand();
+
+    void fillGuiCommand(GuiParser.GuiCommand command);
 }

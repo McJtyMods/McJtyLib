@@ -1,13 +1,11 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.SelectionEvent;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -439,30 +437,32 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         hilightedRows.clear();
     }
 
-
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        rowheight = JSonTools.get(object, "rowheight", DEFAULT_ROWHEIGHT);
-        propagateEventsToChildren = JSonTools.get(object, "propagate", DEFAULT_PROPAGATE);
-        noselection = JSonTools.get(object, "noselection", DEFAULT_NOSELECTION);
-        invisibleselection = JSonTools.get(object, "invisibleselection", DEFAULT_INVISIBLE_SELECTION);
-        drawHorizontalLines = JSonTools.get(object, "horizontallines", DEFAULT_DRAW_HORIZONTAL_LINES);
-        leftMargin = JSonTools.get(object, "leftmargin", DEFAULT_LEFT_MARGIN);
-        topMargin = JSonTools.get(object, "topmargin", DEFAULT_TOP_MARGIN);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        rowheight = GuiParser.get(command, "rowheight", DEFAULT_ROWHEIGHT);
+        propagateEventsToChildren = GuiParser.get(command, "propagate", DEFAULT_PROPAGATE);
+        noselection = GuiParser.get(command, "noselection", DEFAULT_NOSELECTION);
+        invisibleselection = GuiParser.get(command, "invisibleselection", DEFAULT_INVISIBLE_SELECTION);
+        drawHorizontalLines = GuiParser.get(command, "horizontallines", DEFAULT_DRAW_HORIZONTAL_LINES);
+        leftMargin = GuiParser.get(command, "leftmargin", DEFAULT_LEFT_MARGIN);
+        topMargin = GuiParser.get(command, "topmargin", DEFAULT_TOP_MARGIN);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_WIDGETLIST));
-        JSonTools.put(object, "rowheight", rowheight, DEFAULT_ROWHEIGHT);
-        JSonTools.put(object, "propagate", propagateEventsToChildren, DEFAULT_PROPAGATE);
-        JSonTools.put(object, "noselection", noselection, DEFAULT_NOSELECTION);
-        JSonTools.put(object, "invisibleselection", invisibleselection, DEFAULT_INVISIBLE_SELECTION);
-        JSonTools.put(object, "horizontallines", drawHorizontalLines, DEFAULT_DRAW_HORIZONTAL_LINES);
-        JSonTools.put(object, "leftmargin", leftMargin, DEFAULT_LEFT_MARGIN);
-        JSonTools.put(object, "topmargin", topMargin, DEFAULT_TOP_MARGIN);
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        GuiParser.put(command, "rowheight", rowheight, DEFAULT_ROWHEIGHT);
+        GuiParser.put(command, "propagate", propagateEventsToChildren, DEFAULT_PROPAGATE);
+        GuiParser.put(command, "noselection", noselection, DEFAULT_NOSELECTION);
+        GuiParser.put(command, "invisibleselection", invisibleselection, DEFAULT_INVISIBLE_SELECTION);
+        GuiParser.put(command, "horizontallines", drawHorizontalLines, DEFAULT_DRAW_HORIZONTAL_LINES);
+        GuiParser.put(command, "leftmargin", leftMargin, DEFAULT_LEFT_MARGIN);
+        GuiParser.put(command, "topmargin", topMargin, DEFAULT_TOP_MARGIN);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_WIDGETLIST);
     }
 }

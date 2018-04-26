@@ -1,11 +1,9 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -236,45 +234,32 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
 
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        if (object.has("energyoncolor")) {
-            energyOnColor = object.get("energyoncolor").getAsInt();
-        }
-        if (object.has("energyoffcolor")) {
-            energyOffColor = object.get("energyoffcolor").getAsInt();
-        }
-        if (object.has("spacercolor")) {
-            spacerColor = object.get("spacercolor").getAsInt();
-        }
-        if (object.has("textcolor")) {
-            textColor = object.get("textcolor").getAsInt();
-        }
-        horizontal = JSonTools.get(object, "horizontal", DEFAULT_HORIZONTAL);
-        showText = JSonTools.get(object, "showtext", DEFAULT_SHOWTEXT);
-        showRfPerTick = JSonTools.get(object, "showrfpertick", DEFAULT_SHOWRFPERTICK);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        energyOnColor = GuiParser.get(command, "energyoncolor", null);
+        energyOffColor = GuiParser.get(command, "energyoffcolor", null);
+        spacerColor = GuiParser.get(command, "spacercolor", null);
+        textColor = GuiParser.get(command, "textcolor", null);
+        horizontal = GuiParser.get(command, "horizontal", DEFAULT_HORIZONTAL);
+        showText = GuiParser.get(command, "showtext", DEFAULT_SHOWTEXT);
+        showRfPerTick = GuiParser.get(command, "showrfpertick", DEFAULT_SHOWRFPERTICK);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_ENERGYBAR));
-        if (energyOnColor != null) {
-            object.add("energyoncolor", new JsonPrimitive(energyOnColor));
-        }
-        if (energyOffColor != null) {
-            object.add("energyoffcolor", new JsonPrimitive(energyOffColor));
-        }
-        if (spacerColor != null) {
-            object.add("spacercolor", new JsonPrimitive(spacerColor));
-        }
-        if (textColor != null) {
-            object.add("textcolor", new JsonPrimitive(textColor));
-        }
-        JSonTools.put(object, "horizontal", horizontal, DEFAULT_HORIZONTAL);
-        JSonTools.put(object, "showtext", showText, DEFAULT_SHOWTEXT);
-        JSonTools.put(object, "showrfpertick", horizontal, DEFAULT_SHOWRFPERTICK);
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        GuiParser.put(command, "energyoncolor", energyOnColor, null);
+        GuiParser.put(command, "energyoffcolor", energyOffColor, null);
+        GuiParser.put(command, "spacercolor", spacerColor, null);
+        GuiParser.put(command, "textcolor", textColor, null);
+        GuiParser.put(command, "horizontal", horizontal, DEFAULT_HORIZONTAL);
+        GuiParser.put(command, "showtext", showText, DEFAULT_SHOWTEXT);
+        GuiParser.put(command, "showrfpertick", showRfPerTick, DEFAULT_SHOWRFPERTICK);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_ENERGYBAR);
     }
 }
 

@@ -1,9 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
 import net.minecraft.client.Minecraft;
@@ -14,7 +11,9 @@ import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
 
@@ -212,45 +211,46 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
 
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        JsonArray array = object.getAsJsonArray("choices");
-        for (JsonElement element : array) {
-            JsonObject o = element.getAsJsonObject();
-            String choice = o.get("choice").getAsString();
-            JsonArray tarray = o.getAsJsonArray("tooltips");
-            List<String> tooltips = new ArrayList<>();
-            for (JsonElement tt : tarray) {
-                tooltips.add(tt.getAsString());
-            }
-            ResourceLocation image = new ResourceLocation(o.get("image").getAsString());
-            int u = o.get("u").getAsInt();
-            int v = o.get("v").getAsInt();
-            choiceList.add(new ChoiceEntry(choice, tooltips, image, u, v));
-        }
-        withBorder = object.get("withborder").getAsBoolean();
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        command.findCommand("choices").ifPresent(cmd ->
+                cmd.commands().forEach(choiceCmd -> {
+                    String choice = choiceCmd.getOptionalPar(0, "");
+                    List<String> tooltips = choiceCmd.findCommand("tooltips")
+                            .map(tooltipsCmd -> tooltipsCmd.parameters()
+                                    .map(Object::toString)
+                                    .collect(Collectors.toList()))
+                            .orElse(Collections.emptyList());
+                    ResourceLocation image = new ResourceLocation(GuiParser.get(choiceCmd, "image", ""));
+                    int u = GuiParser.getIndexed(choiceCmd, "uv", 0, 0);
+                    int v = GuiParser.getIndexed(choiceCmd, "uv", 1, 0);
+                    ChoiceEntry entry = new ChoiceEntry(choice, tooltips, image, u, v);
+                    choiceList.add(entry);
+                }));
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_IMAGECHOICELABEL));
-        JsonArray array = new JsonArray();
-        object.add("choices", array);
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        GuiParser.GuiCommand choicesCmd = new GuiParser.GuiCommand("choices");
         for (ChoiceEntry entry : choiceList) {
-            JsonObject o = new JsonObject();
-            array.add(o);
-            o.add("choice", new JsonPrimitive(entry.getChoice()));
-            JsonArray tarray = new JsonArray();
-            o.add("tooltips", tarray);
-            for (String tooltip : entry.getTooltips()) {
-                tarray.add(new JsonPrimitive(tooltip));
+            GuiParser.GuiCommand choiceCmd = new GuiParser.GuiCommand("choice").parameter(entry.getChoice());
+            choicesCmd.command(choiceCmd);
+            choiceCmd.command(new GuiParser.GuiCommand("uv").parameter(entry.getU()).parameter(entry.getV()));
+            if (entry.getTooltips() != null && !entry.getTooltips().isEmpty()) {
+                GuiParser.GuiCommand tooltipsCmd = new GuiParser.GuiCommand("tooltips");
+                choiceCmd.command(tooltipsCmd);
+                for (String tt : entry.getTooltips()) {
+                    tooltipsCmd.parameter(tt);
+                }
             }
-            o.add("image", new JsonPrimitive(entry.getImage().toString()));
-            o.add("u", new JsonPrimitive(entry.getU()));
-            o.add("v", new JsonPrimitive(entry.getV()));
+            choiceCmd.command(new GuiParser.GuiCommand("image").parameter(entry.getImage().toString()));
         }
-        object.add("withborder", new JsonPrimitive(withBorder));
-        return object;
+        command.command(choicesCmd);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_IMAGECHOICELABEL);
     }
 }

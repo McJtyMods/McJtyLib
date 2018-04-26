@@ -1,12 +1,10 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -126,18 +124,20 @@ public class ToggleButton extends Label<ToggleButton> {
         }
     }
 
-
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        checkMarker = JSonTools.get(object, "check", DEFAULT_CHECKMARKER);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        checkMarker = GuiParser.get(command, "check", DEFAULT_CHECKMARKER);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_TOGGLEBUTTON));
-        JSonTools.put(object, "check", checkMarker, DEFAULT_CHECKMARKER);
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        GuiParser.put(command, "check", checkMarker, DEFAULT_CHECKMARKER);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_TOGGLEBUTTON);
     }
 }

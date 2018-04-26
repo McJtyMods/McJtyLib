@@ -1,12 +1,10 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -23,7 +21,8 @@ public class Slider extends AbstractWidget<Slider> {
     private boolean horizontal = DEFAULT_HORIZONTAL;
     private int minimumKnobSize = DEFAULT_MINIMUM_KNOBSIZE;
 
-    private Scrollable scrollable;
+    private Scrollable scrollable;      // Old (used as cache in case scrollableName is used)
+    private String scrollableName;      // New
 
     public Slider(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -35,6 +34,15 @@ public class Slider extends AbstractWidget<Slider> {
 
     public Slider setScrollable(Scrollable scrollable) {
         this.scrollable = scrollable;
+        return this;
+    }
+
+    public String getScrollableName() {
+        return scrollableName;
+    }
+
+    public Slider setScrollableName(String scrollableName) {
+        this.scrollableName = scrollableName;
         return this;
     }
 
@@ -61,12 +69,23 @@ public class Slider extends AbstractWidget<Slider> {
         return this;
     }
 
+    private void findScrollable(Window window) {
+        if (scrollable == null) {
+            Widget child = window.findChild(scrollableName);
+            if (child instanceof Scrollable) {
+                scrollable = (Scrollable) child;
+            }
+        }
+    }
+
     @Override
     public void draw(Window window, int x, int y) {
         if (!visible) {
             return;
         }
         super.draw(window, x, y);
+
+        findScrollable(window);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -187,6 +206,7 @@ public class Slider extends AbstractWidget<Slider> {
     public Widget mouseClick(Window window, int x, int y, int button) {
         super.mouseClick(window, x, y, button);
         dragging = true;
+        findScrollable(window);
 
         int divider = scrollable.getMaximum() - scrollable.getCountSelected();
 
@@ -224,20 +244,24 @@ public class Slider extends AbstractWidget<Slider> {
         }
     }
 
-
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        horizontal = JSonTools.get(object, "horizontal", DEFAULT_HORIZONTAL);
-        minimumKnobSize = JSonTools.get(object, "minimumknob", DEFAULT_MINIMUM_KNOBSIZE);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        horizontal = GuiParser.get(command, "horizontal", DEFAULT_HORIZONTAL);
+        minimumKnobSize = GuiParser.get(command, "minimumknob", DEFAULT_MINIMUM_KNOBSIZE);
+        scrollableName = GuiParser.get(command, "scrollable", null);
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_SLIDER));
-        JSonTools.put(object, "horizontal", horizontal, DEFAULT_HORIZONTAL);
-        JSonTools.put(object, "minimumknob", minimumKnobSize, DEFAULT_MINIMUM_KNOBSIZE);
-        return object;
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        GuiParser.put(command, "horizontal", horizontal, DEFAULT_HORIZONTAL);
+        GuiParser.put(command, "minimumknob", minimumKnobSize, DEFAULT_MINIMUM_KNOBSIZE);
+        GuiParser.put(command, "scrollable", scrollableName, null);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_SLIDER);
     }
 }

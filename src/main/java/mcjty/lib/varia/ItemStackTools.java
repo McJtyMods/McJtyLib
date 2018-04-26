@@ -2,6 +2,7 @@ package mcjty.lib.varia;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mcjty.lib.gui.GuiParser;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -147,5 +148,33 @@ public class ItemStackTools {
         return stack;
     }
 
+    public static GuiParser.GuiCommand itemStackToGuiCommand(String name, ItemStack item) {
+        GuiParser.GuiCommand object = new GuiParser.GuiCommand(name);
+        object.parameter(item.getItem().getRegistryName().toString());
+        object.parameter(item.getCount());
+        object.parameter(item.getItemDamage());
+        if (item.hasTagCompound()) {
+            String string = item.getTagCompound().toString();
+            object.command(new GuiParser.GuiCommand("tag").parameter(string));
+        }
+        return object;
+    }
+
+    public static ItemStack guiCommandToItemStack(GuiParser.GuiCommand obj) {
+        String itemName = obj.getOptionalPar(0, "minecraft:stick");
+        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
+        int amount = obj.getOptionalPar(1, 1);
+        int meta = obj.getOptionalPar(2, 0);
+        ItemStack stack = new ItemStack(item, amount, meta);
+        obj.findCommand("tag").ifPresent(cmd -> {
+            try {
+                NBTTagCompound nbt = JsonToNBT.getTagFromJson(cmd.getOptionalPar(0, ""));
+                stack.setTagCompound(nbt);
+            } catch (NBTException e) {
+                e.printStackTrace();
+            }
+        });
+        return stack;
+    }
 
 }

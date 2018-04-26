@@ -1,10 +1,8 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ImageEvent;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -144,28 +142,29 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
 
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        if (object.has("image")) {
-            image = new ResourceLocation(object.get("image").getAsString());
-        }
-        u = JSonTools.get(object, "u", 0);
-        v = JSonTools.get(object, "v", 0);
-        txtWidth = JSonTools.get(object, "txtw", DEFAULT_TXTDIM);
-        txtHeight = JSonTools.get(object, "txth", DEFAULT_TXTDIM);
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        command.findCommand("image").ifPresent(cmd -> image = new ResourceLocation(cmd.getOptionalPar(0, "")));
+        command.findCommand("dim").ifPresent(cmd -> {
+            u = cmd.getOptionalPar(0, 0);
+            v = cmd.getOptionalPar(1, 0);
+            txtWidth  = cmd.getOptionalPar(2, DEFAULT_TXTDIM);
+            txtHeight = cmd.getOptionalPar(3, DEFAULT_TXTDIM);
+        });
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_IMAGELABEL));
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
         if (image != null) {
-            object.add("image", new JsonPrimitive(image.toString()));
+            command.command(new GuiParser.GuiCommand("image").parameter(image.toString()));
         }
-        JSonTools.put(object, "u", u, null);
-        JSonTools.put(object, "v", v, null);
-        JSonTools.put(object, "txtw", txtWidth, DEFAULT_TXTDIM);
-        JSonTools.put(object, "txth", txtHeight, DEFAULT_TXTDIM);
-        return object;
+        GuiParser.GuiCommand dimCmd = new GuiParser.GuiCommand("dim").parameter(u).parameter(v).parameter(txtWidth).parameter(txtHeight);
+        command.command(dimCmd);
+    }
+
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_IMAGELABEL);
     }
 }

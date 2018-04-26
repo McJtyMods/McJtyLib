@@ -1,19 +1,16 @@
 package mcjty.lib.gui.widgets;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
-import mcjty.lib.varia.JSonTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ChoiceLabel extends Label<ChoiceLabel> {
 
@@ -139,33 +136,42 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
     }
 
     @Override
-    public void readFromJSon(JsonObject object) {
-        super.readFromJSon(object);
-        JsonArray array = object.getAsJsonArray("choices");
-        for (JsonElement element : array) {
-            JsonObject o = element.getAsJsonObject();
-            String choice = o.get("choice").getAsString();
-            choiceList.add(choice);
-            List<String> tooltips = JSonTools.getStringList(o, "tooltips");
-            if (tooltips != null) {
-                tooltipMap.put(choice, tooltips);
-            }
-        }
+    public void readFromGuiCommand(GuiParser.GuiCommand command) {
+        super.readFromGuiCommand(command);
+        command.findCommand("choices").ifPresent(cmd -> {
+            cmd.commands().forEach(choiceCmd -> {
+                String choice = choiceCmd.getOptionalPar(0, "");
+                choiceList.add(choice);
+                choiceCmd.findCommand("tooltips")
+                        .ifPresent(tooltipsCmd -> tooltipMap.put(choice, tooltipsCmd.parameters()
+                                .map(Object::toString)
+                                .collect(Collectors.toList())));
+            });
+        });
     }
 
     @Override
-    public JsonObject writeToJSon() {
-        JsonObject object = super.writeToJSon();
-        object.add("type", new JsonPrimitive(TYPE_CHOICELABEL));
-        JsonArray array = new JsonArray();
-        object.add("choices", array);
+    public void fillGuiCommand(GuiParser.GuiCommand command) {
+        super.fillGuiCommand(command);
+        command.removeParameter(1); // We don't need the name as set by the label
+        GuiParser.GuiCommand choicesCmd = new GuiParser.GuiCommand("choices");
         for (String s : choiceList) {
-            JsonObject o = new JsonObject();
-            array.add(o);
-            o.add("choice", new JsonPrimitive(s));
-            JSonTools.putStringList(o, "tooltips", tooltipMap.get(s));
+            GuiParser.GuiCommand choiceCmd = new GuiParser.GuiCommand("choice").parameter(s);
+            choicesCmd.command(choiceCmd);
+            List<String> tooltips = tooltipMap.get(s);
+            if (tooltips != null && !tooltips.isEmpty()) {
+                GuiParser.GuiCommand tooltipsCmd = new GuiParser.GuiCommand("tooltips");
+                choiceCmd.command(tooltipsCmd);
+                for (String tt : tooltips) {
+                    tooltipsCmd.parameter(tt);
+                }
+            }
         }
+        command.command(choicesCmd);
+    }
 
-        return object;
+    @Override
+    public GuiParser.GuiCommand createGuiCommand() {
+        return new GuiParser.GuiCommand(TYPE_CHOICELABEL);
     }
 }
