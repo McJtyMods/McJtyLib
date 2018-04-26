@@ -8,16 +8,16 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.varia.ItemStackTools;
+import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nonnull;
 import java.awt.Rectangle;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Widget<P> {
 
@@ -37,7 +37,9 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     protected boolean visible = true;
     protected List<String> tooltips = null;
     protected List<ItemStack> items = null;
+    private Set<Integer> enableFlags = new HashSet<>();
     protected String name;
+    protected String channel;
 
     private boolean layoutDirty = true;
     private Object userObject = null;
@@ -75,6 +77,18 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     public P setName(String name) {
         this.name = name;
         return (P) this;
+    }
+
+    @Override
+    public P setChannel(String channel) {
+        this.channel = channel;
+        return (P) this;
+    }
+
+    protected void fireChannelEvents(Window window, String id) {
+        if (window != null && channel != null) {
+            window.fireChannelEvents(channel, this, id);
+        }
     }
 
     protected void drawBox(int xx, int yy, int color) {
@@ -136,6 +150,20 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     public P setEnabled(boolean enabled) {
         this.enabled = enabled;
         return (P) this;
+    }
+
+    @Override
+    public P setEnabledFlags(String... flags) {
+        for (String flag : flags) {
+            enableFlags.add(StringRegister.STRINGS.get(flag));
+        }
+        return (P) this;
+    }
+
+    @Nonnull
+    @Override
+    public Set<Integer> getEnabledFlags() {
+        return enableFlags;
     }
 
     @Override
@@ -362,15 +390,15 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(Window window, int x, int y, int button) {
     }
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(Window window, int x, int y) {
     }
 
     @Override
-    public boolean mouseWheel(int amount, int x, int y) {
+    public boolean mouseWheel(Window window, int amount, int x, int y) {
         return false;
     }
 
@@ -423,9 +451,13 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         if (name != null && name.isEmpty()) {
             name = null;
         }
+        channel = GuiParser.get(command, "channel", null);
         command.findCommand("desired").ifPresent(cmd -> {
             desiredWidth = cmd.getOptionalPar(0, SIZE_UNKNOWN);
             desiredHeight = cmd.getOptionalPar(1, SIZE_UNKNOWN);
+        });
+        command.findCommand("enableon").ifPresent(cmd -> {
+            enableFlags.clear();
         });
         command.findCommand("tooltips").ifPresent(cmd -> {
             tooltips = new ArrayList<String>();
@@ -457,6 +489,8 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     @Override
     public void fillGuiCommand(GuiCommand command) {
         command.parameter(name != null ? name : "");
+        GuiParser.put(command, "channel", channel, null);
+
         if (desiredWidth != SIZE_UNKNOWN || desiredHeight != SIZE_UNKNOWN) {
             command.command(new GuiCommand("desired").parameter(desiredWidth).parameter(desiredHeight));
         }
@@ -464,6 +498,14 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         if (layoutHint instanceof PositionalLayout.PositionalHint) {
             PositionalLayout.PositionalHint hint = (PositionalLayout.PositionalHint) layoutHint;
             command.command(new GuiCommand("hint").parameter(hint.getX()).parameter(hint.getY()).parameter(hint.getWidth()).parameter(hint.getHeight()));
+        }
+
+        if (!enableFlags.isEmpty()) {
+            GuiCommand enabledCmd = new GuiCommand("enableon");
+            command.command(enabledCmd);
+            for (Integer flag : enableFlags) {
+                enabledCmd.parameter(StringRegister.STRINGS.get(flag));
+            }
         }
 
         if (tooltips != null && !tooltips.isEmpty()) {

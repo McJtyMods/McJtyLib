@@ -161,7 +161,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         // Use the function above to force reset of the slider in case the contents changed so that it doesn't look weird.
-        mouseWheel(0, x, y);
+        mouseWheel(window, 0, x, y);
 
         super.draw(window, x, y);
         int xx = x + bounds.x + leftMargin;
@@ -220,7 +220,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }}
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(Window window, int x, int y) {
         if (!isEnabledAndVisible()) {
             return;
         }
@@ -246,7 +246,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
-                child.mouseMove(xx, yy);
+                child.mouseMove(window, xx, yy);
             }
         }
     }
@@ -297,7 +297,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(Window window, int x, int y, int button) {
         if (!isEnabledAndVisible()) {
             return;
         }
@@ -310,11 +310,11 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
-                child.mouseRelease(xx, yy, button);
+                child.mouseRelease(window, xx, yy, button);
             }
         }
 
-        super.mouseRelease(x, y, button);
+        super.mouseRelease(window, x, y, button);
     }
 
     private Widget getSelectedWidgetSafe(int sel) {
@@ -326,7 +326,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public boolean mouseWheel(int amount, int x, int y) {
+    public boolean mouseWheel(Window window, int amount, int x, int y) {
         int divider = getMaximum() - getCountSelected();
         if (divider <= 0) {
             first = 0;

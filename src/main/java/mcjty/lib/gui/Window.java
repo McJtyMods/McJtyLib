@@ -1,12 +1,14 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.WidgetRepository;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.IResource;
@@ -17,8 +19,7 @@ import org.lwjgl.input.Mouse;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class represents a window. It contains a single Widget which
@@ -32,6 +33,9 @@ public class Window {
     private Widget hover = null;
     private GuiStyle currentStyle;
     private WindowManager windowManager;
+
+    private final Map<String, List<ChannelEvent>> channelEvents = new HashMap<>();
+    private Set<Integer> activeFlags = new HashSet<>();
 
     private List<FocusEvent> focusEvents = null;
 
@@ -83,6 +87,31 @@ public class Window {
         return toplevel;
     }
 
+    public void setFlag(String flag) {
+        if (flag.startsWith("!")) {
+            // Remove the positive flag
+            activeFlags.remove(StringRegister.STRINGS.get(flag.substring(1)));
+        } else {
+            // Remove the negative flag
+            activeFlags.remove(StringRegister.STRINGS.get("!"+flag));
+        }
+        activeFlags.add(StringRegister.STRINGS.get(flag));
+        enableDisableWidgets(toplevel);
+    }
+
+    private void enableDisableWidgets(Widget<?> widget) {
+        Set<Integer> enabledFlags = widget.getEnabledFlags();
+        if (!enabledFlags.isEmpty()) {
+            boolean enable = activeFlags.containsAll(enabledFlags);
+            widget.setEnabled(enable);
+        }
+        if (widget instanceof AbstractContainerWidget) {
+            for (Widget child : ((AbstractContainerWidget<?>) widget).getChildren()) {
+                enableDisableWidgets(child);
+            }
+        }
+    }
+
     public Widget getWidgetAtPosition(int x, int y) {
         if (toplevel.in(x, y) && toplevel.isVisible()) {
             return toplevel.getWidgetAtPosition(x, y);
@@ -111,9 +140,9 @@ public class Window {
     public void mouseMovedOrUp(int x, int y, int button) {
         // -1 == mouse move
         if (button != -1) {
-            toplevel.mouseRelease(x, y, button);
+            toplevel.mouseRelease(this, x, y, button);
         } else {
-            toplevel.mouseMove(x, y);
+            toplevel.mouseMove(this, x, y);
         }
     }
 
@@ -177,7 +206,7 @@ public class Window {
             }
         }
         if (dwheel != 0) {
-            toplevel.mouseWheel(dwheel, x, y);
+            toplevel.mouseWheel(this, dwheel, x, y);
         }
         PreferencesProperties properties = McJtyLib.getPreferencesProperties(gui.mc.player);
         if (properties != null) {
@@ -240,6 +269,23 @@ public class Window {
         if (focusEvents != null) {
             for (FocusEvent event : focusEvents) {
                 event.focus(this, widget);
+            }
+        }
+    }
+
+    public Window addChannelEvent(String channel, ChannelEvent event) {
+        if (!channelEvents.containsKey(channel)) {
+            channelEvents.put(channel, new ArrayList<>());
+        }
+        channelEvents.get(channel).add(event);
+        return this;
+    }
+
+
+    public void fireChannelEvents(String channel, Widget widget, String id) {
+        if (channelEvents.containsKey(channel)) {
+            for (ChannelEvent event : channelEvents.get(channel)) {
+                event.fire(widget, id);
             }
         }
     }

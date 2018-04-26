@@ -32,7 +32,7 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
             if (currentChoice == null) {
                 currentChoice = choice;
                 setText(currentChoice);
-                fireChoiceEvents(currentChoice);
+                fireChoiceEvents(null, currentChoice);
             }
         }
         return this;
@@ -108,7 +108,7 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
             }
             currentChoice = choiceList.get(index);
             setText(currentChoice);
-            fireChoiceEvents(currentChoice);
+            fireChoiceEvents(window, currentChoice);
         }
         return null;
     }
@@ -127,7 +127,8 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
         }
     }
 
-    private void fireChoiceEvents(String choice) {
+    private void fireChoiceEvents(Window window, String choice) {
+        fireChannelEvents(window, choice);
         if (choiceEvents != null) {
             for (ChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, choice);

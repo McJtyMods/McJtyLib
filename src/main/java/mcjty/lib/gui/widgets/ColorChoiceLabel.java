@@ -31,7 +31,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
             colorList.add(color);
             if (currentColor == null) {
                 currentColor = color;
-                fireChoiceEvents(currentColor);
+                fireChoiceEvents(null, currentColor);
             }
         }
         return this;
@@ -98,7 +98,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
                 }
             }
             currentColor = colorList.get(index);
-            fireChoiceEvents(currentColor);
+            fireChoiceEvents(window, currentColor);
         }
         return null;
     }
@@ -117,7 +117,8 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
         }
     }
 
-    private void fireChoiceEvents(Integer color) {
+    private void fireChoiceEvents(Window window, Integer color) {
+            fireChannelEvents(window, "");
         if (choiceEvents != null) {
             for (ColorChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, color);

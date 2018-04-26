@@ -63,7 +63,7 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
     }
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(Window window, int x, int y) {
         if (dragging && isEnabledAndVisible()) {
             int u = x - bounds.x;
             int v = y - bounds.y;
@@ -72,8 +72,8 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
-        super.mouseRelease(x, y, button);
+    public void mouseRelease(Window window, int x, int y, int button) {
+        super.mouseRelease(window, x, y, button);
         if (dragging) {
             dragging = false;
             int u = x - bounds.x;

@@ -141,10 +141,10 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     @Override
     public Widget mouseClick(Window window, int x, int y, int button) {
         if (isEnabledAndVisible()) {
-            fireSelectionEvents();
+            fireSelectionEvents(window);
             long t = System.currentTimeMillis();
             if (prevTime != -1 && (t - prevTime) < 250) {
-                fireDoubleClickEvent();
+                fireDoubleClickEvent(window);
             }
             prevTime = t;
             return this;
@@ -166,7 +166,8 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         }
     }
 
-    private void fireSelectionEvents() {
+    private void fireSelectionEvents(Window window) {
+        fireChannelEvents(window, "select");
         if (selectionEvents != null) {
             for (BlockRenderEvent event : selectionEvents) {
                 event.select(this);
@@ -174,7 +175,8 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         }
     }
 
-    private void fireDoubleClickEvent() {
+    private void fireDoubleClickEvent(Window window) {
+        fireChannelEvents(window, "doubleclick");
         if (selectionEvents != null) {
             for (BlockRenderEvent event : selectionEvents) {
                 event.doubleClick(this);

@@ -86,18 +86,18 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
-        super.mouseRelease(x, y, button);
+    public void mouseRelease(Window window, int x, int y, int button) {
+        super.mouseRelease(window, x, y, button);
         x -= bounds.x;
         y -= bounds.y;
 
         if (focus != null) {
-            focus.mouseRelease(x, y, button);
+            focus.mouseRelease(window, x, y, button);
             focus = null;
         } else {
             for (Widget child : getChildren()) {
                 if (child.in(x, y) && child.isVisible()) {
-                    child.mouseRelease(x, y, button);
+                    child.mouseRelease(window, x, y, button);
                     return;
                 }
             }
@@ -105,18 +105,18 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void mouseMove(int x, int y) {
-        super.mouseMove(x, y);
+    public void mouseMove(Window window, int x, int y) {
+        super.mouseMove(window, x, y);
 
         x -= bounds.x;
         y -= bounds.y;
 
         if (focus != null) {
-            focus.mouseMove(x, y);
+            focus.mouseMove(window, x, y);
         } else {
             for (Widget child : getChildren()) {
                 if (child.in(x, y) && child.isVisible()) {
-                    child.mouseMove(x, y);
+                    child.mouseMove(window, x, y);
                     return;
                 }
             }

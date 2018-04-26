@@ -6,8 +6,10 @@ import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
 import java.awt.Rectangle;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A widget is a rectangular object in a GUI. Can be anything from a simple button to a
@@ -24,6 +26,11 @@ public interface Widget<P extends Widget> {
     String getName();
 
     P setName(String name);
+
+    /**
+     * When this is set this widget will broadcast events on the given channel
+     */
+    P setChannel(String channel);
 
     /**
      * Return true if this widget is equal to the parameter widget or if the parameter
@@ -82,6 +89,14 @@ public interface Widget<P extends Widget> {
      * Enable or disable mouse interaction with this widget. This is true by default.
      */
     P setEnabled(boolean enabled);
+
+    /**
+     * Enable or disable based on a combination of 'flags'
+     */
+    P setEnabledFlags(String... flags);
+
+    @Nonnull
+    Set<Integer> getEnabledFlags();
 
     boolean isEnabled();
 
@@ -147,29 +162,33 @@ public interface Widget<P extends Widget> {
     /**
      * Handle a mouse release for this widget.
      *
+     * @param window
      * @param x
      * @param y
      * @param button
      */
-    void mouseRelease(int x, int y, int button);
+    void mouseRelease(Window window, int x, int y, int button);
 
     /**
      * Handle a mouse move event.
      *
+     * @param window
      * @param x
      * @param y
      */
-    void mouseMove(int x, int y);
+    void mouseMove(Window window, int x, int y);
 
     /**
      * Handle mousewheel.
      *
+     *
+     * @param window
      * @param amount
      * @param x
      * @param y
      * @return true if handled
      */
-    boolean mouseWheel(int amount, int x, int y);
+    boolean mouseWheel(Window window, int amount, int x, int y);
 
     /**
      * Handle a keyboard event.

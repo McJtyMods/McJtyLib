@@ -53,12 +53,12 @@ public class Button extends Label<Button> {
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
-        super.mouseRelease(x, y, button);
+    public void mouseRelease(Window window, int x, int y, int button) {
+        super.mouseRelease(window, x, y, button);
         if (pressed) {
             pressed = false;
             if (isEnabledAndVisible()) {
-                fireButtonEvents();
+                fireButtonEvents(window);
             }
         }
     }
@@ -77,7 +77,8 @@ public class Button extends Label<Button> {
         }
     }
 
-    private void fireButtonEvents() {
+    private void fireButtonEvents(Window window) {
+        fireChannelEvents(window, "");
         if (buttonEvents != null) {
             for (ButtonEvent event : buttonEvents) {
                 event.buttonClicked(this);
