@@ -1,33 +1,15 @@
 package mcjty.lib.gui;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.annotation.Nullable;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static java.io.StreamTokenizer.*;
 
 public class GuiParser {
-
-    public static void parseAndHandle(ResourceLocation guiDescription, Consumer<GuiCommand> consumer) {
-        try {
-            IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(guiDescription);
-            try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-                parse(br).forEach(consumer);
-            } catch (ParserException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     public static class ParserException extends Exception {
         public ParserException(String s, int linenr) {

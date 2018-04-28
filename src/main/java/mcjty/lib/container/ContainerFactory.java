@@ -1,6 +1,7 @@
 package mcjty.lib.container;
 
 import mcjty.lib.gui.GuiParser;
+import mcjty.lib.gui.GuiParserTools;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,6 +17,7 @@ public class ContainerFactory {
     private Map<Integer,SlotDefinition> indexToType = new HashMap<>();
     private Map<SlotDefinition,SlotRanges> slotRangesMap = new HashMap<>();
     private List<SlotFactory> slots = new ArrayList<>();
+    private final ResourceLocation containerDescriptor;
 
     public static final String CONTAINER_CONTAINER = "container";
     public static final String CONTAINER_PLAYER = "player";
@@ -27,44 +29,66 @@ public class ContainerFactory {
     private int[] accessibleOutputSlots;
 
     public ContainerFactory() {
+        containerDescriptor = null;
     }
 
     public ContainerFactory(ResourceLocation containerDescriptor) {
-        GuiParser.parseAndHandle(containerDescriptor, command -> {
-            if ("container".equals(command.getId())) {
-                command.commands().filter(cmd -> "slot".equals(cmd.getId())).forEach(slotCmd -> {
-                    String typen = slotCmd.getOptionalPar(0, SlotType.SLOT_CONTAINER.getName());
-                    SlotType type = SlotType.findByName(typen);
-                    if (type == null) {
-                        throw new RuntimeException("Unknown slot type: " + typen + "!");
-                    }
-                    List<ItemStack> stacks = new ArrayList<>();
-                    slotCmd.findCommand("items").ifPresent(cmd -> {
-                        cmd.parameters().forEach(par -> {
-                            String itemName = par.toString();
-                            ItemStack stack;
-                            Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(itemName));
-                            if (block != null) {
-                                stack = new ItemStack(block);
-                            } else {
-                                Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
-                                if (item != null) {
-                                    stack = new ItemStack(item);
-                                } else {
-                                    stack = ItemStack.EMPTY;
-                                }
-                            }
-                            stacks.add(stack);
-                        });
-                    });
-                    SlotDefinition slotDefinition = new SlotDefinition(type, stacks.toArray(new ItemStack[stacks.size()]));
-                    // @todo
-                });
-            }
-        });
+        this.containerDescriptor = containerDescriptor;
+
     }
 
     protected void setup() {
+        if (containerDescriptor != null) {
+            GuiParserTools.parseAndHandleServer(containerDescriptor, command -> {
+                if ("container".equals(command.getId())) {
+                    command.commands().filter(cmd -> "slot".equals(cmd.getId())).forEach(slotCmd -> {
+                        handleSlotCommand(slotCmd);
+                    });
+                    command.findCommand("playerslots").ifPresent(cmd -> {
+                        layoutPlayerInventorySlots(cmd.getOptionalPar(0, 0), cmd.getOptionalPar(1, 0));
+                    });
+                }
+            });
+        }
+    }
+
+    private void handleSlotCommand(GuiParser.GuiCommand slotCmd) {
+        String typen = slotCmd.getOptionalPar(0, SlotType.SLOT_CONTAINER.getName());
+        SlotType type = SlotType.findByName(typen);
+        if (type == null) {
+            throw new RuntimeException("Unknown slot type: " + typen + "!");
+        }
+        List<ItemStack> stacks = new ArrayList<>();
+        slotCmd.findCommand("items").ifPresent(cmd -> {
+            cmd.parameters().forEach(par -> {
+                String itemName = par.toString();
+                ItemStack stack;
+                Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(itemName));
+                if (block != null) {
+                    stack = new ItemStack(block);
+                } else {
+                    Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
+                    if (item != null) {
+                        stack = new ItemStack(item);
+                    } else {
+                        stack = ItemStack.EMPTY;
+                    }
+                }
+                stacks.add(stack);
+            });
+        });
+        SlotDefinition slotDefinition = new SlotDefinition(type, stacks.toArray(new ItemStack[stacks.size()]));
+        int[] pos = new int[2];
+        slotCmd.findCommand("pos").ifPresent(cmd -> {
+            pos[0] = cmd.getOptionalPar(0, 0);
+            pos[1] = cmd.getOptionalPar(1, 0);
+        });
+        int[] dim = new int[] { 1, 1 };
+        slotCmd.findCommand("dim").ifPresent(cmd -> {
+            dim[0] = cmd.getOptionalPar(0, 0);
+            dim[1] = cmd.getOptionalPar(1, 0);
+        });
+        addSlotBox(slotDefinition, CONTAINER_CONTAINER, slots.size(), pos[0], pos[1], dim[0], 18, dim[1], 18);
     }
 
     public void doSetup() {

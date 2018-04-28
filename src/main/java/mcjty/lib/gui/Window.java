@@ -52,7 +52,7 @@ public class Window {
     public Window(GuiScreen gui, ResourceLocation guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
-        GuiParser.parseAndHandle(guiDescription, command -> {
+        GuiParserClientTools.parseAndHandleClient(guiDescription, command -> {
             if ("window".equals(command.getId())) {
                 command.findCommand("size").ifPresent(cmd -> {
                     dim[0] = cmd.getOptionalPar(0, -1);
