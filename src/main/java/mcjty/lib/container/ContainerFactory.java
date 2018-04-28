@@ -3,6 +3,7 @@ package mcjty.lib.container;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.GuiParserTools;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -41,12 +42,11 @@ public class ContainerFactory {
         if (containerDescriptor != null) {
             GuiParserTools.parseAndHandleServer(containerDescriptor, command -> {
                 if ("container".equals(command.getId())) {
-                    command.commands().filter(cmd -> "slot".equals(cmd.getId())).forEach(slotCmd -> {
-                        handleSlotCommand(slotCmd);
-                    });
-                    command.findCommand("playerslots").ifPresent(cmd -> {
-                        layoutPlayerInventorySlots(cmd.getOptionalPar(0, 0), cmd.getOptionalPar(1, 0));
-                    });
+                    command.commands()
+                            .filter(cmd -> "slot".equals(cmd.getId()))
+                            .forEach(this::handleSlotCommand);
+                    command.findCommand("playerslots")
+                            .ifPresent(cmd -> layoutPlayerInventorySlots(cmd.getOptionalPar(0, 0), cmd.getOptionalPar(1, 0)));
                 }
             });
         }
@@ -64,7 +64,7 @@ public class ContainerFactory {
                 String itemName = par.toString();
                 ItemStack stack;
                 Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(itemName));
-                if (block != null) {
+                if (block != null && block != Blocks.AIR) {
                     stack = new ItemStack(block);
                 } else {
                     Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
