@@ -39,7 +39,7 @@ public class ColorSelector extends Label<ColorSelector> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
@@ -56,11 +56,11 @@ public class ColorSelector extends Label<ColorSelector> {
             RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleDisabled);
         }
 
-        super.drawOffset(window, x, y, 0, 1);
+        super.drawOffset(x, y, 0, 1);
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             createColorSelectorWindow(window, x, y);
         }
@@ -130,19 +130,19 @@ public class ColorSelector extends Label<ColorSelector> {
             currentColor = getInputColor(red, green, blue);
             current.setColor(calculateContrastingColor(currentColor));
             current.setFilledBackground(0xff000000 | currentColor);
-            fireChoiceEvents(window, currentColor);
+            fireChoiceEvents(currentColor);
         });
         green.addTextEnterEvent((parent, newText) -> {
             currentColor = getInputColor(red, green, blue);
             current.setColor(calculateContrastingColor(currentColor));
             current.setFilledBackground(0xff000000 | currentColor);
-            fireChoiceEvents(window, currentColor);
+            fireChoiceEvents(currentColor);
         });
         blue.addTextEnterEvent((parent, newText) -> {
             currentColor = getInputColor(red, green, blue);
             current.setColor(calculateContrastingColor(currentColor));
             current.setFilledBackground(0xff000000 | currentColor);
-            fireChoiceEvents(window, currentColor);
+            fireChoiceEvents(currentColor);
         });
 
         for (EnumDyeColor color : EnumDyeColor.values()) {
@@ -156,7 +156,7 @@ public class ColorSelector extends Label<ColorSelector> {
                     .addButtonEvent(parent -> {
                         currentColor = color.getColorValue() & 0xffffff;
                         setSelectedColor(red, green, blue, current, currentColor);
-                        fireChoiceEvents(window, currentColor);
+                        fireChoiceEvents(currentColor);
                     })
                     .setLayoutHint(new PositionalLayout.PositionalHint(5 + xx * 20, 23 + yy * 20, 18, 18));
             modalDialog.addChild(colorLabel);
@@ -177,7 +177,7 @@ public class ColorSelector extends Label<ColorSelector> {
         colors.addImageEvent((parent, u, v, color) -> {
             currentColor = color & 0xffffff;
             setSelectedColor(red, green, blue, current, currentColor);
-            fireChoiceEvents(window, currentColor);
+            fireChoiceEvents(currentColor);
         });
         close.addButtonEvent(parent -> window.getWindowManager().closeWindow(modalWindow));
     }
@@ -196,8 +196,8 @@ public class ColorSelector extends Label<ColorSelector> {
         }
     }
 
-    private void fireChoiceEvents(Window window, Integer color) {
-        fireChannelEvents(window, "");
+    private void fireChoiceEvents(Integer color) {
+        fireChannelEvents("");
         if (choiceEvents != null) {
             for (ColorChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, color);

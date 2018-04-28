@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ImageEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -51,34 +50,34 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             dragging = true;
             int u = x - bounds.x;
             int v = y - bounds.y;
-            fireImageEvents(u, v, pickColor(u, v));
+            fireImageEvents("click", u, v, pickColor(u, v));
             return this;
         }
         return null;
     }
 
     @Override
-    public void mouseMove(Window window, int x, int y) {
+    public void mouseMove(int x, int y) {
         if (dragging && isEnabledAndVisible()) {
             int u = x - bounds.x;
             int v = y - bounds.y;
-            fireImageEvents(u, v, pickColor(u, v));
+            fireImageEvents("move", u, v, pickColor(u, v));
         }
     }
 
     @Override
-    public void mouseRelease(Window window, int x, int y, int button) {
-        super.mouseRelease(window, x, y, button);
+    public void mouseRelease(int x, int y, int button) {
+        super.mouseRelease(x, y, button);
         if (dragging) {
             dragging = false;
             int u = x - bounds.x;
             int v = y - bounds.y;
-            fireImageEvents(u, v, pickColor(u, v));
+            fireImageEvents("release", u, v, pickColor(u, v));
         }
     }
 
@@ -100,11 +99,11 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
 
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(window, x, y);
+        super.draw(x, y);
 
         if (image != null) {
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
@@ -129,7 +128,8 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
         }
     }
 
-    private void fireImageEvents(int u, int v, int color) {
+    private void fireImageEvents(String id, int u, int v, int color) {
+        fireChannelEvents(id);
         if (imageEvents != null) {
             if (u < 0 || v < 0 || u >= txtWidth || v >= txtHeight) {
                 return;

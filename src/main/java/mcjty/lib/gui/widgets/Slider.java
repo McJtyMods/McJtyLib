@@ -79,11 +79,11 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(window, x, y);
+        super.draw(x, y);
 
         findScrollable(window);
 
@@ -178,7 +178,7 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public boolean mouseWheel(Window window, int amount, int x, int y) {
+    public boolean mouseWheel(int amount, int x, int y) {
         int first = scrollable.getFirstSelected();
 
         int divider = scrollable.getMaximum() - scrollable.getCountSelected();
@@ -203,8 +203,8 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
-        super.mouseClick(window, x, y, button);
+    public Widget mouseClick(int x, int y, int button) {
+        super.mouseClick(x, y, button);
         dragging = true;
         findScrollable(window);
 
@@ -227,8 +227,8 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public void mouseRelease(Window window, int x, int y, int button) {
-        super.mouseRelease(window, x, y, button);
+    public void mouseRelease(int x, int y, int button) {
+        super.mouseRelease(x, y, button);
         if (dragging) {
             updateScrollable(x, y);
             dragging = false;
@@ -236,8 +236,8 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public void mouseMove(Window window, int x, int y) {
-        super.mouseMove(window, x, y);
+    public void mouseMove(int x, int y) {
+        super.mouseMove(x, y);
         if (dragging) {
             updateScrollable(x, y);
 //            System.out.println("x = " + x + "," + y);

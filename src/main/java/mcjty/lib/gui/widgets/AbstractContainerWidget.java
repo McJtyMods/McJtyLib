@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
-import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -38,13 +37,13 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
     }
 
     @Override
-    public boolean mouseWheel(Window window, int amount, int x, int y) {
+    public boolean mouseWheel(int amount, int x, int y) {
         x -= bounds.x;
         y -= bounds.y;
 
         for (Widget child : children) {
             if (child.in(x, y) && child.isVisible()) {
-                if (child.mouseWheel(window, amount, x, y)) {
+                if (child.mouseWheel(amount, x, y)) {
                     return true;
                 }
             }
@@ -133,8 +132,10 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         command.commands().forEach(cmd -> {
             String type = cmd.getId();
             Widget widget = WidgetRepository.createWidget(type, mc, gui);
-            widget.readFromGuiCommand(cmd);
-            children.add(widget);
+            if (widget != null) {
+                widget.readFromGuiCommand(cmd);
+                children.add(widget);
+            }
         });
     }
 

@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ColorChoiceEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -31,7 +30,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
             colorList.add(color);
             if (currentColor == null) {
                 currentColor = color;
-                fireChoiceEvents(null, currentColor);
+                fireChoiceEvents(currentColor);
             }
         }
         return this;
@@ -62,7 +61,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
@@ -79,11 +78,11 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
             RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleDisabled);
         }
 
-        super.drawOffset(window, x, y, 0, 1);
+        super.drawOffset(x, y, 0, 1);
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             int index = colorList.indexOf(currentColor);
             if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
@@ -98,7 +97,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
                 }
             }
             currentColor = colorList.get(index);
-            fireChoiceEvents(window, currentColor);
+            fireChoiceEvents(currentColor);
         }
         return null;
     }
@@ -117,8 +116,8 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
         }
     }
 
-    private void fireChoiceEvents(Window window, Integer color) {
-            fireChannelEvents(window, "");
+    private void fireChoiceEvents(Integer color) {
+            fireChannelEvents("");
         if (choiceEvents != null) {
             for (ColorChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, color);

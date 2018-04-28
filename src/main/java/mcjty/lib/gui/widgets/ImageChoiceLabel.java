@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -18,6 +17,8 @@ import java.util.stream.Collectors;
 public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
 
     public static final String TYPE_IMAGECHOICELABEL = "imagechoicelabel";
+
+    public static final boolean DEFAULT_WITH_BORDER = false;
 
     private static class ChoiceEntry {
         private final String choice;
@@ -56,7 +57,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     }
 
     private List<ChoiceEntry> choiceList = new ArrayList<>();
-    private boolean withBorder = false;
+    private boolean withBorder = DEFAULT_WITH_BORDER;
     private int highlightedChoice = -1;     // If this choice is selected we 'highlight' it (only in combination with withBorder=true)
 
     private int currentChoice = -1;
@@ -108,7 +109,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                 currentChoice--;
@@ -180,6 +181,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     }
 
     private void fireChoiceEvents(String choice) {
+        fireChannelEvents(choice);
         if (choiceEvents != null) {
             for (ChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, choice);
@@ -188,7 +190,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (withBorder) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;
@@ -206,7 +208,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
             }
         }
 
-        super.draw(window, x, y);
+        super.draw(x, y);
     }
 
 
@@ -227,6 +229,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
                     ChoiceEntry entry = new ChoiceEntry(choice, tooltips, image, u, v);
                     choiceList.add(entry);
                 }));
+        withBorder = GuiParser.get(command, "border", DEFAULT_WITH_BORDER);
     }
 
     @Override
@@ -247,6 +250,7 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
             choiceCmd.command(new GuiParser.GuiCommand("image").parameter(entry.getImage().toString()));
         }
         command.command(choicesCmd);
+        GuiParser.put(command, "border", withBorder, DEFAULT_WITH_BORDER);
     }
 
     @Override

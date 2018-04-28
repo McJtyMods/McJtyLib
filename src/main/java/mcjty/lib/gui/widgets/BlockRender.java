@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.varia.ItemStackTools;
 import net.minecraft.block.Block;
@@ -95,14 +94,14 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
         if (showLabel) {
             drawBackground(x, y, bounds.height, bounds.height);
         } else {
-            super.draw(window, x, y);
+            super.draw(x, y);
         }
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
@@ -139,12 +138,12 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
-            fireSelectionEvents(window);
+            fireSelectionEvents();
             long t = System.currentTimeMillis();
             if (prevTime != -1 && (t - prevTime) < 250) {
-                fireDoubleClickEvent(window);
+                fireDoubleClickEvent();
             }
             prevTime = t;
             return this;
@@ -166,8 +165,8 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         }
     }
 
-    private void fireSelectionEvents(Window window) {
-        fireChannelEvents(window, "select");
+    private void fireSelectionEvents() {
+        fireChannelEvents("select");
         if (selectionEvents != null) {
             for (BlockRenderEvent event : selectionEvents) {
                 event.select(this);
@@ -175,8 +174,8 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         }
     }
 
-    private void fireDoubleClickEvent(Window window) {
-        fireChannelEvents(window, "doubleclick");
+    private void fireDoubleClickEvent() {
+        fireChannelEvents("doubleclick");
         if (selectionEvents != null) {
             for (BlockRenderEvent event : selectionEvents) {
                 event.doubleClick(this);

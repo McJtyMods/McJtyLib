@@ -2,7 +2,6 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -29,11 +28,11 @@ public class IconRender extends AbstractWidget<IconRender> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(window, x, y);
+        super.draw(x, y);
         if (icon != null) {
             RenderHelper.renderObject(mc, x + bounds.x, y + bounds.y, icon, false);
         }

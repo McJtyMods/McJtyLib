@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -162,11 +161,11 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     @Override
-    public void draw(Window window, final int x, final int y) {
+    public void draw(final int x, final int y) {
         if (!visible) {
             return;
         }
-        super.draw(window, x, y);
+        super.draw(x, y);
 
         int bx = x + bounds.x;
         int by = y + bounds.y;

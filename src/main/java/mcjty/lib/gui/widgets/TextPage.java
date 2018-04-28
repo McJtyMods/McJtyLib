@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -162,7 +161,7 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public TextPage mouseClick(Window window, int x, int y, int button) {
+    public TextPage mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             window.setTextFocus(this);
             for (Link link : links) {
@@ -202,8 +201,8 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public boolean keyTyped(Window window, char typedChar, int keyCode) {
-        boolean rc = super.keyTyped(window, typedChar, keyCode);
+    public boolean keyTyped(char typedChar, int keyCode) {
+        boolean rc = super.keyTyped(typedChar, keyCode);
         if (rc) {
             return true;
         }
@@ -228,8 +227,8 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
-        super.draw(window, x, y);
+    public void draw(int x, int y) {
+        super.draw(x, y);
 
         tabCounter = 0;
         y += 3;

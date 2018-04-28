@@ -25,6 +25,10 @@ public interface Widget<P extends Widget> {
 
     String getName();
 
+    Window getWindow();
+
+    void setWindow(Window window);
+
     P setName(String name);
 
     /**
@@ -138,67 +142,60 @@ public interface Widget<P extends Widget> {
      * The given coordinates are the absolute coordinates of the parent. This does *not* include
      * the top/left x,y of this widget itself.
      */
-    void draw(Window window, int x, int y);
+    void draw(int x, int y);
 
     /**
      * After the window has been drawn this is called again to give widgets a chance
      * to render additional stuff that has to be rendered on top of the rest
      */
-    void drawPhase2(Window window, int x, int y);
+    void drawPhase2(int x, int y);
 
     /**
      * Handle a mouse click for this widget. This widget does not have to check if the coordinate is
      * in the bounds. The given coordinates are relative to the parent of this widget.
      *
      *
-     * @param window
      * @param x
      * @param y
      * @param button
      * @return a reference to the widget that wants focus (or null if not)
      */
-    Widget mouseClick(Window window, int x, int y, int button);
+    Widget mouseClick(int x, int y, int button);
 
     /**
      * Handle a mouse release for this widget.
-     *
-     * @param window
-     * @param x
+     *  @param x
      * @param y
      * @param button
      */
-    void mouseRelease(Window window, int x, int y, int button);
+    void mouseRelease(int x, int y, int button);
 
     /**
      * Handle a mouse move event.
-     *
-     * @param window
-     * @param x
+     *  @param x
      * @param y
      */
-    void mouseMove(Window window, int x, int y);
+    void mouseMove(int x, int y);
 
     /**
      * Handle mousewheel.
      *
      *
-     * @param window
      * @param amount
      * @param x
      * @param y
      * @return true if handled
      */
-    boolean mouseWheel(Window window, int amount, int x, int y);
+    boolean mouseWheel(int amount, int x, int y);
 
     /**
      * Handle a keyboard event.
      *
-     * @param window
      * @param typedChar
      * @param keyCode
      * @return true if key was handled
      */
-    boolean keyTyped(Window window, char typedChar, int keyCode);
+    boolean keyTyped(char typedChar, int keyCode);
 
     /**
      * Some layout managers need a layout hint.

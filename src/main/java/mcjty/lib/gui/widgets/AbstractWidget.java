@@ -29,8 +29,11 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     protected Rectangle bounds;
     protected int desiredWidth = SIZE_UNKNOWN;
     protected int desiredHeight = SIZE_UNKNOWN;
+
     protected Minecraft mc;
     protected Gui gui;
+    protected Window window;
+
     private LayoutHint layoutHint = null;
     private boolean enabled = true;
     private boolean hovering = false;
@@ -74,6 +77,16 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
+    public Window getWindow() {
+        return window;
+    }
+
+    @Override
+    public void setWindow(Window window) {
+        this.window = window;
+    }
+
+    @Override
     public P setName(String name) {
         this.name = name;
         return (P) this;
@@ -85,7 +98,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         return (P) this;
     }
 
-    protected void fireChannelEvents(Window window, String id) {
+    protected void fireChannelEvents(String id) {
         if (window != null && channel != null) {
             window.fireChannelEvents(channel, this, id);
         }
@@ -375,35 +388,35 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         drawBackground(x, y);
     }
 
     @Override
-    public void drawPhase2(Window window, int x, int y) {
+    public void drawPhase2(int x, int y) {
 
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         return null;
     }
 
     @Override
-    public void mouseRelease(Window window, int x, int y, int button) {
+    public void mouseRelease(int x, int y, int button) {
     }
 
     @Override
-    public void mouseMove(Window window, int x, int y) {
+    public void mouseMove(int x, int y) {
     }
 
     @Override
-    public boolean mouseWheel(Window window, int amount, int x, int y) {
+    public boolean mouseWheel(int amount, int x, int y) {
         return false;
     }
 
     @Override
-    public boolean keyTyped(Window window, char typedChar, int keyCode) {
+    public boolean keyTyped(char typedChar, int keyCode) {
         return false;
     }
 

@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -58,7 +57,7 @@ public class ToggleButton extends Label<ToggleButton> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
@@ -89,11 +88,11 @@ public class ToggleButton extends Label<ToggleButton> {
             }
         }
 
-        super.drawOffset(window, x, y, checkMarker ? 6 : 0, 1);
+        super.drawOffset(x, y, checkMarker ? 6 : 0, 1);
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             pressed = !pressed;
             fireButtonEvents();
@@ -117,6 +116,7 @@ public class ToggleButton extends Label<ToggleButton> {
     }
 
     private void fireButtonEvents() {
+        fireChannelEvents("");
         if (buttonEvents != null) {
             for (ButtonEvent event : buttonEvents) {
                 event.buttonClicked(this);

@@ -1,15 +1,33 @@
 package mcjty.lib.gui;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.IResource;
+import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.util.Strings;
 
+import javax.annotation.Nullable;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static java.io.StreamTokenizer.TT_NUMBER;
-import static java.io.StreamTokenizer.TT_WORD;
+import static java.io.StreamTokenizer.*;
 
 public class GuiParser {
+
+    public static void parseAndHandle(ResourceLocation guiDescription, Consumer<GuiCommand> consumer) {
+        try {
+            IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(guiDescription);
+            try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
+                parse(br).forEach(consumer);
+            } catch (ParserException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static class ParserException extends Exception {
         public ParserException(String s, int linenr) {
@@ -89,17 +107,19 @@ public class GuiParser {
         public void write(PrintWriter writer, int indent) {
             writer.print(ind(indent) + id);
             if (!parameters.isEmpty()) {
-                writer.print('(');
-                String comma = "";
-                for (Object parameter : parameters) {
-                    Object par = parameter;
-                    if (par instanceof String) {
-                        par = Strings.quote((String) par);
+                if (parameters().anyMatch(o -> o != null && !"".equals(o))) {
+                    writer.print('(');
+                    String comma = "";
+                    for (Object parameter : parameters) {
+                        Object par = parameter;
+                        if (par instanceof String) {
+                            par = Strings.quote((String) par);
+                        }
+                        writer.print(comma + par);
+                        comma = ",";
                     }
-                    writer.print(comma + par);
-                    comma = ",";
+                    writer.print(')');
                 }
-                writer.print(')');
             }
             if (guiCommands.isEmpty()) {
                 writer.println("");
@@ -136,8 +156,13 @@ public class GuiParser {
         }
     }
 
-    public static GuiCommand parseCommand(StreamTokenizer tokenizer) throws IOException, ParserException {
+    @Nullable
+    private static GuiCommand parseCommand(StreamTokenizer tokenizer) throws IOException, ParserException {
         int token = tokenizer.nextToken();
+        if (token == TT_EOF) {
+            return null;
+        }
+
         if (token != TT_WORD) {
             throw new ParserException("Expected a command token, got a '" + (char) token + "' instead!", tokenizer.lineno());
         }
@@ -148,11 +173,17 @@ public class GuiParser {
             token = tokenizer.nextToken();
             while (token != ')') {
                 if (token == TT_WORD || token == '\'') {
-                    guiCommand.parameter(tokenizer.sval);
+                    if (token == TT_WORD && "true".equals(tokenizer.sval.toLowerCase())) {
+                        guiCommand.parameter(true);
+                    } else if (token == TT_WORD && "false".equals(tokenizer.sval.toLowerCase())) {
+                        guiCommand.parameter(false);
+                    } else {
+                        guiCommand.parameter(tokenizer.sval);
+                    }
                 } else if (token == TT_NUMBER) {
                     guiCommand.parameter((int) tokenizer.nval);
                 } else {
-                    throw new ParserException("Expected parameter!", tokenizer.lineno());
+                    throw new ParserException("Expected parameter! Got '" + (char) token + "' instead", tokenizer.lineno());
                 }
                 token = tokenizer.nextToken();
                 if (token == ',') {
@@ -178,17 +209,21 @@ public class GuiParser {
         return guiCommand;
     }
 
-    public static GuiCommand parse(Reader reader) throws IOException, ParserException {
+    public static List<GuiCommand> parse(Reader reader) throws IOException, ParserException {
         StreamTokenizer tokenizer = new StreamTokenizer(reader);
-
-        List<GuiCommand> guiCommands = new ArrayList<>();
 
         tokenizer.slashSlashComments(true);
         tokenizer.eolIsSignificant(false);
         tokenizer.quoteChar('\'');
         tokenizer.parseNumbers();
 
-        return parseCommand(tokenizer);
+        List<GuiCommand> commands = new ArrayList<>();
+        GuiCommand command = parseCommand(tokenizer);
+        while (command != null) {
+            commands.add(command);
+            command = parseCommand(tokenizer);
+        }
+        return commands;
     }
 
     public static void main(String[] args) {
@@ -207,8 +242,7 @@ public class GuiParser {
 "        }");
 
         try {
-            GuiCommand guiCommand = parse(reader);
-            guiCommand.dump(1);
+            parse(reader).stream().forEach(command -> command.dump(1));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ParserException e) {

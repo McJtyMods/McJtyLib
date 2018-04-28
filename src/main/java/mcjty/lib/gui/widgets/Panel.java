@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -35,11 +34,11 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(window, x, y);
+        super.draw(x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
 //        drawBox(xx, yy, 0xffff0000);
@@ -51,33 +50,34 @@ public class Panel extends AbstractContainerWidget<Panel> {
         }
 
         for (Widget child : getChildren()) {
-            child.draw(window, xx, yy);
+            child.setWindow(window);
+            child.draw(xx, yy);
         }
     }
 
     @Override
-    public void drawPhase2(Window window, int x, int y) {
+    public void drawPhase2(int x, int y) {
         if (!visible) {
             return;
         }
-        super.drawPhase2(window, x, y);
+        super.drawPhase2(x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         for (Widget child : getChildren()) {
-            child.drawPhase2(window, xx, yy);
+            child.drawPhase2(xx, yy);
         }
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
-        super.mouseClick(window, x, y, button);
+    public Widget mouseClick(int x, int y, int button) {
+        super.mouseClick(x, y, button);
 
         x -= bounds.x;
         y -= bounds.y;
 
         for (Widget child : getChildren()) {
             if (child.in(x, y) && child.isVisible()) {
-                focus = child.mouseClick(window, x, y, button);
+                focus = child.mouseClick(x, y, button);
                 return this;
             }
         }
@@ -86,18 +86,18 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void mouseRelease(Window window, int x, int y, int button) {
-        super.mouseRelease(window, x, y, button);
+    public void mouseRelease(int x, int y, int button) {
+        super.mouseRelease(x, y, button);
         x -= bounds.x;
         y -= bounds.y;
 
         if (focus != null) {
-            focus.mouseRelease(window, x, y, button);
+            focus.mouseRelease(x, y, button);
             focus = null;
         } else {
             for (Widget child : getChildren()) {
                 if (child.in(x, y) && child.isVisible()) {
-                    child.mouseRelease(window, x, y, button);
+                    child.mouseRelease(x, y, button);
                     return;
                 }
             }
@@ -105,18 +105,18 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void mouseMove(Window window, int x, int y) {
-        super.mouseMove(window, x, y);
+    public void mouseMove(int x, int y) {
+        super.mouseMove(x, y);
 
         x -= bounds.x;
         y -= bounds.y;
 
         if (focus != null) {
-            focus.mouseMove(window, x, y);
+            focus.mouseMove(x, y);
         } else {
             for (Widget child : getChildren()) {
                 if (child.in(x, y) && child.isVisible()) {
-                    child.mouseMove(window, x, y);
+                    child.mouseMove(x, y);
                     return;
                 }
             }

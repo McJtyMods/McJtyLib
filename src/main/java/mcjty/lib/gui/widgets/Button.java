@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -21,7 +20,7 @@ public class Button extends Label<Button> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
@@ -40,11 +39,11 @@ public class Button extends Label<Button> {
             drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
         }
 
-        super.drawOffset(window, x, y, 0, 1);
+        super.drawOffset(x, y, 0, 1);
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             pressed = true;
             return this;
@@ -53,12 +52,12 @@ public class Button extends Label<Button> {
     }
 
     @Override
-    public void mouseRelease(Window window, int x, int y, int button) {
-        super.mouseRelease(window, x, y, button);
+    public void mouseRelease(int x, int y, int button) {
+        super.mouseRelease(x, y, button);
         if (pressed) {
             pressed = false;
             if (isEnabledAndVisible()) {
-                fireButtonEvents(window);
+                fireButtonEvents();
             }
         }
     }
@@ -77,8 +76,8 @@ public class Button extends Label<Button> {
         }
     }
 
-    private void fireButtonEvents(Window window) {
-        fireChannelEvents(window, "");
+    private void fireButtonEvents() {
+        fireChannelEvents("");
         if (buttonEvents != null) {
             for (ButtonEvent event : buttonEvents) {
                 event.buttonClicked(this);

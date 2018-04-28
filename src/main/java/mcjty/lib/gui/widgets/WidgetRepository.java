@@ -3,6 +3,8 @@ package mcjty.lib.gui.widgets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -30,27 +32,32 @@ public class WidgetRepository {
     private static final Map<String, BiFunction<Minecraft, Gui, Widget>> FACTORIES = new HashMap<>();
 
     static {
-        FACTORIES.put(TYPE_BLOCKRENDER, (minecraft, gui) -> new BlockRender(minecraft, gui));
-        FACTORIES.put(TYPE_BUTTON, (minecraft, gui) -> new Button(minecraft, gui));
-        FACTORIES.put(TYPE_CHOICELABEL, (minecraft, gui) -> new ChoiceLabel(minecraft, gui));
-        FACTORIES.put(TYPE_COLORCHOICELABEL, (minecraft, gui) -> new ColorChoiceLabel(minecraft, gui));
-        FACTORIES.put(TYPE_COLORSELECTOR, (minecraft, gui) -> new ColorSelector(minecraft, gui));
-        FACTORIES.put(TYPE_ENERGYBAR, (minecraft, gui) -> new EnergyBar(minecraft, gui));
-        FACTORIES.put(TYPE_ICONHOLDER, (minecraft, gui) -> new IconHolder(minecraft, gui));
-        FACTORIES.put(TYPE_ICONRENDER, (minecraft, gui) -> new IconRender(minecraft, gui));
-        FACTORIES.put(TYPE_IMAGECHOICELABEL, (minecraft, gui) -> new ImageChoiceLabel(minecraft, gui));
-        FACTORIES.put(TYPE_IMAGELABEL, (minecraft, gui) -> new ImageLabel(minecraft, gui));
-        FACTORIES.put(TYPE_PANEL, (minecraft, gui) -> new Panel(minecraft, gui));
-        FACTORIES.put(TYPE_SCROLLABLELABEL, (minecraft, gui) -> new ScrollableLabel(minecraft, gui));
-        FACTORIES.put(TYPE_SLIDER, (minecraft, gui) -> new Slider(minecraft, gui));
-        FACTORIES.put(TYPE_TABBEDPANEL, (minecraft, gui) -> new TabbedPanel(minecraft, gui));
-        FACTORIES.put(TYPE_TEXTFIELD, (minecraft, gui) -> new TextField(minecraft, gui));
+        FACTORIES.put(TYPE_BLOCKRENDER, BlockRender::new);
+        FACTORIES.put(TYPE_BUTTON, Button::new);
+        FACTORIES.put(TYPE_CHOICELABEL, ChoiceLabel::new);
+        FACTORIES.put(TYPE_COLORCHOICELABEL, ColorChoiceLabel::new);
+        FACTORIES.put(TYPE_COLORSELECTOR, ColorSelector::new);
+        FACTORIES.put(TYPE_ENERGYBAR, EnergyBar::new);
+        FACTORIES.put(TYPE_ICONHOLDER, IconHolder::new);
+        FACTORIES.put(TYPE_ICONRENDER, IconRender::new);
+        FACTORIES.put(TYPE_IMAGECHOICELABEL, ImageChoiceLabel::new);
+        FACTORIES.put(TYPE_IMAGELABEL, ImageLabel::new);
+        FACTORIES.put(TYPE_PANEL, Panel::new);
+        FACTORIES.put(TYPE_SCROLLABLELABEL, ScrollableLabel::new);
+        FACTORIES.put(TYPE_SLIDER, Slider::new);
+        FACTORIES.put(TYPE_TABBEDPANEL, TabbedPanel::new);
+        FACTORIES.put(TYPE_TEXTFIELD, TextField::new);
 //        FACTORIES.put(TYPE_TEXTPAGE, (minecraft, gui) -> new TextPage(minecraft, gui));
-        FACTORIES.put(TYPE_TOGGLEBUTTON, (minecraft, gui) -> new ToggleButton(minecraft, gui));
-        FACTORIES.put(TYPE_WIDGETLIST, (minecraft, gui) -> new WidgetList(minecraft, gui));
+        FACTORIES.put(TYPE_TOGGLEBUTTON, ToggleButton::new);
+        FACTORIES.put(TYPE_WIDGETLIST, WidgetList::new);
     }
 
+    @Nullable
     public static Widget createWidget(String type, Minecraft minecraft, Gui gui) {
-        return FACTORIES.get(type).apply(minecraft, gui);
+        BiFunction<Minecraft, Gui, Widget> function = FACTORIES.get(type);
+        if (function == null) {
+            return null;
+        }
+        return function.apply(minecraft, gui);
     }
 }

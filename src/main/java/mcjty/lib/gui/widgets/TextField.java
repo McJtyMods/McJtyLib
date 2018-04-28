@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.TextEnterEvent;
 import mcjty.lib.gui.events.TextEvent;
 import mcjty.lib.gui.events.TextSpecialKeyEvent;
@@ -63,7 +62,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible() && editable) {
             window.setTextFocus(this);
             if (button == 1) {
@@ -76,8 +75,8 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public boolean keyTyped(Window window, char typedChar, int keyCode) {
-        boolean rc = super.keyTyped(window, typedChar, keyCode);
+    public boolean keyTyped(char typedChar, int keyCode) {
+        boolean rc = super.keyTyped(typedChar, keyCode);
         if (rc) {
             return true;
         }
@@ -158,8 +157,8 @@ public class TextField extends AbstractWidget<TextField> {
 
 
     @Override
-    public void draw(Window window, int x, int y) {
-        super.draw(window, x, y);
+    public void draw(int x, int y) {
+        super.draw(x, y);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -206,6 +205,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void fireTextEvents(String newText) {
+        fireChannelEvents("text");
         if (textEvents != null) {
             for (TextEvent event : textEvents) {
                 event.textChanged(this, newText);
@@ -222,6 +222,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void fireArrowUpEvents() {
+        fireChannelEvents("arrowup");
         if (textSpecialKeyEvents != null) {
             for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
                 event.arrowUp(this);
@@ -230,6 +231,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void fireArrowDownEvents() {
+        fireChannelEvents("arrowdown");
         if (textSpecialKeyEvents != null) {
             for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
                 event.arrowDown(this);
@@ -238,6 +240,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void fireTabEvents() {
+        fireChannelEvents("tab");
         if (textSpecialKeyEvents != null) {
             for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
                 event.tab(this);
@@ -260,6 +263,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void fireTextEnterEvents(String newText) {
+        fireChannelEvents("enter");
         if (textEnterEvents != null) {
             for (TextEnterEvent event : textEnterEvents) {
                 event.textEntered(this, newText);

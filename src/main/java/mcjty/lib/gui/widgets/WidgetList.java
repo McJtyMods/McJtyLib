@@ -4,7 +4,6 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.SelectionEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -155,15 +154,15 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
 
         // Use the function above to force reset of the slider in case the contents changed so that it doesn't look weird.
-        mouseWheel(window, 0, x, y);
+        mouseWheel(0, x, y);
 
-        super.draw(window, x, y);
+        super.draw(x, y);
         int xx = x + bounds.x + leftMargin;
         int yy = y + bounds.y + topMargin;
         int top = 0;        // Margin@@@?
@@ -187,11 +186,13 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
                 }
             }
             if (isEnabledAndVisible()) {
-                child.draw(window, xx, yy);
+                child.setWindow(window);
+                child.draw(xx, yy);
             } else {
                 boolean en = child.isEnabled();
                 child.setEnabled(false);
-                child.draw(window, xx, yy);
+                child.setWindow(window);
+                child.draw(xx, yy);
                 child.setEnabled(en);
             }
             top += rh;
@@ -199,12 +200,12 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void drawPhase2(Window window, int x, int y) {
+    public void drawPhase2(int x, int y) {
         if (!visible) {
             return;
         }
 
-        super.drawPhase2(window, x, y);
+        super.drawPhase2(x, y);
         int xx = x + bounds.x + leftMargin;
         int yy = y + bounds.y + topMargin;
         int top = 0;        // Margin@@@?
@@ -214,13 +215,13 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             Widget child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             if (isEnabledAndVisible()) {
-                child.drawPhase2(window, xx, yy);
+                child.drawPhase2(xx, yy);
             }
             top += rh;
         }}
 
     @Override
-    public void mouseMove(Window window, int x, int y) {
+    public void mouseMove(int x, int y) {
         if (!isEnabledAndVisible()) {
             return;
         }
@@ -246,13 +247,13 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
-                child.mouseMove(window, xx, yy);
+                child.mouseMove(xx, yy);
             }
         }
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (!isEnabledAndVisible()) {
             return null;
         }
@@ -283,7 +284,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
-                child.mouseClick(window, xx, yy, button);
+                child.mouseClick(xx, yy, button);
             }
         }
 
@@ -297,7 +298,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void mouseRelease(Window window, int x, int y, int button) {
+    public void mouseRelease(int x, int y, int button) {
         if (!isEnabledAndVisible()) {
             return;
         }
@@ -310,11 +311,11 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
-                child.mouseRelease(window, xx, yy, button);
+                child.mouseRelease(xx, yy, button);
             }
         }
 
-        super.mouseRelease(window, x, y, button);
+        super.mouseRelease(x, y, button);
     }
 
     private Widget getSelectedWidgetSafe(int sel) {
@@ -326,7 +327,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public boolean mouseWheel(Window window, int amount, int x, int y) {
+    public boolean mouseWheel(int amount, int x, int y) {
         int divider = getMaximum() - getCountSelected();
         if (divider <= 0) {
             first = 0;
@@ -399,6 +400,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     private void fireSelectionEvents(int index) {
+        fireChannelEvents("select");
         if (selectionEvents != null) {
             for (SelectionEvent event : selectionEvents) {
                 event.select(this, index);
@@ -407,6 +409,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     private void fireDoubleClickEvent(int index) {
+        fireChannelEvents("doubleclick");
         if (selectionEvents != null) {
             for (SelectionEvent event : selectionEvents) {
                 event.doubleClick(this, index);

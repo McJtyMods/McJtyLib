@@ -1,6 +1,7 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
@@ -11,14 +12,13 @@ import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.IResource;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.awt.Rectangle;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -27,7 +27,7 @@ import java.util.*;
  */
 public class Window {
 
-    private final Widget toplevel;
+    private Widget toplevel;
     private final GuiScreen gui;
     private Widget textFocus = null;
     private Widget hover = null;
@@ -45,30 +45,43 @@ public class Window {
         this.toplevel = toplevel;
     }
 
+    public GuiScreen getGui() {
+        return gui;
+    }
+
     public Window(GuiScreen gui, ResourceLocation guiDescription) {
         this.gui = gui;
-        try {
-            IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(guiDescription);
-            try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-                GuiParser.GuiCommand command = GuiParser.parse(br);
-                String type = command.getId();
-                toplevel = WidgetRepository.createWidget(type, Minecraft.getMinecraft(), gui);
-                toplevel.readFromGuiCommand(command);
-            } catch (GuiParser.ParserException e) {
-                throw new RuntimeException(e);
+        final int[] dim = {-1, -1};
+        GuiParser.parseAndHandle(guiDescription, command -> {
+            if ("window".equals(command.getId())) {
+                command.findCommand("size").ifPresent(cmd -> {
+                    dim[0] = cmd.getOptionalPar(0, -1);
+                    dim[1] = cmd.getOptionalPar(1, -1);
+                });
+                command.findCommand("panel").ifPresent(cmd -> {
+                    toplevel = WidgetRepository.createWidget("panel", Minecraft.getMinecraft(), gui);
+                    toplevel.readFromGuiCommand(cmd);
+                });
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        });
+
+        if (dim[0] != -1 || dim[1] != -1) {
+            if (gui instanceof GenericGuiContainer) {
+                ((GenericGuiContainer) gui).setWindowDimensions(dim[0], dim[1]);
+            }
+            int guiLeft = (gui.width - dim[0]) / 2;
+            int guiTop = (gui.height - dim[1]) / 2;
+            toplevel.setBounds(new Rectangle(guiLeft, guiTop, dim[0], dim[1]));
         }
         Keyboard.enableRepeatEvents(true);
     }
 
-    public Widget findChild(String name) {
+    public <T extends Widget> T findChild(String name) {
         Widget widget = ((AbstractContainerWidget) toplevel).findChildRecursive(name);
         if (widget == null) {
             Logging.logError("Could not find widget '" + name + "'!");
         }
-        return widget;
+        return (T) widget;
     }
 
     public WindowManager getWindowManager() {
@@ -126,7 +139,8 @@ public class Window {
             fireFocusEvents(null);
         }
         if (toplevel.in(x, y) && toplevel.isVisible()) {
-            toplevel.mouseClick(this, x, y, button);
+            toplevel.setWindow(this);
+            toplevel.mouseClick(x, y, button);
         }
     }
 
@@ -138,11 +152,12 @@ public class Window {
     }
 
     public void mouseMovedOrUp(int x, int y, int button) {
+        toplevel.setWindow(this);
         // -1 == mouse move
         if (button != -1) {
-            toplevel.mouseRelease(this, x, y, button);
+            toplevel.mouseRelease(x, y, button);
         } else {
-            toplevel.mouseMove(this, x, y);
+            toplevel.mouseMove(x, y);
         }
     }
 
@@ -167,11 +182,13 @@ public class Window {
 
     public boolean keyTyped(char typedChar, int keyCode) {
         if (keyCode == Keyboard.KEY_F12) {
+            GuiParser.GuiCommand windowCmd = createWindowCommand();
             GuiParser.GuiCommand command = toplevel.createGuiCommand();
             toplevel.fillGuiCommand(command);
+            windowCmd.command(command);
             try {
                 try(PrintWriter writer = new PrintWriter(new File("output.gui"))) {
-                    command.write(writer, 0);
+                    windowCmd.write(writer, 0);
                     writer.flush();
                 }
             } catch (FileNotFoundException e) {
@@ -179,9 +196,17 @@ public class Window {
             }
         }
         if (textFocus != null) {
-            return textFocus.keyTyped(this, typedChar, keyCode);
+            return textFocus.keyTyped(typedChar, keyCode);
         }
         return false;
+    }
+
+    private GuiParser.GuiCommand createWindowCommand() {
+        GuiParser.GuiCommand windowCmd = new GuiParser.GuiCommand("window");
+        windowCmd.command(new GuiParser.GuiCommand("size")
+                .parameter((int)toplevel.getBounds().getWidth())
+                .parameter((int)toplevel.getBounds().getHeight()));
+        return windowCmd;
     }
 
     public void draw() {
@@ -206,7 +231,8 @@ public class Window {
             }
         }
         if (dwheel != 0) {
-            toplevel.mouseWheel(this, dwheel, x, y);
+            toplevel.setWindow(this);
+            toplevel.mouseWheel(dwheel, x, y);
         }
         PreferencesProperties properties = McJtyLib.getPreferencesProperties(gui.mc.player);
         if (properties != null) {
@@ -214,8 +240,10 @@ public class Window {
         } else {
             currentStyle = GuiStyle.STYLE_FLAT_GRADIENT;
         }
-        toplevel.draw(this, 0, 0);
-        toplevel.drawPhase2(this, 0, 0);
+
+        toplevel.setWindow(this);
+        toplevel.draw(0, 0);
+        toplevel.drawPhase2(0, 0);
     }
 
     public GuiStyle getCurrentStyle() {

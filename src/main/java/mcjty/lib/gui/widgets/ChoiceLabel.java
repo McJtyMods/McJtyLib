@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -32,7 +31,7 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
             if (currentChoice == null) {
                 currentChoice = choice;
                 setText(currentChoice);
-                fireChoiceEvents(null, currentChoice);
+                fireChoiceEvents(currentChoice);
             }
         }
         return this;
@@ -64,7 +63,7 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
     }
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
@@ -85,11 +84,11 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
             RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleDisabled);
         }
 
-        super.drawOffset(window, x, y, -3, 1);
+        super.drawOffset(x, y, -3, 1);
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             if (choiceList.isEmpty()) {
                 return null;
@@ -108,7 +107,7 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
             }
             currentChoice = choiceList.get(index);
             setText(currentChoice);
-            fireChoiceEvents(window, currentChoice);
+            fireChoiceEvents(currentChoice);
         }
         return null;
     }
@@ -127,8 +126,8 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
         }
     }
 
-    private void fireChoiceEvents(Window window, String choice) {
-        fireChannelEvents(window, choice);
+    private void fireChoiceEvents(String choice) {
+        fireChannelEvents(choice);
         if (choiceEvents != null) {
             for (ChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, choice);

@@ -55,6 +55,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         return guiTop;
     }
 
+    public void setWindowDimensions(int x, int y) {
+        this.xSize = x;
+        this.ySize = y;
+    }
+
     public GenericGuiContainer(ModBase mod, SimpleNetworkWrapper network, T tileEntity, Container container, int manual, String manualNode) {
         super(container);
         this.modBase = mod;

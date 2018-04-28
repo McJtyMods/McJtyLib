@@ -2,7 +2,6 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
-import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.*;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
@@ -44,7 +43,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
     public boolean setIcon(IIcon icon) {
-        if (fireIconArrived(null, icon)) {
+        if (fireIconArrived(icon)) {
             this.icon = icon;
             return true;
         }
@@ -97,16 +96,16 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
     @Override
-    public void mouseMove(Window window, int x, int y) {
+    public void mouseMove(int x, int y) {
         if (isEnabledAndVisible()) {
             int dx = x - this.bounds.x - border;
             int dy = y - this.bounds.y - border;
-            fireIconHover(window, icon, dx, dy);
+            fireIconHover(icon, dx, dy);
         }
     }
 
     @Override
-    public Widget mouseClick(Window window, int x, int y, int button) {
+    public Widget mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
             } else {
@@ -115,10 +114,10 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 }
                 int dx = x - this.bounds.x - border;
                 int dy = y - this.bounds.y - border;
-                fireIconHolderClicked(window, icon, dx, dy);
+                fireIconHolderClicked(icon, dx, dy);
                 if (icon != null) {
-                    if (fireIconClicked(window, icon, dx, dy)) {
-                        if (fireIconLeaves(window, icon)) {
+                    if (fireIconClicked(icon, dx, dy)) {
+                        if (fireIconLeaves(icon)) {
                             IconManager iconManager = window.getWindowManager().getIconManager();
                             if (makeCopy) {
                                 iconManager.startDragging(icon.clone(), this, dx, dy);
@@ -136,11 +135,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     @Override
-    public void draw(Window window, int x, int y) {
+    public void draw(int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(window, x, y);
+        super.draw(x, y);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -159,11 +158,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
     @Override
-    public void drawPhase2(Window window, int x, int y) {
+    public void drawPhase2(int x, int y) {
         if (!visible) {
             return;
         }
-        super.drawPhase2(window, x, y);
+        super.drawPhase2(x, y);
         if (border > 0 && selectable && selectedBorderColor != null && window.getTextFocus() == this) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;
@@ -179,8 +178,8 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return this;
     }
 
-    private boolean fireIconArrived(Window window, IIcon icon) {
-        fireChannelEvents(window, "arrived");
+    private boolean fireIconArrived(IIcon icon) {
+        fireChannelEvents("arrived");
         if (iconArrivesEvents != null) {
             for (IconArrivesEvent event : iconArrivesEvents) {
                 boolean b = event.iconArrives(this, icon);
@@ -201,8 +200,8 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
 
-    private boolean fireIconLeaves(Window window, IIcon icon) {
-        fireChannelEvents(window, "leaves");
+    private boolean fireIconLeaves(IIcon icon) {
+        fireChannelEvents("leaves");
         if (iconLeavesEvents != null) {
             for (IconLeavesEvent event : iconLeavesEvents) {
                 boolean b = event.iconLeaves(this, icon);
@@ -223,8 +222,8 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
 
-    private boolean fireIconClicked(Window window, IIcon icon, int dx, int dy) {
-        fireChannelEvents(window, "clicked");
+    private boolean fireIconClicked(IIcon icon, int dx, int dy) {
+        fireChannelEvents("clicked");
         if (iconClickedEvents != null) {
             for (IconClickedEvent event : iconClickedEvents) {
                 boolean b = event.iconClicked(this, icon, dx, dy);
@@ -245,8 +244,8 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
 
-    private void fireIconHolderClicked(Window window, IIcon icon, int dx, int dy) {
-        fireChannelEvents(window, "holderclicked");
+    private void fireIconHolderClicked(IIcon icon, int dx, int dy) {
+        fireChannelEvents("holderclicked");
         if (iconHolderClickedEvents != null) {
             for (IconHolderClickedEvent event : iconHolderClickedEvents) {
                 event.holderClicked(this, icon, dx, dy);
@@ -263,8 +262,8 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
 
-    private void fireIconHover(Window window, IIcon icon, int dx, int dy) {
-        fireChannelEvents(window, "hover");
+    private void fireIconHover(IIcon icon, int dx, int dy) {
+        fireChannelEvents("hover");
         if (iconHoverEvents != null) {
             for (IconHoverEvent event : iconHoverEvents) {
                 event.hover(this, icon, dx, dy);
