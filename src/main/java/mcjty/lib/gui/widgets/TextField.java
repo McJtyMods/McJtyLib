@@ -3,9 +3,13 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.TextEnterEvent;
 import mcjty.lib.gui.events.TextEvent;
 import mcjty.lib.gui.events.TextSpecialKeyEvent;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
@@ -21,6 +25,7 @@ import java.util.List;
 public class TextField extends AbstractWidget<TextField> {
 
     public static final String TYPE_TEXTFIELD = "textfield";
+    public static final Key<String> PARAM_TEXT = new Key<>("text", Type.STRING);
 
     public static final boolean DEFAULT_EDITABLE = true;
 
@@ -205,7 +210,10 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void fireTextEvents(String newText) {
-        fireChannelEvents("text");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "text")
+                .put(PARAM_TEXT, newText)
+                .build());
         if (textEvents != null) {
             for (TextEvent event : textEvents) {
                 event.textChanged(this, newText);
@@ -263,7 +271,10 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void fireTextEnterEvents(String newText) {
-        fireChannelEvents("enter");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "enter")
+                .put(PARAM_TEXT, newText)
+                .build());
         if (textEnterEvents != null) {
             for (TextEnterEvent event : textEnterEvents) {
                 event.textEntered(this, newText);

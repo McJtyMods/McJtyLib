@@ -77,7 +77,7 @@ public class Button extends Label<Button> {
     }
 
     private void fireButtonEvents() {
-        fireChannelEvents("");
+        fireChannelEvents();
         if (buttonEvents != null) {
             for (ButtonEvent event : buttonEvents) {
                 event.buttonClicked(this);

@@ -117,7 +117,7 @@ public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollabl
     }
 
     private void fireValueEvents(int value) {
-        fireChannelEvents("");
+        fireChannelEvents();
         if (valueEvents != null) {
             for (ValueEvent event : valueEvents) {
                 event.valueChanged(this, value);

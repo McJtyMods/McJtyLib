@@ -3,7 +3,11 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
@@ -14,6 +18,7 @@ import java.util.stream.Collectors;
 public class ChoiceLabel extends Label<ChoiceLabel> {
 
     public static final String TYPE_CHOICELABEL = "choicelabel";
+    public static final Key<String> PARAM_CHOICE = new Key<>("choice", Type.STRING);
 
     private List<String> choiceList = new ArrayList<>();
     private Map<String,List<String>> tooltipMap = new HashMap<>();
@@ -126,8 +131,11 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
         }
     }
 
-    private void fireChoiceEvents(String choice) {
-        fireChannelEvents(choice);
+    private void fireChoiceEvents(String choice) {        fireChannelEvents(TypedMap.builder()
+            .put(Window.PARAM_ID, "choice")
+            .put(PARAM_CHOICE, choice)
+            .build());
+
         if (choiceEvents != null) {
             for (ChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, choice);

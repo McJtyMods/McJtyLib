@@ -4,7 +4,11 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.SelectionEvent;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -18,6 +22,7 @@ import java.util.Set;
 public class WidgetList extends AbstractContainerWidget<WidgetList> implements Scrollable {
 
     public static final String TYPE_WIDGETLIST = "widgetlist";
+    public static final Key<Integer> PARAM_INDEX = new Key<>("index", Type.INTEGER);
 
     public static final int DEFAULT_ROWHEIGHT = 16;
     public static final boolean DEFAULT_PROPAGATE = false;
@@ -400,7 +405,10 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     private void fireSelectionEvents(int index) {
-        fireChannelEvents("select");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "select")
+                .put(PARAM_INDEX, index)
+                .build());
         if (selectionEvents != null) {
             for (SelectionEvent event : selectionEvents) {
                 event.select(this, index);
@@ -409,7 +417,10 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     private void fireDoubleClickEvent(int index) {
-        fireChannelEvents("doubleclick");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "doubleclick")
+                .put(PARAM_INDEX, index)
+                .build());
         if (selectionEvents != null) {
             for (SelectionEvent event : selectionEvents) {
                 event.doubleClick(this, index);

@@ -1,7 +1,11 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.util.ResourceLocation;
@@ -17,6 +21,8 @@ import java.util.stream.Collectors;
 public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
 
     public static final String TYPE_IMAGECHOICELABEL = "imagechoicelabel";
+    public static final Key<String> PARAM_CHOICE = new Key<>("choice", Type.STRING);
+    public static final Key<Integer> PARAM_CHOICE_IDX = new Key<>("choiceIdx", Type.INTEGER);
 
     public static final boolean DEFAULT_WITH_BORDER = false;
 
@@ -181,7 +187,11 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     }
 
     private void fireChoiceEvents(String choice) {
-        fireChannelEvents(choice);
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "choice")
+                .put(PARAM_CHOICE, choice)
+                .put(PARAM_CHOICE_IDX, currentChoice)
+                .build());
         if (choiceEvents != null) {
             for (ChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, choice);

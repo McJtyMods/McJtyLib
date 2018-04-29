@@ -7,16 +7,22 @@ import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.WidgetRepository;
+import mcjty.lib.network.Argument;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import javax.annotation.Nonnull;
 import java.awt.Rectangle;
 import java.io.*;
 import java.util.*;
@@ -26,6 +32,8 @@ import java.util.*;
  * represents the contents of this window. That widget is usually a Panel.
  */
 public class Window {
+
+    public static final Key<String> PARAM_ID = new Key<>("id", Type.STRING);
 
     private Widget toplevel;
     private final GuiScreen gui;
@@ -49,7 +57,7 @@ public class Window {
         return gui;
     }
 
-    public Window(GuiScreen gui, ResourceLocation guiDescription) {
+    public Window(GuiScreen gui, SimpleNetworkWrapper wrapper, ResourceLocation guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
         GuiParserClientTools.parseAndHandleClient(guiDescription, command -> {
@@ -58,6 +66,14 @@ public class Window {
                     dim[0] = cmd.getOptionalPar(0, -1);
                     dim[1] = cmd.getOptionalPar(1, -1);
                 });
+                command.commands()
+                        .filter(cmd -> "event".equals(cmd.getId()))
+                        .forEach(cmd -> {
+                            String channel = cmd.getOptionalPar(0, "");
+                            String teCommand = cmd.getOptionalPar(1, "");
+                            addChannelEvent(channel, (source, params) -> ((GenericGuiContainer) gui).sendServerCommand(wrapper, teCommand,
+                                    new Argument("par", params.getOptional(PARAM_ID).orElse(""))));
+                        });
                 command.findCommand("panel").ifPresent(cmd -> {
                     toplevel = WidgetRepository.createWidget("panel", Minecraft.getMinecraft(), gui);
                     toplevel.readFromGuiCommand(cmd);
@@ -310,10 +326,10 @@ public class Window {
     }
 
 
-    public void fireChannelEvents(String channel, Widget widget, String id) {
+    public void fireChannelEvents(String channel, Widget widget, @Nonnull TypedMap params) {
         if (channelEvents.containsKey(channel)) {
             for (ChannelEvent event : channelEvents.get(channel)) {
-                event.fire(widget, id);
+                event.fire(widget, params);
             }
         }
     }

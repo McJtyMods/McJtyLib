@@ -3,7 +3,11 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ColorChoiceEvent;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
@@ -14,6 +18,7 @@ import java.util.stream.Collectors;
 public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
 
     public static final String TYPE_COLORCHOICELABEL = "colorchoicelabel";
+    public static final Key<Integer> PARAM_COLOR = new Key<>("color", Type.INTEGER);
 
     private List<Integer> colorList = new ArrayList<>();
     private Map<Integer,List<String>> tooltipMap = new HashMap<>();
@@ -117,7 +122,10 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
     }
 
     private void fireChoiceEvents(Integer color) {
-            fireChannelEvents("");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "choice")
+                .put(PARAM_COLOR, color)
+                .build());
         if (choiceEvents != null) {
             for (ColorChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, color);

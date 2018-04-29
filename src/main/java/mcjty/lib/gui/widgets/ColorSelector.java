@@ -7,6 +7,9 @@ import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ColorChoiceEvent;
 import mcjty.lib.gui.layout.PositionalLayout;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
@@ -20,6 +23,7 @@ import java.util.List;
 public class ColorSelector extends Label<ColorSelector> {
 
     public static final String TYPE_COLORSELECTOR = "colorselector";
+    public static final Key<Integer> PARAM_COLOR = new Key<>("color", Type.INTEGER);
 
     private Integer currentColor = null;
     private List<ColorChoiceEvent> choiceEvents = null;
@@ -197,7 +201,10 @@ public class ColorSelector extends Label<ColorSelector> {
     }
 
     private void fireChoiceEvents(Integer color) {
-        fireChannelEvents("");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "choice")
+                .put(PARAM_COLOR, color)
+                .build());
         if (choiceEvents != null) {
             for (ColorChoiceEvent event : choiceEvents) {
                 event.choiceChanged(this, color);

@@ -3,7 +3,11 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -15,6 +19,7 @@ import static mcjty.lib.base.StyleConfig.*;
 public class ToggleButton extends Label<ToggleButton> {
 
     public static final String TYPE_TOGGLEBUTTON = "togglebutton";
+    public static final Key<Boolean> PARAM_ON = new Key<>("on", Type.BOOLEAN);
 
     public static final boolean DEFAULT_CHECKMARKER = false;
 
@@ -116,7 +121,10 @@ public class ToggleButton extends Label<ToggleButton> {
     }
 
     private void fireButtonEvents() {
-        fireChannelEvents("");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "enter")
+                .put(PARAM_ON, isPressed())
+                .build());
         if (buttonEvents != null) {
             for (ButtonEvent event : buttonEvents) {
                 event.buttonClicked(this);

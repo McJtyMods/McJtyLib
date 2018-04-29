@@ -1,7 +1,11 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ImageEvent;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -17,6 +21,9 @@ import java.util.List;
 public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
 
     public static final String TYPE_IMAGELABEL = "imagelabel";
+    public static final Key<Integer> PARAM_U = new Key<>("u", Type.INTEGER);
+    public static final Key<Integer> PARAM_V = new Key<>("v", Type.INTEGER);
+
     public static final int DEFAULT_TXTDIM = 256;
 
     private boolean dragging = false;
@@ -129,7 +136,11 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
     }
 
     private void fireImageEvents(String id, int u, int v, int color) {
-        fireChannelEvents(id);
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, id)
+                .put(PARAM_U, u)
+                .put(PARAM_V, v)
+                .build());
         if (imageEvents != null) {
             if (u < 0 || v < 0 || u >= txtWidth || v >= txtHeight) {
                 return;

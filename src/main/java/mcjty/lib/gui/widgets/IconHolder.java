@@ -2,9 +2,13 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
+import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.*;
 import mcjty.lib.gui.icons.IIcon;
 import mcjty.lib.gui.icons.IconManager;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
@@ -15,6 +19,8 @@ import java.util.List;
 public class IconHolder extends AbstractWidget<IconHolder> {
 
     public static final String TYPE_ICONHOLDER = "iconholder";
+    public static final Key<Integer> PARAM_DX = new Key<>("dx", Type.INTEGER);
+    public static final Key<Integer> PARAM_DY = new Key<>("dy", Type.INTEGER);
 
     public static final boolean DEFAULT_SELECTABLE = false;
     public static final int DEFAULT_BORDER = 0;
@@ -223,7 +229,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     private boolean fireIconClicked(IIcon icon, int dx, int dy) {
-        fireChannelEvents("clicked");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "clicked")
+                .put(PARAM_DX, dx)
+                .put(PARAM_DY, dy)
+                .build());
         if (iconClickedEvents != null) {
             for (IconClickedEvent event : iconClickedEvents) {
                 boolean b = event.iconClicked(this, icon, dx, dy);
@@ -245,7 +255,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     private void fireIconHolderClicked(IIcon icon, int dx, int dy) {
-        fireChannelEvents("holderclicked");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "holderclicked")
+                .put(PARAM_DX, dx)
+                .put(PARAM_DY, dy)
+                .build());
         if (iconHolderClickedEvents != null) {
             for (IconHolderClickedEvent event : iconHolderClickedEvents) {
                 event.holderClicked(this, icon, dx, dy);
@@ -263,7 +277,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     private void fireIconHover(IIcon icon, int dx, int dy) {
-        fireChannelEvents("hover");
+        fireChannelEvents(TypedMap.builder()
+                .put(Window.PARAM_ID, "hover")
+                .put(PARAM_DX, dx)
+                .put(PARAM_DY, dy)
+                .build());
         if (iconHoverEvents != null) {
             for (IconHoverEvent event : iconHoverEvents) {
                 event.hover(this, icon, dx, dy);

@@ -9,6 +9,7 @@ import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.StringRegister;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -98,9 +99,17 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         return (P) this;
     }
 
+    protected void fireChannelEvents() {
+        fireChannelEvents(TypedMap.EMPTY);
+    }
+
     protected void fireChannelEvents(String id) {
+        fireChannelEvents(TypedMap.builder().put(Window.PARAM_ID, id).build());
+    }
+
+    protected void fireChannelEvents(@Nonnull TypedMap params) {
         if (window != null && channel != null) {
-            window.fireChannelEvents(channel, this, id);
+            window.fireChannelEvents(channel, this, params);
         }
     }
 
