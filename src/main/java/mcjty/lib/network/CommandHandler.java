@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import javax.annotation.Nonnull;
@@ -14,6 +15,11 @@ import java.util.Map;
 public interface CommandHandler {
     /// Return true if command was handled correctly. False if not.
     boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args);
+
+    /// Return true if command was handled correctly. False if not.
+    default boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
+        return false;
+    }
 
     /// Return the result which will be sent back to the client
     @Nonnull

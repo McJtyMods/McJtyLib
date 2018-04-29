@@ -7,11 +7,9 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.network.Argument;
-import mcjty.lib.network.Arguments;
-import mcjty.lib.network.PacketSendServerCommand;
-import mcjty.lib.network.PacketServerCommand;
+import mcjty.lib.network.*;
 import mcjty.lib.varia.Logging;
+import mcjty.typed.TypedMap;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -407,6 +405,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     public void sendServerCommand(SimpleNetworkWrapper network, String command, Argument... arguments) {
         network.sendToServer(new PacketServerCommand(tileEntity.getPos(), null, command, arguments));
+    }
+
+    public void sendServerCommand(SimpleNetworkWrapper network, String command, TypedMap params) {
+        network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), null, command, params));
     }
 
     public void sendServerCommand(SimpleNetworkWrapper network, int dimensionId, String command, Argument... arguments) {

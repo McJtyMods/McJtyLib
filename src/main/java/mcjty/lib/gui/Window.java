@@ -7,7 +7,6 @@ import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.WidgetRepository;
-import mcjty.lib.network.Argument;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
@@ -24,7 +23,9 @@ import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
 import java.awt.Rectangle;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 /**
@@ -71,8 +72,8 @@ public class Window {
                         .forEach(cmd -> {
                             String channel = cmd.getOptionalPar(0, "");
                             String teCommand = cmd.getOptionalPar(1, "");
-                            addChannelEvent(channel, (source, params) -> ((GenericGuiContainer) gui).sendServerCommand(wrapper, teCommand,
-                                    new Argument("par", params.getOptional(PARAM_ID).orElse(""))));
+                            addChannelEvent(channel, (source, params) ->
+                                    ((GenericGuiContainer) gui).sendServerCommand(wrapper, teCommand, params));
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
                     toplevel = WidgetRepository.createWidget("panel", Minecraft.getMinecraft(), gui);
@@ -122,7 +123,7 @@ public class Window {
             activeFlags.remove(StringRegister.STRINGS.get(flag.substring(1)));
         } else {
             // Remove the negative flag
-            activeFlags.remove(StringRegister.STRINGS.get("!"+flag));
+            activeFlags.remove(StringRegister.STRINGS.get("!" + flag));
         }
         activeFlags.add(StringRegister.STRINGS.get(flag));
         enableDisableWidgets(toplevel);
@@ -203,7 +204,7 @@ public class Window {
             toplevel.fillGuiCommand(command);
             windowCmd.command(command);
             try {
-                try(PrintWriter writer = new PrintWriter(new File("output.gui"))) {
+                try (PrintWriter writer = new PrintWriter(new File("output.gui"))) {
                     windowCmd.write(writer, 0);
                     writer.flush();
                 }
@@ -220,8 +221,8 @@ public class Window {
     private GuiParser.GuiCommand createWindowCommand() {
         GuiParser.GuiCommand windowCmd = new GuiParser.GuiCommand("window");
         windowCmd.command(new GuiParser.GuiCommand("size")
-                .parameter((int)toplevel.getBounds().getWidth())
-                .parameter((int)toplevel.getBounds().getHeight()));
+                .parameter((int) toplevel.getBounds().getWidth())
+                .parameter((int) toplevel.getBounds().getHeight()));
         return windowCmd;
     }
 

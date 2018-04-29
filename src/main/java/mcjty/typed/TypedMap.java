@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public final class TypedMap {
 
@@ -12,6 +13,14 @@ public final class TypedMap {
 
     TypedMap(Map<Key<?>, Object> map) {
         this.map = new HashMap<>(map);
+    }
+
+    public Set<Key<?>> getKeys() {
+        return map.keySet();
+    }
+
+    public int size() {
+        return map.size();
     }
 
     public <V> V get(@Nonnull Key<V> key) {
