@@ -183,7 +183,7 @@ public class Label<P extends Label<P>> extends AbstractWidget<P> {
     }
 
     private int calculateHorizontalOffset() {
-        if (horizontalAlignment != HorizontalAlignment.ALIGH_LEFT) {
+        if (horizontalAlignment != HorizontalAlignment.ALIGN_LEFT) {
             int w = mc.fontRenderer.getStringWidth(text);
             if (horizontalAlignment == HorizontalAlignment.ALIGN_RIGHT) {
                 return bounds.width - w;

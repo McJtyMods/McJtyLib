@@ -59,7 +59,7 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
             desiredWidth = width;
         }
         switch (horizontalAlignment) {
-            case ALIGH_LEFT: break;
+            case ALIGN_LEFT: break;
             case ALIGN_RIGHT: x += width - desiredWidth; break;
             case ALIGN_CENTER: x += (width - desiredWidth) / 2; break;
         }
