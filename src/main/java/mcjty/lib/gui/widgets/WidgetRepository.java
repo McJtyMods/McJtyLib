@@ -19,6 +19,7 @@ import static mcjty.lib.gui.widgets.IconHolder.TYPE_ICONHOLDER;
 import static mcjty.lib.gui.widgets.IconRender.TYPE_ICONRENDER;
 import static mcjty.lib.gui.widgets.ImageChoiceLabel.TYPE_IMAGECHOICELABEL;
 import static mcjty.lib.gui.widgets.ImageLabel.TYPE_IMAGELABEL;
+import static mcjty.lib.gui.widgets.Label.TYPE_LABEL;
 import static mcjty.lib.gui.widgets.Panel.TYPE_PANEL;
 import static mcjty.lib.gui.widgets.ScrollableLabel.TYPE_SCROLLABLELABEL;
 import static mcjty.lib.gui.widgets.Slider.TYPE_SLIDER;
@@ -34,6 +35,7 @@ public class WidgetRepository {
     static {
         FACTORIES.put(TYPE_BLOCKRENDER, BlockRender::new);
         FACTORIES.put(TYPE_BUTTON, Button::new);
+        FACTORIES.put(TYPE_LABEL, Label::new);
         FACTORIES.put(TYPE_CHOICELABEL, ChoiceLabel::new);
         FACTORIES.put(TYPE_COLORCHOICELABEL, ColorChoiceLabel::new);
         FACTORIES.put(TYPE_COLORSELECTOR, ColorSelector::new);
