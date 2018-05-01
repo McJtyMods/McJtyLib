@@ -3,6 +3,9 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.events.ValueEvent;
+import mcjty.typed.Key;
+import mcjty.typed.Type;
+import mcjty.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -12,6 +15,7 @@ import java.util.List;
 public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollable {
 
     public static final String TYPE_SCROLLABLELABEL = "scrollablelabel";
+    public static final Key<Integer> PARAM_VALUE = new Key<>("value", Type.INTEGER);
 
     public static final int DEFAULT_REALMIN = 0;
     public static final int DEFAULT_REALMAX = 100;
@@ -117,7 +121,7 @@ public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollabl
     }
 
     private void fireValueEvents(int value) {
-        fireChannelEvents();
+        fireChannelEvents(TypedMap.builder().put(PARAM_VALUE, value).build());
         if (valueEvents != null) {
             for (ValueEvent event : valueEvents) {
                 event.valueChanged(this, value);
