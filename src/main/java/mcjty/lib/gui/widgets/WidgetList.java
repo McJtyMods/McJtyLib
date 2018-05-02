@@ -89,6 +89,9 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     public int getSelected() {
+        if (selected >= getChildren().size()) {
+            return -1;
+        }
         return selected;
     }
 
