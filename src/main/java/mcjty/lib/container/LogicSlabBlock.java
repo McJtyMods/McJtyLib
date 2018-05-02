@@ -192,8 +192,11 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         return power;
     }
 
+    @Deprecated
     @Override
     protected void checkRedstone(World world, BlockPos pos) {
+        // Old behaviour
+        // @todo remove once all implementations do this in the TE.checkRedstone
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity)te;
@@ -250,11 +253,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         TileEntity te = world.getTileEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity) te;
-            if (side == logicTileEntity.getFacing(state).getInputSide()) {
-                return logicTileEntity.getPowerOutput();
-            } else {
-                return 0;
-            }
+            return logicTileEntity.getRedstoneOutput(state, world, pos, side);
         }
         return 0;
     }

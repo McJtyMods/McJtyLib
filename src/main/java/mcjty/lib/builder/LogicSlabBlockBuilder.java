@@ -36,6 +36,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
 
     public LogicSlabBlockBuilder(ModBase mod, String registryName) {
         super(mod, registryName);
+        rotationType(BaseBlock.RotationType.NONE);
     }
 
     public LogicSlabBlockBuilder<T> tileEntityClass(Class<T> tileEntityClass) {
@@ -113,6 +114,15 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             @Override
             public RotationType getRotationType() {
                 return rotationType;
+            }
+
+            @Override
+            protected void checkRedstone(World world, BlockPos pos) {
+                TileEntity te = world.getTileEntity(pos);
+                if (te instanceof LogicTileEntity) {
+                    LogicTileEntity logicTileEntity = (LogicTileEntity)te;
+                    logicTileEntity.checkRedstone(world, pos);
+                }
             }
 
             @Override

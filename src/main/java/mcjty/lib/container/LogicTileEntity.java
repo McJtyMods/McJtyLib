@@ -2,11 +2,18 @@ package mcjty.lib.container;
 
 import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 import static mcjty.lib.container.LogicSlabBlock.LOGIC_FACING;
 import static mcjty.lib.container.LogicSlabBlock.META_INTERMEDIATE;
@@ -58,6 +65,41 @@ public class LogicTileEntity extends GenericTileEntity {
         EnumFacing outputSide = getFacing(getWorld().getBlockState(this.pos)).getInputSide().getOpposite();
         getWorld().neighborChanged(this.pos.offset(outputSide), this.getBlockType(), this.pos);
         //        getWorld().notifyNeighborsOfStateChange(this.pos, this.getBlockType());
+    }
+
+    @Override
+    public void checkRedstone(World world, BlockPos pos) {
+        EnumFacing inputSide = getFacing(world.getBlockState(pos)).getInputSide();
+        int power = getInputStrength(world, pos, inputSide);
+        setPowerInput(power);
+    }
+
+    /**
+     * Returns the signal strength at one input of the block
+     */
+    protected int getInputStrength(World world, BlockPos pos, EnumFacing side) {
+        int power = world.getRedstonePower(pos.offset(side), side);
+        if (power < 15) {
+            // Check if there is no redstone wire there. If there is a 'bend' in the redstone wire it is
+            // not detected with world.getRedstonePower().
+            // Not exactly pretty, but it's how vanilla redstone repeaters do it.
+            IBlockState blockState = world.getBlockState(pos.offset(side));
+            Block b = blockState.getBlock();
+            if (b == Blocks.REDSTONE_WIRE) {
+                power = Math.max(power, blockState.getValue(BlockRedstoneWire.POWER));
+            }
+        }
+
+        return power;
+    }
+
+    @Override
+    public int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+        if (side == getFacing(state).getInputSide()) {
+            return getPowerOutput();
+        } else {
+            return 0;
+        }
     }
 
     @Override
