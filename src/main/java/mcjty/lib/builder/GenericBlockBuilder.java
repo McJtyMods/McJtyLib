@@ -66,7 +66,6 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
         return this;
     }
 
-
     @Override
     public GenericBlock<T, GenericContainer> build() {
         IProperty<?>[] properties = calculateProperties();
@@ -74,6 +73,8 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
         boolean hasRedstoneOutput = flags.contains(BlockFlags.REDSTONE_OUTPUT);
         IRedstoneGetter getter = getRedstoneGetter(hasRedstoneOutput);
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
+        IGetLightValue getLightValue = getGetLightValue();
+        final boolean opaque = !flags.contains(BlockFlags.NON_OPAQUE);
 
         GenericBlock<T, GenericContainer> block = new GenericBlock<T, GenericContainer>(mod, material, tileEntityClass, GenericContainer.class,
                 (player, tileEntity) -> {
@@ -83,7 +84,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
                     }
                     c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
                     c.generateSlots();
-                    return (GenericContainer) c;
+                    return c;
                 },
                 itemBlockClass, registryName, true) {
             @Override
@@ -133,8 +134,18 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             }
 
             @Override
+            public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+                return getLightValue.getLightValue(state, world, pos);
+            }
+
+            @Override
             protected IModuleSupport getModuleSupport() {
                 return moduleSupport;
+            }
+
+            @Override
+            public boolean isOpaqueCube(IBlockState state) {
+                return opaque;
             }
         };
         setupBlock(block);
@@ -152,9 +163,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
                 return -1;
             };
         } else {
-            getter = (state, world, pos, side) -> {
-                return -1;
-            };
+            getter = (state, world, pos, side) -> -1;
         }
         return getter;
     }

@@ -12,7 +12,8 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -22,7 +23,6 @@ import org.lwjgl.input.Keyboard;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -46,6 +46,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
     protected InformationString informationStringWithShift;
 
     protected Set<BlockFlags> flags = new HashSet<>();
+    protected int lightValue = -1;
 
     protected BaseBlock.RotationType rotationType = BaseBlock.RotationType.ROTATION;
 
@@ -104,9 +105,16 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
         return (T) this;
     }
 
+    public T lightValue(int v) {
+        this.lightValue = v;
+        return (T) this;
+    }
+
     public BaseBlock build() {
         IProperty<?>[] properties = calculateProperties();
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
+        IGetLightValue getLightValue = getGetLightValue();
+        final boolean opaque = !flags.contains(BlockFlags.NON_OPAQUE);
 
         BaseBlock block = new BaseBlock(mod, material, registryName, itemBlockClass) {
             @Override
@@ -133,9 +141,27 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
             public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
                 return canRenderInLayer.canRenderInLayer(state, layer);
             }
+
+            @Override
+            public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+                return getLightValue.getLightValue(state, world, pos);
+            }
+
+            @Override
+            public boolean isOpaqueCube(IBlockState state) {
+                return opaque;
+            }
         };
         setupBlock(block);
         return block;
+    }
+
+    protected IGetLightValue getGetLightValue() {
+        if (lightValue == -1) {
+            return (state, world, pos) -> state.getLightValue();
+        } else {
+            return (state, world, pos) -> lightValue;
+        }
     }
 
     protected ICanRenderInLayer getCanRenderInLayer() {
