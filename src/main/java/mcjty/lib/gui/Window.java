@@ -129,6 +129,23 @@ public class Window {
         enableDisableWidgets(toplevel);
     }
 
+    public void clearFlag(String flag) {
+        activeFlags.remove(StringRegister.STRINGS.get(flag));
+        activeFlags.add(StringRegister.STRINGS.get("!" + flag));
+        enableDisableWidgets(toplevel);
+    }
+
+    public void setFlag(String flag, boolean v) {
+        if (v) {
+            activeFlags.remove(StringRegister.STRINGS.get("!" + flag));
+            activeFlags.add(StringRegister.STRINGS.get(flag));
+        } else {
+            activeFlags.remove(StringRegister.STRINGS.get(flag));
+            activeFlags.add(StringRegister.STRINGS.get("!" + flag));
+        }
+        enableDisableWidgets(toplevel);
+    }
+
     private void enableDisableWidgets(Widget<?> widget) {
         Set<Integer> enabledFlags = widget.getEnabledFlags();
         if (!enabledFlags.isEmpty()) {

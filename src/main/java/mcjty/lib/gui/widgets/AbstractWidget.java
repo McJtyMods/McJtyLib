@@ -480,15 +480,16 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         });
         command.findCommand("enableon").ifPresent(cmd -> {
             enableFlags.clear();
+            cmd.parameters().forEach(flag -> enableFlags.add(StringRegister.STRINGS.get((String)flag)));
         });
         command.findCommand("tooltips").ifPresent(cmd -> {
-            tooltips = new ArrayList<String>();
+            tooltips = new ArrayList<>();
             for (Object par : cmd.getParameters()) {
                 tooltips.add(par.toString());
             }
         });
         command.findCommand("items").ifPresent(cmd -> {
-            items = new ArrayList<ItemStack>();
+            items = new ArrayList<>();
             for (GuiCommand itemCmd : cmd.getGuiCommands()) {
                 items.add(ItemStackTools.guiCommandToItemStack(itemCmd));
             }
