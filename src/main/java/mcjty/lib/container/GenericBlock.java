@@ -62,8 +62,14 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private final BiFunction<EntityPlayer, TileEntity, C> containerFactory;
     private final Class<? extends C> containerClass;
 
+    private boolean needsRedstoneCheck = false;
+    private boolean hasRedstoneOutput = false;
+    private IModuleSupport moduleSupport = null;
+
     @SideOnly(Side.CLIENT)
     private Class<? extends GenericGuiContainer> guiClass;
+
+    private int guiId = -1;
 
     public GenericBlock(ModBase mod,
                            Material material,
@@ -108,11 +114,19 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     public boolean needsRedstoneCheck() {
-        return false;
+        return needsRedstoneCheck;
     }
 
     public boolean hasRedstoneOutput() {
-        return false;
+        return hasRedstoneOutput;
+    }
+
+    public void setNeedsRedstoneCheck(boolean needsRedstoneCheck) {
+        this.needsRedstoneCheck = needsRedstoneCheck;
+    }
+
+    public void setHasRedstoneOutput(boolean hasRedstoneOutput) {
+        this.hasRedstoneOutput = hasRedstoneOutput;
     }
 
     /**
@@ -191,8 +205,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag flags) {
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flags) {
         intAddInformation(stack, tooltip);
+        super.addInformation(stack, world, tooltip, flags);
     }
 
     protected void intAddInformation(ItemStack itemStack, List<String> list) {
@@ -331,7 +346,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     protected IModuleSupport getModuleSupport() {
-        return null;
+        return moduleSupport;
+    }
+
+    public void setModuleSupport(IModuleSupport moduleSupport) {
+        this.moduleSupport = moduleSupport;
     }
 
     public boolean handleModule(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
@@ -475,7 +494,13 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     /**
      * Return the id of the gui to use for this block.
      */
-    public abstract int getGuiID();
+    public int getGuiID() {
+        return guiId;
+    }
+
+    public void setGuiId(int guiId) {
+        this.guiId = guiId;
+    }
 
     @Override
     public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {

@@ -6,21 +6,13 @@ import mcjty.lib.container.GenericItemBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.input.Keyboard;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -31,6 +23,7 @@ import java.util.regex.Pattern;
 public class BaseBlockBuilder<T extends BaseBlockBuilder> {
 
     private static final Pattern COMPILE = Pattern.compile("@", Pattern.LITERAL);
+    public static final IProperty<?>[] EMPTY_PROPERTIES = new IProperty<?>[0];
 
     protected final ModBase mod;
     protected final String registryName;
@@ -70,23 +63,23 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
         return (T) this;
     }
 
-    public T information(String informationString, Function<ItemStack, String>... parameters) {
-        this.informationString = new InformationString(informationString, parameters);
-        return (T) this;
-    }
-
-    public T information(String informationString) {
+    public T info(String informationString) {
         this.informationString = new InformationString(informationString);
         return (T) this;
     }
 
-    public T informationShift(String informationString, Function<ItemStack, String>... parameters) {
-        this.informationStringWithShift = new InformationString(informationString, parameters);
+    public T infoParameter(Function<ItemStack, String> parameter) {
+        this.informationString.addParameter(parameter);
         return (T) this;
     }
 
-    public T informationShift(String informationString) {
+    public T infoExtended(String informationString) {
         this.informationStringWithShift = new InformationString(informationString);
+        return (T) this;
+    }
+
+    public T infoExtendedParameter(Function<ItemStack, String> parameter) {
+        this.informationStringWithShift.addParameter(parameter);
         return (T) this;
     }
 
@@ -114,24 +107,8 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
         IProperty<?>[] properties = calculateProperties();
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
-        final boolean opaque = !flags.contains(BlockFlags.NON_OPAQUE);
 
         BaseBlock block = new BaseBlock(mod, material, registryName, itemBlockClass) {
-            @Override
-            @SideOnly(Side.CLIENT)
-            public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag flags) {
-                InformationString i = informationString;
-                if ((Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) && informationStringWithShift != null) {
-                    i = informationStringWithShift;
-                }
-                addLocalizedInformation(i, stack, tooltip);
-            }
-
-            @Override
-            public RotationType getRotationType() {
-                return rotationType;
-            }
-
             @Override
             protected IProperty<?>[] getProperties() {
                 return properties;
@@ -145,11 +122,6 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
             @Override
             public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
-            }
-
-            @Override
-            public boolean isOpaqueCube(IBlockState state) {
-                return opaque;
             }
         };
         setupBlock(block);
@@ -187,9 +159,12 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
 
     protected IProperty<?>[] calculateProperties() {
         IProperty<?>[] properties = BaseBlock.getProperties(rotationType);
-        if (!extraProperties.isEmpty()) {
+        IProperty<?>[] additionalProperties = getAdditionalProperties();
+
+        if (!extraProperties.isEmpty() || additionalProperties.length > 0) {
             List<IProperty<?>> newProperties = new ArrayList<>();
             Collections.addAll(newProperties, properties);
+            Collections.addAll(newProperties, additionalProperties);
             for (IProperty<?> property : extraProperties) {
                 newProperties.add(property);
             }
@@ -198,23 +173,23 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
         return properties;
     }
 
+    protected IProperty<?>[] getAdditionalProperties() {
+        return EMPTY_PROPERTIES;
+    }
+
     protected void setupBlock(BaseBlock block) {
         block.setCreative(flags.contains(BlockFlags.CREATIVE));
         if (creativeTabs != null) {
             block.setCreativeTab(creativeTabs);
         }
-    }
-
-    @SideOnly(Side.CLIENT)
-    public static void addLocalizedInformation(InformationString informationString, ItemStack stack, List<String> tooltip) {
-        if (informationString != null) {
-            Object[] parameters = new Object[informationString.getInformationStringParameters().size()];
-            for (int i = 0 ; i < parameters.length ; i++) {
-                parameters[i] = informationString.getInformationStringParameters().get(i).apply(stack);
-            }
-            String translated = I18n.format(informationString.getString(), parameters);
-            translated = COMPILE.matcher(translated).replaceAll("\u00a7");
-            Collections.addAll(tooltip, StringUtils.split(translated, "\n"));
+        block.setRotationType(rotationType);
+        final boolean opaque = !flags.contains(BlockFlags.NON_OPAQUE);
+        block.setOpaqueCube(opaque);
+        block.setInformationString(informationString);
+        if (informationStringWithShift != null) {
+            block.setInformationStringWithShift(informationStringWithShift);
+        } else {
+            block.setInformationStringWithShift(informationString);
         }
     }
 }

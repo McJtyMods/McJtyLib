@@ -1,10 +1,10 @@
 package mcjty.lib.container;
 
 import mcjty.lib.base.ModBase;
-import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -19,10 +19,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ChunkCache;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -282,21 +280,6 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
-        int meta = state.getValue(META_INTERMEDIATE);
-        TileEntity te = world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
-        if (te instanceof LogicTileEntity) {
-            LogicTileEntity logicTileEntity = (LogicTileEntity) te;
-            LogicFacing facing = logicTileEntity.getFacing(state);
-            facing = LogicFacing.getFacingWithMeta(facing, meta);
-            return state.withProperty(LOGIC_FACING, facing);
-        } else {
-            Logging.warn(null, "LogicSlabBlock missing its tile entity!");
-            return state.withProperty(LOGIC_FACING, DOWN_TONORTH);
-        }
-    }
-
-    @Override
     public IBlockState getStateFromMeta(int meta) {
         return getDefaultState().withProperty(META_INTERMEDIATE, meta & 3);
     }
@@ -305,7 +288,6 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     public int getMetaFromState(IBlockState state) {
         return state.getValue(META_INTERMEDIATE);
     }
-
 
     @Override
     protected BlockStateContainer createBlockState() {

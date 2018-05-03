@@ -3,7 +3,6 @@ package mcjty.lib.builder;
 import net.minecraft.item.ItemStack;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -14,17 +13,11 @@ public class InformationString {
 
     public InformationString(String string) {
         this.string = string;
-        informationStringParameters = Collections.emptyList();
+        informationStringParameters = new ArrayList<>();
     }
 
-    public InformationString(String string, Function<ItemStack, String>... parameters) {
-        this.string = string;
-        if (parameters.length > 0) {
-            informationStringParameters = new ArrayList<>(parameters.length);
-            Collections.addAll(informationStringParameters, parameters);
-        } else {
-            informationStringParameters = Collections.emptyList();
-        }
+    public void addParameter(Function<ItemStack, String> parameter) {
+        informationStringParameters.add(parameter);
     }
 
     public String getString() {

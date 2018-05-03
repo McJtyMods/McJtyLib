@@ -2,6 +2,7 @@ package mcjty.lib.container;
 
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.builder.InformationString;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.varia.OrientationTools;
@@ -18,6 +19,8 @@ import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -31,9 +34,14 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.commons.lang3.StringUtils;
+import org.lwjgl.input.Keyboard;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Optional.InterfaceList({
         @Optional.Interface(iface = "mcjty.lib.compat.waila.WailaInfoProvider", modid = "waila"),
@@ -41,11 +49,20 @@ import java.util.List;
 })
 public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider {
 
+    public static final IProperty[] NONE_PROPERTIES = new IProperty[0];
     protected ModBase modBase;
     private boolean creative;
+    private RotationType rotationType = RotationType.ROTATION;
+    private boolean opaque = true;
+
+    private InformationString informationString;
+    private InformationString informationStringWithShift;
 
     public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+
+    public static final IProperty[] HORIZ_PROPERTIES = new IProperty[]{FACING_HORIZ};
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
+    public static final IProperty[] ROTATING_PROPERTIES = new IProperty[]{FACING};
 
     public BaseBlock(ModBase mod,
                         Material material,
@@ -86,7 +103,31 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public RotationType getRotationType() {
-        return RotationType.ROTATION;
+        return rotationType;
+    }
+
+    public void setRotationType(RotationType rotationType) {
+        this.rotationType = rotationType;
+    }
+
+    public void setInformationString(InformationString informationString) {
+        this.informationString = informationString;
+    }
+
+    public void setInformationStringWithShift(InformationString informationStringWithShift) {
+        this.informationStringWithShift = informationStringWithShift;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag advanced) {
+        InformationString i = informationString;
+        if ((Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
+            i = informationStringWithShift;
+        }
+        if (i != null) {
+            addLocalizedInformation(i, stack, tooltip);
+        }
     }
 
     @Override
@@ -174,17 +215,27 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public static IProperty<?>[] getProperties(RotationType rotationType) {
         switch (rotationType) {
             case HORIZROTATION:
-                return new IProperty[] { FACING_HORIZ };
+                return HORIZ_PROPERTIES;
             case ROTATION:
-                return new IProperty[] { FACING };
+                return ROTATING_PROPERTIES;
+            case NONE:
             default:
-                return new IProperty[0];
+                return NONE_PROPERTIES;
         }
     }
 
     @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, getProperties());
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return opaque;
+    }
+
+    public void setOpaqueCube(boolean opaque) {
+        this.opaque = opaque;
     }
 
     @SideOnly(Side.CLIENT)
@@ -202,5 +253,20 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @Optional.Method(modid = "waila")
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         return currenttip;
+    }
+
+    private static final Pattern COMPILE = Pattern.compile("@", Pattern.LITERAL);
+
+    @SideOnly(Side.CLIENT)
+    public static void addLocalizedInformation(InformationString informationString, ItemStack stack, List<String> tooltip) {
+        if (informationString != null) {
+            Object[] parameters = new Object[informationString.getInformationStringParameters().size()];
+            for (int i = 0 ; i < parameters.length ; i++) {
+                parameters[i] = informationString.getInformationStringParameters().get(i).apply(stack);
+            }
+            String translated = I18n.format(informationString.getString(), parameters);
+            translated = COMPILE.matcher(translated).replaceAll("\u00a7");
+            Collections.addAll(tooltip, StringUtils.split(translated, "\n"));
+        }
     }
 }

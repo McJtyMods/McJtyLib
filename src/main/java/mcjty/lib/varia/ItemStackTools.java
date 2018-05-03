@@ -103,6 +103,16 @@ public class ItemStackTools {
     }
 
     @Nonnull
+    public static Function<ItemStack, String> intGetter(String tag, Integer def) {
+        return stack -> Integer.toString(ItemStackTools.mapTag(stack, nbt -> nbt.getInteger(tag), def));
+    }
+
+    @Nonnull
+    public static Function<ItemStack, String> strGetter(String tag, String def) {
+        return stack -> ItemStackTools.mapTag(stack, nbt -> nbt.getString(tag), def);
+    }
+
+    @Nonnull
     public static Stream<NBTBase> getListStream(NBTTagCompound compound, String tag) {
         NBTTagList list = compound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
         return StreamSupport.stream(list.spliterator(), false);

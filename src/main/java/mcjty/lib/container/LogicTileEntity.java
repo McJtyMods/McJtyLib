@@ -4,12 +4,9 @@ import mcjty.lib.entity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -113,5 +110,13 @@ public class LogicTileEntity extends GenericTileEntity {
         super.writeToNBT(tagCompound);
         tagCompound.setInteger("lf", facing.ordinal());
         return tagCompound;
+    }
+
+    @Override
+    public IBlockState getActualState(IBlockState state) {
+        int meta = state.getValue(META_INTERMEDIATE);
+        LogicFacing facing = getFacing(state);
+        facing = LogicFacing.getFacingWithMeta(facing, meta);
+        return state.withProperty(LOGIC_FACING, facing);
     }
 }

@@ -3,30 +3,26 @@ package mcjty.lib.builder;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.container.*;
-import mcjty.lib.entity.GenericTileEntity;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Keyboard;
 
-import javax.annotation.Nullable;
-import java.util.List;
+import static mcjty.lib.container.LogicSlabBlock.LOGIC_FACING;
+import static mcjty.lib.container.LogicSlabBlock.META_INTERMEDIATE;
 
 /**
  * Build blocks using this class
  */
 public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockBuilder<LogicSlabBlockBuilder<T>> {
 
+    public static IProperty<?>[] ADDITIONAL_PROPERTIES = null;;
     private Class<T> tileEntityClass;
     private ContainerFactory containerFactory;
 
@@ -65,14 +61,19 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
     }
 
     @Override
+    protected IProperty<?>[] getAdditionalProperties() {
+        if (ADDITIONAL_PROPERTIES == null) {
+            ADDITIONAL_PROPERTIES = new IProperty<?>[]{LOGIC_FACING, META_INTERMEDIATE};
+        }
+        return ADDITIONAL_PROPERTIES;
+    }
+
+    @Override
     public GenericBlock<T, GenericContainer> build() {
         IProperty<?>[] properties = calculateProperties();
-        boolean needsRedstoneCheck = flags.contains(BlockFlags.REDSTONE_CHECK);
-        boolean hasRedstoneOutput = flags.contains(BlockFlags.REDSTONE_OUTPUT);
-        IRedstoneGetter getter = getRedstoneGetter(hasRedstoneOutput);
+        IRedstoneGetter getter = GenericBlockBuilder.getRedstoneGetter(flags.contains(BlockFlags.REDSTONE_OUTPUT));
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
-        final boolean opaque = !flags.contains(BlockFlags.NON_OPAQUE);
 
         GenericBlock<T, GenericContainer> block = new LogicSlabBlock<T, GenericContainer>(mod, material, tileEntityClass, GenericContainer.class,
                 (player, tileEntity) -> {
@@ -85,36 +86,6 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
                     return c;
                 },
                 itemBlockClass, registryName, true) {
-            @Override
-            public int getGuiID() {
-                return guiId;
-            }
-
-            @SideOnly(Side.CLIENT)
-            @Override
-            public void addInformation(ItemStack stack, @Nullable World player, List<String> tooltip, ITooltipFlag flags) {
-                intAddInformation(stack, tooltip);
-                InformationString i = informationString;
-                if ((Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) && informationStringWithShift != null) {
-                    i = informationStringWithShift;
-                }
-                addLocalizedInformation(i, stack, tooltip);
-            }
-
-            @Override
-            public boolean needsRedstoneCheck() {
-                return needsRedstoneCheck;
-            }
-
-            @Override
-            public boolean hasRedstoneOutput() {
-                return hasRedstoneOutput;
-            }
-
-            @Override
-            public RotationType getRotationType() {
-                return rotationType;
-            }
 
             @Override
             protected void checkRedstone(World world, BlockPos pos) {
@@ -146,32 +117,21 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
-            protected IModuleSupport getModuleSupport() {
-                return moduleSupport;
-            }
-
-            @Override
-            public boolean isOpaqueCube(IBlockState state) {
-                return opaque;
+            protected BlockStateContainer createBlockState() {
+                return new BlockStateContainer(this, getProperties());
             }
         };
         setupBlock(block);
         return block;
     }
 
-    private IRedstoneGetter getRedstoneGetter(boolean hasRedstoneOutput) {
-        IRedstoneGetter getter;
-        if (hasRedstoneOutput) {
-            getter = (state, world, pos, side) -> {
-                TileEntity te = world.getTileEntity(pos);
-                if (te instanceof GenericTileEntity) {
-                    return ((GenericTileEntity) te).getRedstoneOutput(state, world, pos, side);
-                }
-                return -1;
-            };
-        } else {
-            getter = (state, world, pos, side) -> -1;
-        }
-        return getter;
+    @Override
+    protected void setupBlock(BaseBlock block) {
+        super.setupBlock(block);
+        GenericBlock b = (GenericBlock) block;
+        b.setGuiId(guiId);
+        b.setNeedsRedstoneCheck(flags.contains(BlockFlags.REDSTONE_CHECK));
+        b.setHasRedstoneOutput(flags.contains(BlockFlags.REDSTONE_OUTPUT));
+        b.setModuleSupport(moduleSupport);
     }
 }
