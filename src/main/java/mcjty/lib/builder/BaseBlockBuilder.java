@@ -115,6 +115,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
             }
 
             @Override
+            public RotationType getRotationType() {
+                return rotationType;
+            }
+
+            @Override
             public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
                 return canRenderInLayer.canRenderInLayer(state, layer);
             }
@@ -182,7 +187,6 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder> {
         if (creativeTabs != null) {
             block.setCreativeTab(creativeTabs);
         }
-        block.setRotationType(rotationType);
         final boolean opaque = !flags.contains(BlockFlags.NON_OPAQUE);
         block.setOpaqueCube(opaque);
         block.setInformationString(informationString);

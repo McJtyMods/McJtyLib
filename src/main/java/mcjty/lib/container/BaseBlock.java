@@ -52,7 +52,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public static final IProperty[] NONE_PROPERTIES = new IProperty[0];
     protected ModBase modBase;
     private boolean creative;
-    private RotationType rotationType = RotationType.ROTATION;
     private boolean opaque = true;
 
     private InformationString informationString;
@@ -103,11 +102,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public RotationType getRotationType() {
-        return rotationType;
-    }
-
-    public void setRotationType(RotationType rotationType) {
-        this.rotationType = rotationType;
+        return RotationType.ROTATION;
     }
 
     public void setInformationString(InformationString informationString) {

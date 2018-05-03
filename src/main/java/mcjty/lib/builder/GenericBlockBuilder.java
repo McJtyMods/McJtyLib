@@ -74,6 +74,11 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
                 itemBlockClass, registryName, true) {
 
             @Override
+            public RotationType getRotationType() {
+                return rotationType;
+            }
+
+            @Override
             protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
                 return getter.getRedstoneOutput(state, world, pos, side);
             }

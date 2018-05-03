@@ -88,6 +88,11 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
                 itemBlockClass, registryName, true) {
 
             @Override
+            public RotationType getRotationType() {
+                return rotationType;
+            }
+
+            @Override
             protected void checkRedstone(World world, BlockPos pos) {
                 TileEntity te = world.getTileEntity(pos);
                 if (te instanceof LogicTileEntity) {
