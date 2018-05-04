@@ -59,18 +59,18 @@ targetCompatibility = 1.8
 
 
 minecraft {
-    version = "1.12.2-14.23.0.2512"
+    version = "1.12.2-14.23.3.2678"
     runDir = "run"
-    mappings = "snapshot_20171011"
+    mappings = "snapshot_20180504"
     useDepAts = true
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.12.2:4.8.5.144"
+    deobfCompile "mezz.jei:jei_1.12.2:4.8.5.159"
     compile "li.cil.oc:OpenComputers:MC1.12.1-1.7.+:api"
     deobfCompile "cofh:RedstoneFlux:1.12-2.0.0.1:universal"
     deobfCompile "mcp.mobius.waila:Hwyla:1.8.18-B32_1.12:api"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.19-11"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.20-12"
     //deobfCompile "com.github.mcjty:intwheel:1.1x-1.1.0"
 }
 
