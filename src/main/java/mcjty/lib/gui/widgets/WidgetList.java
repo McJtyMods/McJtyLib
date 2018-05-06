@@ -6,9 +6,9 @@ import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.SelectionEvent;
-import mcjty.typed.Key;
-import mcjty.typed.Type;
-import mcjty.typed.TypedMap;
+import mcjty.lib.typed.Key;
+import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 

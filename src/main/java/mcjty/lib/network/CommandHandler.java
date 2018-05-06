@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
-import mcjty.typed.Type;
-import mcjty.typed.TypedMap;
+import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import javax.annotation.Nonnull;

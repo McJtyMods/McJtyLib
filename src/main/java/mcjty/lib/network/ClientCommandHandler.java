@@ -1,6 +1,6 @@
 package mcjty.lib.network;
 
-import mcjty.typed.Type;
+import mcjty.lib.typed.Type;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.varia.Logging;
-import mcjty.typed.TypedMap;
+import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;

@@ -1,4 +1,4 @@
-package mcjty.typed;
+package mcjty.lib.typed;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
