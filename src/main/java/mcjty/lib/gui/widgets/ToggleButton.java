@@ -7,6 +7,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ButtonEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -147,5 +148,15 @@ public class ToggleButton extends Label<ToggleButton> {
     @Override
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_TOGGLEBUTTON);
+    }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        setPressed(TypeConvertors.toBoolean(value));
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return isPressed();
     }
 }

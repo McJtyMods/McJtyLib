@@ -11,7 +11,9 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -216,5 +218,33 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     @Override
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_BLOCKRENDER);
+    }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        if (value == null) {
+            setRenderItem(null);
+        } else {
+            Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(value.toString()));
+            if (item != null) {
+                setRenderItem(new ItemStack(item));
+            } else {
+                Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(value.toString()));
+                if (block != null) {
+                    setRenderItem(new ItemStack(block));
+                } else {
+                    setRenderItem(null);
+                }
+            }
+        }
+    }
+
+    @Override
+    public Object getGenericValue() {
+        if (renderItem instanceof ItemStack) {
+            return ((ItemStack) renderItem).getItem().getRegistryName().toString();
+        } else {
+            return null;
+        }
     }
 }

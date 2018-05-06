@@ -7,6 +7,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ColorChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -171,5 +172,15 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
     @Override
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_COLORCHOICELABEL);
+    }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        setCurrentColor(TypeConvertors.toInt(value));
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return getCurrentColor();
     }
 }

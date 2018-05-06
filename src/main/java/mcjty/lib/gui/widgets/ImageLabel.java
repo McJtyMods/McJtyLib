@@ -178,4 +178,13 @@ public class ImageLabel<P extends ImageLabel<P>> extends AbstractWidget<P> {
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_IMAGELABEL);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return null;
+    }
 }

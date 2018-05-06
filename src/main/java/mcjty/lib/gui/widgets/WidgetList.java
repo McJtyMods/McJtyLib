@@ -482,4 +482,13 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_WIDGETLIST);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return null;
+    }
 }

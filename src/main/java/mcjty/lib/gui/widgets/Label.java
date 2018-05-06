@@ -222,4 +222,18 @@ public class Label<P extends Label<P>> extends AbstractWidget<P> {
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_LABEL);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        if (value == null) {
+            setText("");
+        } else {
+            setText(value.toString());
+        }
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return getText();
+    }
 }

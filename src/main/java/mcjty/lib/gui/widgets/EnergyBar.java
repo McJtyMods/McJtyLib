@@ -260,5 +260,15 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_ENERGYBAR);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return null;
+    }
 }
 

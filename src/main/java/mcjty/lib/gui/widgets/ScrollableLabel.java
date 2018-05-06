@@ -5,6 +5,7 @@ import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.events.ValueEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -148,5 +149,15 @@ public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollabl
     @Override
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_SCROLLABLELABEL);
+    }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        setRealValue(TypeConvertors.toInt(value));
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return getRealValue();
     }
 }

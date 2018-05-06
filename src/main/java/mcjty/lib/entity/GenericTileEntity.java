@@ -56,7 +56,7 @@ import java.util.function.BiConsumer;
 public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler {
 
     public static final IValue[] EMPTY_VALUES = new IValue[0];
-    public static String COMMAND_SYNC_BINDING_BOOLEAN = "generic.syncBindingBool";
+    public static String COMMAND_SYNC_BINDING = "generic.syncBinding";
 
     private int infused = 0;
 
@@ -497,11 +497,20 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     @Override
     public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
-        if (COMMAND_SYNC_BINDING_BOOLEAN.equals(command)) {
+        if (COMMAND_SYNC_BINDING.equals(command)) {
             for (Key<?> key : params.getKeys()) {
+                // @todo can be improved?
                 if (Type.BOOLEAN.equals(key.getType())) {
                     Key<Boolean> bkey = (Key<Boolean>) key;
                     Boolean o = params.get(bkey);
+                    findSetter(bkey).accept(this, o);
+                } else if (Type.INTEGER.equals(key.getType())) {
+                    Key<Integer> bkey = (Key<Integer>) key;
+                    Integer o = params.get(bkey);
+                    findSetter(bkey).accept(this, o);
+                } else if (Type.STRING.equals(key.getType())) {
+                    Key<String> bkey = (Key<String>) key;
+                    String o = params.get(bkey);
                     findSetter(bkey).accept(this, o);
                 }
             }

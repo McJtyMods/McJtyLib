@@ -182,4 +182,20 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_CHOICELABEL);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        if (value instanceof Integer) {
+            setChoice(choiceList.get((Integer) value));
+        } else if (value instanceof Boolean) {
+            setChoice(choiceList.get(((Boolean) value) ? 1 : 0));
+        } else {
+            super.setGenericValue(value);
+        }
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return getCurrentChoice();
+    }
 }

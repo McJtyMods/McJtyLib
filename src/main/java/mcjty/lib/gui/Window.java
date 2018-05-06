@@ -7,16 +7,14 @@ import mcjty.lib.entity.IValue;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
-import mcjty.lib.gui.widgets.ToggleButton;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.WidgetRepository;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.typed.TypeConvertors;
-import mcjty.lib.varia.Logging;
-import mcjty.lib.varia.StringRegister;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -26,11 +24,12 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.List;
 
 /**
  * This class represents a window. It contains a single Widget which
@@ -362,16 +361,16 @@ public class Window {
     private <T extends GenericTileEntity> void initializeBinding(SimpleNetworkWrapper network, String componentName, T te, IValue value) {
         Object v = value.getter().apply(te);
         Widget component = findChild(componentName);
-        // @todo temporary, ugly code
-        if (component instanceof ToggleButton) {
-            ((ToggleButton) component).setPressed(TypeConvertors.toBoolean(v));
-            ((ToggleButton) component).addButtonEvent(parent -> {
-                ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING_BOOLEAN,
-                        TypedMap.builder()
-                                .put(value.getKey(), ((ToggleButton) component).isPressed())
-                                .build());
-            });
-        }
+        component.setGenericValue(v);
+        // @todo componentName == channelName? Is channel required?
+        addChannelEvent(componentName, (source, params) -> {
+            ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
+                    TypedMap.builder()
+                            // @todo this conversion can fail!
+                            .put(value.getKey(), value.getKey().getType().convert(component.getGenericValue()))
+                            .build());
+
+        });
     }
 
     public void fireChannelEvents(String channel, Widget widget, @Nonnull TypedMap params) {

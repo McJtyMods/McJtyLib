@@ -167,4 +167,13 @@ public class Panel extends AbstractContainerWidget<Panel> {
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_PANEL);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return null;
+    }
 }

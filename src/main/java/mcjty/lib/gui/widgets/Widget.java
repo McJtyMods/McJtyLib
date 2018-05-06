@@ -7,7 +7,7 @@ import mcjty.lib.gui.layout.PositionalLayout;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.List;
 import java.util.Set;
 
@@ -226,4 +226,8 @@ public interface Widget<P extends Widget> {
     GuiParser.GuiCommand createGuiCommand();
 
     void fillGuiCommand(GuiParser.GuiCommand command);
+
+    <T> void setGenericValue(T value);
+
+    Object getGenericValue();
 }

@@ -5,6 +5,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -266,5 +267,21 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
     @Override
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_IMAGECHOICELABEL);
+    }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        if (value instanceof Integer) {
+            setCurrentChoice((Integer) value);
+        } else if (value instanceof Boolean) {
+            setCurrentChoice(((Boolean) value) ? 1 : 0);
+        } else {
+            setCurrentChoice(TypeConvertors.toInt(value));
+        }
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return getCurrentChoiceIndex();
     }
 }

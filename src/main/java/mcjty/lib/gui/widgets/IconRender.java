@@ -43,4 +43,13 @@ public class IconRender extends AbstractWidget<IconRender> {
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_ICONRENDER);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return null;
+    }
 }

@@ -310,4 +310,13 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_ICONHOLDER);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return null;
+    }
 }

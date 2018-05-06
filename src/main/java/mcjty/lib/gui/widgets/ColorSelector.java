@@ -9,6 +9,7 @@ import mcjty.lib.gui.events.ColorChoiceEvent;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -16,7 +17,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.util.ResourceLocation;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -226,5 +227,15 @@ public class ColorSelector extends Label<ColorSelector> {
     @Override
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_COLORSELECTOR);
+    }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        setCurrentColor(TypeConvertors.toInt(value));
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return getCurrentColor();
     }
 }

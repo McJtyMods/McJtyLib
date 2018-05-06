@@ -298,4 +298,18 @@ public class TextField extends AbstractWidget<TextField> {
     public GuiParser.GuiCommand createGuiCommand() {
         return new GuiParser.GuiCommand(TYPE_TEXTFIELD);
     }
+
+    @Override
+    public <T> void setGenericValue(T value) {
+        if (value == null) {
+            setText("");
+        } else {
+            setText(value.toString());
+        }
+    }
+
+    @Override
+    public Object getGenericValue() {
+        return getText();
+    }
 }
