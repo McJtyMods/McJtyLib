@@ -6,12 +6,14 @@ import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
+import mcjty.lib.typed.Key;
+import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
-import mcjty.lib.typed.Type;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
@@ -49,8 +51,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler {
+
+    public static final IValue[] EMPTY_VALUES = new IValue[0];
+    public static String COMMAND_SYNC_BINDING_BOOLEAN = "generic.syncBindingBool";
 
     private int infused = 0;
 
@@ -73,6 +79,10 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         if (getWorld() != null) {
             getWorld().markChunkDirty(this.pos, this);
         }
+    }
+
+    public IValue[] getValues() {
+        return EMPTY_VALUES;
     }
 
     @Override
@@ -472,6 +482,32 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
      * Return false if this was not handled here. In that case the default rotateBlock() will be done
      */
     public boolean wrenchUse(World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
+        return false;
+    }
+
+    private <T extends GenericTileEntity, V> BiConsumer<T, V> findSetter(Key<V> key) {
+        // Cache or use Map?
+        for (IValue value : getValues()) {
+            if (key.getName().equals(value.getKey().getName())) {
+                return value.setter();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
+        if (COMMAND_SYNC_BINDING_BOOLEAN.equals(command)) {
+            for (Key<?> key : params.getKeys()) {
+                if (Type.BOOLEAN.equals(key.getType())) {
+                    Key<Boolean> bkey = (Key<Boolean>) key;
+                    Boolean o = params.get(bkey);
+                    findSetter(bkey).accept(this, o);
+                }
+            }
+            markDirtyClient();
+            return true;
+        }
         return false;
     }
 }

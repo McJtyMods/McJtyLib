@@ -2,12 +2,16 @@ package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericGuiContainer;
+import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.entity.IValue;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
+import mcjty.lib.gui.widgets.ToggleButton;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.WidgetRepository;
 import mcjty.lib.preferences.PreferencesProperties;
+import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
 import mcjty.lib.typed.Key;
@@ -343,6 +347,32 @@ public class Window {
         return this;
     }
 
+    public <T extends GenericTileEntity> Window bind(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
+        for (IValue value : te.getValues()) {
+            Key key = value.getKey();
+            if (keyName.equals(key.getName())) {
+                initializeBinding(network, componentName, te, value);
+                return this;
+            }
+        }
+
+        throw new IllegalArgumentException("Could not find value '" + keyName + "' in supplied TE!");
+    }
+
+    private <T extends GenericTileEntity> void initializeBinding(SimpleNetworkWrapper network, String componentName, T te, IValue value) {
+        Object v = value.getter().apply(te);
+        Widget component = findChild(componentName);
+        // @todo temporary, ugly code
+        if (component instanceof ToggleButton) {
+            ((ToggleButton) component).setPressed(TypeConvertors.toBoolean(v));
+            ((ToggleButton) component).addButtonEvent(parent -> {
+                ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING_BOOLEAN,
+                        TypedMap.builder()
+                                .put(value.getKey(), ((ToggleButton) component).isPressed())
+                                .build());
+            });
+        }
+    }
 
     public void fireChannelEvents(String channel, Widget widget, @Nonnull TypedMap params) {
         if (channelEvents.containsKey(channel)) {
