@@ -19,6 +19,14 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'maven'
 apply plugin: 'signing'
 
+// More user properties
+ext.user = parseConfig(file('extra.properties'))
+if (ext.user != null) {
+    ext.user.each { k, v ->
+        project.ext.set(k, v)
+    }
+}
+
 repositories {
     maven { // The repo from which to get waila
         name "Mobius Repo"
@@ -59,19 +67,19 @@ targetCompatibility = 1.8
 
 
 minecraft {
-    version = "1.12.2-14.23.3.2678"
+    version = "${minecraft_version}-${forge_version}"
     runDir = "run"
-    mappings = "snapshot_20180504"
+    mappings = mcp_mappings
     useDepAts = true
 }
 
 dependencies {
-    deobfCompile "mezz.jei:jei_1.12.2:4.8.5.159"
-    compile "li.cil.oc:OpenComputers:MC1.12.1-1.7.+:api"
-    deobfCompile "cofh:RedstoneFlux:1.12-2.0.0.1:universal"
-    deobfCompile "mcp.mobius.waila:Hwyla:1.8.18-B32_1.12:api"
-    deobfCompile "mcjty.theoneprobe:TheOneProbe-1.12:1.12-1.4.20-12"
-    //deobfCompile "com.github.mcjty:intwheel:1.1x-1.1.0"
+    deobfCompile "mezz.jei:jei_${jei_version}"
+    deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"
+    deobfCompile "mcjty.theoneprobe:TheOneProbe-:${top_version}"
+    deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
+
+    compile "li.cil.oc:OpenComputers:${oc_version}"
 }
 
 task deobfJar(type: Jar) {
