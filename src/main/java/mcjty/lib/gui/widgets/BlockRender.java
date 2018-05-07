@@ -4,6 +4,7 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.events.BlockRenderEvent;
+import mcjty.lib.typed.Type;
 import mcjty.lib.varia.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -240,7 +241,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         if (renderItem instanceof ItemStack) {
             return ((ItemStack) renderItem).getItem().getRegistryName().toString();
         } else {

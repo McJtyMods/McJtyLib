@@ -4,6 +4,7 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
+import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -233,7 +234,7 @@ public class Label<P extends Label<P>> extends AbstractWidget<P> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return getText();
     }
 }

@@ -3,6 +3,7 @@ package mcjty.lib.gui;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.entity.IAction;
 import mcjty.lib.entity.IValue;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
@@ -61,7 +62,7 @@ public class Window {
         return gui;
     }
 
-    public Window(GuiScreen gui, SimpleNetworkWrapper wrapper, ResourceLocation guiDescription) {
+    public Window(GuiScreen gui, GenericTileEntity tileEntity, SimpleNetworkWrapper wrapper, ResourceLocation guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
         GuiParserClientTools.parseAndHandleClient(guiDescription, command -> {
@@ -82,6 +83,20 @@ public class Window {
                     toplevel = WidgetRepository.createWidget("panel", Minecraft.getMinecraft(), gui);
                     toplevel.readFromGuiCommand(cmd);
                 });
+                command.commands()
+                        .filter(cmd -> "bind".equals(cmd.getId()))
+                        .forEach(cmd -> {
+                            String component = cmd.getOptionalPar(0, "");
+                            String value = cmd.getOptionalPar(1, "");
+                            bind(wrapper, component, tileEntity, value);
+                        });
+                command.commands()
+                        .filter(cmd -> "action".equals(cmd.getId()))
+                        .forEach(cmd -> {
+                            String component = cmd.getOptionalPar(0, "");
+                            String key = cmd.getOptionalPar(1, "");
+                            action(wrapper, component, tileEntity, key);
+                        });
             }
         });
 
@@ -346,6 +361,27 @@ public class Window {
         return this;
     }
 
+    public <T extends GenericTileEntity> Window action(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
+        for (IAction action : te.getActions()) {
+            if (keyName.equals(action.getKey())) {
+                initializeAction(network, componentName, te, action);
+                return this;
+            }
+        }
+
+        Logging.message(Minecraft.getMinecraft().player, "Could not find action '" + keyName + "' in supplied TE!");
+        return this;
+    }
+
+    private <T extends GenericTileEntity> void initializeAction(SimpleNetworkWrapper network, String componentName, T te, IAction action) {
+        addChannelEvent(componentName, (source, params) -> {
+            ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
+                    TypedMap.builder()
+                            .put(GenericTileEntity.PARAM_KEY, action.getKey())
+                            .build());
+        });
+    }
+
     public <T extends GenericTileEntity> Window bind(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
         for (IValue value : te.getValues()) {
             Key key = value.getKey();
@@ -355,19 +391,26 @@ public class Window {
             }
         }
 
-        throw new IllegalArgumentException("Could not find value '" + keyName + "' in supplied TE!");
+        Logging.message(Minecraft.getMinecraft().player, "Could not find value '" + keyName + "' in supplied TE!");
+        return this;
     }
 
     private <T extends GenericTileEntity> void initializeBinding(SimpleNetworkWrapper network, String componentName, T te, IValue value) {
         Object v = value.getter().apply(te);
         Widget component = findChild(componentName);
+
+        if (component == null) {
+            Logging.message(Minecraft.getMinecraft().player, "Could not find component '" + componentName + "'!");
+            return;
+        }
         component.setGenericValue(v);
-        // @todo componentName == channelName? Is channel required?
+
         addChannelEvent(componentName, (source, params) -> {
+            Type type = value.getKey().getType();
             ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
                     TypedMap.builder()
                             // @todo this conversion can fail!
-                            .put(value.getKey(), value.getKey().getType().convert(component.getGenericValue()))
+                            .put(value.getKey(), type.convert(component.getGenericValue(type)))
                             .build());
 
         });

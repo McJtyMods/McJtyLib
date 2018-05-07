@@ -42,8 +42,8 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     protected List<String> tooltips = null;
     protected List<ItemStack> items = null;
     private Set<Integer> enableFlags = new HashSet<>();
-    protected String name;
-    protected String channel;
+    private String name;
+    private String channel;
 
     private boolean layoutDirty = true;
     private Object userObject = null;
@@ -90,6 +90,9 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     @Override
     public P setName(String name) {
         this.name = name;
+        if (channel == null) {
+            channel = name;     // Automatic channel
+        }
         return (P) this;
     }
 
@@ -474,6 +477,9 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
             name = null;
         }
         channel = GuiParser.get(command, "channel", null);
+        if (channel == null) {
+            channel = name;
+        }
         command.findCommand("desired").ifPresent(cmd -> {
             desiredWidth = cmd.getOptionalPar(0, SIZE_UNKNOWN);
             desiredHeight = cmd.getOptionalPar(1, SIZE_UNKNOWN);

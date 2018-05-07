@@ -34,6 +34,10 @@ public final class Type<V> {
         return type;
     }
 
+    public boolean isA(Object b) {
+        return type.isInstance(b);
+    }
+
     @Nonnull
     public List<V> convert(@Nonnull List<?> list) {
         for(Object o : list) {

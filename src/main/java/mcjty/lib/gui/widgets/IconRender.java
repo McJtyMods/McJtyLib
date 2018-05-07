@@ -2,6 +2,7 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
+import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -49,7 +50,7 @@ public class IconRender extends AbstractWidget<IconRender> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return null;
     }
 }

@@ -180,7 +180,7 @@ public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return getCurrentColor();
     }
 }

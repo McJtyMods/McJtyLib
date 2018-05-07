@@ -2,6 +2,7 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.*;
+import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -173,7 +174,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return null;
     }
 }

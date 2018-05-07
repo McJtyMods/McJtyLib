@@ -5,6 +5,7 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
+import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -270,7 +271,7 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return null;
     }
 }

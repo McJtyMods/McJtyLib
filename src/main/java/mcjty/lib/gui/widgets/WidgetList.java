@@ -488,7 +488,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return null;
     }
 }

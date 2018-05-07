@@ -276,12 +276,17 @@ public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
         } else if (value instanceof Boolean) {
             setCurrentChoice(((Boolean) value) ? 1 : 0);
         } else {
-            setCurrentChoice(TypeConvertors.toInt(value));
+            setCurrentChoice(value.toString());
         }
     }
 
     @Override
-    public Object getGenericValue() {
-        return getCurrentChoiceIndex();
+    public Object getGenericValue(Type type) {
+        if (Type.INTEGER.equals(type)) {
+            return getCurrentChoiceIndex();
+        } else if (Type.BOOLEAN.equals(type)) {
+            return getCurrentChoiceIndex() != 0;
+        }
+        return getCurrentChoice();
     }
 }

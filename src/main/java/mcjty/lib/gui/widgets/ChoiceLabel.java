@@ -19,6 +19,7 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
 
     public static final String TYPE_CHOICELABEL = "choicelabel";
     public static final Key<String> PARAM_CHOICE = new Key<>("choice", Type.STRING);
+    public static final Key<Integer> PARAM_CHOICE_IDX = new Key<>("choiceIdx", Type.INTEGER);
 
     private List<String> choiceList = new ArrayList<>();
     private Map<String,List<String>> tooltipMap = new HashMap<>();
@@ -131,9 +132,11 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
         }
     }
 
-    private void fireChoiceEvents(String choice) {        fireChannelEvents(TypedMap.builder()
+    private void fireChoiceEvents(String choice) {
+        fireChannelEvents(TypedMap.builder()
             .put(Window.PARAM_ID, "choice")
             .put(PARAM_CHOICE, choice)
+            .put(PARAM_CHOICE_IDX, choiceList.indexOf(choice))
             .build());
 
         if (choiceEvents != null) {
@@ -195,7 +198,12 @@ public class ChoiceLabel extends Label<ChoiceLabel> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
+        if (Type.INTEGER.equals(type)) {
+            return choiceList.indexOf(getCurrentChoice());
+        } else if (Type.BOOLEAN.equals(type)) {
+            return choiceList.indexOf(getCurrentChoice()) != 0;
+        }
         return getCurrentChoice();
     }
 }

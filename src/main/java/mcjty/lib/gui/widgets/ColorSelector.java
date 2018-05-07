@@ -235,7 +235,7 @@ public class ColorSelector extends Label<ColorSelector> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return getCurrentColor();
     }
 }

@@ -52,11 +52,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class GenericTileEntity extends TileEntity implements CommandHandler, ClientCommandHandler {
 
     public static final IValue[] EMPTY_VALUES = new IValue[0];
-    public static String COMMAND_SYNC_BINDING = "generic.syncBinding";
+    public static final IAction[] EMPTY_ACTIONS = new IAction[0];
+
+    public static final String COMMAND_SYNC_BINDING = "generic.syncBinding";
+    public static final String COMMAND_SYNC_ACTION = "generic.syncAction";
+    public static final Key<String> PARAM_KEY = new Key<>("key", Type.STRING);
+
+    public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
     private int infused = 0;
 
@@ -83,6 +90,10 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     public IValue[] getValues() {
         return EMPTY_VALUES;
+    }
+
+    public IAction[] getActions() {
+        return EMPTY_ACTIONS;
     }
 
     @Override
@@ -123,6 +134,15 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
     public void setRSMode(RedstoneMode redstoneMode) {
         this.rsMode = redstoneMode;
         markDirtyClient();
+    }
+
+    public void setRSModeInt(int i) {
+        this.rsMode = RedstoneMode.values()[i];
+        markDirtyClient();
+    }
+
+    public int getRSModeInt() {
+        return rsMode.ordinal();
     }
 
     // Use redstone mode and input power to decide if this is enabled or not
@@ -495,6 +515,15 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return null;
     }
 
+    private <T extends GenericTileEntity> Consumer<T> findConsumer(String key) {
+        for (IAction action : getActions()) {
+            if (key.equals(action.getKey())) {
+                return action.consumer();
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
         if (COMMAND_SYNC_BINDING.equals(command)) {
@@ -512,9 +541,17 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
                     Key<String> bkey = (Key<String>) key;
                     String o = params.get(bkey);
                     findSetter(bkey).accept(this, o);
+                } else if (Type.DOUBLE.equals(key.getType())) {
+                    Key<Double> bkey = (Key<Double>) key;
+                    Double o = params.get(bkey);
+                    findSetter(bkey).accept(this, o);
                 }
             }
             markDirtyClient();
+            return true;
+        } else if (COMMAND_SYNC_ACTION.equals(command)) {
+            String key = params.get(PARAM_KEY);
+            findConsumer(key).accept(this);
             return true;
         }
         return false;

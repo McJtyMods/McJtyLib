@@ -157,7 +157,7 @@ public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollabl
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return getRealValue();
     }
 }

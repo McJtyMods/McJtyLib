@@ -1,6 +1,7 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
+import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -158,7 +159,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return null;
     }
 }

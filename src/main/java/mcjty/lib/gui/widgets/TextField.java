@@ -309,7 +309,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public Object getGenericValue() {
+    public Object getGenericValue(Type type) {
         return getText();
     }
 }

@@ -4,6 +4,7 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
+import mcjty.lib.typed.Type;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -229,5 +230,5 @@ public interface Widget<P extends Widget> {
 
     <T> void setGenericValue(T value);
 
-    Object getGenericValue();
+    Object getGenericValue(Type type);
 }
