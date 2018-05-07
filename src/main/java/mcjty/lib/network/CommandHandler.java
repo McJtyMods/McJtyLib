@@ -14,6 +14,7 @@ import java.util.Map;
  */
 public interface CommandHandler {
     /// Return true if command was handled correctly. False if not.
+    @Deprecated
     boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args);
 
     /// Return true if command was handled correctly. False if not.
