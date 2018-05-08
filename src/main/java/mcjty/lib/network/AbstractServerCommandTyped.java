@@ -59,6 +59,9 @@ public class AbstractServerCommandTyped implements IMessage {
                     case TYPE_DOUBLE:
                         args.put(new Key<>(key, Type.DOUBLE), buf.readDouble());
                         break;
+                    case TYPE_BLOCKPOS:
+                        args.put(new Key<>(key, Type.BLOCKPOS), NetworkTools.readPos(buf));
+                        break;
                 }
             }
         }
@@ -81,6 +84,9 @@ public class AbstractServerCommandTyped implements IMessage {
             } else if (key.getType() == Type.DOUBLE) {
                 buf.writeByte(ArgumentType.TYPE_DOUBLE.ordinal());
                 buf.writeDouble((Double) args.get(key));
+            } else if (key.getType() == Type.BLOCKPOS) {
+                buf.writeByte(ArgumentType.TYPE_BLOCKPOS.ordinal());
+                NetworkTools.writePos(buf, (BlockPos) args.get(key));
             } else {
                 throw new RuntimeException("Unsupported type for key " + key.getName() + "!");
             }

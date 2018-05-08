@@ -1,5 +1,7 @@
 package mcjty.lib.typed;
 
+import net.minecraft.util.math.BlockPos;
+
 import javax.annotation.Nonnull;
 import java.util.List;
 
@@ -17,6 +19,7 @@ public final class Type<V> {
     public static final Type<Long> LONG = create(Long.class);
     public static final Type<String> STRING = create(String.class);
     public static final Type<Boolean> BOOLEAN = create(Boolean.class);
+    public static final Type<BlockPos> BLOCKPOS = create(BlockPos.class);
 
     @Nonnull private final Class<V> type;
 
