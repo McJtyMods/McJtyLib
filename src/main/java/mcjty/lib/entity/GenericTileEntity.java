@@ -6,6 +6,7 @@ import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
+import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -38,6 +39,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -524,30 +526,19 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return null;
     }
 
+    // Client side function to send a value to the server
+    public <T> void valueToServer(SimpleNetworkWrapper network, Key<T> valueKey, T value) {
+        network.sendToServer(new PacketServerCommandTyped(getPos(),
+                COMMAND_SYNC_BINDING,
+                TypedMap.builder()
+                        .put(valueKey, value)
+                        .build()));
+    }
+
     @Override
     public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
         if (COMMAND_SYNC_BINDING.equals(command)) {
-            for (Key<?> key : params.getKeys()) {
-                // @todo can be improved?
-                if (Type.BOOLEAN.equals(key.getType())) {
-                    Key<Boolean> bkey = (Key<Boolean>) key;
-                    Boolean o = params.get(bkey);
-                    findSetter(bkey).accept(this, o);
-                } else if (Type.INTEGER.equals(key.getType())) {
-                    Key<Integer> bkey = (Key<Integer>) key;
-                    Integer o = params.get(bkey);
-                    findSetter(bkey).accept(this, o);
-                } else if (Type.STRING.equals(key.getType())) {
-                    Key<String> bkey = (Key<String>) key;
-                    String o = params.get(bkey);
-                    findSetter(bkey).accept(this, o);
-                } else if (Type.DOUBLE.equals(key.getType())) {
-                    Key<Double> bkey = (Key<Double>) key;
-                    Double o = params.get(bkey);
-                    findSetter(bkey).accept(this, o);
-                }
-            }
-            markDirtyClient();
+            syncBinding(params);
             return true;
         } else if (COMMAND_SYNC_ACTION.equals(command)) {
             String key = params.get(PARAM_KEY);
@@ -555,5 +546,29 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
             return true;
         }
         return false;
+    }
+
+    private void syncBinding(TypedMap params) {
+        for (Key<?> key : params.getKeys()) {
+            // @todo can be improved?
+            if (Type.BOOLEAN.equals(key.getType())) {
+                Key<Boolean> bkey = (Key<Boolean>) key;
+                Boolean o = params.get(bkey);
+                findSetter(bkey).accept(this, o);
+            } else if (Type.INTEGER.equals(key.getType())) {
+                Key<Integer> bkey = (Key<Integer>) key;
+                Integer o = params.get(bkey);
+                findSetter(bkey).accept(this, o);
+            } else if (Type.STRING.equals(key.getType())) {
+                Key<String> bkey = (Key<String>) key;
+                String o = params.get(bkey);
+                findSetter(bkey).accept(this, o);
+            } else if (Type.DOUBLE.equals(key.getType())) {
+                Key<Double> bkey = (Key<Double>) key;
+                Double o = params.get(bkey);
+                findSetter(bkey).accept(this, o);
+            }
+        }
+        markDirtyClient();
     }
 }

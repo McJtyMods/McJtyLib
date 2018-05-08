@@ -374,12 +374,26 @@ public class Window {
     }
 
     private <T extends GenericTileEntity> void initializeAction(SimpleNetworkWrapper network, String componentName, T te, IAction action) {
-        addChannelEvent(componentName, (source, params) -> {
-            ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
-                    TypedMap.builder()
-                            .put(GenericTileEntity.PARAM_KEY, action.getKey())
-                            .build());
-        });
+        addChannelEvent(componentName, (source, params) -> sendAction(network, action));
+    }
+
+    public <T extends GenericTileEntity> void sendAction(SimpleNetworkWrapper network, T te, String actionKey) {
+        for (IAction action : te.getActions()) {
+            if (actionKey.equals(action.getKey())) {
+                sendAction(network, action);
+                return;
+            }
+        }
+
+        Logging.message(Minecraft.getMinecraft().player, "Could not find action '" + actionKey + "' in supplied TE!");
+
+    }
+
+    private void sendAction(SimpleNetworkWrapper network, IAction action) {
+        ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
+                TypedMap.builder()
+                        .put(GenericTileEntity.PARAM_KEY, action.getKey())
+                        .build());
     }
 
     public <T extends GenericTileEntity> Window bind(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
