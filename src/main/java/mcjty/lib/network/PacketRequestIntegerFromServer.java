@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
@@ -16,7 +17,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
  * a tile entity on the server side that implements CommandHandler. This will call 'executeWithResultInteger()' on
  * that command handler. A PacketIntegerFromServer will be sent back from the client.
  */
-public class PacketRequestIntegerFromServer extends AbstractServerCommand {
+public class PacketRequestIntegerFromServer extends AbstractServerCommandTyped {
     private String clientCommand;
     private String modid;
 
@@ -39,8 +40,8 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand {
         NetworkTools.writeString(buf, modid);
     }
 
-    public PacketRequestIntegerFromServer(String modid, BlockPos pos, String command, String clientCommand, Argument... arguments) {
-        super(pos, command, arguments);
+    public PacketRequestIntegerFromServer(String modid, BlockPos pos, String command, String clientCommand, TypedMap params) {
+        super(pos, command, params);
         this.clientCommand = clientCommand;
         this.modid = modid;
     }
@@ -59,7 +60,7 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommand {
                 return;
             }
             CommandHandler commandHandler = (CommandHandler) te;
-            Integer result = commandHandler.executeWithResultInteger(message.command, message.args);
+            Integer result = commandHandler.executeWithResultInteger(message.command, message.params);
             if (result == null) {
                 Logging.log("Command " + message.command + " was not handled!");
                 return;

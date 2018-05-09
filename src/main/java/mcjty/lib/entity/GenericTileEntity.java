@@ -3,7 +3,6 @@ package mcjty.lib.entity;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.container.InventoryHelper;
-import mcjty.lib.network.Argument;
 import mcjty.lib.network.ClientCommandHandler;
 import mcjty.lib.network.CommandHandler;
 import mcjty.lib.network.PacketServerCommandTyped;
@@ -51,7 +50,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -369,12 +367,12 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
 
     @Nonnull
     @Override
-    public <T> List<T> executeWithResultList(String command, Map<String, Argument> args, Type<T> type) {
+    public <T> List<T> executeWithResultList(String command, TypedMap args, Type<T> type) {
         return Collections.emptyList();
     }
 
     @Override
-    public Integer executeWithResultInteger(String command, Map<String, Argument> args) {
+    public Integer executeWithResultInteger(String command, TypedMap args) {
         return null;
     }
 

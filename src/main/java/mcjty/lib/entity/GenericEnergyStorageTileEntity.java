@@ -1,11 +1,9 @@
 package mcjty.lib.entity;
 
-import mcjty.lib.network.Argument;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.network.PacketRequestIntegerFromServer;
+import mcjty.lib.typed.TypedMap;
 import net.minecraft.nbt.NBTTagCompound;
-
-import java.util.Map;
 
 public class GenericEnergyStorageTileEntity extends GenericTileEntity {
 
@@ -73,11 +71,11 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
         requestRfDelay = 3;
         PacketHandler.modNetworking.get(modid).sendToServer(new PacketRequestIntegerFromServer(modid, pos,
                 CMD_GETENERGY,
-                CLIENTCMD_GETENERGY));
+                CLIENTCMD_GETENERGY, TypedMap.EMPTY));
     }
 
     @Override
-    public Integer executeWithResultInteger(String command, Map<String, Argument> args) {
+    public Integer executeWithResultInteger(String command, TypedMap args) {
         Integer rc = super.executeWithResultInteger(command, args);
         if (rc != null) {
             return rc;

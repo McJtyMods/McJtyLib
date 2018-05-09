@@ -1,5 +1,7 @@
 package mcjty.lib.network;
 
+import mcjty.lib.typed.Key;
+import mcjty.lib.typed.Type;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -8,8 +10,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-
-import java.util.Map;
 
 public class PacketUpdateNBTItemHandler<T extends PacketUpdateNBTItem> implements IMessageHandler<T, IMessage> {
     @Override
@@ -33,23 +33,20 @@ public class PacketUpdateNBTItemHandler<T extends PacketUpdateNBTItem> implement
             tagCompound = new NBTTagCompound();
             heldItem.setTagCompound(tagCompound);
         }
-        for (Map.Entry<String, Argument> entry : message.args.entrySet()) {
-            String key = entry.getKey();
-            switch (entry.getValue().getType()) {
-                case TYPE_STRING:
-                    tagCompound.setString(key, entry.getValue().getString());
-                    break;
-                case TYPE_INTEGER:
-                    tagCompound.setInteger(key, entry.getValue().getInteger());
-                    break;
-                case TYPE_BLOCKPOS:
-                    throw new RuntimeException("BlockPos not supported for PacketUpdateNBTItem!");
-                case TYPE_BOOLEAN:
-                    tagCompound.setBoolean(key, entry.getValue().getBoolean());
-                    break;
-                case TYPE_DOUBLE:
-                    tagCompound.setDouble(key, entry.getValue().getDouble());
-                    break;
+        for (Key<?> akey : message.args.getKeys()) {
+            String key = akey.getName();
+            if (Type.STRING.equals(akey.getType())) {
+                tagCompound.setString(key, (String) message.args.get(akey));
+            } else if (Type.INTEGER.equals(akey.getType())) {
+                tagCompound.setInteger(key, (Integer) message.args.get(akey));
+            } else if (Type.DOUBLE.equals(akey.getType())) {
+                tagCompound.setDouble(key, (Double) message.args.get(akey));
+            } else if (Type.BOOLEAN.equals(akey.getType())) {
+                tagCompound.setBoolean(key, (Boolean) message.args.get(akey));
+            } else if (Type.BLOCKPOS.equals(akey.getType())) {
+                throw new RuntimeException("BlockPos not supported for PacketUpdateNBTItem!");
+            } else if (Type.ITEMSTACK.equals(akey.getType())) {
+                throw new RuntimeException("ItemStack not supported for PacketUpdateNBTItem!");
             }
         }
     }

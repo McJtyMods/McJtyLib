@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.typed.TypedMap;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -15,7 +16,7 @@ import net.minecraft.util.math.BlockPos;
  * @param <S> is the type of the subclass of this class. i.e. the class you're implementing
  * @param <C> is the type of the subclass of PacketListFromServer. i.e. the class sent back from the server.
  */
-public abstract class PacketRequestListFromServer<T, S extends PacketRequestListFromServer<T, S, C>, C extends PacketListFromServer<C,T>> extends AbstractServerCommand {
+public abstract class PacketRequestListFromServer<T, S extends PacketRequestListFromServer<T, S, C>, C extends PacketListFromServer<C,T>> extends AbstractServerCommandTyped {
     public String modid;
 
     @Override
@@ -33,8 +34,8 @@ public abstract class PacketRequestListFromServer<T, S extends PacketRequestList
     public PacketRequestListFromServer() {
     }
 
-    public PacketRequestListFromServer(String modid, BlockPos pos, String command, Argument... arguments) {
-        super(pos, command, arguments);
+    public PacketRequestListFromServer(String modid, BlockPos pos, String command, TypedMap params) {
+        super(pos, command, params);
         this.modid = modid;
     }
 }

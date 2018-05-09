@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.typed.TypedMap;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -11,7 +12,7 @@ import net.minecraft.util.math.BlockPos;
  *
  * @param <T> is the type of the items in the list that is requested from the server
  */
-public class PacketRequestServerList<T> extends AbstractServerCommand {
+public class PacketRequestServerList<T> extends AbstractServerCommandTyped {
     public String modid;
 
     @Override
@@ -29,8 +30,8 @@ public class PacketRequestServerList<T> extends AbstractServerCommand {
     public PacketRequestServerList() {
     }
 
-    public PacketRequestServerList(String modid, BlockPos pos, String command, Argument... arguments) {
-        super(pos, command, arguments);
+    public PacketRequestServerList(String modid, BlockPos pos, String command, TypedMap params) {
+        super(pos, command, params);
         this.modid = modid;
     }
 }

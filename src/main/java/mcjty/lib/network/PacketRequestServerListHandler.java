@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
-import mcjty.lib.varia.Logging;
 import mcjty.lib.typed.Type;
+import mcjty.lib.varia.Logging;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -39,7 +39,7 @@ public abstract class PacketRequestServerListHandler<M extends PacketRequestServ
             return;
         }
         CommandHandler commandHandler = (CommandHandler) te;
-        List<T> list = commandHandler.executeWithResultList(message.command, message.args, type);
+        List<T> list = commandHandler.executeWithResultList(message.command, message.params, type);
         sendToClient(message.pos, list, ctx);
     }
 

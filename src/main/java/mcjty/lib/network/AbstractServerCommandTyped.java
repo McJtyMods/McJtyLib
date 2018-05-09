@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
@@ -62,6 +63,9 @@ public class AbstractServerCommandTyped implements IMessage {
                     case TYPE_BLOCKPOS:
                         args.put(new Key<>(key, Type.BLOCKPOS), NetworkTools.readPos(buf));
                         break;
+                    case TYPE_STACK:
+                        args.put(new Key<>(key, Type.ITEMSTACK), NetworkTools.readItemStack(buf));
+                        break;
                 }
             }
         }
@@ -87,6 +91,9 @@ public class AbstractServerCommandTyped implements IMessage {
             } else if (key.getType() == Type.BLOCKPOS) {
                 buf.writeByte(ArgumentType.TYPE_BLOCKPOS.ordinal());
                 NetworkTools.writePos(buf, (BlockPos) args.get(key));
+            } else if (key.getType() == Type.ITEMSTACK) {
+                buf.writeByte(ArgumentType.TYPE_STACK.ordinal());
+                NetworkTools.writeItemStack(buf, (ItemStack) args.get(key));
             } else {
                 throw new RuntimeException("Unsupported type for key " + key.getName() + "!");
             }
