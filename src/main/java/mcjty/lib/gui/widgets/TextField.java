@@ -310,6 +310,19 @@ public class TextField extends AbstractWidget<TextField> {
 
     @Override
     public Object getGenericValue(Type type) {
+        if (Type.INTEGER.equals(type)) {
+            try {
+                return Integer.parseInt(getText());
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        } else if (Type.DOUBLE.equals(type)) {
+            try {
+                return Double.parseDouble(getText());
+            } catch (NumberFormatException e) {
+                return 0.0;
+            }
+        }
         return getText();
     }
 }
