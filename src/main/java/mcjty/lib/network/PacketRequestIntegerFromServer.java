@@ -55,11 +55,11 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommandTyped {
 
         private void handle(PacketRequestIntegerFromServer message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
-            if(!(te instanceof CommandHandler)) {
+            if(!(te instanceof ICommandHandler)) {
                 Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                 return;
             }
-            CommandHandler commandHandler = (CommandHandler) te;
+            ICommandHandler commandHandler = (ICommandHandler) te;
             Integer result = commandHandler.executeWithResultInteger(message.command, message.params);
             if (result == null) {
                 Logging.log("Command " + message.command + " was not handled!");

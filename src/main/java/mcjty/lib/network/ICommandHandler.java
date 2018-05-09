@@ -11,7 +11,7 @@ import java.util.List;
  * Implement this interface if you want to receive server-side messages (typically sent from a packet that
  * implements PacketRequestListFromServer or PacketServerCommand).
  */
-public interface CommandHandler {
+public interface ICommandHandler {
     /// Return true if command was handled correctly. False if not.
     default boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
         return false;

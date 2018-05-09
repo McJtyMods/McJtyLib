@@ -34,11 +34,11 @@ public abstract class PacketRequestServerListHandler<M extends PacketRequestServ
 
     private void handle(M message, MessageContext ctx) {
         TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
-        if(!(te instanceof CommandHandler)) {
+        if(!(te instanceof ICommandHandler)) {
             Logging.log("TileEntity is not a CommandHandler!");
             return;
         }
-        CommandHandler commandHandler = (CommandHandler) te;
+        ICommandHandler commandHandler = (ICommandHandler) te;
         List<T> list = commandHandler.executeWithResultList(message.command, message.params, type);
         sendToClient(message.pos, list, ctx);
     }

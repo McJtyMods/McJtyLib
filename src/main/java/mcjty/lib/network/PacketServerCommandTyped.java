@@ -51,11 +51,11 @@ public class PacketServerCommandTyped extends AbstractServerCommandTyped {
                 return;
             }
             TileEntity te = world.getTileEntity(message.pos);
-            if(!(te instanceof CommandHandler)) {
+            if(!(te instanceof ICommandHandler)) {
                 Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                 return;
             }
-            CommandHandler commandHandler = (CommandHandler) te;
+            ICommandHandler commandHandler = (ICommandHandler) te;
             if (!commandHandler.execute(playerEntity, message.command, message.params)) {
                 Logging.log("Command " + message.command + " was not handled!");
             }
