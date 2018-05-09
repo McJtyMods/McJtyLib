@@ -74,7 +74,6 @@ public class PacketHandler {
 
         // Server side
        // networkWrapper.registerMessage(PacketSetGuiStyle.Handler.class, PacketSetGuiStyle.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketServerCommand.Handler.class, PacketServerCommand.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketServerCommandTyped.Handler.class, PacketServerCommandTyped.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketSendServerCommand.Handler.class, PacketSendServerCommand.class, startIndex++, Side.SERVER);
         networkWrapper.registerMessage(PacketRequestIntegerFromServer.Handler.class, PacketRequestIntegerFromServer.class, startIndex++, Side.SERVER);

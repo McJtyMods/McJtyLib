@@ -1,5 +1,6 @@
 package mcjty.lib.typed;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
@@ -20,6 +21,7 @@ public final class Type<V> {
     public static final Type<String> STRING = create(String.class);
     public static final Type<Boolean> BOOLEAN = create(Boolean.class);
     public static final Type<BlockPos> BLOCKPOS = create(BlockPos.class);
+    public static final Type<ItemStack> ITEMSTACK = create(ItemStack.class);
 
     @Nonnull private final Class<V> type;
 

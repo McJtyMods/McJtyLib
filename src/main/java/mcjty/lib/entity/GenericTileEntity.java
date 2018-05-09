@@ -367,11 +367,6 @@ public class GenericTileEntity extends TileEntity implements CommandHandler, Cli
         return ownerUUID;
     }
 
-    @Override
-    public boolean execute(EntityPlayerMP playerMP, String command, Map<String, Argument> args) {
-        return false;
-    }
-
     @Nonnull
     @Override
     public <T> List<T> executeWithResultList(String command, Map<String, Argument> args, Type<T> type) {
