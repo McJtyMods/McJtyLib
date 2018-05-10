@@ -1,4 +1,4 @@
-package mcjty.lib.varia;
+package mcjty.lib.compat;
 
 import crazypants.enderio.base.power.IPowerStorage;
 import net.minecraft.tileentity.TileEntity;

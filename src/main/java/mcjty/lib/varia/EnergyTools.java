@@ -2,6 +2,9 @@ package mcjty.lib.varia;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.power.IBigPower;
+import mcjty.lib.compat.EnergySupportDraconic;
+import mcjty.lib.compat.EnergySupportEnderIO;
+import mcjty.lib.compat.EnergySupportMekanism;
 import mcjty.lib.compat.RedstoneFluxCompatibility;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;

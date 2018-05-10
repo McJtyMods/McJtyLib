@@ -1,4 +1,4 @@
-package mcjty.lib.varia;
+package mcjty.lib.compat;
 
 import mekanism.api.energy.IStrictEnergyStorage;
 import net.minecraft.tileentity.TileEntity;

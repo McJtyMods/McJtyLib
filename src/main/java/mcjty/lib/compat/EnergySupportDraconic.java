@@ -1,4 +1,4 @@
-package mcjty.lib.varia;
+package mcjty.lib.compat;
 
 import com.brandon3055.draconicevolution.api.IExtendedRFStorage;
 import net.minecraft.tileentity.TileEntity;
