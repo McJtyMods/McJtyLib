@@ -33,11 +33,6 @@ public class Slider extends AbstractWidget<Slider> {
         return scrollable;
     }
 
-    public Slider setScrollable(Scrollable scrollable) {
-        this.scrollable = scrollable;
-        return this;
-    }
-
     public String getScrollableName() {
         return scrollableName;
     }
