@@ -1,4 +1,4 @@
-package mcjty.lib.gui;
+package mcjty.lib.client;
 
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.varia.MathTools;

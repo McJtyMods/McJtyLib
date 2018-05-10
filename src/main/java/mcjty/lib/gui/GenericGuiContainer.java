@@ -1,10 +1,8 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.base.ModBase;
+import mcjty.lib.client.RenderHelper;
 import mcjty.lib.tileentity.GenericTileEntity;
-import mcjty.lib.gui.GuiSideWindow;
-import mcjty.lib.gui.Window;
-import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.*;
@@ -224,7 +222,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                             font.drawStringWithShadow(s2, curx, yy, -1);
                             curx += font.getStringWidth(s2);
                         } else {
-                            mcjty.lib.gui.RenderHelper.renderObject(mc, curx + 1, yy, o, false);
+                            RenderHelper.renderObject(mc, curx + 1, yy, o, false);
                             curx += 20;
                             lineHasItemStacks = true;
                         }

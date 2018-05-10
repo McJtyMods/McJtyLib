@@ -1,4 +1,4 @@
-package mcjty.lib.gui;
+package mcjty.lib.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;

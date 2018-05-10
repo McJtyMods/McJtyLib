@@ -1,7 +1,7 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
-import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.*;
 import mcjty.lib.gui.icons.IIcon;

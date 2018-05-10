@@ -1,4 +1,4 @@
-package mcjty.lib.gui;
+package mcjty.lib.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -41,7 +41,7 @@ public class BlockOutlineRenderer {
         float my = c.getY();
         float mz = c.getZ();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-        mcjty.lib.gui.RenderHelper.renderHighLightedBlocksOutline(buffer, mx, my, mz, 1.0f, 0.0f, 0.0f, 1.0f);
+        RenderHelper.renderHighLightedBlocksOutline(buffer, mx, my, mz, 1.0f, 0.0f, 0.0f, 1.0f);
 
         tessellator.draw();
 
@@ -152,7 +152,7 @@ public class BlockOutlineRenderer {
         float my = pos.getY();
         float mz = pos.getZ();
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
-        mcjty.lib.gui.RenderHelper.renderHighLightedBlocksOutline(buffer, mx, my, mz, .9f, .7f, 0, 1);
+        RenderHelper.renderHighLightedBlocksOutline(buffer, mx, my, mz, .9f, .7f, 0, 1);
 
         tessellator.draw();
 
@@ -208,7 +208,7 @@ public class BlockOutlineRenderer {
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
         for (BlockPos coordinate : coordinates) {
-            mcjty.lib.gui.RenderHelper.renderHighLightedBlocksOutline(buffer,
+            RenderHelper.renderHighLightedBlocksOutline(buffer,
                     base.getX() + coordinate.getX(), base.getY() + coordinate.getY(), base.getZ() + coordinate.getZ(),
                     .5f, .3f, 0f, 1.0f);
         }

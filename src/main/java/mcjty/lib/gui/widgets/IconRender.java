@@ -1,7 +1,7 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
-import mcjty.lib.gui.RenderHelper;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
