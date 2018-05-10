@@ -1,6 +1,7 @@
 package mcjty.lib.blocks;
 
 import mcjty.lib.base.ModBase;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LogicFacing;
 import mcjty.lib.tileentity.LogicTileEntity;
 import net.minecraft.block.Block;
@@ -275,6 +276,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
             logicTileEntity.setFacing(newfacing);
             world.setBlockState(pos, state.getBlock().getDefaultState()
                     .withProperty(META_INTERMEDIATE, meta), 3);
+            logicTileEntity.rotateBlock(axis);
             return true;
         }
         return false;
