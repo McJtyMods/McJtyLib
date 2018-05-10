@@ -8,7 +8,8 @@ public class WorldTools {
         if (world == null || pos == null) {
             return false;
         }
-        return world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null && world.getChunkFromBlockCoords(pos).isLoaded();
+        return world.isBlockLoaded(pos);
+//        return world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null && world.getChunkFromBlockCoords(pos).isLoaded();
     }
 
 
