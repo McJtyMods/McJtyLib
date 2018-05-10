@@ -9,7 +9,7 @@ import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.CofhApiItemCompatibility;
-import mcjty.lib.container.GenericGuiContainer;
+import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.varia.WrenchUsage;
 import mcjty.lib.tileentity.GenericTileEntity;

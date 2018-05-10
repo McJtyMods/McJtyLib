@@ -1,7 +1,6 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;

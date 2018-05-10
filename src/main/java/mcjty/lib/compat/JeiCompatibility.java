@@ -1,6 +1,6 @@
 package mcjty.lib.compat;
 
-import mcjty.lib.container.GenericGuiContainer;
+import mcjty.lib.gui.GenericGuiContainer;
 import mezz.jei.api.BlankModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;

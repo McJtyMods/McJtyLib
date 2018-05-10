@@ -1,6 +1,6 @@
 package mcjty.lib;
 
-import mcjty.lib.container.GenericGuiContainer;
+import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiScreenEvent;

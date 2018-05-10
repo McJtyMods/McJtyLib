@@ -1,4 +1,4 @@
-package mcjty.lib.container;
+package mcjty.lib.gui;
 
 import mcjty.lib.base.ModBase;
 import mcjty.lib.tileentity.GenericTileEntity;

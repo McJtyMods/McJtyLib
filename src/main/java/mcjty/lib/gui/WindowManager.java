@@ -1,6 +1,5 @@
 package mcjty.lib.gui;
 
-import mcjty.lib.container.GenericGuiContainer;
 import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
