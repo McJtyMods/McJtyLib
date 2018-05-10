@@ -1,4 +1,4 @@
-package mcjty.lib.container;
+package mcjty.lib.blocks;
 
 import crazypants.enderio.api.redstone.IRedstoneConnectable;
 import mcjty.lib.McJtyLib;
@@ -9,7 +9,10 @@ import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.CofhApiItemCompatibility;
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.container.GenericGuiContainer;
+import mcjty.lib.container.InventoryHelper;
+import mcjty.lib.varia.WrenchUsage;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -465,7 +468,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     /**
-     * Break a block in the world, convert it to an entity and remember all the settings
+     * Break a block in the world, convert it to an bindings and remember all the settings
      * for this block in the itemstack.
      */
     protected void breakAndRemember(World world, EntityPlayer player, BlockPos pos) {

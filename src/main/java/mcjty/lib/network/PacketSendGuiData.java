@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Request information from the tile entity which is needed for the GUI
+ * Request information from the tile bindings which is needed for the GUI
  */
 public class PacketSendGuiData implements IMessage {
     private int dimId;

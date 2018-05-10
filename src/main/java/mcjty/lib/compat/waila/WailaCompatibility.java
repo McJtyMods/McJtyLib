@@ -1,6 +1,6 @@
 package mcjty.lib.compat.waila;
 
-import mcjty.lib.container.BaseBlock;
+import mcjty.lib.blocks.BaseBlock;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;

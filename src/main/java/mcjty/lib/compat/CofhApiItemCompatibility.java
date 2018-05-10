@@ -1,7 +1,7 @@
 package mcjty.lib.compat;
 
 import cofh.api.item.IToolHammer;
-import mcjty.lib.container.WrenchUsage;
+import mcjty.lib.varia.WrenchUsage;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

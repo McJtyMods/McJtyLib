@@ -2,7 +2,11 @@ package mcjty.lib.builder;
 
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.blocks.BaseBlock;
+import mcjty.lib.blocks.GenericBlock;
+import mcjty.lib.blocks.LogicSlabBlock;
 import mcjty.lib.container.*;
+import mcjty.lib.tileentity.LogicTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -14,8 +18,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import static mcjty.lib.container.LogicSlabBlock.LOGIC_FACING;
-import static mcjty.lib.container.LogicSlabBlock.META_INTERMEDIATE;
+import static mcjty.lib.blocks.LogicSlabBlock.LOGIC_FACING;
+import static mcjty.lib.blocks.LogicSlabBlock.META_INTERMEDIATE;
 
 /**
  * Build blocks using this class

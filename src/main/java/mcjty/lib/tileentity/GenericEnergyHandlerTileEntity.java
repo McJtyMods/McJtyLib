@@ -1,4 +1,4 @@
-package mcjty.lib.entity;
+package mcjty.lib.tileentity;
 
 import cofh.redstoneflux.api.IEnergyProvider;
 import cofh.redstoneflux.api.IEnergyReceiver;

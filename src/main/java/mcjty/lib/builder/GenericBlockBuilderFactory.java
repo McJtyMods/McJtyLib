@@ -1,7 +1,7 @@
 package mcjty.lib.builder;
 
 import mcjty.lib.base.ModBase;
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.creativetab.CreativeTabs;
 
 public class GenericBlockBuilderFactory {

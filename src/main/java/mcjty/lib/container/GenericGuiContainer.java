@@ -1,7 +1,7 @@
 package mcjty.lib.container;
 
 import mcjty.lib.base.ModBase;
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.gui.GuiSideWindow;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.WindowManager;

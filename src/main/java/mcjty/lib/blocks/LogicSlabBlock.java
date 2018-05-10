@@ -1,10 +1,11 @@
-package mcjty.lib.container;
+package mcjty.lib.blocks;
 
 import mcjty.lib.base.ModBase;
+import mcjty.lib.varia.LogicFacing;
+import mcjty.lib.tileentity.LogicTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
@@ -27,7 +28,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.function.BiFunction;
 
-import static mcjty.lib.container.LogicFacing.*;
+import static mcjty.lib.varia.LogicFacing.*;
 import static net.minecraft.util.EnumFacing.*;
 
 /**

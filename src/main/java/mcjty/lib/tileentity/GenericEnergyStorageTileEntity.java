@@ -1,4 +1,4 @@
-package mcjty.lib.entity;
+package mcjty.lib.tileentity;
 
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.network.PacketRequestIntegerFromServer;

@@ -2,8 +2,10 @@ package mcjty.lib.builder;
 
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.blocks.BaseBlock;
+import mcjty.lib.blocks.GenericBlock;
 import mcjty.lib.container.*;
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.inventory.IInventory;

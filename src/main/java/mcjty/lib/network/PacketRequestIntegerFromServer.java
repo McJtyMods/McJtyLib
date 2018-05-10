@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
- * a tile entity on the server side that implements CommandHandler. This will call 'executeWithResultInteger()' on
+ * a tile bindings on the server side that implements CommandHandler. This will call 'executeWithResultInteger()' on
  * that command handler. A PacketIntegerFromServer will be sent back from the client.
  */
 public class PacketRequestIntegerFromServer extends AbstractServerCommandTyped {

@@ -1,8 +1,10 @@
-package mcjty.lib.entity;
+package mcjty.lib.tileentity;
 
 import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.container.InventoryHelper;
+import mcjty.lib.bindings.IAction;
+import mcjty.lib.bindings.IValue;
 import mcjty.lib.network.IClientCommandHandler;
 import mcjty.lib.network.ICommandHandler;
 import mcjty.lib.network.PacketServerCommandTyped;
@@ -204,7 +206,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     /**
      * For compatibility reasons this calls writeToNBT() but for
      * efficiency reasons you should override this in your tile
-     * entity to only write what you need on the client.
+     * bindings to only write what you need on the client.
      *
      * @param tagCompound
      */
@@ -215,7 +217,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     /**
      * For compatibility reasons this calls readFromNBT() but for
      * efficiency reasons you should override this in your tile
-     * entity to only read what you need on the client.
+     * bindings to only read what you need on the client.
      *
      * @param tagCompound
      */

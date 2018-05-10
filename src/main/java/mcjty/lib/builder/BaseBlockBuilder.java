@@ -1,8 +1,8 @@
 package mcjty.lib.builder;
 
 import mcjty.lib.base.ModBase;
-import mcjty.lib.container.BaseBlock;
-import mcjty.lib.container.GenericItemBlock;
+import mcjty.lib.blocks.BaseBlock;
+import mcjty.lib.blocks.GenericItemBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;

@@ -1,8 +1,7 @@
 package mcjty.lib.builder;
 
 import mcjty.lib.base.ModBase;
-import mcjty.lib.container.LogicTileEntity;
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.tileentity.LogicTileEntity;
 import net.minecraft.creativetab.CreativeTabs;
 
 public class LogicSlabBlockBuilderFactory {

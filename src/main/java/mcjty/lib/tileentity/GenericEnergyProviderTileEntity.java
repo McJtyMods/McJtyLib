@@ -1,35 +1,26 @@
-package mcjty.lib.entity;
+package mcjty.lib.tileentity;
 
-import cofh.redstoneflux.api.IEnergyReceiver;
+import cofh.redstoneflux.api.IEnergyProvider;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
-@Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyReceiver")
-public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, IEnergyStorage {
+@Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyProvider")
+public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEntity implements IEnergyProvider, IEnergyStorage {
 
-    public GenericEnergyReceiverTileEntity(int maxEnergy, int maxReceive) {
-        super(maxEnergy, maxReceive);
+    public GenericEnergyProviderTileEntity(int maxEnergy, int maxExtract) {
+        super(maxEnergy, 0, maxExtract);
     }
-
-    public GenericEnergyReceiverTileEntity(int maxEnergy, int maxReceive, int maxExtract) {
-        super(maxEnergy, maxReceive, maxExtract);
-    }
-
-    public void consumeEnergy(int consume) {
-        modifyEnergyStored(-consume);
-    }
-
 
     // -----------------------------------------------------------
-    // For IEnergyReceiver
+    // For IEnergyProvider
 
     @Optional.Method(modid = "redstoneflux")
     @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        return storage.receiveEnergy(maxReceive, simulate);
+    public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
+        return storage.extractEnergy(maxExtract, simulate);
     }
 
     @Optional.Method(modid = "redstoneflux")
@@ -55,7 +46,7 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
 
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        return storage.receiveEnergy(maxReceive, simulate);
+        return 0;
     }
 
     @Override
@@ -80,7 +71,7 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
 
     @Override
     public boolean canReceive() {
-        return true;
+        return false;
     }
 
     @Override

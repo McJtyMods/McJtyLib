@@ -88,7 +88,7 @@ public class TeleportationTools {
 
 
     /**
-     * Teleport an entity and return the new entity (as teleporting to other dimensions causes
+     * Teleport an bindings and return the new bindings (as teleporting to other dimensions causes
      * entities to be killed and recreated)
      */
     public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, EnumFacing facing) {

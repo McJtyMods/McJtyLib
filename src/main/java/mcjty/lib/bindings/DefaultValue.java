@@ -1,5 +1,6 @@
-package mcjty.lib.entity;
+package mcjty.lib.bindings;
 
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 
 import java.util.function.BiConsumer;

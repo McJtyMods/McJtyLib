@@ -1,4 +1,4 @@
-package mcjty.lib.container;
+package mcjty.lib.varia;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;

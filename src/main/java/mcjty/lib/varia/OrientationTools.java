@@ -1,6 +1,6 @@
 package mcjty.lib.varia;
 
-import mcjty.lib.container.BaseBlock;
+import mcjty.lib.blocks.BaseBlock;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.EnumFacing;

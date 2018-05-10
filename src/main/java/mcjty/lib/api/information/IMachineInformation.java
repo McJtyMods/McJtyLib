@@ -3,7 +3,7 @@ package mcjty.lib.api.information;
 import javax.annotation.Nullable;
 
 /**
- * Implement this interface on your tile entity so that other
+ * Implement this interface on your tile bindings so that other
  * mods (like The One Probe) can request information from your block.
  */
 public interface IMachineInformation {

@@ -1,5 +1,6 @@
-package mcjty.lib.container;
+package mcjty.lib.blocks;
 
+import mcjty.lib.blocks.BaseBlock;
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemBlock;

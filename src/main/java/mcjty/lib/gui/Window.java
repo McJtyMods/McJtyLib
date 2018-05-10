@@ -2,9 +2,9 @@ package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericGuiContainer;
-import mcjty.lib.entity.GenericTileEntity;
-import mcjty.lib.entity.IAction;
-import mcjty.lib.entity.IValue;
+import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.bindings.IAction;
+import mcjty.lib.bindings.IValue;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;

@@ -1,4 +1,4 @@
-package mcjty.lib.container;
+package mcjty.lib.varia;
 
 public enum WrenchUsage {
     NOT,                // Not a wrench

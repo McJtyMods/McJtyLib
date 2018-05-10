@@ -1,4 +1,4 @@
-package mcjty.lib.container;
+package mcjty.lib.blocks;
 
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.base.ModBase;

@@ -1,4 +1,6 @@
-package mcjty.lib.entity;
+package mcjty.lib.bindings;
+
+import mcjty.lib.tileentity.GenericTileEntity;
 
 import java.util.function.Consumer;
 

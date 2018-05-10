@@ -1,6 +1,7 @@
-package mcjty.lib.container;
+package mcjty.lib.tileentity;
 
-import mcjty.lib.entity.GenericTileEntity;
+import mcjty.lib.blocks.LogicSlabBlock;
+import mcjty.lib.varia.LogicFacing;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
@@ -12,8 +13,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-import static mcjty.lib.container.LogicSlabBlock.LOGIC_FACING;
-import static mcjty.lib.container.LogicSlabBlock.META_INTERMEDIATE;
+import static mcjty.lib.blocks.LogicSlabBlock.LOGIC_FACING;
+import static mcjty.lib.blocks.LogicSlabBlock.META_INTERMEDIATE;
 
 public class LogicTileEntity extends GenericTileEntity {
 

@@ -1,4 +1,4 @@
-package mcjty.lib.entity;
+package mcjty.lib.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.energy.EnergyStorage;
