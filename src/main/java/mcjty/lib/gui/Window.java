@@ -76,7 +76,7 @@ public class Window {
                         .forEach(cmd -> {
                             String channel = cmd.getOptionalPar(0, "");
                             String teCommand = cmd.getOptionalPar(1, "");
-                            addChannelEvent(channel, (source, params) ->
+                            event(channel, (source, params) ->
                                     ((GenericGuiContainer) gui).sendServerCommand(wrapper, teCommand, params));
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
@@ -353,7 +353,7 @@ public class Window {
         }
     }
 
-    public Window addChannelEvent(String channel, ChannelEvent event) {
+    public Window event(String channel, ChannelEvent event) {
         if (!channelEvents.containsKey(channel)) {
             channelEvents.put(channel, new ArrayList<>());
         }
@@ -374,7 +374,7 @@ public class Window {
     }
 
     private <T extends GenericTileEntity> void initializeAction(SimpleNetworkWrapper network, String componentName, T te, IAction action) {
-        addChannelEvent(componentName, (source, params) -> sendAction(network, action));
+        event(componentName, (source, params) -> sendAction(network, action));
     }
 
     public <T extends GenericTileEntity> void sendAction(SimpleNetworkWrapper network, T te, String actionKey) {
@@ -419,7 +419,7 @@ public class Window {
         }
         component.setGenericValue(v);
 
-        addChannelEvent(componentName, (source, params) -> {
+        event(componentName, (source, params) -> {
             Type type = value.getKey().getType();
             ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
                     TypedMap.builder()
