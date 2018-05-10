@@ -41,7 +41,7 @@ public class McJtyRegister {
                 if (tiles.containsKey(mBlock.getBlock())) {
                     MTile tile = tiles.get(mBlock.getBlock());
                     if (tile.getTileEntityClass() == null) {
-                        throw new RuntimeException("Bad tile bindings registration for block: " + mBlock.getBlock().getRegistryName().toString());
+                        throw new RuntimeException("Bad tile entity registration for block: " + mBlock.getBlock().getRegistryName().toString());
                     }
                     GameRegistry.registerTileEntity(tile.getTileEntityClass(), mBlock.getMod().getModId() + "_" + mBlock.getBlock().getRegistryName().getResourcePath());
                 }

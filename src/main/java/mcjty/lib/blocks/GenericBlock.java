@@ -468,7 +468,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     /**
-     * Break a block in the world, convert it to an bindings and remember all the settings
+     * Break a block in the world, convert it to an entity and remember all the settings
      * for this block in the itemstack.
      */
     protected void breakAndRemember(World world, EntityPlayer player, BlockPos pos) {

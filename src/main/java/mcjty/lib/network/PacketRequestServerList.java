@@ -6,7 +6,7 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * Make a subclass of this class to implement a command that can be sent from the client (typically in a GUI)
- * and will perform some command on the server-side tile bindings. The result of that command (a list of some
+ * and will perform some command on the server-side tile entity. The result of that command (a list of some
  * type of object) will be sent back to the client through the 'PacketListToClient' class. So typically
  * you would also make a subclass of PacketListToClient.
  *

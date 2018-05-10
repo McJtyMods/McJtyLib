@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
- * a tile bindings on the server side that implements CommandHandler. This will call 'execute()' on
+ * a tile entity on the server side that implements CommandHandler. This will call 'execute()' on
  * that command handler.
  */
 public class PacketServerCommandTyped extends AbstractServerCommandTyped {

@@ -206,7 +206,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     /**
      * For compatibility reasons this calls writeToNBT() but for
      * efficiency reasons you should override this in your tile
-     * bindings to only write what you need on the client.
+     * entity to only write what you need on the client.
      *
      * @param tagCompound
      */
@@ -217,7 +217,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     /**
      * For compatibility reasons this calls readFromNBT() but for
      * efficiency reasons you should override this in your tile
-     * bindings to only read what you need on the client.
+     * entity to only read what you need on the client.
      *
      * @param tagCompound
      */

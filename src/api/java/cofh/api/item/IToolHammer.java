@@ -43,8 +43,8 @@ public interface IToolHammer {
      * Callback for when the tool has been used reactively.
      *
      * @param item   The ItemStack for the tool. Not required to match equipped item (e.g., multi-tools that contain other tools).
-     * @param user   The bindings using the tool.
-     * @param entity The bindings the tool is being used on.
+     * @param user   The entity using the tool.
+     * @param entity The entity the tool is being used on.
      */
     void toolUsed(ItemStack item, EntityLivingBase user, Entity entity);
 }
