@@ -61,11 +61,11 @@ public class PacketIntegerFromServer implements IMessage {
 
         private void handle(PacketIntegerFromServer message, MessageContext ctx) {
             TileEntity te = Minecraft.getMinecraft().world.getTileEntity(message.pos);
-            if(!(te instanceof ClientCommandHandler)) {
+            if(!(te instanceof IClientCommandHandler)) {
                 Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
                 return;
             }
-            ClientCommandHandler clientCommandHandler = (ClientCommandHandler) te;
+            IClientCommandHandler clientCommandHandler = (IClientCommandHandler) te;
             if (!clientCommandHandler.execute(message.command, message.result)) {
                 Logging.log("Command " + message.command + " was not handled!");
             }

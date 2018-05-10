@@ -3,7 +3,7 @@ package mcjty.lib.entity;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.container.InventoryHelper;
-import mcjty.lib.network.ClientCommandHandler;
+import mcjty.lib.network.IClientCommandHandler;
 import mcjty.lib.network.ICommandHandler;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.typed.Key;
@@ -54,7 +54,7 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class GenericTileEntity extends TileEntity implements ICommandHandler, ClientCommandHandler {
+public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
 
     public static final IValue[] EMPTY_VALUES = new IValue[0];
     public static final IAction[] EMPTY_ACTIONS = new IAction[0];
