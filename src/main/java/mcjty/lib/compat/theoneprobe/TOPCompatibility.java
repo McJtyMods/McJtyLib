@@ -1,5 +1,7 @@
 package mcjty.lib.compat.theoneprobe;
 
+import mcjty.lib.McJtyLib;
+import mcjty.lib.base.ModBase;
 import mcjty.lib.varia.Logging;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.state.IBlockState;
@@ -46,6 +48,9 @@ public class TOPCompatibility {
 
                 }
             });
+
+            McJtyLib.forEachMod(ModBase::handleTopExtras);
+
             return null;
         }
     }

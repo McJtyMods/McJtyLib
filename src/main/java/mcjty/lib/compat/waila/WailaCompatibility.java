@@ -1,5 +1,7 @@
 package mcjty.lib.compat.waila;
 
+import mcjty.lib.McJtyLib;
+import mcjty.lib.base.ModBase;
 import mcjty.lib.blocks.BaseBlock;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -38,6 +40,9 @@ public class WailaCompatibility implements IWailaDataProvider {
             registrar.registerHeadProvider(INSTANCE, BaseBlock.class);
             registrar.registerBodyProvider(INSTANCE, BaseBlock.class);
             registrar.registerTailProvider(INSTANCE, BaseBlock.class);
+
+            McJtyLib.forEachMod(ModBase::handleWailaExtras);
+
             loaded = true;
         }
     }

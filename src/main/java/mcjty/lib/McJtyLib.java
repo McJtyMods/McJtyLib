@@ -1,5 +1,6 @@
 package mcjty.lib;
 
+import mcjty.lib.base.ModBase;
 import mcjty.lib.network.Arguments;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.network.PacketSendPreferencesToClient;
@@ -28,6 +29,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * Created by Elec332 on 24-3-2016.
@@ -53,6 +55,18 @@ public class McJtyLib {
 
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
+
+    private static final Map<String, ModBase> mods = new HashMap<>();
+
+    public static void registerMod(ModBase mod) {
+        mods.put(mod.getModId(), mod);
+    }
+
+    public static void forEachMod(Consumer<ModBase> consumer) {
+        for (ModBase mod : mods.values()) {
+            consumer.accept(mod);
+        }
+    }
 
     public static void registerCommand(String modid, String id, IServerCommand command) {
         serverCommands.put(Pair.of(modid, id), command);
