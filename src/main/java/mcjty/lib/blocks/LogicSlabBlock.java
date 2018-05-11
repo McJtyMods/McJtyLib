@@ -1,9 +1,8 @@
 package mcjty.lib.blocks;
 
 import mcjty.lib.base.ModBase;
-import mcjty.lib.tileentity.GenericTileEntity;
-import mcjty.lib.varia.LogicFacing;
 import mcjty.lib.tileentity.LogicTileEntity;
+import mcjty.lib.varia.LogicFacing;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRedstoneWire;
 import net.minecraft.block.material.Material;
@@ -50,6 +49,28 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
 
     public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, Class<? extends C> containerClass, BiFunction<EntityPlayer, TileEntity, C> containerFactory, Class<? extends ItemBlock> itemBlockClass, String name, boolean isContainer) {
         super(mod, material, tileEntityClass, containerClass, containerFactory, itemBlockClass, name, isContainer);
+    }
+
+    public static EnumFacing rotateLeft(EnumFacing downSide, EnumFacing inputSide) {
+        switch (downSide) {
+            case DOWN:
+                return inputSide.rotateY();
+            case UP:
+                return inputSide.rotateYCCW();
+            case NORTH:
+                return inputSide.rotateAround(Axis.Z);
+            case SOUTH:
+                return inputSide.getOpposite().rotateAround(Axis.Z);
+            case WEST:
+                return inputSide.rotateAround(Axis.X);
+            case EAST:
+                return inputSide.getOpposite().rotateAround(Axis.X);
+        }
+        return inputSide;
+    }
+
+    public static EnumFacing rotateRight(EnumFacing downSide, EnumFacing inputSide) {
+        return rotateLeft(downSide.getOpposite(), inputSide);
     }
 
     @Override
