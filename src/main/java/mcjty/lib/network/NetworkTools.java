@@ -9,6 +9,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +78,7 @@ public class NetworkTools {
     }
 
     /// This function supports itemstacks with more then 64 items.
-    public static void writeItemStack(ByteBuf dataOut, ItemStack itemStack) {
+    public static void writeItemStack(ByteBuf dataOut, @Nonnull ItemStack itemStack) {
         PacketBuffer buf = new PacketBuffer(dataOut);
         NBTTagCompound nbt = new NBTTagCompound();
         itemStack.writeToNBT(nbt);

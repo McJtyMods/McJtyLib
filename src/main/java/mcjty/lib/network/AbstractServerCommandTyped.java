@@ -61,10 +61,18 @@ public class AbstractServerCommandTyped implements IMessage {
                         args.put(new Key<>(key, Type.DOUBLE), buf.readDouble());
                         break;
                     case TYPE_BLOCKPOS:
-                        args.put(new Key<>(key, Type.BLOCKPOS), NetworkTools.readPos(buf));
+                        if (buf.readBoolean()) {
+                            args.put(new Key<>(key, Type.BLOCKPOS), NetworkTools.readPos(buf));
+                        } else {
+                            args.put(new Key<>(key, Type.BLOCKPOS), null);
+                        }
                         break;
                     case TYPE_STACK:
-                        args.put(new Key<>(key, Type.ITEMSTACK), NetworkTools.readItemStack(buf));
+                        if (buf.readBoolean()) {
+                            args.put(new Key<>(key, Type.ITEMSTACK), NetworkTools.readItemStack(buf));
+                        } else {
+                            args.put(new Key<>(key, Type.ITEMSTACK), null);
+                        }
                         break;
                 }
             }
@@ -90,10 +98,22 @@ public class AbstractServerCommandTyped implements IMessage {
                 buf.writeDouble((Double) args.get(key));
             } else if (key.getType() == Type.BLOCKPOS) {
                 buf.writeByte(ArgumentType.TYPE_BLOCKPOS.ordinal());
-                NetworkTools.writePos(buf, (BlockPos) args.get(key));
+                BlockPos pos = (BlockPos) args.get(key);
+                if (pos != null) {
+                    buf.writeBoolean(true);
+                    NetworkTools.writePos(buf, pos);
+                } else {
+                    buf.writeBoolean(false);
+                }
             } else if (key.getType() == Type.ITEMSTACK) {
                 buf.writeByte(ArgumentType.TYPE_STACK.ordinal());
-                NetworkTools.writeItemStack(buf, (ItemStack) args.get(key));
+                ItemStack stack = (ItemStack) args.get(key);
+                if (stack != null) {
+                    buf.writeBoolean(true);
+                    NetworkTools.writeItemStack(buf, stack);
+                } else {
+                    buf.writeBoolean(false);
+                }
             } else {
                 throw new RuntimeException("Unsupported type for key " + key.getName() + "!");
             }
