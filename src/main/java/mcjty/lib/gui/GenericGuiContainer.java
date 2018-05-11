@@ -2,10 +2,12 @@ package mcjty.lib.gui;
 
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
-import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.network.*;
+import mcjty.lib.network.Arguments;
+import mcjty.lib.network.PacketSendServerCommand;
+import mcjty.lib.network.PacketServerCommandTyped;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
@@ -23,7 +25,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -282,11 +284,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
     }
 
     private boolean isPartiallyCoveredByModalWindow(Slot slotIn) {
-        return windowManager.getModalWindows().anyMatch(window -> {
-            int xPos = slotIn.xPos;
-            int yPos = slotIn.yPos;
-            return window.getToplevel().getBounds().intersects(new Rectangle(xPos, yPos, 18, 18));
-        });
+        int xPos = slotIn.xPos + window.getToplevel().getBounds().x;
+        int yPos = slotIn.yPos + window.getToplevel().getBounds().y;
+
+        return windowManager.getModalWindows()
+                .anyMatch(window -> window.getToplevel().getBounds().intersects(new Rectangle(xPos, yPos, 18, 18)));
     }
 
     /**
