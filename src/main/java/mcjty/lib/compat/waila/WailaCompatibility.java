@@ -32,11 +32,15 @@ public class WailaCompatibility implements IWailaDataProvider {
     private static boolean registered;
     private static boolean loaded;
 
+    public static IWailaRegistrar registrar;
+
     public static void load(IWailaRegistrar registrar) {
         if (!registered){
             throw new RuntimeException("Please register this handler using the provided method");
         }
         if (!loaded) {
+            WailaCompatibility.registrar = registrar;
+
             registrar.registerHeadProvider(INSTANCE, BaseBlock.class);
             registrar.registerBodyProvider(INSTANCE, BaseBlock.class);
             registrar.registerTailProvider(INSTANCE, BaseBlock.class);

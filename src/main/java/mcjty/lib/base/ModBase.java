@@ -24,7 +24,8 @@ public interface ModBase {
 
     /**
      * If your mod is registered with McJtyLib.registerMod() then this will be called after
-     * McJtyLib finds that WAILA or HWYLA is present
+     * McJtyLib finds that WAILA or HWYLA is present. You can get the wail registrar
+     * at WailaCompatibility.registrar.
      */
     default void handleWailaExtras() {}
 
