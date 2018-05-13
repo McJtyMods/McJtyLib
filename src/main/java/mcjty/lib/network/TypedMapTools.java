@@ -7,6 +7,9 @@ import mcjty.lib.typed.TypedMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TypedMapTools {
 
     public static TypedMap readArguments(ByteBuf buf) {
@@ -46,6 +49,21 @@ public class TypedMapTools {
                             args.put(new Key<>(key, Type.ITEMSTACK), null);
                         }
                         break;
+                    case TYPE_STRING_LIST: {
+                        int s = buf.readInt();
+                        if (s == -1) {
+                            args.put(new Key<>(key, Type.STRING_LIST), null);
+                        } else {
+                            List<String> list = new ArrayList<>(s);
+                            for (int j = 0; j < s; j++) {
+                                list.set(j, NetworkTools.readStringUTF8(buf));
+                            }
+                            args.put(new Key<>(key, Type.STRING_LIST), list);
+                        }
+                        break;
+                    }
+                    default:
+                        throw new RuntimeException("Unsupported type for key '" + key + "'!");
                 }
             }
         }
@@ -88,6 +106,16 @@ public class TypedMapTools {
                     NetworkTools.writeItemStack(buf, stack);
                 } else {
                     buf.writeBoolean(false);
+                }
+            } else if (key.getType() == Type.STRING_LIST) {
+                List<String> list = (List<String>) args.get(key);
+                if (list != null) {
+                    buf.writeInt(list.size());
+                    for (String s : list) {
+                        NetworkTools.writeStringUTF8(buf, s);
+                    }
+                } else {
+                    buf.writeInt(-1);
                 }
             } else {
                 throw new RuntimeException("Unsupported type for key " + key.getName() + "!");

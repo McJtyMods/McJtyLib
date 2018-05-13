@@ -49,6 +49,8 @@ public class PacketUpdateNBTItemHandler<T extends PacketUpdateNBTItem> implement
                 throw new RuntimeException("BlockPos not supported for PacketUpdateNBTItem!");
             } else if (Type.ITEMSTACK.equals(akey.getType())) {
                 throw new RuntimeException("ItemStack not supported for PacketUpdateNBTItem!");
+            } else {
+                throw new RuntimeException(akey.getType().getType().getSimpleName() + " not supported for PacketUpdateNBTItem!");
             }
         }
     }
