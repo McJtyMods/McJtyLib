@@ -1,7 +1,9 @@
 package mcjty.lib.network;
 
 import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -9,9 +11,10 @@ import java.util.List;
  * implements PacketListFromServer).
  */
 public interface IClientCommandHandler {
-    /// Return true if command was handled correctly. False if not.
-    <T> boolean execute(String command, List<T> list, Type<T> type);
 
     /// Return true if command was handled correctly. False if not.
-    boolean execute(String command, Integer result);
+    <T> boolean receiveListFromServer(String command, List<T> list, Type<T> type);
+
+    /// Return true if command was handled correctly. False if not.
+    boolean receiveDataFromServer(String command, @Nonnull TypedMap result);
 }

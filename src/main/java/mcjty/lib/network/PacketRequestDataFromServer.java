@@ -17,11 +17,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
  * a tile entity on the server side that implements CommandHandler. This will call 'executeWithResultInteger()' on
  * that command handler. A PacketIntegerFromServer will be sent back from the client.
  */
-public class PacketRequestIntegerFromServer extends AbstractServerCommandTyped {
+public class PacketRequestDataFromServer extends AbstractServerCommandTyped {
     private String clientCommand;
     private String modid;
 
-    public PacketRequestIntegerFromServer() {
+    public PacketRequestDataFromServer() {
     }
 
     @Override
@@ -40,27 +40,27 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommandTyped {
         NetworkTools.writeString(buf, modid);
     }
 
-    public PacketRequestIntegerFromServer(String modid, BlockPos pos, String command, String clientCommand, TypedMap params) {
+    public PacketRequestDataFromServer(String modid, BlockPos pos, String command, String clientCommand, TypedMap params) {
         super(pos, command, params);
         this.clientCommand = clientCommand;
         this.modid = modid;
     }
 
-    public static class Handler implements IMessageHandler<PacketRequestIntegerFromServer, IMessage> {
+    public static class Handler implements IMessageHandler<PacketRequestDataFromServer, IMessage> {
         @Override
-        public IMessage onMessage(PacketRequestIntegerFromServer message, MessageContext ctx) {
+        public IMessage onMessage(PacketRequestDataFromServer message, MessageContext ctx) {
             FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
             return null;
         }
 
-        private void handle(PacketRequestIntegerFromServer message, MessageContext ctx) {
+        private void handle(PacketRequestDataFromServer message, MessageContext ctx) {
             TileEntity te = ctx.getServerHandler().player.getEntityWorld().getTileEntity(message.pos);
             if(!(te instanceof ICommandHandler)) {
                 Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                 return;
             }
             ICommandHandler commandHandler = (ICommandHandler) te;
-            Integer result = commandHandler.executeWithResultInteger(message.command, message.params);
+            TypedMap result = commandHandler.executeWithResult(message.command, message.params);
             if (result == null) {
                 Logging.log("Command " + message.command + " was not handled!");
                 return;
@@ -69,9 +69,9 @@ public class PacketRequestIntegerFromServer extends AbstractServerCommandTyped {
             sendReplyToClient(message, result, ctx.getServerHandler().player);
        }
 
-        private void sendReplyToClient(PacketRequestIntegerFromServer message, Integer result, EntityPlayerMP player) {
+        private void sendReplyToClient(PacketRequestDataFromServer message, TypedMap result, EntityPlayerMP player) {
             SimpleNetworkWrapper wrapper = PacketHandler.modNetworking.get(message.modid);
-            PacketIntegerFromServer msg = new PacketIntegerFromServer(message.pos, message.clientCommand, result);
+            PacketDataFromServer msg = new PacketDataFromServer(message.pos, message.clientCommand, result);
             wrapper.sendTo(msg, player);
         }
 

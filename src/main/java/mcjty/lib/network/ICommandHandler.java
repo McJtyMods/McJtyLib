@@ -5,6 +5,7 @@ import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.EntityPlayerMP;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -21,6 +22,7 @@ public interface ICommandHandler {
     @Nonnull
     <T> List<T> executeWithResultList(String command, TypedMap args, Type<T> type);
 
-    /// Return a numeric result which will be sent back to the client. Returns null if command was not handled.
-    Integer executeWithResultInteger(String command, TypedMap args);
+    /// Return a typed map result which will be sent back to the client. Returns null if command was not handled.
+    @Nullable
+    TypedMap executeWithResult(String command, TypedMap args);
 }

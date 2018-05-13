@@ -39,6 +39,8 @@ public class PacketUpdateNBTItemHandler<T extends PacketUpdateNBTItem> implement
                 tagCompound.setString(key, (String) message.args.get(akey));
             } else if (Type.INTEGER.equals(akey.getType())) {
                 tagCompound.setInteger(key, (Integer) message.args.get(akey));
+            } else if (Type.LONG.equals(akey.getType())) {
+                tagCompound.setLong(key, (Long) message.args.get(akey));
             } else if (Type.DOUBLE.equals(akey.getType())) {
                 tagCompound.setDouble(key, (Double) message.args.get(akey));
             } else if (Type.BOOLEAN.equals(akey.getType())) {

@@ -1,14 +1,21 @@
 package mcjty.lib.tileentity;
 
 import mcjty.lib.network.PacketHandler;
-import mcjty.lib.network.PacketRequestIntegerFromServer;
+import mcjty.lib.network.PacketRequestDataFromServer;
+import mcjty.lib.typed.Key;
+import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.nbt.NBTTagCompound;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class GenericEnergyStorageTileEntity extends GenericTileEntity {
 
     public static final String CMD_GETENERGY = "getEnergy";
     public static final String CLIENTCMD_GETENERGY = "getEnergy";
+
+    public static final Key<Integer> PARAM_ENERGY = new Key<>("energy", Type.INTEGER);
 
     protected McJtyEnergyStorage storage;
 
@@ -69,31 +76,32 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
             return;
         }
         requestRfDelay = 3;
-        PacketHandler.modNetworking.get(modid).sendToServer(new PacketRequestIntegerFromServer(modid, pos,
+        PacketHandler.modNetworking.get(modid).sendToServer(new PacketRequestDataFromServer(modid, pos,
                 CMD_GETENERGY,
                 CLIENTCMD_GETENERGY, TypedMap.EMPTY));
     }
 
     @Override
-    public Integer executeWithResultInteger(String command, TypedMap args) {
-        Integer rc = super.executeWithResultInteger(command, args);
+    @Nullable
+    public TypedMap executeWithResult(String command, TypedMap args) {
+        TypedMap rc = super.executeWithResult(command, args);
         if (rc != null) {
             return rc;
         }
         if (CMD_GETENERGY.equals(command)) {
-            return storage.getEnergyStored();
+            return TypedMap.builder().put(PARAM_ENERGY, storage.getEnergyStored()).build();
         }
         return null;
     }
 
     @Override
-    public boolean execute(String command, Integer result) {
-        boolean rc = super.execute(command, result);
+    public boolean receiveDataFromServer(String command, @Nonnull TypedMap result) {
+        boolean rc = super.receiveDataFromServer(command, result);
         if (rc) {
             return true;
         }
         if (CLIENTCMD_GETENERGY.equals(command)) {
-            setCurrentRF(result);
+            setCurrentRF(result.get(PARAM_ENERGY));
             return true;
         }
         return false;

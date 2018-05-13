@@ -23,6 +23,9 @@ public class TypedMapTools {
                     case TYPE_INTEGER:
                         args.put(new Key<>(key, Type.INTEGER), buf.readInt());
                         break;
+                    case TYPE_LONG:
+                        args.put(new Key<>(key, Type.LONG), buf.readLong());
+                        break;
                     case TYPE_BOOLEAN:
                         args.put(new Key<>(key, Type.BOOLEAN), buf.readBoolean());
                         break;
@@ -59,6 +62,9 @@ public class TypedMapTools {
             } else if (key.getType() == Type.INTEGER) {
                 buf.writeByte(ArgumentType.TYPE_INTEGER.ordinal());
                 buf.writeInt((Integer) args.get(key));
+            } else if (key.getType() == Type.LONG) {
+                buf.writeByte(ArgumentType.TYPE_LONG.ordinal());
+                buf.writeLong((Integer) args.get(key));
             } else if (key.getType() == Type.BOOLEAN) {
                 buf.writeByte(ArgumentType.TYPE_BOOLEAN.ordinal());
                 buf.writeBoolean((Boolean) args.get(key));

@@ -374,17 +374,17 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public Integer executeWithResultInteger(String command, TypedMap args) {
+    public TypedMap executeWithResult(String command, TypedMap args) {
         return null;
     }
 
     @Override
-    public <T> boolean execute(String command, List<T> list, Type<T> type) {
+    public <T> boolean receiveListFromServer(String command, List<T> list, Type<T> type) {
         return false;
     }
 
     @Override
-    public boolean execute(String command, Integer result) {
+    public boolean receiveDataFromServer(String command, @Nonnull TypedMap result) {
         return false;
     }
 

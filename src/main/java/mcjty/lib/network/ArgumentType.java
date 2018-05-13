@@ -9,7 +9,8 @@ public enum ArgumentType {
     TYPE_BLOCKPOS(2),
     TYPE_BOOLEAN(3),
     TYPE_DOUBLE(4),
-    TYPE_STACK(5);
+    TYPE_STACK(5),
+    TYPE_LONG(6);
 
     private final int index;
     private static final Map<Integer, ArgumentType> mapping = new HashMap<>();
