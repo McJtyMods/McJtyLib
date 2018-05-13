@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import javax.annotation.Nonnull;
@@ -9,7 +10,7 @@ public class PacketSendClientCommand implements IMessage {
 
     private String modid;
     private String command;
-    private Arguments arguments;
+    private TypedMap arguments;
 
 
     public String getModid() {
@@ -20,7 +21,7 @@ public class PacketSendClientCommand implements IMessage {
         return command;
     }
 
-    public Arguments getArguments() {
+    public TypedMap getArguments() {
         return arguments;
     }
 
@@ -28,20 +29,20 @@ public class PacketSendClientCommand implements IMessage {
     public void fromBytes(ByteBuf buf) {
         modid = NetworkTools.readString(buf);
         command = NetworkTools.readString(buf);
-        arguments = new Arguments(buf);
+        arguments = TypedMapTools.readArguments(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         NetworkTools.writeString(buf, modid);
         NetworkTools.writeString(buf, command);
-        arguments.toBytes(buf);
+        TypedMapTools.writeArguments(buf, arguments);
     }
 
     public PacketSendClientCommand() {
     }
 
-    public PacketSendClientCommand(String modid, String command, @Nonnull Arguments arguments) {
+    public PacketSendClientCommand(String modid, String command, @Nonnull TypedMap arguments) {
         this.modid = modid;
         this.command = command;
         this.arguments = arguments;

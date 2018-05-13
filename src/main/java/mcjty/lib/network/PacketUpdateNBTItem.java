@@ -13,12 +13,12 @@ public abstract class PacketUpdateNBTItem implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        args = AbstractServerCommandTyped.readArguments(buf);
+        args = TypedMapTools.readArguments(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        AbstractServerCommandTyped.writeArguments(buf, args);
+        TypedMapTools.writeArguments(buf, args);
     }
 
     public PacketUpdateNBTItem() {

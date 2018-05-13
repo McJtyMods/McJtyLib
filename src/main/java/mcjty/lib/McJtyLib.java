@@ -1,12 +1,12 @@
 package mcjty.lib;
 
 import mcjty.lib.base.ModBase;
-import mcjty.lib.network.Arguments;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
+import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -76,7 +76,7 @@ public class McJtyLib {
         clientCommands.put(Pair.of(modid, id), command);
     }
 
-    public static boolean handleCommand(String modid, String id, EntityPlayer player, Arguments arguments) {
+    public static boolean handleCommand(String modid, String id, EntityPlayer player, TypedMap arguments) {
         IServerCommand command = serverCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;
@@ -84,7 +84,7 @@ public class McJtyLib {
         return command.execute(player, arguments);
     }
 
-    public static boolean handleClientCommand(String modid, String id, EntityPlayer player, Arguments arguments) {
+    public static boolean handleClientCommand(String modid, String id, EntityPlayer player, TypedMap arguments) {
         IServerCommand command = clientCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;

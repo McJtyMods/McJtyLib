@@ -4,6 +4,7 @@ import mcjty.lib.network.clientinfo.InfoPacketClient;
 import mcjty.lib.network.clientinfo.InfoPacketServer;
 import mcjty.lib.network.clientinfo.PacketGetInfoFromServer;
 import mcjty.lib.network.clientinfo.PacketReturnInfoToClient;
+import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -93,7 +94,7 @@ public class PacketHandler {
     }
 
     // From client side only: send server command
-    public static void sendCommand(SimpleNetworkWrapper network, String modid, String command, @Nonnull  Arguments arguments) {
+    public static void sendCommand(SimpleNetworkWrapper network, String modid, String command, @Nonnull TypedMap arguments) {
         network.sendToServer(new PacketSendServerCommand(modid, command, arguments));
     }
 }

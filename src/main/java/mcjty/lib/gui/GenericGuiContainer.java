@@ -4,7 +4,6 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.network.Arguments;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -411,12 +410,12 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), dimensionId, command, params));
     }
 
-    public void sendServerCommand(String modid, String command, @Nonnull Arguments arguments) {
+    public void sendServerCommand(String modid, String command, @Nonnull TypedMap arguments) {
         network.sendToServer(new PacketSendServerCommand(modid, command, arguments));
     }
 
     public void sendServerCommand(String modid, String command) {
-        network.sendToServer(new PacketSendServerCommand(modid, command, Arguments.EMPTY));
+        network.sendToServer(new PacketSendServerCommand(modid, command, TypedMap.EMPTY));
     }
 
 }
