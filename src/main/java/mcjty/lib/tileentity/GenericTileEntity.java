@@ -2,12 +2,10 @@ package mcjty.lib.tileentity;
 
 import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
-import mcjty.lib.network.IClientCommandHandler;
-import mcjty.lib.network.ICommandHandler;
-import mcjty.lib.network.PacketServerCommandTyped;
+import mcjty.lib.container.InventoryHelper;
+import mcjty.lib.network.*;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -529,6 +527,14 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
                         .put(valueKey, value)
                         .build()));
     }
+
+    /**
+     * Call this client-side to this TE to request data from the server
+     */
+    public void requestDataFromServer(String modid, String command, String clientCommand, @Nonnull TypedMap params) {
+        PacketHandler.modNetworking.get(modid).sendToServer(new PacketRequestDataFromServer(modid, pos, command, clientCommand, params));
+    }
+
 
     @Override
     public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {

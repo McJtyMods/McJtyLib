@@ -1,7 +1,5 @@
 package mcjty.lib.tileentity;
 
-import mcjty.lib.network.PacketHandler;
-import mcjty.lib.network.PacketRequestDataFromServer;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -76,9 +74,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
             return;
         }
         requestRfDelay = 3;
-        PacketHandler.modNetworking.get(modid).sendToServer(new PacketRequestDataFromServer(modid, pos,
-                CMD_GETENERGY,
-                CLIENTCMD_GETENERGY, TypedMap.EMPTY));
+        requestDataFromServer(modid, CMD_GETENERGY, CLIENTCMD_GETENERGY, TypedMap.EMPTY);
     }
 
     @Override
