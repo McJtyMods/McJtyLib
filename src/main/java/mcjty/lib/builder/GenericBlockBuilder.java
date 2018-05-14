@@ -85,6 +85,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
                 return getter.getRedstoneOutput(state, world, pos, side);
             }
 
+
             @Override
             protected IProperty<?>[] getProperties() {
                 return properties;
