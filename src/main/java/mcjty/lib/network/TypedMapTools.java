@@ -75,6 +75,19 @@ public class TypedMapTools {
                         }
                         break;
                     }
+                    case TYPE_POS_LIST: {
+                        int s = buf.readInt();
+                        if (s == -1) {
+                            args.put(new Key<>(key, Type.POS_LIST), null);
+                        } else {
+                            List<BlockPos> list = new ArrayList<>(s);
+                            for (int j = 0; j < s; j++) {
+                                list.set(j, NetworkTools.readPos(buf));
+                            }
+                            args.put(new Key<>(key, Type.POS_LIST), list);
+                        }
+                        break;
+                    }
                     default:
                         throw new RuntimeException("Unsupported type for key '" + key + "'!");
                 }
@@ -136,6 +149,16 @@ public class TypedMapTools {
                     buf.writeInt(list.size());
                     for (ItemStack s : list) {
                         NetworkTools.writeItemStack(buf, s);
+                    }
+                } else {
+                    buf.writeInt(-1);
+                }
+            } else if (key.getType() == Type.POS_LIST) {
+                List<BlockPos> list = (List<BlockPos>) args.get(key);
+                if (list != null) {
+                    buf.writeInt(list.size());
+                    for (BlockPos s : list) {
+                        NetworkTools.writePos(buf, s);
                     }
                 } else {
                     buf.writeInt(-1);

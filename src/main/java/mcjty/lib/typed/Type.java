@@ -25,6 +25,7 @@ public final class Type<V> {
 
     public static final Type<List<String>> STRING_LIST = create(List.class);
     public static final Type<List<ItemStack>> ITEMSTACK_LIST = create(List.class);
+    public static final Type<List<BlockPos>> POS_LIST = create(List.class);
 
     @Nonnull private final Class<V> type;
 
