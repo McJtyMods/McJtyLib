@@ -62,6 +62,19 @@ public class TypedMapTools {
                         }
                         break;
                     }
+                    case TYPE_ITEMSTACK_LIST: {
+                        int s = buf.readInt();
+                        if (s == -1) {
+                            args.put(new Key<>(key, Type.ITEMSTACK_LIST), null);
+                        } else {
+                            List<ItemStack> list = new ArrayList<>(s);
+                            for (int j = 0; j < s; j++) {
+                                list.set(j, NetworkTools.readItemStack(buf));
+                            }
+                            args.put(new Key<>(key, Type.ITEMSTACK_LIST), list);
+                        }
+                        break;
+                    }
                     default:
                         throw new RuntimeException("Unsupported type for key '" + key + "'!");
                 }
@@ -113,6 +126,16 @@ public class TypedMapTools {
                     buf.writeInt(list.size());
                     for (String s : list) {
                         NetworkTools.writeStringUTF8(buf, s);
+                    }
+                } else {
+                    buf.writeInt(-1);
+                }
+            } else if (key.getType() == Type.ITEMSTACK_LIST) {
+                List<ItemStack> list = (List<ItemStack>) args.get(key);
+                if (list != null) {
+                    buf.writeInt(list.size());
+                    for (ItemStack s : list) {
+                        NetworkTools.writeItemStack(buf, s);
                     }
                 } else {
                     buf.writeInt(-1);

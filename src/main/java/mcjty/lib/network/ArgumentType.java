@@ -12,7 +12,8 @@ public enum ArgumentType {
     TYPE_DOUBLE(4),
     TYPE_STACK(5),
     TYPE_LONG(6),
-    TYPE_STRING_LIST(7);
+    TYPE_STRING_LIST(7),
+    TYPE_ITEMSTACK_LIST(8);
 
     private final int index;
     private static final Map<Integer, ArgumentType> mapping = new HashMap<>();

@@ -19,10 +19,12 @@ public final class Type<V> {
     public static final Type<Double> DOUBLE = create(Double.class);
     public static final Type<Long> LONG = create(Long.class);
     public static final Type<String> STRING = create(String.class);
-    public static final Type<List<String>> STRING_LIST = create(List.class);
     public static final Type<Boolean> BOOLEAN = create(Boolean.class);
     public static final Type<BlockPos> BLOCKPOS = create(BlockPos.class);
     public static final Type<ItemStack> ITEMSTACK = create(ItemStack.class);
+
+    public static final Type<List<String>> STRING_LIST = create(List.class);
+    public static final Type<List<ItemStack>> ITEMSTACK_LIST = create(List.class);
 
     @Nonnull private final Class<V> type;
 
