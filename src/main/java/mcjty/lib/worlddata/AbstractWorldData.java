@@ -2,6 +2,7 @@ package mcjty.lib.worlddata;
 
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.common.DimensionManager;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +17,8 @@ public abstract class AbstractWorldData<T extends AbstractWorldData> extends Wor
         super(name);
     }
 
-    public void save(World world) {
+    public void save() {
+        World world = DimensionManager.getWorld(0);
         world.setData(mapName, this);
         markDirty();
     }
@@ -32,6 +34,12 @@ public abstract class AbstractWorldData<T extends AbstractWorldData> extends Wor
 
     public static int getDataCount() {
         return instances.size();
+    }
+
+    @Nonnull
+    public static <T extends AbstractWorldData> T getData(Class<T> clazz, String name) {
+        World world = DimensionManager.getWorld(0);
+        return getData(world, clazz, name);
     }
 
     @Nonnull
