@@ -18,7 +18,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
  * that command handler. A PacketIntegerFromServer will be sent back from the client.
  */
 public class PacketRequestDataFromServer extends AbstractServerCommandTyped {
-    private String clientCommand;
     private String modid;
 
     public PacketRequestDataFromServer() {
@@ -28,7 +27,6 @@ public class PacketRequestDataFromServer extends AbstractServerCommandTyped {
     public void fromBytes(ByteBuf buf) {
         super.fromBytes(buf);
 
-        clientCommand = NetworkTools.readString(buf);
         modid = NetworkTools.readString(buf);
     }
 
@@ -36,13 +34,11 @@ public class PacketRequestDataFromServer extends AbstractServerCommandTyped {
     public void toBytes(ByteBuf buf) {
         super.toBytes(buf);
 
-        NetworkTools.writeString(buf, clientCommand);
         NetworkTools.writeString(buf, modid);
     }
 
-    public PacketRequestDataFromServer(String modid, BlockPos pos, String command, String clientCommand, TypedMap params) {
+    public PacketRequestDataFromServer(String modid, BlockPos pos, String command, TypedMap params) {
         super(pos, command, params);
-        this.clientCommand = clientCommand;
         this.modid = modid;
     }
 
@@ -71,7 +67,7 @@ public class PacketRequestDataFromServer extends AbstractServerCommandTyped {
 
         private void sendReplyToClient(PacketRequestDataFromServer message, TypedMap result, EntityPlayerMP player) {
             SimpleNetworkWrapper wrapper = PacketHandler.modNetworking.get(message.modid);
-            PacketDataFromServer msg = new PacketDataFromServer(message.pos, message.clientCommand, result);
+            PacketDataFromServer msg = new PacketDataFromServer(message.pos, message.command, result);
             wrapper.sendTo(msg, player);
         }
 

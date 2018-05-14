@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 public class GenericEnergyStorageTileEntity extends GenericTileEntity {
 
     public static final String CMD_GETENERGY = "getEnergy";
-    public static final String CLIENTCMD_GETENERGY = "getEnergy";
 
     public static final Key<Integer> PARAM_ENERGY = new Key<>("energy", Type.INTEGER);
 
@@ -74,7 +73,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
             return;
         }
         requestRfDelay = 3;
-        requestDataFromServer(modid, CMD_GETENERGY, CLIENTCMD_GETENERGY, TypedMap.EMPTY);
+        requestDataFromServer(modid, CMD_GETENERGY, TypedMap.EMPTY);
     }
 
     @Override
@@ -96,7 +95,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
         if (rc) {
             return true;
         }
-        if (CLIENTCMD_GETENERGY.equals(command)) {
+        if (CMD_GETENERGY.equals(command)) {
             setCurrentRF(result.get(PARAM_ENERGY));
             return true;
         }
