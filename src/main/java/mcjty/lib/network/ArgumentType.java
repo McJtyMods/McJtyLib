@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // @todo, remove this
-public enum ArgumentType {
+enum ArgumentType {
     TYPE_STRING(0),
     TYPE_INTEGER(1),
     TYPE_BLOCKPOS(2),

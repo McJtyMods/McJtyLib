@@ -134,6 +134,7 @@ public class TypedMapTools {
                     buf.writeBoolean(false);
                 }
             } else if (key.getType() == Type.STRING_LIST) {
+                buf.writeByte(ArgumentType.TYPE_STRING_LIST.ordinal());
                 List<String> list = (List<String>) args.get(key);
                 if (list != null) {
                     buf.writeInt(list.size());
@@ -144,6 +145,7 @@ public class TypedMapTools {
                     buf.writeInt(-1);
                 }
             } else if (key.getType() == Type.ITEMSTACK_LIST) {
+                buf.writeByte(ArgumentType.TYPE_ITEMSTACK_LIST.ordinal());
                 List<ItemStack> list = (List<ItemStack>) args.get(key);
                 if (list != null) {
                     buf.writeInt(list.size());
@@ -154,6 +156,7 @@ public class TypedMapTools {
                     buf.writeInt(-1);
                 }
             } else if (key.getType() == Type.POS_LIST) {
+                buf.writeByte(ArgumentType.TYPE_POS_LIST.ordinal());
                 List<BlockPos> list = (List<BlockPos>) args.get(key);
                 if (list != null) {
                     buf.writeInt(list.size());
