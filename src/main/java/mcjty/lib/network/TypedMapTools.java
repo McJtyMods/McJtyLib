@@ -85,7 +85,7 @@ public class TypedMapTools {
                         } else {
                             List<String> list = new ArrayList<>(s);
                             for (int j = 0; j < s; j++) {
-                                list.set(j, NetworkTools.readStringUTF8(buf));
+                                list.add(NetworkTools.readStringUTF8(buf));
                             }
                             args.put(new Key<>(key, Type.STRING_LIST), list);
                         }
@@ -98,7 +98,7 @@ public class TypedMapTools {
                         } else {
                             List<ItemStack> list = new ArrayList<>(s);
                             for (int j = 0; j < s; j++) {
-                                list.set(j, NetworkTools.readItemStack(buf));
+                                list.add(NetworkTools.readItemStack(buf));
                             }
                             args.put(new Key<>(key, Type.ITEMSTACK_LIST), list);
                         }
@@ -111,7 +111,7 @@ public class TypedMapTools {
                         } else {
                             List<BlockPos> list = new ArrayList<>(s);
                             for (int j = 0; j < s; j++) {
-                                list.set(j, NetworkTools.readPos(buf));
+                                list.add(NetworkTools.readPos(buf));
                             }
                             args.put(new Key<>(key, Type.POS_LIST), list);
                         }
