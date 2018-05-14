@@ -108,7 +108,7 @@ public class TypedMapTools {
                 buf.writeInt((Integer) args.get(key));
             } else if (key.getType() == Type.LONG) {
                 buf.writeByte(ArgumentType.TYPE_LONG.ordinal());
-                buf.writeLong((Integer) args.get(key));
+                buf.writeLong((Long) args.get(key));
             } else if (key.getType() == Type.BOOLEAN) {
                 buf.writeByte(ArgumentType.TYPE_BOOLEAN.ordinal());
                 buf.writeBoolean((Boolean) args.get(key));
