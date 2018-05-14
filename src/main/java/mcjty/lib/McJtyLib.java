@@ -74,13 +74,13 @@ public class McJtyLib {
 
     @Mod.EventHandler
     public void serverStarted(FMLServerStartingEvent event) {
-        Logging.log("Preparing all data");
+        Logging.log("Preparing all world data");
         AbstractWorldData.clearInstances();
     }
 
     @Mod.EventHandler
     public void serverStopped(FMLServerStoppedEvent event) {
-        Logging.log("Cleaning up all data");
+        Logging.log("Cleaning up all world data: " + AbstractWorldData.getDataCount() + " data blobs");
         AbstractWorldData.clearInstances();
     }
 

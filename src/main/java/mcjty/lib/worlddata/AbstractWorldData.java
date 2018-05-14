@@ -30,6 +30,10 @@ public abstract class AbstractWorldData<T extends AbstractWorldData> extends Wor
         instances.clear();
     }
 
+    public static int getDataCount() {
+        return instances.size();
+    }
+
     @Nonnull
     public static <T extends AbstractWorldData> T getData(World world, Class<T> clazz, String name) {
         if (world.isRemote) {
