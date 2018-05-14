@@ -7,6 +7,8 @@ import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.Logging;
+import mcjty.lib.worlddata.AbstractWorldData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -21,6 +23,8 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -66,6 +70,18 @@ public class McJtyLib {
         for (ModBase mod : mods.values()) {
             consumer.accept(mod);
         }
+    }
+
+    @Mod.EventHandler
+    public void serverStarted(FMLServerStartingEvent event) {
+        Logging.log("Preparing all data");
+        AbstractWorldData.clearInstances();
+    }
+
+    @Mod.EventHandler
+    public void serverStopped(FMLServerStoppedEvent event) {
+        Logging.log("Cleaning up all data");
+        AbstractWorldData.clearInstances();
     }
 
     public static void registerCommand(String modid, String id, IServerCommand command) {
