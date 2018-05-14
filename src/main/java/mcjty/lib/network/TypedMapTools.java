@@ -8,9 +8,38 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TypedMapTools {
+
+    private static Map<Type<?>, ArgumentType> typeToIndex = null;
+
+    private static void setupTypeMapping() {
+        if (typeToIndex == null) {
+            typeToIndex = new HashMap<>();
+            registerMapping(Type.STRING, ArgumentType.TYPE_STRING);
+            registerMapping(Type.INTEGER, ArgumentType.TYPE_INTEGER);
+            registerMapping(Type.BLOCKPOS, ArgumentType.TYPE_BLOCKPOS);
+            registerMapping(Type.BOOLEAN, ArgumentType.TYPE_BOOLEAN);
+            registerMapping(Type.DOUBLE, ArgumentType.TYPE_DOUBLE);
+            registerMapping(Type.ITEMSTACK, ArgumentType.TYPE_STACK);
+            registerMapping(Type.LONG, ArgumentType.TYPE_LONG);
+            registerMapping(Type.STRING_LIST, ArgumentType.TYPE_STRING_LIST);
+            registerMapping(Type.ITEMSTACK_LIST, ArgumentType.TYPE_ITEMSTACK_LIST);
+            registerMapping(Type.POS_LIST, ArgumentType.TYPE_POS_LIST);
+        }
+    }
+
+    private static void registerMapping(Type<?> type, ArgumentType argumentType) {
+        typeToIndex.put(type, argumentType);
+    }
+
+    private static ArgumentType getArgumentType(Type<?> type) {
+        setupTypeMapping();
+        return typeToIndex.get(type);
+    }
 
     public static TypedMap readArguments(ByteBuf buf) {
         TypedMap.Builder args = TypedMap.builder();
@@ -100,75 +129,116 @@ public class TypedMapTools {
         buf.writeInt(args.size());
         for (Key key : args.getKeys()) {
             NetworkTools.writeString(buf, key.getName());
-            if (key.getType() == Type.STRING) {
-                buf.writeByte(ArgumentType.TYPE_STRING.ordinal());
-                NetworkTools.writeString(buf, (String) args.get(key));
-            } else if (key.getType() == Type.INTEGER) {
-                buf.writeByte(ArgumentType.TYPE_INTEGER.ordinal());
-                buf.writeInt((Integer) args.get(key));
-            } else if (key.getType() == Type.LONG) {
-                buf.writeByte(ArgumentType.TYPE_LONG.ordinal());
-                buf.writeLong((Long) args.get(key));
-            } else if (key.getType() == Type.BOOLEAN) {
-                buf.writeByte(ArgumentType.TYPE_BOOLEAN.ordinal());
-                buf.writeBoolean((Boolean) args.get(key));
-            } else if (key.getType() == Type.DOUBLE) {
-                buf.writeByte(ArgumentType.TYPE_DOUBLE.ordinal());
-                buf.writeDouble((Double) args.get(key));
-            } else if (key.getType() == Type.BLOCKPOS) {
-                buf.writeByte(ArgumentType.TYPE_BLOCKPOS.ordinal());
-                BlockPos pos = (BlockPos) args.get(key);
-                if (pos != null) {
-                    buf.writeBoolean(true);
-                    NetworkTools.writePos(buf, pos);
-                } else {
-                    buf.writeBoolean(false);
-                }
-            } else if (key.getType() == Type.ITEMSTACK) {
-                buf.writeByte(ArgumentType.TYPE_STACK.ordinal());
-                ItemStack stack = (ItemStack) args.get(key);
-                if (stack != null) {
-                    buf.writeBoolean(true);
-                    NetworkTools.writeItemStack(buf, stack);
-                } else {
-                    buf.writeBoolean(false);
-                }
-            } else if (key.getType() == Type.STRING_LIST) {
-                buf.writeByte(ArgumentType.TYPE_STRING_LIST.ordinal());
-                List<String> list = (List<String>) args.get(key);
-                if (list != null) {
-                    buf.writeInt(list.size());
-                    for (String s : list) {
-                        NetworkTools.writeStringUTF8(buf, s);
+            ArgumentType argumentType = getArgumentType(key.getType());
+            buf.writeByte(argumentType.ordinal());
+            switch (argumentType) {
+                case TYPE_STRING:
+                    NetworkTools.writeString(buf, (String) args.get(key));
+                    break;
+                case TYPE_INTEGER:
+                    buf.writeInt((Integer) args.get(key));
+                    break;
+                case TYPE_BLOCKPOS: {
+                    BlockPos pos = (BlockPos) args.get(key);
+                    if (pos != null) {
+                        buf.writeBoolean(true);
+                        NetworkTools.writePos(buf, pos);
+                    } else {
+                        buf.writeBoolean(false);
                     }
-                } else {
-                    buf.writeInt(-1);
+                    break;
                 }
-            } else if (key.getType() == Type.ITEMSTACK_LIST) {
-                buf.writeByte(ArgumentType.TYPE_ITEMSTACK_LIST.ordinal());
-                List<ItemStack> list = (List<ItemStack>) args.get(key);
-                if (list != null) {
-                    buf.writeInt(list.size());
-                    for (ItemStack s : list) {
-                        NetworkTools.writeItemStack(buf, s);
+                case TYPE_BOOLEAN:
+                    buf.writeBoolean((Boolean) args.get(key));
+                    break;
+                case TYPE_DOUBLE:
+                    buf.writeDouble((Double) args.get(key));
+                    break;
+                case TYPE_STACK: {
+                    ItemStack stack = (ItemStack) args.get(key);
+                    if (stack != null) {
+                        buf.writeBoolean(true);
+                        NetworkTools.writeItemStack(buf, stack);
+                    } else {
+                        buf.writeBoolean(false);
                     }
-                } else {
-                    buf.writeInt(-1);
+                    break;
                 }
-            } else if (key.getType() == Type.POS_LIST) {
-                buf.writeByte(ArgumentType.TYPE_POS_LIST.ordinal());
-                List<BlockPos> list = (List<BlockPos>) args.get(key);
-                if (list != null) {
-                    buf.writeInt(list.size());
-                    for (BlockPos s : list) {
-                        NetworkTools.writePos(buf, s);
+                case TYPE_LONG:
+                    buf.writeLong((Long) args.get(key));
+                    break;
+                case TYPE_STRING_LIST: {
+                    List<String> list = (List<String>) args.get(key);
+                    if (list != null) {
+                        buf.writeInt(list.size());
+                        for (String s : list) {
+                            NetworkTools.writeStringUTF8(buf, s);
+                        }
+                    } else {
+                        buf.writeInt(-1);
                     }
-                } else {
-                    buf.writeInt(-1);
+                    break;
                 }
-            } else {
-                throw new RuntimeException("Unsupported type for key " + key.getName() + "!");
+                case TYPE_ITEMSTACK_LIST: {
+                    List<ItemStack> list = (List<ItemStack>) args.get(key);
+                    if (list != null) {
+                        buf.writeInt(list.size());
+                        for (ItemStack s : list) {
+                            NetworkTools.writeItemStack(buf, s);
+                        }
+                    } else {
+                        buf.writeInt(-1);
+                    }
+                    break;
+                }
+                case TYPE_POS_LIST: {
+                    List<BlockPos> list = (List<BlockPos>) args.get(key);
+                    if (list != null) {
+                        buf.writeInt(list.size());
+                        for (BlockPos s : list) {
+                            NetworkTools.writePos(buf, s);
+                        }
+                    } else {
+                        buf.writeInt(-1);
+                    }
+                    break;
+                }
             }
+        }
+    }
+
+    // @todo, remove this
+    enum ArgumentType {
+        TYPE_STRING(0),
+        TYPE_INTEGER(1),
+        TYPE_BLOCKPOS(2),
+        TYPE_BOOLEAN(3),
+        TYPE_DOUBLE(4),
+        TYPE_STACK(5),
+        TYPE_LONG(6),
+        TYPE_STRING_LIST(7),
+        TYPE_ITEMSTACK_LIST(8),
+        TYPE_POS_LIST(9);
+
+        private final int index;
+        private static final Map<Integer, ArgumentType> mapping = new HashMap<>();
+
+        static {
+            for (ArgumentType type : ArgumentType.values()) {
+                mapping.put(type.index, type);
+            }
+        }
+
+        ArgumentType(int index) {
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public static ArgumentType getType(int index) {
+            return mapping.get(index);
         }
     }
 }
