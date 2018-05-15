@@ -64,11 +64,16 @@ public class Window {
     public Window(GuiScreen gui, GenericTileEntity tileEntity, SimpleNetworkWrapper wrapper, ResourceLocation guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
+        final int[] sidesize = {0, 0};
         GuiParserClientTools.parseAndHandleClient(guiDescription, command -> {
             if ("window".equals(command.getId())) {
                 command.findCommand("size").ifPresent(cmd -> {
                     dim[0] = cmd.getOptionalPar(0, -1);
                     dim[1] = cmd.getOptionalPar(1, -1);
+                });
+                command.findCommand("sidesize").ifPresent(cmd -> {
+                    sidesize[0] = cmd.getOptionalPar(0, 0);
+                    sidesize[1] = cmd.getOptionalPar(1, 0);
                 });
                 command.commands()
                         .filter(cmd -> "event".equals(cmd.getId()))
@@ -105,7 +110,7 @@ public class Window {
             }
             int guiLeft = (gui.width - dim[0]) / 2;
             int guiTop = (gui.height - dim[1]) / 2;
-            toplevel.setBounds(new Rectangle(guiLeft, guiTop, dim[0], dim[1]));
+            toplevel.setBounds(new Rectangle(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]));
         }
         Keyboard.enableRepeatEvents(true);
     }
