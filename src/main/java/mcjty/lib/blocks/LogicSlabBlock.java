@@ -15,6 +15,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -39,16 +40,12 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     public static PropertyInteger META_INTERMEDIATE = PropertyInteger.create("intermediate", 0, 3);
     public static PropertyEnum<LogicFacing> LOGIC_FACING = PropertyEnum.create("logic_facing", LogicFacing.class);
 
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, Class<? extends C> containerClass, String name, boolean isContainer) {
-        super(mod, material, tileEntityClass, containerClass, name, isContainer);
+    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<EntityPlayer, IInventory, C> containerFactory, String name, boolean isContainer) {
+        super(mod, material, tileEntityClass, containerFactory, name, isContainer);
     }
 
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, Class<? extends C> containerClass, Class<? extends ItemBlock> itemBlockClass, String name, boolean isContainer) {
-        super(mod, material, tileEntityClass, containerClass, itemBlockClass, name, isContainer);
-    }
-
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, Class<? extends C> containerClass, BiFunction<EntityPlayer, TileEntity, C> containerFactory, Class<? extends ItemBlock> itemBlockClass, String name, boolean isContainer) {
-        super(mod, material, tileEntityClass, containerClass, containerFactory, itemBlockClass, name, isContainer);
+    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<EntityPlayer, IInventory, C> containerFactory, Class<? extends ItemBlock> itemBlockClass, String name, boolean isContainer) {
+        super(mod, material, tileEntityClass, containerFactory, itemBlockClass, name, isContainer);
     }
 
     public static EnumFacing rotateLeft(EnumFacing downSide, EnumFacing inputSide) {

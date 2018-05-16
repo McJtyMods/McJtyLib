@@ -4,7 +4,9 @@ import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericBlock;
-import mcjty.lib.container.*;
+import mcjty.lib.container.ContainerFactory;
+import mcjty.lib.container.EmptyContainerFactory;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -63,7 +65,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
 
-        GenericBlock<T, GenericContainer> block = new GenericBlock<T, GenericContainer>(mod, material, tileEntityClass, GenericContainer.class,
+        GenericBlock<T, GenericContainer> block = new GenericBlock<T, GenericContainer>(mod, material, tileEntityClass,
                 (player, tileEntity) -> {
                     GenericContainer c = new GenericContainer(containerFactory);
                     if (tileEntity instanceof IInventory) {

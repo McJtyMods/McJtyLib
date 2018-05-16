@@ -9,12 +9,12 @@ import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.CofhApiItemCompatibility;
-import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.container.InventoryHelper;
-import mcjty.lib.varia.WrenchUsage;
+import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
+import mcjty.lib.varia.WrenchUsage;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
@@ -62,7 +62,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         implements ITileEntityProvider, IRedstoneConnectable {
 
     protected final Class<? extends T> tileEntityClass;
-    private final BiFunction<EntityPlayer, TileEntity, C> containerFactory;
+    private final BiFunction<EntityPlayer, IInventory, C> containerFactory;
 
     private boolean needsRedstoneCheck = false;
     private boolean hasRedstoneOutput = false;
@@ -73,68 +73,18 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     private int guiId = -1;
 
-    @Deprecated
     public GenericBlock(ModBase mod,
                            Material material,
                            Class<? extends T> tileEntityClass,
-                           Class<? extends C> containerClass,
-                           String name, boolean isContainer) {
-        this(mod, material, tileEntityClass, (player, inventory) -> {
-            C container;
-            try {
-                Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
-                container = constructor.newInstance(player, inventory instanceof IInventory ? (IInventory)inventory : null);
-                return container;
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                Logging.logError("Severe exception during creation of gui!");
-                throw new RuntimeException(e);
-            }
-        }, GenericItemBlock.class, name, isContainer);
-    }
-
-    public GenericBlock(ModBase mod,
-                           Material material,
-                           Class<? extends T> tileEntityClass,
-                           BiFunction<EntityPlayer, TileEntity, C> containerFactory,
+                           BiFunction<EntityPlayer, IInventory, C> containerFactory,
                            String name, boolean isContainer) {
         this(mod, material, tileEntityClass, containerFactory, GenericItemBlock.class, name, isContainer);
     }
 
-    @Deprecated
     public GenericBlock(ModBase mod,
                         Material material,
                         Class<? extends T> tileEntityClass,
-                        Class<? extends C> containerClass,
-                        Class<? extends ItemBlock> itemBlockClass,
-                        String name, boolean isContainer) {
-        this(mod, material, tileEntityClass, (player, inventory) -> {
-            C container;
-            try {
-                Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
-                container = constructor.newInstance(player, inventory instanceof IInventory ? (IInventory)inventory : null);
-                return container;
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                Logging.logError("Severe exception during creation of gui!");
-                throw new RuntimeException(e);
-            }
-        }, itemBlockClass, name, isContainer);
-    }
-
-    @Deprecated
-    public GenericBlock(ModBase mod,
-                        Material material,
-                        Class<? extends T> tileEntityClass,
-                        Class<? extends C> containerClass,
-                        BiFunction<EntityPlayer, TileEntity, C> containerFactory,
-                        Class<? extends ItemBlock> itemBlockClass,
-                        String name, boolean isContainer) {
-        this(mod, material, tileEntityClass, containerFactory, itemBlockClass, name, isContainer);
-    }
-
-    public GenericBlock(ModBase mod,
-                        Material material,
-                        Class<? extends T> tileEntityClass,
-                        BiFunction<EntityPlayer, TileEntity, C> containerFactory,
+                        BiFunction<EntityPlayer, IInventory, C> containerFactory,
                         Class<? extends ItemBlock> itemBlockClass,
                         String name, boolean isContainer) {
         super(mod, material, name, itemBlockClass);
@@ -556,13 +506,13 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @SideOnly(Side.CLIENT)
     public GuiContainer createClientGui(EntityPlayer entityPlayer, TileEntity tileEntity) {
-        T inventory = (T) tileEntity;
+        IInventory inventory = tileEntity instanceof IInventory ? (IInventory) tileEntity : null;
         C container;
         GenericGuiContainer<? super T> gui;
         try {
-            container = containerFactory.apply(entityPlayer, tileEntity);
+            container = containerFactory.apply(entityPlayer, inventory);
             Constructor<? extends GenericGuiContainer<? super T>> guiConstructor = getGuiClass().getConstructor(tileEntityClass, container.getClass());
-            gui = guiConstructor.newInstance(inventory, container);
+            gui = guiConstructor.newInstance(tileEntity, container);
             return gui;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             Logging.logError("Severe exception during creation of gui!");
@@ -571,7 +521,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     public Container createServerContainer(EntityPlayer entityPlayer, TileEntity tileEntity) {
-        return containerFactory.apply(entityPlayer, tileEntity);
+        if (tileEntity instanceof IInventory) {
+            return containerFactory.apply(entityPlayer, (IInventory) tileEntity);
+        } else {
+            return containerFactory.apply(entityPlayer, null);
+        }
     }
 
     @Override

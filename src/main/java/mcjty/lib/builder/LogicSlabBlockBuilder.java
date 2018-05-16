@@ -5,7 +5,9 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericBlock;
 import mcjty.lib.blocks.LogicSlabBlock;
-import mcjty.lib.container.*;
+import mcjty.lib.container.ContainerFactory;
+import mcjty.lib.container.EmptyContainerFactory;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.LogicTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
@@ -79,11 +81,11 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
 
-        GenericBlock<T, GenericContainer> block = new LogicSlabBlock<T, GenericContainer>(mod, material, tileEntityClass, GenericContainer.class,
-                (player, tileEntity) -> {
+        GenericBlock<T, GenericContainer> block = new LogicSlabBlock<T, GenericContainer>(mod, material, tileEntityClass,
+                (player, inventory) -> {
                     GenericContainer c = new GenericContainer(containerFactory);
-                    if (tileEntity instanceof IInventory) {
-                        c.addInventory(ContainerFactory.CONTAINER_CONTAINER, (IInventory) tileEntity);
+                    if (inventory != null) {
+                        c.addInventory(ContainerFactory.CONTAINER_CONTAINER, inventory);
                     }
                     c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
                     c.generateSlots();
