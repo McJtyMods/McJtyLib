@@ -70,7 +70,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private IModuleSupport moduleSupport = null;
 
     @SideOnly(Side.CLIENT)
-    private Class<? extends GenericGuiContainer> guiClass;
+    private Class<? extends GenericGuiContainer<T>> guiClass;
 
     private int guiId = -1;
 
@@ -517,12 +517,12 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @SideOnly(Side.CLIENT)
-    public Class<? extends GenericGuiContainer> getGuiClass() {
+    public Class<? extends GenericGuiContainer<T>> getGuiClass() {
         return guiClass;
     }
 
     @SideOnly(Side.CLIENT)
-    public void setGuiClass(Class<? extends GenericGuiContainer> guiClass) {
+    public void setGuiClass(Class<? extends GenericGuiContainer<T>> guiClass) {
         this.guiClass = guiClass;
     }
 
@@ -530,10 +530,10 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     public GuiContainer createClientGui(EntityPlayer entityPlayer, TileEntity tileEntity) {
         T inventory = (T) tileEntity;
         C container;
-        GenericGuiContainer gui;
+        GenericGuiContainer<T> gui;
         try {
             container = containerFactory.apply(entityPlayer, tileEntity);
-            Constructor<? extends GenericGuiContainer> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
+            Constructor<? extends GenericGuiContainer<T>> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
             gui = guiConstructor.newInstance(inventory, container);
             return gui;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
