@@ -159,7 +159,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return null;
     }
 }

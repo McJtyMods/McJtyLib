@@ -234,7 +234,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return getText();
     }
 }

@@ -156,7 +156,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return isPressed();
     }
 }

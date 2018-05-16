@@ -157,7 +157,7 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return getRealValue();
     }
 }

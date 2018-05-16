@@ -10,5 +10,5 @@ public interface Layout {
      * @param width
      * @param height
      */
-    void doLayout(Collection<Widget> children, int width, int height);
+    void doLayout(Collection<Widget<?>> children, int width, int height);
 }

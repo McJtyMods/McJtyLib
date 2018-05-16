@@ -50,7 +50,7 @@ public class IconRender extends AbstractWidget<IconRender> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return null;
     }
 }

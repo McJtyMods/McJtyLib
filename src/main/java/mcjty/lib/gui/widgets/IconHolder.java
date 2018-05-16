@@ -316,7 +316,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return null;
     }
 }

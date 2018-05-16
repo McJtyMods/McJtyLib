@@ -230,5 +230,5 @@ public interface Widget<P extends Widget> {
 
     <T> void setGenericValue(T value);
 
-    Object getGenericValue(Type type);
+    Object getGenericValue(Type<?> type);
 }

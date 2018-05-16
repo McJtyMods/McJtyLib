@@ -184,7 +184,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return null;
     }
 }

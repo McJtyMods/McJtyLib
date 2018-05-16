@@ -6,7 +6,7 @@ import java.util.Collection;
 
 public class VerticalLayout extends AbstractLayout<VerticalLayout> {
     @Override
-    public void doLayout(Collection<Widget> children, int width, int height) {
+    public void doLayout(Collection<Widget<?>> children, int width, int height) {
         int otherHeight = calculateDynamicSize(children, height, Widget.Dimension.DIMENSION_HEIGHT);
 
         int top = getVerticalMargin();

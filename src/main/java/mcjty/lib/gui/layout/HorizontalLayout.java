@@ -7,7 +7,7 @@ import java.util.Collection;
 public class HorizontalLayout extends AbstractLayout<HorizontalLayout> {
 
     @Override
-    public void doLayout(Collection<Widget> children, int width, int height) {
+    public void doLayout(Collection<Widget<?>> children, int width, int height) {
         int otherWidth = calculateDynamicSize(children, width, Widget.Dimension.DIMENSION_WIDTH);
 
         int left = getHorizontalMargin();

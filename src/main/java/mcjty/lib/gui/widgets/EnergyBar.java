@@ -268,7 +268,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return null;
     }
 }

@@ -309,7 +309,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         if (Type.INTEGER.equals(type)) {
             try {
                 return Integer.parseInt(getText());

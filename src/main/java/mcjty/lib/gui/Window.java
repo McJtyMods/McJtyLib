@@ -7,6 +7,7 @@ import mcjty.lib.bindings.IValue;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
+import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.WidgetRepository;
 import mcjty.lib.preferences.PreferencesProperties;
@@ -24,7 +25,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -39,10 +40,10 @@ public class Window {
 
     public static final Key<String> PARAM_ID = new Key<>("id", Type.STRING);
 
-    private Widget toplevel;
+    private AbstractContainerWidget<?> toplevel;
     private final GuiScreen gui;
-    private Widget textFocus = null;
-    private Widget hover = null;
+    private Widget<?> textFocus = null;
+    private Widget<?> hover = null;
     private GuiStyle currentStyle;
     private WindowManager windowManager;
 
@@ -52,7 +53,7 @@ public class Window {
     private List<FocusEvent> focusEvents = null;
 
 
-    public Window(GuiScreen gui, Widget toplevel) {
+    public Window(GuiScreen gui, AbstractContainerWidget<?> toplevel) {
         this.gui = gui;
         this.toplevel = toplevel;
     }
@@ -81,10 +82,10 @@ public class Window {
                             String channel = cmd.getOptionalPar(0, "");
                             String teCommand = cmd.getOptionalPar(1, "");
                             event(channel, (source, params) ->
-                                    ((GenericGuiContainer) gui).sendServerCommand(wrapper, teCommand, params));
+                                    ((GenericGuiContainer<?>) gui).sendServerCommand(wrapper, teCommand, params));
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
-                    toplevel = WidgetRepository.createWidget("panel", Minecraft.getMinecraft(), gui);
+                    toplevel = (Panel)WidgetRepository.createWidget("panel", Minecraft.getMinecraft(), gui);
                     toplevel.readFromGuiCommand(cmd);
                 });
                 command.commands()
@@ -106,7 +107,7 @@ public class Window {
 
         if (dim[0] != -1 || dim[1] != -1) {
             if (gui instanceof GenericGuiContainer) {
-                ((GenericGuiContainer) gui).setWindowDimensions(dim[0], dim[1]);
+                ((GenericGuiContainer<?>) gui).setWindowDimensions(dim[0], dim[1]);
             }
             int guiLeft = (gui.width - dim[0]) / 2;
             int guiTop = (gui.height - dim[1]) / 2;
@@ -115,12 +116,12 @@ public class Window {
         Keyboard.enableRepeatEvents(true);
     }
 
-    public <T extends Widget> T findChild(String name) {
-        Widget widget = ((AbstractContainerWidget) toplevel).findChildRecursive(name);
+    public Widget<?> findChild(String name) {
+        Widget<?> widget = ((AbstractContainerWidget<?>) toplevel).findChildRecursive(name);
         if (widget == null) {
             Logging.logError("Could not find widget '" + name + "'!");
         }
-        return (T) widget;
+        return widget;
     }
 
     public WindowManager getWindowManager() {
@@ -131,11 +132,11 @@ public class Window {
         this.windowManager = windowManager;
     }
 
-    public boolean isWidgetOnWindow(Widget w) {
+    public boolean isWidgetOnWindow(Widget<?> w) {
         return toplevel.containsWidget(w);
     }
 
-    public Widget getToplevel() {
+    public Widget<?> getToplevel() {
         return toplevel;
     }
 
@@ -175,13 +176,13 @@ public class Window {
             widget.setEnabled(enable);
         }
         if (widget instanceof AbstractContainerWidget) {
-            for (Widget child : ((AbstractContainerWidget<?>) widget).getChildren()) {
+            for (Widget<?> child : ((AbstractContainerWidget<?>) widget).getChildren()) {
                 enableDisableWidgets(child);
             }
         }
     }
 
-    public Widget getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(int x, int y) {
         if (toplevel.in(x, y) && toplevel.isVisible()) {
             return toplevel.getWidgetAtPosition(x, y);
         } else {
@@ -217,7 +218,7 @@ public class Window {
         }
     }
 
-    public void setTextFocus(Widget focus) {
+    public void setTextFocus(Widget<?> focus) {
         if (windowManager != null) {
             windowManager.clearFocus();
         }
@@ -225,14 +226,14 @@ public class Window {
     }
 
     // Package visible for the WindowManager
-    void setFocus(Widget focus) {
+    void setFocus(Widget<?> focus) {
         if (textFocus != focus) {
             textFocus = focus;
             fireFocusEvents(focus);
         }
     }
 
-    public Widget getTextFocus() {
+    public Widget<?> getTextFocus() {
         return textFocus;
     }
 
@@ -349,7 +350,7 @@ public class Window {
     }
 
 
-    private void fireFocusEvents(Widget widget) {
+    private void fireFocusEvents(Widget<?> widget) {
         if (focusEvents != null) {
             for (FocusEvent event : focusEvents) {
                 event.focus(this, widget);
@@ -366,7 +367,7 @@ public class Window {
     }
 
     public <T extends GenericTileEntity> Window action(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
-        for (IAction action : te.getActions()) {
+        for (IAction<?> action : te.getActions()) {
             if (keyName.equals(action.getKey())) {
                 initializeAction(network, componentName, te, action);
                 return this;
@@ -377,12 +378,12 @@ public class Window {
         return this;
     }
 
-    private <T extends GenericTileEntity> void initializeAction(SimpleNetworkWrapper network, String componentName, T te, IAction action) {
+    private <T extends GenericTileEntity> void initializeAction(SimpleNetworkWrapper network, String componentName, T te, IAction<?> action) {
         event(componentName, (source, params) -> sendAction(network, action));
     }
 
     public <T extends GenericTileEntity> void sendAction(SimpleNetworkWrapper network, T te, String actionKey) {
-        for (IAction action : te.getActions()) {
+        for (IAction<?> action : te.getActions()) {
             if (actionKey.equals(action.getKey())) {
                 sendAction(network, action);
                 return;
@@ -393,16 +394,16 @@ public class Window {
 
     }
 
-    private void sendAction(SimpleNetworkWrapper network, IAction action) {
-        ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
+    private void sendAction(SimpleNetworkWrapper network, IAction<?> action) {
+        ((GenericGuiContainer<?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
                 TypedMap.builder()
                         .put(GenericTileEntity.PARAM_KEY, action.getKey())
                         .build());
     }
 
     public <T extends GenericTileEntity> Window bind(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
-        for (IValue value : te.getValues()) {
-            Key key = value.getKey();
+        for (IValue<?, ?> value : te.getValues()) {
+            Key<?> key = value.getKey();
             if (keyName.equals(key.getName())) {
                 initializeBinding(network, componentName, te, value);
                 return this;
@@ -415,7 +416,7 @@ public class Window {
 
     private <T extends GenericTileEntity> void initializeBinding(SimpleNetworkWrapper network, String componentName, T te, IValue value) {
         Object v = value.getter().apply(te);
-        Widget component = findChild(componentName);
+        Widget<?> component = findChild(componentName);
 
         if (component == null) {
             Logging.message(Minecraft.getMinecraft().player, "Could not find component '" + componentName + "'!");
@@ -424,8 +425,8 @@ public class Window {
         component.setGenericValue(v);
 
         event(componentName, (source, params) -> {
-            Type type = value.getKey().getType();
-            ((GenericGuiContainer)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
+            Type<?> type = value.getKey().getType();
+            ((GenericGuiContainer<?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
                     TypedMap.builder()
                             // @todo this conversion can fail!
                             .put(value.getKey(), type.convert(component.getGenericValue(type)))
@@ -434,7 +435,7 @@ public class Window {
         });
     }
 
-    public void fireChannelEvents(String channel, Widget widget, @Nonnull TypedMap params) {
+    public void fireChannelEvents(String channel, Widget<?> widget, @Nonnull TypedMap params) {
         if (channelEvents.containsKey(channel)) {
             for (ChannelEvent event : channelEvents.get(channel)) {
                 event.fire(widget, params);

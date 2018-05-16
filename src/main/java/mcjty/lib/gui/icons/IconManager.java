@@ -82,7 +82,7 @@ public class IconManager {
     }
 
     private IconHolder findClosestIconHolder(int x, int y) {
-        Optional<Widget> widget = windowManager.findWidgetAtPosition(x, y);
+        Optional<Widget<?>> widget = windowManager.findWidgetAtPosition(x, y);
         if (widget.isPresent() && widget.get() instanceof IconHolder) {
             return (IconHolder) widget.get();
         }

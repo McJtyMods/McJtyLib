@@ -12,7 +12,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
 
     private Layout layout = new HorizontalLayout();
 
-    private Widget focus = null;
+    private Widget<?> focus = null;
 
     public Panel(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -25,7 +25,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Widget getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(int x, int y) {
         if (isDirty()) {
             layout.doLayout(getChildren(), bounds.width, bounds.height);
             markClean();
@@ -50,7 +50,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
             markClean();
         }
 
-        for (Widget child : getChildren()) {
+        for (Widget<?> child : getChildren()) {
             child.setWindow(window);
             child.draw(xx, yy);
         }
@@ -64,19 +64,19 @@ public class Panel extends AbstractContainerWidget<Panel> {
         super.drawPhase2(x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
-        for (Widget child : getChildren()) {
+        for (Widget<?> child : getChildren()) {
             child.drawPhase2(xx, yy);
         }
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<Panel> mouseClick(int x, int y, int button) {
         super.mouseClick(x, y, button);
 
         x -= bounds.x;
         y -= bounds.y;
 
-        for (Widget child : getChildren()) {
+        for (Widget<?> child : getChildren()) {
             if (child.in(x, y) && child.isVisible()) {
                 focus = child.mouseClick(x, y, button);
                 return this;
@@ -96,7 +96,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
             focus.mouseRelease(x, y, button);
             focus = null;
         } else {
-            for (Widget child : getChildren()) {
+            for (Widget<?> child : getChildren()) {
                 if (child.in(x, y) && child.isVisible()) {
                     child.mouseRelease(x, y, button);
                     return;
@@ -115,7 +115,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
         if (focus != null) {
             focus.mouseMove(x, y);
         } else {
-            for (Widget child : getChildren()) {
+            for (Widget<?> child : getChildren()) {
                 if (child.in(x, y) && child.isVisible()) {
                     child.mouseMove(x, y);
                     return;
@@ -136,7 +136,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
         } else {
             layout = new PositionalLayout();
         }
-        AbstractLayout abstractLayout = (AbstractLayout) layout;
+        AbstractLayout<?> abstractLayout = (AbstractLayout<?>) layout;
         abstractLayout.setSpacing(GuiParser.get(command, "spacing", AbstractLayout.DEFAULT_SPACING));
         abstractLayout.setHorizontalAlignment(HorizontalAlignment.getByName(GuiParser.get(command, "horizalign", AbstractLayout.DEFAULT_HORIZONTAL_ALIGN.name())));
         abstractLayout.setVerticalAlignment(VerticalAlignment.getByName(GuiParser.get(command, "vertalign", AbstractLayout.DEFAULT_VERTICAL_ALIGN.name())));
@@ -155,7 +155,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
             command.parameter("positional");
         }
         if (layout instanceof AbstractLayout) {
-            AbstractLayout abstractLayout = (AbstractLayout) layout;
+            AbstractLayout<?> abstractLayout = (AbstractLayout<?>) layout;
             GuiParser.put(command, "spacing", abstractLayout.getSpacing(), AbstractLayout.DEFAULT_SPACING);
             GuiParser.put(command, "horizalign", abstractLayout.getHorizontalAlignment().name(), AbstractLayout.DEFAULT_HORIZONTAL_ALIGN.name());
             GuiParser.put(command, "vertalign", abstractLayout.getVerticalAlignment().name(), AbstractLayout.DEFAULT_VERTICAL_ALIGN.name());
@@ -174,7 +174,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return null;
     }
 }

@@ -137,7 +137,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
     @Override
     protected void setupBlock(BaseBlock block) {
         super.setupBlock(block);
-        GenericBlock b = (GenericBlock) block;
+        GenericBlock<?, ?> b = (GenericBlock<?, ?>) block;
         b.setGuiId(guiId);
         b.setNeedsRedstoneCheck(flags.contains(BlockFlags.REDSTONE_CHECK));
         b.setHasRedstoneOutput(flags.contains(BlockFlags.REDSTONE_OUTPUT));

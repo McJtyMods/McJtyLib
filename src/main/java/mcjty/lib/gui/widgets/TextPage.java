@@ -566,7 +566,7 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         return null;
     }
 }

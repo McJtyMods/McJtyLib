@@ -198,7 +198,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         if (Type.INTEGER.equals(type)) {
             return choiceList.indexOf(getCurrentChoice());
         } else if (Type.BOOLEAN.equals(type)) {

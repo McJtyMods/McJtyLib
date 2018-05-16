@@ -8,7 +8,7 @@ import java.util.Collection;
 public class PositionalLayout extends AbstractLayout<PositionalLayout> {
 
     @Override
-    public void doLayout(Collection<Widget> children, int width, int height) {
+    public void doLayout(Collection<Widget<?>> children, int width, int height) {
         for (Widget child : children) {
             PositionalHint hint = (PositionalHint) child.getLayoutHint();
             if (hint != null) {

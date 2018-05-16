@@ -56,8 +56,8 @@ import java.util.function.Consumer;
 
 public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
 
-    public static final IValue[] EMPTY_VALUES = new IValue[0];
-    public static final IAction[] EMPTY_ACTIONS = new IAction[0];
+    public static final IValue<?, ?>[] EMPTY_VALUES = new IValue[0];
+    public static final IAction<?>[] EMPTY_ACTIONS = new IAction[0];
 
     public static final String COMMAND_SYNC_BINDING = "generic.syncBinding";
     public static final String COMMAND_SYNC_ACTION = "generic.syncAction";
@@ -88,11 +88,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
-    public IValue[] getValues() {
+    public IValue<?, ?>[] getValues() {
         return EMPTY_VALUES;
     }
 
-    public IAction[] getActions() {
+    public IAction<?>[] getActions() {
         return EMPTY_ACTIONS;
     }
 

@@ -29,8 +29,8 @@ public class McJtyLibClient {
         @SubscribeEvent
         public void onKeyboardInput(GuiScreenEvent.KeyboardInputEvent.Pre event) {
             if (event.getGui() instanceof GenericGuiContainer) {
-                GenericGuiContainer container = (GenericGuiContainer) event.getGui();
-                Widget focus = container.getWindow().getTextFocus();
+                GenericGuiContainer<?> container = (GenericGuiContainer<?>) event.getGui();
+                Widget<?> focus = container.getWindow().getTextFocus();
                 if (focus != null) {
                     event.setCanceled(true);
 

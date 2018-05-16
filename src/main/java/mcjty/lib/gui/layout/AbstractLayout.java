@@ -26,7 +26,7 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
      * @param dimension
      * @return the size of each dynamic widget
      */
-    protected int calculateDynamicSize(Collection<Widget> children, int totalSize, Widget.Dimension dimension) {
+    protected int calculateDynamicSize(Collection<Widget<?>> children, int totalSize, Widget.Dimension dimension) {
         // Calculate the total fixed size from all the children that have a fixed size
         int totalFixed = 0;
         int countFixed = 0;

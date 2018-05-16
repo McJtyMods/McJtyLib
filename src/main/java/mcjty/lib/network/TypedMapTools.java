@@ -127,7 +127,7 @@ public class TypedMapTools {
 
     public static void writeArguments(ByteBuf buf, TypedMap args) {
         buf.writeInt(args.size());
-        for (Key key : args.getKeys()) {
+        for (Key<?> key : args.getKeys()) {
             NetworkTools.writeString(buf, key.getName());
             ArgumentType argumentType = getArgumentType(key.getType());
             buf.writeByte(argumentType.ordinal());

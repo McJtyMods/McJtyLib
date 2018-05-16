@@ -281,7 +281,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         if (Type.INTEGER.equals(type)) {
             return getCurrentChoiceIndex();
         } else if (Type.BOOLEAN.equals(type)) {

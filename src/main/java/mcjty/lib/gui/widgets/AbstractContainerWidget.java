@@ -10,7 +10,7 @@ import java.util.List;
 
 public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<P>> extends AbstractWidget<P> {
 
-    private final List<Widget> children = new ArrayList<>();
+    private final List<Widget<?>> children = new ArrayList<>();
 
     public AbstractContainerWidget(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -96,7 +96,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         return children.size();
     }
 
-    public List<Widget> getChildren() {
+    public List<Widget<?>> getChildren() {
         return children;
     }
 
@@ -111,13 +111,13 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         return null;
     }
 
-    public Widget findChildRecursive(String name) {
-        for (Widget child : children) {
+    public Widget<?> findChildRecursive(String name) {
+        for (Widget<?> child : children) {
             if (name.equals(child.getName())) {
                 return child;
             }
             if (child instanceof AbstractContainerWidget) {
-                Widget widget = ((AbstractContainerWidget) child).findChildRecursive(name);
+                Widget<?> widget = ((AbstractContainerWidget<?>) child).findChildRecursive(name);
                 if (widget != null) {
                     return widget;
                 }

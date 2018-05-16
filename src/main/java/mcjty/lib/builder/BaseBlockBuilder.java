@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 /**
  * Build blocks using this class
  */
-public class BaseBlockBuilder<T extends BaseBlockBuilder> {
+public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
 
     private static final Pattern COMPILE = Pattern.compile("@", Pattern.LITERAL);
     public static final IProperty<?>[] EMPTY_PROPERTIES = new IProperty<?>[0];

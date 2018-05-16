@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
 })
 public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider {
 
-    public static final IProperty[] NONE_PROPERTIES = new IProperty[0];
+    public static final IProperty<?>[] NONE_PROPERTIES = new IProperty[0];
     protected ModBase modBase;
     private boolean creative;
     private boolean opaque = true;
@@ -59,9 +59,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 
-    public static final IProperty[] HORIZ_PROPERTIES = new IProperty[]{FACING_HORIZ};
+    public static final IProperty<?>[] HORIZ_PROPERTIES = new IProperty[]{FACING_HORIZ};
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
-    public static final IProperty[] ROTATING_PROPERTIES = new IProperty[]{FACING};
+    public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{FACING};
 
     public BaseBlock(ModBase mod,
                         Material material,

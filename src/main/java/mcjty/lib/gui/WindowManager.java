@@ -1,6 +1,7 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.gui.icons.IconManager;
+import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -8,6 +9,7 @@ import org.lwjgl.input.Mouse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -42,7 +44,7 @@ public class WindowManager {
         Stream.concat(windows.stream(), modalWindows.stream()).forEach(w -> w.setFocus(null));
     }
 
-    public void setFocus(Widget w) {
+    public void setFocus(Widget<?> w) {
         clearFocus();
         Stream.concat(windows.stream(), modalWindows.stream())
                 .filter(window -> window.isWidgetOnWindow(w))
@@ -62,7 +64,7 @@ public class WindowManager {
         return this;
     }
 
-    public Window createModalWindow(Widget topLevel) {
+    public Window createModalWindow(AbstractContainerWidget<?> topLevel) {
         Window w = new Window(gui, topLevel);
         addModalWindow(w);
         return w;
@@ -116,11 +118,9 @@ public class WindowManager {
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
     }
 
-    public Optional<Widget> findWidgetAtPosition(int x, int y) {
-        return windows.stream()
-                .map(w -> w.getWidgetAtPosition(x, y))
-                .filter(w -> w != null)
-                .findFirst();
+    public Optional<Widget<?>> findWidgetAtPosition(int x, int y) {
+        Stream<Widget<?>> s = windows.stream().map(w -> w.getWidgetAtPosition(x, y));
+        return s.filter(Objects::nonNull).findFirst();
     }
 
     public void mouseClicked(int x, int y, int button) {

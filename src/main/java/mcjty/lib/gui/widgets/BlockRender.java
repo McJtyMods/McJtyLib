@@ -241,7 +241,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public Object getGenericValue(Type type) {
+    public Object getGenericValue(Type<?> type) {
         if (renderItem instanceof ItemStack) {
             return ((ItemStack) renderItem).getItem().getRegistryName().toString();
         } else {
