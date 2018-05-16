@@ -10,7 +10,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
-public class AbstractLabel<P extends AbstractLabel<P>> extends AbstractWidget<P> {
+public abstract class AbstractLabel<P extends AbstractLabel<P>> extends AbstractWidget<P> {
 
     public static final String TYPE_LABEL = "label";
 

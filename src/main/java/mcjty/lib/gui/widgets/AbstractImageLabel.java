@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbstractImageLabel<P extends AbstractImageLabel<P>> extends AbstractWidget<P> {
+public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extends AbstractWidget<P> {
 
     public static final String TYPE_IMAGELABEL = "imagelabel";
     public static final Key<Integer> PARAM_U = new Key<>("u", Type.INTEGER);
