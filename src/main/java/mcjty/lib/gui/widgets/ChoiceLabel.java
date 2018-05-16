@@ -15,7 +15,7 @@ import org.lwjgl.input.Keyboard;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ChoiceLabel extends Label<ChoiceLabel> {
+public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
 
     public static final String TYPE_CHOICELABEL = "choicelabel";
     public static final Key<String> PARAM_CHOICE = new Key<>("choice", Type.STRING);

@@ -17,7 +17,7 @@ import java.util.List;
 
 import static mcjty.lib.base.StyleConfig.*;
 
-public class ToggleButton extends Label<ToggleButton> {
+public class ToggleButton extends AbstractLabel<ToggleButton> {
 
     public static final String TYPE_TOGGLEBUTTON = "togglebutton";
     public static final Key<Boolean> PARAM_ON = new Key<>("on", Type.BOOLEAN);

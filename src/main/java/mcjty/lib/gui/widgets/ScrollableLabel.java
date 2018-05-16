@@ -13,7 +13,7 @@ import net.minecraft.client.gui.Gui;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScrollableLabel extends Label<ScrollableLabel> implements Scrollable {
+public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements Scrollable {
 
     public static final String TYPE_SCROLLABLELABEL = "scrollablelabel";
     public static final Key<Integer> PARAM_VALUE = new Key<>("value", Type.INTEGER);

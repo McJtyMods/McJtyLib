@@ -21,7 +21,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ColorSelector extends Label<ColorSelector> {
+public class ColorSelector extends AbstractLabel<ColorSelector> {
 
     public static final String TYPE_COLORSELECTOR = "colorselector";
     public static final Key<Integer> PARAM_COLOR = new Key<>("color", Type.INTEGER);
@@ -167,7 +167,7 @@ public class ColorSelector extends Label<ColorSelector> {
             modalDialog.addChild(colorLabel);
         }
 
-        ImageLabel colors = new ImageLabel<>(mc, gui)
+        ImageLabel colors = new ImageLabel(mc, gui)
                 .setImage(new ResourceLocation(McJtyLib.PROVIDES, "textures/gui/colorpicker.png"), 0, 0)
                 .setTextureDimensions(128, 128)
                 .setLayoutHint(new PositionalLayout.PositionalHint(105, 5, 128, 128));

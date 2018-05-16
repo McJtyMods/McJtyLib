@@ -16,7 +16,7 @@ import org.lwjgl.input.Keyboard;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ColorChoiceLabel extends Label<ColorChoiceLabel> {
+public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
 
     public static final String TYPE_COLORCHOICELABEL = "colorchoicelabel";
     public static final Key<Integer> PARAM_COLOR = new Key<>("color", Type.INTEGER);

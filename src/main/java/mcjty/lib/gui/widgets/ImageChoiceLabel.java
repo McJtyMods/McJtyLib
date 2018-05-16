@@ -19,7 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ImageChoiceLabel extends ImageLabel<ImageChoiceLabel> {
+public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
 
     public static final String TYPE_IMAGECHOICELABEL = "imagechoicelabel";
     public static final Key<String> PARAM_CHOICE = new Key<>("choice", Type.STRING);
