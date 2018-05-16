@@ -57,14 +57,8 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
         if (data == null) {
             try {
                 data = clazz.getConstructor(String.class).newInstance(name);
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+            } catch (InstantiationException|IllegalAccessException|InvocationTargetException|NoSuchMethodException e) {
+                throw new RuntimeException(e);
             }
         }
         instances.put(name, data);
