@@ -9,7 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractWorldData<T extends AbstractWorldData> extends WorldSavedData {
+public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends WorldSavedData {
 
     private static final Map<String, AbstractWorldData<?>> instances = new HashMap<>();
 
@@ -26,7 +26,7 @@ public abstract class AbstractWorldData<T extends AbstractWorldData> extends Wor
     public abstract void clear();
 
     public static void clearInstances() {
-        for (AbstractWorldData data : instances.values()) {
+        for (AbstractWorldData<?> data : instances.values()) {
             data.clear();
         }
         instances.clear();
@@ -37,20 +37,20 @@ public abstract class AbstractWorldData<T extends AbstractWorldData> extends Wor
     }
 
     @Nonnull
-    public static <T extends AbstractWorldData> T getData(Class<T> clazz, String name) {
+    public static <T extends AbstractWorldData<T>> T getData(Class<T> clazz, String name) {
         World world = DimensionManager.getWorld(0);
         return getData(world, clazz, name);
     }
 
     @Nonnull
-    public static <T extends AbstractWorldData> T getData(World world, Class<T> clazz, String name) {
+    public static <T extends AbstractWorldData<T>> T getData(World world, Class<T> clazz, String name) {
         if (world.isRemote) {
             throw new RuntimeException("Don't access this client-side!");
         }
 
-        AbstractWorldData<?> data = instances.get(name);
+        T data = (T) instances.get(name);
         if (data != null) {
-            return (T) data;
+            return data;
         }
 
         data = (T) world.loadData(clazz, name);
@@ -68,7 +68,7 @@ public abstract class AbstractWorldData<T extends AbstractWorldData> extends Wor
             }
         }
         instances.put(name, data);
-        return (T) data;
+        return data;
     }
 
 
