@@ -62,6 +62,10 @@ repositories {
         name = "CoFH Maven"
         url = "http://maven.covers1624.net"
     }
+    maven {
+        name = "TESLA"
+        url = "https://maven.mcmoddev.com"
+    }
 }
 
 version = "1.12-2.6.8"
@@ -90,6 +94,7 @@ dependencies {
     deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"
     deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
     deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
+    deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
 
     compile "li.cil.oc:OpenComputers:${oc_version}"
 }
