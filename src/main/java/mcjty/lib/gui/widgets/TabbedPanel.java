@@ -13,25 +13,25 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
 
     public static final String TYPE_TABBEDPANEL = "tabbedpanel";
 
-    private Widget current = null;
-    private Map<String,Widget> pages = new HashMap<>();
+    private Widget<?> current = null;
+    private Map<String,Widget<?>> pages = new HashMap<>();
 
     public TabbedPanel(Minecraft mc, Gui gui) {
         super(mc, gui);
     }
 
-    public TabbedPanel addPage(String name, Widget child) {
+    public TabbedPanel addPage(String name, Widget<?> child) {
         addChild(child);
         pages.put(name, child);
         return this;
     }
 
-    public Widget getCurrent() {
+    public Widget<?> getCurrent() {
         return current;
     }
 
     public String getCurrentName() {
-        for (Map.Entry<String,Widget> me : pages.entrySet()) {
+        for (Map.Entry<String,Widget<?>> me : pages.entrySet()) {
             if (current == me.getValue()) {
                 return me.getKey();
             }
@@ -39,7 +39,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
         return null;
     }
 
-    public TabbedPanel setCurrent(Widget current) {
+    public TabbedPanel setCurrent(Widget<?> current) {
         this.current = current;
         return this;
     }
@@ -50,7 +50,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Widget getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(int x, int y) {
         if (current == null) {
             return this;
         }
@@ -83,7 +83,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
 
     private void setChildBounds() {
         if (isDirty()) {
-            for (Widget child : getChildren()) {
+            for (Widget<?> child : getChildren()) {
                 child.setBounds(new Rectangle(0, 0, getBounds().width, getBounds().height));
             }
             markClean();
@@ -91,7 +91,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(int x, int y, int button) {
         super.mouseClick(x, y, button);
 
         setChildBounds();

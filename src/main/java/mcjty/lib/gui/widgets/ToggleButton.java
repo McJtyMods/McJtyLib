@@ -98,7 +98,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             pressed = !pressed;
             fireButtonEvents();

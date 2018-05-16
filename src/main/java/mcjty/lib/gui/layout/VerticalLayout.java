@@ -10,7 +10,7 @@ public class VerticalLayout extends AbstractLayout<VerticalLayout> {
         int otherHeight = calculateDynamicSize(children, height, Widget.Dimension.DIMENSION_HEIGHT);
 
         int top = getVerticalMargin();
-        for (Widget child : children) {
+        for (Widget<?> child : children) {
             int h = child.getDesiredHeight();
             if (h == Widget.SIZE_UNKNOWN) {
                 h = otherHeight;

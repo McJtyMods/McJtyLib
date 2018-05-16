@@ -67,7 +67,7 @@ public class Slider extends AbstractWidget<Slider> {
 
     private void findScrollable(Window window) {
         if (scrollable == null) {
-            Widget child = window.findChild(scrollableName);
+            Widget<?> child = window.findChild(scrollableName);
             if (child instanceof Scrollable) {
                 scrollable = (Scrollable) child;
             }
@@ -199,7 +199,7 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(int x, int y, int button) {
         super.mouseClick(x, y, button);
         dragging = true;
         findScrollable(window);

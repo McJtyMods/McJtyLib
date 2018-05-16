@@ -16,7 +16,7 @@ import java.util.Set;
  * A widget is a rectangular object in a GUI. Can be anything from a simple button to a
  * more complicated table with images and descriptions.
  */
-public interface Widget<P extends Widget> {
+public interface Widget<P extends Widget<P>> {
     static final int SIZE_UNKNOWN = -1;
 
     static enum Dimension {
@@ -135,7 +135,7 @@ public interface Widget<P extends Widget> {
      * is only called for valid coordaintes that are guaranteed to be in this widget. So widgets
      * that don't have children should just return themselves.
      */
-    Widget getWidgetAtPosition(int x, int y);
+    Widget<?> getWidgetAtPosition(int x, int y);
 
     /**
      * Draw this widget on the GUI at the specific position. This position is usually supplied by the
@@ -161,7 +161,7 @@ public interface Widget<P extends Widget> {
      * @param button
      * @return a reference to the widget that wants focus (or null if not)
      */
-    Widget mouseClick(int x, int y, int button);
+    Widget<?> mouseClick(int x, int y, int button);
 
     /**
      * Handle a mouse release for this widget.

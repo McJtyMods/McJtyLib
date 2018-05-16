@@ -136,13 +136,13 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public Widget getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(int x, int y) {
         x -= bounds.x;
         y -= bounds.y;
 
         doLayout();
         for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
-            Widget child = getChildren().get(i);
+            Widget<?> child = getChildren().get(i);
             if (child.in(x, y) && child.isVisible()) {
                 return child.getWidgetAtPosition(x, y);
             }
@@ -154,7 +154,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     private void doLayout() {
         int top = 0;
         for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
-            Widget child = getChildren().get(i);
+            Widget<?> child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             top += rh;
@@ -177,7 +177,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 //        drawBox(xx, yy, 0xffff0000);
 
         for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
-            Widget child = getChildren().get(i);
+            Widget<?> child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
             boolean hilighted = hilightedRows.contains(i);
@@ -220,7 +220,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 //        drawBox(xx, yy, 0xffff0000);
 
         for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
-            Widget child = getChildren().get(i);
+            Widget<?> child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             if (isEnabledAndVisible()) {
                 child.drawPhase2(xx, yy);
@@ -251,7 +251,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             top += rh;
         }
         if (propagateEventsToChildren && newSelected != -1) {
-            Widget child = getSelectedWidgetSafe(newSelected);
+            Widget<?> child = getSelectedWidgetSafe(newSelected);
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
@@ -261,7 +261,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(int x, int y, int button) {
         if (!isEnabledAndVisible()) {
             return null;
         }
@@ -288,7 +288,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         if (propagateEventsToChildren && selected != -1) {
-            Widget child = getSelectedWidgetSafe(selected);
+            Widget<?> child = getSelectedWidgetSafe(selected);
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
@@ -315,7 +315,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         if (propagateEventsToChildren && selected != -1) {
-            Widget child = getSelectedWidgetSafe(selected);
+            Widget<?> child = getSelectedWidgetSafe(selected);
             int xx = x-bounds.x;
             int yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
@@ -326,7 +326,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         super.mouseRelease(x, y, button);
     }
 
-    private Widget getSelectedWidgetSafe(int sel) {
+    private Widget<?> getSelectedWidgetSafe(int sel) {
         if (sel < getChildren().size()) {
             return getChildren().get(sel);
         } else {
@@ -432,7 +432,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public WidgetList removeChild(Widget child) {
+    public WidgetList removeChild(Widget<?> child) {
         int index = getChildren().indexOf(child);
         if (index != -1) {
             Set<Integer> newHighlights = new HashSet<>();

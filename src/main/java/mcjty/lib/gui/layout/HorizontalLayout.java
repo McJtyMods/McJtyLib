@@ -11,7 +11,7 @@ public class HorizontalLayout extends AbstractLayout<HorizontalLayout> {
         int otherWidth = calculateDynamicSize(children, width, Widget.Dimension.DIMENSION_WIDTH);
 
         int left = getHorizontalMargin();
-        for (Widget child : children) {
+        for (Widget<?> child : children) {
             int w = child.getDesiredWidth();
             if (w == Widget.SIZE_UNKNOWN) {
                 w = otherWidth;

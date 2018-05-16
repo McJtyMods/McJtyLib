@@ -88,7 +88,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             int index = colorList.indexOf(currentColor);
             if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {

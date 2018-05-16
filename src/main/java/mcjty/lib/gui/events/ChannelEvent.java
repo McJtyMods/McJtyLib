@@ -10,5 +10,5 @@ import javax.annotation.Nonnull;
  */
 public interface ChannelEvent {
 
-    void fire(@Nonnull Widget source, @Nonnull TypedMap params);
+    void fire(@Nonnull Widget<?> source, @Nonnull TypedMap params);
 }
