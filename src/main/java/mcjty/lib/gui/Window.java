@@ -116,12 +116,12 @@ public class Window {
         Keyboard.enableRepeatEvents(true);
     }
 
-    public Widget<?> findChild(String name) {
+    public <T extends Widget<T>> T findChild(String name) {
         Widget<?> widget = ((AbstractContainerWidget<?>) toplevel).findChildRecursive(name);
         if (widget == null) {
             Logging.logError("Could not find widget '" + name + "'!");
         }
-        return widget;
+        return (T)widget;
     }
 
     public WindowManager getWindowManager() {
