@@ -1,7 +1,7 @@
 package mcjty.lib.compat;
 
 import mcjty.lib.gui.GenericGuiContainer;
-import mezz.jei.api.BlankModPlugin;
+import mezz.jei.api.IModPlugin;
 import mezz.jei.api.IModRegistry;
 import mezz.jei.api.JEIPlugin;
 import mezz.jei.api.gui.IAdvancedGuiHandler;
@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.List;
 
 @JEIPlugin
-public class JeiCompatibility extends BlankModPlugin {
+public class JeiCompatibility implements IModPlugin {
 	@Override
 	public void register(@Nonnull IModRegistry registry) {
 		registry.addAdvancedGuiHandlers(new IAdvancedGuiHandler<GenericGuiContainer>() {
