@@ -549,26 +549,14 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return false;
     }
 
+    private <T> void syncBindingHelper(TypedMap params, Key<T> bkey) {
+        T o = params.get(bkey);
+        findSetter(bkey).accept(this, o);
+    }
+
     private void syncBinding(TypedMap params) {
         for (Key<?> key : params.getKeys()) {
-            // @todo can be improved?
-            if (Type.BOOLEAN.equals(key.getType())) {
-                Key<Boolean> bkey = (Key<Boolean>) key;
-                Boolean o = params.get(bkey);
-                findSetter(bkey).accept(this, o);
-            } else if (Type.INTEGER.equals(key.getType())) {
-                Key<Integer> bkey = (Key<Integer>) key;
-                Integer o = params.get(bkey);
-                findSetter(bkey).accept(this, o);
-            } else if (Type.STRING.equals(key.getType())) {
-                Key<String> bkey = (Key<String>) key;
-                String o = params.get(bkey);
-                findSetter(bkey).accept(this, o);
-            } else if (Type.DOUBLE.equals(key.getType())) {
-                Key<Double> bkey = (Key<Double>) key;
-                Double o = params.get(bkey);
-                findSetter(bkey).accept(this, o);
-            }
+            syncBindingHelper(params, key);
         }
         markDirtyClient();
     }
