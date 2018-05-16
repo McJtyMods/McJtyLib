@@ -63,7 +63,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     protected final Class<? extends T> tileEntityClass;
     private final BiFunction<EntityPlayer, TileEntity, C> containerFactory;
-    private final Class<? extends C> containerClass;
 
     private boolean needsRedstoneCheck = false;
     private boolean hasRedstoneOutput = false;
@@ -74,21 +73,41 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     private int guiId = -1;
 
+    @Deprecated
     public GenericBlock(ModBase mod,
                            Material material,
                            Class<? extends T> tileEntityClass,
                            Class<? extends C> containerClass,
                            String name, boolean isContainer) {
-        this(mod, material, tileEntityClass, containerClass, GenericItemBlock.class, name, isContainer);
+        this(mod, material, tileEntityClass, (player, inventory) -> {
+            C container;
+            try {
+                Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
+                container = constructor.newInstance(player, inventory instanceof IInventory ? (IInventory)inventory : null);
+                return container;
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                Logging.logError("Severe exception during creation of gui!");
+                throw new RuntimeException(e);
+            }
+        }, GenericItemBlock.class, name, isContainer);
     }
 
+    public GenericBlock(ModBase mod,
+                           Material material,
+                           Class<? extends T> tileEntityClass,
+                           BiFunction<EntityPlayer, TileEntity, C> containerFactory,
+                           String name, boolean isContainer) {
+        this(mod, material, tileEntityClass, containerFactory, GenericItemBlock.class, name, isContainer);
+    }
+
+    @Deprecated
     public GenericBlock(ModBase mod,
                         Material material,
                         Class<? extends T> tileEntityClass,
                         Class<? extends C> containerClass,
                         Class<? extends ItemBlock> itemBlockClass,
                         String name, boolean isContainer) {
-        this(mod, material, tileEntityClass, containerClass, (player, inventory) -> {
+        this(mod, material, tileEntityClass, (player, inventory) -> {
             C container;
             try {
                 Constructor<? extends C> constructor = containerClass.getConstructor(EntityPlayer.class, IInventory.class);
@@ -101,6 +120,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }, itemBlockClass, name, isContainer);
     }
 
+    @Deprecated
     public GenericBlock(ModBase mod,
                         Material material,
                         Class<? extends T> tileEntityClass,
@@ -108,10 +128,18 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                         BiFunction<EntityPlayer, TileEntity, C> containerFactory,
                         Class<? extends ItemBlock> itemBlockClass,
                         String name, boolean isContainer) {
+        this(mod, material, tileEntityClass, containerFactory, itemBlockClass, name, isContainer);
+    }
+
+    public GenericBlock(ModBase mod,
+                        Material material,
+                        Class<? extends T> tileEntityClass,
+                        BiFunction<EntityPlayer, TileEntity, C> containerFactory,
+                        Class<? extends ItemBlock> itemBlockClass,
+                        String name, boolean isContainer) {
         super(mod, material, name, itemBlockClass);
         this.hasTileEntity = isContainer;
         this.tileEntityClass = tileEntityClass;
-        this.containerClass = containerClass;
         this.containerFactory = containerFactory;
         McJtyRegister.registerLater(this, tileEntityClass);
     }
@@ -533,7 +561,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         GenericGuiContainer<? super T> gui;
         try {
             container = containerFactory.apply(entityPlayer, tileEntity);
-            Constructor<? extends GenericGuiContainer<? super T>> guiConstructor = getGuiClass().getConstructor(tileEntityClass, containerClass);
+            Constructor<? extends GenericGuiContainer<? super T>> guiConstructor = getGuiClass().getConstructor(tileEntityClass, container.getClass());
             gui = guiConstructor.newInstance(inventory, container);
             return gui;
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
