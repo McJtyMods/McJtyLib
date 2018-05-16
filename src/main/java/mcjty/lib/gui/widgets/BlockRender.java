@@ -141,7 +141,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             fireSelectionEvents();
             long t = System.currentTimeMillis();

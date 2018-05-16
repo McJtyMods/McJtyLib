@@ -41,7 +41,7 @@ public interface Widget<P extends Widget> {
      * Return true if this widget is equal to the parameter widget or if the parameter
      * widget is contained in this widget.
      */
-    boolean containsWidget(Widget w);
+    boolean containsWidget(Widget<?> w);
 
     /**
      * Set the actual bounds for this widget. These coordinates are relative to the parents

@@ -57,7 +57,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             dragging = true;
             int u = x - bounds.x;

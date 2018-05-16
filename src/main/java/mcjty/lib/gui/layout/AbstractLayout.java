@@ -30,7 +30,7 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
         // Calculate the total fixed size from all the children that have a fixed size
         int totalFixed = 0;
         int countFixed = 0;
-        for (Widget child : children) {
+        for (Widget<?> child : children) {
             int s = child.getDesiredSize(dimension);
             if (s != Widget.SIZE_UNKNOWN) {
                 totalFixed += s;
@@ -53,7 +53,7 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
         return otherSize;
     }
 
-    protected Rectangle align(int x, int y, int width, int height, Widget child) {
+    protected Rectangle align(int x, int y, int width, int height, Widget<?> child) {
         int desiredWidth = child.getDesiredWidth();
         if (desiredWidth == Widget.SIZE_UNKNOWN) {
             desiredWidth = width;

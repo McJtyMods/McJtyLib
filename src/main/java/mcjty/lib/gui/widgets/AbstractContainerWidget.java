@@ -23,11 +23,11 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
     }
 
     @Override
-    public Widget getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(int x, int y) {
         x -= bounds.x;
         y -= bounds.y;
 
-        for (Widget child : children) {
+        for (Widget<?> child : children) {
             if (child.in(x, y) && child.isVisible()) {
                 return child.getWidgetAtPosition(x, y);
             }
@@ -41,7 +41,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         x -= bounds.x;
         y -= bounds.y;
 
-        for (Widget child : children) {
+        for (Widget<?> child : children) {
             if (child.in(x, y) && child.isVisible()) {
                 if (child.mouseWheel(amount, x, y)) {
                     return true;
@@ -53,11 +53,11 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
     }
 
     @Override
-    public boolean containsWidget(Widget w) {
+    public boolean containsWidget(Widget<?> w) {
         if (w == this) {
             return true;
         }
-        for (Widget child : children) {
+        for (Widget<?> child : children) {
             if (child.containsWidget(w)) {
                 return true;
             }
@@ -65,14 +65,14 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         return false;
     }
 
-    public P addChildren(Widget... children) {
-        for (Widget child : children) {
+    public P addChildren(Widget<?>... children) {
+        for (Widget<?> child : children) {
             addChild(child);
         }
         return (P) this;
     }
 
-    public P addChild(Widget child) {
+    public P addChild(Widget<?> child) {
         if (child == null) {
             throw new RuntimeException("THIS IS NOT POSSIBLE!");
         }
@@ -81,7 +81,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         return (P) this;
     }
 
-    public P removeChild(Widget child) {
+    public P removeChild(Widget<?> child) {
         children.remove(child);
         markDirty();
         return (P) this;
@@ -100,10 +100,10 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         return children;
     }
 
-    public Widget getChild(int index) { return children.get(index); }
+    public Widget<?> getChild(int index) { return children.get(index); }
 
-    public Widget findChild(String name) {
-        for (Widget child : children) {
+    public Widget<?> findChild(String name) {
+        for (Widget<?> child : children) {
             if (name.equals(child.getName())) {
                 return child;
             }
@@ -131,7 +131,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         super.readFromGuiCommand(command);
         command.commands().forEach(cmd -> {
             String type = cmd.getId();
-            Widget widget = WidgetRepository.createWidget(type, mc, gui);
+            Widget<?> widget = WidgetRepository.createWidget(type, mc, gui);
             if (widget != null) {
                 widget.readFromGuiCommand(cmd);
                 children.add(widget);
@@ -142,7 +142,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
     @Override
     public void fillGuiCommand(GuiParser.GuiCommand command) {
         super.fillGuiCommand(command);
-        for (Widget child : children) {
+        for (Widget<?> child : children) {
             GuiParser.GuiCommand childCommand = child.createGuiCommand();
             child.fillGuiCommand(childCommand);
             command.command(childCommand);

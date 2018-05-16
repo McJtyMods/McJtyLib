@@ -63,7 +63,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     // Thick:           vv
 
     @Override
-    public boolean containsWidget(Widget w) {
+    public boolean containsWidget(Widget<?> w) {
         return w == this;
     }
 
@@ -124,7 +124,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public Widget getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(int x, int y) {
         return this;
     }
 
@@ -410,7 +410,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public Widget mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(int x, int y, int button) {
         return null;
     }
 
