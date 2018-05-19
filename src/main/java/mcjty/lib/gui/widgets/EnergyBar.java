@@ -19,8 +19,8 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     public static final boolean DEFAULT_SHOWTEXT = true;
     public static final boolean DEFAULT_SHOWRFPERTICK = false;
 
-    private int value;
-    private int maxValue;
+    private long value;
+    private long maxValue;
     private Integer energyOnColor = null;
     private Integer energyOffColor = null;
     private Integer spacerColor = null;
@@ -101,26 +101,26 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return this;
     }
 
-    public int getValue() {
+    public long getValue() {
         if (handler != null) {
             return handler.getEnergyStored();
         }
         return value;
     }
 
-    public EnergyBar setValue(int value) {
+    public EnergyBar setValue(long value) {
         this.value = value;
         return this;
     }
 
-    public int getMaxValue() {
+    public long getMaxValue() {
        if (handler != null) {
            return handler.getMaxEnergyStored();
        }
        return maxValue;
     }
 
-    public EnergyBar setMaxValue(int maxValue) {
+    public EnergyBar setMaxValue(long maxValue) {
         this.maxValue = maxValue;
         return this;
     }
@@ -172,20 +172,20 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         int by = y + bounds.y;
         RenderHelper.drawThickBeveledBox(bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, StyleConfig.colorEnergyBarTopLeft, StyleConfig.colorEnergyBarBottomRight, 0xff636363);
 
-        int currentValue = getValue();
-        int maximum = getMaxValue();
+        long currentValue = getValue();
+        long maximum = getMaxValue();
         if (maximum > 0) {
             int color;
             boolean on = false;
             if (horizontal) {
-                int w = (int) ((bounds.width-2) * (float) currentValue / maximum);
+                int w = (int) ((bounds.width-2) * (double) currentValue / maximum);
                 for (int xx = bx+1 ; xx < bx + bounds.width-2 ; xx++) {
                     color = getColor(bx, w, on, xx);
                     RenderHelper.drawVerticalLine(xx, by+1, by + bounds.height - 2, color);
                     on = !on;
                 }
             } else {
-                int h = (int) ((bounds.height-2) * (float) currentValue / maximum);
+                int h = (int) ((bounds.height-2) * (double) currentValue / maximum);
                 for (int yy = y+1 ; yy < y + bounds.height-2 ; yy++) {
                     color = getColorReversed(y, h, on, yy);
                     RenderHelper.drawHorizontalLine(bx+1, y + by + bounds.height - yy -2, bx + bounds.width - 2, color);
