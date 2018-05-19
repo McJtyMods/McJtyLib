@@ -75,7 +75,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
                     c.generateSlots();
                     return c;
                 },
-                itemBlockClass, registryName, true) {
+                itemBlockFactory, registryName, true) {
 
             @Override
             public RotationType getRotationType() {

@@ -38,9 +38,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nullable;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 @Optional.InterfaceList({
@@ -63,10 +67,24 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{FACING};
 
+    @Deprecated
     public BaseBlock(ModBase mod,
                         Material material,
                         String name,
                         Class<? extends ItemBlock> itemBlockClass) {
+        this(mod, material, name, block -> {
+            try {
+                return itemBlockClass.getConstructor(Block.class).newInstance(block);
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public BaseBlock(ModBase mod,
+                        Material material,
+                        String name,
+                        Function<Block, ItemBlock> itemBlockFactory) {
         super(material);
         this.modBase = mod;
         this.creative = false;
@@ -75,7 +93,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         setHarvestLevel("pickaxe", 0);
         setUnlocalizedName(mod.getModId() + "." + name);
         setRegistryName(name);
-        McJtyRegister.registerLater(this, mod, itemBlockClass);
+        McJtyRegister.registerLater(this, mod, itemBlockFactory);
     }
 
     public BaseBlock setCreative(boolean creative) {

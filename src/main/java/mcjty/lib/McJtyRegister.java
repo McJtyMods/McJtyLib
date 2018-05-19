@@ -9,12 +9,11 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class McJtyRegister {
 
@@ -22,8 +21,8 @@ public class McJtyRegister {
     private static final Map<Block,MTile> tiles = new HashMap<>();
     private static final List<MItem> items = new ArrayList<>();
 
-    public static void registerLater(Block block, ModBase mod, @Nullable Class<? extends ItemBlock> itemBlockClass) {
-        blocks.add(new MBlock(block, mod, itemBlockClass));
+    public static void registerLater(Block block, ModBase mod, @Nullable Function<Block, ItemBlock> itemBlockFactory) {
+        blocks.add(new MBlock(block, mod, itemBlockFactory));
     }
 
     public static void registerLater(Block block, @Nullable Class<? extends TileEntity> tileEntityClass) {
@@ -56,25 +55,13 @@ public class McJtyRegister {
             }
         }
         for (MBlock mBlock : blocks) {
-            if (mBlock.getItemBlockClass() != null) {
+            if (mBlock.getItemBlockFactory() != null) {
                 if (mBlock.getMod().getModId().equals(mod.getModId())) {
-                    ItemBlock itemBlock = createItemBlock(mBlock.getBlock(), mBlock.getItemBlockClass());
+                    ItemBlock itemBlock = mBlock.getItemBlockFactory().apply(mBlock.getBlock());
                     itemBlock.setRegistryName(mBlock.getBlock().getRegistryName());
                     registry.register(itemBlock);
                 }
             }
-        }
-    }
-
-
-    private static ItemBlock createItemBlock(Block block, Class<? extends ItemBlock> itemBlockClass) {
-        try {
-            Class<?>[] ctorArgClasses = new Class<?>[1];
-            ctorArgClasses[0] = Block.class;
-            Constructor<? extends ItemBlock> itemCtor = itemBlockClass.getConstructor(ctorArgClasses);
-            return itemCtor.newInstance(block);
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -93,12 +80,12 @@ public class McJtyRegister {
     private static class MBlock {
         private final Block block;
         private final ModBase mod;
-        private final Class<? extends ItemBlock> itemBlockClass;
+        private final Function<Block, ItemBlock> itemBlockFactory;
 
-        public MBlock(Block block, ModBase mod, Class<? extends ItemBlock> itemBlockClass) {
+        public MBlock(Block block, ModBase mod, Function<Block, ItemBlock> itemBlockFactory) {
             this.block = block;
             this.mod = mod;
-            this.itemBlockClass = itemBlockClass;
+            this.itemBlockFactory = itemBlockFactory;
         }
 
         public Block getBlock() {
@@ -109,8 +96,8 @@ public class McJtyRegister {
             return mod;
         }
 
-        public Class<? extends ItemBlock> getItemBlockClass() {
-            return itemBlockClass;
+        public Function<Block, ItemBlock> getItemBlockFactory() {
+            return itemBlockFactory;
         }
     }
 

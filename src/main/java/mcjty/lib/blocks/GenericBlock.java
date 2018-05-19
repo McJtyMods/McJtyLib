@@ -54,6 +54,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 @Optional.InterfaceList({
         @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "enderio"),
@@ -78,16 +79,32 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                            Class<? extends T> tileEntityClass,
                            BiFunction<EntityPlayer, IInventory, C> containerFactory,
                            String name, boolean isContainer) {
-        this(mod, material, tileEntityClass, containerFactory, GenericItemBlock.class, name, isContainer);
+        this(mod, material, tileEntityClass, containerFactory, GenericItemBlock::new, name, isContainer);
     }
 
+    @Deprecated
     public GenericBlock(ModBase mod,
                         Material material,
                         Class<? extends T> tileEntityClass,
                         BiFunction<EntityPlayer, IInventory, C> containerFactory,
                         Class<? extends ItemBlock> itemBlockClass,
                         String name, boolean isContainer) {
-        super(mod, material, name, itemBlockClass);
+        this(mod, material, tileEntityClass, containerFactory, block -> {
+            try {
+                return itemBlockClass.getConstructor(Block.class).newInstance(block);
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        }, name, isContainer);
+    }
+
+    public GenericBlock(ModBase mod,
+                        Material material,
+                        Class<? extends T> tileEntityClass,
+                        BiFunction<EntityPlayer, IInventory, C> containerFactory,
+                        Function<Block, ItemBlock> itemBlockFactory,
+                        String name, boolean isContainer) {
+        super(mod, material, name, itemBlockFactory);
         this.hasTileEntity = isContainer;
         this.tileEntityClass = tileEntityClass;
         this.containerFactory = containerFactory;

@@ -3,6 +3,7 @@ package mcjty.lib.builder;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericItemBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -13,6 +14,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -31,7 +33,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected CreativeTabs creativeTabs;
 
     protected Material material = Material.IRON;
-    protected Class<? extends ItemBlock> itemBlockClass = GenericItemBlock.class;
+    protected Function<Block, ItemBlock> itemBlockFactory = GenericItemBlock::new;
 
     protected List<IProperty<?>> extraProperties = new ArrayList<>();
 
@@ -58,8 +60,20 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
+    @Deprecated
     public T itemBlockClass(Class<? extends ItemBlock> itemBlockClass) {
-        this.itemBlockClass = itemBlockClass;
+        this.itemBlockFactory = block -> {
+            try {
+                return itemBlockClass.getConstructor(Block.class).newInstance(block);
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        return (T) this;
+    }
+
+    public T itemBlockFactory(Function<Block, ItemBlock> itemBlockFactory) {
+        this.itemBlockFactory = itemBlockFactory;
         return (T) this;
     }
 
@@ -108,7 +122,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
 
-        BaseBlock block = new BaseBlock(mod, material, registryName, itemBlockClass) {
+        BaseBlock block = new BaseBlock(mod, material, registryName, itemBlockFactory) {
             @Override
             protected IProperty<?>[] getProperties() {
                 return properties;

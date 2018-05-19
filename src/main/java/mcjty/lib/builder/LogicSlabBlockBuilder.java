@@ -91,7 +91,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
                     c.generateSlots();
                     return c;
                 },
-                itemBlockClass, registryName, true) {
+                itemBlockFactory, registryName, true) {
 
             @Override
             public RotationType getRotationType() {
