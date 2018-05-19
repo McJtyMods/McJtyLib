@@ -29,7 +29,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     private IEnergyStorage handler = null;
     private boolean showText = DEFAULT_SHOWTEXT;
     private boolean showRfPerTick = DEFAULT_SHOWRFPERTICK;
-    private int rfPerTick = 0;
+    private long rfPerTick = 0;
 
     public EnergyBar(Minecraft mc, Gui gui) {
         super(mc, gui);
@@ -92,11 +92,11 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return this;
     }
 
-    public int getRfPerTick() {
+    public long getRfPerTick() {
         return rfPerTick;
     }
 
-    public EnergyBar setRfPerTick(int rfPerTick) {
+    public EnergyBar setRfPerTick(long rfPerTick) {
         this.rfPerTick = rfPerTick;
         return this;
     }
