@@ -23,16 +23,16 @@ public class McJtyRegister {
     private static final Map<Block,MTile> tiles = new HashMap<>();
     private static final List<MItem> items = new ArrayList<>();
 
-    @Deprecated
-    public static void registerLater(Block block, ModBase mod, @Nullable Class<? extends ItemBlock> itemBlockClass) {
-        registerLater(block, mod, b -> {
-            try {
-                return itemBlockClass.getConstructor(Block.class).newInstance(b);
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
+//    @Deprecated
+//    public static void registerLater(Block block, ModBase mod, @Nullable Class<? extends ItemBlock> itemBlockClass) {
+//        registerLater(block, mod, b -> {
+//            try {
+//                return itemBlockClass.getConstructor(Block.class).newInstance(b);
+//            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+//                throw new RuntimeException(e);
+//            }
+//        });
+//    }
 
     public static void registerLater(Block block, ModBase mod, @Nullable Function<Block, ItemBlock> itemBlockFactory) {
         blocks.add(new MBlock(block, mod, itemBlockFactory));
