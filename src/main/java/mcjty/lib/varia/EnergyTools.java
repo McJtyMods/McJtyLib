@@ -15,28 +15,10 @@ import net.minecraftforge.fml.common.Loader;
 public class EnergyTools {
 
     public static class EnergyLevel {
-        private final int energy;
-        private final int maxEnergy;
-
-        public EnergyLevel(int energy, int maxEnergy) {
-            this.energy = energy;
-            this.maxEnergy = maxEnergy;
-        }
-
-        public int getEnergy() {
-            return energy;
-        }
-
-        public int getMaxEnergy() {
-            return maxEnergy;
-        }
-    }
-
-    public static class EnergyLevelMulti {
         private final long energy;
         private final long maxEnergy;
 
-        public EnergyLevelMulti(long energy, long maxEnergy) {
+        public EnergyLevel(long energy, long maxEnergy) {
             this.energy = energy;
             this.maxEnergy = maxEnergy;
         }
@@ -76,7 +58,7 @@ public class EnergyTools {
     }
 
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
-    public static EnergyLevelMulti getEnergyLevelMulti(TileEntity tileEntity) {
+    public static EnergyLevel getEnergyLevelMulti(TileEntity tileEntity) {
         long maxEnergyStored;
         long energyStored;
         doCheckMods();
@@ -103,7 +85,7 @@ public class EnergyTools {
             maxEnergyStored = 0;
             energyStored = 0;
         }
-        return new EnergyLevelMulti(energyStored, maxEnergyStored);
+        return new EnergyLevel(energyStored, maxEnergyStored);
     }
 
     public static EnergyLevel getEnergyLevel(TileEntity tileEntity) {
