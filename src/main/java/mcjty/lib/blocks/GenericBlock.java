@@ -12,7 +12,6 @@ import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
-import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.lib.varia.WrenchUsage;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -70,7 +69,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private IModuleSupport moduleSupport = null;
 
     @SideOnly(Side.CLIENT)
-    private Class<? extends GenericGuiContainer<? super T>> guiClass;
+    private BiFunction<T, C, GenericGuiContainer<? super T>> guiFactory;
 
     private int guiId = -1;
 
@@ -511,30 +510,62 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
+    @Deprecated
+    private BiFunction<T, C, GenericGuiContainer<? super T>> guiClassToFactory(Class<? extends GenericGuiContainer<? super T>> guiClass) {
+        for(Constructor<GenericGuiContainer<? super T>> guiConstructor : (Constructor<GenericGuiContainer<? super T>>[])guiClass.getConstructors()) {
+            Class<?>[] parameterTypes = guiConstructor.getParameterTypes();
+            if(parameterTypes.length != 2) continue;
+            if(parameterTypes[0] != tileEntityClass) continue;
+            if(!Container.class.isAssignableFrom(parameterTypes[1])) continue;
+            return(tileEntity, container) -> {
+                try {
+                    return guiConstructor.newInstance(tileEntity, container);
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+        }
+        throw new RuntimeException("No suitable constructor could be found for " + guiClass.getName());
+    }
+
+    @Deprecated
+    private static class GuiClassNotOverriddenException extends Exception {
+        public GuiClassNotOverriddenException() {
+            super(null, null, false, false);
+        }
+    }
+
+    @Deprecated
+    public Class<? extends GenericGuiContainer<? super T>> getGuiClass() throws GuiClassNotOverriddenException {
+        throw new GuiClassNotOverriddenException();
+    }
+
+    @Deprecated
     @SideOnly(Side.CLIENT)
-    public Class<? extends GenericGuiContainer<? super T>> getGuiClass() {
-        return guiClass;
+    public void setGuiClass(Class<? extends GenericGuiContainer<? super T>> guiClass) {
+        this.guiFactory = guiClassToFactory(guiClass);
     }
 
     @SideOnly(Side.CLIENT)
-    public void setGuiClass(Class<? extends GenericGuiContainer<? super T>> guiClass) {
-        this.guiClass = guiClass;
+    public BiFunction<T, C, GenericGuiContainer<? super T>> getGuiFactory() {
+        // TODO Once the deprecated stuff is removed, replace this whole method body with "return guiFactory;"
+        try {
+            return guiClassToFactory(getGuiClass());
+        } catch(GuiClassNotOverriddenException e) {
+            return guiFactory;
+        }
+    }
+
+    @SideOnly(Side.CLIENT)
+    public void setGuiFactory(BiFunction<T, C, GenericGuiContainer<? super T>> guiFactory) {
+        this.guiFactory = guiFactory;
     }
 
     @SideOnly(Side.CLIENT)
     public GuiContainer createClientGui(EntityPlayer entityPlayer, TileEntity tileEntity) {
         IInventory inventory = tileEntity instanceof IInventory ? (IInventory) tileEntity : null;
-        C container;
-        GenericGuiContainer<? super T> gui;
-        try {
-            container = containerFactory.apply(entityPlayer, inventory);
-            Constructor<? extends GenericGuiContainer<? super T>> guiConstructor = getGuiClass().getConstructor(tileEntityClass, container.getClass());
-            gui = guiConstructor.newInstance(tileEntity, container);
-            return gui;
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            Logging.logError("Severe exception during creation of gui!");
-            throw new RuntimeException(e);
-        }
+        C container = containerFactory.apply(entityPlayer, inventory);
+        return getGuiFactory().apply((T) tileEntity, container);
     }
 
     public Container createServerContainer(EntityPlayer entityPlayer, TileEntity tileEntity) {
