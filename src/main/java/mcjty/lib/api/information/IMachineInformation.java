@@ -14,7 +14,7 @@ public interface IMachineInformation {
      * @return a positive number indicating energy production, a negative
      * number indicating energy consumption and 0 otherwise.
      */
-    int getEnergyDiffPerTick();
+    long getEnergyDiffPerTick();
 
     /**
      * Return a short name indicating the type of energy unit this
