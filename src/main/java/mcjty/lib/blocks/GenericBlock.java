@@ -540,12 +540,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         throw new GuiClassNotOverriddenException();
     }
 
-    @Deprecated
-    @SideOnly(Side.CLIENT)
-    public void setGuiClass(Class<? extends GenericGuiContainer<? super T>> guiClass) {
-        this.guiFactory = guiClassToFactory(guiClass);
-    }
-
     @SideOnly(Side.CLIENT)
     public BiFunction<T, C, GenericGuiContainer<? super T>> getGuiFactory() {
         // TODO Once the deprecated stuff is removed, replace this whole method body with "return guiFactory;"
