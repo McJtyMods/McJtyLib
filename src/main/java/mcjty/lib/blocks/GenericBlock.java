@@ -510,44 +510,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
-    @Deprecated
-    private BiFunction<T, C, GenericGuiContainer<? super T>> guiClassToFactory(Class<? extends GenericGuiContainer<? super T>> guiClass) {
-        for(Constructor<GenericGuiContainer<? super T>> guiConstructor : (Constructor<GenericGuiContainer<? super T>>[])guiClass.getConstructors()) {
-            Class<?>[] parameterTypes = guiConstructor.getParameterTypes();
-            if(parameterTypes.length != 2) continue;
-            if(parameterTypes[0] != tileEntityClass) continue;
-            if(!Container.class.isAssignableFrom(parameterTypes[1])) continue;
-            return(tileEntity, container) -> {
-                try {
-                    return guiConstructor.newInstance(tileEntity, container);
-                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-            };
-        }
-        throw new RuntimeException("No suitable constructor could be found for " + guiClass.getName());
-    }
-
-    @Deprecated
-    private static class GuiClassNotOverriddenException extends Exception {
-        public GuiClassNotOverriddenException() {
-            super(null, null, false, false);
-        }
-    }
-
-    @Deprecated
-    public Class<? extends GenericGuiContainer<? super T>> getGuiClass() throws GuiClassNotOverriddenException {
-        throw new GuiClassNotOverriddenException();
-    }
-
     @SideOnly(Side.CLIENT)
     public BiFunction<T, C, GenericGuiContainer<? super T>> getGuiFactory() {
-        // TODO Once the deprecated stuff is removed, replace this whole method body with "return guiFactory;"
-        try {
-            return guiClassToFactory(getGuiClass());
-        } catch(GuiClassNotOverriddenException e) {
-            return guiFactory;
-        }
+        return guiFactory;
     }
 
     @SideOnly(Side.CLIENT)
