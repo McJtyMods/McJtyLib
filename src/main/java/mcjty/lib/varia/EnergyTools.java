@@ -115,17 +115,21 @@ public class EnergyTools {
         return new EnergyLevel(energyStored, maxEnergyStored);
     }
 
-    public static long receiveEnergy(TileEntity tileEntity, EnumFacing from, int maxReceive) {
+    public static long receiveEnergy(TileEntity tileEntity, EnumFacing from, long maxReceive) {
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyReceiver(tileEntity, from)) {
             return TeslaCompatibility.receiveEnergy(tileEntity, from, maxReceive);
         } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyReceiver(tileEntity)) {
-            return RedstoneFluxCompatibility.receiveEnergy(tileEntity, from, maxReceive);
+            return RedstoneFluxCompatibility.receiveEnergy(tileEntity, from, unsignedClampToInt(maxReceive));
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, from)) {
             IEnergyStorage capability = tileEntity.getCapability(CapabilityEnergy.ENERGY, from);
             if (capability.canReceive()) {
-                return capability.receiveEnergy(maxReceive, false);
+                return capability.receiveEnergy(unsignedClampToInt(maxReceive), false);
             }
         }
         return 0;
+    }
+
+    public static int unsignedClampToInt(long l) {
+        return l > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)l;
     }
 }
