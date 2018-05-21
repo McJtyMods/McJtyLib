@@ -1,24 +1,73 @@
 package mcjty.lib.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
 
-public class McJtyEnergyStorage extends EnergyStorage {
+public class McJtyEnergyStorage implements IEnergyStorage {
+    protected int energy;
+    protected int capacity;
+    protected int maxReceive;
+    protected int maxExtract;
 
     public McJtyEnergyStorage(int capacity) {
-        super(capacity);
+        this(capacity, capacity, capacity, 0);
     }
 
     public McJtyEnergyStorage(int capacity, int maxTransfer) {
-        super(capacity, maxTransfer);
+        this(capacity, maxTransfer, maxTransfer, 0);
     }
 
     public McJtyEnergyStorage(int capacity, int maxReceive, int maxExtract) {
-        super(capacity, maxReceive, maxExtract);
+        this(capacity, maxReceive, maxExtract, 0);
     }
 
     public McJtyEnergyStorage(int capacity, int maxReceive, int maxExtract, int energy) {
-        super(capacity, maxReceive, maxExtract, energy);
+        this.capacity = capacity;
+        this.maxReceive = maxReceive;
+        this.maxExtract = maxExtract;
+        this.energy = Math.max(0 , Math.min(capacity, energy));
+    }
+
+    @Override
+    public int receiveEnergy(int maxReceive, boolean simulate) {
+        if (!canReceive())
+            return 0;
+
+        int energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
+        if (!simulate)
+            energy += energyReceived;
+        return energyReceived;
+    }
+
+    @Override
+    public int extractEnergy(int maxExtract, boolean simulate) {
+        if (!canExtract())
+            return 0;
+
+        int energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxExtract));
+        if (!simulate)
+            energy -= energyExtracted;
+        return energyExtracted;
+    }
+
+    @Override
+    public int getEnergyStored() {
+        return energy;
+    }
+
+    @Override
+    public int getMaxEnergyStored() {
+        return capacity;
+    }
+
+    @Override
+    public boolean canExtract() {
+        return this.maxExtract > 0;
+    }
+
+    @Override
+    public boolean canReceive() {
+        return this.maxReceive > 0;
     }
 
     public void modifyEnergyStored(int energy) {
