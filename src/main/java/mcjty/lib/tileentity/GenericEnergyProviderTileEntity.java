@@ -1,6 +1,7 @@
 package mcjty.lib.tileentity;
 
 import cofh.redstoneflux.api.IEnergyProvider;
+import mcjty.lib.varia.EnergyTools;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -20,19 +21,19 @@ public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEnt
     @Optional.Method(modid = "redstoneflux")
     @Override
     public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate) {
-        return storage.extractEnergy(maxExtract, simulate);
+        return (int)storage.extractEnergy(maxExtract, simulate);
     }
 
     @Optional.Method(modid = "redstoneflux")
     @Override
     public int getEnergyStored(EnumFacing from) {
-        return storage.getEnergyStored();
+        return EnergyTools.unsignedClampToInt(storage.getEnergyStored());
     }
 
     @Optional.Method(modid = "redstoneflux")
     @Override
     public int getMaxEnergyStored(EnumFacing from) {
-        return storage.getMaxEnergyStored();
+        return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
     }
 
     @Optional.Method(modid = "redstoneflux")
@@ -56,12 +57,12 @@ public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEnt
 
     @Override
     public int getEnergyStored() {
-        return storage.getEnergyStored();
+        return EnergyTools.unsignedClampToInt(storage.getEnergyStored());
     }
 
     @Override
     public int getMaxEnergyStored() {
-        return storage.getMaxEnergyStored();
+        return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
     }
 
     @Override

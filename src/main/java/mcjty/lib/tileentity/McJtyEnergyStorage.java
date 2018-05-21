@@ -3,55 +3,55 @@ package mcjty.lib.tileentity;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class McJtyEnergyStorage {
-    protected int energy;
-    protected int capacity;
-    protected int maxReceive;
-    protected int maxExtract;
+    protected long energy;
+    protected long capacity;
+    protected long maxReceive;
+    protected long maxExtract;
 
-    public McJtyEnergyStorage(int capacity) {
+    public McJtyEnergyStorage(long capacity) {
         this(capacity, capacity, capacity, 0);
     }
 
-    public McJtyEnergyStorage(int capacity, int maxTransfer) {
+    public McJtyEnergyStorage(long capacity, long maxTransfer) {
         this(capacity, maxTransfer, maxTransfer, 0);
     }
 
-    public McJtyEnergyStorage(int capacity, int maxReceive, int maxExtract) {
+    public McJtyEnergyStorage(long capacity, long maxReceive, long maxExtract) {
         this(capacity, maxReceive, maxExtract, 0);
     }
 
-    public McJtyEnergyStorage(int capacity, int maxReceive, int maxExtract, int energy) {
+    public McJtyEnergyStorage(long capacity, long maxReceive, long maxExtract, long energy) {
         this.capacity = capacity;
         this.maxReceive = maxReceive;
         this.maxExtract = maxExtract;
         this.energy = Math.max(0 , Math.min(capacity, energy));
     }
 
-    public int receiveEnergy(int maxReceive, boolean simulate) {
+    public long receiveEnergy(long maxReceive, boolean simulate) {
         if (!canReceive())
             return 0;
 
-        int energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
+        long energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
         if (!simulate)
             energy += energyReceived;
         return energyReceived;
     }
 
-    public int extractEnergy(int maxExtract, boolean simulate) {
+    public long extractEnergy(long maxExtract, boolean simulate) {
         if (!canExtract())
             return 0;
 
-        int energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxExtract));
+        long energyExtracted = Math.min(energy, Math.min(this.maxExtract, maxExtract));
         if (!simulate)
             energy -= energyExtracted;
         return energyExtracted;
     }
 
-    public int getEnergyStored() {
+    public long getEnergyStored() {
         return energy;
     }
 
-    public int getMaxEnergyStored() {
+    public long getMaxEnergyStored() {
         return capacity;
     }
 
@@ -63,7 +63,7 @@ public class McJtyEnergyStorage {
         return this.maxReceive > 0;
     }
 
-    public void modifyEnergyStored(int energy) {
+    public void modifyEnergyStored(long energy) {
         if (energy > capacity - this.energy) {
             energy = capacity - this.energy;
         } else if (energy < -this.energy) {
@@ -73,17 +73,17 @@ public class McJtyEnergyStorage {
         this.energy += energy;
     }
 
-    public void setMaxReceive(int max) {
+    public void setMaxReceive(long max) {
         this.maxReceive = max;
     }
 
-    public void setMaxExtract(int max) {
+    public void setMaxExtract(long max) {
         this.maxExtract = max;
     }
 
     public McJtyEnergyStorage readFromNBT(NBTTagCompound nbt) {
 
-        this.energy = nbt.getInteger("Energy");
+        this.energy = nbt.getLong("Energy");
 
         if (energy > capacity) {
             energy = capacity;
@@ -96,7 +96,7 @@ public class McJtyEnergyStorage {
         if (energy < 0) {
             energy = 0;
         }
-        nbt.setInteger("Energy", energy);
+        nbt.setLong("Energy", energy);
         return nbt;
     }
 }

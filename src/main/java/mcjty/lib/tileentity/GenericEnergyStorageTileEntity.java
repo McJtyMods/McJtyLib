@@ -12,11 +12,11 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
 
     public static final String CMD_GETENERGY = "getEnergy";
 
-    public static final Key<Integer> PARAM_ENERGY = new Key<>("energy", Type.INTEGER);
+    public static final Key<Long> PARAM_ENERGY = new Key<>("energy", Type.LONG);
 
     protected McJtyEnergyStorage storage;
 
-    private static int currentRF = 0;
+    private static long currentRF = 0;
 
     private int requestRfDelay = 3;
 
@@ -58,11 +58,11 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
         storage.writeToNBT(tagCompound);
     }
 
-    public static int getCurrentRF() {
+    public static long getCurrentRF() {
         return currentRF;
     }
 
-    public static void setCurrentRF(int currentRF) {
+    public static void setCurrentRF(long currentRF) {
         GenericEnergyStorageTileEntity.currentRF = currentRF;
     }
 
