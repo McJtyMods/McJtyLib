@@ -2,14 +2,20 @@ package mcjty.lib.tileentity;
 
 import cofh.redstoneflux.api.IEnergyProvider;
 import mcjty.lib.varia.EnergyTools;
+import net.darkhax.tesla.api.ITeslaHolder;
+import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
-@Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyProvider")
-public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEntity implements IEnergyProvider, IEnergyStorage {
+@Optional.InterfaceList({
+    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
+    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaProducer"),
+    @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyProvider")
+})
+public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEntity implements IEnergyProvider, ITeslaHolder, ITeslaProducer, IEnergyStorage {
 
     public GenericEnergyProviderTileEntity(long maxEnergy, long maxExtract) {
         super(maxEnergy, 0, maxExtract);
@@ -40,6 +46,25 @@ public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEnt
     @Override
     public boolean canConnectEnergy(EnumFacing from) {
         return true;
+    }
+
+    // -----------------------------------------------------------
+    // For ITeslaHolder and ITeslaProducer
+    // deliberately not @Optional so that we can reliably call these elsewhere
+
+    @Override
+    public long takePower(long power, boolean simulated) {
+        return storage.extractEnergy(power, simulated);
+    }
+
+    @Override
+    public long getStoredPower() {
+        return storage.getEnergyStored();
+    }
+
+    @Override
+    public long getCapacity() {
+        return storage.getMaxEnergyStored();
     }
 
     // -----------------------------------------------------------

@@ -3,6 +3,9 @@ package mcjty.lib.tileentity;
 import cofh.redstoneflux.api.IEnergyProvider;
 import cofh.redstoneflux.api.IEnergyReceiver;
 import mcjty.lib.varia.EnergyTools;
+import net.darkhax.tesla.api.ITeslaConsumer;
+import net.darkhax.tesla.api.ITeslaHolder;
+import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -10,10 +13,13 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.InterfaceList({
+        @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
+        @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer"),
+        @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaProducer"),
         @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyProvider", modid = "redstoneflux"),
         @Optional.Interface(iface = "cofh.redstoneflux.api.IEnergyReceiver", modid = "redstoneflux")
         })
-public class GenericEnergyHandlerTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, IEnergyProvider, IEnergyStorage {
+public class GenericEnergyHandlerTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, IEnergyProvider, ITeslaHolder, ITeslaConsumer, ITeslaProducer, IEnergyStorage {
 
     public GenericEnergyHandlerTileEntity(long maxEnergy, long maxReceive) {
         super(maxEnergy, maxReceive);
@@ -54,6 +60,30 @@ public class GenericEnergyHandlerTileEntity extends GenericEnergyStorageTileEnti
     @Override
     public boolean canConnectEnergy(EnumFacing from) {
         return true;
+    }
+
+    // -----------------------------------------------------------
+    // For ITeslaHolder, ITeslaConsumer, and ITeslaProducer
+    // deliberately not @Optional so that we can reliably call these elsewhere
+
+    @Override
+    public long takePower(long power, boolean simulated) {
+        return storage.extractEnergy(power, simulated);
+    }
+
+    @Override
+    public long givePower(long power, boolean simulated) {
+        return storage.receiveEnergy(power, simulated);
+    }
+
+    @Override
+    public long getStoredPower() {
+        return storage.getEnergyStored();
+    }
+
+    @Override
+    public long getCapacity() {
+        return storage.getMaxEnergyStored();
     }
 
     // -----------------------------------------------------------
