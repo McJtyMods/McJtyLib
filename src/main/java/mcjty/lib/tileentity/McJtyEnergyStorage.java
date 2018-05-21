@@ -1,9 +1,8 @@
 package mcjty.lib.tileentity;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.energy.IEnergyStorage;
 
-public class McJtyEnergyStorage implements IEnergyStorage {
+public class McJtyEnergyStorage {
     protected int energy;
     protected int capacity;
     protected int maxReceive;
@@ -28,7 +27,6 @@ public class McJtyEnergyStorage implements IEnergyStorage {
         this.energy = Math.max(0 , Math.min(capacity, energy));
     }
 
-    @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         if (!canReceive())
             return 0;
@@ -39,7 +37,6 @@ public class McJtyEnergyStorage implements IEnergyStorage {
         return energyReceived;
     }
 
-    @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
         if (!canExtract())
             return 0;
@@ -50,22 +47,18 @@ public class McJtyEnergyStorage implements IEnergyStorage {
         return energyExtracted;
     }
 
-    @Override
     public int getEnergyStored() {
         return energy;
     }
 
-    @Override
     public int getMaxEnergyStored() {
         return capacity;
     }
 
-    @Override
     public boolean canExtract() {
         return this.maxExtract > 0;
     }
 
-    @Override
     public boolean canReceive() {
         return this.maxReceive > 0;
     }
