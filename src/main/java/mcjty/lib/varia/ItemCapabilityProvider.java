@@ -33,22 +33,22 @@ public class ItemCapabilityProvider implements ICapabilityProvider {
             return (T) new IEnergyStorage() {
                 @Override
                 public int receiveEnergy(int maxReceive, boolean simulate) {
-                    return item.receiveEnergy(itemStack, maxReceive, simulate);
+                    return (int)item.receiveEnergy(itemStack, maxReceive, simulate);
                 }
 
                 @Override
                 public int extractEnergy(int maxExtract, boolean simulate) {
-                    return item.extractEnergy(itemStack, maxExtract, simulate);
+                    return (int)item.extractEnergy(itemStack, maxExtract, simulate);
                 }
 
                 @Override
                 public int getEnergyStored() {
-                    return item.getEnergyStored(itemStack);
+                    return EnergyTools.unsignedClampToInt(item.getEnergyStored(itemStack));
                 }
 
                 @Override
                 public int getMaxEnergyStored() {
-                    return item.getMaxEnergyStored(itemStack);
+                    return EnergyTools.unsignedClampToInt(item.getMaxEnergyStored(itemStack));
                 }
 
                 @Override

@@ -11,15 +11,15 @@ import net.minecraftforge.fml.common.Optional;
 @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyReceiver")
 public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, IEnergyStorage {
 
-    public GenericEnergyReceiverTileEntity(int maxEnergy, int maxReceive) {
+    public GenericEnergyReceiverTileEntity(long maxEnergy, long maxReceive) {
         super(maxEnergy, maxReceive);
     }
 
-    public GenericEnergyReceiverTileEntity(int maxEnergy, int maxReceive, int maxExtract) {
+    public GenericEnergyReceiverTileEntity(long maxEnergy, long maxReceive, long maxExtract) {
         super(maxEnergy, maxReceive, maxExtract);
     }
 
-    public void consumeEnergy(int consume) {
+    public void consumeEnergy(long consume) {
         modifyEnergyStored(-consume);
     }
 

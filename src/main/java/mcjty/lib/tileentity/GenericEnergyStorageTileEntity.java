@@ -20,16 +20,16 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
 
     private int requestRfDelay = 3;
 
-    public void modifyEnergyStored(int energy) {
+    public void modifyEnergyStored(long energy) {
         storage.modifyEnergyStored(energy);
     }
 
-    public GenericEnergyStorageTileEntity(int maxEnergy, int maxReceive) {
+    public GenericEnergyStorageTileEntity(long maxEnergy, long maxReceive) {
         storage = new McJtyEnergyStorage(maxEnergy);
         storage.setMaxReceive(maxReceive);
     }
 
-    public GenericEnergyStorageTileEntity(int maxEnergy, int maxReceive, int maxExtract) {
+    public GenericEnergyStorageTileEntity(long maxEnergy, long maxReceive, long maxExtract) {
         storage = new McJtyEnergyStorage(maxEnergy);
         storage.setMaxReceive(maxReceive);
         storage.setMaxExtract(maxExtract);

@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.Optional;
 @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyProvider")
 public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEntity implements IEnergyProvider, IEnergyStorage {
 
-    public GenericEnergyProviderTileEntity(int maxEnergy, int maxExtract) {
+    public GenericEnergyProviderTileEntity(long maxEnergy, long maxExtract) {
         super(maxEnergy, 0, maxExtract);
     }
 

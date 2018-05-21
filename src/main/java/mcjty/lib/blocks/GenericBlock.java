@@ -211,7 +211,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         NBTTagCompound tagCompound = itemStack.getTagCompound();
         if (tagCompound != null) {
             if (tagCompound.hasKey("Energy")) {
-                int energy = tagCompound.getInteger("Energy");
+                long energy = tagCompound.getLong("Energy");
                 list.add(TextFormatting.GREEN + "Energy: " + energy + " rf");
             }
             if (this instanceof Infusable) {

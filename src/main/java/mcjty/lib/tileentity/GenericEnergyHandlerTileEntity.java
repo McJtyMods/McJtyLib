@@ -15,11 +15,11 @@ import net.minecraftforge.fml.common.Optional;
         })
 public class GenericEnergyHandlerTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, IEnergyProvider, IEnergyStorage {
 
-    public GenericEnergyHandlerTileEntity(int maxEnergy, int maxReceive) {
+    public GenericEnergyHandlerTileEntity(long maxEnergy, long maxReceive) {
         super(maxEnergy, maxReceive);
     }
 
-    public GenericEnergyHandlerTileEntity(int maxEnergy, int maxReceive, int maxExtract) {
+    public GenericEnergyHandlerTileEntity(long maxEnergy, long maxReceive, long maxExtract) {
         super(maxEnergy, maxReceive, maxExtract);
     }
 
