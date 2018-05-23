@@ -17,17 +17,10 @@ public class TeslaCompatibility {
         return te != null && te.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side);
     }
 
-    public static long getEnergy(TileEntity te) {
-        return te.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, EnumFacing.DOWN).getStoredPower();
-    }
-
     public static long getEnergy(TileEntity te, @Nullable EnumFacing side) {
         return te.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getStoredPower();
     }
 
-    public static long getMaxEnergy(TileEntity te) {
-        return te.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, EnumFacing.DOWN).getCapacity();
-    }
     public static long getMaxEnergy(TileEntity te, @Nullable EnumFacing side) {
         return te.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getCapacity();
     }

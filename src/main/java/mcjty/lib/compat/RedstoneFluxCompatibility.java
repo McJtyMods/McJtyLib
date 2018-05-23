@@ -19,17 +19,10 @@ public class RedstoneFluxCompatibility {
         return te instanceof IEnergyReceiver;
     }
 
-    public static int getEnergy(TileEntity te) {
-        return ((IEnergyHandler) te).getEnergyStored(EnumFacing.DOWN);
-    }
-
     public static int getEnergy(TileEntity te, EnumFacing side) {
         return ((IEnergyHandler) te).getEnergyStored(side);
     }
 
-    public static int getMaxEnergy(TileEntity te) {
-        return ((IEnergyHandler) te).getMaxEnergyStored(EnumFacing.DOWN);
-    }
     public static int getMaxEnergy(TileEntity te, EnumFacing side) {
         return ((IEnergyHandler) te).getMaxEnergyStored(side);
     }
