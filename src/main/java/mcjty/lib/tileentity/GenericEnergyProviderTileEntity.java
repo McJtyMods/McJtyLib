@@ -77,7 +77,7 @@ public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEnt
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        return 0;
+        return (int)storage.extractEnergy(maxExtract, simulate);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class GenericEnergyProviderTileEntity extends GenericEnergyStorageTileEnt
 
     @Override
     public boolean canExtract() {
-        return false;
+        return true;
     }
 
     @Override
