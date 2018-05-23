@@ -1,21 +1,15 @@
 package mcjty.lib.tileentity;
 
 import cofh.redstoneflux.api.IEnergyReceiver;
-import mcjty.lib.varia.EnergyTools;
 import net.darkhax.tesla.api.ITeslaConsumer;
-import net.darkhax.tesla.api.ITeslaHolder;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.InterfaceList({
-    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
     @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer"),
     @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyReceiver")
 })
-public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, ITeslaHolder, ITeslaConsumer, IEnergyStorage {
+public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, ITeslaConsumer {
 
     public GenericEnergyReceiverTileEntity(long maxEnergy, long maxReceive) {
         super(maxEnergy, maxReceive);
@@ -39,41 +33,13 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
         return (int)storage.receiveEnergy(maxReceive, simulate);
     }
 
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int getEnergyStored(EnumFacing from) {
-        return EnergyTools.unsignedClampToInt(storage.getEnergyStored());
-    }
-
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
-        return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
-    }
-
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return true;
-    }
-
     // -----------------------------------------------------------
-    // For ITeslaHolder and ITeslaConsumer
-    // deliberately not @Optional so that we can reliably call these elsewhere
+    // For ITeslaConsumer
+    // deliberately not @Optional so that we can reliably call this elsewhere
 
     @Override
     public long givePower(long power, boolean simulated) {
         return storage.receiveEnergy(power, simulated);
-    }
-
-    @Override
-    public long getStoredPower() {
-        return storage.getEnergyStored();
-    }
-
-    @Override
-    public long getCapacity() {
-        return storage.getMaxEnergyStored();
     }
 
     // -----------------------------------------------------------
@@ -85,43 +51,7 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
     }
 
     @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
-        return 0;
-    }
-
-    @Override
-    public int getEnergyStored() {
-        return EnergyTools.unsignedClampToInt(storage.getEnergyStored());
-    }
-
-    @Override
-    public int getMaxEnergyStored() {
-        return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
-    }
-
-    @Override
-    public boolean canExtract() {
-        return false;
-    }
-
-    @Override
     public boolean canReceive() {
         return true;
-    }
-
-    @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY) {
-            return true;
-        }
-        return super.hasCapability(capability, facing);
-    }
-
-    @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY) {
-            return (T) this;
-        }
-        return super.getCapability(capability, facing);
     }
 }

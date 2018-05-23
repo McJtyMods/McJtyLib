@@ -3,12 +3,25 @@ package mcjty.lib.tileentity;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.EnergyTools;
+import net.darkhax.tesla.api.ITeslaHolder;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class GenericEnergyStorageTileEntity extends GenericTileEntity {
+import cofh.redstoneflux.api.IEnergyHandler;
+
+@Optional.InterfaceList({
+    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
+    @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyHandler")
+})
+public class GenericEnergyStorageTileEntity extends GenericTileEntity implements ITeslaHolder, IEnergyHandler, IEnergyStorage {
 
     public static final String CMD_GETENERGY = "getEnergy";
 
@@ -100,5 +113,89 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity {
             return true;
         }
         return false;
+    }
+
+    // -----------------------------------------------------------
+    // For IEnergyHandler
+
+    @Optional.Method(modid = "redstoneflux")
+    @Override
+    public int getEnergyStored(EnumFacing from) {
+        return EnergyTools.unsignedClampToInt(storage.getEnergyStored());
+    }
+
+    @Optional.Method(modid = "redstoneflux")
+    @Override
+    public int getMaxEnergyStored(EnumFacing from) {
+        return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
+    }
+
+    @Optional.Method(modid = "redstoneflux")
+    @Override
+    public boolean canConnectEnergy(EnumFacing from) {
+        return true;
+    }
+
+    // -----------------------------------------------------------
+    // For ITeslaHolder
+    // deliberately not @Optional so that we can reliably call these elsewhere
+
+    @Override
+    public long getStoredPower() {
+        return storage.getEnergyStored();
+    }
+
+    @Override
+    public long getCapacity() {
+        return storage.getMaxEnergyStored();
+    }
+
+    // -----------------------------------------------------------
+    // For IEnergyStorage
+
+    @Override
+    public int receiveEnergy(int maxReceive, boolean simulate) {
+        return 0;
+    }
+
+    @Override
+    public int extractEnergy(int maxExtract, boolean simulate) {
+        return 0;
+    }
+
+    @Override
+    public int getEnergyStored() {
+        return EnergyTools.unsignedClampToInt(storage.getEnergyStored());
+    }
+
+    @Override
+    public int getMaxEnergyStored() {
+        return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
+    }
+
+    @Override
+    public boolean canExtract() {
+        return false;
+    }
+
+    @Override
+    public boolean canReceive() {
+        return false;
+    }
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+        if (capability == CapabilityEnergy.ENERGY) {
+            return true;
+        }
+        return super.hasCapability(capability, facing);
+    }
+
+    @Override
+    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+        if (capability == CapabilityEnergy.ENERGY) {
+            return (T) this;
+        }
+        return super.getCapability(capability, facing);
     }
 }
