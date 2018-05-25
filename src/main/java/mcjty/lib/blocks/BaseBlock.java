@@ -67,20 +67,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
     public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{FACING};
 
-    @Deprecated
-    public BaseBlock(ModBase mod,
-                        Material material,
-                        String name,
-                        Class<? extends ItemBlock> itemBlockClass) {
-        this(mod, material, name, block -> {
-            try {
-                return itemBlockClass.getConstructor(Block.class).newInstance(block);
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
     public BaseBlock(ModBase mod,
                         Material material,
                         String name,

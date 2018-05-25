@@ -92,11 +92,6 @@ public class BlockTools {
         return stack.getDisplayName();
     }
 
-    @Deprecated
-    public static IBlockState placeStackAt(EntityPlayer player, ItemStack blockStack, World world, BlockPos pos) {
-        return placeStackAt(player, blockStack, world, pos, null);
-    }
-
     public static IBlockState placeStackAt(EntityPlayer player, ItemStack blockStack, World world, BlockPos pos, @Nullable IBlockState origState) {
         if (blockStack.getItem() instanceof ItemBlock) {
             ItemBlock itemBlock = (ItemBlock) blockStack.getItem();

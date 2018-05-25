@@ -14,7 +14,6 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -57,18 +56,6 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
 
     public T material(Material material) {
         this.material = material;
-        return (T) this;
-    }
-
-    @Deprecated
-    public T itemBlockClass(Class<? extends ItemBlock> itemBlockClass) {
-        this.itemBlockFactory = block -> {
-            try {
-                return itemBlockClass.getConstructor(Block.class).newInstance(block);
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        };
         return (T) this;
     }
 

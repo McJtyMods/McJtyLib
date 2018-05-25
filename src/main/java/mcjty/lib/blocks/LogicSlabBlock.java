@@ -27,7 +27,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -44,17 +43,6 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
 
     public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<EntityPlayer, IInventory, C> containerFactory, String name, boolean isContainer) {
         super(mod, material, tileEntityClass, containerFactory, name, isContainer);
-    }
-
-    @Deprecated
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<EntityPlayer, IInventory, C> containerFactory, Class<? extends ItemBlock> itemBlockClass, String name, boolean isContainer) {
-        super(mod, material, tileEntityClass, containerFactory, block -> {
-            try {
-                return itemBlockClass.getConstructor(Block.class).newInstance(block);
-            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        }, name, isContainer);
     }
 
     public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<EntityPlayer, IInventory, C> containerFactory, Function<Block, ItemBlock> itemBlockFactory, String name, boolean isContainer) {

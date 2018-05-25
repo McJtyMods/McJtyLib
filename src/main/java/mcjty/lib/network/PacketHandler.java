@@ -23,11 +23,6 @@ public class PacketHandler {
         return packetId++;
     }
 
-    @Deprecated
-    public static int nextID() {
-        return nextPacketID();
-    }
-
     public static SimpleNetworkWrapper registerMessages(String modid, String channelName) {
         SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
         registerMessages(network);
