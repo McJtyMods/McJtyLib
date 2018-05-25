@@ -1,5 +1,6 @@
 package mcjty.lib.tileentity;
 
+import mcjty.lib.api.power.IBigPower;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -21,7 +22,7 @@ import cofh.redstoneflux.api.IEnergyHandler;
     @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
     @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyHandler")
 })
-public class GenericEnergyStorageTileEntity extends GenericTileEntity implements ITeslaHolder, IEnergyHandler, IEnergyStorage {
+public class GenericEnergyStorageTileEntity extends GenericTileEntity implements IBigPower, ITeslaHolder, IEnergyHandler, IEnergyStorage {
 
     public static final String CMD_GETENERGY = "getEnergy";
 
