@@ -85,7 +85,7 @@ public class Window {
                                     ((GenericGuiContainer<?>) gui).sendServerCommand(wrapper, teCommand, params));
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
-                    toplevel = (Panel)WidgetRepository.createWidget("panel", Minecraft.getMinecraft(), gui);
+                    toplevel = new Panel(Minecraft.getMinecraft(), gui);
                     toplevel.readFromGuiCommand(cmd);
                 });
                 command.commands()

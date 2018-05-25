@@ -30,7 +30,7 @@ import static mcjty.lib.gui.widgets.WidgetList.TYPE_WIDGETLIST;
 
 public class WidgetRepository {
 
-    private static final Map<String, BiFunction<Minecraft, Gui, Widget>> FACTORIES = new HashMap<>();
+    private static final Map<String, BiFunction<Minecraft, Gui, Widget<?>>> FACTORIES = new HashMap<>();
 
     static {
         FACTORIES.put(TYPE_BLOCKRENDER, BlockRender::new);
@@ -55,8 +55,8 @@ public class WidgetRepository {
     }
 
     @Nullable
-    public static Widget createWidget(String type, Minecraft minecraft, Gui gui) {
-        BiFunction<Minecraft, Gui, Widget> function = FACTORIES.get(type);
+    public static Widget<?> createWidget(String type, Minecraft minecraft, Gui gui) {
+        BiFunction<Minecraft, Gui, Widget<?>> function = FACTORIES.get(type);
         if (function == null) {
             return null;
         }
