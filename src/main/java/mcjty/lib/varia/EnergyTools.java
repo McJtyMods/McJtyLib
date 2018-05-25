@@ -26,10 +26,10 @@ public class EnergyTools {
     public static Capability<ITeslaHolder> TESLA_HOLDER = null;
 
     @CapabilityInject(ITeslaConsumer.class)
-    protected static Capability<ITeslaConsumer> TESLA_CONSUMER = null;
+    public static Capability<ITeslaConsumer> TESLA_CONSUMER = null;
 
     @CapabilityInject(ITeslaProducer.class)
-    protected static Capability<ITeslaProducer> TESLA_PRODUCER = null;
+    public static Capability<ITeslaProducer> TESLA_PRODUCER = null;
 
     public static class EnergyLevel {
         private final long energy;
