@@ -13,12 +13,14 @@ import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nullable;
 
+import mcjty.lib.api.power.IBigPower;
+
 @Optional.InterfaceList({
     @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer"),
     @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
     @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaProducer")
 })
-public class ItemCapabilityProvider implements ICapabilityProvider, IEnergyStorage, ITeslaHolder, ITeslaConsumer, ITeslaProducer {
+public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, IEnergyStorage, ITeslaHolder, ITeslaConsumer, ITeslaProducer {
 
     private final ItemStack itemStack;
     private final IEnergyItem item;
