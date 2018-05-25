@@ -69,8 +69,8 @@ public class EnergyTools {
         long energyStored;
         doCheckMods();
         if (tileEntity instanceof IBigPower) {
-            maxEnergyStored = ((IBigPower) tileEntity).getBigMaxEnergy();
-            energyStored = ((IBigPower) tileEntity).getBigEnergy();
+            maxEnergyStored = ((IBigPower) tileEntity).getCapacity();
+            energyStored = ((IBigPower) tileEntity).getStoredPower();
         } else if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(tileEntity, side)) {
             maxEnergyStored = TeslaCompatibility.getMaxEnergy(tileEntity, side);
             energyStored = TeslaCompatibility.getEnergy(tileEntity, side);
