@@ -110,6 +110,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         this.hasRedstoneOutput = hasRedstoneOutput;
     }
 
+    @Deprecated
+    public boolean shouldRedstoneConduitConnect(World world, int x, int y, int z, EnumFacing from) {
+        throw new AbstractMethodError();
+    }
+
     @Override
     @Optional.Method(modid = "enderio")
     public boolean shouldRedstoneConduitConnect(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EnumFacing from) {
