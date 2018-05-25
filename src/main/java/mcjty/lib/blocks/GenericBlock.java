@@ -126,18 +126,10 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         this.hasRedstoneOutput = hasRedstoneOutput;
     }
 
-    /**
-     * @deprecated override {@link #shouldRedstoneConduitConnect(World, BlockPos, EnumFacing)} instead
-     */
-    @Deprecated
-    public boolean shouldRedstoneConduitConnect(World world, int x, int y, int z, EnumFacing from) {
-        return needsRedstoneCheck() || hasRedstoneOutput();
-    }
-
     @Override
     @Optional.Method(modid = "enderio")
     public boolean shouldRedstoneConduitConnect(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EnumFacing from) {
-        return shouldRedstoneConduitConnect(world, pos.getX(), pos.getY(), pos.getZ(), from);
+        return needsRedstoneCheck() || hasRedstoneOutput();
     }
 
     protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
