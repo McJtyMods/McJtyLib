@@ -9,13 +9,27 @@ import mcjty.lib.compat.EnergySupportEnderIO;
 import mcjty.lib.compat.EnergySupportMekanism;
 import mcjty.lib.compat.RedstoneFluxCompatibility;
 import mcjty.lib.compat.TeslaCompatibility;
+import net.darkhax.tesla.api.ITeslaConsumer;
+import net.darkhax.tesla.api.ITeslaHolder;
+import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Loader;
 
 public class EnergyTools {
+
+    @CapabilityInject(ITeslaHolder.class)
+    public static Capability<ITeslaHolder> TESLA_HOLDER = null;
+
+    @CapabilityInject(ITeslaConsumer.class)
+    protected static Capability<ITeslaConsumer> TESLA_CONSUMER = null;
+
+    @CapabilityInject(ITeslaProducer.class)
+    protected static Capability<ITeslaProducer> TESLA_PRODUCER = null;
 
     public static class EnergyLevel {
         private final long energy;

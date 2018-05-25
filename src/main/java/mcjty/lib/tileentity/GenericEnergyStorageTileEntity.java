@@ -9,6 +9,7 @@ import net.darkhax.tesla.api.ITeslaHolder;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
@@ -186,7 +187,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY) {
+        if (capability == CapabilityEnergy.ENERGY || capability == EnergyTools.TESLA_HOLDER) {
             return true;
         }
         return super.hasCapability(capability, facing);
@@ -194,7 +195,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY) {
+        if (capability == CapabilityEnergy.ENERGY || capability == EnergyTools.TESLA_HOLDER) {
             return (T) this;
         }
         return super.getCapability(capability, facing);
