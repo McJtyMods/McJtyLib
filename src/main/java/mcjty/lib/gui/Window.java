@@ -369,7 +369,7 @@ public class Window {
     public <T extends GenericTileEntity> Window action(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
         for (IAction<?> action : te.getActions()) {
             if (keyName.equals(action.getKey())) {
-                initializeAction(network, componentName, te, action);
+                initializeAction(network, componentName, action);
                 return this;
             }
         }
@@ -378,7 +378,7 @@ public class Window {
         return this;
     }
 
-    private <T extends GenericTileEntity> void initializeAction(SimpleNetworkWrapper network, String componentName, T te, IAction<?> action) {
+    private void initializeAction(SimpleNetworkWrapper network, String componentName, IAction<?> action) {
         event(componentName, (source, params) -> sendAction(network, action));
     }
 
