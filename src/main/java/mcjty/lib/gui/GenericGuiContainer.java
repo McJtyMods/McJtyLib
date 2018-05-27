@@ -251,6 +251,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         }
     }
 
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        drawWindow();
+    }
 
     protected void drawWindow() {
         drawDefaultBackground();
