@@ -123,7 +123,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
     @Optional.Method(modid = "redstoneflux")
     @Override
     public int getEnergyStored(EnumFacing from) {
-        return EnergyTools.unsignedClampToInt(storage.getEnergyStored());
+        return EnergyTools.getIntEnergyStored(storage.getEnergyStored(), storage.getMaxEnergyStored());
     }
 
     @Optional.Method(modid = "redstoneflux")
@@ -167,7 +167,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
 
     @Override
     public int getEnergyStored() {
-        return EnergyTools.unsignedClampToInt(storage.getEnergyStored());
+        return EnergyTools.getIntEnergyStored(storage.getEnergyStored(), storage.getMaxEnergyStored());
     }
 
     @Override

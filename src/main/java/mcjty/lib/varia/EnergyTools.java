@@ -181,4 +181,32 @@ public class EnergyTools {
     public static int unsignedClampToInt(long l) {
         return l > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int)l;
     }
+
+    /**
+     * Some energy APIs only support ints for energy, not longs.
+     * This function makes sure that these APIs never incorrectly think that
+     * larger-than-int storage is too full or empty to perform operations on.
+     *
+     * @param energyStored The actual energy stored
+     * @param maxEnergyStored The actual max energy stored
+     * @return The energy stored to report to APIs that don't support longs
+     */
+    public static int getIntEnergyStored(long energyStored, long maxEnergyStored) {
+        if(maxEnergyStored <= Integer.MAX_VALUE) {
+            // Easy case: everything naturally fits in ints already
+            return (int)energyStored;
+        }
+        if(energyStored <= 0x3FFF_FFFF) {
+            // Very little energy is stored. Return the amount such that the integer API will know the true energy stored
+            return (int)energyStored;
+        }
+        long remainingCapacity = maxEnergyStored - energyStored;
+        if(remainingCapacity <= 0x3FFF_FFFF) {
+            // Very little capacity remains. Return the amount such that the integer API will know the true remaining capacity
+            return Integer.MAX_VALUE - (int)remainingCapacity;
+        }
+        // All of the numbers involved are so high that we can't return the true energy stored or remaining capacity.
+        // We can only fit one bit of useful information: whether or not it's half full
+        return energyStored < remainingCapacity ? 0x3FFF_FFFF : 0x4000_0000;
+    }
 }

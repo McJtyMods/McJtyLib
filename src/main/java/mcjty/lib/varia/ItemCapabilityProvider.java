@@ -58,7 +58,7 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, I
 
     @Override
     public int getEnergyStored() {
-        return EnergyTools.unsignedClampToInt(item.getEnergyStoredL(itemStack));
+        return EnergyTools.getIntEnergyStored(item.getEnergyStoredL(itemStack), item.getMaxEnergyStoredL(itemStack));
     }
 
     @Override

@@ -29,7 +29,7 @@ public interface IEnergyItem extends IEnergyContainerItem {
     @Override
     @Optional.Method(modid = "redstoneflux")
     default int getEnergyStored(ItemStack container) {
-        return EnergyTools.unsignedClampToInt(getEnergyStoredL(container));
+        return EnergyTools.getIntEnergyStored(getEnergyStoredL(container), getMaxEnergyStoredL(container));
     }
 
     @Override
