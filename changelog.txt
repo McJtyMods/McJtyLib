@@ -1,0 +1,4 @@
+3.0.0alpha:
+- Major refactoring and changes. Updating McJtyLib will require an update of all mods that need it
+- New more flexible color picker widget
+- New ‘tallChunkFriendly’ config in McJtyLib which changes to a less efficient way to encode positions but one that is more friendly towards mods that increase the maximum build height
