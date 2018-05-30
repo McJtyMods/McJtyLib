@@ -290,7 +290,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         int xPos = slotIn.xPos + window.getToplevel().getBounds().x;
         int yPos = slotIn.yPos + window.getToplevel().getBounds().y;
 
-        return windowManager.getModalWindows()
+        return getWindowManager().getModalWindows()
                 .anyMatch(window -> window.getToplevel().getBounds().intersects(new Rectangle(xPos, yPos, 18, 18)));
     }
 
