@@ -52,7 +52,8 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
         int yy = y + bounds.y;
 
         if (isEnabled()) {
-            drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff000000 | getCurrentColor());
+            Integer color = getCurrentColorSafe();
+            drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 0xff000000 | color);
             RenderHelper.drawLeftTriangle(xx + bounds.width - 10, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleNormal);
             RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleNormal);
         } else {
@@ -62,6 +63,14 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
         }
 
         super.drawOffset(x, y, 0, 1);
+    }
+
+    private Integer getCurrentColorSafe() {
+        Integer color = getCurrentColor();
+        if (color == null) {
+            color = 0;
+        }
+        return color;
     }
 
     @Override
@@ -118,10 +127,12 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
         int wy = (int) (window.getToplevel().getBounds().getY() + 20);
         modalDialog.setBounds(new Rectangle(wx, wy, 240, 160));
 
+        int cc = getCurrentColorSafe();
+
         Button current = new Button(mc, gui).setLayoutHint(new PositionalLayout.PositionalHint(5, 108, 95, 27))
                 .setText("Current")
-                .setColor(calculateContrastingColor(currentColor))
-                .setFilledBackground(0xff000000 | currentColor);
+                .setColor(calculateContrastingColor(cc))
+                .setFilledBackground(0xff000000 | cc);
 
         TextField red = new TextField(mc, gui)
                 .setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 30, 15));
@@ -129,7 +140,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
                 .setLayoutHint(new PositionalLayout.PositionalHint(38, 5, 30, 15));
         TextField blue = new TextField(mc, gui)
                 .setLayoutHint(new PositionalLayout.PositionalHint(71, 5, 30, 15));
-        setSelectedColor(red, green, blue, current, currentColor);
+        setSelectedColor(red, green, blue, current, cc);
 
         red.addTextEnterEvent((parent, newText) -> {
             currentColor = getInputColor(red, green, blue);
