@@ -367,7 +367,7 @@ public class Window {
     }
 
     public <T extends GenericTileEntity> Window action(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
-        for (IAction<?> action : te.getActions()) {
+        for (IAction action : te.getActions()) {
             if (keyName.equals(action.getKey())) {
                 initializeAction(network, componentName, action);
                 return this;
@@ -378,12 +378,12 @@ public class Window {
         return this;
     }
 
-    private void initializeAction(SimpleNetworkWrapper network, String componentName, IAction<?> action) {
+    private void initializeAction(SimpleNetworkWrapper network, String componentName, IAction action) {
         event(componentName, (source, params) -> sendAction(network, action));
     }
 
     public <T extends GenericTileEntity> void sendAction(SimpleNetworkWrapper network, T te, String actionKey) {
-        for (IAction<?> action : te.getActions()) {
+        for (IAction action : te.getActions()) {
             if (actionKey.equals(action.getKey())) {
                 sendAction(network, action);
                 return;
@@ -394,7 +394,7 @@ public class Window {
 
     }
 
-    private void sendAction(SimpleNetworkWrapper network, IAction<?> action) {
+    private void sendAction(SimpleNetworkWrapper network, IAction action) {
         ((GenericGuiContainer<?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
                 TypedMap.builder()
                         .put(GenericTileEntity.PARAM_KEY, action.getKey())
@@ -402,10 +402,10 @@ public class Window {
     }
 
     public <T extends GenericTileEntity> Window bind(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
-        for (IValue<?, ?> value : te.getValues()) {
+        for (IValue<?> value : te.getValues()) {
             Key<?> key = value.getKey();
             if (keyName.equals(key.getName())) {
-                initializeBinding(network, componentName, te, value);
+                initializeBinding(network, componentName, value);
                 return this;
             }
         }
@@ -414,8 +414,8 @@ public class Window {
         return this;
     }
 
-    private <T extends GenericTileEntity> void initializeBinding(SimpleNetworkWrapper network, String componentName, T te, IValue value) {
-        Object v = value.getter().apply(te);
+    private <V> void initializeBinding(SimpleNetworkWrapper network, String componentName, IValue<V> value) {
+        V v = value.getter().get();
         Widget<?> component = findChild(componentName);
 
         if (component == null) {
@@ -425,7 +425,7 @@ public class Window {
         component.setGenericValue(v);
 
         event(componentName, (source, params) -> {
-            Type<?> type = value.getKey().getType();
+            Type<V> type = value.getKey().getType();
             ((GenericGuiContainer<?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
                     TypedMap.builder()
                             // @todo this conversion can fail!

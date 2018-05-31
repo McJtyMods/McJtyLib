@@ -1,16 +1,15 @@
 package mcjty.lib.bindings;
 
-import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-public interface IValue<V, T extends GenericTileEntity> {
+public interface IValue<V> {
 
     Key<V> getKey();
 
-    Function<T, V> getter();
+    Supplier<V> getter();
 
-    BiConsumer<T, V> setter();
+    Consumer<V> setter();
 }

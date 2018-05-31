@@ -56,8 +56,8 @@ import java.util.function.Consumer;
 
 public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
 
-    public static final IValue<?, ?>[] EMPTY_VALUES = new IValue[0];
-    public static final IAction<?>[] EMPTY_ACTIONS = new IAction[0];
+    public static final IValue<?>[] EMPTY_VALUES = new IValue[0];
+    public static final IAction[] EMPTY_ACTIONS = new IAction[0];
 
     public static final String COMMAND_SYNC_BINDING = "generic.syncBinding";
     public static final String COMMAND_SYNC_ACTION = "generic.syncAction";
@@ -88,11 +88,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
-    public IValue<?, ?>[] getValues() {
+    public IValue<?>[] getValues() {
         return EMPTY_VALUES;
     }
 
-    public IAction<?>[] getActions() {
+    public IAction[] getActions() {
         return EMPTY_ACTIONS;
     }
 
@@ -500,7 +500,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return false;
     }
 
-    private <T extends GenericTileEntity, V> BiConsumer<T, V> findSetter(Key<V> key) {
+    private <V> Consumer<V> findSetter(Key<V> key) {
         // Cache or use Map?
         for (IValue value : getValues()) {
             if (key.getName().equals(value.getKey().getName())) {
@@ -510,7 +510,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return null;
     }
 
-    private <T extends GenericTileEntity> Consumer<T> findConsumer(String key) {
+    private Runnable findConsumer(String key) {
         for (IAction action : getActions()) {
             if (key.equals(action.getKey())) {
                 return action.consumer();
@@ -543,7 +543,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             return true;
         } else if (COMMAND_SYNC_ACTION.equals(command)) {
             String key = params.get(PARAM_KEY);
-            findConsumer(key).accept(this);
+            findConsumer(key).run();
             return true;
         }
         return false;
@@ -551,7 +551,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     private <T> void syncBindingHelper(TypedMap params, Key<T> bkey) {
         T o = params.get(bkey);
-        findSetter(bkey).accept(this, o);
+        findSetter(bkey).accept(o);
     }
 
     private void syncBinding(TypedMap params) {

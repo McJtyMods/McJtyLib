@@ -1,15 +1,11 @@
 package mcjty.lib.bindings;
 
-import mcjty.lib.tileentity.GenericTileEntity;
-
-import java.util.function.Consumer;
-
-public class DefaultAction<T extends GenericTileEntity> implements IAction<T> {
+public class DefaultAction implements IAction {
 
     private final String key;
-    private final Consumer<T> consumer;
+    private final Runnable consumer;
 
-    public DefaultAction(String key, Consumer<T> consumer) {
+    public DefaultAction(String key, Runnable consumer) {
         this.key = key;
         this.consumer = consumer;
     }
@@ -20,7 +16,7 @@ public class DefaultAction<T extends GenericTileEntity> implements IAction<T> {
     }
 
     @Override
-    public Consumer<T> consumer() {
+    public Runnable consumer() {
         return consumer;
     }
 }
