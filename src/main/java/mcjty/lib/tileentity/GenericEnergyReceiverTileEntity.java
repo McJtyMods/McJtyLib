@@ -59,17 +59,4 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
     public long givePower(long power, boolean simulated) {
         return storage.receiveEnergy(power, simulated);
     }
-
-    // -----------------------------------------------------------
-    // For IEnergyStorage
-
-    @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        return (int)storage.receiveEnergy(maxReceive, simulate);
-    }
-
-    @Override
-    public boolean canReceive() {
-        return true;
-    }
 }

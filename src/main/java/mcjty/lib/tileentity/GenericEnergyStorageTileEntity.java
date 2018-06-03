@@ -23,7 +23,7 @@ import cofh.redstoneflux.api.IEnergyHandler;
     @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
     @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyHandler")
 })
-public class GenericEnergyStorageTileEntity extends GenericTileEntity implements IBigPower, ITeslaHolder, IEnergyHandler, IEnergyStorage {
+public class GenericEnergyStorageTileEntity extends GenericTileEntity implements IBigPower, ITeslaHolder, IEnergyHandler {
 
     public static final String CMD_GETENERGY = "getEnergy";
 
@@ -155,35 +155,39 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
     // -----------------------------------------------------------
     // For IEnergyStorage
 
-    @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        return 0;
-    }
+    private final IEnergyStorage energyStorage = new IEnergyStorage() {
+        private final boolean isReceiver = GenericEnergyStorageTileEntity.this instanceof GenericEnergyReceiverTileEntity;
 
-    @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
-        return 0;
-    }
+        @Override
+        public int receiveEnergy(int maxReceive, boolean simulate) {
+            return isReceiver ? (int)storage.receiveEnergy(maxReceive, simulate) : 0;
+        }
 
-    @Override
-    public int getEnergyStored() {
-        return EnergyTools.getIntEnergyStored(storage.getEnergyStored(), storage.getMaxEnergyStored());
-    }
+        @Override
+        public int extractEnergy(int maxExtract, boolean simulate) {
+            return 0;
+        }
 
-    @Override
-    public int getMaxEnergyStored() {
-        return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
-    }
+        @Override
+        public int getEnergyStored() {
+            return EnergyTools.getIntEnergyStored(storage.getEnergyStored(), storage.getMaxEnergyStored());
+        }
 
-    @Override
-    public boolean canExtract() {
-        return false;
-    }
+        @Override
+        public int getMaxEnergyStored() {
+            return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
+        }
 
-    @Override
-    public boolean canReceive() {
-        return false;
-    }
+        @Override
+        public boolean canExtract() {
+            return false;
+        }
+
+        @Override
+        public boolean canReceive() {
+            return isReceiver;
+        }
+    };
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
@@ -195,7 +199,9 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
 
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY || capability == EnergyTools.TESLA_HOLDER) {
+        if (capability == CapabilityEnergy.ENERGY) {
+            return (T) energyStorage;
+        } else if(capability == EnergyTools.TESLA_HOLDER) {
             return (T) this;
         }
         return super.getCapability(capability, facing);

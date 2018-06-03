@@ -20,7 +20,7 @@ import mcjty.lib.api.power.IBigPower;
     @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
     @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaProducer")
 })
-public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, IEnergyStorage, ITeslaHolder, ITeslaConsumer, ITeslaProducer {
+public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, ITeslaHolder, ITeslaConsumer, ITeslaProducer {
 
     private final ItemStack itemStack;
     private final IEnergyItem item;
@@ -40,41 +40,46 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, I
 
     @Override
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
-        if (capability == CapabilityEnergy.ENERGY || capability == EnergyTools.TESLA_HOLDER || capability == EnergyTools.TESLA_CONSUMER || capability == EnergyTools.TESLA_PRODUCER) {
+        if (capability == CapabilityEnergy.ENERGY) {
+            return (T) energyStorage;
+        } else if(capability == EnergyTools.TESLA_HOLDER || capability == EnergyTools.TESLA_CONSUMER || capability == EnergyTools.TESLA_PRODUCER) {
             return (T) this;
         }
         return null;
     }
 
-    @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-        return (int)item.receiveEnergyL(itemStack, maxReceive, simulate);
-    }
+    private final IEnergyStorage energyStorage = new IEnergyStorage() {
 
-    @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
-        return (int)item.extractEnergyL(itemStack, maxExtract, simulate);
-    }
+        @Override
+        public int receiveEnergy(int maxReceive, boolean simulate) {
+            return (int)item.receiveEnergyL(itemStack, maxReceive, simulate);
+        }
 
-    @Override
-    public int getEnergyStored() {
-        return EnergyTools.getIntEnergyStored(item.getEnergyStoredL(itemStack), item.getMaxEnergyStoredL(itemStack));
-    }
+        @Override
+        public int extractEnergy(int maxExtract, boolean simulate) {
+            return (int)item.extractEnergyL(itemStack, maxExtract, simulate);
+        }
 
-    @Override
-    public int getMaxEnergyStored() {
-        return EnergyTools.unsignedClampToInt(item.getMaxEnergyStoredL(itemStack));
-    }
+        @Override
+        public int getEnergyStored() {
+            return EnergyTools.getIntEnergyStored(item.getEnergyStoredL(itemStack), item.getMaxEnergyStoredL(itemStack));
+        }
 
-    @Override
-    public boolean canExtract() {
-        return true;
-    }
+        @Override
+        public int getMaxEnergyStored() {
+            return EnergyTools.unsignedClampToInt(item.getMaxEnergyStoredL(itemStack));
+        }
 
-    @Override
-    public boolean canReceive() {
-        return true;
-    }
+        @Override
+        public boolean canExtract() {
+            return true;
+        }
+
+        @Override
+        public boolean canReceive() {
+            return true;
+        }
+    };
 
     @Override
     public long getStoredPower() {
