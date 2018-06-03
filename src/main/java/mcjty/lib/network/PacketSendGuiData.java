@@ -43,6 +43,10 @@ public class PacketSendGuiData implements IMessage {
         public boolean match(Object o) {
             return clazz.isInstance(o);
         }
+
+        public T cast(Object o) {
+            return clazz.cast(o);
+        }
     }
 
 
@@ -70,6 +74,10 @@ public class PacketSendGuiData implements IMessage {
         }
     }
 
+    private static <T> void acceptCasted(Entry<T> triple, ByteBuf buf, Object o) {
+        triple.consumer.accept(Pair.of(buf, triple.cast(o)));
+    }
+
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(dimId);
@@ -78,10 +86,10 @@ public class PacketSendGuiData implements IMessage {
         for (Object o : data) {
             boolean ok = false;
             for (Map.Entry<Integer, Entry<?>> entry : CLASS_MAP.entrySet()) {
-                Entry triple = entry.getValue();
+                Entry<?> triple = entry.getValue();
                 if (triple.match(o)) {
                     buf.writeByte(entry.getKey());
-                    triple.consumer.accept(Pair.of(buf, o));
+                    acceptCasted(triple, buf, o);
                     ok = true;
                     break;
                 }
