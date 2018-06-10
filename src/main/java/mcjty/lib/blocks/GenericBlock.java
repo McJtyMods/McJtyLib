@@ -49,8 +49,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -66,6 +64,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     private boolean needsRedstoneCheck = false;
     private boolean hasRedstoneOutput = false;
+    private boolean infusable = false;
     private IModuleSupport moduleSupport = null;
 
     @SideOnly(Side.CLIENT)
@@ -100,6 +99,14 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     public boolean hasRedstoneOutput() {
         return hasRedstoneOutput;
+    }
+
+    public void setInfusable(boolean infusable) {
+        this.infusable = infusable;
+    }
+
+    public boolean isInfusable() {
+        return infusable || this instanceof Infusable;
     }
 
     public void setNeedsRedstoneCheck(boolean needsRedstoneCheck) {
@@ -195,7 +202,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                 long energy = tagCompound.getLong("Energy");
                 list.add(TextFormatting.GREEN + "Energy: " + energy + " rf");
             }
-            if (this instanceof Infusable) {
+            if (isInfusable()) {
                 int infused = tagCompound.getInteger("infused");
                 int pct = infused * 100 / GeneralConfig.maxInfuse;
                 list.add(TextFormatting.YELLOW + "Infused: " + pct + "%");

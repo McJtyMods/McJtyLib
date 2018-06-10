@@ -12,7 +12,6 @@ import mcjty.lib.tileentity.LogicTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -35,6 +34,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
     private IModuleSupport moduleSupport;
 
     private int guiId = -1;
+    private boolean infusable = false;
 
     public LogicSlabBlockBuilder(ModBase mod, String registryName) {
         super(mod, registryName);
@@ -53,6 +53,11 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
 
     public LogicSlabBlockBuilder<T> emptyContainer() {
         this.containerFactory = EmptyContainerFactory.getInstance();
+        return this;
+    }
+
+    public LogicSlabBlockBuilder<T> infusable() {
+        this.infusable = true;
         return this;
     }
 
@@ -144,5 +149,6 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
         b.setNeedsRedstoneCheck(flags.contains(BlockFlags.REDSTONE_CHECK));
         b.setHasRedstoneOutput(flags.contains(BlockFlags.REDSTONE_OUTPUT));
         b.setModuleSupport(moduleSupport);
+        b.setInfusable(infusable);
     }
 }

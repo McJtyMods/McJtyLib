@@ -28,6 +28,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
     private IModuleSupport moduleSupport;
 
     private int guiId = -1;
+    private boolean infusable = false;
 
     public GenericBlockBuilder(ModBase mod, String registryName) {
         super(mod, registryName);
@@ -45,6 +46,11 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
 
     public GenericBlockBuilder<T> emptyContainer() {
         this.containerFactory = EmptyContainerFactory.getInstance();
+        return this;
+    }
+
+    public GenericBlockBuilder<T> infusable() {
+        this.infusable = true;
         return this;
     }
 
@@ -68,8 +74,8 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
         GenericBlock<T, GenericContainer> block = new GenericBlock<T, GenericContainer>(mod, material, tileEntityClass,
                 (player, tileEntity) -> {
                     GenericContainer c = new GenericContainer(containerFactory);
-                    if (tileEntity instanceof IInventory) {
-                        c.addInventory(ContainerFactory.CONTAINER_CONTAINER, (IInventory) tileEntity);
+                    if (tileEntity != null) {
+                        c.addInventory(ContainerFactory.CONTAINER_CONTAINER, tileEntity);
                     }
                     c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
                     c.generateSlots();
@@ -131,5 +137,6 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
         b.setNeedsRedstoneCheck(flags.contains(BlockFlags.REDSTONE_CHECK));
         b.setHasRedstoneOutput(flags.contains(BlockFlags.REDSTONE_OUTPUT));
         b.setModuleSupport(moduleSupport);
+        b.setInfusable(infusable);
     }
 }
