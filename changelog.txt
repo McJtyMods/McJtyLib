@@ -1,3 +1,6 @@
+3.0.1:
+- Various blocks in RFTools could no longer be infused and also didn't show their current infusion value (already infused blocks would still do their bonus however)
+
 3.0.0:
 - Major refactoring and changes. Updating McJtyLib will require an update of all mods that need it
 - New more flexible color picker widget
