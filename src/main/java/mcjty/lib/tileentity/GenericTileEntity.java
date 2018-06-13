@@ -387,6 +387,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
 
+    @Deprecated
     protected boolean needsCustomInvWrapper() {
         return false;
     }
@@ -396,7 +397,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     @Override
     public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
-        if (needsCustomInvWrapper()) {
+        if (facing == null ? this instanceof IInventory : this instanceof ISidedInventory) {
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
                 return true;
             }
@@ -407,18 +408,18 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     @Override
     public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            if (needsCustomInvWrapper()) {
-                if (facing == null) {
+            if (facing == null) {
+                if (this instanceof IInventory) {
                     if (invHandlerNull == null) {
                         invHandlerNull = new InvWrapper((IInventory) this);
                     }
                     return (T) invHandlerNull;
-                } else {
-                    if (invHandlerSided == null) {
-                        invHandlerSided = new NullSidedInvWrapper((ISidedInventory) this);
-                    }
-                    return (T) invHandlerSided;
                 }
+            } else if (this instanceof ISidedInventory) {
+                if (invHandlerSided == null) {
+                    invHandlerSided = new NullSidedInvWrapper((ISidedInventory) this);
+                }
+                return (T) invHandlerSided;
             }
         }
         return super.getCapability(capability, facing);
