@@ -235,6 +235,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     public void setOpaqueCube(boolean opaque) {
         this.opaque = opaque;
+        this.fullBlock = this.getDefaultState().isOpaqueCube();
+        this.lightOpacity = this.fullBlock ? 255 : 0;
+        this.translucent = !blockMaterial.blocksLight();
     }
 
     @SideOnly(Side.CLIENT)
