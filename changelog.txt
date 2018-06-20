@@ -1,3 +1,6 @@
+3.0.2:
+- Fixed a problem with default opaqueness of all blocks
+
 3.0.1:
 - Various blocks in RFTools could no longer be infused and also didn't show their current infusion value (already infused blocks would still do their bonus however)
 
