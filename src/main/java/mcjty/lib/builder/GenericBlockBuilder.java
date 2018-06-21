@@ -70,6 +70,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
         IRedstoneGetter getter = getRedstoneGetter(flags.contains(BlockFlags.REDSTONE_OUTPUT));
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
+        ISideRenderControl renderControl = getSideRenderControl();
 
         GenericBlock<T, GenericContainer> block = new GenericBlock<T, GenericContainer>(mod, material, tileEntityClass,
                 (player, tileEntity) -> {
@@ -107,6 +108,11 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             @Override
             public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
+            }
+
+            @Override
+            public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+                return renderControl.doesSideBlockRendering(state, world, pos, face);
             }
         };
         setupBlock(block);

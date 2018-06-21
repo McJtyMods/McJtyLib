@@ -85,6 +85,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
         IRedstoneGetter getter = GenericBlockBuilder.getRedstoneGetter(flags.contains(BlockFlags.REDSTONE_OUTPUT));
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
+        ISideRenderControl renderControl = getSideRenderControl();
 
         GenericBlock<T, GenericContainer> block = new LogicSlabBlock<T, GenericContainer>(mod, material, tileEntityClass,
                 (player, inventory) -> {
@@ -135,6 +136,11 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             @Override
             protected BlockStateContainer createBlockState() {
                 return new BlockStateContainer(this, getProperties());
+            }
+
+            @Override
+            public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+                return renderControl.doesSideBlockRendering(state, world, pos, face);
             }
         };
         setupBlock(block);

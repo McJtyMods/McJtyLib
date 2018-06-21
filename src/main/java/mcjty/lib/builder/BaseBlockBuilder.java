@@ -11,6 +11,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
@@ -108,6 +109,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         IProperty<?>[] properties = calculateProperties();
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
+        ISideRenderControl renderControl = getSideRenderControl();
 
         BaseBlock block = new BaseBlock(mod, material, registryName, itemBlockFactory) {
             @Override
@@ -129,6 +131,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
             }
+
+            @Override
+            public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+                return renderControl.doesSideBlockRendering(state, world, pos, face);
+            }
         };
         setupBlock(block);
         return block;
@@ -139,6 +146,14 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             return (state, world, pos) -> state.getLightValue();
         } else {
             return (state, world, pos) -> lightValue;
+        }
+    }
+
+    protected ISideRenderControl getSideRenderControl() {
+        if (flags.contains(BlockFlags.RENDER_NOSIDES)) {
+            return (state, world, pos, face) -> world.getBlockState(pos.offset(face)).equals(state);
+        } else {
+            return (state, world, pos, face) -> state.isOpaqueCube();
         }
     }
 
