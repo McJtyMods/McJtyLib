@@ -8,12 +8,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 import java.util.*;
 import java.util.function.Function;
@@ -36,6 +39,8 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected Function<Block, ItemBlock> itemBlockFactory = GenericItemBlock::new;
 
     protected List<IProperty<?>> extraProperties = new ArrayList<>();
+
+    protected IActivateAction action = (world, pos, player, hand, side, hitX, hitY, hitZ) -> false;
 
     protected InformationString informationString;
     protected InformationString informationStringWithShift;
@@ -105,6 +110,12 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
+    public T activateAction(IActivateAction action) {
+        this.action = action;
+        return (T) this;
+    }
+
+
     public BaseBlock build() {
         IProperty<?>[] properties = calculateProperties();
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
@@ -135,6 +146,15 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             @Override
             public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
+            }
+
+            @Override
+            public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+                if (!action.doActivate(worldIn, pos, playerIn, hand, facing, hitX, hitY, hitZ)) {
+                    return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+                } else {
+                    return true;
+                }
             }
         };
         setupBlock(block);
