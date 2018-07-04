@@ -146,6 +146,11 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
+            public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+                clickAction.doClick(worldIn, pos, playerIn);
+            }
+
+            @Override
             public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
                 if (!action.doActivate(worldIn, pos, playerIn, hand, facing, hitX, hitY, hitZ)) {
                     return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);

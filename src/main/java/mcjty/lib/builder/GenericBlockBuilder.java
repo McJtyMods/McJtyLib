@@ -97,7 +97,6 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
                 return getter.getRedstoneOutput(state, world, pos, side);
             }
 
-
             @Override
             protected IProperty<?>[] getProperties() {
                 return properties;
@@ -116,6 +115,11 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             @Override
             public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
+            }
+
+            @Override
+            public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+                clickAction.doClick(worldIn, pos, playerIn);
             }
 
             @Override

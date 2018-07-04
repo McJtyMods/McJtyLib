@@ -41,6 +41,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected List<IProperty<?>> extraProperties = new ArrayList<>();
 
     protected IActivateAction action = (world, pos, player, hand, side, hitX, hitY, hitZ) -> false;
+    protected IClickAction clickAction = (world, pos, player) -> {};
 
     protected InformationString informationString;
     protected InformationString informationStringWithShift;
@@ -110,6 +111,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
+    public T clickAction(IClickAction action) {
+        this.clickAction = action;
+        return (T) this;
+    }
+
     public T activateAction(IActivateAction action) {
         this.action = action;
         return (T) this;
@@ -146,6 +152,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             @Override
             public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
+            }
+
+            @Override
+            public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+                clickAction.doClick(worldIn, pos, playerIn);
             }
 
             @Override
