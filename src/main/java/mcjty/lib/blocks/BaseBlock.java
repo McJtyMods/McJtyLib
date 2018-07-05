@@ -38,9 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nullable;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +53,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public static final IProperty<?>[] NONE_PROPERTIES = new IProperty[0];
     protected ModBase modBase;
     private boolean creative;
-    private boolean opaque = true;
+    private boolean nonopaque = false;  // Has to be false because true initializer doesn't work in constructor
 
     private InformationString informationString;
     private InformationString informationStringWithShift;
@@ -230,11 +227,11 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @Override
     public boolean isOpaqueCube(IBlockState state) {
-        return opaque;
+        return !nonopaque;
     }
 
     public void setOpaqueCube(boolean opaque) {
-        this.opaque = opaque;
+        this.nonopaque = !opaque;
         this.fullBlock = this.getDefaultState().isOpaqueCube();
         this.lightOpacity = this.fullBlock ? 255 : 0;
         this.translucent = !blockMaterial.blocksLight();
