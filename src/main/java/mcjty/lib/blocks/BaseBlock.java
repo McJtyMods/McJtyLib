@@ -53,7 +53,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public static final IProperty<?>[] NONE_PROPERTIES = new IProperty[0];
     protected ModBase modBase;
     private boolean creative;
-    private boolean nonopaque = false;  // Has to be false because true initializer doesn't work in constructor
+
+    // The vanilla Block constructor sets this.fullBlock based on isOpaqueCube. We want our blocks to be opaque by default.
+    // If this were "opaque = true", our constructor wouldn't set it to true until after Block's constructor finished,
+    // so fullBlock would be wrong. Since booleans default to false, we need to invert this one as "nonopaque = false", so
+    // that it will be correct while we're still in Block's constructor.
+    private boolean nonopaque = false;
 
     private InformationString informationString;
     private InformationString informationStringWithShift;
