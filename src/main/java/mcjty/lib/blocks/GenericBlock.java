@@ -64,7 +64,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     private boolean needsRedstoneCheck = false;
     private boolean hasRedstoneOutput = false;
-    private boolean infusable = false;
+    private boolean infusable = this instanceof Infusable;
     private IModuleSupport moduleSupport = null;
 
     @SideOnly(Side.CLIENT)
@@ -106,7 +106,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     public boolean isInfusable() {
-        return infusable || this instanceof Infusable;
+        return infusable;
     }
 
     public void setNeedsRedstoneCheck(boolean needsRedstoneCheck) {
