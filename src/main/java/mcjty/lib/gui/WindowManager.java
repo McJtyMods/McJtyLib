@@ -5,9 +5,9 @@ import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.util.NonNullList;
 import org.lwjgl.input.Mouse;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,8 +21,8 @@ public class WindowManager {
     private IconManager iconManager = new IconManager(this);
     private final GuiScreen gui;
 
-    private List<Window> windows = new ArrayList<>();
-    private List<Window> modalWindows = new ArrayList<>();
+    private NonNullList<Window> windows = NonNullList.create();
+    private NonNullList<Window> modalWindows = NonNullList.create();
 
     // If -1 it is not this window manager that manages the mousewheel but
     // the window itself
