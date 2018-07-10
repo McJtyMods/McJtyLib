@@ -16,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -129,6 +130,11 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
                 } else {
                     return true;
                 }
+            }
+
+            @Override
+            public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+                return boundingBox.getBoundingBox(state, source, pos);
             }
         };
         setupBlock(block);

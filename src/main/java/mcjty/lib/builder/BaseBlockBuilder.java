@@ -14,6 +14,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -21,6 +22,8 @@ import net.minecraft.world.World;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
+
+import static net.minecraft.block.Block.FULL_BLOCK_AABB;
 
 /**
  * Build blocks using this class
@@ -42,6 +45,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
 
     protected IActivateAction action = (world, pos, player, hand, side, hitX, hitY, hitZ) -> false;
     protected IClickAction clickAction = (world, pos, player) -> {};
+    protected IGetBoundingBox boundingBox = (state, source, pos) -> FULL_BLOCK_AABB;
 
     protected InformationString informationString;
     protected InformationString informationStringWithShift;
@@ -121,6 +125,10 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
+    public T boundingBox(IGetBoundingBox boundingBox) {
+        this.boundingBox = boundingBox;
+        return (T) this;
+    }
 
     public BaseBlock build() {
         IProperty<?>[] properties = calculateProperties();
@@ -166,6 +174,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
                 } else {
                     return true;
                 }
+            }
+
+            @Override
+            public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+                return boundingBox.getBoundingBox(state, source, pos);
             }
         };
         setupBlock(block);
