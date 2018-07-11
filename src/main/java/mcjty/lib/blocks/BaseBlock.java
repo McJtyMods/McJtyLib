@@ -59,6 +59,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     // so fullBlock would be wrong. Since booleans default to false, we need to invert this one as "nonopaque = false", so
     // that it will be correct while we're still in Block's constructor.
     private boolean nonopaque = false;
+    private boolean nonfullcube = false;
 
     private InformationString informationString;
     private InformationString informationStringWithShift;
@@ -235,11 +236,20 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return !nonopaque;
     }
 
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return !nonfullcube;
+    }
+
     public void setOpaqueCube(boolean opaque) {
         this.nonopaque = !opaque;
         this.fullBlock = this.getDefaultState().isOpaqueCube();
         this.lightOpacity = this.fullBlock ? 255 : 0;
         this.translucent = !blockMaterial.blocksLight();
+    }
+
+    public void setFullcube(boolean fullcube) {
+        this.nonfullcube = !fullcube;
     }
 
     @SideOnly(Side.CLIENT)

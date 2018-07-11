@@ -249,6 +249,10 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         }
         final boolean opaque = !flags.contains(BlockFlags.NON_OPAQUE);
         block.setOpaqueCube(opaque);
+
+        final boolean full = !flags.contains(BlockFlags.NON_FULLCUBE);
+        block.setFullcube(full);
+
         block.setInformationString(informationString);
         if (informationStringWithShift != null) {
             block.setInformationStringWithShift(informationStringWithShift);
