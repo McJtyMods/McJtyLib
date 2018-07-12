@@ -42,6 +42,7 @@ public class BlamingNonNullList<E> extends AbstractList<E>
         NullPointerException ex = null;
         if(element == null) {
             ex = new NullPointerException();
+            ex.printStackTrace();
         }
         BlameHolder<E> bh = this.delegate.set(index, new BlameHolder<E>(element, ex));
         if(doRethrow && bh.object == null) throw new RuntimeException("A NullPointerException was previously ignored", bh.blame);
@@ -53,6 +54,7 @@ public class BlamingNonNullList<E> extends AbstractList<E>
         NullPointerException ex = null;
         if(element == null) {
             ex = new NullPointerException();
+            ex.printStackTrace();
         }
         this.delegate.add(index, new BlameHolder<E>(element, ex));
     }
