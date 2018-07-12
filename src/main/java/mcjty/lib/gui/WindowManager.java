@@ -84,8 +84,12 @@ public class WindowManager {
 
     public void draw() {
         mouseWheel = Mouse.getDWheel();
+        windows.setDoRethrow(true);
         windows.stream().forEach(w -> w.draw());
+        windows.setDoRethrow(false);
+        modalWindows.setDoRethrow(true);
         modalWindows.stream().forEach(w -> w.draw());
+        modalWindows.setDoRethrow(false);
         iconManager.draw(Minecraft.getMinecraft(), gui);
     }
 
