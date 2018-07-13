@@ -1,7 +1,7 @@
 3.0.3:
 - Again a fix with opaqueness. It was not done correctly last time
 - A few new features for the upcoming Ariente mod
--
+- Joseph tried to work around an issue with NEI sometimes causing the GUI's from McJtyLib to fail. This is not fixed yet but now it should crash earlier. If you have this problem a lot remove NEI for now
 
 3.0.2:
 - Fixed a problem with default opaqueness of all blocks
