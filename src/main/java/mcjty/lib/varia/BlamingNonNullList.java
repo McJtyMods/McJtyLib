@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 public class BlamingNonNullList<E> extends AbstractList<E>
 {
     private final List<BlameHolder<E>> delegate;
+    private boolean doRethrow = false;
 
     private static class BlameHolder<E> {
         final E object;
@@ -24,40 +25,44 @@ public class BlamingNonNullList<E> extends AbstractList<E>
         this.delegate = new ArrayList<>();
     }
 
+    public void setDoRethrow(boolean doRethrow) {
+        this.doRethrow = doRethrow;
+    }
+
     @Nonnull
     public E get(int index)
     {
         BlameHolder<E> bh = this.delegate.get(index);
-        if(bh.object == null) throw new RuntimeException("A NullPointerException was previously ignored", bh.blame);
+        if(doRethrow && bh.object == null) throw new RuntimeException("A NullPointerException was previously ignored", bh.blame);
         return bh.object;
     }
 
     public E set(int index, E element)
     {
+        NullPointerException ex = null;
         if(element == null) {
-            NullPointerException ex = new NullPointerException();
-            this.delegate.set(index, new BlameHolder<E>(null, ex));
-            throw ex;
+            ex = new NullPointerException();
+            ex.printStackTrace();
         }
-        BlameHolder<E> bh = this.delegate.set(index, new BlameHolder<E>(element, null));
-        if(bh.object == null) throw new RuntimeException("A NullPointerException was previously ignored", bh.blame);
+        BlameHolder<E> bh = this.delegate.set(index, new BlameHolder<E>(element, ex));
+        if(doRethrow && bh.object == null) throw new RuntimeException("A NullPointerException was previously ignored", bh.blame);
         return bh.object;
     }
 
     public void add(int index, E element)
     {
+        NullPointerException ex = null;
         if(element == null) {
-            NullPointerException ex = new NullPointerException();
-            this.delegate.add(index, new BlameHolder<E>(null, ex));
-            throw ex;
+            ex = new NullPointerException();
+            ex.printStackTrace();
         }
-        this.delegate.add(index, new BlameHolder<E>(element, null));
+        this.delegate.add(index, new BlameHolder<E>(element, ex));
     }
 
     public E remove(int index)
     {
         BlameHolder<E> bh = this.delegate.remove(index);
-        if(bh.object == null) throw new RuntimeException("A NullPointerException was previously ignored", bh.blame);
+        if(doRethrow && bh.object == null) throw new RuntimeException("A NullPointerException was previously ignored", bh.blame);
         return bh.object;
     }
 
