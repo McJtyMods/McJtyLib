@@ -37,13 +37,14 @@ public class McJtyRegister {
     public static void registerBlocks(ModBase mod, IForgeRegistry<Block> registry) {
         for (MBlock mBlock : blocks) {
             if (mBlock.getMod().getModId().equals(mod.getModId())) {
-                registry.register(mBlock.getBlock());
-                if (tiles.containsKey(mBlock.getBlock())) {
-                    MTile tile = tiles.get(mBlock.getBlock());
+                Block block = mBlock.getBlock();
+                registry.register(block);
+                if (tiles.containsKey(block)) {
+                    MTile tile = tiles.get(block);
                     if (tile.getTileEntityClass() == null) {
-                        throw new RuntimeException("Bad tile entity registration for block: " + mBlock.getBlock().getRegistryName().toString());
+                        throw new RuntimeException("Bad tile entity registration for block: " + block.getRegistryName().toString());
                     }
-                    GameRegistry.registerTileEntity(tile.getTileEntityClass(), mBlock.getMod().getModId() + "_" + mBlock.getBlock().getRegistryName().getResourcePath());
+                    GameRegistry.registerTileEntity(tile.getTileEntityClass(), mBlock.getMod().getModId() + "_" + block.getRegistryName().getResourcePath());
                 }
             }
         }
