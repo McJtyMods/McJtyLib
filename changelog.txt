@@ -1,3 +1,7 @@
+3.0.4:
+- WARNING: Do not load any worlds with McJtyLib 3.0.3 or earlier if you last saved them with McJtyLib 3.0.4 or later!
+- Joseph fixed log warnings due to tile entities being registered with names like "minecraft:xnet_controller" instead of "xnet:controller".
+
 3.0.3:
 - Again a fix with opaqueness. It was not done correctly last time
 - A few new features for the upcoming Ariente mod

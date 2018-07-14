@@ -1,10 +1,14 @@
 package mcjty.lib;
 
 import mcjty.lib.base.ModBase;
+import mcjty.lib.datafix.fixes.TileEntityNamespace;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.datafix.FixTypes;
+import net.minecraftforge.common.util.ModFixs;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -26,8 +30,19 @@ public class McJtyRegister {
         blocks.add(new MBlock(block, mod, itemBlockFactory));
     }
 
+    /**
+     * @deprecated use {@link McJtyRegister#registerLater(Block, Class, boolean)} instead
+     */
+    @Deprecated
     public static void registerLater(Block block, @Nullable Class<? extends TileEntity> tileEntityClass) {
-        tiles.put(block, new MTile(tileEntityClass));
+        registerLater(block, tileEntityClass, true);
+    }
+
+    /**
+     * @param needsNamespaceFixer Should always be false for all new blocks. True for any block that has a tile entity and used to call the deprecated {@link McJtyRegister#registerLater(Block, Class)} method above.
+     */
+    public static void registerLater(Block block, @Nullable Class<? extends TileEntity> tileEntityClass, boolean needsNamespaceFixer) {
+        tiles.put(block, new MTile(tileEntityClass, needsNamespaceFixer));
     }
 
     public static void registerLater(Item item, ModBase mod) {
@@ -35,6 +50,15 @@ public class McJtyRegister {
     }
 
     public static void registerBlocks(ModBase mod, IForgeRegistry<Block> registry) {
+        registerBlocks(mod, registry, null, 1);
+    }
+
+    /**
+     * @param modFixs If your mod uses a ModFixs, pass it here. Otherwise, pass null and one will be created.
+     * @param fixVersion If your mod uses a ModFixs, pass the fix version to use for the tile entity namespace fix. Otherwise, pass 1.
+     */
+    public static void registerBlocks(ModBase mod, IForgeRegistry<Block> registry, @Nullable ModFixs modFixs, int fixVersion) {
+        Map<String, String> oldToNewIdMap = new HashMap<>();
         for (MBlock mBlock : blocks) {
             if (mBlock.getMod().getModId().equals(mod.getModId())) {
                 Block block = mBlock.getBlock();
@@ -44,9 +68,24 @@ public class McJtyRegister {
                     if (tile.getTileEntityClass() == null) {
                         throw new RuntimeException("Bad tile entity registration for block: " + block.getRegistryName().toString());
                     }
-                    GameRegistry.registerTileEntity(tile.getTileEntityClass(), mBlock.getMod().getModId() + "_" + block.getRegistryName().getResourcePath());
+                    String newId = block.getRegistryName().toString();
+                    GameRegistry.registerTileEntity(tile.getTileEntityClass(), newId);
+                    if (tile.isNeedsNamespaceFixer()) {
+                        String oldPath = mBlock.getMod().getModId() + "_" + block.getRegistryName().getResourcePath();
+                        oldToNewIdMap.put(oldPath, newId);
+                        oldToNewIdMap.put("minecraft:" + oldPath, newId);
+                    }
                 }
             }
+        }
+        if(!oldToNewIdMap.isEmpty()) {
+            // We used to accidentally register TEs with names like "minecraft:xnet_controller" instead of "xnet:controller".
+            // Set up a DataFixer to map these incorrect names to the correct ones, so that we don't break old saved games.
+            // @todo Remove all this if we ever break saved-game compatibility.
+            if(modFixs == null) {
+                modFixs = FMLCommonHandler.instance().getDataFixer().init(mod.getModId(), fixVersion);
+            }
+            modFixs.registerFix(FixTypes.BLOCK_ENTITY, new TileEntityNamespace(oldToNewIdMap, fixVersion));
         }
     }
 
@@ -69,13 +108,19 @@ public class McJtyRegister {
 
     private static class MTile {
         private final Class<? extends TileEntity> tileEntityClass;
+        private final boolean needsNamespaceFixer;
 
-        public MTile(Class<? extends TileEntity> tileEntityClass) {
+        public MTile(Class<? extends TileEntity> tileEntityClass, boolean needsNamespaceFixer) {
             this.tileEntityClass = tileEntityClass;
+            this.needsNamespaceFixer = needsNamespaceFixer;
         }
 
         public Class<? extends TileEntity> getTileEntityClass() {
             return tileEntityClass;
+        }
+
+        public boolean isNeedsNamespaceFixer() {
+            return needsNamespaceFixer;
         }
     }
 
