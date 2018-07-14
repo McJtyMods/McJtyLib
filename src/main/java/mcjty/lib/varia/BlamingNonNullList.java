@@ -29,6 +29,7 @@ public class BlamingNonNullList<E> extends AbstractList<E>
         this.doRethrow = doRethrow;
     }
 
+    @Override
     @Nonnull
     public E get(int index)
     {
@@ -37,6 +38,7 @@ public class BlamingNonNullList<E> extends AbstractList<E>
         return bh.object;
     }
 
+    @Override
     public E set(int index, E element)
     {
         NullPointerException ex = null;
@@ -49,6 +51,7 @@ public class BlamingNonNullList<E> extends AbstractList<E>
         return bh.object;
     }
 
+    @Override
     public void add(int index, E element)
     {
         NullPointerException ex = null;
@@ -59,6 +62,7 @@ public class BlamingNonNullList<E> extends AbstractList<E>
         this.delegate.add(index, new BlameHolder<E>(element, ex));
     }
 
+    @Override
     public E remove(int index)
     {
         BlameHolder<E> bh = this.delegate.remove(index);
@@ -66,6 +70,7 @@ public class BlamingNonNullList<E> extends AbstractList<E>
         return bh.object;
     }
 
+    @Override
     public int size()
     {
         return this.delegate.size();
