@@ -73,7 +73,7 @@ public class McJtyRegister {
                     if (tile.isNeedsNamespaceFixer()) {
                         String oldPath = mBlock.getMod().getModId() + "_" + block.getRegistryName().getResourcePath();
                         oldToNewIdMap.put(oldPath, newId);
-                        oldToNewIdMap.put("minecraft:" + oldPath, newId);
+                        oldToNewIdMap.put("minecraft:" + oldPath.toLowerCase(), newId);
                     }
                 }
             }
