@@ -92,6 +92,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
 
     protected WindowManager getWindowManager() {
         if (windowManager == null) {
+            if (sideWindow.getWindow() == null) {
+                RuntimeException e = new RuntimeException("Internal error! getWindowManager() called before initGui!");
+                Logging.getLogger().error(e); // Some mods (NEI) will swallow this exception without a trace unless we log it ourself.
+                throw e;
+            }
             windowManager = new WindowManager(this);
             windowManager.addWindow(sideWindow.getWindow());
             windowManager.addWindow(window);
