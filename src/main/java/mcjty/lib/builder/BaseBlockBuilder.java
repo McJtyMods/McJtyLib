@@ -8,6 +8,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -19,6 +20,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -135,6 +137,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
         ISideRenderControl renderControl = getSideRenderControl();
+        boolean nocd = flags.contains(BlockFlags.NO_COLLISION);
 
         BaseBlock block = new BaseBlock(mod, material, registryName, itemBlockFactory) {
             @Override
@@ -179,6 +182,13 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             @Override
             public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
                 return boundingBox.getBoundingBox(state, source, pos);
+            }
+
+            @Override
+            public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+                if (!nocd) {
+                    super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
+                }
             }
         };
         setupBlock(block);

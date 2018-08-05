@@ -9,5 +9,6 @@ public enum BlockFlags {
     RENDER_SOLID,
     RENDER_CUTOUT,
     RENDER_TRANSLUCENT,
-    RENDER_NOSIDES
+    RENDER_NOSIDES,
+    NO_COLLISION
 }
