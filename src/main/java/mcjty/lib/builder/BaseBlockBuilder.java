@@ -48,6 +48,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected IActivateAction action = (world, pos, player, hand, side, hitX, hitY, hitZ) -> false;
     protected IClickAction clickAction = (world, pos, player) -> {};
     protected IGetBoundingBox boundingBox = (state, source, pos) -> FULL_BLOCK_AABB;
+    protected IAddCollisionBoxToList cdBoxToList = null;
 
     protected InformationString informationString;
     protected InformationString informationStringWithShift;
@@ -127,6 +128,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
+    public T addCollisionBoxToList(IAddCollisionBoxToList list) {
+        this.cdBoxToList = list;
+        return (T) this;
+    }
+
     public T boundingBox(IGetBoundingBox boundingBox) {
         this.boundingBox = boundingBox;
         return (T) this;
@@ -137,7 +143,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
         ISideRenderControl renderControl = getSideRenderControl();
-        boolean nocd = flags.contains(BlockFlags.NO_COLLISION);
+        IAddCollisionBoxToList boxToList = getAddCollisionBoxToList();
 
         BaseBlock block = new BaseBlock(mod, material, registryName, itemBlockFactory) {
             @Override
@@ -186,7 +192,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
 
             @Override
             public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-                if (!nocd) {
+                if (!boxToList.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState)) {
                     super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
                 }
             }
@@ -200,6 +206,16 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             return (state, world, pos) -> state.getLightValue();
         } else {
             return (state, world, pos) -> lightValue;
+        }
+    }
+
+    protected IAddCollisionBoxToList getAddCollisionBoxToList() {
+        if (cdBoxToList != null) {
+            return cdBoxToList;
+        } else if (flags.contains(BlockFlags.NO_COLLISION)) {
+            return (state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState) -> true;
+        } else {
+            return (state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState) -> false;
         }
     }
 

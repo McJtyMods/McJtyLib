@@ -12,7 +12,6 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -79,7 +78,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
         ICanRenderInLayer canRenderInLayer = getCanRenderInLayer();
         IGetLightValue getLightValue = getGetLightValue();
         ISideRenderControl renderControl = getSideRenderControl();
-        boolean nocd = flags.contains(BlockFlags.NO_COLLISION);
+        IAddCollisionBoxToList boxToList = getAddCollisionBoxToList();
 
         GenericBlock<T, GenericContainer> block = new GenericBlock<T, GenericContainer>(mod, material, tileEntityClass,
                 (player, tileEntity) -> {
@@ -144,7 +143,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
 
             @Override
             public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-                if (!nocd) {
+                if (!boxToList.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState)) {
                     super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
                 }
             }
