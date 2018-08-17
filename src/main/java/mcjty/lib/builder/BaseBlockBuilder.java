@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -49,6 +50,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected IClickAction clickAction = (world, pos, player) -> {};
     protected IGetBoundingBox boundingBox = (state, source, pos) -> FULL_BLOCK_AABB;
     protected IAddCollisionBoxToList cdBoxToList = null;
+    protected IGetAIPathNodeType getAIPathNodeType = (state, world, pos) -> null;
 
     protected InformationString informationString;
     protected InformationString informationStringWithShift;
@@ -128,6 +130,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
+    public T getAIPathNodeType(IGetAIPathNodeType getter) {
+        this.getAIPathNodeType = getter;
+        return (T) this;
+    }
+
     public T addCollisionBoxToList(IAddCollisionBoxToList list) {
         this.cdBoxToList = list;
         return (T) this;
@@ -195,6 +202,16 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
                 if (!boxToList.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState)) {
                     super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
                 }
+            }
+
+            @Nullable
+            @Override
+            public PathNodeType getAiPathNodeType(IBlockState state, IBlockAccess world, BlockPos pos) {
+                PathNodeType type = getAIPathNodeType.getAiPathNodeType(state, world, pos);
+                if (type == null) {
+                    return super.getAiPathNodeType(state, world, pos);
+                }
+                return type;
             }
         };
         setupBlock(block);

@@ -12,6 +12,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -146,6 +147,16 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
                 if (!boxToList.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState)) {
                     super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
                 }
+            }
+
+            @Nullable
+            @Override
+            public PathNodeType getAiPathNodeType(IBlockState state, IBlockAccess world, BlockPos pos) {
+                PathNodeType type = getAIPathNodeType.getAiPathNodeType(state, world, pos);
+                if (type == null) {
+                    return super.getAiPathNodeType(state, world, pos);
+                }
+                return type;
             }
         };
         setupBlock(block);
