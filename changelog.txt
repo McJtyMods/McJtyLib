@@ -1,3 +1,6 @@
+3.0.5:
+- Joseph fixed a crash when dragging the mouse outside of a color picker
+
 3.0.4:
 - WARNING: Do not load any worlds with McJtyLib 3.0.3 or earlier if you last saved them with McJtyLib 3.0.4 or later!
 - Joseph fixed log warnings due to tile entities being registered with names like "minecraft:xnet_controller" instead of "xnet:controller".

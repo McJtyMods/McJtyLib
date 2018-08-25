@@ -70,7 +70,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
     @Override
     public void mouseMove(int x, int y) {
-        if (dragging && isEnabledAndVisible()) {
+        if (dragging && in(x, y) && isEnabledAndVisible()) {
             int u = x - bounds.x;
             int v = y - bounds.y;
             fireImageEvents("move", u, v, pickColor(u, v));
@@ -82,9 +82,11 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
         super.mouseRelease(x, y, button);
         if (dragging) {
             dragging = false;
-            int u = x - bounds.x;
-            int v = y - bounds.y;
-            fireImageEvents("release", u, v, pickColor(u, v));
+            if(in(x, y)) {
+                int u = x - bounds.x;
+                int v = y - bounds.y;
+                fireImageEvents("release", u, v, pickColor(u, v));
+            }
         }
     }
 
