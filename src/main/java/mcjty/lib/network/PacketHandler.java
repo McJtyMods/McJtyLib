@@ -1,9 +1,12 @@
 package mcjty.lib.network;
 
+import mcjty.lib.McJtyLib;
+import mcjty.lib.McJtyLibClient;
 import mcjty.lib.typed.TypedMap;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -24,11 +27,30 @@ public class PacketHandler {
     }
 
     public static SimpleNetworkWrapper registerMessages(String modid, String channelName) {
-        SimpleNetworkWrapper network = NetworkRegistry.INSTANCE.newSimpleChannel(channelName);
+        SimpleNetworkWrapper network = new SimpleNetworkWrapper(channelName) {
+            @Override
+            public void sendToServer(IMessage message) {
+                if (message instanceof IClientServerDelayed && !canBeSent(message)) {
+                    return;
+                }
+                super.sendToServer(message);
+            }
+        };
         registerMessages(network);
         modNetworking.put(modid, network);
         return network;
     }
+
+    @SideOnly(Side.CLIENT)
+    private static boolean canBeSent(IMessage message) {
+        return McJtyLibClient.connected;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static void onDisconnect() {
+        McJtyLibClient.connected = false;
+    }
+
 
     public static int registerMessages(SimpleNetworkWrapper networkWrapper){
         return registerMessages(networkWrapper, 0);

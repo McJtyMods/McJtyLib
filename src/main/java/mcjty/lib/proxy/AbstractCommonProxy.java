@@ -47,5 +47,4 @@ public abstract class AbstractCommonProxy {
     public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
         throw new IllegalStateException("This should only be called from client side");
     }
-
 }

@@ -12,6 +12,7 @@ import org.lwjgl.input.Keyboard;
 public class McJtyLibClient {
 
     private static boolean init;
+    public static boolean connected = false;
 
     public static void preInit(FMLPreInitializationEvent event){
         if (init) {
