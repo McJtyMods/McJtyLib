@@ -72,6 +72,7 @@ public class PacketHandler {
         networkWrapper.registerMessage(PacketSendClientCommandHandler.class, PacketSendClientCommand.class, startIndex++, Side.CLIENT);
         networkWrapper.registerMessage(PacketDataFromServer.Handler.class, PacketDataFromServer.class, startIndex++, Side.CLIENT);
         networkWrapper.registerMessage(PacketSendGuiData.Handler.class, PacketSendGuiData.class, startIndex++, Side.CLIENT);
+        networkWrapper.registerMessage(PacketFinalizeLogin.class, PacketFinalizeLogin.class, startIndex++, Side.CLIENT);
 
         return startIndex;
     }
