@@ -23,7 +23,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -73,7 +73,7 @@ public class McJtyLib {
     }
 
     @Mod.EventHandler
-    public void serverStarted(FMLServerStartingEvent event) {
+    public void serverStarted(FMLServerAboutToStartEvent event) {
         Logging.log("Preparing all world data");
         AbstractWorldData.clearInstances();
     }

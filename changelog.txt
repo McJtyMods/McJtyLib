@@ -1,6 +1,7 @@
 3.0.5:
 - Joseph fixed a crash when dragging the mouse outside of a color picker
 - Added support for fixing problems with early client->server packets that would sometimes fire before the server had a chance to setup networking for that client
+- Worked around a bug in Mekanism which would cause the XNet network data to load too early causing it to be destroyed again at the time the server starts (the event for which occurs after loading the world). This cleanup has now moved to right before the server starts to load anything
 
 3.0.4:
 - WARNING: Do not load any worlds with McJtyLib 3.0.3 or earlier if you last saved them with McJtyLib 3.0.4 or later!
