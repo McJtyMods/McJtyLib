@@ -36,8 +36,11 @@ public class LogicTileEntity extends GenericTileEntity {
 
     public LogicFacing getFacing(IBlockState state) {
         // Should not be needed but apparently it sometimes is
-        if (facing == null || !(state.getBlock() instanceof LogicSlabBlock)) {
-            Logging.getLogger().log(Level.WARN, "LogicTileEntity has unknown/invalid facing!");
+        if (facing == null) {
+            Logging.getLogger().log(Level.WARN, "LogicTileEntity has null facing!");
+            return LogicFacing.DOWN_TOEAST;
+        } else if (!(state.getBlock() instanceof LogicSlabBlock)) {
+            Logging.getLogger().log(Level.WARN, "LogicTileEntity expected LogicSlabBlock but had " + state.getBlock().getClass().getName());
             return LogicFacing.DOWN_TOEAST;
         }
         Integer meta = state.getValue(META_INTERMEDIATE);
