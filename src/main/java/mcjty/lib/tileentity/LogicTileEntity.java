@@ -12,6 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import org.apache.logging.log4j.Level;
 
 import static mcjty.lib.blocks.LogicSlabBlock.LOGIC_FACING;
 import static mcjty.lib.blocks.LogicSlabBlock.META_INTERMEDIATE;
@@ -36,7 +37,7 @@ public class LogicTileEntity extends GenericTileEntity {
     public LogicFacing getFacing(IBlockState state) {
         // Should not be needed but apparently it sometimes is
         if (facing == null || !(state.getBlock() instanceof LogicSlabBlock)) {
-            Logging.warn(null, "LogicTileEntity has unknown/invalid facing!");
+            Logging.getLogger().log(Level.WARN, "LogicTileEntity has unknown/invalid facing!");
             return LogicFacing.DOWN_TOEAST;
         }
         Integer meta = state.getValue(META_INTERMEDIATE);
