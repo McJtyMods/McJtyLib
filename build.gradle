@@ -39,6 +39,9 @@ repositories {
         name 'tterrag maven'
         url "https://maven.tterrag.com/"
     }
+    maven { // Ender IO
+        url "https://maven2.tterrag.com/"
+    }
     maven { // OC Repo
         url "http://maven.cil.li/"
     }
@@ -77,6 +80,7 @@ dependencies {
     deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
     deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
     deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
+    deobfCompile "com.enderio:EnderIO:${enderio_version}"
 
     compile "li.cil.oc:OpenComputers:${oc_version}"
 }
