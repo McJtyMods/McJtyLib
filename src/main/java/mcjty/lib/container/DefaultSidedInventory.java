@@ -42,12 +42,12 @@ public interface DefaultSidedInventory extends ISidedInventory {
 
     @Override
     default boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
-        return false;
+        return true;
     }
 
     @Override
     default boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
-        return false;
+        return true;
     }
 
     @Override
