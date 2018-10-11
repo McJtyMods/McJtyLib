@@ -2,6 +2,7 @@ package mcjty.lib;
 
 import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.tooltips.TooltipRender;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -19,6 +20,7 @@ public class McJtyLibClient {
             return;
         }
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
+        MinecraftForge.EVENT_BUS.register(new TooltipRender());
         init = true;
     }
 

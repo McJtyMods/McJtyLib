@@ -1,3 +1,7 @@
+3.0.6:
+- Joseph ...
+- Added support for rendering itemstacks in gui tooltips
+
 3.0.5:
 - Joseph fixed a crash when dragging the mouse outside of a color picker
 - Added support for fixing problems with early client->server packets that would sometimes fire before the server had a chance to setup networking for that client
