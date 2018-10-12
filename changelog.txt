@@ -1,5 +1,5 @@
 3.0.6:
-- Joseph ...
+- Joseph Fixed a crash in cases where a warning was supposed to be printed
 - Added support for rendering itemstacks in gui tooltips
 
 3.0.5:
