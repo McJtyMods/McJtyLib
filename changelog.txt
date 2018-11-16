@@ -1,3 +1,6 @@
+3.0.7:
+- Zarkov removed an old fix for teleporting out of the end.
+
 3.0.6:
 - Joseph Fixed a crash in cases where a warning was supposed to be printed
 - Added support for rendering itemstacks in gui tooltips
