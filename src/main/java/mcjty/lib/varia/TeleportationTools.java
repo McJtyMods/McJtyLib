@@ -61,12 +61,6 @@ public class TeleportationTools {
 
         worldServer.getMinecraftServer().getPlayerList().transferPlayerToDimension(entityPlayerMP, dimension, new McJtyLibTeleporter(worldServer, x, y, z));
         player.setPositionAndUpdate(x, y, z);
-        if (oldDimension == 1) {
-            // For some reason teleporting out of the end does weird things.
-            player.setPositionAndUpdate(x, y, z);
-            worldServer.spawnEntity(player);
-            worldServer.updateEntityWithOptionalForce(player, false);
-        }
     }
 
     private static void facePosition(Entity entity, double newX, double newY, double newZ, BlockPos dest) {
