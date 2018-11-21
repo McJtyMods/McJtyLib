@@ -193,12 +193,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
                 k += 2 + (textLines.size() - 1) * 10 + linesWithItemStacks * 8;
             }
 
-            if (guiLeft + xx + i > this.width) {
+            if (xx > this.width - guiLeft - i - 5) {
                 xx -= 28 + i;
             }
 
-            if (guiTop + yy + k + 6 > this.height) {
-                yy = this.height - k - 6;
+            if (xx < 4 - guiLeft) {
+                xx = 4 - guiLeft;
+            }
+
+            if (yy > this.height - guiTop - k - 4) {
+                yy = this.height - guiTop - k - 4;
+            } else if (yy < 4 - guiTop) {
+                yy = 4 - guiTop;
             }
 
             this.zLevel = 300.0F;
