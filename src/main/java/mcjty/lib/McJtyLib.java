@@ -6,6 +6,7 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
+import mcjty.lib.proxy.CommonProxy;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.worlddata.AbstractWorldData;
@@ -22,6 +23,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
@@ -52,6 +54,9 @@ public class McJtyLib {
 
     @CapabilityInject(PreferencesProperties.class)
     public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
+
+    @SidedProxy(clientSide = "mcjty.lib.proxy.ClientProxy", serverSide = "mcjty.lib.proxy.CommonProxy")
+    public static CommonProxy proxy;
 
     public static SimpleNetworkWrapper networkHandler;
     private static boolean init;

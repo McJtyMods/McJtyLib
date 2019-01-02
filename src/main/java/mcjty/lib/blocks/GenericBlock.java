@@ -175,7 +175,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
     @Optional.Method(modid = "waila")
     public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
         currenttip = super.getWailaBody(itemStack, currenttip, accessor, config);
