@@ -5,9 +5,11 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.varia.WrenchChecker;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -63,6 +65,21 @@ public abstract class AbstractCommonProxy implements IProxy {
 
     @Override
     public void initItemModelMesher(Item item, int meta, ModelResourceLocation model) {
+        throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
+    public void initTESRItemStack(Item item, int meta, Class<? extends TileEntity> clazz) {
+        throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
+    public void initCustomMeshDefinition(Item item, ItemMeshDefinition meshDefinition) {
+        throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
+    public void initCustomItemModel(Item item, int meta, ModelResourceLocation model) {
         throw new IllegalStateException("This should only be called from client side");
     }
 }
