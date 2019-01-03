@@ -9,7 +9,6 @@ import net.darkhax.tesla.api.ITeslaHolder;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Optional;
@@ -17,13 +16,10 @@ import net.minecraftforge.fml.common.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import cofh.redstoneflux.api.IEnergyHandler;
-
 @Optional.InterfaceList({
-    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
-    @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyHandler")
+    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder")
 })
-public class GenericEnergyStorageTileEntity extends GenericTileEntity implements IBigPower, ITeslaHolder, IEnergyHandler {
+public class GenericEnergyStorageTileEntity extends GenericTileEntity implements IBigPower, ITeslaHolder {
 
     public static final String CMD_GETENERGY = "getEnergy";
 
@@ -117,25 +113,12 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
         return false;
     }
 
-    // -----------------------------------------------------------
-    // For IEnergyHandler
-
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int getEnergyStored(EnumFacing from) {
+    public int getEnergyStored() {
         return EnergyTools.getIntEnergyStored(storage.getEnergyStored(), storage.getMaxEnergyStored());
     }
 
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int getMaxEnergyStored(EnumFacing from) {
+    public int getMaxEnergyStored() {
         return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
-    }
-
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public boolean canConnectEnergy(EnumFacing from) {
-        return true;
     }
 
     // -----------------------------------------------------------

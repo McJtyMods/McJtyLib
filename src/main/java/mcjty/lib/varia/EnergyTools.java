@@ -1,13 +1,10 @@
 package mcjty.lib.varia;
 
-import javax.annotation.Nullable;
-
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.power.IBigPower;
 import mcjty.lib.compat.EnergySupportDraconic;
 import mcjty.lib.compat.EnergySupportEnderIO;
 import mcjty.lib.compat.EnergySupportMekanism;
-import mcjty.lib.compat.RedstoneFluxCompatibility;
 import mcjty.lib.compat.TeslaCompatibility;
 import net.darkhax.tesla.api.ITeslaConsumer;
 import net.darkhax.tesla.api.ITeslaHolder;
@@ -21,6 +18,8 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.common.Loader;
+
+import javax.annotation.Nullable;
 
 public class EnergyTools {
 
@@ -58,9 +57,6 @@ public class EnergyTools {
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(te, side)) {
             return true;
         }
-        if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(te)) {
-            return true;
-        }
         return te.hasCapability(CapabilityEnergy.ENERGY, side);
     }
 
@@ -70,9 +66,6 @@ public class EnergyTools {
             return true;
         }
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyItem(stack)) {
-            return true;
-        }
-        if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyItem(item)) {
             return true;
         }
         return stack.hasCapability(CapabilityEnergy.ENERGY, null);
@@ -113,9 +106,6 @@ public class EnergyTools {
         } else if (enderio && EnergySupportEnderIO.isEnderioTileEntity(tileEntity)) {
             maxEnergyStored = EnergySupportEnderIO.getMaxEnergy(tileEntity);
             energyStored = EnergySupportEnderIO.getCurrentEnergy(tileEntity);
-        } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
-            maxEnergyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity, side);
-            energyStored = RedstoneFluxCompatibility.getEnergy(tileEntity, side);
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
             maxEnergyStored = energy.getMaxEnergyStored();
@@ -133,9 +123,6 @@ public class EnergyTools {
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(tileEntity, side)) {
             maxEnergyStored = TeslaCompatibility.getMaxEnergy(tileEntity, side);
             energyStored = TeslaCompatibility.getEnergy(tileEntity, side);
-        } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyHandler(tileEntity)) {
-            maxEnergyStored = RedstoneFluxCompatibility.getMaxEnergy(tileEntity, side);
-            energyStored = RedstoneFluxCompatibility.getEnergy(tileEntity, side);
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)) {
             IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
             maxEnergyStored = energy.getMaxEnergyStored();
@@ -150,8 +137,6 @@ public class EnergyTools {
     public static long receiveEnergy(TileEntity tileEntity, EnumFacing from, long maxReceive) {
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyReceiver(tileEntity, from)) {
             return TeslaCompatibility.receiveEnergy(tileEntity, from, maxReceive);
-        } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyReceiver(tileEntity)) {
-            return RedstoneFluxCompatibility.receiveEnergy(tileEntity, from, unsignedClampToInt(maxReceive));
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, from)) {
             IEnergyStorage capability = tileEntity.getCapability(CapabilityEnergy.ENERGY, from);
             if (capability.canReceive()) {
@@ -167,8 +152,6 @@ public class EnergyTools {
             return ((IEnergyItem)item).receiveEnergyL(stack, maxReceive, false);
         } else if (McJtyLib.tesla && TeslaCompatibility.isEnergyItem(stack)) {
             return TeslaCompatibility.receiveEnergy(stack, maxReceive, false);
-        } else if (McJtyLib.redstoneflux && RedstoneFluxCompatibility.isEnergyItem(item)) {
-            return RedstoneFluxCompatibility.receiveEnergy(item, stack, unsignedClampToInt(maxReceive), false);
         } else if (stack.hasCapability(CapabilityEnergy.ENERGY, null)) {
             IEnergyStorage capability = stack.getCapability(CapabilityEnergy.ENERGY, null);
             if (capability.canReceive()) {

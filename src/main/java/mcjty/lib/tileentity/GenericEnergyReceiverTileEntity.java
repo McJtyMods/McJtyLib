@@ -1,18 +1,15 @@
 package mcjty.lib.tileentity;
 
-import cofh.redstoneflux.api.IEnergyReceiver;
 import mcjty.lib.varia.EnergyTools;
 import net.darkhax.tesla.api.ITeslaConsumer;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.InterfaceList({
-    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer"),
-    @Optional.Interface(modid = "redstoneflux", iface = "cofh.redstoneflux.api.IEnergyReceiver")
+    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer")
 })
-public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements IEnergyReceiver, ITeslaConsumer {
+public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements ITeslaConsumer {
 
     public GenericEnergyReceiverTileEntity(long maxEnergy, long maxReceive) {
         super(maxEnergy, maxReceive);
@@ -40,15 +37,6 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
             return (T) this;
         }
         return super.getCapability(capability, facing);
-    }
-
-    // -----------------------------------------------------------
-    // For IEnergyReceiver
-
-    @Optional.Method(modid = "redstoneflux")
-    @Override
-    public int receiveEnergy(EnumFacing from, int maxReceive, boolean simulate) {
-        return (int)storage.receiveEnergy(maxReceive, simulate);
     }
 
     // -----------------------------------------------------------

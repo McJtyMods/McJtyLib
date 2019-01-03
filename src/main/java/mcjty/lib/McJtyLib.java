@@ -60,7 +60,7 @@ public class McJtyLib {
 
     public static SimpleNetworkWrapper networkHandler;
     private static boolean init;
-    public static boolean tesla, redstoneflux, cofhapiitem;
+    public static boolean tesla, cofhapiitem;
 
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
@@ -124,7 +124,6 @@ public class McJtyLib {
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         init = true;
         tesla = Loader.isModLoaded("tesla");
-        redstoneflux = Loader.isModLoaded("redstoneflux");
         cofhapiitem = Loader.isModLoaded("cofhapi|item");
     }
 
