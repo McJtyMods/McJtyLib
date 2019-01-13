@@ -1,5 +1,7 @@
-3.0.8:
+3.1.0:
 - Joseph fixed tooltips sometimes rendering partially offscreen.
+- Removal of COFH RF API support. Only Forge Energy is supported now!
+- New helper classes for cleaner proxy support in mods using McJtyLib
 
 3.0.7:
 - Zarkov removed an old fix for teleporting out of the end.

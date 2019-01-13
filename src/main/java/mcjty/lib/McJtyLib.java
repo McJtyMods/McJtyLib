@@ -47,7 +47,7 @@ import java.util.function.Consumer;
         dependencies = "after:enderio@[5.0.21,)")
 public class McJtyLib {
 
-    public static final String VERSION = "3.0.7";
+    public static final String VERSION = "3.1.0";
     public static final String PROVIDES = "mcjtylib_ng";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
