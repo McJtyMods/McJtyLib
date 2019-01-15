@@ -3,7 +3,6 @@ package mcjty.lib.proxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.item.Item;
@@ -37,11 +36,6 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void initTESRItemStack(Item item, int meta, Class<? extends TileEntity> clazz) {
         ForgeHooksClient.registerTESRItemStack(item, meta, clazz);
-    }
-
-    @Override
-    public void initCustomMeshDefinition(Item item, ItemMeshDefinition meshDefinition) {
-        ModelLoader.setCustomMeshDefinition(item, meshDefinition);
     }
 
     @Override
