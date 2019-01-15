@@ -1,3 +1,6 @@
+3.1.1:
+- Fixed a client-side dependency problem
+
 3.1.0:
 - Joseph fixed tooltips sometimes rendering partially offscreen.
 - Removal of COFH RF API support. Only Forge Energy is supported now!
