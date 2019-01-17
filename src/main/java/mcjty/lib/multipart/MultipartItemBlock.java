@@ -1,6 +1,7 @@
 package mcjty.lib.multipart;
 
 
+import mcjty.lib.proxy.CommonProxy;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -53,7 +54,7 @@ public class MultipartItemBlock extends ItemBlock {
     private boolean onItemUseHelper(EntityPlayer player, World world, BlockPos pos) {
         if (!world.isRemote) {
             Block block = world.getBlockState(pos).getBlock();
-            if (block == null /*ModBlocks.bundleBlock*/) {
+            if (block == CommonProxy.multipartBlock) {
                 TileEntity te = world.getTileEntity(pos);
                 if (te instanceof MultipartTE) {
 
@@ -103,7 +104,7 @@ public class MultipartItemBlock extends ItemBlock {
 
     private boolean placeBlockAtHelper(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
-            Block block = null;//@todo ModBlocks.bundleBlock;
+            Block block = CommonProxy.multipartBlock;
             boolean placed = false;
             if (world.getBlockState(pos).getBlock() != block) {
                 placed = true;

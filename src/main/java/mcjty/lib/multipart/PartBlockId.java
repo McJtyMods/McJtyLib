@@ -1,26 +1,20 @@
 package mcjty.lib.multipart;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class PartBlockId {
-    private final String registryName;
-    private final int meta;
+    private final IBlockState state;
 
-    public PartBlockId(IBlockState mimicBlock) {
-        Block block = mimicBlock.getBlock();
-        this.registryName = block.getRegistryName().toString();
-        this.meta = block.getMetaFromState(mimicBlock);
+    public PartBlockId(IBlockState state) {
+        this.state = state;
     }
 
     public IBlockState getBlockState() {
-        return ForgeRegistries.BLOCKS.getValue(new ResourceLocation(registryName)).getStateFromMeta(meta);
+        return state;
     }
 
     @Override
     public String toString() {
-        return registryName + '@' + meta;
+        return state.toString();
     }
 }

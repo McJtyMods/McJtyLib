@@ -1,6 +1,8 @@
 package mcjty.lib;
 
 import mcjty.lib.base.ModBase;
+import mcjty.lib.multipart.MultipartBlock;
+import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
@@ -30,6 +32,7 @@ import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -45,7 +48,7 @@ import java.util.function.Consumer;
         acceptedMinecraftVersions = "[1.12,1.13)",
         version = McJtyLib.VERSION,
         dependencies = "after:enderio@[5.0.21,)")
-public class McJtyLib {
+public class McJtyLib implements ModBase {
 
     public static final String VERSION = "3.1.1";
     public static final String PROVIDES = "mcjtylib_ng";
@@ -57,6 +60,9 @@ public class McJtyLib {
 
     @SidedProxy(clientSide = "mcjty.lib.proxy.ClientProxy", serverSide = "mcjty.lib.proxy.CommonProxy")
     public static CommonProxy proxy;
+
+    @Mod.Instance(PROVIDES)
+    public static McJtyLib instance;
 
     public static SimpleNetworkWrapper networkHandler;
     private static boolean init;
@@ -87,6 +93,16 @@ public class McJtyLib {
     public void serverStopped(FMLServerStoppedEvent event) {
         Logging.log("Cleaning up all world data: " + AbstractWorldData.getDataCount() + " data blobs");
         AbstractWorldData.clearInstances();
+    }
+
+    @Override
+    public String getModId() {
+        return PROVIDES;
+    }
+
+    @Override
+    public void openManual(EntityPlayer player, int bookindex, String page) {
+
     }
 
     public static void registerCommand(String modid, String id, IServerCommand command) {
@@ -129,6 +145,11 @@ public class McJtyLib {
 
     public static PreferencesProperties getPreferencesProperties(EntityPlayer player) {
         return player.getCapability(PREFERENCES_CAPABILITY, null);
+    }
+
+    @Mod.EventHandler
+    public void actualPreInit(FMLPreInitializationEvent e) {
+        proxy.preInit(e);
     }
 
     public static class EventHandler {

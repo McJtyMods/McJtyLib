@@ -1,5 +1,6 @@
 package mcjty.lib.proxy;
 
+import mcjty.lib.multipart.MultipartModelLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -8,9 +9,29 @@ import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ClientProxy extends CommonProxy {
+
+    @Override
+    public void preInit(FMLPreInitializationEvent e) {
+        super.preInit(e);
+        MinecraftForge.EVENT_BUS.register(new McJtyLibBlockRegister());
+        ModelLoaderRegistry.registerLoader(new MultipartModelLoader());
+    }
+
+    private static class McJtyLibBlockRegister {
+        @SubscribeEvent
+        public void registerModels(ModelRegistryEvent event) {
+            CommonProxy.multipartBlock.initModel();
+        }
+
+    }
 
     @Override
     public void initStandardItemModel(Block block) {
