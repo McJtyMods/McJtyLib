@@ -4,7 +4,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 import java.util.List;
 
-public class PartsProperty implements IUnlistedProperty<List> {
+public class PartsProperty implements IUnlistedProperty<List<PartBlockId>> {
 
     private final String name;
 
@@ -18,17 +18,17 @@ public class PartsProperty implements IUnlistedProperty<List> {
     }
 
     @Override
-    public boolean isValid(List value) {
+    public boolean isValid(List<PartBlockId> value) {
         return true;
     }
 
     @Override
-    public Class<List> getType() {
-        return List.class;
+    public Class<List<PartBlockId>> getType() {
+        return (Class<List<PartBlockId>>) (Class) List.class;
     }
 
     @Override
-    public String valueToString(List value) {
+    public String valueToString(List<PartBlockId> value) {
         return value.toString();
     }
 }
