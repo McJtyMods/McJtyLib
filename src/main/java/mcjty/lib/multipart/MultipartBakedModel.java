@@ -51,7 +51,7 @@ public class MultipartBakedModel implements IBakedModel {
             return Collections.emptyList();
         }
 
-        if (side != null || (MinecraftForgeClient.getRenderLayer() != BlockRenderLayer.CUTOUT_MIPPED)) {
+        if (side != null) {
             return Collections.emptyList();
         }
 

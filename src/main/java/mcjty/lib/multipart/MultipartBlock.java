@@ -11,7 +11,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -23,6 +27,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 
 public class MultipartBlock extends Block implements ITileEntityProvider {
+
+    public static final AxisAlignedBB AABB_EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
+    public static final AxisAlignedBB AABB_CENTER = new AxisAlignedBB(.4, .4, .4, .6, .6, .6);
 
     public static final PartsProperty PARTS = new PartsProperty("parts");
 
@@ -58,6 +65,73 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
     public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
         return true; // delegated to GenericCableBakedModel#getQuads
     }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+        return AABB_EMPTY;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+        return false;
+    }
+
+
+    @Nullable
+    @Override
+    public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof MultipartTE) {
+            MultipartTE multipartTE = (MultipartTE) te;
+            for (PartBlockId part : multipartTE.getParts()) {
+                RayTraceResult result = part.getBlockState().collisionRayTrace(world, pos, start, end);
+                if (result != null) {
+                    return result;
+                }
+            }
+            return null;
+        } else {
+            return super.collisionRayTrace(blockState, world, pos, start, end);
+        }
+
+
+//        Vec3d vec3d = start.subtract(pos.getX(), pos.getY(), pos.getZ());
+//        Vec3d vec3d1 = end.subtract(pos.getX(), pos.getY(), pos.getZ());
+//
+//
+//
+//        RayTraceResult rc = checkIntersect(pos, vec3d, vec3d1, AABB_CENTER);
+//        if (rc != null) {
+//            return rc;
+//        }
+//
+//
+//        return super.collisionRayTrace(blockState, world, pos, start, end);
+    }
+
+    private RayTraceResult checkIntersect(BlockPos pos, Vec3d vec3d, Vec3d vec3d1, AxisAlignedBB boundingBox) {
+        RayTraceResult raytraceresult = boundingBox.calculateIntercept(vec3d, vec3d1);
+        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX(), pos.getY(), pos.getZ()), raytraceresult.sideHit, pos);
+    }
+
+    @Override
+    public boolean isBlockNormalCube(IBlockState blockState) {
+        return false;
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState blockState) {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
+
 
 
     @Override
