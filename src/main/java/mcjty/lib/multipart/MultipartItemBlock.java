@@ -38,7 +38,10 @@ public class MultipartItemBlock extends ItemBlock {
 
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (onItemUseHelper(player, world, pos)) {
+        ItemStack itemstack = player.getHeldItem(hand);
+        int meta = this.getMetadata(itemstack.getMetadata());
+        IBlockState toPlace = block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
+        if (onItemUseHelper(player, world, pos, toPlace)) {
             return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
         } else {
             return EnumActionResult.FAIL;
@@ -47,33 +50,43 @@ public class MultipartItemBlock extends ItemBlock {
 
     @Override
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
-        return placeBlockAtHelper(stack, player, world, pos, side, hitX, hitY, hitZ);
+        if (!world.isRemote) {
+            Block block1 = CommonProxy.multipartBlock;
+            boolean placed = false;
+            if (world.getBlockState(pos).getBlock() != block1) {
+                placed = true;
+                if (!world.setBlockState(pos, block1.getDefaultState(), 3)) {
+                    return false;
+                }
+            }
+
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() == block1) {
+                if (placed) {
+                    block1.onBlockPlacedBy(world, pos, state, player, stack);
+                }
+
+//                addCable(world, pos, side, hitX, hitY, hitZ);
+            }
+        }
+
+        return true;
     }
 
 
-    private boolean onItemUseHelper(EntityPlayer player, World world, BlockPos pos) {
+    private boolean onItemUseHelper(EntityPlayer player, World world, BlockPos pos, IBlockState toPlace) {
         if (!world.isRemote) {
             Block block = world.getBlockState(pos).getBlock();
             if (block == CommonProxy.multipartBlock) {
                 TileEntity te = world.getTileEntity(pos);
                 if (te instanceof MultipartTE) {
-
-//                    if (te.countCableEndPoints(type, subType) == 0) {
-                        // If there are no end points of this type in the bundle we hit then we assume that we
-                        // add a cable in the bundle itself. If we have end points then we just place
-                        // a new bundle as usual.
-                        RayTraceResult movingObjectPosition = getMovingObjectPositionFromPlayer(world, player, false);
-
-                        if (movingObjectPosition != null) {
-                            EnumFacing side = movingObjectPosition.sideHit;
-                            float hitX = (float) movingObjectPosition.hitVec.x - movingObjectPosition.getBlockPos().getX();
-                            float hitY = (float) movingObjectPosition.hitVec.y - movingObjectPosition.getBlockPos().getY();
-                            float hitZ = (float) movingObjectPosition.hitVec.z - movingObjectPosition.getBlockPos().getZ();
-
-//                            addCable(world, pos, side, hitX, hitY, hitZ);
-                            return false;
-                        }
-//                    }
+                    MultipartTE multipartTE = (MultipartTE) te;
+                    if (multipartTE.testIntersect(toPlace)) {
+                        // There is a collision. We can't place. Fallback to the normal method of placing adjacent to this block
+                        return true;
+                    } else {
+                        multipartTE.addPart(toPlace);
+                    }
                 }
             }
         }
@@ -101,30 +114,6 @@ public class MultipartItemBlock extends ItemBlock {
         return worldIn.rayTraceBlocks(vec3, vec31, useLiquids, !useLiquids, false);
     }
 
-
-    private boolean placeBlockAtHelper(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (!world.isRemote) {
-            Block block = CommonProxy.multipartBlock;
-            boolean placed = false;
-            if (world.getBlockState(pos).getBlock() != block) {
-                placed = true;
-                if (!world.setBlockState(pos, block.getDefaultState(), 3)) {
-                    return false;
-                }
-            }
-
-            IBlockState state = world.getBlockState(pos);
-            if (state.getBlock() == block) {
-                if (placed) {
-                    block.onBlockPlacedBy(world, pos, state, player, stack);
-                }
-
-                addCable(world, pos, side, hitX, hitY, hitZ);
-            }
-        }
-
-        return true;
-    }
 
     /*
      * Add a new cable to a bundle adjacent to the given coordinate.

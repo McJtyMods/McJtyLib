@@ -82,7 +82,6 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
     @Nullable
     @Override
     public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
-
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
