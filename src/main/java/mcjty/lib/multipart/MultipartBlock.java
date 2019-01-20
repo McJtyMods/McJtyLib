@@ -9,6 +9,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -25,6 +26,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class MultipartBlock extends Block implements ITileEntityProvider {
 
@@ -67,6 +69,17 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
+    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof MultipartTE) {
+            MultipartTE multipartTE = (MultipartTE) te;
+            for (PartBlockId part : multipartTE.getParts()) {
+                addCollisionBoxToList(pos, entityBox, collidingBoxes, part.getBlockState().getCollisionBoundingBox(world, pos));
+            }
+        }
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
     public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
         return AABB_EMPTY;
@@ -75,7 +88,7 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
     @Override
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-        return false;
+        return true;
     }
 
 

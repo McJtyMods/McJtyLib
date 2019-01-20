@@ -2,8 +2,11 @@ package mcjty.lib.multipart;
 
 
 import mcjty.lib.proxy.CommonProxy;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
@@ -12,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
@@ -36,42 +40,139 @@ public class MultipartItemBlock extends ItemBlock {
         return true;
     }
 
-    @Override
+
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        IBlockState iblockstate = world.getBlockState(pos);
+        Block block = iblockstate.getBlock();
+
         ItemStack itemstack = player.getHeldItem(hand);
+        if (itemstack.isEmpty()) {
+            return EnumActionResult.FAIL;
+        }
+
         int meta = this.getMetadata(itemstack.getMetadata());
-        IBlockState toPlace = block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
-        if (onItemUseHelper(player, world, pos, toPlace)) {
-            return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
+        IBlockState toPlace = this.block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
+
+        if (!block.isReplaceable(world, pos) && !canFitInside(block, world, pos, toPlace)) {
+            pos = pos.offset(facing);
+            iblockstate = world.getBlockState(pos);
+            block = iblockstate.getBlock();
+        }
+
+        if (player.canPlayerEdit(pos, facing, itemstack)) {
+            // We have to call getStateForPlacement again to be sure it is ok for this position as well
+            toPlace = this.block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
+
+            if (canFitInside(block, world, pos, toPlace)) {
+                if (placeBlockAt(itemstack, player, world, pos, facing, hitX, hitY, hitZ, toPlace)) {
+                    SoundType soundtype = toPlace.getBlock().getSoundType(toPlace, world, pos, player);
+                    world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                    itemstack.shrink(1);
+                }
+                return EnumActionResult.SUCCESS;
+            } else if (world.mayPlace(this.block, pos, false, facing, null)) {
+                if (placeBlockAt(itemstack, player, world, pos, facing, hitX, hitY, hitZ, toPlace)) {
+                    SoundType soundtype = toPlace.getBlock().getSoundType(toPlace, world, pos, player);
+                    world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                    itemstack.shrink(1);
+                }
+
+                return EnumActionResult.SUCCESS;
+            } else {
+                return EnumActionResult.FAIL;
+            }
         } else {
             return EnumActionResult.FAIL;
         }
     }
 
+    private boolean canFitInside(Block block, World world, BlockPos pos, IBlockState toPlace) {
+        if (block != CommonProxy.multipartBlock) {
+            return false;
+        }
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof MultipartTE) {
+            return !((MultipartTE) te).testIntersect(toPlace);
+        } else {
+            return false;
+        }
+    }
+
+//
+//    @Override
+//    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+//        ItemStack itemstack = player.getHeldItem(hand);
+//        int meta = this.getMetadata(itemstack.getMetadata());
+//        IBlockState toPlace = block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
+//        boolean result = onItemUseHelper(player, world, pos, toPlace);
+//
+//
+//
+//        if (result) {
+//            return super.onItemUse(player, world, pos, hand, facing, hitX, hitY, hitZ);
+//        } else {
+//            return EnumActionResult.FAIL;
+//        }
+//    }
+
     @Override
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
-        if (!world.isRemote) {
-            Block block1 = CommonProxy.multipartBlock;
-            boolean placed = false;
-            if (world.getBlockState(pos).getBlock() != block1) {
-                placed = true;
-                if (!world.setBlockState(pos, block1.getDefaultState(), 3)) {
-                    return false;
-                }
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof MultipartTE) {
+            ((MultipartTE) te).addPart(newState);
+            return true;
+        }
+
+        IBlockState multiState = CommonProxy.multipartBlock.getDefaultState();
+        if (!world.setBlockState(pos, multiState, 11)) {
+            return false;
+        }
+
+        IBlockState state = world.getBlockState(pos);
+        if (state.getBlock() == CommonProxy.multipartBlock) {
+            setTileEntityNBT(world, player, pos, stack);
+
+            te = world.getTileEntity(pos);
+            if (te instanceof MultipartTE) {
+                ((MultipartTE) te).addPart(newState);
+                return true;
             }
 
-            IBlockState state = world.getBlockState(pos);
-            if (state.getBlock() == block1) {
-                if (placed) {
-                    block1.onBlockPlacedBy(world, pos, state, player, stack);
-                }
+            newState.getBlock().onBlockPlacedBy(world, pos, newState, player, stack);
 
-//                addCable(world, pos, side, hitX, hitY, hitZ);
+            if (player instanceof EntityPlayerMP) {
+                CriteriaTriggers.PLACED_BLOCK.trigger((EntityPlayerMP) player, pos, stack);
             }
         }
 
         return true;
     }
+
+
+//    @Override
+//    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
+//        if (!world.isRemote) {
+//            Block block1 = CommonProxy.multipartBlock;
+//            boolean placed = false;
+//            if (world.getBlockState(pos).getBlock() != block1) {
+//                placed = true;
+//                if (!world.setBlockState(pos, block1.getDefaultState(), 3)) {
+//                    return false;
+//                }
+//            }
+//
+//            IBlockState state = world.getBlockState(pos);
+//            if (state.getBlock() == block1) {
+//                if (placed) {
+//                    block1.onBlockPlacedBy(world, pos, state, player, stack);
+//                }
+//
+////                addCable(world, pos, side, hitX, hitY, hitZ);
+//            }
+//        }
+//
+//        return true;
+//    }
 
 
     private boolean onItemUseHelper(EntityPlayer player, World world, BlockPos pos, IBlockState toPlace) {
@@ -86,6 +187,7 @@ public class MultipartItemBlock extends ItemBlock {
                         return true;
                     } else {
                         multipartTE.addPart(toPlace);
+                        return false;
                     }
                 }
             }
@@ -101,14 +203,14 @@ public class MultipartItemBlock extends ItemBlock {
         double z = playerIn.posZ;
         Vec3d vec3 = new Vec3d(x, y, z);
         float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
-        float f3 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
+        float f3 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
         float f4 = -MathHelper.cos(-pitch * 0.017453292F);
         float f5 = MathHelper.sin(-pitch * 0.017453292F);
         float f6 = f3 * f4;
         float f7 = f2 * f4;
         double reach = 5.0D;
         if (playerIn instanceof EntityPlayerMP) {
-            reach = ((EntityPlayerMP)playerIn).interactionManager.getBlockReachDistance();
+            reach = ((EntityPlayerMP) playerIn).interactionManager.getBlockReachDistance();
         }
         Vec3d vec31 = vec3.addVector(f6 * reach, f5 * reach, f7 * reach);
         return worldIn.rayTraceBlocks(vec3, vec31, useLiquids, !useLiquids, false);
@@ -126,7 +228,7 @@ public class MultipartItemBlock extends ItemBlock {
         } else {
             Set<Integer> excluded = Collections.emptySet();
 
-            vector = new Vec3d(pos.getX()+.5f, pos.getY()+.5f, pos.getZ()+.5f);
+            vector = new Vec3d(pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f);
 //            Optional<BundleTE> bundleTE = BlockTools.getTE(BundleTE.class, world, adjacentC);
 //            if (bundleTE.isPresent()) {
 //                CableSection connectableSection = bundleTE.get().findConnectableSection(type, subType, excluded);
@@ -138,4 +240,5 @@ public class MultipartItemBlock extends ItemBlock {
 
         final Vec3d finalVector = vector;
 //        BlockTools.getTE(BundleTE.class, world, pos).ifPresent(p -> p.addCableToNetwork(type, subType, finalVector));
-    }}
+    }
+}

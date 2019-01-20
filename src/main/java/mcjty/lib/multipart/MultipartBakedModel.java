@@ -51,10 +51,6 @@ public class MultipartBakedModel implements IBakedModel {
             return Collections.emptyList();
         }
 
-        if (side != null) {
-            return Collections.emptyList();
-        }
-
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
 
         List<PartBlockId> parts = extendedBlockState.getValue(MultipartBlock.PARTS);
@@ -67,8 +63,9 @@ public class MultipartBakedModel implements IBakedModel {
                 if (layer == null || blockState.getBlock().canRenderInLayer(blockState, layer)) {
                     IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(blockState);
                     try {
-                        quads.addAll(model.getQuads(state, side, rand));
+                        quads.addAll(model.getQuads(state, side, rand++));
                     } catch (Exception ignore) {
+                        System.out.println("MultipartBakedModel.getQuads");
                     }
                 }
             }
