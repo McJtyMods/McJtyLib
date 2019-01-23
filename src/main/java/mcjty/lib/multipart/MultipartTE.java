@@ -2,7 +2,6 @@ package mcjty.lib.multipart;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
@@ -22,6 +21,7 @@ import java.util.List;
 public class MultipartTE extends TileEntity {
 
     private List<PartBlockId> parts = new ArrayList<>();
+    private List<TileEntity> tileEntities = new ArrayList<>();
     private int version = 0;    // To update rendering client-side
 
     @Override
@@ -29,17 +29,15 @@ public class MultipartTE extends TileEntity {
         return oldState.getBlock() != newSate.getBlock();
     }
 
-    public void addPart(IBlockState part) {
+    public void addPart(IBlockState part, TileEntity te) {
         parts.add(new PartBlockId(part));
+        tileEntities.add(te);
         version++;
         markDirtyClient();
     }
 
     public List<PartBlockId> getParts() {
-        List<PartBlockId> newParts = new ArrayList<>(parts);
-//        Block value = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("ariente", "signal_receiver"));
-//        newParts.add(new PartBlockId(value.getDefaultState()));
-        return newParts;
+        return parts;
     }
 
     @Override

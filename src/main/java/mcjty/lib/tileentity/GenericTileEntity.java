@@ -107,7 +107,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
     }
 
-    // ------------------------------------------------------
+    @Nullable
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        return null;
+    }
+
+        // ------------------------------------------------------
     // Redstone
 
     protected boolean needsRedstoneMode() {

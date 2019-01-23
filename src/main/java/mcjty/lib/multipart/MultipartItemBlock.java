@@ -6,7 +6,6 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemBlock;
@@ -115,11 +114,15 @@ public class MultipartItemBlock extends ItemBlock {
 //        }
 //    }
 
+    private TileEntity createTileEntity(World world, IBlockState state) {
+        return state.getBlock().createTileEntity(world, state);
+    }
+
     @Override
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
-            ((MultipartTE) te).addPart(newState);
+            ((MultipartTE) te).addPart(newState, createTileEntity(world, newState));
             return true;
         }
 
@@ -134,7 +137,7 @@ public class MultipartItemBlock extends ItemBlock {
 
             te = world.getTileEntity(pos);
             if (te instanceof MultipartTE) {
-                ((MultipartTE) te).addPart(newState);
+                ((MultipartTE) te).addPart(newState, createTileEntity(world, newState));
                 return true;
             }
 
@@ -174,26 +177,6 @@ public class MultipartItemBlock extends ItemBlock {
 //        return true;
 //    }
 
-
-    private boolean onItemUseHelper(EntityPlayer player, World world, BlockPos pos, IBlockState toPlace) {
-        if (!world.isRemote) {
-            Block block = world.getBlockState(pos).getBlock();
-            if (block == CommonProxy.multipartBlock) {
-                TileEntity te = world.getTileEntity(pos);
-                if (te instanceof MultipartTE) {
-                    MultipartTE multipartTE = (MultipartTE) te;
-                    if (multipartTE.testIntersect(toPlace)) {
-                        // There is a collision. We can't place. Fallback to the normal method of placing adjacent to this block
-                        return true;
-                    } else {
-                        multipartTE.addPart(toPlace);
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
 
     private RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, EntityPlayer playerIn, boolean useLiquids) {
         float pitch = playerIn.rotationPitch;
