@@ -3,8 +3,9 @@ package mcjty.lib.multipart;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 import java.util.List;
+import java.util.Map;
 
-public class PartsProperty implements IUnlistedProperty<List<PartBlockId>> {
+public class PartsProperty implements IUnlistedProperty<Map<PartSlot, MultipartTE.Part>> {
 
     private final String name;
 
@@ -18,17 +19,17 @@ public class PartsProperty implements IUnlistedProperty<List<PartBlockId>> {
     }
 
     @Override
-    public boolean isValid(List<PartBlockId> value) {
+    public boolean isValid(Map<PartSlot, MultipartTE.Part> value) {
         return true;
     }
 
     @Override
-    public Class<List<PartBlockId>> getType() {
-        return (Class<List<PartBlockId>>) (Class) List.class;
+    public Class<Map<PartSlot, MultipartTE.Part>> getType() {
+        return (Class<Map<PartSlot, MultipartTE.Part>>) (Class) List.class;
     }
 
     @Override
-    public String valueToString(List<PartBlockId> value) {
+    public String valueToString(Map<PartSlot, MultipartTE.Part> value) {
         return value.toString();
     }
 }

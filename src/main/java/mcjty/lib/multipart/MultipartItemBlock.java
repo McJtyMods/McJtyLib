@@ -23,6 +23,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Set;
 
@@ -51,8 +52,12 @@ public class MultipartItemBlock extends ItemBlock {
 
         int meta = this.getMetadata(itemstack.getMetadata());
         IBlockState toPlace = this.block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
+        PartSlot slot = PartSlot.NONE;
+        if (this.block instanceof IPartBlock) {
+            slot = ((IPartBlock) this.block).getSlotForPlacement(world, pos, toPlace);
+        }
 
-        if (!block.isReplaceable(world, pos) && !canFitInside(block, world, pos, toPlace)) {
+        if (!block.isReplaceable(world, pos) && !canFitInside(block, world, pos, slot)) {
             pos = pos.offset(facing);
             iblockstate = world.getBlockState(pos);
             block = iblockstate.getBlock();
@@ -61,16 +66,19 @@ public class MultipartItemBlock extends ItemBlock {
         if (player.canPlayerEdit(pos, facing, itemstack)) {
             // We have to call getStateForPlacement again to be sure it is ok for this position as well
             toPlace = this.block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
+            if (this.block instanceof IPartBlock) {
+                slot = ((IPartBlock) this.block).getSlotForPlacement(world, pos, toPlace);
+            }
 
-            if (canFitInside(block, world, pos, toPlace)) {
-                if (placeBlockAt(itemstack, player, world, pos, facing, hitX, hitY, hitZ, toPlace)) {
+            if (canFitInside(block, world, pos, slot)) {
+                if (placeBlockAtInternal(itemstack, player, world, pos, facing, hitX, hitY, hitZ, toPlace, slot)) {
                     SoundType soundtype = toPlace.getBlock().getSoundType(toPlace, world, pos, player);
                     world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                     itemstack.shrink(1);
                 }
                 return EnumActionResult.SUCCESS;
             } else if (world.mayPlace(this.block, pos, false, facing, null)) {
-                if (placeBlockAt(itemstack, player, world, pos, facing, hitX, hitY, hitZ, toPlace)) {
+                if (placeBlockAtInternal(itemstack, player, world, pos, facing, hitX, hitY, hitZ, toPlace, slot)) {
                     SoundType soundtype = toPlace.getBlock().getSoundType(toPlace, world, pos, player);
                     world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                     itemstack.shrink(1);
@@ -85,13 +93,14 @@ public class MultipartItemBlock extends ItemBlock {
         }
     }
 
-    private boolean canFitInside(Block block, World world, BlockPos pos, IBlockState toPlace) {
+    private boolean canFitInside(Block block, World world, BlockPos pos, PartSlot slot) {
         if (block != CommonProxy.multipartBlock) {
             return false;
         }
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
-            return !((MultipartTE) te).testIntersect(toPlace);
+            MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
+            return part == null;
         } else {
             return false;
         }
@@ -120,9 +129,15 @@ public class MultipartItemBlock extends ItemBlock {
 
     @Override
     public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
+        // Not implemented
+        return false;
+    }
+
+    private boolean placeBlockAtInternal(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState,
+                                         @Nonnull PartSlot slot) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
-            ((MultipartTE) te).addPart(newState, createTileEntity(world, newState));
+            ((MultipartTE) te).addPart(slot, newState, createTileEntity(world, newState));
             return true;
         }
 
@@ -137,7 +152,7 @@ public class MultipartItemBlock extends ItemBlock {
 
             te = world.getTileEntity(pos);
             if (te instanceof MultipartTE) {
-                ((MultipartTE) te).addPart(newState, createTileEntity(world, newState));
+                ((MultipartTE) te).addPart(slot, newState, createTileEntity(world, newState));
                 return true;
             }
 

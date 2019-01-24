@@ -13,6 +13,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class MultipartBakedModel implements IBakedModel {
 
@@ -53,13 +54,14 @@ public class MultipartBakedModel implements IBakedModel {
 
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
 
-        List<PartBlockId> parts = extendedBlockState.getValue(MultipartBlock.PARTS);
+        Map<PartSlot, MultipartTE.Part> parts = extendedBlockState.getValue(MultipartBlock.PARTS);
         if (parts != null) {
             List<BakedQuad> quads = new ArrayList<>();
             BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
 
-            for (PartBlockId part : parts) {
-                IBlockState blockState = part.getBlockState();
+            for (Map.Entry<PartSlot, MultipartTE.Part> entry : parts.entrySet()) {
+                MultipartTE.Part part = entry.getValue();
+                IBlockState blockState = part.getState();
                 if (layer == null || blockState.getBlock().canRenderInLayer(blockState, layer)) {
                     IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(blockState);
                     try {

@@ -3,6 +3,7 @@ package mcjty.lib.builder;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericItemBlock;
+import mcjty.lib.multipart.PartSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -21,6 +22,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
@@ -51,6 +53,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected IGetBoundingBox boundingBox = (state, source, pos) -> FULL_BLOCK_AABB;
     protected IAddCollisionBoxToList cdBoxToList = null;
     protected IGetAIPathNodeType getAIPathNodeType = (state, world, pos) -> null;
+    protected ISlotGetter slotGetter = (world, pos, newState) -> PartSlot.NONE;
 
     protected InformationString informationString;
     protected InformationString informationStringWithShift;
@@ -120,6 +123,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
+    public T slotGetter(ISlotGetter getter) {
+        this.slotGetter = getter;
+        return (T) this;
+    }
+
     public T clickAction(IClickAction action) {
         this.clickAction = action;
         return (T) this;
@@ -181,6 +189,12 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             @Override
             public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
                 clickAction.doClick(worldIn, pos, playerIn);
+            }
+
+            @Nonnull
+            @Override
+            public PartSlot getSlotForPlacement(World world, BlockPos pos, IBlockState newState) {
+                return slotGetter.getSlotForPlacement(world, pos, newState);
             }
 
             @Override

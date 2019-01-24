@@ -27,6 +27,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 public class MultipartBlock extends Block implements ITileEntityProvider {
 
@@ -73,8 +74,9 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
-            for (PartBlockId part : multipartTE.getParts()) {
-                addCollisionBoxToList(pos, entityBox, collidingBoxes, part.getBlockState().getCollisionBoundingBox(world, pos));
+            for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
+                MultipartTE.Part part = entry.getValue();
+                addCollisionBoxToList(pos, entityBox, collidingBoxes, part.getState().getCollisionBoundingBox(world, pos));
             }
         }
     }
@@ -98,8 +100,9 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
-            for (PartBlockId part : multipartTE.getParts()) {
-                RayTraceResult result = part.getBlockState().collisionRayTrace(world, pos, start, end);
+            for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
+                MultipartTE.Part part = entry.getValue();
+                RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
                 if (result != null) {
                     return result;
                 }

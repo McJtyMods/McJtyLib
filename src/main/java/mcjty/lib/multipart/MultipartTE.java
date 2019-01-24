@@ -15,13 +15,32 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MultipartTE extends TileEntity {
 
-    private List<PartBlockId> parts = new ArrayList<>();
-    private List<TileEntity> tileEntities = new ArrayList<>();
+    public static class Part {
+        private final IBlockState state;
+        private final TileEntity tileEntity;
+
+        public Part(IBlockState state, TileEntity tileEntity) {
+            this.state = state;
+            this.tileEntity = tileEntity;
+        }
+
+        public IBlockState getState() {
+            return state;
+        }
+
+        public TileEntity getTileEntity() {
+            return tileEntity;
+        }
+    }
+
+    private Map<PartSlot, Part> parts = new HashMap<>();
+//    private List<PartBlockId> parts = new ArrayList<>();
+//    private List<TileEntity> tileEntities = new ArrayList<>();
     private int version = 0;    // To update rendering client-side
 
     @Override
@@ -29,14 +48,13 @@ public class MultipartTE extends TileEntity {
         return oldState.getBlock() != newSate.getBlock();
     }
 
-    public void addPart(IBlockState part, TileEntity te) {
-        parts.add(new PartBlockId(part));
-        tileEntities.add(te);
+    public void addPart(PartSlot slot, IBlockState state, TileEntity te) {
+        parts.put(slot, new Part(state, te));
         version++;
         markDirtyClient();
     }
 
-    public List<PartBlockId> getParts() {
+    public Map<PartSlot, Part> getParts() {
         return parts;
     }
 
@@ -79,11 +97,25 @@ public class MultipartTE extends TileEntity {
         NBTTagList list = compound.getTagList("parts", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < list.tagCount() ; i++) {
             NBTTagCompound tag = list.getCompoundTagAt(i);
-            ResourceLocation id = new ResourceLocation(tag.getString("id"));
-            int meta = tag.getInteger("meta");
-            Block block = ForgeRegistries.BLOCKS.getValue(id);
-            if (block != null) {
-                parts.add(new PartBlockId(block.getStateFromMeta(meta)));
+
+            PartSlot slot = PartSlot.byName(tag.getString("slot"));
+            if (slot != null) {
+                ResourceLocation id = new ResourceLocation(tag.getString("id"));
+                int meta = tag.getInteger("meta");
+                Block block = ForgeRegistries.BLOCKS.getValue(id);
+                if (block != null) {
+                    IBlockState state = block.getStateFromMeta(meta);
+                    TileEntity te = null;
+                    if (tag.hasKey("te")) {
+                        NBTTagCompound tc = tag.getCompoundTag("te");
+                        te = block.createTileEntity(null, state);// @todo
+                        if (te != null) {
+                            te.readFromNBT(tc);
+                        }
+                    }
+                    Part part = new Part(state, te);
+                    parts.put(slot, part);
+                }
             }
         }
     }
@@ -91,11 +123,24 @@ public class MultipartTE extends TileEntity {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         NBTTagList list = new NBTTagList();
-        for (PartBlockId part : parts) {
+        for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             NBTTagCompound tag = new NBTTagCompound();
-            IBlockState state = part.getBlockState();
+            PartSlot slot = entry.getKey();
+            Part part = entry.getValue();
+
+            tag.setString("slot", slot.name());
+
+            IBlockState state = part.getState();
             tag.setString("id", state.getBlock().getRegistryName().toString());
             tag.setInteger("meta", state.getBlock().getMetaFromState(state));
+
+            TileEntity te = part.getTileEntity();
+            if (te != null) {
+                NBTTagCompound tc = new NBTTagCompound();
+                tc = te.writeToNBT(tc);
+                tag.setTag("te", tc);
+            }
+
             list.appendTag(tag);
         }
         compound.setTag("parts", list);
@@ -106,8 +151,10 @@ public class MultipartTE extends TileEntity {
 
     public boolean testIntersect(IBlockState blockState) {
         AxisAlignedBB box = blockState.getBoundingBox(world, pos);
-        for (PartBlockId part : getParts()) {
-            AxisAlignedBB partBox = part.getBlockState().getBoundingBox(world, pos);
+        for (Map.Entry<PartSlot, Part> entry : getParts().entrySet()) {
+            // @todo just check on slot?
+            Part part = entry.getValue();
+            AxisAlignedBB partBox = part.getState().getBoundingBox(world, pos);
             if (box.intersects(partBox)) {
                 return true;
             }

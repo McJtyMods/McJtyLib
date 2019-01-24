@@ -6,6 +6,8 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.builder.InformationString;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
+import mcjty.lib.multipart.IPartBlock;
+import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.varia.OrientationTools;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
@@ -35,6 +37,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Keyboard;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,7 +49,7 @@ import java.util.regex.Pattern;
         @Optional.Interface(iface = "mcjty.lib.compat.waila.WailaInfoProvider", modid = "waila"),
         @Optional.Interface(iface = "mcjty.lib.compat.theoneprobe.TOPInfoProvider", modid = "theoneprobe")
 })
-public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider {
+public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock {
 
     public static final IProperty<?>[] NONE_PROPERTIES = new IProperty[0];
     protected ModBase modBase;
@@ -98,6 +101,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     public static boolean activateBlock(Block block, World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         return block.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
+    }
+
+    @Nonnull
+    @Override
+    public PartSlot getSlotForPlacement(World world, BlockPos pos, IBlockState newState) {
+        return PartSlot.NONE;
     }
 
     public enum RotationType {

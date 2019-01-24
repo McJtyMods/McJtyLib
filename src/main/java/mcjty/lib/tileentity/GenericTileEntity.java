@@ -51,7 +51,6 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
@@ -108,11 +107,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Nullable
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
         return null;
     }
 
-        // ------------------------------------------------------
+    // ------------------------------------------------------
     // Redstone
 
     protected boolean needsRedstoneMode() {
