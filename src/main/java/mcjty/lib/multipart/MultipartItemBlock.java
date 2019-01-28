@@ -54,7 +54,7 @@ public class MultipartItemBlock extends ItemBlock {
         IBlockState toPlace = this.block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
         PartSlot slot = PartSlot.NONE;
         if (this.block instanceof IPartBlock) {
-            slot = ((IPartBlock) this.block).getSlotForPlacement(world, pos, toPlace);
+            slot = ((IPartBlock) this.block).getSlotFromState(world, pos, toPlace);
         }
 
         if (!block.isReplaceable(world, pos) && !canFitInside(block, world, pos, slot)) {
@@ -67,7 +67,7 @@ public class MultipartItemBlock extends ItemBlock {
             // We have to call getStateForPlacement again to be sure it is ok for this position as well
             toPlace = this.block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
             if (this.block instanceof IPartBlock) {
-                slot = ((IPartBlock) this.block).getSlotForPlacement(world, pos, toPlace);
+                slot = ((IPartBlock) this.block).getSlotFromState(world, pos, toPlace);
             }
 
             if (canFitInside(block, world, pos, slot)) {

@@ -9,5 +9,5 @@ import javax.annotation.Nonnull;
 public interface IPartBlock {
 
     @Nonnull
-    PartSlot getSlotForPlacement(World world, BlockPos pos, IBlockState newState);
+    PartSlot getSlotFromState(World world, BlockPos pos, IBlockState newState);
 }

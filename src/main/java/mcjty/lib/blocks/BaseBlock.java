@@ -105,7 +105,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @Nonnull
     @Override
-    public PartSlot getSlotForPlacement(World world, BlockPos pos, IBlockState newState) {
+    public PartSlot getSlotFromState(World world, BlockPos pos, IBlockState newState) {
         return PartSlot.NONE;
     }
 

@@ -7,5 +7,5 @@ import net.minecraft.world.World;
 
 public interface ISlotGetter {
 
-    PartSlot getSlotForPlacement(World world, BlockPos pos, IBlockState newState);
+    PartSlot getSlotFromState(World world, BlockPos pos, IBlockState newState);
 }

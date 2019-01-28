@@ -7,10 +7,12 @@ import mcjty.lib.blocks.GenericBlock;
 import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.container.EmptyContainerFactory;
 import mcjty.lib.container.GenericContainer;
+import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tileentity.TileEntity;
@@ -22,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -126,6 +129,21 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             @Override
             public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
                 clickAction.doClick(worldIn, pos, playerIn);
+            }
+
+            @Nonnull
+            @Override
+            public PartSlot getSlotFromState(World world, BlockPos pos, IBlockState newState) {
+                return slotGetter.getSlotFromState(world, pos, newState);
+            }
+
+            @Override
+            public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+                IBlockState state = placementGetter.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+                if (state != null) {
+                    return state;
+                }
+                return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
             }
 
             @Override

@@ -10,6 +10,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -54,6 +55,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected IAddCollisionBoxToList cdBoxToList = null;
     protected IGetAIPathNodeType getAIPathNodeType = (state, world, pos) -> null;
     protected ISlotGetter slotGetter = (world, pos, newState) -> PartSlot.NONE;
+    protected IPlacementGetter placementGetter = (world, pos, facing, hitX, hitY, hitZ, meta, placer) -> null;
 
     protected InformationString informationString;
     protected InformationString informationStringWithShift;
@@ -128,6 +130,11 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
+    public T placementGetter(IPlacementGetter getter) {
+        this.placementGetter = getter;
+        return (T) this;
+    }
+
     public T clickAction(IClickAction action) {
         this.clickAction = action;
         return (T) this;
@@ -193,8 +200,17 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
 
             @Nonnull
             @Override
-            public PartSlot getSlotForPlacement(World world, BlockPos pos, IBlockState newState) {
-                return slotGetter.getSlotForPlacement(world, pos, newState);
+            public PartSlot getSlotFromState(World world, BlockPos pos, IBlockState newState) {
+                return slotGetter.getSlotFromState(world, pos, newState);
+            }
+
+            @Override
+            public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+                IBlockState state = placementGetter.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+                if (state != null) {
+                    return state;
+                }
+                return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
             }
 
             @Override

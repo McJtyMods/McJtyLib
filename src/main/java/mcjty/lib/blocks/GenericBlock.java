@@ -427,18 +427,6 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        TileEntity te = world.getTileEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            IBlockState state = ((GenericTileEntity) te).getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
-            if (state != null) {
-                return state;
-            }
-        }
-        return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer);
-    }
-
     protected void setOwner(World world, BlockPos pos, EntityLivingBase entityLivingBase) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity && entityLivingBase instanceof EntityPlayer) {

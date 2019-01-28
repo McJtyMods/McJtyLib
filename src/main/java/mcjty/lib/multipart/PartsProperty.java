@@ -25,7 +25,7 @@ public class PartsProperty implements IUnlistedProperty<Map<PartSlot, MultipartT
 
     @Override
     public Class<Map<PartSlot, MultipartTE.Part>> getType() {
-        return (Class<Map<PartSlot, MultipartTE.Part>>) (Class) List.class;
+        return (Class<Map<PartSlot, MultipartTE.Part>>) (Class) Map.class;
     }
 
     @Override
