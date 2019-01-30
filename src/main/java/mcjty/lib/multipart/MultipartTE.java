@@ -1,6 +1,7 @@
 package mcjty.lib.multipart;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -48,19 +49,41 @@ public class MultipartTE extends TileEntity {
         return oldState.getBlock() != newSate.getBlock();
     }
 
+    private void dumpParts(String prefix) {
+        if (world.isRemote) {
+            System.out.println("====== CLIENT(" + prefix + ") " + pos.toString() + " ======");
+        } else {
+            System.out.println("====== SERVER(" + prefix + ") " + pos.toString() + " ======");
+        }
+        for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
+            IBlockState state = entry.getValue().state;
+            System.out.println("    SLOT: " + entry.getKey().name() +
+                    "    " + state.getBlock().getRegistryName().toString());
+            for (Map.Entry<IProperty<?>, Comparable<?>> e : state.getProperties().entrySet()) {
+                System.out.println("        PROP: " + e.getKey() + " = " + e.getValue());
+            }
+
+        }
+    }
+
     public void addPart(PartSlot slot, IBlockState state, TileEntity te) {
         parts.put(slot, new Part(state, te));
-        version++;
-        markDirtyClient();
+        if (!world.isRemote) {
+            version++;
+            markDirtyClient();
+        }
+        dumpParts("add");
     }
 
     public void removePart(IBlockState partState) {
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             if (entry.getValue().getState() == partState) {
                 parts.remove(entry.getKey());
-                // @todo remove self if parts is empty
-                version++;
-                markDirtyClient();
+                if (!world.isRemote) {
+                    version++;
+                    markDirtyClient();
+                }
+                dumpParts("remove");
                 return;
             }
         }
@@ -73,8 +96,9 @@ public class MultipartTE extends TileEntity {
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
         int oldVersion = version;
-        super.onDataPacket(net, packet);
+        readFromNBT(packet.getNbtCompound());
         if (world.isRemote && version != oldVersion) {
+            dumpParts("onData");
             world.markBlockRangeForRenderUpdate(pos, pos);
         }
     }
@@ -82,14 +106,15 @@ public class MultipartTE extends TileEntity {
     @Override
     public NBTTagCompound getUpdateTag() {
         NBTTagCompound updateTag = super.getUpdateTag();
-        readFromNBT(updateTag);
+        writeToNBT(updateTag);
         return updateTag;
     }
 
     @Nullable
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
-        NBTTagCompound nbtTag = getUpdateTag();
+        NBTTagCompound nbtTag = new NBTTagCompound();
+        writeToNBT(nbtTag);
         return new SPacketUpdateTileEntity(pos, 1, nbtTag);
     }
 
@@ -105,6 +130,7 @@ public class MultipartTE extends TileEntity {
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
+        parts.clear();
         version = compound.getInteger("version");
         NBTTagList list = compound.getTagList("parts", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < list.tagCount() ; i++) {
