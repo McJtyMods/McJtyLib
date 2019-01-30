@@ -2,7 +2,6 @@ package mcjty.lib;
 
 import mcjty.lib.base.ModBase;
 import mcjty.lib.multipart.MultipartBlock;
-import mcjty.lib.multipart.MultipartClientHelper;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.network.IServerCommand;
@@ -40,7 +39,6 @@ import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -200,6 +198,19 @@ public class McJtyLib implements ModBase {
                 }
             }
         }
+
+        @SubscribeEvent
+        public void onBlockBreakEvent (BlockEvent.BreakEvent event){
+            World world = event.getWorld();
+            if (world.isRemote) {
+                return;
+            }
+            BlockPos pos = event.getPos();
+            if (event.getState().getBlock() instanceof MultipartBlock) {
+                event.setCanceled(true);
+            }
+        }
+
     }
 
     private static void registerCapabilities(){
