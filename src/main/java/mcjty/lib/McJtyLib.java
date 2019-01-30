@@ -2,6 +2,8 @@ package mcjty.lib;
 
 import mcjty.lib.base.ModBase;
 import mcjty.lib.multipart.MultipartBlock;
+import mcjty.lib.multipart.MultipartClientHelper;
+import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.network.PacketSendPreferencesToClient;
@@ -12,17 +14,23 @@ import mcjty.lib.proxy.CommonProxy;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.worlddata.AbstractWorldData;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTBase;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -172,6 +180,23 @@ public class McJtyLib implements ModBase {
                     event.addCapability(PREFERENCES_CAPABILITY_KEY, new PreferencesDispatcher());
                 } else {
                     throw new IllegalStateException(event.getObject().toString());
+                }
+            }
+        }
+
+        @SubscribeEvent
+        public void onBreakBlock(PlayerInteractEvent.LeftClickBlock event) {
+            World world = event.getWorld();
+            BlockPos pos = event.getPos();
+            IBlockState state = world.getBlockState(pos);
+            if (state.getBlock() instanceof MultipartBlock) {
+                TileEntity tileEntity = world.getTileEntity(pos);
+                if (tileEntity instanceof MultipartTE) {
+                    if (!world.isRemote) {
+                        if (!MultipartHelper.hit((MultipartTE) tileEntity, state, event.getEntityPlayer(), event.getHitVec())) {
+                            event.setCanceled(true);
+                        }
+                    }
                 }
             }
         }

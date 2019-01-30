@@ -4,6 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.McJtyRegister;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
@@ -41,6 +42,9 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
         setUnlocalizedName(McJtyLib.PROVIDES + "." + "multipart");
         setRegistryName("multipart");
         McJtyRegister.registerLater(this, McJtyLib.instance, MultipartItemBlock::new);
+        setHardness(2.0f);
+        setSoundType(SoundType.METAL);
+        setHarvestLevel("pickaxe", 0);
         // @todo TEMPORARY!
         setCreativeTab(CreativeTabs.MISC);
     }
@@ -62,6 +66,7 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
         IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { PARTS };
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
+
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -111,20 +116,24 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
         } else {
             return super.collisionRayTrace(blockState, world, pos, start, end);
         }
+    }
 
-
-//        Vec3d vec3d = start.subtract(pos.getX(), pos.getY(), pos.getZ());
-//        Vec3d vec3d1 = end.subtract(pos.getX(), pos.getY(), pos.getZ());
-//
-//
-//
-//        RayTraceResult rc = checkIntersect(pos, vec3d, vec3d1, AABB_CENTER);
-//        if (rc != null) {
-//            return rc;
-//        }
-//
-//
-//        return super.collisionRayTrace(blockState, world, pos, start, end);
+    @Nullable
+    public IBlockState getHitPart(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof MultipartTE) {
+            MultipartTE multipartTE = (MultipartTE) te;
+            for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
+                MultipartTE.Part part = entry.getValue();
+                RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
+                if (result != null) {
+                    return part.getState();
+                }
+            }
+            return null;
+        } else {
+            return null;
+        }
     }
 
     private RayTraceResult checkIntersect(BlockPos pos, Vec3d vec3d, Vec3d vec3d1, AxisAlignedBB boundingBox) {

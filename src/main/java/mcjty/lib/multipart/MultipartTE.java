@@ -54,6 +54,18 @@ public class MultipartTE extends TileEntity {
         markDirtyClient();
     }
 
+    public void removePart(IBlockState partState) {
+        for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
+            if (entry.getValue().getState() == partState) {
+                parts.remove(entry.getKey());
+                // @todo remove self if parts is empty
+                version++;
+                markDirtyClient();
+                return;
+            }
+        }
+    }
+
     public Map<PartSlot, Part> getParts() {
         return parts;
     }
