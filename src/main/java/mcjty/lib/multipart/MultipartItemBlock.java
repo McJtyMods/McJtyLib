@@ -2,6 +2,7 @@ package mcjty.lib.multipart;
 
 
 import mcjty.lib.proxy.CommonProxy;
+import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
@@ -137,7 +138,11 @@ public class MultipartItemBlock extends ItemBlock {
                                          @Nonnull PartSlot slot) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
-            ((MultipartTE) te).addPart(slot, newState, createTileEntity(world, newState));
+            TileEntity tileEntity = createTileEntity(world, newState);
+            if (tileEntity instanceof GenericTileEntity && stack.getTagCompound() != null) {
+                ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTagCompound());
+            }
+            ((MultipartTE) te).addPart(slot, newState, tileEntity);
             return true;
         }
 
@@ -152,7 +157,11 @@ public class MultipartItemBlock extends ItemBlock {
 
             te = world.getTileEntity(pos);
             if (te instanceof MultipartTE) {
-                ((MultipartTE) te).addPart(slot, newState, createTileEntity(world, newState));
+                TileEntity tileEntity = createTileEntity(world, newState);
+                if (tileEntity instanceof GenericTileEntity) {
+                    ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTagCompound());
+                }
+                ((MultipartTE) te).addPart(slot, newState, tileEntity);
                 return true;
             }
 

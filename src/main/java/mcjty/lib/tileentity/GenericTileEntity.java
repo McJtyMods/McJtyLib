@@ -31,6 +31,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -107,8 +108,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
     }
 
-    public void onPartAdded(PartSlot slot, IBlockState state) {
+    public void onPartAdded(PartSlot slot, IBlockState state, TileEntity multipartTile) {
+    }
 
+    public boolean onBlockActivated(IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        return false;
     }
 
     // ------------------------------------------------------

@@ -1,9 +1,14 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.proxy.CommonProxy;
+import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -26,16 +31,26 @@ public class MultipartHelper {
     }
 
     // Return true if there are no more parts left
-    public static boolean hit(MultipartTE multipartTE, IBlockState state, EntityPlayer player, Vec3d hitVec) {
-//        RayTraceResult result = getMovingObjectPositionFromPlayer(multipartTE.getWorld(), player, false);
-//        if (result == null) {
-//            return;
-//        }
-        IBlockState hitPart = CommonProxy.multipartBlock.getHitPart(state, multipartTE.getWorld(), multipartTE.getPos(), getPlayerEyes(player), hitVec);
+    public static boolean removePart(MultipartTE multipartTE, IBlockState state, EntityPlayer player, Vec3d hitVec) {
+        BlockPos pos = multipartTE.getPos();
+        MultipartTE.Part hitPart = CommonProxy.multipartBlock.getHitPart(state, multipartTE.getWorld(), pos, getPlayerEyes(player), hitVec);
         if (hitPart == null) {
             return false;
         }
-        multipartTE.removePart(hitPart);
+
+        IBlockState hitState = hitPart.getState();
+        TileEntity hitTile = hitPart.getTileEntity();
+
+        ItemStack stack = new ItemStack(Item.getItemFromBlock(hitState.getBlock()));
+        if (hitTile instanceof GenericTileEntity) {
+            NBTTagCompound tagCompound = new NBTTagCompound();
+            ((GenericTileEntity) hitTile).writeRestorableToNBT(tagCompound);
+            stack.setTagCompound(tagCompound);
+        }
+        BlockTools.spawnItemStack(multipartTE.getWorld(), pos.getX(), pos.getY(), pos.getZ(), stack);
+
+        multipartTE.removePart(hitState);
+
         return multipartTE.getParts().isEmpty();
     }
 
@@ -57,7 +72,7 @@ public class MultipartHelper {
         return worldIn.rayTraceBlocks(vec3, vec31, useLiquids, !useLiquids, false);
     }
 
-    private static Vec3d getPlayerEyes(EntityPlayer playerIn) {
+    public static Vec3d getPlayerEyes(EntityPlayer playerIn) {
         double x = playerIn.posX;
         double y = playerIn.posY + playerIn.getEyeHeight();
         double z = playerIn.posZ;

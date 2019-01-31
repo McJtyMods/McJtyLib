@@ -29,7 +29,6 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -183,7 +182,7 @@ public class McJtyLib implements ModBase {
         }
 
         @SubscribeEvent
-        public void onBreakBlock(PlayerInteractEvent.LeftClickBlock event) {
+        public void onPlayerInteract(PlayerInteractEvent.LeftClickBlock event) {
             World world = event.getWorld();
             BlockPos pos = event.getPos();
             IBlockState state = world.getBlockState(pos);
@@ -191,23 +190,11 @@ public class McJtyLib implements ModBase {
                 TileEntity tileEntity = world.getTileEntity(pos);
                 if (tileEntity instanceof MultipartTE) {
                     if (!world.isRemote) {
-                        if (MultipartHelper.hit((MultipartTE) tileEntity, state, event.getEntityPlayer(), event.getHitVec())) {
+                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, event.getEntityPlayer(), event.getHitVec())) {
                             world.setBlockToAir(pos);
                         }
                     }
                 }
-                event.setCanceled(true);
-            }
-        }
-
-        @SubscribeEvent
-        public void onBlockBreakEvent (BlockEvent.BreakEvent event){
-            World world = event.getWorld();
-            if (world.isRemote) {
-                return;
-            }
-            BlockPos pos = event.getPos();
-            if (event.getState().getBlock() instanceof MultipartBlock) {
                 event.setCanceled(true);
             }
         }

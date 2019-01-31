@@ -1,20 +1,18 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -41,8 +39,6 @@ public class MultipartTE extends TileEntity {
     }
 
     private Map<PartSlot, Part> parts = new HashMap<>();
-//    private List<PartBlockId> parts = new ArrayList<>();
-//    private List<TileEntity> tileEntities = new ArrayList<>();
     private int version = 0;    // To update rendering client-side
 
     @Override
@@ -71,14 +67,14 @@ public class MultipartTE extends TileEntity {
         parts.put(slot, new Part(state, te));
 
         if (te instanceof GenericTileEntity) {
-            ((GenericTileEntity) te).onPartAdded(slot, state);
+            ((GenericTileEntity) te).onPartAdded(slot, state, this);
         }
 
         if (!world.isRemote) {
             version++;
             markDirtyClient();
         }
-        dumpParts("add");
+//        dumpParts("add");
     }
 
     public void removePart(IBlockState partState) {
@@ -89,7 +85,7 @@ public class MultipartTE extends TileEntity {
                     version++;
                     markDirtyClient();
                 }
-                dumpParts("remove");
+//                dumpParts("remove");
                 return;
             }
         }
@@ -104,7 +100,7 @@ public class MultipartTE extends TileEntity {
         int oldVersion = version;
         readFromNBT(packet.getNbtCompound());
         if (world.isRemote && version != oldVersion) {
-            dumpParts("onData");
+//            dumpParts("onData");
             world.markBlockRangeForRenderUpdate(pos, pos);
         }
     }
@@ -144,22 +140,34 @@ public class MultipartTE extends TileEntity {
 
             PartSlot slot = PartSlot.byName(tag.getString("slot"));
             if (slot != null) {
-                ResourceLocation id = new ResourceLocation(tag.getString("id"));
-                int meta = tag.getInteger("meta");
-                Block block = ForgeRegistries.BLOCKS.getValue(id);
-                if (block != null) {
-                    IBlockState state = block.getStateFromMeta(meta);
-                    TileEntity te = null;
-                    if (tag.hasKey("te")) {
-                        NBTTagCompound tc = tag.getCompoundTag("te");
-                        te = block.createTileEntity(null, state);// @todo
-                        if (te != null) {
-                            te.readFromNBT(tc);
-                        }
+                IBlockState state = NBTUtil.readBlockState(tag);
+                TileEntity te = null;
+                if (tag.hasKey("te")) {
+                    NBTTagCompound tc = tag.getCompoundTag("te");
+                    te = state.getBlock().createTileEntity(world, state);// @todo
+                    if (te != null) {
+                        te.setWorld(world);
+                        te.readFromNBT(tc);
+                        te.setPos(pos);
                     }
-                    Part part = new Part(state, te);
-                    parts.put(slot, part);
                 }
+                Part part = new Part(state, te);
+                parts.put(slot, part);
+            }
+        }
+    }
+
+    @Override
+    protected void setWorldCreate(World worldIn) {
+        setWorld(worldIn);
+    }
+
+    @Override
+    public void setWorld(World worldIn) {
+        super.setWorld(worldIn);
+        for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
+            if (entry.getValue().getTileEntity() != null) {
+                entry.getValue().getTileEntity().setWorld(world);
             }
         }
     }
@@ -173,10 +181,8 @@ public class MultipartTE extends TileEntity {
             Part part = entry.getValue();
 
             tag.setString("slot", slot.name());
-
             IBlockState state = part.getState();
-            tag.setString("id", state.getBlock().getRegistryName().toString());
-            tag.setInteger("meta", state.getBlock().getMetaFromState(state));
+            NBTUtil.writeBlockState(tag, state);
 
             TileEntity te = part.getTileEntity();
             if (te != null) {

@@ -2,6 +2,14 @@ package mcjty.lib.multipart;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.McJtyRegister;
+import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
+import mcjty.lib.compat.waila.WailaInfoProvider;
+import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.theoneprobe.api.IProbeHitData;
+import mcjty.theoneprobe.api.IProbeInfo;
+import mcjty.theoneprobe.api.ProbeMode;
+import mcp.mobius.waila.api.IWailaConfigHandler;
+import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -11,9 +19,12 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -23,6 +34,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -30,7 +42,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-public class MultipartBlock extends Block implements ITileEntityProvider {
+public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoProvider, ITileEntityProvider {
 
     public static final AxisAlignedBB AABB_EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     public static final AxisAlignedBB AABB_CENTER = new AxisAlignedBB(.4, .4, .4, .6, .6, .6);
@@ -99,6 +111,29 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
     }
 
 
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        MultipartTE.Part part = getHitPart(state, world, pos, MultipartHelper.getPlayerEyes(player), new Vec3d(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ));
+        if (part != null) {
+            if (part.getTileEntity() instanceof GenericTileEntity) {
+                return ((GenericTileEntity) part.getTileEntity()).onBlockActivated(part.getState(), player, hand, facing, hitX, hitY, hitZ);
+            } else {
+                return part.getState().getBlock().onBlockActivated(world, pos, part.getState(), player, hand, facing, hitX, hitY, hitZ);
+            }
+        }
+        return false;
+    }
+
+    @Nullable
+    public IBlockState getHitState(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+        MultipartTE.Part part = getHitPart(blockState, world, pos, start, end);
+        if (part != null) {
+            return part.getState();
+        } else {
+            return null;
+        }
+    }
+
     @Nullable
     @Override
     public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
@@ -119,7 +154,7 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
     }
 
     @Nullable
-    public IBlockState getHitPart(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+    public MultipartTE.Part getHitPart(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
@@ -127,7 +162,7 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
                 MultipartTE.Part part = entry.getValue();
                 RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
                 if (result != null) {
-                    return part.getState();
+                    return part;
                 }
             }
             return null;
@@ -156,6 +191,33 @@ public class MultipartBlock extends Block implements ITileEntityProvider {
         return false;
     }
 
+    @Override
+    @Optional.Method(modid = "theoneprobe")
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+        MultipartTE.Part part = getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
+        if (part != null) {
+            if (part.getTileEntity() instanceof GenericTileEntity) {
+                ((GenericTileEntity) part.getTileEntity()).addProbeInfo(mode, probeInfo, player, world, blockState, data);
+            } else if (part.getState().getBlock() instanceof TOPInfoProvider) {
+                ((TOPInfoProvider) part.getState().getBlock()).addProbeInfo(mode, probeInfo, player, world, blockState, data);
+            }
+        }
+    }
+
+    @Override
+    @Optional.Method(modid = "waila")
+    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+        MultipartTE.Part part = getHitPart(accessor.getBlockState(), accessor.getWorld(), accessor.getPosition(),
+                MultipartHelper.getPlayerEyes(accessor.getPlayer()), accessor.getRenderingPosition());
+        if (part != null) {
+            if (part.getTileEntity() instanceof GenericTileEntity) {
+                ((GenericTileEntity) part.getTileEntity()).addWailaBody(itemStack, currenttip, accessor, config);
+            } else if (part.getState().getBlock() instanceof WailaInfoProvider) {
+                return ((WailaInfoProvider) part.getState().getBlock()).getWailaBody(itemStack, currenttip, accessor, config);
+            }
+        }
+        return currenttip;
+    }
 
 
     @Override

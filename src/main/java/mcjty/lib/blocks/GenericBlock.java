@@ -313,6 +313,12 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            if (((GenericTileEntity) te).onBlockActivated(state, player, hand, side, hitX, hitY, hitZ)) {
+                return true;
+            }
+        }
         ItemStack heldItem = player.getHeldItem(hand);
         if (handleModule(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)) {
             return true;
