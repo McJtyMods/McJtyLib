@@ -5,6 +5,7 @@ import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
 import mcjty.lib.container.InventoryHelper;
+import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.network.*;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
@@ -104,6 +105,10 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
+    }
+
+    public void onPartAdded(PartSlot slot, IBlockState state) {
+
     }
 
     // ------------------------------------------------------

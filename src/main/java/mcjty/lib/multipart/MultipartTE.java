@@ -1,5 +1,6 @@
 package mcjty.lib.multipart;
 
+import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
@@ -68,6 +69,11 @@ public class MultipartTE extends TileEntity {
 
     public void addPart(PartSlot slot, IBlockState state, TileEntity te) {
         parts.put(slot, new Part(state, te));
+
+        if (te instanceof GenericTileEntity) {
+            ((GenericTileEntity) te).onPartAdded(slot, state);
+        }
+
         if (!world.isRemote) {
             version++;
             markDirtyClient();
