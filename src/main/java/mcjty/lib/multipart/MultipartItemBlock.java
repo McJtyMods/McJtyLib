@@ -158,7 +158,7 @@ public class MultipartItemBlock extends ItemBlock {
             te = world.getTileEntity(pos);
             if (te instanceof MultipartTE) {
                 TileEntity tileEntity = createTileEntity(world, newState);
-                if (tileEntity instanceof GenericTileEntity) {
+                if (tileEntity instanceof GenericTileEntity && stack.hasTagCompound()) {
                     ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTagCompound());
                 }
                 ((MultipartTE) te).addPart(slot, newState, tileEntity);
