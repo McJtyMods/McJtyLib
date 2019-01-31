@@ -30,6 +30,17 @@ public class MultipartHelper {
         return null;
     }
 
+    public static IBlockState getBlockState(IBlockAccess access, BlockPos pos, PartSlot slot) {
+        TileEntity te = access.getTileEntity(pos);
+        if (te instanceof MultipartTE) {
+            MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
+            if (part != null) {
+                return part.getState();
+            }
+        }
+        return null;
+    }
+
     // Return true if there are no more parts left
     public static boolean removePart(MultipartTE multipartTE, IBlockState state, EntityPlayer player, Vec3d hitVec) {
         BlockPos pos = multipartTE.getPos();
