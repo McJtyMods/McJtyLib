@@ -31,31 +31,8 @@ public class BlockTools {
 
     public static void spawnItemStack(World world, int x, int y, int z, ItemStack itemstack) {
         if (!itemstack.isEmpty()) {
-            float f = random.nextFloat() * 0.8F + 0.1F;
-            float f1 = random.nextFloat() * 0.8F + 0.1F;
-            EntityItem entityitem;
-
-            float f2 = random.nextFloat() * 0.8F + 0.1F;
-            while (itemstack.getCount() > 0) {
-                int j = random.nextInt(21) + 10;
-
-                if (j > itemstack.getCount()) {
-                    j = itemstack.getCount();
-                }
-
-                int amount = -j;
-                itemstack.grow(amount);
-                entityitem = new EntityItem(world, (x + f), (y + f1), (z + f2), new ItemStack(itemstack.getItem(), j, itemstack.getItemDamage()));
-                float f3 = 0.05F;
-                entityitem.motionX = ((float)random.nextGaussian() * f3);
-                entityitem.motionY = ((float)random.nextGaussian() * f3 + 0.2F);
-                entityitem.motionZ = ((float)random.nextGaussian() * f3);
-
-                if (itemstack.hasTagCompound()) {
-                    entityitem.getItem().setTagCompound(itemstack.getTagCompound().copy());
-                }
-                world.spawnEntity(entityitem);
-            }
+            EntityItem entityItem = new EntityItem(world, x, y, z, itemstack);
+            world.spawnEntity(entityItem);
         }
     }
 
