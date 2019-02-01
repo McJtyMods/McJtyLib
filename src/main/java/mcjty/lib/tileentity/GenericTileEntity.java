@@ -10,6 +10,7 @@ import mcjty.lib.network.*;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.ItemStackList;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
 import mcjty.theoneprobe.api.IProbeHitData;
@@ -245,10 +246,16 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     protected void readBufferFromNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
-        NBTTagList bufferTagList = tagCompound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+        readBufferFromNBT(tagCompound, "Items", inventoryHelper.getStacks());
+    }
+
+    protected void readBufferFromNBT(NBTTagCompound tagCompound, String tag, ItemStackList list) {
+        NBTTagList bufferTagList = tagCompound.getTagList(tag, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < bufferTagList.tagCount(); i++) {
             NBTTagCompound nbtTagCompound = bufferTagList.getCompoundTagAt(i);
-            inventoryHelper.setStackInSlot(i, new ItemStack(nbtTagCompound));
+            if (i < list.size()) {
+                list.set(i, new ItemStack(nbtTagCompound));
+            }
         }
     }
 
@@ -285,17 +292,20 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
-    protected void writeBufferToNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
+    protected void writeBufferToNBT(NBTTagCompound tagCompound, String tag, ItemStackList list) {
         NBTTagList bufferTagList = new NBTTagList();
-        for (int i = 0; i < inventoryHelper.getCount(); i++) {
-            ItemStack stack = inventoryHelper.getStackInSlot(i);
+        for (ItemStack stack : list) {
             NBTTagCompound nbtTagCompound = new NBTTagCompound();
             if (!stack.isEmpty()) {
                 stack.writeToNBT(nbtTagCompound);
             }
             bufferTagList.appendTag(nbtTagCompound);
         }
-        tagCompound.setTag("Items", bufferTagList);
+        tagCompound.setTag(tag, bufferTagList);
+    }
+
+    protected void writeBufferToNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
+        writeBufferToNBT(tagCompound, "Items", inventoryHelper.getStacks());
     }
 
     @Override

@@ -398,6 +398,10 @@ public class InventoryHelper {
         return stacks.get(index);
     }
 
+    public ItemStackList getStacks() {
+        return stacks;
+    }
+
     /**
      * This function sets a stack in a slot but doesn't check if this slot allows it.
      * @param index
