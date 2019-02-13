@@ -56,6 +56,9 @@ public class TeleportationTools {
         EntityPlayerMP entityPlayerMP = (EntityPlayerMP) player;
         MinecraftServer server = player.getEntityWorld().getMinecraftServer();
         WorldServer worldServer = server.getWorld(dimension);
+        if (worldServer == null) {
+            return;
+        }
         player.addExperienceLevel(0);
 
 
