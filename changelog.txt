@@ -1,3 +1,6 @@
+Upcoming:
+- New methods for rendering quads and general API cleanup in the RenderHelper
+
 3.1.1:
 - Fixed a client-side dependency problem
 

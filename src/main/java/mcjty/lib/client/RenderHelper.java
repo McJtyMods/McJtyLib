@@ -25,6 +25,12 @@ import javax.annotation.Nullable;
 public class RenderHelper {
     public static float rot = 0.0f;
 
+    public static final RenderSettings DEFAULT_SETTINGS = RenderSettings.builder()
+            .color(255, 255, 255)
+            .alpha(128)
+            .build();
+
+
     public static void renderEntity(Entity entity, int xPos, int yPos) {
         float f1 = 10F;
         renderEntity(entity, xPos, yPos, f1);
@@ -547,18 +553,21 @@ public class RenderHelper {
     }
 
     public static void renderBillboardQuadBright(double scale) {
-        int brightness = 240;
-        int b1 = brightness >> 16 & 65535;
-        int b2 = brightness & 65535;
+        renderBillboardQuadBright(scale, DEFAULT_SETTINGS);
+    }
+
+    public static void renderBillboardQuadBright(double scale, RenderSettings settings) {
+        int b1 = settings.getBrightness() >> 16 & 65535;
+        int b2 = settings.getBrightness() & 65535;
         GlStateManager.pushMatrix();
         RenderHelper.rotateToPlayer();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-        buffer.pos(-scale, -scale, 0.0D).tex(0.0D, 0.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(-scale, scale, 0.0D).tex(0.0D, 1.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(scale, scale, 0.0D).tex(1.0D, 1.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(scale, -scale, 0.0D).tex(1.0D, 0.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+        buffer.pos(-scale, -scale, 0.0D).tex(0.0D, 0.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(-scale, scale, 0.0D).tex(0.0D, 1.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(scale, scale, 0.0D).tex(1.0D, 1.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(scale, -scale, 0.0D).tex(1.0D, 0.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
         tessellator.draw();
         GlStateManager.popMatrix();
     }
@@ -660,13 +669,8 @@ public class RenderHelper {
         return width;
     }
 
-
     /**
      * Draw a beam with some thickness.
-     * @param S
-     * @param E
-     * @param P
-     * @param width
      */
     public static void drawBeam(Vector S, Vector E, Vector P, float width) {
         Vector PS = Sub(S, P);
@@ -681,19 +685,38 @@ public class RenderHelper {
         Vector p3 = Add(E, half);
         Vector p4 = Sub(E, half);
 
-        drawQuad(Tessellator.getInstance(), p1, p3, p4, p2);
+        drawQuad(Tessellator.getInstance(), p1, p3, p4, p2, DEFAULT_SETTINGS);
     }
 
-    private static void drawQuad(Tessellator tessellator, Vector p1, Vector p2, Vector p3, Vector p4) {
-        int brightness = 240;
-        int b1 = brightness >> 16 & 65535;
-        int b2 = brightness & 65535;
+    /**
+     * Draw a beam with some thickness.
+     */
+    public static void drawBeam(Vector S, Vector E, Vector P, RenderSettings settings) {
+        Vector PS = Sub(S, P);
+        Vector SE = Sub(E, S);
+
+        Vector normal = Cross(PS, SE);
+        normal = normal.normalize();
+
+        Vector half = Mul(normal, settings.getWidth());
+        Vector p1 = Add(S, half);
+        Vector p2 = Sub(S, half);
+        Vector p3 = Add(E, half);
+        Vector p4 = Sub(E, half);
+
+        drawQuad(Tessellator.getInstance(), p1, p3, p4, p2, settings);
+    }
+
+    private static void drawQuad(Tessellator tessellator, Vector p1, Vector p2, Vector p3, Vector p4,
+                                 RenderSettings settings) {
+        int b1 = settings.getBrightness() >> 16 & 65535;
+        int b2 = settings.getBrightness() & 65535;
 
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0.0D, 0.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1.0D, 0.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1.0D, 1.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0.0D, 1.0D).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0.0D, 0.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1.0D, 0.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1.0D, 1.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0.0D, 1.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
     }
 
     public static class Vector {
@@ -705,6 +728,10 @@ public class RenderHelper {
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+
+        public static Vector Vector(float x, float y, float z) {
+            return new Vector(x, y, z);
         }
 
         public float getX() {
