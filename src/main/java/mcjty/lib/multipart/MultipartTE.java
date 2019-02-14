@@ -95,6 +95,7 @@ public class MultipartTE extends TileEntity {
         return parts;
     }
 
+
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
         int oldVersion = version;
