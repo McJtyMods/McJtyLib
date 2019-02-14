@@ -129,11 +129,18 @@ public class MultipartTE extends TileEntity {
         }
     }
 
+    private boolean partExists(PartSlot slot, IBlockState state) {
+        if (parts.containsKey(slot)) {
+            return parts.get(slot).getState().equals(state);
+        }
+        return false;
+    }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        parts.clear();
+
+        Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
         version = compound.getInteger("version");
         NBTTagList list = compound.getTagList("parts", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < list.tagCount() ; i++) {
@@ -142,20 +149,42 @@ public class MultipartTE extends TileEntity {
             PartSlot slot = PartSlot.byName(tag.getString("slot"));
             if (slot != null) {
                 IBlockState state = NBTUtil.readBlockState(tag);
-                TileEntity te = null;
-                if (tag.hasKey("te")) {
-                    NBTTagCompound tc = tag.getCompoundTag("te");
-                    te = state.getBlock().createTileEntity(world, state);// @todo
-                    if (te != null) {
-                        te.setWorld(world);
-                        te.readFromNBT(tc);
-                        te.setPos(pos);
+                if (partExists(slot, state)) {
+                    // Part is already there. Just update it
+                    Part part = parts.get(slot);
+                    if (tag.hasKey("te")) {
+                        NBTTagCompound tc = tag.getCompoundTag("te");
+                        TileEntity te = part.tileEntity;
+                        if (te == null) {
+                            te = state.getBlock().createTileEntity(world, state);// @todo
+                            if (te != null) {
+                                te.setWorld(world);
+                                te.readFromNBT(tc);
+                                te.setPos(pos);
+                            }
+                        } else {
+                            te.readFromNBT(tc);
+                            te.setPos(pos);
+                        }
                     }
+                    newparts.put(slot, part);
+                } else {
+                    TileEntity te = null;
+                    if (tag.hasKey("te")) {
+                        NBTTagCompound tc = tag.getCompoundTag("te");
+                        te = state.getBlock().createTileEntity(world, state);// @todo
+                        if (te != null) {
+                            te.setWorld(world);
+                            te.readFromNBT(tc);
+                            te.setPos(pos);
+                        }
+                    }
+                    Part part = new Part(state, te);
+                    newparts.put(slot, part);
                 }
-                Part part = new Part(state, te);
-                parts.put(slot, part);
             }
         }
+        parts = newparts;
     }
 
     @Override
