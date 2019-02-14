@@ -56,6 +56,7 @@ public class MultipartHelper {
         if (hitTile instanceof GenericTileEntity) {
             NBTTagCompound tagCompound = new NBTTagCompound();
             ((GenericTileEntity) hitTile).writeRestorableToNBT(tagCompound);
+            ((GenericTileEntity) hitTile).onBlockBreak(multipartTE.getWorld(), multipartTE.getPos(), hitState);
             stack.setTagCompound(tagCompound);
         }
         BlockTools.spawnItemStack(multipartTE.getWorld(), pos.getX(), pos.getY(), pos.getZ(), stack);

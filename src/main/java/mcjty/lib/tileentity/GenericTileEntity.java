@@ -106,7 +106,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
     }
 
-    public void onBlockBreak(World workd, BlockPos pos, IBlockState state) {
+    public void onBlockBreak(World world, BlockPos pos, IBlockState state) {
     }
 
     public void onPartAdded(PartSlot slot, IBlockState state, TileEntity multipartTile) {
