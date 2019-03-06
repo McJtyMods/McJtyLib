@@ -4,6 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartTE;
+import mcjty.lib.setup.DefaultCommonSetup;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CommonProxy extends AbstractCommonProxy {
+public class CommonSetup extends DefaultCommonSetup {
 
     public static MultipartBlock multipartBlock;
 
@@ -23,6 +24,10 @@ public class CommonProxy extends AbstractCommonProxy {
         multipartBlock = new MultipartBlock();
         GameRegistry.registerTileEntity(MultipartTE.class, new ResourceLocation(McJtyLib.PROVIDES, "multipart_te"));
         MinecraftForge.EVENT_BUS.register(new BlockRegister());
+    }
+
+    @Override
+    public void createTabs() {
     }
 
     private static class BlockRegister {

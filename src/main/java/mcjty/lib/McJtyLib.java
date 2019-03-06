@@ -9,7 +9,8 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.proxy.CommonProxy;
+import mcjty.lib.proxy.CommonSetup;
+import mcjty.lib.proxy.IProxy;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.worlddata.AbstractWorldData;
@@ -63,8 +64,9 @@ public class McJtyLib implements ModBase {
     @CapabilityInject(PreferencesProperties.class)
     public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
 
-    @SidedProxy(clientSide = "mcjty.lib.proxy.ClientProxy", serverSide = "mcjty.lib.proxy.CommonProxy")
-    public static CommonProxy proxy;
+    @SidedProxy(clientSide = "mcjty.lib.proxy.ClientProxy", serverSide = "mcjty.lib.proxy.ServerProxy")
+    public static IProxy proxy;
+    public static CommonSetup setup = new CommonSetup();
 
     @Mod.Instance(PROVIDES)
     public static McJtyLib instance;
@@ -154,6 +156,7 @@ public class McJtyLib implements ModBase {
 
     @Mod.EventHandler
     public void actualPreInit(FMLPreInitializationEvent e) {
+        setup.preInit(e);
         proxy.preInit(e);
     }
 

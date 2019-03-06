@@ -1,9 +1,10 @@
-package mcjty.lib.proxy;
+package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.GeneralConfig;
+import mcjty.lib.proxy.IProxy;
 import mcjty.lib.varia.WrenchChecker;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -22,17 +23,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import java.io.File;
 import java.util.concurrent.Callable;
 
-@Deprecated
-public abstract class AbstractCommonProxy implements IProxy {
-
-    public File modConfigDir;
-    protected Configuration mainConfig = null;
+public abstract class DefaultServerProxy implements IProxy {
 
     @Override
     public void preInit(FMLPreInitializationEvent e) {
-        McJtyLib.preInit(e);
-        GeneralConfig.preInit(e);
-        modConfigDir = e.getModConfigurationDirectory();
     }
 
     @Override
@@ -41,7 +35,6 @@ public abstract class AbstractCommonProxy implements IProxy {
 
     @Override
     public void postInit(FMLPostInitializationEvent e) {
-        WrenchChecker.init();
     }
 
     @Override

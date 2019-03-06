@@ -1,6 +1,6 @@
 package mcjty.lib.multipart;
 
-import mcjty.lib.proxy.CommonProxy;
+import mcjty.lib.proxy.CommonSetup;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.state.IBlockState;
@@ -44,7 +44,7 @@ public class MultipartHelper {
     // Return true if there are no more parts left
     public static boolean removePart(MultipartTE multipartTE, IBlockState state, EntityPlayer player, Vec3d hitVec) {
         BlockPos pos = multipartTE.getPos();
-        MultipartTE.Part hitPart = CommonProxy.multipartBlock.getHitPart(state, multipartTE.getWorld(), pos, getPlayerEyes(player), hitVec);
+        MultipartTE.Part hitPart = CommonSetup.multipartBlock.getHitPart(state, multipartTE.getWorld(), pos, getPlayerEyes(player), hitVec);
         if (hitPart == null) {
             return false;
         }
