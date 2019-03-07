@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -214,6 +215,31 @@ public class NetworkTools {
             return buf.readFloat();
         } else {
             return null;
+        }
+    }
+
+    @Nullable
+    public static List<BlockPos> readPosList(ByteBuf buf) {
+        List<BlockPos> list = null;
+        int size = buf.readInt();
+        if (size != -1) {
+            list = new ArrayList<>(size);
+            for (int i = 0 ; i < size ; i++) {
+                BlockPos item = readPos(buf);
+                list.add(item);
+            }
+        }
+        return list;
+    }
+
+    public static void writePosList(ByteBuf buf, @Nullable List<BlockPos> list) {
+        if (list == null) {
+            buf.writeInt(-1);
+        } else {
+            buf.writeInt(list.size());
+            for (BlockPos item : list) {
+                writePos(buf, item);
+            }
         }
     }
 }

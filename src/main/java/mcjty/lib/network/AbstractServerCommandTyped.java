@@ -5,6 +5,7 @@ import mcjty.lib.typed.TypedMap;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
+@Deprecated
 public class AbstractServerCommandTyped implements IMessage {
 
     protected BlockPos pos;

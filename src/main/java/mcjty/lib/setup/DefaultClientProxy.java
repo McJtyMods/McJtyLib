@@ -56,6 +56,11 @@ public class DefaultClientProxy implements IProxy {
     }
 
     @Override
+    public void enqueueWork(Runnable runnable) {
+        Minecraft.getMinecraft().addScheduledTask(runnable);
+    }
+
+    @Override
     public <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule) {
         return Minecraft.getMinecraft().addScheduledTask(callableToSchedule);
     }

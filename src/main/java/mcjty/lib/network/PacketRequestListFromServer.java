@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
  * @param <S> is the type of the subclass of this class. i.e. the class you're implementing
  * @param <C> is the type of the subclass of PacketListFromServer. i.e. the class sent back from the server.
  */
+@Deprecated
 public abstract class PacketRequestListFromServer<T, S extends PacketRequestListFromServer<T, S, C>, C extends PacketListFromServer<C,T>> extends AbstractServerCommandTyped {
     public String modid;
 

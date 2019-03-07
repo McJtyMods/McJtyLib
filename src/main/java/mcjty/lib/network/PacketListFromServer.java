@@ -14,6 +14,7 @@ import java.util.List;
  * @param <S> is the type of the subclass of this class. i.e. the class you're implementing
  * @param <T> is the type of the items in the list that is requested from the server
  */
+@Deprecated
 public abstract class PacketListFromServer<S extends PacketListFromServer<S, T>, T> implements IMessage {
 
     public BlockPos pos;

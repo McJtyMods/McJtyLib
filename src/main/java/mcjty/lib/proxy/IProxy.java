@@ -33,6 +33,8 @@ public interface IProxy {
 
     ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule);
 
+    void enqueueWork(Runnable runnable);
+
     void initStandardItemModel(Block block);
 
     void initCustomItemModel(Item item, int meta, ModelResourceLocation model);

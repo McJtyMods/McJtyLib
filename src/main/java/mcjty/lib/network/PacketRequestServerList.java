@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
  *
  * @param <T> is the type of the items in the list that is requested from the server
  */
+@Deprecated
 public class PacketRequestServerList<T> extends AbstractServerCommandTyped {
     public String modid;
 

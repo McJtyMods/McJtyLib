@@ -1,5 +1,6 @@
 package mcjty.lib.network;
 
+import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -17,19 +18,53 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
  * a tile entity on the server side that implements CommandHandler. This will call 'execute()' on
  * that command handler.
  */
-public class PacketServerCommandTyped extends AbstractServerCommandTyped {
+public class PacketServerCommandTyped implements IMessage {
+
+    protected BlockPos pos;
+    protected Integer dimensionId;
+    protected String command;
+    protected TypedMap params;
 
     public PacketServerCommandTyped() {
     }
 
     public PacketServerCommandTyped(BlockPos pos, String command, TypedMap params) {
-        super(pos, command, params);
+        this.pos = pos;
+        this.command = command;
+        this.params = params;
         this.dimensionId = null;
     }
 
     public PacketServerCommandTyped(BlockPos pos, Integer dimensionId, String command, TypedMap params) {
-        super(pos, command, params);
+        this.pos = pos;
+        this.command = command;
+        this.params = params;
         this.dimensionId = dimensionId;
+    }
+
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        pos = NetworkTools.readPos(buf);
+        command = NetworkTools.readString(buf);
+        params = TypedMapTools.readArguments(buf);
+        if (buf.readBoolean()) {
+            dimensionId = buf.readInt();
+        } else {
+            dimensionId = null;
+        }
+    }
+
+    @Override
+    public void toBytes(ByteBuf buf) {
+        NetworkTools.writePos(buf, pos);
+        NetworkTools.writeString(buf, command);
+        TypedMapTools.writeArguments(buf, params);
+        if (dimensionId != null) {
+            buf.writeBoolean(true);
+            buf.writeInt(dimensionId);
+        } else {
+            buf.writeBoolean(false);
+        }
     }
 
     public static class Handler implements IMessageHandler<PacketServerCommandTyped, IMessage> {

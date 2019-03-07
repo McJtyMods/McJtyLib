@@ -65,6 +65,11 @@ public abstract class AbstractCommonProxy implements IProxy {
     }
 
     @Override
+    public void enqueueWork(Runnable runnable) {
+        throw new IllegalStateException("Not implemented here");
+    }
+
+    @Override
     public void initStandardItemModel(Block block) {
         throw new IllegalStateException("This should only be called from client side");
     }

@@ -1,6 +1,5 @@
 package mcjty.lib.network;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.McJtyLibClient;
 import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

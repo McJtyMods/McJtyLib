@@ -17,7 +17,10 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
  * a tile entity on the server side that implements CommandHandler. This will call 'executeWithResultInteger()' on
  * that command handler. A PacketIntegerFromServer will be sent back from the client.
  */
-public class PacketRequestDataFromServer extends AbstractServerCommandTyped {
+public class PacketRequestDataFromServer implements IMessage {
+    protected BlockPos pos;
+    protected String command;
+    protected TypedMap params;
     private String modid;
 
     public PacketRequestDataFromServer() {
@@ -25,20 +28,24 @@ public class PacketRequestDataFromServer extends AbstractServerCommandTyped {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        super.fromBytes(buf);
-
+        pos = NetworkTools.readPos(buf);
+        command = NetworkTools.readString(buf);
+        params = TypedMapTools.readArguments(buf);
         modid = NetworkTools.readString(buf);
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        super.toBytes(buf);
-
+        NetworkTools.writePos(buf, pos);
+        NetworkTools.writeString(buf, command);
+        TypedMapTools.writeArguments(buf, params);
         NetworkTools.writeString(buf, modid);
     }
 
     public PacketRequestDataFromServer(String modid, BlockPos pos, String command, TypedMap params) {
-        super(pos, command, params);
+        this.pos = pos;
+        this.command = command;
+        this.params = params;
         this.modid = modid;
     }
 

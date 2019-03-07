@@ -2,10 +2,7 @@ package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
-import mcjty.lib.McJtyLib;
-import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.proxy.IProxy;
-import mcjty.lib.varia.WrenchChecker;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,13 +11,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.animation.ITimeValue;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-import java.io.File;
 import java.util.concurrent.Callable;
 
 public abstract class DefaultServerProxy implements IProxy {
@@ -55,6 +51,11 @@ public abstract class DefaultServerProxy implements IProxy {
     @Override
     public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
         throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
+    public void enqueueWork(Runnable runnable) {
+        FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(runnable);
     }
 
     @Override
