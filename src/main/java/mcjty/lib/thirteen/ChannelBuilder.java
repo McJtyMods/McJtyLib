@@ -33,6 +33,6 @@ public class ChannelBuilder {
     }
 
     public SimpleChannel simpleChannel() {
-        return new SimpleChannel(channelName.getResourcePath());
+        return new SimpleChannel(channelName);
     }
 }

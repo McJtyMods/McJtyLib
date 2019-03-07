@@ -1,7 +1,8 @@
 package mcjty.lib.thirteen;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
+import mcjty.lib.network.PacketHandler;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
@@ -14,8 +15,8 @@ public class SimpleChannel {
 
     private final SimpleNetworkWrapper network;
 
-    public SimpleChannel(String name) {
-        this.network = NetworkRegistry.INSTANCE.newSimpleChannel(name);
+    public SimpleChannel(ResourceLocation name) {
+        this.network = PacketHandler.registerMessages(name.getResourceDomain(), name.getResourcePath());
     }
 
     public SimpleNetworkWrapper getNetwork() {
