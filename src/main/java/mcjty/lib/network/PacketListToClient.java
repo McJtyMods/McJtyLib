@@ -13,6 +13,7 @@ import java.util.List;
  *
  * @param <T> is the type of the items in the list that is requested from the server
  */
+@Deprecated
 public abstract class PacketListToClient<T> implements IMessage {
 
     public BlockPos pos;
