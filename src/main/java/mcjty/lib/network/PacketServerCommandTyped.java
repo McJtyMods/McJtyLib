@@ -1,17 +1,17 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.varia.Logging;
+import mcjty.lib.thirteen.Context;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import java.util.function.Supplier;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
@@ -26,6 +26,10 @@ public class PacketServerCommandTyped implements IMessage {
     protected TypedMap params;
 
     public PacketServerCommandTyped() {
+    }
+
+    public PacketServerCommandTyped(ByteBuf buf) {
+        fromBytes(buf);
     }
 
     public PacketServerCommandTyped(BlockPos pos, String command, TypedMap params) {
@@ -67,33 +71,29 @@ public class PacketServerCommandTyped implements IMessage {
         }
     }
 
-    public static class Handler implements IMessageHandler<PacketServerCommandTyped, IMessage> {
-        @Override
-        public IMessage onMessage(PacketServerCommandTyped message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketServerCommandTyped message, MessageContext ctx) {
-            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            EntityPlayerMP playerEntity = ctx.getSender();
             World world;
-            if (message.dimensionId == null) {
+            if (dimensionId == null) {
                 world = playerEntity.getEntityWorld();
             } else {
-                world = DimensionManager.getWorld(message.dimensionId);
+                world = DimensionManager.getWorld(dimensionId);
             }
             if (world == null) {
                 return;
             }
-            TileEntity te = world.getTileEntity(message.pos);
+            TileEntity te = world.getTileEntity(pos);
             if(!(te instanceof ICommandHandler)) {
                 Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                 return;
             }
             ICommandHandler commandHandler = (ICommandHandler) te;
-            if (!commandHandler.execute(playerEntity, message.command, message.params)) {
-                Logging.log("Command " + message.command + " was not handled!");
+            if (!commandHandler.execute(playerEntity, command, params)) {
+                Logging.log("Command " + command + " was not handled!");
             }
-        }
+        });
+        ctx.setPacketHandled(true);
     }
 }

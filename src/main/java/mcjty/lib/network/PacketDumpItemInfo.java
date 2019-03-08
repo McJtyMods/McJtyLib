@@ -2,17 +2,17 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpItemNBT;
+import mcjty.lib.thirteen.Context;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.UserListOps;
 import net.minecraft.server.management.UserListOpsEntry;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.apache.logging.log4j.Level;
+
+import java.util.function.Supplier;
 
 /**
  * Debug packet to dump item info
@@ -34,19 +34,18 @@ public class PacketDumpItemInfo implements IMessage {
     public PacketDumpItemInfo() {
     }
 
+    public PacketDumpItemInfo(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketDumpItemInfo(boolean verbose) {
         this.verbose = verbose;
     }
 
-    public static class Handler implements IMessageHandler<PacketDumpItemInfo, IMessage> {
-        @Override
-        public IMessage onMessage(PacketDumpItemInfo message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketDumpItemInfo message, MessageContext ctx) {
-            EntityPlayerMP player = ctx.getServerHandler().player;
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            EntityPlayerMP player = ctx.getSender();
             MinecraftServer server = player.getEntityWorld().getMinecraftServer();
             UserListOps oppedPlayers = server.getPlayerList().getOppedPlayers();
             UserListOpsEntry entry = oppedPlayers.getEntry(player.getGameProfile());
@@ -54,11 +53,12 @@ public class PacketDumpItemInfo implements IMessage {
             if (perm >= 1) {
                 ItemStack item = player.getHeldItemMainhand();
                 if (!item.isEmpty()) {
-                    String output = DumpItemNBT.dumpItemNBT(item, message.verbose);
+                    String output = DumpItemNBT.dumpItemNBT(item, verbose);
                     Logging.getLogger().log(Level.INFO, "### Server side ###");
                     Logging.getLogger().log(Level.INFO, output);
                 }
             }
-        }
+        });
+        ctx.setPacketHandled(true);
     }
 }

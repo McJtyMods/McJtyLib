@@ -2,17 +2,16 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLibClient;
+import mcjty.lib.thirteen.Context;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.function.Supplier;
 
 /**
  * This is sent from the server to the client after the login has occured so that packets that implement
  * IClientServerDelayed can be sent
  */
-public class PacketFinalizeLogin implements IMessage, IMessageHandler<PacketFinalizeLogin, IMessage> {
+public class PacketFinalizeLogin implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
@@ -22,13 +21,19 @@ public class PacketFinalizeLogin implements IMessage, IMessageHandler<PacketFina
     public void toBytes(ByteBuf buf) {
     }
 
-    @Override
-    public IMessage onMessage(PacketFinalizeLogin message, MessageContext ctx) {
-        finalizeClientLogin();
-        return null;
+    public PacketFinalizeLogin() {
     }
 
-    @SideOnly(Side.CLIENT)
+    public PacketFinalizeLogin(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        finalizeClientLogin();
+        ctx.setPacketHandled(true);
+    }
+
     private void finalizeClientLogin() {
         McJtyLibClient.connected = true;
     }

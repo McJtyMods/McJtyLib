@@ -1,21 +1,20 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.McJtyLib;
+import mcjty.lib.thirteen.Context;
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Request information from the tile entity which is needed for the GUI
@@ -104,6 +103,10 @@ public class PacketSendGuiData implements IMessage {
     public PacketSendGuiData() {
     }
 
+    public PacketSendGuiData(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketSendGuiData(World world, BlockPos pos) {
         this.dimId = world.provider.getDimension();
         this.pos = pos;
@@ -116,23 +119,18 @@ public class PacketSendGuiData implements IMessage {
         }
     }
 
-    public static class Handler implements IMessageHandler<PacketSendGuiData, IMessage> {
-        @Override
-        public IMessage onMessage(PacketSendGuiData message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
-
-        private void handle(PacketSendGuiData message, MessageContext ctx) {
-            WorldClient world = Minecraft.getMinecraft().world;
-            if (world.provider.getDimension() == message.dimId) {
-                TileEntity te = world.getTileEntity(message.pos);
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            World world = McJtyLib.proxy.getClientWorld();
+            if (world.provider.getDimension() == dimId) {
+                TileEntity te = world.getTileEntity(pos);
                 if (te instanceof GenericTileEntity) {
                     GenericTileEntity tileEntity = (GenericTileEntity) te;
-                    tileEntity.syncDataForGUI(message.data);
+                    tileEntity.syncDataForGUI(data);
                 }
             }
-        }
+        });
+        ctx.setPacketHandled(true);
     }
-
 }

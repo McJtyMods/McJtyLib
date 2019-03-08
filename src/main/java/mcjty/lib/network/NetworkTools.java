@@ -141,11 +141,12 @@ public class NetworkTools {
         }
     }
 
-    public static void writeStringList(ByteBuf dataOut, List<String> list) {
+    public static void writeStringList(ByteBuf dataOut, @Nonnull List<String> list) {
         dataOut.writeInt(list.size());
         list.stream().forEach(s -> writeStringUTF8(dataOut, s));
     }
 
+    @Nonnull
     public static List<String> readStringList(ByteBuf dataIn) {
         int size = dataIn.readInt();
         List<String> list = new ArrayList<>(size);
@@ -240,6 +241,23 @@ public class NetworkTools {
             for (BlockPos item : list) {
                 writePos(buf, item);
             }
+        }
+    }
+
+    @Nonnull
+    public static List<ItemStack> readItemStackList(ByteBuf buf) {
+        int size = buf.readInt();
+        List<ItemStack> outputs = new ArrayList<>(size);
+        for (int i = 0 ; i < size ; i++) {
+            outputs.add(NetworkTools.readItemStack(buf));
+        }
+        return outputs;
+    }
+
+    public static void writeItemStackList(ByteBuf buf, @Nonnull List<ItemStack> outputs) {
+        buf.writeInt(outputs.size());
+        for (ItemStack output : outputs) {
+            NetworkTools.writeItemStack(buf, output);
         }
     }
 }

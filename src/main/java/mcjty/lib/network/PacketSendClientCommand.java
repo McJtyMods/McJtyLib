@@ -1,10 +1,12 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.thirteen.Context;
 import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 import javax.annotation.Nonnull;
+import java.util.function.Supplier;
 
 public class PacketSendClientCommand implements IMessage {
 
@@ -42,10 +44,21 @@ public class PacketSendClientCommand implements IMessage {
     public PacketSendClientCommand() {
     }
 
+    public PacketSendClientCommand(ByteBuf buf) {
+        fromBytes(buf);
+    }
+
     public PacketSendClientCommand(String modid, String command, @Nonnull TypedMap arguments) {
         this.modid = modid;
         this.command = command;
         this.arguments = arguments;
     }
 
+    public void handle(Supplier<Context> supplier) {
+        Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            ClientCommandHandlerHelper.onMessage(this);
+        });
+        ctx.setPacketHandled(true);
+    }
 }

@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.McJtyLibClient;
+import mcjty.lib.thirteen.SimpleChannel;
 import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -51,29 +52,22 @@ public class PacketHandler {
     }
 
 
-    public static int registerMessages(SimpleNetworkWrapper networkWrapper){
-        return registerMessages(networkWrapper, 0);
-    }
-
-    public static int registerMessages(SimpleNetworkWrapper networkWrapper, int startIndex){
+    private static void registerMessages(SimpleNetworkWrapper networkWrapper) {
+        int startIndex = 0;
+        SimpleChannel channel = new SimpleChannel(networkWrapper);
 
         // Server side
-       // networkWrapper.registerMessage(PacketSetGuiStyle.Handler.class, PacketSetGuiStyle.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketServerCommandTyped.Handler.class, PacketServerCommandTyped.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketSendServerCommand.Handler.class, PacketSendServerCommand.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketRequestDataFromServer.Handler.class, PacketRequestDataFromServer.class, startIndex++, Side.SERVER);
-//        networkWrapper.registerMessage(PacketUpdateNBTItem.Handler.class, PacketUpdateNBTItem.class, startIndex++, Side.SERVER);
-//        networkWrapper.registerMessage(PacketUpdateNBTItemInventory.Handler.class, PacketUpdateNBTItemInventory.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketDumpItemInfo.Handler.class, PacketDumpItemInfo.class, startIndex++, Side.SERVER);
-        networkWrapper.registerMessage(PacketDumpBlockInfo.Handler.class, PacketDumpBlockInfo.class, startIndex++, Side.SERVER);
+        channel.registerMessageServer(startIndex++, PacketServerCommandTyped.class, PacketServerCommandTyped::toBytes, PacketServerCommandTyped::new, PacketServerCommandTyped::handle);
+        channel.registerMessageServer(startIndex++, PacketSendServerCommand.class, PacketSendServerCommand::toBytes, PacketSendServerCommand::new, PacketSendServerCommand::handle);
+        channel.registerMessageServer(startIndex++, PacketRequestDataFromServer.class, PacketRequestDataFromServer::toBytes, PacketRequestDataFromServer::new, PacketRequestDataFromServer::handle);
+        channel.registerMessageServer(startIndex++, PacketDumpItemInfo.class, PacketDumpItemInfo::toBytes, PacketDumpItemInfo::new, PacketDumpItemInfo::handle);
+        channel.registerMessageServer(startIndex++, PacketDumpBlockInfo.class, PacketDumpBlockInfo::toBytes, PacketDumpBlockInfo::new, PacketDumpBlockInfo::handle);
 
         // Client side
-        networkWrapper.registerMessage(PacketSendClientCommandHandler.class, PacketSendClientCommand.class, startIndex++, Side.CLIENT);
-        networkWrapper.registerMessage(PacketDataFromServer.Handler.class, PacketDataFromServer.class, startIndex++, Side.CLIENT);
-        networkWrapper.registerMessage(PacketSendGuiData.Handler.class, PacketSendGuiData.class, startIndex++, Side.CLIENT);
-        networkWrapper.registerMessage(PacketFinalizeLogin.class, PacketFinalizeLogin.class, startIndex++, Side.CLIENT);
-
-        return startIndex;
+        channel.registerMessageClient(startIndex++, PacketSendClientCommand.class, PacketSendClientCommand::toBytes, PacketSendClientCommand::new, PacketSendClientCommand::handle);
+        channel.registerMessageClient(startIndex++, PacketDataFromServer.class, PacketDataFromServer::toBytes, PacketDataFromServer::new, PacketDataFromServer::handle);
+        channel.registerMessageClient(startIndex++, PacketSendGuiData.class, PacketSendGuiData::toBytes, PacketSendGuiData::new, PacketSendGuiData::handle);
+        channel.registerMessageClient(startIndex++, PacketFinalizeLogin.class, PacketFinalizeLogin::toBytes, PacketFinalizeLogin::new, PacketFinalizeLogin::handle);
     }
 
     // From client side only: send server command
