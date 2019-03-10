@@ -180,7 +180,20 @@ public class ConfigSpec {
 
             @Override
             public void build(Configuration cfg) {
-                String result = cfg.getString(name, category, value.get().name(), comment);
+                String cmt = comment == null ? "" : comment+" ";
+                List<String> validValues = new ArrayList<>();
+                boolean first = true;
+                for (T t : values) {
+                    validValues.add(t.name());
+                    cmt += first ? "(" : ",";
+                    cmt += t.name();
+                    first = false;
+                }
+                cmt += ")";
+
+                String[] valid = validValues.toArray(new String[validValues.size()]);
+
+                String result = cfg.getString(name, category, value.get().name(), cmt, valid, valid);
                 for (T t : values) {
                     if (t.name().equalsIgnoreCase(result)) {
                         value.set(t);
