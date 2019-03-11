@@ -4,7 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
-import mcjty.lib.proxy.CommonSetup;
+import mcjty.lib.setup.CommonSetup;
 import mcjty.lib.varia.Logging;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.Block;

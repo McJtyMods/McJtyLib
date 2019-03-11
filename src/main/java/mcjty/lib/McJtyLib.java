@@ -9,7 +9,7 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.proxy.CommonSetup;
+import mcjty.lib.setup.CommonSetup;
 import mcjty.lib.proxy.IProxy;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;

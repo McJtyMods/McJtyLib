@@ -1,6 +1,7 @@
 package mcjty.lib.proxy;
 
 import mcjty.lib.multipart.MultipartModelLoader;
+import mcjty.lib.setup.CommonSetup;
 import mcjty.lib.setup.DefaultClientProxy;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;

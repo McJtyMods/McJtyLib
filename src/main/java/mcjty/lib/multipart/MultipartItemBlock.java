@@ -1,7 +1,7 @@
 package mcjty.lib.multipart;
 
 
-import mcjty.lib.proxy.CommonSetup;
+import mcjty.lib.setup.CommonSetup;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
