@@ -4,7 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
-import mcjty.lib.setup.CommonSetup;
+import mcjty.lib.setup.ModSetup;
 import mcjty.lib.varia.Logging;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.Block;
@@ -62,11 +62,11 @@ public class TOPCompatibility {
 
             probe.registerBlockDisplayOverride((mode, probeInfo, player, world, blockState, data) -> {
                 Block block = blockState.getBlock();
-                if (block == CommonSetup.multipartBlock) {
+                if (block == ModSetup.multipartBlock) {
                     String modid = McJtyLib.PROVIDES;
 
                     ItemStack pickBlock = data.getPickBlock();
-                    MultipartTE.Part part = CommonSetup.multipartBlock.getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
+                    MultipartTE.Part part = ModSetup.multipartBlock.getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
                     if (part != null) {
                         pickBlock = part.getState().getBlock().getItem(world, data.getPos(), part.getState());
                         modid = part.getState().getBlock().getRegistryName().getResourceDomain();

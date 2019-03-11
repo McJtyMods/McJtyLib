@@ -9,7 +9,7 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.setup.CommonSetup;
+import mcjty.lib.setup.ModSetup;
 import mcjty.lib.proxy.IProxy;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
@@ -66,7 +66,7 @@ public class McJtyLib implements ModBase {
 
     @SidedProxy(clientSide = "mcjty.lib.proxy.ClientProxy", serverSide = "mcjty.lib.proxy.ServerProxy")
     public static IProxy proxy;
-    public static CommonSetup setup = new CommonSetup();
+    public static ModSetup setup = new ModSetup();
 
     @Mod.Instance(PROVIDES)
     public static McJtyLib instance;

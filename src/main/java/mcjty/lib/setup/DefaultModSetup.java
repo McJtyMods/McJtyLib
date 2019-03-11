@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
-public abstract class DefaultCommonSetup {
+public abstract class DefaultModSetup {
 
     private File modConfigDir;
     private Logger logger;

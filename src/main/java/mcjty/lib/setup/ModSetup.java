@@ -4,7 +4,6 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartTE;
-import mcjty.lib.setup.DefaultCommonSetup;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -14,7 +13,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
-public class CommonSetup extends DefaultCommonSetup {
+public class ModSetup extends DefaultModSetup {
 
     public static MultipartBlock multipartBlock;
 
