@@ -200,6 +200,16 @@ public class ConfigSpec {
                         return;
                     }
                 }
+
+                // Try as an integer
+                int ord = Integer.parseInt(result);
+                for (T t : values) {
+                    if (t.ordinal() == ord) {
+                        value.set(t);
+                        return;
+                    }
+                }
+
                 throw new IllegalArgumentException("Unknown value '" + result + "' for configuration '" + name + "'!");
             }
         }
