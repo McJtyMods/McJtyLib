@@ -1,7 +1,6 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.McJtyLibClient;
 import mcjty.lib.thirteen.Context;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
@@ -35,7 +34,7 @@ public class PacketFinalizeLogin implements IMessage {
     }
 
     private void finalizeClientLogin() {
-        McJtyLibClient.connected = true;
+        PacketHandler.connected = true;
     }
 
 }

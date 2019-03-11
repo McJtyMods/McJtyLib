@@ -1,12 +1,9 @@
 package mcjty.lib.network;
 
-import mcjty.lib.McJtyLibClient;
 import mcjty.lib.thirteen.SimpleChannel;
 import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -16,6 +13,8 @@ public class PacketHandler {
 
     /* Make sure this number is higher than the amount of packets registered by default*/
     public static final int INTERNAL_PACKETS = 12;
+
+    public static boolean connected = false;
 
     // For the client-info packet system:
     private static int packetId = INTERNAL_PACKETS;
@@ -41,14 +40,14 @@ public class PacketHandler {
         return network;
     }
 
-    @SideOnly(Side.CLIENT)
+    // Only use client-side!
     private static boolean canBeSent(IMessage message) {
-        return McJtyLibClient.connected;
+        return connected;
     }
 
-    @SideOnly(Side.CLIENT)
+    // Only use client-side!
     public static void onDisconnect() {
-        McJtyLibClient.connected = false;
+        connected = false;
     }
 
 

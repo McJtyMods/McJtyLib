@@ -1,7 +1,6 @@
 package mcjty.test;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.McJtyLibClient;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
