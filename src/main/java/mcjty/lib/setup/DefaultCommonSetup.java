@@ -16,7 +16,7 @@ import java.io.File;
 public abstract class DefaultCommonSetup {
 
     protected File modConfigDir;
-    protected Configuration mainConfig = null;
+//    protected Configuration mainConfig = null;
     private Logger logger;
     protected CreativeTabs creativeTab;
 
@@ -24,7 +24,7 @@ public abstract class DefaultCommonSetup {
         logger = e.getModLog();
         createTabs();
         McJtyLib.preInit(e);
-        GeneralConfig.preInit(e);
+        GeneralConfig.init(e);
         modConfigDir = e.getModConfigurationDirectory();
     }
 
@@ -51,10 +51,10 @@ public abstract class DefaultCommonSetup {
         return modConfigDir;
     }
 
-    public Configuration getConfig() {
-        return mainConfig;
-    }
-
+//    public Configuration getConfig() {
+//        return mainConfig;
+//    }
+//
     public Logger getLogger() {
         return logger;
     }

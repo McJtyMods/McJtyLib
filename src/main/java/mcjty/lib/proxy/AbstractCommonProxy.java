@@ -31,7 +31,7 @@ public abstract class AbstractCommonProxy implements IProxy {
     @Override
     public void preInit(FMLPreInitializationEvent e) {
         McJtyLib.preInit(e);
-        GeneralConfig.preInit(e);
+        GeneralConfig.init(e);
         modConfigDir = e.getModConfigurationDirectory();
     }
 

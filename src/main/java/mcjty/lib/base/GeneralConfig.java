@@ -27,7 +27,7 @@ public class GeneralConfig {
                 "The maximum amount of dimensional shards that can be infused in a single machine").getInt();
     }
 
-    public static void preInit(FMLPreInitializationEvent e) {
+    public static void init(FMLPreInitializationEvent e) {
         modConfigDir = e.getModConfigurationDirectory();
         mainConfig = new Configuration(new File(modConfigDir.getPath(), "mcjtylib.cfg"));
         try {
