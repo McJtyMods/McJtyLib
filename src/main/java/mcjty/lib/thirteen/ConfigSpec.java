@@ -3,7 +3,9 @@ package mcjty.lib.thirteen;
 import net.minecraftforge.common.config.Configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class ConfigSpec {
 
@@ -69,12 +71,20 @@ public class ConfigSpec {
             return v.get();
         }
 
+        public <T> ConfigValue<List<? extends T>> defineList(String name, List<? extends T> defaultValue, Predicate<Object> elementValidator) {
+            LV v = new LV(name, getCurrentCategory(), getCurrentComment(), defaultValue, elementValidator);
+            comment = null;
+            values.add(v);
+            return v.get();
+        }
+
+
         public Builder comment(String comment) {
             this.comment = comment;
             return this;
         }
 
-        private static abstract class V {
+        private abstract static class V {
             protected final String name;
             protected final String category;
             protected final String comment;
@@ -161,6 +171,35 @@ public class ConfigSpec {
             @Override
             public void build(Configuration cfg) {
                 value.set(cfg.getInt(name, category, value.get(), min, max, comment));
+            }
+        }
+
+        private static class LV<T extends List<?>> extends V {
+            private final ConfigValue<T> value;
+            private final Predicate<Object> elementValidator;
+
+            public LV(String name, String category, String comment, T def, Predicate<Object> elementValidator) {
+                super(name, category, comment);
+                this.elementValidator = elementValidator;
+                this.value = new ConfigValue<>(def);
+            }
+
+            public ConfigValue<T> get() {
+                return value;
+            }
+
+            @Override
+            public void build(Configuration cfg) {
+                T objects = value.get();
+                String[] def = new String[objects.size()];
+                int i = 0;
+                for (Object o : objects) {
+                    def[i++] = o.toString();
+                }
+                List<String> rc = new ArrayList<>();
+                String[] result = cfg.getStringList(name, category, def, comment);
+                Collections.addAll(rc, result);
+                value.set((T) rc);
             }
         }
 
