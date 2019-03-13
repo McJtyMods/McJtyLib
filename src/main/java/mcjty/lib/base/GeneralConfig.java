@@ -1,5 +1,6 @@
 package mcjty.lib.base;
 
+import mcjty.lib.varia.Logging;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -19,6 +20,9 @@ public class GeneralConfig {
     public static boolean tallChunkFriendly = false;
 
     public static void init(Configuration cfg) {
+        Logging.doLogging = cfg.get(CATEGORY_GENERAL, "logging", Logging.doLogging,
+                "If true dump a lot of logging information about various things. Useful for debugging.").getBoolean();
+
         manageOwnership = cfg.get(CATEGORY_GENERAL, "manageOwnership", manageOwnership,
                 "If true then blocks using mcjtylib will have ownership tagged on them (useful for the rftools security manager)").getBoolean();
         tallChunkFriendly = cfg.get(CATEGORY_GENERAL, "tallChunkFriendly", tallChunkFriendly,

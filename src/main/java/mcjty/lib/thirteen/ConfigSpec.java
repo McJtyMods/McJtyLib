@@ -72,7 +72,14 @@ public class ConfigSpec {
         }
 
         public <T> ConfigValue<List<? extends T>> defineList(String name, List<? extends T> defaultValue, Predicate<Object> elementValidator) {
-            LV v = new LV(name, getCurrentCategory(), getCurrentComment(), defaultValue, elementValidator);
+            LV v = new LV(name, getCurrentCategory(), getCurrentComment(), defaultValue, elementValidator, false);
+            comment = null;
+            values.add(v);
+            return v.get();
+        }
+
+        public <T> ConfigValue<List<? extends T>> defineIntList(String name, List<? extends T> defaultValue, Predicate<Object> elementValidator) {
+            LV v = new LV(name, getCurrentCategory(), getCurrentComment(), defaultValue, elementValidator, true);
             comment = null;
             values.add(v);
             return v.get();
@@ -177,11 +184,13 @@ public class ConfigSpec {
         private static class LV<T extends List<?>> extends V {
             private final ConfigValue<T> value;
             private final Predicate<Object> elementValidator;
+            private final boolean asInt;
 
-            public LV(String name, String category, String comment, T def, Predicate<Object> elementValidator) {
+            public LV(String name, String category, String comment, T def, Predicate<Object> elementValidator, boolean asInt) {
                 super(name, category, comment);
                 this.elementValidator = elementValidator;
                 this.value = new ConfigValue<>(def);
+                this.asInt = asInt;
             }
 
             public ConfigValue<T> get() {
@@ -196,10 +205,18 @@ public class ConfigSpec {
                 for (Object o : objects) {
                     def[i++] = o.toString();
                 }
-                List<String> rc = new ArrayList<>();
                 String[] result = cfg.getStringList(name, category, def, comment);
-                Collections.addAll(rc, result);
-                value.set((T) rc);
+                if (asInt) {
+                    List<Integer> rc = new ArrayList<>();
+                    for (String s : result) {
+                        rc.add(Integer.parseInt(s));
+                    }
+                    value.set((T) rc);
+                } else {
+                    List<String> rc = new ArrayList<>();
+                    Collections.addAll(rc, result);
+                    value.set((T) rc);
+                }
             }
         }
 
