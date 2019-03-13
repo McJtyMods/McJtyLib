@@ -26,10 +26,13 @@ public abstract class DefaultModSetup {
         GeneralConfig.init(e);
         modConfigDir = e.getModConfigurationDirectory();
 
+        setupConfig();
         setupModCompat();
     }
 
     protected abstract void setupModCompat();
+
+    protected abstract void setupConfig();
 
     public abstract void createTabs();
 
