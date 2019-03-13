@@ -64,6 +64,13 @@ public class ConfigSpec {
             return v.get();
         }
 
+        public <T> ConfigValue<T> define(String name, T def) {
+            SV<T> v = new SV<T>(name, getCurrentCategory(), getCurrentComment(), def);
+            comment = null;
+            values.add(v);
+            return v.get();
+        }
+
         public <T extends Enum<T>> ConfigValue<T> defineEnum(String name, T def, T... enumValues) {
             EV v = new EV(name, getCurrentCategory(), getCurrentComment(), def, enumValues);
             comment = null;
@@ -156,6 +163,25 @@ public class ConfigSpec {
             @Override
             public void build(Configuration cfg) {
                 value.set(cfg.getFloat(name, category, (float) value.get(), (float) min, (float) max, comment));
+            }
+        }
+
+        private static class SV<T> extends V {
+            private final ConfigValue<T> value;
+
+            public SV(String name, String category, String comment, T def) {
+                super(name, category, comment);
+                this.value = new ConfigValue<>(def);
+            }
+
+            public ConfigValue<T> get() {
+                return value;
+            }
+
+            @Override
+            public void build(Configuration cfg) {
+                String result = cfg.getString(name, category, value.get().toString(), comment);
+                value.set((T) result);
             }
         }
 
