@@ -142,9 +142,11 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
             MultipartTE multipartTE = (MultipartTE) te;
             for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
                 MultipartTE.Part part = entry.getValue();
-                RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
-                if (result != null) {
-                    return result;
+                if (!(part.getState().getBlock() instanceof MultipartBlock)) {     // @todo safety
+                    RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
+                    if (result != null) {
+                        return result;
+                    }
                 }
             }
             return null;
@@ -160,9 +162,11 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
             MultipartTE multipartTE = (MultipartTE) te;
             for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
                 MultipartTE.Part part = entry.getValue();
-                RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
-                if (result != null) {
-                    return part;
+                if (!(part.getState().getBlock() instanceof MultipartBlock)) {     // @todo safety
+                    RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
+                    if (result != null) {
+                        return part;
+                    }
                 }
             }
             return null;

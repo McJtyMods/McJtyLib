@@ -65,7 +65,9 @@ public class MultipartBakedModel implements IBakedModel {
                 if (layer == null || blockState.getBlock().canRenderInLayer(blockState, layer)) {
                     IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(blockState);
                     try {
-                        quads.addAll(model.getQuads(state, side, rand++));
+                        if (!(model instanceof MultipartBakedModel)) {  // @todo safety
+                            quads.addAll(model.getQuads(state, side, rand++));
+                        }
                     } catch (Exception ignore) {
                         System.out.println("MultipartBakedModel.getQuads");
                     }
