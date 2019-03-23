@@ -136,6 +136,12 @@ public class MultipartTE extends TileEntity {
         return false;
     }
 
+    public void markDirtyQuick() {
+        if (world != null) {
+            world.markChunkDirty(this.pos, this);
+        }
+    }
+
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
