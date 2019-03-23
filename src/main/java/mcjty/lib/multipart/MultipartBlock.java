@@ -20,6 +20,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -79,6 +80,20 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
         return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
 
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        MultipartTE.Part part = getHitPart(state, world, pos, player.getPositionEyes(0), target.hitVec);
+        if (part != null) {
+            return new ItemStack(Item.getItemFromBlock(part.getState().getBlock()));
+        } else {
+            return ItemStack.EMPTY;
+        }
+    }
+
+    @Override
+    public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+        return ItemStack.EMPTY;
+    }
 
     @Override
     @SideOnly(Side.CLIENT)
