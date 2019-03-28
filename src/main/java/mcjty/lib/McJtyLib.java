@@ -53,7 +53,7 @@ import java.util.function.Consumer;
 @Mod(modid = McJtyLib.PROVIDES, name = "McJtyLib",
         acceptedMinecraftVersions = "[1.12,1.13)",
         version = McJtyLib.VERSION,
-        dependencies = "after:enderio@[5.0.21,)")
+        dependencies = "after:forge@[14.23.5.2800,);after:enderio@[5.0.21,)")
 public class McJtyLib implements ModBase {
 
     public static final String VERSION = "3.1.1";
