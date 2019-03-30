@@ -548,10 +548,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         ItemStack stack = super.getItem(world, pos, state);
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
-            String displayName = ((GenericTileEntity)te).displayName;
-            if (displayName != null) {
-                stack.setStackDisplayName(displayName);
-            }
+            NBTTagCompound tagCompound = new NBTTagCompound();
+            ((GenericTileEntity)te).writeRestorableToNBT(tagCompound);
+            stack.setTagCompound(tagCompound);
         }
         return stack;
     }
