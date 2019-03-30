@@ -67,7 +67,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
-    private String displayName = null;
+    public String displayName = null;
     private int infused = 0;
 
     private String ownerName = "";

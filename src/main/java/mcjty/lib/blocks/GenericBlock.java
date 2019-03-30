@@ -543,4 +543,16 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
         return false;
     }
+
+    public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+        ItemStack stack = super.getItem(world, pos, state);
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            String displayName = ((GenericTileEntity)te).displayName;
+            if (displayName != null) {
+                stack.setStackDisplayName(displayName);
+            }
+        }
+        return stack;
+    }
 }
