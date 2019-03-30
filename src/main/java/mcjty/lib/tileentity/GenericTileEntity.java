@@ -67,6 +67,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
+    private String displayName = null;
     private int infused = 0;
 
     private String ownerName = "";
@@ -278,6 +279,10 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             rsMode = RedstoneMode.values()[m];
         }
 
+        NBTTagCompound display = tagCompound.getCompoundTag("display");
+        if (display.hasKey("Name", Constants.NBT.TAG_STRING)) {
+            displayName = display.getString("Name");
+        }
         infused = tagCompound.getInteger("infused");
         ownerName = tagCompound.getString("owner");
         if (tagCompound.hasKey("idM")) {
@@ -328,6 +333,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void writeRestorableToNBT(NBTTagCompound tagCompound) {
         if (needsRedstoneMode()) {
             tagCompound.setByte("rsMode", (byte) rsMode.ordinal());
+        }
+        if (displayName != null) {
+            NBTTagCompound display = tagCompound.getCompoundTag("display");
+            display.setString("Name", displayName);
+            tagCompound.setTag("display", display);
         }
         tagCompound.setInteger("infused", infused);
         tagCompound.setString("owner", ownerName);
