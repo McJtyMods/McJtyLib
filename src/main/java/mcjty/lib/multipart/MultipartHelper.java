@@ -30,6 +30,17 @@ public class MultipartHelper {
         return null;
     }
 
+    public static TileEntity getTileEntity(IBlockAccess access, PartPos pos) {
+        TileEntity te = access.getTileEntity(pos.getPos());
+        if (te instanceof MultipartTE) {
+            MultipartTE.Part part = ((MultipartTE) te).getParts().get(pos.getSlot());
+            if (part != null) {
+                return part.getTileEntity();
+            }
+        }
+        return null;
+    }
+
     public static IBlockState getBlockState(IBlockAccess access, BlockPos pos, PartSlot slot) {
         TileEntity te = access.getTileEntity(pos);
         if (te instanceof MultipartTE) {
