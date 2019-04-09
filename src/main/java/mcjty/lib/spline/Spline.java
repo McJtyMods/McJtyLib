@@ -22,10 +22,15 @@ public abstract class Spline<T> {
         this.scale = scale;
     }
 
-    public Spline addPoint(T point, float time) {
+    public void addPoint(T point, float time) {
         points.add(point);
         times.add(time);
-        return this;
+    }
+
+    // Insert a new point at the specific index. Points already at this index and further will be shifted
+    public void insertPoint(T point, float time, int idx) {
+        points.add(idx, point);
+        times.add(idx, time);
     }
 
     public abstract void calculate(float time);
