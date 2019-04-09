@@ -8,6 +8,8 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -85,7 +87,7 @@ public class RenderHelper {
     public static boolean renderObject(Minecraft mc, RenderItem itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
         itemRender.zLevel = lvl;
 
-        if (itm==null) {
+        if (itm == null) {
             return renderItemStack(mc, itemRender, ItemStack.EMPTY, x, y, "", highlight);
         }
         if (itm instanceof Item) {
@@ -184,13 +186,40 @@ public class RenderHelper {
 //        }
     }
 
-    public static boolean renderItemStack(Minecraft mc, RenderItem itemRender, ItemStack itm, int x, int y, String txt, boolean highlight){
+    public static void renderStackOnGround(ItemStack stack, double alpha) {
+        if (!stack.isEmpty()) {
+            IBakedModel ibakedmodel = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, null, null);
+            if (!stack.isEmpty()) {
+                Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, (float) alpha);
+                GlStateManager.enableRescaleNormal();
+                GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
+                GlStateManager.enableBlend();
+                GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+                GlStateManager.pushMatrix();
+
+                ibakedmodel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
+
+                Minecraft.getMinecraft().getRenderItem().renderItem(stack, ibakedmodel);
+                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
+                GlStateManager.popMatrix();
+                GlStateManager.disableRescaleNormal();
+                GlStateManager.disableBlend();
+                Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+            }
+        }
+
+    }
+
+    public static boolean renderItemStack(Minecraft mc, RenderItem itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
         GlStateManager.color(1F, 1F, 1F);
 
         boolean rc = false;
-        if (highlight){
+        if (highlight) {
             GlStateManager.disableLighting();
-            drawVerticalGradientRect(x, y, x+16, y+16, 0x80ffffff, 0xffffffff);
+            drawVerticalGradientRect(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
         }
         if (!itm.isEmpty() && itm.getItem() != null) {
             rc = true;
@@ -219,7 +248,7 @@ public class RenderHelper {
      * Renders the stack size and/or damage bar for the given ItemStack.
      */
     private static void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
-                                                int scaled) {
+                                                 int scaled) {
         if (!stack.isEmpty()) {
             int stackSize = stack.getCount();
             if (stackSize != 1 || text != null) {
@@ -374,11 +403,11 @@ public class RenderHelper {
     }
 
     public static void drawHorizontalLine(int x1, int y1, int x2, int color) {
-        Gui.drawRect(x1, y1, x2, y1+1, color);
+        Gui.drawRect(x1, y1, x2, y1 + 1, color);
     }
 
     public static void drawVerticalLine(int x1, int y1, int y2, int color) {
-        Gui.drawRect(x1, y1, x1+1, y2, color);
+        Gui.drawRect(x1, y1, x1 + 1, y2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
@@ -398,34 +427,34 @@ public class RenderHelper {
     // Draw a small triangle. x,y is the coordinate of the top point
     public static void drawUpTriangle(int x, int y, int color) {
         drawHorizontalLine(x, y, x, color);
-        drawHorizontalLine(x-1, y+1, x+1, color);
+        drawHorizontalLine(x - 1, y + 1, x + 1, color);
         drawHorizontalLine(x - 2, y + 2, x + 2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the bottom point
     public static void drawDownTriangle(int x, int y, int color) {
         drawHorizontalLine(x, y, x, color);
-        drawHorizontalLine(x-1, y-1, x+1, color);
-        drawHorizontalLine(x-2, y-2, x+2, color);
+        drawHorizontalLine(x - 1, y - 1, x + 1, color);
+        drawHorizontalLine(x - 2, y - 2, x + 2, color);
     }
 
     /**
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThickButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Gui.drawRect(x1+2, y1+2, x2-2, y2-2, average);
-        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
-        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        Gui.drawRect(x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
+        drawHorizontalLine(x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
 
-        drawHorizontalLine(x1+1, y1+1, x2-1, bright);
-        drawHorizontalLine(x1+2, y1+2, x2-2, bright);
-        drawVerticalLine(x1+1, y1+2, y2-2, bright);
-        drawVerticalLine(x1+2, y1+3, y2-3, bright);
+        drawHorizontalLine(x1 + 1, y1 + 1, x2 - 1, bright);
+        drawHorizontalLine(x1 + 2, y1 + 2, x2 - 2, bright);
+        drawVerticalLine(x1 + 1, y1 + 2, y2 - 2, bright);
+        drawVerticalLine(x1 + 2, y1 + 3, y2 - 3, bright);
 
-        drawHorizontalLine(x1+3, y2-3, x2-2, dark);
-        drawHorizontalLine(x1+2, y2-2, x2-1, dark);
+        drawHorizontalLine(x1 + 3, y2 - 3, x2 - 2, dark);
+        drawHorizontalLine(x1 + 2, y2 - 2, x2 - 1, dark);
         drawVerticalLine(x2 - 2, y1 + 2, y2 - 2, dark);
         drawVerticalLine(x2 - 3, y1 + 3, y2 - 3, dark);
     }
@@ -435,16 +464,16 @@ public class RenderHelper {
      */
     public static void drawThinButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
         Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
-        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
-        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
 
-        drawHorizontalLine(x1+1, y1+1, x2-2, bright);
+        drawHorizontalLine(x1 + 1, y1 + 1, x2 - 2, bright);
         drawVerticalLine(x1 + 1, y1 + 2, y2 - 3, bright);
 
         drawHorizontalLine(x1 + 1, y2 - 2, x2 - 1, dark);
-        drawVerticalLine(x2-2, y1+1, y2-2, dark);
+        drawVerticalLine(x2 - 2, y1 + 1, y2 - 2, dark);
     }
 
     /**
@@ -452,16 +481,16 @@ public class RenderHelper {
      */
     public static void drawThinButtonBoxGradient(int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
         drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
-        drawHorizontalLine(x1+1, y1, x2-1, StyleConfig.colorButtonExternalBorder);
-        drawHorizontalLine(x1+1, y2-1, x2-1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(x2-1, y1+1, y2-1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
 
-        drawHorizontalLine(x1+1, y1+1, x2-2, bright);
+        drawHorizontalLine(x1 + 1, y1 + 1, x2 - 2, bright);
         drawVerticalLine(x1 + 1, y1 + 2, y2 - 3, bright);
 
         drawHorizontalLine(x1 + 1, y2 - 2, x2 - 1, dark);
-        drawVerticalLine(x2-2, y1+1, y2-2, dark);
+        drawVerticalLine(x2 - 2, y1 + 1, y2 - 2, dark);
     }
 
     /**
@@ -476,9 +505,9 @@ public class RenderHelper {
      */
     public static void drawFlatButtonBoxGradient(int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
         drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
-        drawHorizontalLine(x1, y1, x2-1, bright);
-        drawVerticalLine(x1, y1, y2-1, bright);
-        drawVerticalLine(x2-1, y1, y2-1, dark);
+        drawHorizontalLine(x1, y1, x2 - 1, bright);
+        drawVerticalLine(x1, y1, y2 - 1, bright);
+        drawVerticalLine(x2 - 1, y1, y2 - 1, dark);
         drawHorizontalLine(x1, y2 - 1, x2, dark);
     }
 
@@ -487,12 +516,12 @@ public class RenderHelper {
      */
     public static void drawBeveledBox(int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Gui.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
+            Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
-        drawHorizontalLine(x1, y1, x2-1, topleftcolor);
-        drawVerticalLine(x1, y1, y2-1, topleftcolor);
-        drawVerticalLine(x2-1, y1, y2-1, botrightcolor);
-        drawHorizontalLine(x1, y2-1, x2, botrightcolor);
+        drawHorizontalLine(x1, y1, x2 - 1, topleftcolor);
+        drawVerticalLine(x1, y1, y2 - 1, topleftcolor);
+        drawVerticalLine(x2 - 1, y1, y2 - 1, botrightcolor);
+        drawHorizontalLine(x1, y2 - 1, x2, botrightcolor);
     }
 
     /**
@@ -500,11 +529,11 @@ public class RenderHelper {
      */
     public static void drawThickBeveledBox(int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Gui.drawRect(x1+1, y1+1, x2-1, y2-1, fillcolor);
+            Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
-        Gui.drawRect(x1, y1, x2-1, y1+thickness, topleftcolor);
-        Gui.drawRect(x1, y1, x1+thickness, y2-1, topleftcolor);
-        Gui.drawRect(x2-thickness, y1, x2, y2-1, botrightcolor);
+        Gui.drawRect(x1, y1, x2 - 1, y1 + thickness, topleftcolor);
+        Gui.drawRect(x1, y1, x1 + thickness, y2 - 1, topleftcolor);
+        Gui.drawRect(x2 - thickness, y1, x2, y2 - 1, botrightcolor);
         Gui.drawRect(x1, y2 - thickness, x2, y2, botrightcolor);
     }
 
@@ -513,12 +542,12 @@ public class RenderHelper {
      */
     public static void drawFlatBox(int x1, int y1, int x2, int y2, int border, int fill) {
         if (fill != -1) {
-            Gui.drawRect(x1+1, y1+1, x2-1, y2-1, fill);
+            Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
         }
-        drawHorizontalLine(x1, y1, x2-1, border);
-        drawVerticalLine(x1, y1, y2-1, border);
-        drawVerticalLine(x2-1, y1, y2-1, border);
-        drawHorizontalLine(x1, y2-1, x2, border);
+        drawHorizontalLine(x1, y1, x2 - 1, border);
+        drawVerticalLine(x1, y1, y2 - 1, border);
+        drawVerticalLine(x2 - 1, y1, y2 - 1, border);
+        drawHorizontalLine(x1, y2 - 1, x2, border);
     }
 
     /**
@@ -526,8 +555,8 @@ public class RenderHelper {
      */
     public static void drawTexturedModalRect(int x, int y, int u, int v, int width, int height) {
         float zLevel = 0.01f;
-        float f = (1/256.0f);
-        float f1 = (1/256.0f);
+        float f = (1 / 256.0f);
+        float f1 = (1 / 256.0f);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -539,13 +568,13 @@ public class RenderHelper {
     }
 
     public static void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int totw, int toth) {
-        float f = 1.0f/totw;
-        float f1 = 1.0f/toth;
+        float f = 1.0f / totw;
+        float f1 = 1.0f / toth;
         double zLevel = 50;
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexbuffer = tessellator.getBuffer();
         vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        vertexbuffer.pos((x + 0), (y + height), zLevel).tex(((textureX + 0) *  f), ((textureY + height) * f1)).endVertex();
+        vertexbuffer.pos((x + 0), (y + height), zLevel).tex(((textureX + 0) * f), ((textureY + height) * f1)).endVertex();
         vertexbuffer.pos((x + width), (y + height), zLevel).tex(((textureX + width) * f), ((textureY + height) * f1)).endVertex();
         vertexbuffer.pos((x + width), (y + 0), zLevel).tex(((textureX + width) * f), ((textureY + 0) * f1)).endVertex();
         vertexbuffer.pos((x + 0), (y + 0), zLevel).tex(((textureX + 0) * f), ((textureY + 0) * f1)).endVertex();
@@ -757,50 +786,52 @@ public class RenderHelper {
     }
 
     private static Vector Cross(Vector a, Vector b) {
-        float x = a.y*b.z - a.z*b.y;
-        float y = a.z*b.x - a.x*b.z;
-        float z = a.x*b.y - a.y*b.x;
+        float x = a.y * b.z - a.z * b.y;
+        float y = a.z * b.x - a.x * b.z;
+        float z = a.x * b.y - a.y * b.x;
         return new Vector(x, y, z);
     }
 
     private static Vector Sub(Vector a, Vector b) {
-        return new Vector(a.x-b.x, a.y-b.y, a.z-b.z);
+        return new Vector(a.x - b.x, a.y - b.y, a.z - b.z);
     }
+
     private static Vector Add(Vector a, Vector b) {
-        return new Vector(a.x+b.x, a.y+b.y, a.z+b.z);
+        return new Vector(a.x + b.x, a.y + b.y, a.z + b.z);
     }
+
     private static Vector Mul(Vector a, float f) {
         return new Vector(a.x * f, a.y * f, a.z * f);
     }
 
     public static void renderHighLightedBlocksOutline(BufferBuilder buffer, float mx, float my, float mz, float r, float g, float b, float a) {
         buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my, mz).color(r, g, b, a).endVertex();
         buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my + 1, mz).color(r, g, b, a).endVertex();
         buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my+1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx+1, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz+1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my+1, mz+1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
     }
 
 
