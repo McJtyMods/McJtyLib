@@ -41,7 +41,38 @@ public enum PartSlot {
     EAST_US,
     EAST_UN,
     EAST_DS,
-    EAST_DN;
+    EAST_DN,
+
+    DOWN_NW_BACK,
+    DOWN_NE_BACK,
+    DOWN_SW_BACK,
+    DOWN_SE_BACK,
+
+    UP_NW_BACK,
+    UP_NE_BACK,
+    UP_SW_BACK,
+    UP_SE_BACK,
+
+    NORTH_UW_BACK,
+    NORTH_UE_BACK,
+    NORTH_DW_BACK,
+    NORTH_DE_BACK,
+
+    SOUTH_UW_BACK,
+    SOUTH_UE_BACK,
+    SOUTH_DW_BACK,
+    SOUTH_DE_BACK,
+
+    WEST_US_BACK,
+    WEST_UN_BACK,
+    WEST_DS_BACK,
+    WEST_DN_BACK,
+
+    EAST_US_BACK,
+    EAST_UN_BACK,
+    EAST_DS_BACK,
+    EAST_DN_BACK;
+
 
     public static final PartSlot[] VALUES = PartSlot.values();
     private static final Map<String, PartSlot> SLOT_MAP = new HashMap<>();
