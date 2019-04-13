@@ -128,7 +128,9 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        MultipartTE.Part part = getHitPart(state, world, pos, MultipartHelper.getPlayerEyes(player), new Vec3d(pos.getX() + hitX, pos.getY() + hitY, pos.getZ() + hitZ));
+        Vec3d start = MultipartHelper.getPlayerEyes(player);
+        Vec3d end = new Vec3d(start.x + (pos.getX() + hitX - start.x) * 3, start.y + (pos.getY() + hitY - start.y) * 3, start.z + (pos.getZ() + hitZ - start.z) * 3);
+        MultipartTE.Part part = getHitPart(state, world, pos, start, end);
         if (part != null) {
             if (part.getTileEntity() instanceof GenericTileEntity) {
                 return ((GenericTileEntity) part.getTileEntity()).onBlockActivated(part.getState(), player, hand, facing, hitX, hitY, hitZ);
