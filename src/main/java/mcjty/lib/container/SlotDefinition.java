@@ -3,38 +3,48 @@ package mcjty.lib.container;
 import net.minecraft.item.ItemStack;
 
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 public class SlotDefinition {
     private final SlotType type;
-    private final ItemStack[] itemStacks;
-    private final Class<?> itemClass;
+    private final Predicate<ItemStack> validItems;
 
     public SlotDefinition(SlotType type, ItemStack... itemStacks) {
         this.type = type;
-        this.itemStacks = itemStacks;
-        this.itemClass = null;
+        this.validItems = stack -> {
+            for (ItemStack itemStack : itemStacks) {
+                if (itemStack.getItem() == stack.getItem()) {
+                    return true;
+                }
+            }
+            return false;
+        };
     }
 
     public SlotDefinition(SlotType type, Class<?> itemClass) {
         this.type = type;
-        this.itemStacks = new ItemStack[0];
-        this.itemClass = itemClass; // TODO see if this can be changed to Class<? extends Item>
+        this.validItems = stack -> {
+            if (itemClass != null && itemClass.isInstance(stack.getItem())) {
+                return true;
+            }
+            return false;
+        };
     }
+
+    public SlotDefinition(SlotType type, Predicate<ItemStack> validItems) {
+        this.type = type;
+        this.validItems = validItems;
+    }
+
+
 
     public SlotType getType() {
         return type;
     }
 
     public boolean itemStackMatches(ItemStack stack) {
-        for (ItemStack itemStack : itemStacks) {
-            if (itemStack.getItem() == stack.getItem()) {
-                return true;
-            }
-        }
-        if (itemClass != null && itemClass.isInstance(stack.getItem())) {
-            return true;
-        }
-        return false;
+        return validItems.test(stack);
     }
 
     @Override
@@ -47,18 +57,12 @@ public class SlotDefinition {
         }
 
         SlotDefinition that = (SlotDefinition) o;
-
-        if (!Arrays.equals(itemStacks, that.itemStacks)) {
-            return false;
-        }
         return type == that.type;
 
     }
 
     @Override
     public int hashCode() {
-        int result = type.hashCode();
-        result = 31 * result + (itemStacks != null ? Arrays.hashCode(itemStacks) : 0);
-        return result;
+        return Objects.hash(type);
     }
 }
