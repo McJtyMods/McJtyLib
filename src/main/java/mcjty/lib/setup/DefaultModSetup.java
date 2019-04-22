@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.function.Supplier;
 
 public abstract class DefaultModSetup {
 
@@ -36,11 +37,11 @@ public abstract class DefaultModSetup {
 
     public abstract void createTabs();
 
-    protected void createTab(String name, ItemStack stack) {
+    protected void createTab(String name, Supplier<ItemStack> stack) {
         creativeTab = new CreativeTabs(name) {
             @Override
             public ItemStack getTabIconItem() {
-                return stack;
+                return stack.get();
             }
         };
     }
