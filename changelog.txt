@@ -1,5 +1,9 @@
-Upcoming:
+3.5.0:
+- Major changes to how mods using McJtyLib are structured. Preparations for 1.13/1.14 porting
+- 1.13 like config system
+- 1.13 like networking system
 - New methods for rendering quads and general API cleanup in the RenderHelper
+- New multipart system (currently only used by Ariente)
 
 3.1.1:
 - Fixed a client-side dependency problem
