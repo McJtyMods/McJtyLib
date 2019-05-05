@@ -2,6 +2,7 @@ package mcjty.lib.varia;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 
 public class BlockPosTools {
 
@@ -47,5 +48,9 @@ public class BlockPosTools {
 
     public static String toString(BlockPos pos) {
         return pos.getX() + "," + pos.getY() + "," + pos.getZ();
+    }
+
+    public static ChunkPos getChunkCoordFromPos(BlockPos pos) {
+        return new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4);
     }
 }
