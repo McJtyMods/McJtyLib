@@ -1,3 +1,6 @@
+3.5.1:
+- Small change for Ariente
+
 3.5.0:
 - Major changes to how mods using McJtyLib are structured. Preparations for 1.13/1.14 porting
 - 1.13 like config system
