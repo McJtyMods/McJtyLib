@@ -313,7 +313,9 @@ public class ConfigSpec {
             return value;
         }
 
-        private void set(boolean value) {
+        @Deprecated
+        // Warning! Probably not the best way to do this
+        public void set(boolean value) {
             this.value = value;
         }
     }
@@ -330,7 +332,9 @@ public class ConfigSpec {
             return value;
         }
 
-        private void set(double value) {
+        @Deprecated
+        // Warning! Probably not the best way to do this
+        public void set(double value) {
             this.value = value;
         }
     }
@@ -347,7 +351,9 @@ public class ConfigSpec {
             return value;
         }
 
-        private void set(int value) {
+        @Deprecated
+        // Warning! Probably not the best way to do this
+        public void set(int value) {
             this.value = value;
         }
     }
@@ -364,7 +370,9 @@ public class ConfigSpec {
             return value;
         }
 
-        private void set(T value) {
+        @Deprecated
+        // Warning! Probably not the best way to do this
+        public void set(T value) {
             this.value = value;
         }
     }
