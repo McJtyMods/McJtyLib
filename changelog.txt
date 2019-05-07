@@ -1,3 +1,6 @@
+3.5.2:
+- Small change for HoloGui
+
 3.5.1:
 - Small change for Ariente
 
