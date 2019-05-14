@@ -1,3 +1,6 @@
+Upcoming:
+- Added withRotation() to BaseBlock making all McJtyLib based blocks rotatable
+
 3.5.2:
 - Small change for HoloGui
 

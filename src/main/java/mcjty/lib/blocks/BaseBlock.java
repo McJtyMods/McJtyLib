@@ -29,6 +29,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
@@ -172,6 +173,19 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             default:
                 return EnumFacing.NORTH;
         }
+    }
+
+    @Override
+    public IBlockState withRotation(IBlockState state, Rotation rot) {
+        switch (getRotationType()) {
+            case HORIZROTATION:
+                return state.withProperty(FACING_HORIZ, rot.rotate(state.getValue(FACING_HORIZ)));
+            case ROTATION:
+                return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
+            case NONE:
+                return state;
+        }
+        return state;
     }
 
     public EnumFacing getRightDirection(IBlockState state) {
