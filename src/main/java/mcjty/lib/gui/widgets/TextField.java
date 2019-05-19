@@ -167,12 +167,18 @@ public class TextField extends AbstractWidget<TextField> {
                 if (cursor < text.length()) {
                     cursor++;
                 }
-            } else if (new Integer(typedChar).intValue() == 0) {
-                // Do nothing
             } else {
-                text = text.substring(0, cursor) + typedChar + text.substring(cursor);
-                cursor++;
-                fireTextEvents(text);
+                // e.g. F1~12, insert
+                // Char code of 0 will appear to be nothing
+                if ((int) typedChar != 0) {
+                    if (isRegionSelected()) {
+                        replaceSelectedRegion(String.valueOf(typedChar));
+                    } else {
+                        text = text.substring(0, cursor) + typedChar + text.substring(cursor);
+                    }
+                    cursor++;
+                    fireTextEvents(text);
+                }
             }
             return true;
         }
