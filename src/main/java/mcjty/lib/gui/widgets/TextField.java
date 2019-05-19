@@ -12,9 +12,10 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -32,6 +33,10 @@ public class TextField extends AbstractWidget<TextField> {
     private String text = "";
     private int cursor = 0;
     private int startOffset = 0;        // Start character where we are displaying
+    /**
+     * One end of the selected region. If nothing is selected, is should be -1.
+     */
+    private int selection = -1;
     private List<TextEvent> textEvents = null;
     private List<TextEnterEvent> textEnterEvents = null;
     private List<TextSpecialKeyEvent> textSpecialKeyEvents = null;
@@ -96,6 +101,15 @@ public class TextField extends AbstractWidget<TextField> {
                 text = text.substring(0, cursor) + data + text.substring(cursor);
                 cursor += data.length();
                 fireTextEvents(text);
+            } else if (keyCode == Keyboard.KEY_C && Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+//                int selectionStart = Math.min(cursor, selectionEnd); // Inclusive
+//                int selectionEnd = Math.max(cursor, this.selectionEnd); // Exclusive
+//                GuiScreen.setClipboardString(text.substring(selectionStart, selectionEnd));
+//                text = text.substring(0, selectionStart) + text.substring(selectionEnd);
+//                fireTextEvents(text);
+            } else if (keyCode == Keyboard.KEY_A && Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+//                cursor = 0;
+//                selectionEnd = text.length();
             } else if (keyCode == Keyboard.KEY_RETURN) {
                 fireTextEnterEvents(text);
 //                window.setTextFocus(null);
@@ -124,10 +138,12 @@ public class TextField extends AbstractWidget<TextField> {
             } else if (keyCode == Keyboard.KEY_TAB) {
                 fireTabEvents();
             } else if (keyCode == Keyboard.KEY_LEFT) {
+                updateSelection();
                 if (cursor > 0) {
                     cursor--;
                 }
             } else if (keyCode == Keyboard.KEY_RIGHT) {
+                updateSelection();
                 if (cursor < text.length()) {
                     cursor++;
                 }
@@ -160,6 +176,45 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
+    public void setSelection(int start, int end) {
+        selection = start;
+        cursor = end;
+    }
+
+    public void clearSelection() {
+        selection = -1;
+    }
+
+    public boolean isRegionSelected() {
+        return selection != -1;
+    }
+
+    /**
+     * Inclusive text index indicating start of the selected region. If nothing is selected, it will return -1.
+     */
+    public int getSelectionStart() {
+        return Math.min(cursor, selection);
+    }
+
+    /**
+     * Exclusive text index indicating end of the selecred region, If nothing is selected, it will return {@link #cursor}.
+     */
+    public int getSelectionEnd() {
+        return Math.max(cursor, selection);
+    }
+
+    private void updateSelection() {
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+            // Don't clear selection as long as LSHIFT is pressed
+            if(!isRegionSelected()) {
+                selection = cursor;
+            }
+        } else {
+            clearSelection();
+        }
+    }
+
+
 
     @Override
     public void draw(int x, int y) {
@@ -179,18 +234,43 @@ public class TextField extends AbstractWidget<TextField> {
 
         RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
 
+        String renderedText = mc.fontRenderer.trimStringToWidth(this.text.substring(startOffset), bounds.width - 10);
+        int textX = x + 5 + bounds.x;
+        int textY = y + calculateVerticalOffset() + bounds.y;
         if (isEnabled()) {
             if (isEditable()) {
-                mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff000000);
+                mc.fontRenderer.drawString(renderedText, textX, textY, 0xff000000);
             } else {
-                mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff333333);
+                mc.fontRenderer.drawString(renderedText, textX, textY, 0xff333333);
+            }
+
+            drawSelectionBox:
+            if (isRegionSelected()) {
+                int selectionStart = getSelectionStart();
+                int selectionEnd = getSelectionEnd();
+
+                // Text: abcdefghijklmn
+                // Rendered: abcdefg, length=7
+                //                 ^6
+                int renderedStart = selectionStart - startOffset;
+                int renderedEnd = selectionEnd - startOffset;
+                // Break if selectionStart is behind the rendered text or selectionEnd is before rendered text
+                if (renderedStart < 0 || renderedEnd < 0) {
+                    break drawSelectionBox;
+                }
+
+                String renderedSelection = renderedText.substring(renderedStart, renderedEnd);
+                String renderedPreSelection = renderedText.substring(0, renderedStart);
+                int selectionX = textX + mc.fontRenderer.getStringWidth(renderedPreSelection);
+                int selectionWidth = mc.fontRenderer.getStringWidth(renderedSelection);
+                RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.fontRenderer.FONT_HEIGHT, 52, 71, 92, GlStateManager.LogicOp.OR_REVERSE);
             }
         } else {
-            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xffa0a0a0);
+            mc.fontRenderer.drawString(renderedText, textX, textY, 0xffa0a0a0);
         }
 
         if (window.getTextFocus() == this) {
-            int w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
+            int w = mc.fontRenderer.getStringWidth(this.text.substring(startOffset, cursor));
             Gui.drawRect(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }
