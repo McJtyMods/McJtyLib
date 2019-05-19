@@ -246,7 +246,7 @@ public class TextField extends AbstractWidget<TextField> {
 
     private void updateSelection() {
         if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-            // Don't clear selection as long as LSHIFT is pressed
+            // Don't clear selection as long as shift is pressed
             if(!isRegionSelected()) {
                 selection = cursor;
             }
@@ -298,7 +298,7 @@ public class TextField extends AbstractWidget<TextField> {
                 String renderedPreSelection = renderedText.substring(0, renderedStart);
                 int selectionX = textX + mc.fontRenderer.getStringWidth(renderedPreSelection);
                 int selectionWidth = mc.fontRenderer.getStringWidth(renderedSelection);
-                RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.fontRenderer.FONT_HEIGHT, 52, 71, 92, GlStateManager.LogicOp.OR_REVERSE);
+                RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.fontRenderer.FONT_HEIGHT, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
             }
         } else {
             mc.fontRenderer.drawString(renderedText, textX, textY, 0xffa0a0a0);
