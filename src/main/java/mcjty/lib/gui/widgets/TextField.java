@@ -13,6 +13,7 @@ import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
@@ -244,7 +245,6 @@ public class TextField extends AbstractWidget<TextField> {
                 mc.fontRenderer.drawString(renderedText, textX, textY, 0xff333333);
             }
 
-            drawSelectionBox:
             if (isRegionSelected()) {
                 int selectionStart = getSelectionStart();
                 int selectionEnd = getSelectionEnd();
@@ -252,12 +252,8 @@ public class TextField extends AbstractWidget<TextField> {
                 // Text: abcdefghijklmn
                 // Rendered: abcdefg, length=7
                 //                 ^6
-                int renderedStart = selectionStart - startOffset;
-                int renderedEnd = selectionEnd - startOffset;
-                // Break if selectionStart is behind the rendered text or selectionEnd is before rendered text
-                if (renderedStart < 0 || renderedEnd < 0) {
-                    break drawSelectionBox;
-                }
+                int renderedStart = MathHelper.clamp(selectionStart - startOffset, 0, renderedText.length());
+                int renderedEnd = MathHelper.clamp(selectionEnd - startOffset, 0, renderedText.length());
 
                 String renderedSelection = renderedText.substring(renderedStart, renderedEnd);
                 String renderedPreSelection = renderedText.substring(0, renderedStart);
