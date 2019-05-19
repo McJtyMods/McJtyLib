@@ -12,6 +12,7 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
@@ -92,25 +93,35 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            if (keyCode == Keyboard.KEY_V && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL))) {
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                String data = "";
-                try {
-                    data = (String) clipboard.getData(DataFlavor.stringFlavor);
-                } catch (UnsupportedFlavorException | IOException e) {
+            if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
+                if(keyCode == Keyboard.KEY_V) {
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    String data = "";
+                    try {
+                        data = (String) clipboard.getData(DataFlavor.stringFlavor);
+                    } catch (UnsupportedFlavorException | IOException e) {
+                    }
+
+                    if (isRegionSelected()) {
+                        replaceSelectedRegion(data);
+                    } else {
+                        text = text.substring(0, cursor) + data + text.substring(cursor);
+                    }
+                    cursor += data.length();
+                    fireTextEvents(text);
+                } else if (keyCode == Keyboard.KEY_C) {
+                    if (isRegionSelected()) {
+                        GuiScreen.setClipboardString(getSelectedText());
+                    }
+                } else if (keyCode == Keyboard.KEY_X) {
+                    if (isRegionSelected()) {
+                        GuiScreen.setClipboardString(getSelectedText());
+                        replaceSelectedRegion("");
+                        fireTextEvents(text);
+                    }
+                } else if (keyCode == Keyboard.KEY_A) {
+                    selectAll();
                 }
-                text = text.substring(0, cursor) + data + text.substring(cursor);
-                cursor += data.length();
-                fireTextEvents(text);
-            } else if (keyCode == Keyboard.KEY_C && Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
-//                int selectionStart = Math.min(cursor, selectionEnd); // Inclusive
-//                int selectionEnd = Math.max(cursor, this.selectionEnd); // Exclusive
-//                GuiScreen.setClipboardString(text.substring(selectionStart, selectionEnd));
-//                text = text.substring(0, selectionStart) + text.substring(selectionEnd);
-//                fireTextEvents(text);
-            } else if (keyCode == Keyboard.KEY_A && Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
-//                cursor = 0;
-//                selectionEnd = text.length();
             } else if (keyCode == Keyboard.KEY_RETURN) {
                 fireTextEnterEvents(text);
 //                window.setTextFocus(null);
@@ -118,19 +129,27 @@ public class TextField extends AbstractWidget<TextField> {
             } else if (keyCode == Keyboard.KEY_ESCAPE) {
                 return false;
             } else if (keyCode == Keyboard.KEY_BACK) {
-                if (!text.isEmpty() && cursor > 0) {
-                    text = text.substring(0, cursor-1) + text.substring(cursor);
+                if (isRegionSelected()) {
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                } else if (!text.isEmpty() && cursor > 0) {
+                    text = text.substring(0, cursor - 1) + text.substring(cursor);
                     cursor--;
                     fireTextEvents(text);
                 }
             } else if (keyCode == Keyboard.KEY_DELETE) {
-                if (cursor < text.length()) {
-                    text = text.substring(0, cursor) + text.substring(cursor+1);
+                if (isRegionSelected()) {
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                } else if (cursor < text.length()) {
+                    text = text.substring(0, cursor) + text.substring(cursor + 1);
                     fireTextEvents(text);
                 }
             } else if (keyCode == Keyboard.KEY_HOME) {
+                updateSelection();
                 cursor = 0;
             } else if (keyCode == Keyboard.KEY_END) {
+                updateSelection();
                 cursor = text.length();
             } else if (keyCode == Keyboard.KEY_DOWN) {
                 fireArrowDownEvents();
@@ -177,6 +196,10 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
+    public void selectAll() {
+        setSelection(0, text.length());
+    }
+
     public void setSelection(int start, int end) {
         selection = start;
         cursor = end;
@@ -204,8 +227,19 @@ public class TextField extends AbstractWidget<TextField> {
         return Math.max(cursor, selection);
     }
 
+    public String getSelectedText() {
+        return text.substring(getSelectionStart(), getSelectionEnd());
+    }
+
+    public void replaceSelectedRegion(String replacement) {
+        int selectionStart = getSelectionStart();
+        text = text.substring(0, selectionStart) + replacement + text.substring(getSelectionEnd());
+        cursor = selectionStart;
+        clearSelection();
+    }
+
     private void updateSelection() {
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
             // Don't clear selection as long as LSHIFT is pressed
             if(!isRegionSelected()) {
                 selection = cursor;
@@ -214,7 +248,6 @@ public class TextField extends AbstractWidget<TextField> {
             clearSelection();
         }
     }
-
 
 
     @Override
