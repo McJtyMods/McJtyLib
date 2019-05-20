@@ -12,9 +12,12 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.input.Keyboard;
 
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -32,6 +35,10 @@ public class TextField extends AbstractWidget<TextField> {
     private String text = "";
     private int cursor = 0;
     private int startOffset = 0;        // Start character where we are displaying
+    /**
+     * One end of the selected region. If nothing is selected, is should be -1.
+     */
+    private int selection = -1;
     private List<TextEvent> textEvents = null;
     private List<TextEnterEvent> textEnterEvents = null;
     private List<TextSpecialKeyEvent> textSpecialKeyEvents = null;
@@ -86,16 +93,35 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            if (keyCode == Keyboard.KEY_V && (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL))) {
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                String data = "";
-                try {
-                    data = (String) clipboard.getData(DataFlavor.stringFlavor);
-                } catch (UnsupportedFlavorException | IOException e) {
+            if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
+                if(keyCode == Keyboard.KEY_V) {
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    String data = "";
+                    try {
+                        data = (String) clipboard.getData(DataFlavor.stringFlavor);
+                    } catch (UnsupportedFlavorException | IOException e) {
+                    }
+
+                    if (isRegionSelected()) {
+                        replaceSelectedRegion(data);
+                    } else {
+                        text = text.substring(0, cursor) + data + text.substring(cursor);
+                    }
+                    cursor += data.length();
+                    fireTextEvents(text);
+                } else if (keyCode == Keyboard.KEY_C) {
+                    if (isRegionSelected()) {
+                        GuiScreen.setClipboardString(getSelectedText());
+                    }
+                } else if (keyCode == Keyboard.KEY_X) {
+                    if (isRegionSelected()) {
+                        GuiScreen.setClipboardString(getSelectedText());
+                        replaceSelectedRegion("");
+                        fireTextEvents(text);
+                    }
+                } else if (keyCode == Keyboard.KEY_A) {
+                    selectAll();
                 }
-                text = text.substring(0, cursor) + data + text.substring(cursor);
-                cursor += data.length();
-                fireTextEvents(text);
             } else if (keyCode == Keyboard.KEY_RETURN) {
                 fireTextEnterEvents(text);
 //                window.setTextFocus(null);
@@ -103,19 +129,27 @@ public class TextField extends AbstractWidget<TextField> {
             } else if (keyCode == Keyboard.KEY_ESCAPE) {
                 return false;
             } else if (keyCode == Keyboard.KEY_BACK) {
-                if (!text.isEmpty() && cursor > 0) {
-                    text = text.substring(0, cursor-1) + text.substring(cursor);
+                if (isRegionSelected()) {
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                } else if (!text.isEmpty() && cursor > 0) {
+                    text = text.substring(0, cursor - 1) + text.substring(cursor);
                     cursor--;
                     fireTextEvents(text);
                 }
             } else if (keyCode == Keyboard.KEY_DELETE) {
-                if (cursor < text.length()) {
-                    text = text.substring(0, cursor) + text.substring(cursor+1);
+                if (isRegionSelected()) {
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                } else if (cursor < text.length()) {
+                    text = text.substring(0, cursor) + text.substring(cursor + 1);
                     fireTextEvents(text);
                 }
             } else if (keyCode == Keyboard.KEY_HOME) {
+                updateSelection();
                 cursor = 0;
             } else if (keyCode == Keyboard.KEY_END) {
+                updateSelection();
                 cursor = text.length();
             } else if (keyCode == Keyboard.KEY_DOWN) {
                 fireArrowDownEvents();
@@ -124,19 +158,27 @@ public class TextField extends AbstractWidget<TextField> {
             } else if (keyCode == Keyboard.KEY_TAB) {
                 fireTabEvents();
             } else if (keyCode == Keyboard.KEY_LEFT) {
+                updateSelection();
                 if (cursor > 0) {
                     cursor--;
                 }
             } else if (keyCode == Keyboard.KEY_RIGHT) {
+                updateSelection();
                 if (cursor < text.length()) {
                     cursor++;
                 }
-            } else if (new Integer(typedChar).intValue() == 0) {
-                // Do nothing
             } else {
-                text = text.substring(0, cursor) + typedChar + text.substring(cursor);
-                cursor++;
-                fireTextEvents(text);
+                // e.g. F1~12, insert
+                // Char code of 0 will appear to be nothing
+                if ((int) typedChar != 0) {
+                    if (isRegionSelected()) {
+                        replaceSelectedRegion(String.valueOf(typedChar));
+                    } else {
+                        text = text.substring(0, cursor) + typedChar + text.substring(cursor);
+                    }
+                    cursor++;
+                    fireTextEvents(text);
+                }
             }
             return true;
         }
@@ -160,6 +202,59 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
+    public void selectAll() {
+        setSelection(0, text.length());
+    }
+
+    public void setSelection(int start, int end) {
+        selection = start;
+        cursor = end;
+    }
+
+    public void clearSelection() {
+        selection = -1;
+    }
+
+    public boolean isRegionSelected() {
+        return selection != -1;
+    }
+
+    /**
+     * Inclusive text index indicating start of the selected region. If nothing is selected, it will return -1.
+     */
+    public int getSelectionStart() {
+        return Math.min(cursor, selection);
+    }
+
+    /**
+     * Exclusive text index indicating end of the selecred region, If nothing is selected, it will return {@link #cursor}.
+     */
+    public int getSelectionEnd() {
+        return Math.max(cursor, selection);
+    }
+
+    public String getSelectedText() {
+        return text.substring(getSelectionStart(), getSelectionEnd());
+    }
+
+    public void replaceSelectedRegion(String replacement) {
+        int selectionStart = getSelectionStart();
+        text = text.substring(0, selectionStart) + replacement + text.substring(getSelectionEnd());
+        cursor = selectionStart;
+        clearSelection();
+    }
+
+    private void updateSelection() {
+        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            // Don't clear selection as long as shift is pressed
+            if(!isRegionSelected()) {
+                selection = cursor;
+            }
+        } else {
+            clearSelection();
+        }
+    }
+
 
     @Override
     public void draw(int x, int y) {
@@ -179,18 +274,38 @@ public class TextField extends AbstractWidget<TextField> {
 
         RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
 
+        String renderedText = mc.fontRenderer.trimStringToWidth(this.text.substring(startOffset), bounds.width - 10);
+        int textX = x + 5 + bounds.x;
+        int textY = y + calculateVerticalOffset() + bounds.y;
         if (isEnabled()) {
             if (isEditable()) {
-                mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff000000);
+                mc.fontRenderer.drawString(renderedText, textX, textY, 0xff000000);
             } else {
-                mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xff333333);
+                mc.fontRenderer.drawString(renderedText, textX, textY, 0xff333333);
+            }
+
+            if (isRegionSelected()) {
+                int selectionStart = getSelectionStart();
+                int selectionEnd = getSelectionEnd();
+
+                // Text: abcdefghijklmn
+                // Rendered: abcdefg, length=7
+                //                 ^6
+                int renderedStart = MathHelper.clamp(selectionStart - startOffset, 0, renderedText.length());
+                int renderedEnd = MathHelper.clamp(selectionEnd - startOffset, 0, renderedText.length());
+
+                String renderedSelection = renderedText.substring(renderedStart, renderedEnd);
+                String renderedPreSelection = renderedText.substring(0, renderedStart);
+                int selectionX = textX + mc.fontRenderer.getStringWidth(renderedPreSelection);
+                int selectionWidth = mc.fontRenderer.getStringWidth(renderedSelection);
+                RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.fontRenderer.FONT_HEIGHT, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
             }
         } else {
-            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text.substring(startOffset), bounds.width - 10), x + 5 + bounds.x, y + calculateVerticalOffset() + bounds.y, 0xffa0a0a0);
+            mc.fontRenderer.drawString(renderedText, textX, textY, 0xffa0a0a0);
         }
 
         if (window.getTextFocus() == this) {
-            int w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
+            int w = mc.fontRenderer.getStringWidth(this.text.substring(startOffset, cursor));
             Gui.drawRect(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }

@@ -438,6 +438,17 @@ public class RenderHelper {
         drawHorizontalLine(x - 2, y - 2, x + 2, color);
     }
 
+    public static void drawColorLogic(int x, int y, int width, int height, int red, int green, int blue, GlStateManager.LogicOp colorLogic) {
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableColorLogic();
+        GlStateManager.colorLogicOp(colorLogic);
+
+        draw(Tessellator.getInstance().getBuffer(), x, y, width, height, red, green, blue, 255);
+
+        GlStateManager.disableColorLogic();
+        GlStateManager.enableTexture2D();
+    }
+
     /**
      * Draw a button box. x2 and y2 are not included.
      */
