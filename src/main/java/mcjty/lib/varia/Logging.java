@@ -1,6 +1,8 @@
 package mcjty.lib.varia;
 
 import javax.annotation.Nonnull;
+
+import mcjty.lib.McJtyLib;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.Style;
@@ -21,7 +23,7 @@ public class Logging {
     public static boolean doLogging = false;
 
     private Logging() {
-        logger = LogManager.getLogger();
+        logger = LogManager.getLogger(McJtyLib.PROVIDES);
         instance = this;
     }
 
