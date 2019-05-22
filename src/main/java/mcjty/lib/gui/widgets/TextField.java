@@ -64,6 +64,7 @@ public class TextField extends AbstractWidget<TextField> {
     public TextField setText(String text) {
         this.text = text;
         cursor = text.length();
+        selection = -1;
         if (startOffset >= cursor) {
             startOffset = cursor-1;
             if (startOffset < 0) {
@@ -327,9 +328,6 @@ public class TextField extends AbstractWidget<TextField> {
                 int selectionStart = getSelectionStart();
                 int selectionEnd = getSelectionEnd();
 
-                // Text: abcdefghijklmn
-                // Rendered: abcdefg, length=7
-                //                 ^6
                 int renderedStart = MathHelper.clamp(selectionStart - startOffset, 0, renderedText.length());
                 int renderedEnd = MathHelper.clamp(selectionEnd - startOffset, 0, renderedText.length());
 
