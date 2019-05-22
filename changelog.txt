@@ -1,4 +1,4 @@
-Upcoming:
+3.5.3:
 - Added withRotation() to BaseBlock making all McJtyLib based blocks rotatable
 - Osmium0001 added a way to copy/paste selections in all McJtyLib textfields (use shift arrow keys to make selections)
 - Osmium0001 fixed logging for McJtyLib so it is tagged with the correct mod
