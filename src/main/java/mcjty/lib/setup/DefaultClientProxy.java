@@ -102,6 +102,21 @@ public class DefaultClientProxy implements IProxy {
     }
 
     @Override
+    public boolean isForwardKeyDown() {
+        return Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindForward.getKeyCode());
+    }
+
+    @Override
+    public boolean isBackKeyDown() {
+        return Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindBack.getKeyCode());
+    }
+
+    @Override
+    public boolean isSneakKeyDown() {
+        return Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+    }
+
+    @Override
     public IAnimationStateMachine load(ResourceLocation location, ImmutableMap<String, ITimeValue> parameters) {
         return ModelLoaderRegistry.loadASM(location, parameters);
     }

@@ -3,6 +3,7 @@ package mcjty.lib.proxy;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -14,6 +15,7 @@ import net.minecraftforge.common.model.animation.IAnimationStateMachine;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.lwjgl.input.Keyboard;
 
 import java.util.concurrent.Callable;
 
@@ -46,6 +48,12 @@ public interface IProxy {
     void initTESRItemStack(Item item, int meta, Class<? extends TileEntity> clazz);
 
     boolean isJumpKeyDown();
+
+    boolean isForwardKeyDown();
+
+    boolean isBackKeyDown();
+
+    boolean isSneakKeyDown();
 
     IAnimationStateMachine load(ResourceLocation location, ImmutableMap<String, ITimeValue> parameters);
 }
