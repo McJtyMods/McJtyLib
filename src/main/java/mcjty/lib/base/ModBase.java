@@ -1,6 +1,6 @@
 package mcjty.lib.base;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public interface ModBase {
 
@@ -12,7 +12,7 @@ public interface ModBase {
      * @param bookindex
      * @param page
      */
-    void openManual(EntityPlayer player, int bookindex, String page);
+    void openManual(PlayerEntity player, int bookindex, String page);
 
     /**
      * If your mod is registered with McJtyLib.registerMod() then this will be called after

@@ -63,7 +63,7 @@ public class TOPCompatibility {
             probe.registerBlockDisplayOverride((mode, probeInfo, player, world, blockState, data) -> {
                 Block block = blockState.getBlock();
                 if (block == ModSetup.multipartBlock) {
-                    String modid = McJtyLib.PROVIDES;
+                    String modid = McJtyLib.MODID;
 
                     ItemStack pickBlock = data.getPickBlock();
                     MultipartTE.Part part = ModSetup.multipartBlock.getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());

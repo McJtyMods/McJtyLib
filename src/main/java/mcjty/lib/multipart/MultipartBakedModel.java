@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class MultipartBakedModel implements IBakedModel {
 
-    public static final ModelResourceLocation MODEL = new ModelResourceLocation(McJtyLib.PROVIDES + ":multipart");
+    public static final ModelResourceLocation MODEL = new ModelResourceLocation(McJtyLib.MODID + ":multipart");
 
     private TextureAtlasSprite particleTexture;
 

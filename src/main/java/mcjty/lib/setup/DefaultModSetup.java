@@ -3,12 +3,10 @@ package mcjty.lib.setup;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.varia.WrenchChecker;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -16,16 +14,16 @@ import java.util.function.Supplier;
 
 public abstract class DefaultModSetup {
 
-    private File modConfigDir;
+//    private File modConfigDir;
     private Logger logger;
-    protected CreativeTabs creativeTab;
+    protected ItemGroup creativeTab;
 
-    public void preInit(FMLPreInitializationEvent e) {
-        logger = e.getModLog();
+    public void preInit(FMLCommonSetupEvent e) {
+        logger = LogManager.getLogger();
         createTabs();
         McJtyLib.preInit(e);
         GeneralConfig.init(e);
-        modConfigDir = e.getModConfigurationDirectory();
+//        modConfigDir = e.getModConfigurationDirectory();
 
         setupConfig();
         setupModCompat();
@@ -38,9 +36,9 @@ public abstract class DefaultModSetup {
     public abstract void createTabs();
 
     protected void createTab(String name, Supplier<ItemStack> stack) {
-        creativeTab = new CreativeTabs(name) {
+        creativeTab = new ItemGroup(name) {
             @Override
-            public ItemStack getTabIconItem() {
+            public ItemStack createIcon() {
                 return stack.get();
             }
         };

@@ -9,18 +9,16 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
+import mcjty.lib.proxy.ClientProxy;
+import mcjty.lib.proxy.ServerProxy;
 import mcjty.lib.setup.ModSetup;
 import mcjty.lib.proxy.IProxy;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.worlddata.AbstractWorldData;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -30,48 +28,46 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
-/**
- * Created by Elec332 on 24-3-2016.
- */
-@SuppressWarnings("unused")
-@Mod(modid = McJtyLib.PROVIDES, name = "McJtyLib",
-        acceptedMinecraftVersions = "[1.12,1.13)",
-        version = McJtyLib.VERSION,
-        dependencies = "after:forge@[14.23.5.2800,);after:enderio@[5.0.21,)")
+@Mod(McJtyLib.MODID)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+//
+//@Mod(modid = McJtyLib.PROVIDES, name = "McJtyLib",
+//        acceptedMinecraftVersions = "[1.12,1.13)",
+//        version = McJtyLib.VERSION,
+//        dependencies = "after:forge@[14.23.5.2800,);after:enderio@[5.0.21,)")
 public class McJtyLib implements ModBase {
 
     public static final String VERSION = "3.5.3";
-    public static final String PROVIDES = "mcjtylib_ng";
+    public static final String MODID = "mcjtylib_ng";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
 
     @CapabilityInject(PreferencesProperties.class)
     public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
 
-    @SidedProxy(clientSide = "mcjty.lib.proxy.ClientProxy", serverSide = "mcjty.lib.proxy.ServerProxy")
-    public static IProxy proxy;
+    public static IProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
     public static ModSetup setup = new ModSetup();
 
-    @Mod.Instance(PROVIDES)
     public static McJtyLib instance;
 
-    public static SimpleNetworkWrapper networkHandler;
+    public static SimpleChannel networkHandler;
     private static boolean init;
     public static boolean tesla, cofhapiitem;
 
@@ -79,6 +75,12 @@ public class McJtyLib implements ModBase {
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
 
     private static final Map<String, ModBase> mods = new HashMap<>();
+
+    public McJtyLib() {
+        instance = this;
+        // Register the setup method for modloading
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
+    }
 
     public static void registerMod(ModBase mod) {
         mods.put(mod.getModId(), mod);
@@ -90,13 +92,13 @@ public class McJtyLib implements ModBase {
         }
     }
 
-    @Mod.EventHandler
+    @SubscribeEvent
     public void serverStarted(FMLServerAboutToStartEvent event) {
         Logging.log("Preparing all world data");
         AbstractWorldData.clearInstances();
     }
 
-    @Mod.EventHandler
+    @SubscribeEvent
     public void serverStopped(FMLServerStoppedEvent event) {
         Logging.log("Cleaning up all world data: " + AbstractWorldData.getDataCount() + " data blobs");
         AbstractWorldData.clearInstances();
@@ -104,11 +106,11 @@ public class McJtyLib implements ModBase {
 
     @Override
     public String getModId() {
-        return PROVIDES;
+        return MODID;
     }
 
     @Override
-    public void openManual(EntityPlayer player, int bookindex, String page) {
+    public void openManual(PlayerEntity player, int bookindex, String page) {
 
     }
 
@@ -120,7 +122,7 @@ public class McJtyLib implements ModBase {
         clientCommands.put(Pair.of(modid, id), command);
     }
 
-    public static boolean handleCommand(String modid, String id, EntityPlayer player, TypedMap arguments) {
+    public static boolean handleCommand(String modid, String id, PlayerEntity player, TypedMap arguments) {
         IServerCommand command = serverCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;
@@ -128,7 +130,7 @@ public class McJtyLib implements ModBase {
         return command.execute(player, arguments);
     }
 
-    public static boolean handleClientCommand(String modid, String id, EntityPlayer player, TypedMap arguments) {
+    public static boolean handleClientCommand(String modid, String id, PlayerEntity player, TypedMap arguments) {
         IServerCommand command = clientCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;
@@ -136,28 +138,27 @@ public class McJtyLib implements ModBase {
         return command.execute(player, arguments);
     }
 
-    public static void preInit(FMLPreInitializationEvent event){
+    public void init(final FMLCommonSetupEvent event) {
+        setup.preInit(event);
+        proxy.preInit(event);
+    }
+
+    public static void preInit(final FMLCommonSetupEvent event) {
         if (init) {
             return;
         }
         registerCapabilities();
-        networkHandler = new SimpleNetworkWrapper(PROVIDES);
+        networkHandler = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> "1.0", s -> true, s -> true);
         networkHandler.registerMessage(PacketSendPreferencesToClient.Handler.class, PacketSendPreferencesToClient.class, 0, Side.CLIENT);
         networkHandler.registerMessage(PacketSetGuiStyle.Handler.class, PacketSetGuiStyle.class, 1, Side.SERVER);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         init = true;
-        tesla = Loader.isModLoaded("tesla");
-        cofhapiitem = Loader.isModLoaded("cofhapi|item");
+        tesla = ModList.get().isLoaded("tesla");
+        cofhapiitem = ModList.get().isLoaded("cofhapi|item");
     }
 
-    public static PreferencesProperties getPreferencesProperties(EntityPlayer player) {
+    public static PreferencesProperties getPreferencesProperties(PlayerEntity player) {
         return player.getCapability(PREFERENCES_CAPABILITY, null);
-    }
-
-    @Mod.EventHandler
-    public void actualPreInit(FMLPreInitializationEvent e) {
-        setup.preInit(e);
-        proxy.preInit(e);
     }
 
     public static class EventHandler {
@@ -175,7 +176,7 @@ public class McJtyLib implements ModBase {
 
         @SubscribeEvent
         public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
-            if (event.getObject() instanceof EntityPlayer) {
+            if (event.getObject() instanceof PlayerEntity) {
                 if (!event.getCapabilities().containsKey(PREFERENCES_CAPABILITY_KEY) && !event.getObject().hasCapability(PREFERENCES_CAPABILITY, null)) {
                     event.addCapability(PREFERENCES_CAPABILITY_KEY, new PreferencesDispatcher());
                 } else {
@@ -223,7 +224,7 @@ public class McJtyLib implements ModBase {
     }
 
     static {
-        PREFERENCES_CAPABILITY_KEY = new ResourceLocation(PROVIDES, "Preferences");
+        PREFERENCES_CAPABILITY_KEY = new ResourceLocation(MODID, "Preferences");
     }
 
 }

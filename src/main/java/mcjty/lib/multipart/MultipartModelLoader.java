@@ -18,7 +18,7 @@ public class MultipartModelLoader implements ICustomModelLoader {
 
     @Override
     public boolean accepts(ResourceLocation modelLocation) {
-        if (!modelLocation.getResourceDomain().equals(McJtyLib.PROVIDES)) {
+        if (!modelLocation.getResourceDomain().equals(McJtyLib.MODID)) {
             return false;
         }
         return NAMES.contains(modelLocation.getResourcePath());

@@ -23,7 +23,7 @@ public class Logging {
     public static boolean doLogging = false;
 
     private Logging() {
-        logger = LogManager.getLogger(McJtyLib.PROVIDES);
+        logger = LogManager.getLogger(McJtyLib.MODID);
         instance = this;
     }
 

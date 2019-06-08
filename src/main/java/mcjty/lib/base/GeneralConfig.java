@@ -4,6 +4,7 @@ import mcjty.lib.varia.Logging;
 import net.minecraftforge.fml.common.FMLLog;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
@@ -31,7 +32,7 @@ public class GeneralConfig {
                 "The maximum amount of dimensional shards that can be infused in a single machine").getInt();
     }
 
-    public static void init(FMLPreInitializationEvent e) {
+    public static void init(FMLCommonSetupEvent e) {
         modConfigDir = e.getModConfigurationDirectory();
         mainConfig = new Configuration(new File(modConfigDir.getPath(), "mcjtylib.cfg"));
         try {

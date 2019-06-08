@@ -3,33 +3,29 @@ package mcjty.lib.proxy;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.lwjgl.input.Keyboard;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.concurrent.Callable;
 
 public interface IProxy {
 
-    void preInit(FMLPreInitializationEvent e);
+    void preInit(FMLCommonSetupEvent e);
 
-    void init(FMLInitializationEvent e);
+    void init(FMLCommonSetupEvent e);
 
-    void postInit(FMLPostInitializationEvent e);
+    void postInit(FMLCommonSetupEvent e);
 
     World getClientWorld();
 
-    EntityPlayer getClientPlayer();
+    PlayerEntity getClientPlayer();
 
     <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule);
 

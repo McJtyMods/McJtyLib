@@ -3,12 +3,12 @@ package mcjty.lib.setup;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.proxy.IProxy;
+import net.java.games.input.Keyboard;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.block.statemap.StateMapperBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -18,51 +18,48 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.lwjgl.input.Keyboard;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.concurrent.Callable;
 
 public class DefaultClientProxy implements IProxy {
 
     @Override
-    public void preInit(FMLPreInitializationEvent e) {
+    public void preInit(FMLCommonSetupEvent e) {
     }
 
     @Override
-    public void init(FMLInitializationEvent e) {
+    public void init(FMLCommonSetupEvent e) {
 
     }
 
     @Override
-    public void postInit(FMLPostInitializationEvent e) {
+    public void postInit(FMLCommonSetupEvent e) {
 
     }
     @Override
     public World getClientWorld() {
-        return Minecraft.getMinecraft().world;
+        return Minecraft.getInstance().field_71441_e;
     }
 
     @Override
-    public EntityPlayer getClientPlayer() {
-        return Minecraft.getMinecraft().player;
+    public PlayerEntity getClientPlayer() {
+        return Minecraft.getInstance().field_71439_g;
     }
 
     @Override
     public void enqueueWork(Runnable runnable) {
-        Minecraft.getMinecraft().addScheduledTask(runnable);
+        Minecraft.getInstance().addScheduledTask(runnable);
     }
 
     @Override
     public <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule) {
-        return Minecraft.getMinecraft().addScheduledTask(callableToSchedule);
+        return Minecraft.getInstance().addScheduledTask(callableToSchedule);
     }
 
     @Override
     public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
-        return Minecraft.getMinecraft().addScheduledTask(runnableToSchedule);
+        return Minecraft.getInstance().addScheduledTask(runnableToSchedule);
     }
 
     @Override
@@ -74,7 +71,7 @@ public class DefaultClientProxy implements IProxy {
     public void initStateMapper(Block block, ModelResourceLocation model) {
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
-            protected ModelResourceLocation getModelResourceLocation(IBlockState iBlockState) {
+            protected ModelResourceLocation getModelResourceLocation(BlockState iBlockState) {
                 return model;
             }
         };
@@ -83,7 +80,7 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public void initItemModelMesher(Item item, int meta, ModelResourceLocation model) {
-        Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, meta, model);
+        Minecraft.getInstance().getItemRenderer().getItemModelMesher().register(item, meta, model);
     }
 
     @Override
@@ -98,22 +95,22 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public boolean isJumpKeyDown() {
-        return Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindJump.getKeyCode());
+        return Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindJump.getKeyCode());
     }
 
     @Override
     public boolean isForwardKeyDown() {
-        return Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindForward.getKeyCode());
+        return Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindForward.getKeyCode());
     }
 
     @Override
     public boolean isBackKeyDown() {
-        return Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindBack.getKeyCode());
+        return Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindBack.getKeyCode());
     }
 
     @Override
     public boolean isSneakKeyDown() {
-        return Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
+        return Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindSneak.getKeyCode());
     }
 
     @Override

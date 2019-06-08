@@ -52,7 +52,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     public MultipartBlock() {
         super(Material.IRON);
-        setUnlocalizedName(McJtyLib.PROVIDES + "." + "multipart");
+        setUnlocalizedName(McJtyLib.MODID + "." + "multipart");
         setRegistryName("multipart");
         McJtyRegister.registerLater(this, McJtyLib.instance, MultipartItemBlock::new);
         setHardness(2.0f);
