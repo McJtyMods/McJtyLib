@@ -13,8 +13,11 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -52,8 +55,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
         this.ySize = y;
     }
 
-    public GenericGuiContainer(ModBase mod, SimpleChannel network, T tileEntity, Container container, int manual, String manualNode) {
-        super(container);
+    public GenericGuiContainer(ModBase mod, SimpleChannel network, T tileEntity, Container container, PlayerInventory inventory, int manual, String manualNode) {
+        super(container, inventory, new StringTextComponent("test"));   // @todo
         this.modBase = mod;
         this.network = network;
         this.tileEntity = tileEntity;
@@ -71,10 +74,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
 
 
     @Override
-    public void initGui() {
+    public void init() {
         windowManager = null;
-        super.initGui();
-        sideWindow.initGui(modBase, network, mc, this, guiLeft, guiTop, xSize, ySize);
+        super.init();
+        sideWindow.initGui(modBase, network, minecraft, this, guiLeft, guiTop, xSize, ySize);
     }
 
     /**
@@ -412,11 +415,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
         }
     }
 
-    public void sendServerCommand(SimpleNetworkWrapper network, String command, TypedMap params) {
+    public void sendServerCommand(SimpleChannel network, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), null, command, params));
     }
 
-    public void sendServerCommand(SimpleNetworkWrapper network, int dimensionId, String command, TypedMap params) {
+    public void sendServerCommand(SimpleChannel network, int dimensionId, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), dimensionId, command, params));
     }
 

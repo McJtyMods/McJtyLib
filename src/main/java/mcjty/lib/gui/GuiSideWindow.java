@@ -7,9 +7,9 @@ import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.PacketSetGuiStyle;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import java.awt.*;
 
@@ -30,7 +30,7 @@ public class GuiSideWindow {
         this.manualNode = manualNode;
     }
 
-    public void initGui(final ModBase modBase, final SimpleNetworkWrapper network, final Minecraft mc, GuiScreen gui, int guiLeft, int guiTop, int xSize, int ySize) {
+    public void initGui(final ModBase modBase, final SimpleChannel network, final Minecraft mc, Screen gui, int guiLeft, int guiTop, int xSize, int ySize) {
         style = McJtyLib.getPreferencesProperties(mc.player).getStyle();
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
@@ -55,7 +55,7 @@ public class GuiSideWindow {
         guiButton.setTooltips("Gui style:", style.getStyle());
     }
 
-    private void changeStyle(SimpleNetworkWrapper network) {
+    private void changeStyle(SimpleChannel network) {
         int next = style.ordinal() + 1;
         if (next >= GuiStyle.values().length) {
             next = 0;

@@ -2,7 +2,7 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
 
     private final List<Widget<?>> children = new ArrayList<>();
 
-    public AbstractContainerWidget(Minecraft mc, Gui gui) {
+    public AbstractContainerWidget(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 

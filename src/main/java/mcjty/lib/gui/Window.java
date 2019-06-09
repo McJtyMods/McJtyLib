@@ -363,7 +363,7 @@ public class Window {
         return this;
     }
 
-    public <T extends GenericTileEntity> Window action(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
+    public <T extends GenericTileEntity> Window action(SimpleChannel network, String componentName, T te, String keyName) {
         for (IAction action : te.getActions()) {
             if (keyName.equals(action.getKey())) {
                 initializeAction(network, componentName, action);
@@ -371,15 +371,15 @@ public class Window {
             }
         }
 
-        Logging.message(Minecraft.getMinecraft().player, "Could not find action '" + keyName + "' in supplied TE!");
+        Logging.message(Minecraft.getInstance().player, "Could not find action '" + keyName + "' in supplied TE!");
         return this;
     }
 
-    private void initializeAction(SimpleNetworkWrapper network, String componentName, IAction action) {
+    private void initializeAction(SimpleChannel network, String componentName, IAction action) {
         event(componentName, (source, params) -> sendAction(network, action));
     }
 
-    public <T extends GenericTileEntity> void sendAction(SimpleNetworkWrapper network, T te, String actionKey) {
+    public <T extends GenericTileEntity> void sendAction(SimpleChannel network, T te, String actionKey) {
         for (IAction action : te.getActions()) {
             if (actionKey.equals(action.getKey())) {
                 sendAction(network, action);
@@ -387,18 +387,18 @@ public class Window {
             }
         }
 
-        Logging.message(Minecraft.getMinecraft().player, "Could not find action '" + actionKey + "' in supplied TE!");
+        Logging.message(Minecraft.getInstance().player, "Could not find action '" + actionKey + "' in supplied TE!");
 
     }
 
-    private void sendAction(SimpleNetworkWrapper network, IAction action) {
+    private void sendAction(SimpleChannel network, IAction action) {
         ((GenericGuiContainer<?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
                 TypedMap.builder()
                         .put(GenericTileEntity.PARAM_KEY, action.getKey())
                         .build());
     }
 
-    public <T extends GenericTileEntity> Window bind(SimpleNetworkWrapper network, String componentName, T te, String keyName) {
+    public <T extends GenericTileEntity> Window bind(SimpleChannel network, String componentName, T te, String keyName) {
         for (IValue<?> value : te.getValues()) {
             Key<?> key = value.getKey();
             if (keyName.equals(key.getName())) {
@@ -407,16 +407,16 @@ public class Window {
             }
         }
 
-        Logging.message(Minecraft.getMinecraft().player, "Could not find value '" + keyName + "' in supplied TE!");
+        Logging.message(Minecraft.getInstance().player, "Could not find value '" + keyName + "' in supplied TE!");
         return this;
     }
 
-    private <V> void initializeBinding(SimpleNetworkWrapper network, String componentName, IValue<V> value) {
+    private <V> void initializeBinding(SimpleChannel network, String componentName, IValue<V> value) {
         V v = value.getter().get();
         Widget<?> component = findChild(componentName);
 
         if (component == null) {
-            Logging.message(Minecraft.getMinecraft().player, "Could not find component '" + componentName + "'!");
+            Logging.message(Minecraft.getInstance().player, "Could not find component '" + componentName + "'!");
             return;
         }
         component.setGenericValue(v);

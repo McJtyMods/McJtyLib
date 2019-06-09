@@ -3,7 +3,7 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.events.ButtonEvent;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public class Button extends AbstractLabel<Button> {
     private List<ButtonEvent> buttonEvents = null;
     private boolean pressed = false;
 
-    public Button(Minecraft mc, Gui gui) {
+    public Button(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 
