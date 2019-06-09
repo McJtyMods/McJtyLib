@@ -10,7 +10,7 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
     private boolean pressed = false;
     private boolean checkMarker = DEFAULT_CHECKMARKER;
 
-    public ToggleButton(Minecraft mc, Gui gui) {
+    public ToggleButton(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 

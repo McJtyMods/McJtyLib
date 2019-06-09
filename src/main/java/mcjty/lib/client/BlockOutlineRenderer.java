@@ -1,7 +1,7 @@
 package mcjty.lib.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.PlayerEntitySP;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -22,7 +22,7 @@ public class BlockOutlineRenderer {
     public static void renderHilightedBlock(BlockPos c, float partialTicks) {
         Minecraft mc = Minecraft.getMinecraft();
 
-        EntityPlayerSP p = mc.player;
+        PlayerEntitySP p = mc.player;
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
@@ -52,7 +52,7 @@ public class BlockOutlineRenderer {
     /**
      * This method translates GL state relative to player position
      */
-    public static void renderOutlines(EntityPlayerSP p, Set<BlockPos> coordinates, int r, int g, int b, float partialTicks) {
+    public static void renderOutlines(PlayerEntitySP p, Set<BlockPos> coordinates, int r, int g, int b, float partialTicks) {
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
@@ -163,7 +163,7 @@ public class BlockOutlineRenderer {
     /**
      * This method translates GL state relative to player position
      */
-    public static void renderHighlightedBlocks(EntityPlayerSP p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
+    public static void renderHighlightedBlocks(PlayerEntitySP p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;

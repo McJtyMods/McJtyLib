@@ -2,8 +2,8 @@ package mcjty.lib.varia;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
@@ -17,11 +17,11 @@ import javax.annotation.Nullable;
 
 public class TeleportationTools {
 
-    public static void performTeleport(EntityPlayer player, int dimension, BlockPos dest, @Nullable EnumFacing direction) {
+    public static void performTeleport(PlayerEntity player, int dimension, BlockPos dest, @Nullable EnumFacing direction) {
         performTeleport(player, dimension, dest.getX() + 0.5, dest.getY() + 1.5, dest.getZ() + 0.5, direction);
     }
 
-    public static void performTeleport(EntityPlayer player, int dimension, double destX, double destY, double destZ, @Nullable EnumFacing direction) {
+    public static void performTeleport(PlayerEntity player, int dimension, double destX, double destY, double destZ, @Nullable EnumFacing direction) {
         int oldId = player.getEntityWorld().provider.getDimension();
 
         float rotationYaw = player.rotationYaw;
@@ -51,9 +51,9 @@ public class TeleportationTools {
     }
 
 
-    public static void teleportToDimension(EntityPlayer player, int dimension, double x, double y, double z) {
+    public static void teleportToDimension(PlayerEntity player, int dimension, double x, double y, double z) {
         int oldDimension = player.getEntityWorld().provider.getDimension();
-        EntityPlayerMP entityPlayerMP = (EntityPlayerMP) player;
+        PlayerEntityMP PlayerEntityMP = (PlayerEntityMP) player;
         MinecraftServer server = player.getEntityWorld().getMinecraftServer();
         WorldServer worldServer = server.getWorld(dimension);
         if (worldServer == null) {
@@ -62,7 +62,7 @@ public class TeleportationTools {
         player.addExperienceLevel(0);
 
 
-        worldServer.getMinecraftServer().getPlayerList().transferPlayerToDimension(entityPlayerMP, dimension, new McJtyLibTeleporter(worldServer, x, y, z));
+        worldServer.getMinecraftServer().getPlayerList().transferPlayerToDimension(PlayerEntityMP, dimension, new McJtyLibTeleporter(worldServer, x, y, z));
         player.setPositionAndUpdate(x, y, z);
     }
 
@@ -90,8 +90,8 @@ public class TeleportationTools {
      */
     public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, EnumFacing facing) {
         World world = entity.getEntityWorld();
-        if (entity instanceof EntityPlayer) {
-            performTeleport((EntityPlayer) entity, destWorld.provider.getDimension(), newX, newY, newZ, facing);
+        if (entity instanceof PlayerEntity) {
+            performTeleport((PlayerEntity) entity, destWorld.provider.getDimension(), newX, newY, newZ, facing);
             return entity;
         } else {
             float rotationYaw = entity.rotationYaw;

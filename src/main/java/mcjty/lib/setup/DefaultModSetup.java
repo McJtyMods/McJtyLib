@@ -44,24 +44,23 @@ public abstract class DefaultModSetup {
         };
     }
 
-    public void init(FMLInitializationEvent e) {
+    public void init(FMLCommonSetupEvent e) {
 
     }
 
-    public void postInit(FMLPostInitializationEvent e) {
+    public void postInit(FMLCommonSetupEvent e) {
         WrenchChecker.init();
     }
 
-    public File getModConfigDir() {
-        return modConfigDir;
-    }
+//    public File getModConfigDir() {
+//        return modConfigDir;
+//    }
 
-//
     public Logger getLogger() {
         return logger;
     }
 
-    public CreativeTabs getTab() {
+    public ItemGroup getTab() {
         return creativeTab;
     }
 }

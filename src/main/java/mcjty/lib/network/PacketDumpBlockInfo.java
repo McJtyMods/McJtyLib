@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpBlockNBT;
 import mcjty.lib.thirteen.Context;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.UserListOps;
 import net.minecraft.server.management.UserListOpsEntry;
@@ -55,7 +55,7 @@ public class PacketDumpBlockInfo implements IMessage {
     public void handle(Supplier<Context> supplier) {
         Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            EntityPlayerMP player = ctx.getSender();
+            PlayerEntityMP player = ctx.getSender();
             MinecraftServer server = player.getEntityWorld().getMinecraftServer();
             UserListOps oppedPlayers = server.getPlayerList().getOppedPlayers();
             UserListOpsEntry entry = oppedPlayers.getEntry(player.getGameProfile());

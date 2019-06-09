@@ -1,6 +1,6 @@
 package mcjty.lib.container;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
@@ -9,11 +9,11 @@ import net.minecraft.item.ItemStack;
  */
 public class EmptyContainer extends GenericContainer {
 
-    public EmptyContainer(EntityPlayer player, IInventory inventory) {
+    public EmptyContainer(PlayerEntity player, IInventory inventory) {
         super(EmptyContainerFactory.getInstance());
     }
 
-    public EmptyContainer(EntityPlayer player) {
+    public EmptyContainer(PlayerEntity player) {
         this(player, null);
     }
 

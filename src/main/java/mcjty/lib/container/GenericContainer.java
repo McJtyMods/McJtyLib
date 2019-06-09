@@ -3,8 +3,8 @@ package mcjty.lib.container;
 import com.google.common.collect.Range;
 import mcjty.lib.network.PacketSendGuiData;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -36,9 +36,9 @@ public class GenericContainer extends Container {
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer entityPlayer) {
+    public boolean canInteractWith(PlayerEntity PlayerEntity) {
         for (IInventory inventory : inventories.values()) {
-            if (!inventory.isUsableByPlayer(entityPlayer)) {
+            if (!inventory.isUsableByPlayer(PlayerEntity)) {
                 return false;
             }
         }
@@ -128,7 +128,7 @@ public class GenericContainer extends Container {
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer player, int index) {
+    public ItemStack transferStackInSlot(PlayerEntity player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
@@ -289,7 +289,7 @@ public class GenericContainer extends Container {
 
 
     @Override
-    public ItemStack slotClick(int index, int button, ClickType mode, EntityPlayer player) {
+    public ItemStack slotClick(int index, int button, ClickType mode, PlayerEntity player) {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.getHasStack()) {
@@ -313,8 +313,8 @@ public class GenericContainer extends Container {
     // of the fields you need in the GUI has changed
     protected void notifyPlayerOfChanges(SimpleNetworkWrapper wrapper, World world, BlockPos pos) {
         for (IContainerListener listener : this.listeners) {
-            if (listener instanceof EntityPlayerMP) {
-                EntityPlayerMP player = (EntityPlayerMP) listener;
+            if (listener instanceof PlayerEntityMP) {
+                PlayerEntityMP player = (PlayerEntityMP) listener;
                 wrapper.sendTo(new PacketSendGuiData(world, pos), player);
             }
         }

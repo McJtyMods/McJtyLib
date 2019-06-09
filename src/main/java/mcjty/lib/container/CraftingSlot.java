@@ -1,7 +1,7 @@
 package mcjty.lib.container;
 
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -29,7 +29,7 @@ public class CraftingSlot extends Slot {
     }
 
     @Override
-    public ItemStack onTake(EntityPlayer thePlayer, ItemStack stack) {
+    public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack) {
         crafter.craftItem();
         return super.onTake(thePlayer, stack);
     }

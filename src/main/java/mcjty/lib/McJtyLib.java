@@ -1,6 +1,7 @@
 package mcjty.lib;
 
 import mcjty.lib.base.ModBase;
+import mcjty.lib.base.StyleConfig;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
@@ -31,12 +32,15 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
@@ -55,7 +59,7 @@ import java.util.function.Consumer;
 public class McJtyLib implements ModBase {
 
     public static final String VERSION = "3.5.3";
-    public static final String MODID = "mcjtylib_ng";
+    public static final String MODID = "mcjtylib";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
 
@@ -80,6 +84,12 @@ public class McJtyLib implements ModBase {
         instance = this;
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, StyleConfig.CLIENT_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, StyleConfig.SERVER_CONFIG);
+
+        StyleConfig.loadConfig(StyleConfig.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-client.toml"));
+        StyleConfig.loadConfig(StyleConfig.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-server.toml"));
     }
 
     public static void registerMod(ModBase mod) {
@@ -170,7 +180,7 @@ public class McJtyLib implements ModBase {
         public void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
             if (event.phase == TickEvent.Phase.START && !event.player.getEntityWorld().isRemote) {
                 PreferencesProperties preferencesProperties = getPreferencesProperties(event.player);
-                preferencesProperties.tick((EntityPlayerMP) event.player);
+                preferencesProperties.tick((PlayerEntityMP) event.player);
             }
         }
 
@@ -194,7 +204,7 @@ public class McJtyLib implements ModBase {
                 TileEntity tileEntity = world.getTileEntity(pos);
                 if (tileEntity instanceof MultipartTE) {
                     if (!world.isRemote) {
-                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, event.getEntityPlayer(), event.getHitVec())) {
+                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, event.getPlayerEntity(), event.getHitVec())) {
                             world.setBlockToAir(pos);
                         }
                     }

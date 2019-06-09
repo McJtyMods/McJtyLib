@@ -19,7 +19,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -81,7 +81,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
         MultipartTE.Part part = getHitPart(state, world, pos, player.getPositionEyes(0), target.hitVec);
         if (part != null) {
             return new ItemStack(Item.getItemFromBlock(part.getState().getBlock()));
@@ -127,7 +127,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, PlayerEntity player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         Vec3d start = MultipartHelper.getPlayerEyes(player);
         Vec3d end = new Vec3d(start.x + (pos.getX() + hitX - start.x) * 3, start.y + (pos.getY() + hitY - start.y) * 3, start.z + (pos.getZ() + hitZ - start.z) * 3);
         MultipartTE.Part part = getHitPart(state, world, pos, start, end);
@@ -214,7 +214,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     @Override
     @Optional.Method(modid = "theoneprobe")
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, IBlockState blockState, IProbeHitData data) {
         MultipartTE.Part part = getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
         if (part != null) {
             if (part.getTileEntity() instanceof GenericTileEntity) {

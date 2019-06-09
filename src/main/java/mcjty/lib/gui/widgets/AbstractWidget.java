@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -7,18 +8,18 @@ import mcjty.lib.gui.GuiParser.GuiCommand;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
+import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.StringRegister;
-import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Widget<P> {
 
@@ -32,7 +33,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     protected int desiredHeight = SIZE_UNKNOWN;
 
     protected Minecraft mc;
-    protected Gui gui;
+    protected Screen gui;
     protected Window window;
 
     private LayoutHint layoutHint = null;
@@ -67,7 +68,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         return w == this;
     }
 
-    protected AbstractWidget(Minecraft mc, Gui gui) {
+    protected AbstractWidget(Minecraft mc, Screen gui) {
         this.mc = mc;
         this.gui = gui;
     }
@@ -117,10 +118,10 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     protected void drawBox(int xx, int yy, int color) {
-        Gui.drawRect(xx, yy, xx, yy + bounds.height, color);
-        Gui.drawRect(xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
-        Gui.drawRect(xx, yy, xx + bounds.width, yy, color);
-        Gui.drawRect(xx, yy + bounds.height, xx + bounds.width, yy + bounds.height, color);
+        Screen.fill(xx, yy, xx, yy + bounds.height, color);
+        Screen.fill(xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
+        Screen.fill(xx, yy, xx + bounds.width, yy, color);
+        Screen.fill(xx, yy + bounds.height, xx + bounds.width, yy + bounds.height, color);
     }
 
     @Override

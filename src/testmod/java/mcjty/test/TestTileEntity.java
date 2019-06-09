@@ -3,7 +3,7 @@ package mcjty.test;
 import mcjty.lib.container.DefaultSidedInventory;
 import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.bindings.GenericTileEntity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class TestTileEntity extends GenericTileEntity implements DefaultSidedInventory {
 
@@ -15,7 +15,7 @@ public class TestTileEntity extends GenericTileEntity implements DefaultSidedInv
     }
 
     @Override
-    public boolean isUsable(EntityPlayer player) {
+    public boolean isUsable(PlayerEntity player) {
         return canPlayerAccess(player);
     }
 }

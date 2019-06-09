@@ -11,17 +11,12 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -31,10 +26,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class GenericGuiContainer<T extends GenericTileEntity> extends GuiContainer {
+public abstract class GenericGuiContainer<T extends GenericTileEntity> extends ContainerScreen {
 
     protected ModBase modBase;
-    protected SimpleNetworkWrapper network;
+    protected SimpleChannel network;
 
     protected Window window;
     private WindowManager windowManager;
@@ -57,7 +52,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends G
         this.ySize = y;
     }
 
-    public GenericGuiContainer(ModBase mod, SimpleNetworkWrapper network, T tileEntity, Container container, int manual, String manualNode) {
+    public GenericGuiContainer(ModBase mod, SimpleChannel network, T tileEntity, Container container, int manual, String manualNode) {
         super(container);
         this.modBase = mod;
         this.network = network;

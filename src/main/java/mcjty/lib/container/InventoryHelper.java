@@ -1,7 +1,7 @@
 package mcjty.lib.container;
 
 import mcjty.lib.varia.ItemStackList;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.InventoryBasic;
@@ -158,7 +158,7 @@ public class InventoryHelper {
      * Inject a module that the player is holding into the appropriate slots (slots are from start to stop inclusive both ends)
      * @return true if successful
      */
-    public static boolean installModule(EntityPlayer player, ItemStack heldItem, EnumHand hand, BlockPos pos, int start, int stop) {
+    public static boolean installModule(PlayerEntity player, ItemStack heldItem, EnumHand hand, BlockPos pos, int start, int stop) {
         World world = player.getEntityWorld();
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof IInventory) {

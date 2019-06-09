@@ -12,7 +12,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -41,11 +41,11 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     public static PropertyInteger META_INTERMEDIATE = PropertyInteger.create("intermediate", 0, 3);
     public static PropertyEnum<LogicFacing> LOGIC_FACING = PropertyEnum.create("logic_facing", LogicFacing.class);
 
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<EntityPlayer, IInventory, C> containerFactory, String name, boolean isContainer) {
+    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<PlayerEntity, IInventory, C> containerFactory, String name, boolean isContainer) {
         super(mod, material, tileEntityClass, containerFactory, name, isContainer);
     }
 
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<EntityPlayer, IInventory, C> containerFactory, Function<Block, ItemBlock> itemBlockFactory, String name, boolean isContainer) {
+    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<PlayerEntity, IInventory, C> containerFactory, Function<Block, ItemBlock> itemBlockFactory, String name, boolean isContainer) {
         super(mod, material, tileEntityClass, containerFactory, itemBlockFactory, name, isContainer);
     }
 

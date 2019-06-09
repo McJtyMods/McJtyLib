@@ -3,7 +3,7 @@ package mcjty.lib.debugtools;
 import com.google.gson.*;
 import mcjty.lib.network.PacketDumpItemInfo;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -43,7 +43,7 @@ public class DumpItemNBT {
     }
 
     // Use client-side
-    public static void dumpHeldItem(@Nullable SimpleNetworkWrapper network, @Nonnull EntityPlayer player, boolean verbose) {
+    public static void dumpHeldItem(@Nullable SimpleNetworkWrapper network, @Nonnull PlayerEntity player, boolean verbose) {
         ItemStack item = player.getHeldItemMainhand();
         if (item.isEmpty()) {
             return;

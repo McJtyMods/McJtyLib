@@ -11,7 +11,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathNodeType;
@@ -194,7 +194,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             }
 
             @Override
-            public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+            public void onBlockClicked(World worldIn, BlockPos pos, PlayerEntity playerIn) {
                 clickAction.doClick(worldIn, pos, playerIn);
             }
 
@@ -214,7 +214,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             }
 
             @Override
-            public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+            public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
                 if (!action.doActivate(worldIn, pos, playerIn, hand, facing, hitX, hitY, hitZ)) {
                     return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
                 } else {

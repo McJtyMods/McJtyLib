@@ -3,7 +3,7 @@ package mcjty.lib.varia;
 import javax.annotation.Nonnull;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
@@ -68,11 +68,11 @@ public class Logging {
         }
     }
 
-    public static void message(@Nonnull EntityPlayer player, String message) {
+    public static void message(@Nonnull PlayerEntity player, String message) {
         player.sendStatusMessage(new TextComponentString(message), false);
     }
 
-    public static void warn(@Nonnull EntityPlayer player, String message) {
+    public static void warn(@Nonnull PlayerEntity player, String message) {
         player.sendStatusMessage(new TextComponentString(message).setStyle(new Style().setColor(TextFormatting.RED)), false);
     }
 }

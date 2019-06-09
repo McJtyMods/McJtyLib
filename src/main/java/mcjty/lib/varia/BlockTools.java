@@ -3,7 +3,7 @@ package mcjty.lib.varia;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -69,7 +69,7 @@ public class BlockTools {
         return stack.getDisplayName();
     }
 
-    public static IBlockState placeStackAt(EntityPlayer player, ItemStack blockStack, World world, BlockPos pos, @Nullable IBlockState origState) {
+    public static IBlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable IBlockState origState) {
         if (blockStack.getItem() instanceof ItemBlock) {
             ItemBlock itemBlock = (ItemBlock) blockStack.getItem();
             if (origState == null) {

@@ -1,6 +1,6 @@
 package mcjty.lib.varia;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.network.play.server.SPacketSoundEffect;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
@@ -14,15 +14,15 @@ public class SoundTools {
         SPacketSoundEffect soundEffect = new SPacketSoundEffect(soundName, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
 
         for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
-            EntityPlayerMP entityplayermp = (EntityPlayerMP)worldObj.playerEntities.get(j);
-            BlockPos chunkcoordinates = entityplayermp.getPosition();
+            PlayerEntityMP PlayerEntitymp = (PlayerEntityMP)worldObj.playerEntities.get(j);
+            BlockPos chunkcoordinates = PlayerEntitymp.getPosition();
             double d7 = x - chunkcoordinates.getX();
             double d8 = y - chunkcoordinates.getY();
             double d9 = z - chunkcoordinates.getZ();
             double d10 = d7 * d7 + d8 * d8 + d9 * d9;
 
             if (d10 <= 256.0D) {
-                entityplayermp.connection.sendPacket(soundEffect);
+                PlayerEntitymp.connection.sendPacket(soundEffect);
             }
         }
     }

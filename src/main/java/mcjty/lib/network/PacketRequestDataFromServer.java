@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import mcjty.lib.thirteen.Context;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -73,7 +73,7 @@ public class PacketRequestDataFromServer implements IMessage {
         ctx.setPacketHandled(true);
     }
 
-    private void sendReplyToClient(PacketRequestDataFromServer message, TypedMap result, EntityPlayerMP player) {
+    private void sendReplyToClient(PacketRequestDataFromServer message, TypedMap result, PlayerEntityMP player) {
         SimpleNetworkWrapper wrapper = PacketHandler.modNetworking.get(message.modid);
         PacketDataFromServer msg = new PacketDataFromServer(message.pos, message.command, result);
         wrapper.sendTo(msg, player);

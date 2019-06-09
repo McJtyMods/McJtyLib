@@ -1,6 +1,6 @@
 package mcjty.lib.container;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
@@ -56,12 +56,12 @@ public interface DefaultSidedInventory extends ISidedInventory {
     }
 
     @Override
-    default void openInventory(EntityPlayer player) {
+    default void openInventory(PlayerEntity player) {
 
     }
 
     @Override
-    default void closeInventory(EntityPlayer player) {
+    default void closeInventory(PlayerEntity player) {
 
     }
 

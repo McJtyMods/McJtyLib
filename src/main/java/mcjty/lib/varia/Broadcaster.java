@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
 import com.google.common.collect.Maps;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
 import java.util.Map;
@@ -21,8 +21,8 @@ public class Broadcaster {
             }
         }
         messages.put(message, time);
-        for (Object p : worldObj.playerEntities) {
-            EntityPlayer player = (EntityPlayer) p;
+        for (Object p : worldObj.getPlayers()) {
+            PlayerEntity player = (PlayerEntity) p;
             double sqdist = player.getDistanceSq(x + .5, y + .5, z + .5);
             if (sqdist < radius) {
                 Logging.warn(player, message);

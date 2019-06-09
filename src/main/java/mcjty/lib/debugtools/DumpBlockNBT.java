@@ -5,7 +5,7 @@ import mcjty.lib.network.PacketDumpBlockInfo;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -61,7 +61,7 @@ public class DumpBlockNBT {
     }
 
     // Use client-side
-    public static void dumpFocusedBlock(@Nullable SimpleNetworkWrapper network, @Nonnull EntityPlayer player, boolean liquids, boolean verbose) {
+    public static void dumpFocusedBlock(@Nullable SimpleNetworkWrapper network, @Nonnull PlayerEntity player, boolean liquids, boolean verbose) {
         Vec3d start = player.getPositionEyes(1.0f);
         Vec3d vec31 = player.getLook(1.0f);
         float dist = 20;

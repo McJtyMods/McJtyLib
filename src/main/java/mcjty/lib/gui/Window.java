@@ -1,7 +1,6 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
 import mcjty.lib.gui.events.ChannelEvent;
@@ -9,23 +8,21 @@ import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.gui.widgets.WidgetRepository;
 import mcjty.lib.preferences.PreferencesProperties;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -41,7 +38,7 @@ public class Window {
     public static final Key<String> PARAM_ID = new Key<>("id", Type.STRING);
 
     private AbstractContainerWidget<?> toplevel;
-    private final GuiScreen gui;
+    private final Screen gui;
     private Widget<?> textFocus = null;
     private Widget<?> hover = null;
     private GuiStyle currentStyle;
@@ -53,16 +50,16 @@ public class Window {
     private List<FocusEvent> focusEvents = null;
 
 
-    public Window(GuiScreen gui, AbstractContainerWidget<?> toplevel) {
+    public Window(Screen gui, AbstractContainerWidget<?> toplevel) {
         this.gui = gui;
         this.toplevel = toplevel;
     }
 
-    public GuiScreen getGui() {
+    public Screen getGui() {
         return gui;
     }
 
-    public Window(GuiScreen gui, GenericTileEntity tileEntity, SimpleNetworkWrapper wrapper, ResourceLocation guiDescription) {
+    public Window(Screen gui, GenericTileEntity tileEntity, SimpleChannel wrapper, ResourceLocation guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
         final int[] sidesize = {0, 0};
@@ -85,7 +82,7 @@ public class Window {
                                     ((GenericGuiContainer<?>) gui).sendServerCommand(wrapper, teCommand, params));
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
-                    toplevel = new Panel(Minecraft.getMinecraft(), gui);
+                    toplevel = new Panel(Minecraft.getInstance(), gui);
                     toplevel.readFromGuiCommand(cmd);
                 });
                 command.commands()

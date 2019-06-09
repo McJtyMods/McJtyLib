@@ -12,7 +12,7 @@ import mcjty.lib.tileentity.LogicTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -146,12 +146,12 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
-            public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+            public void onBlockClicked(World worldIn, BlockPos pos, PlayerEntity playerIn) {
                 clickAction.doClick(worldIn, pos, playerIn);
             }
 
             @Override
-            public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+            public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
                 if (!action.doActivate(worldIn, pos, playerIn, hand, facing, hitX, hitY, hitZ)) {
                     return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
                 } else {

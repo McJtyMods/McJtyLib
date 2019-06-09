@@ -1,7 +1,7 @@
 package mcjty.lib.thirteen;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
@@ -19,7 +19,7 @@ public class Context {
     }
 
     @Nullable
-    public EntityPlayerMP getSender() {
+    public PlayerEntityMP getSender() {
         if (context.getServerHandler() != null) {
             return context.getServerHandler().player;
         } else {

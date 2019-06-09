@@ -3,7 +3,7 @@ package mcjty.lib.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.preferences.PreferencesProperties;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -41,7 +41,7 @@ public class PacketSetGuiStyle implements IMessage {
         }
 
         private void handle(PacketSetGuiStyle message, MessageContext ctx) {
-            EntityPlayerMP playerEntity = ctx.getServerHandler().player;
+            PlayerEntityMP playerEntity = ctx.getServerHandler().player;
 
             PreferencesProperties properties = McJtyLib.getPreferencesProperties(playerEntity);
             properties.setStyle(message.style);

@@ -4,7 +4,7 @@ import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.container.SlotDefinition;
 import mcjty.lib.container.SlotType;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 
 public class TestContainer extends GenericContainer {
@@ -21,7 +21,7 @@ public class TestContainer extends GenericContainer {
     };
 
 
-    public TestContainer(EntityPlayer player, IInventory containerInventory) {
+    public TestContainer(PlayerEntity player, IInventory containerInventory) {
         super(factory);
         addInventory(CONTAINER_INVENTORY, containerInventory);
         addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);

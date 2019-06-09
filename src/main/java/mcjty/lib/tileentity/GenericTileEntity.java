@@ -21,8 +21,8 @@ import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -113,7 +113,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void onPartAdded(PartSlot slot, IBlockState state, TileEntity multipartTile) {
     }
 
-    public boolean onBlockActivated(IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(IBlockState state, PlayerEntity player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         return false;
     }
 
@@ -200,7 +200,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return ((float) infused) / GeneralConfig.maxInfuse;
     }
 
-    public boolean canPlayerAccess(EntityPlayer player) {
+    public boolean canPlayerAccess(PlayerEntity player) {
         return !isInvalid() && player.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
@@ -350,7 +350,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
-    public boolean setOwner(EntityPlayer player) {
+    public boolean setOwner(PlayerEntity player) {
         if (!GeneralConfig.manageOwnership) {
             return false;
         }
@@ -452,12 +452,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return super.getCapability(capability, facing);
     }
 
-    public boolean checkAccess(EntityPlayer player) {
+    public boolean checkAccess(PlayerEntity player) {
         return false;
     }
 
     @Optional.Method(modid = "theoneprobe")
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, EntityPlayer player, World world, IBlockState blockState, IProbeHitData data) {
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, IBlockState blockState, IProbeHitData data) {
         if (blockState.getBlock() instanceof Infusable) {
             int infused = getInfused();
             int pct = infused * 100 / GeneralConfig.maxInfuse;
@@ -524,7 +524,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     /**
      * Return false if this was not handled here. In that case the default rotateBlock() will be done
      */
-    public boolean wrenchUse(World world, BlockPos pos, EnumFacing side, EntityPlayer player) {
+    public boolean wrenchUse(World world, BlockPos pos, EnumFacing side, PlayerEntity player) {
         return false;
     }
 
@@ -565,7 +565,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
 
     @Override
-    public boolean execute(EntityPlayerMP playerMP, String command, TypedMap params) {
+    public boolean execute(PlayerEntityMP playerMP, String command, TypedMap params) {
         if (COMMAND_SYNC_BINDING.equals(command)) {
             syncBinding(params);
             return true;

@@ -7,8 +7,8 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -36,13 +36,13 @@ public class MultipartItemBlock extends ItemBlock {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
+    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side, PlayerEntity player, ItemStack stack) {
         // Return true to make this work all the time.
         return true;
     }
 
 
-    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         IBlockState iblockstate = world.getBlockState(pos);
         Block block = iblockstate.getBlock();
 
@@ -109,7 +109,7 @@ public class MultipartItemBlock extends ItemBlock {
 
 //
 //    @Override
-//    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+//    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 //        ItemStack itemstack = player.getHeldItem(hand);
 //        int meta = this.getMetadata(itemstack.getMetadata());
 //        IBlockState toPlace = block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
@@ -129,12 +129,12 @@ public class MultipartItemBlock extends ItemBlock {
     }
 
     @Override
-    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
+    public boolean placeBlockAt(ItemStack stack, PlayerEntity player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
         // Not implemented
         return false;
     }
 
-    private boolean placeBlockAtInternal(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState,
+    private boolean placeBlockAtInternal(ItemStack stack, PlayerEntity player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState,
                                          @Nonnull PartSlot slot) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
@@ -167,8 +167,8 @@ public class MultipartItemBlock extends ItemBlock {
 
             newState.getBlock().onBlockPlacedBy(world, pos, newState, player, stack);
 
-            if (player instanceof EntityPlayerMP) {
-                CriteriaTriggers.PLACED_BLOCK.trigger((EntityPlayerMP) player, pos, stack);
+            if (player instanceof PlayerEntityMP) {
+                CriteriaTriggers.PLACED_BLOCK.trigger((PlayerEntityMP) player, pos, stack);
             }
         }
 
@@ -177,7 +177,7 @@ public class MultipartItemBlock extends ItemBlock {
 
 
 //    @Override
-//    public boolean placeBlockAt(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
+//    public boolean placeBlockAt(ItemStack stack, PlayerEntity player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
 //        if (!world.isRemote) {
 //            Block block1 = CommonProxy.multipartBlock;
 //            boolean placed = false;
@@ -202,7 +202,7 @@ public class MultipartItemBlock extends ItemBlock {
 //    }
 
 
-    private RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, EntityPlayer playerIn, boolean useLiquids) {
+    private RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, PlayerEntity playerIn, boolean useLiquids) {
         float pitch = playerIn.rotationPitch;
         float yaw = playerIn.rotationYaw;
         double x = playerIn.posX;
@@ -216,8 +216,8 @@ public class MultipartItemBlock extends ItemBlock {
         float f6 = f3 * f4;
         float f7 = f2 * f4;
         double reach = 5.0D;
-        if (playerIn instanceof EntityPlayerMP) {
-            reach = ((EntityPlayerMP) playerIn).interactionManager.getBlockReachDistance();
+        if (playerIn instanceof PlayerEntityMP) {
+            reach = ((PlayerEntityMP) playerIn).interactionManager.getBlockReachDistance();
         }
         Vec3d vec31 = vec3.addVector(f6 * reach, f5 * reach, f7 * reach);
         return worldIn.rayTraceBlocks(vec3, vec31, useLiquids, !useLiquids, false);

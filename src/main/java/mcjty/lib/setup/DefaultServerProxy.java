@@ -5,7 +5,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.proxy.IProxy;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -39,7 +39,7 @@ public abstract class DefaultServerProxy implements IProxy {
     }
 
     @Override
-    public EntityPlayer getClientPlayer() {
+    public PlayerEntity getClientPlayer() {
         throw new IllegalStateException("This should only be called from client side");
     }
 

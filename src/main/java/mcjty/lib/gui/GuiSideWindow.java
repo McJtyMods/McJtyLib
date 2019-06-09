@@ -8,7 +8,7 @@ import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.PacketSetGuiStyle;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 
 import java.awt.*;
@@ -47,7 +47,7 @@ public class GuiSideWindow {
     }
 
     private void help(ModBase modBase, Minecraft mc) {
-        EntityPlayer player = mc.player;
+        PlayerEntity player = mc.player;
         modBase.openManual(player, manual, manualNode);
     }
 

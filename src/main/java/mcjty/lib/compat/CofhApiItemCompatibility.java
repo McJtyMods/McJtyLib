@@ -2,7 +2,7 @@ package mcjty.lib.compat;
 
 import cofh.api.item.IToolHammer;
 import mcjty.lib.varia.WrenchUsage;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
@@ -12,7 +12,7 @@ public class CofhApiItemCompatibility {
         return item instanceof IToolHammer;
     }
 
-    public static WrenchUsage getWrenchUsage(Item item, ItemStack itemStack, EntityPlayer player, BlockPos pos) {
+    public static WrenchUsage getWrenchUsage(Item item, ItemStack itemStack, PlayerEntity player, BlockPos pos) {
         IToolHammer hammer = (IToolHammer) item;
         if (hammer.isUsable(itemStack, player, pos)) {
             hammer.toolUsed(itemStack, player, pos);

@@ -3,7 +3,7 @@ package mcjty.lib.preferences;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class PreferencesProperties {
@@ -21,13 +21,13 @@ public class PreferencesProperties {
     public PreferencesProperties() {
     }
 
-    public void tick(EntityPlayerMP player) {
+    public void tick(PlayerEntityMP player) {
         if (dirty) {
             syncToClient(player);
         }
     }
 
-    private void syncToClient(EntityPlayerMP player) {
+    private void syncToClient(PlayerEntityMP player) {
         McJtyLib.networkHandler.sendTo(new PacketSendPreferencesToClient(buffX, buffY, style), player);
         dirty = false;
     }

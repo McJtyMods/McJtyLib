@@ -4,7 +4,7 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.*;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
 public class Panel extends AbstractContainerWidget<Panel> {
 
@@ -14,7 +14,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
 
     private Widget<?> focus = null;
 
-    public Panel(Minecraft mc, Gui gui) {
+    public Panel(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 
