@@ -1,15 +1,15 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.thirteen.Context;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.PlayerEntityMP;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -18,18 +18,22 @@ import java.util.function.Supplier;
  * a tile entity on the server side that implements CommandHandler. This will call 'execute()' on
  * that command handler.
  */
-public class PacketServerCommandTyped implements IMessage {
+public class PacketServerCommandTyped {
 
     protected BlockPos pos;
     protected Integer dimensionId;
     protected String command;
     protected TypedMap params;
 
-    public PacketServerCommandTyped() {
-    }
-
     public PacketServerCommandTyped(ByteBuf buf) {
-        fromBytes(buf);
+        pos = NetworkTools.readPos(buf);
+        command = NetworkTools.readString(buf);
+        params = TypedMapTools.readArguments(buf);
+        if (buf.readBoolean()) {
+            dimensionId = buf.readInt();
+        } else {
+            dimensionId = null;
+        }
     }
 
     public PacketServerCommandTyped(BlockPos pos, String command, TypedMap params) {
@@ -46,19 +50,6 @@ public class PacketServerCommandTyped implements IMessage {
         this.dimensionId = dimensionId;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        pos = NetworkTools.readPos(buf);
-        command = NetworkTools.readString(buf);
-        params = TypedMapTools.readArguments(buf);
-        if (buf.readBoolean()) {
-            dimensionId = buf.readInt();
-        } else {
-            dimensionId = null;
-        }
-    }
-
-    @Override
     public void toBytes(ByteBuf buf) {
         NetworkTools.writePos(buf, pos);
         NetworkTools.writeString(buf, command);
@@ -71,15 +62,15 @@ public class PacketServerCommandTyped implements IMessage {
         }
     }
 
-    public void handle(Supplier<Context> supplier) {
-        Context ctx = supplier.get();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            PlayerEntityMP playerEntity = ctx.getSender();
+            PlayerEntity playerEntity = ctx.getSender();
             World world;
             if (dimensionId == null) {
                 world = playerEntity.getEntityWorld();
             } else {
-                world = DimensionManager.getWorld(dimensionId);
+                world = DimensionManager.getWorld(playerEntity.getServer(), DimensionType.getById(dimensionId), false, false);  // @todo 1.14 check?
             }
             if (world == null) {
                 return;

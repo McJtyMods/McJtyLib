@@ -1,6 +1,5 @@
 package mcjty.lib.multipart;
 
-import net.minecraftforge.common.property.IUnlistedProperty;
 
 import java.util.List;
 import java.util.Map;
