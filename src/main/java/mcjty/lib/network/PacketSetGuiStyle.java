@@ -3,49 +3,38 @@ package mcjty.lib.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.preferences.PreferencesProperties;
-import net.minecraft.entity.player.PlayerEntityMP;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 /**
  * Change the GUI style.
  */
-public class PacketSetGuiStyle implements IMessage {
+public class PacketSetGuiStyle {
 
     private String style;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+    public PacketSetGuiStyle(ByteBuf buf) {
         style = NetworkTools.readString(buf);
     }
 
-    @Override
     public void toBytes(ByteBuf buf) {
         NetworkTools.writeString(buf, style);
-    }
-
-    public PacketSetGuiStyle() {
     }
 
     public PacketSetGuiStyle(String style) {
         this.style = style;
     }
 
-    public static class Handler implements IMessageHandler<PacketSetGuiStyle, IMessage> {
-        @Override
-        public IMessage onMessage(PacketSetGuiStyle message, MessageContext ctx) {
-            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-            return null;
-        }
+    public void handle(Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> handle(this, ctx));
+        ctx.get().setPacketHandled(true);
+    }
 
-        private void handle(PacketSetGuiStyle message, MessageContext ctx) {
-            PlayerEntityMP playerEntity = ctx.getServerHandler().player;
-
-            PreferencesProperties properties = McJtyLib.getPreferencesProperties(playerEntity);
-            properties.setStyle(message.style);
-        }
-
+    private static void handle(PacketSetGuiStyle message, NetworkEvent.Context ctx) {
+        PlayerEntity playerEntity = ctx.getSender();
+        PreferencesProperties properties = McJtyLib.getPreferencesProperties(playerEntity);
+        properties.setStyle(message.style);
     }
 }

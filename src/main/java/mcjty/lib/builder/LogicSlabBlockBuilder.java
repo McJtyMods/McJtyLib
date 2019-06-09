@@ -11,12 +11,12 @@ import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.LogicTileEntity;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -116,7 +116,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
-            protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+            protected int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
                 return getter.getRedstoneOutput(state, world, pos, side);
             }
 
@@ -126,12 +126,12 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
-            public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+            public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
                 return canRenderInLayer.canRenderInLayer(state, layer);
             }
 
             @Override
-            public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+            public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
             }
 
@@ -141,7 +141,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
-            public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+            public boolean doesSideBlockRendering(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
             }
 
@@ -151,7 +151,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
-            public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+            public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
                 if (!action.doActivate(worldIn, pos, playerIn, hand, facing, hitX, hitY, hitZ)) {
                     return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
                 } else {

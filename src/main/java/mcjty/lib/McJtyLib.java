@@ -199,7 +199,7 @@ public class McJtyLib implements ModBase {
         public void onPlayerInteract(PlayerInteractEvent.LeftClickBlock event) {
             World world = event.getWorld();
             BlockPos pos = event.getPos();
-            IBlockState state = world.getBlockState(pos);
+            BlockState state = world.getBlockState(pos);
             if (state.getBlock() instanceof MultipartBlock) {
                 TileEntity tileEntity = world.getTileEntity(pos);
                 if (tileEntity instanceof MultipartTE) {
@@ -219,12 +219,12 @@ public class McJtyLib implements ModBase {
         CapabilityManager.INSTANCE.register(PreferencesProperties.class, new Capability.IStorage<PreferencesProperties>() {
 
             @Override
-            public NBTBase writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, EnumFacing side) {
+            public NBTBase writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, EnumFacing side, NBTBase nbt) {
+            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, NBTBase nbt) {
                 throw new UnsupportedOperationException();
             }
 

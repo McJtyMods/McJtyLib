@@ -3,7 +3,7 @@ package mcjty.lib.container;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.text.ITextComponent;
 
 public interface DefaultSidedInventory extends ISidedInventory {
@@ -36,17 +36,17 @@ public interface DefaultSidedInventory extends ISidedInventory {
     }
 
     @Override
-    default int[] getSlotsForFace(EnumFacing side) {
+    default int[] getSlotsForFace(Direction side) {
         return new int[0];
     }
 
     @Override
-    default boolean canInsertItem(int index, ItemStack itemStackIn, EnumFacing direction) {
+    default boolean canInsertItem(int index, ItemStack itemStackIn, Direction direction) {
         return false;
     }
 
     @Override
-    default boolean canExtractItem(int index, ItemStack stack, EnumFacing direction) {
+    default boolean canExtractItem(int index, ItemStack stack, Direction direction) {
         return false;
     }
 

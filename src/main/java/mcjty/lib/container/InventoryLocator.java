@@ -4,7 +4,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -18,9 +18,9 @@ import net.minecraftforge.items.ItemHandlerHelper;
 public class InventoryLocator {
 
     private BlockPos inventoryCoordinate = null;
-    private EnumFacing inventorySide = null;
+    private Direction inventorySide = null;
 
-    private IItemHandler getItemHandlerAtDirection(World worldObj, BlockPos thisCoordinate, EnumFacing direction) {
+    private IItemHandler getItemHandlerAtDirection(World worldObj, BlockPos thisCoordinate, Direction direction) {
         if (direction == null) {
             if (inventoryCoordinate != null) {
                 return getItemHandlerAtCoordinate(worldObj, inventoryCoordinate, inventorySide);
@@ -37,7 +37,7 @@ public class InventoryLocator {
         return null;
     }
 
-    private IItemHandler getItemHandlerAtCoordinate(World worldObj, BlockPos c, EnumFacing direction) {
+    private IItemHandler getItemHandlerAtCoordinate(World worldObj, BlockPos c, Direction direction) {
         TileEntity te = worldObj.getTileEntity(c);
         if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction)) {
             return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction);
@@ -46,7 +46,7 @@ public class InventoryLocator {
     }
 
 
-    private IInventory getInventoryAtDirection(World worldObj, BlockPos thisCoordinate, EnumFacing direction) {
+    private IInventory getInventoryAtDirection(World worldObj, BlockPos thisCoordinate, Direction direction) {
         if (direction == null) {
             if (inventoryCoordinate != null) {
                 return getInventoryAtCoordinate(worldObj, inventoryCoordinate);
@@ -67,8 +67,8 @@ public class InventoryLocator {
         return null;
     }
 
-    public void ejectStack(World worldObj, BlockPos pos, ItemStack stack, BlockPos thisCoordinate, EnumFacing[] directions) {
-        for (EnumFacing dir : directions) {
+    public void ejectStack(World worldObj, BlockPos pos, ItemStack stack, BlockPos thisCoordinate, Direction[] directions) {
+        for (Direction dir : directions) {
             IItemHandler handler = getItemHandlerAtDirection(worldObj, thisCoordinate, dir);
             if (stack.isEmpty()) {
                 break;
@@ -100,7 +100,7 @@ public class InventoryLocator {
     }
 
 
-    public EnumFacing getInventorySide() {
+    public Direction getInventorySide() {
         return inventorySide;
     }
 

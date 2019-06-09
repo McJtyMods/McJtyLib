@@ -1,10 +1,10 @@
 package mcjty.lib.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
 
@@ -17,19 +17,19 @@ public class RenderGlowEffect {
     public static void renderGlow(Tessellator tessellator, double x, double y, double z) {
         BufferBuilder buffer = tessellator.getBuffer();
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y, z);
+        GlStateManager.translated(x, y, z);
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.UP.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.DOWN.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.NORTH.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.SOUTH.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.WEST.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.EAST.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(buffer, Direction.UP.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(buffer, Direction.DOWN.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(buffer, Direction.NORTH.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(buffer, Direction.SOUTH.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(buffer, Direction.WEST.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(buffer, Direction.EAST.ordinal(), 1.1f, -0.05f);
 
         tessellator.draw();
         GlStateManager.popMatrix();
@@ -92,7 +92,7 @@ public class RenderGlowEffect {
             this.v4 = v4;
         }
 
-        public Quad rotate(EnumFacing direction) {
+        public Quad rotate(Direction direction) {
             switch (direction) {
                 case NORTH: return new Quad(v4, v1, v2, v3);
                 case EAST: return new Quad(v3, v4, v1, v2);

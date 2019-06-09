@@ -2,7 +2,7 @@ package mcjty.lib.tileentity;
 
 import mcjty.lib.varia.EnergyTools;
 import net.darkhax.tesla.api.ITeslaConsumer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.Optional;
 
@@ -24,7 +24,7 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+    public boolean hasCapability(Capability<?> capability, Direction facing) {
         if (capability == EnergyTools.TESLA_CONSUMER) {
             return true;
         }
@@ -32,7 +32,7 @@ public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEnt
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+    public <T> T getCapability(Capability<T> capability, Direction facing) {
         if (capability == EnergyTools.TESLA_CONSUMER) {
             return (T) this;
         }

@@ -50,7 +50,7 @@ public class PacketSendPreferencesToClient implements IMessage {
     public static class Handler implements IMessageHandler<PacketSendPreferencesToClient, IMessage> {
         @Override
         public IMessage onMessage(PacketSendPreferencesToClient message, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(() -> SendPreferencesToClientHelper.setPreferences(message));
+            Minecraft.getInstance().addScheduledTask(() -> SendPreferencesToClientHelper.setPreferences(message));
             return null;
         }
 

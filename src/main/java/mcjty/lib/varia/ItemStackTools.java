@@ -89,12 +89,12 @@ public class ItemStackTools {
     }
 
     @Nonnull
-    public static Optional<NBTTagCompound> getTag(@Nonnull ItemStack stack) {
+    public static Optional<CompoundNBT> getTag(@Nonnull ItemStack stack) {
         return Optional.ofNullable(stack.getTagCompound());
     }
 
     @Nonnull
-    public static <R> R mapTag(@Nonnull ItemStack stack, Function<NBTTagCompound,R> mapping, @Nonnull R def) {
+    public static <R> R mapTag(@Nonnull ItemStack stack, Function<CompoundNBT,R> mapping, @Nonnull R def) {
         if (stack.hasTagCompound()) {
             return mapping.apply(stack.getTagCompound());
         } else {
@@ -113,7 +113,7 @@ public class ItemStackTools {
     }
 
     @Nonnull
-    public static Stream<NBTBase> getListStream(NBTTagCompound compound, String tag) {
+    public static Stream<NBTBase> getListStream(CompoundNBT compound, String tag) {
         NBTTagList list = compound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
         return StreamSupport.stream(list.spliterator(), false);
     }
@@ -149,7 +149,7 @@ public class ItemStackTools {
         ItemStack stack = new ItemStack(item, amount, meta);
         if (obj.has("nbt")) {
             try {
-                NBTTagCompound nbt = JsonToNBT.getTagFromJson(obj.get("nbt").getAsString());
+                CompoundNBT nbt = JsonToNBT.getTagFromJson(obj.get("nbt").getAsString());
                 stack.setTagCompound(nbt);
             } catch (NBTException e) {
                 // @todo What to do?
@@ -178,7 +178,7 @@ public class ItemStackTools {
         ItemStack stack = new ItemStack(item, amount, meta);
         obj.findCommand("tag").ifPresent(cmd -> {
             try {
-                NBTTagCompound nbt = JsonToNBT.getTagFromJson(cmd.getOptionalPar(0, ""));
+                CompoundNBT nbt = JsonToNBT.getTagFromJson(cmd.getOptionalPar(0, ""));
                 stack.setTagCompound(nbt);
             } catch (NBTException e) {
                 e.printStackTrace();

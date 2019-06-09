@@ -4,7 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.entity.player.PlayerEntityMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 public class PreferencesProperties {
 
@@ -32,13 +32,13 @@ public class PreferencesProperties {
         dirty = false;
     }
 
-    public void saveNBTData(NBTTagCompound compound) {
+    public void saveNBTData(CompoundNBT compound) {
         compound.setInteger("buffX", buffX);
         compound.setInteger("buffY", buffY);
         compound.setString("style", style.getStyle());
     }
 
-    public void loadNBTData(NBTTagCompound compound) {
+    public void loadNBTData(CompoundNBT compound) {
         buffX = compound.getInteger("buffX");
         buffY = compound.getInteger("buffY");
         String s = compound.getString("style");

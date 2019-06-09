@@ -10,15 +10,15 @@ import mcjty.lib.container.GenericContainer;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathNodeType;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -102,7 +102,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             }
 
             @Override
-            protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+            protected int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
                 return getter.getRedstoneOutput(state, world, pos, side);
             }
 
@@ -112,17 +112,17 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             }
 
             @Override
-            public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+            public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
                 return canRenderInLayer.canRenderInLayer(state, layer);
             }
 
             @Override
-            public int getLightValue(IBlockState state, IBlockAccess world, BlockPos pos) {
+            public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
             }
 
             @Override
-            public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing face) {
+            public boolean doesSideBlockRendering(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
             }
 
@@ -133,13 +133,13 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
 
             @Nonnull
             @Override
-            public PartSlot getSlotFromState(World world, BlockPos pos, IBlockState newState) {
+            public PartSlot getSlotFromState(World world, BlockPos pos, BlockState newState) {
                 return slotGetter.getSlotFromState(world, pos, newState);
             }
 
             @Override
-            public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-                IBlockState state = placementGetter.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+            public BlockState getStateForPlacement(World worldIn, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, MobEntity placer) {
+                BlockState state = placementGetter.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
                 if (state != null) {
                     return state;
                 }
@@ -147,7 +147,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             }
 
             @Override
-            public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, PlayerEntity playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+            public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
                 if (!action.doActivate(worldIn, pos, playerIn, hand, facing, hitX, hitY, hitZ)) {
                     return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
                 } else {
@@ -156,12 +156,12 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             }
 
             @Override
-            public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+            public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
                 return boundingBox.getBoundingBox(state, source, pos);
             }
 
             @Override
-            public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+            public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
                 if (!boxToList.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState)) {
                     super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
                 }
@@ -169,7 +169,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
 
             @Nullable
             @Override
-            public PathNodeType getAiPathNodeType(IBlockState state, IBlockAccess world, BlockPos pos) {
+            public PathNodeType getAiPathNodeType(BlockState state, IBlockAccess world, BlockPos pos) {
                 PathNodeType type = getAIPathNodeType.getAiPathNodeType(state, world, pos);
                 if (type == null) {
                     return super.getAiPathNodeType(state, world, pos);

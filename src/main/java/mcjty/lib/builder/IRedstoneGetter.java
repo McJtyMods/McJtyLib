@@ -1,10 +1,10 @@
 package mcjty.lib.builder;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 public interface IRedstoneGetter {
-    int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side);
+    int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side);
 }

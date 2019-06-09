@@ -3,7 +3,7 @@ package mcjty.lib.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -13,7 +13,7 @@ public class HudRenderHelper {
     public static void renderHud(List<String> messages,
                                  HudPlacement hudPlacement,
                                  HudOrientation hudOrientation,
-                                 EnumFacing orientation,
+                                 Direction orientation,
                                  double x, double y, double z, float scale) {
         GlStateManager.pushMatrix();
 
@@ -30,12 +30,12 @@ public class HudRenderHelper {
                 GlStateManager.rotate(-getHudAngle(orientation), 0.0F, 1.0F, 0.0F);
                 break;
             case HUD_TOPLAYER_HORIZ:
-                GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
                 GlStateManager.rotate(180, 0.0F, 1.0F, 0.0F);
                 break;
             case HUD_TOPLAYER:
-                GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-                GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotate(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotate(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
                 GlStateManager.rotate(180, 0.0F, 1.0F, 0.0F);
                 break;
         }
@@ -47,12 +47,12 @@ public class HudRenderHelper {
         }
 
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        Minecraft.getMinecraft().entityRenderer.disableLightmap();
+        Minecraft.getInstance().entityRenderer.disableLightmap();
         GlStateManager.disableBlend();
         GlStateManager.disableLighting();
 
-        renderText(Minecraft.getMinecraft().fontRenderer, messages, 11, scale);
-        Minecraft.getMinecraft().entityRenderer.enableLightmap();
+        renderText(Minecraft.getInstance().fontRenderer, messages, 11, scale);
+        Minecraft.getInstance().entityRenderer.enableLightmap();
 
 //        RenderHelper.enableStandardItemLighting();
         GlStateManager.enableLighting();
@@ -62,7 +62,7 @@ public class HudRenderHelper {
         GlStateManager.popMatrix();
     }
 
-    private static float getHudAngle(EnumFacing orientation) {
+    private static float getHudAngle(Direction orientation) {
         float f3 = 0.0f;
 
         if (orientation != null) {

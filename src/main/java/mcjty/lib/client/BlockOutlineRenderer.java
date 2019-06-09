@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -20,7 +20,7 @@ public class BlockOutlineRenderer {
      * This method translates GL state relative to player position
      */
     public static void renderHilightedBlock(BlockPos c, float partialTicks) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
 
         PlayerEntitySP p = mc.player;
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
@@ -58,7 +58,7 @@ public class BlockOutlineRenderer {
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
 
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        Minecraft.getMinecraft().entityRenderer.disableLightmap();
+        Minecraft.getInstance().entityRenderer.disableLightmap();
         GlStateManager.disableDepth();
         GlStateManager.disableTexture2D();
         GlStateManager.disableLighting();
@@ -72,7 +72,7 @@ public class BlockOutlineRenderer {
 
         GlStateManager.popMatrix();
 
-        Minecraft.getMinecraft().entityRenderer.enableLightmap();
+        Minecraft.getInstance().entityRenderer.enableLightmap();
         GlStateManager.enableTexture2D();
     }
 
@@ -138,7 +138,7 @@ public class BlockOutlineRenderer {
      */
     public static void renderBoxOutline(BlockPos pos) {
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        Minecraft.getMinecraft().entityRenderer.disableLightmap();
+        Minecraft.getInstance().entityRenderer.disableLightmap();
         GlStateManager.disableTexture2D();
         GlStateManager.disableBlend();
         GlStateManager.disableLighting();
@@ -156,7 +156,7 @@ public class BlockOutlineRenderer {
 
         tessellator.draw();
 
-        Minecraft.getMinecraft().entityRenderer.enableLightmap();
+        Minecraft.getInstance().entityRenderer.enableLightmap();
         GlStateManager.enableTexture2D();
     }
 
@@ -177,7 +177,7 @@ public class BlockOutlineRenderer {
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
-        Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
+        Minecraft.getInstance().getTextureManager().bindTexture(texture);
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 //        tessellator.setColorRGBA(255, 255, 255, 64);
@@ -191,12 +191,12 @@ public class BlockOutlineRenderer {
             float y = base.getY() + coordinate.getY();
             float z = base.getZ() + coordinate.getZ();
             Vec3d offs = new Vec3d(x, y, z);
-            RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.UP.ordinal(), 1.1f, -0.05f, offs);
-            RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.DOWN.ordinal(), 1.1f, -0.05f, offs);
-            RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.NORTH.ordinal(), 1.1f, -0.05f, offs);
-            RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.SOUTH.ordinal(), 1.1f, -0.05f, offs);
-            RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.WEST.ordinal(), 1.1f, -0.05f, offs);
-            RenderGlowEffect.addSideFullTexture(buffer, EnumFacing.EAST.ordinal(), 1.1f, -0.05f, offs);
+            RenderGlowEffect.addSideFullTexture(buffer, Direction.UP.ordinal(), 1.1f, -0.05f, offs);
+            RenderGlowEffect.addSideFullTexture(buffer, Direction.DOWN.ordinal(), 1.1f, -0.05f, offs);
+            RenderGlowEffect.addSideFullTexture(buffer, Direction.NORTH.ordinal(), 1.1f, -0.05f, offs);
+            RenderGlowEffect.addSideFullTexture(buffer, Direction.SOUTH.ordinal(), 1.1f, -0.05f, offs);
+            RenderGlowEffect.addSideFullTexture(buffer, Direction.WEST.ordinal(), 1.1f, -0.05f, offs);
+            RenderGlowEffect.addSideFullTexture(buffer, Direction.EAST.ordinal(), 1.1f, -0.05f, offs);
         }
         tessellator.draw();
 

@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -327,7 +327,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                         ItemStack stack = ingredient.getMatchingStacks()[0];
                         if (stack != null && stack.getItemDamage() == 32767) {
                             // Just pick 0 here.
-                            NBTTagCompound tc = stack.getTagCompound();
+                            CompoundNBT tc = stack.getTagCompound();
                             stack = new ItemStack(stack.getItem(), stack.getCount(), 0);
                             if (tc != null) {
                                 stack.setTagCompound(tc.copy());

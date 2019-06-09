@@ -1,9 +1,8 @@
 package mcjty.lib.network;
 
-import mcjty.lib.thirteen.SimpleChannel;
 import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -19,14 +18,14 @@ public class PacketHandler {
     // For the client-info packet system:
     private static int packetId = INTERNAL_PACKETS;
 
-    public static Map<String,SimpleNetworkWrapper> modNetworking = new HashMap<>();
+    public static Map<String, SimpleChannel> modNetworking = new HashMap<>();
 
     public static int nextPacketID() {
         return packetId++;
     }
 
-    public static SimpleNetworkWrapper registerMessages(String modid, String channelName) {
-        SimpleNetworkWrapper network = new SimpleNetworkWrapper(channelName) {
+    public static SimpleChannel registerMessages(String modid, String channelName) {
+        SimpleChannel network = new SimpleChannel(channelName) {
             @Override
             public void sendToServer(IMessage message) {
                 if (message instanceof IClientServerDelayed && !canBeSent(message)) {
@@ -51,7 +50,7 @@ public class PacketHandler {
     }
 
 
-    private static void registerMessages(SimpleNetworkWrapper networkWrapper) {
+    private static void registerMessages(SimpleChannel networkWrapper) {
         int startIndex = 0;
         SimpleChannel channel = new SimpleChannel(networkWrapper);
 
@@ -70,7 +69,7 @@ public class PacketHandler {
     }
 
     // From client side only: send server command
-    public static void sendCommand(SimpleNetworkWrapper network, String modid, String command, @Nonnull TypedMap arguments) {
+    public static void sendCommand(SimpleChannel network, String modid, String command, @Nonnull TypedMap arguments) {
         network.sendToServer(new PacketSendServerCommand(modid, command, arguments));
     }
 }

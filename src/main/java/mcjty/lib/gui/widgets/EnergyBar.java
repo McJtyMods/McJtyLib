@@ -5,7 +5,7 @@ import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     private boolean showRfPerTick = DEFAULT_SHOWRFPERTICK;
     private long rfPerTick = 0;
 
-    public EnergyBar(Minecraft mc, Gui gui) {
+    public EnergyBar(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 

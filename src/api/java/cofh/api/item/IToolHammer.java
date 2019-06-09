@@ -1,7 +1,7 @@
 package cofh.api.item;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 
@@ -18,7 +18,7 @@ public interface IToolHammer {
      * @param pos  Coordinates of the block
      * @return True if this tool can be used
      */
-    boolean isUsable(ItemStack item, EntityLivingBase user, BlockPos pos);
+    boolean isUsable(ItemStack item, MobEntity user, BlockPos pos);
 
     /**
      * Called to ensure that the tool can be used on an entity.
@@ -28,7 +28,7 @@ public interface IToolHammer {
      * @param entity The entity the tool is being used on.
      * @return True if this tool can be used.
      */
-    boolean isUsable(ItemStack item, EntityLivingBase user, Entity entity);
+    boolean isUsable(ItemStack item, MobEntity user, Entity entity);
 
     /**
      * Callback for when the tool has been used reactively.
@@ -37,7 +37,7 @@ public interface IToolHammer {
      * @param user The entity using the tool.
      * @param pos  Coordinates of the block.
      */
-    void toolUsed(ItemStack item, EntityLivingBase user, BlockPos pos);
+    void toolUsed(ItemStack item, MobEntity user, BlockPos pos);
 
     /**
      * Callback for when the tool has been used reactively.
@@ -46,5 +46,5 @@ public interface IToolHammer {
      * @param user   The entity using the tool.
      * @param entity The entity the tool is being used on.
      */
-    void toolUsed(ItemStack item, EntityLivingBase user, Entity entity);
+    void toolUsed(ItemStack item, MobEntity user, Entity entity);
 }

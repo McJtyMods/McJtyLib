@@ -5,7 +5,7 @@ import mcjty.lib.network.PacketDumpItemInfo;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.Level;
 
@@ -23,7 +23,7 @@ public class DumpItemNBT {
         jsonObject.add("item", new JsonPrimitive(item.getItem().getRegistryName().toString()));
         jsonObject.add("meta", new JsonPrimitive(item.getItemDamage()));
         if (item.hasTagCompound()) {
-            NBTTagCompound tag = item.getTagCompound();
+            CompoundNBT tag = item.getTagCompound();
             if (verbose) {
                 String nbtJson = tag.toString();
                 JsonParser parser = new JsonParser();

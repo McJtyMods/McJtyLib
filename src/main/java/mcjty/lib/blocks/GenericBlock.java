@@ -22,20 +22,20 @@ import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -118,37 +118,37 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Deprecated
-    public boolean shouldRedstoneConduitConnect(World world, int x, int y, int z, EnumFacing from) {
+    public boolean shouldRedstoneConduitConnect(World world, int x, int y, int z, Direction from) {
         throw new AbstractMethodError();
     }
 
     @Override
     @Optional.Method(modid = "enderio")
-    public boolean shouldRedstoneConduitConnect(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EnumFacing from) {
+    public boolean shouldRedstoneConduitConnect(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull Direction from) {
         return needsRedstoneCheck() || hasRedstoneOutput();
     }
 
-    protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+    protected int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
         return -1;
     }
 
     @Override
-    public boolean canProvidePower(IBlockState state) {
+    public boolean canProvidePower(BlockState state) {
         return hasRedstoneOutput();
     }
 
     @Override
-    public int getWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+    public int getWeakPower(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
         return getRedstoneOutput(state, world, pos, side);
     }
 
     @Override
-    public int getStrongPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+    public int getStrongPower(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
         return getRedstoneOutput(state, world, pos, side);
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+    public void breakBlock(World world, BlockPos pos, BlockState state) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
             if (!world.isRemote) {
@@ -163,7 +163,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     @Optional.Method(modid = "theoneprobe")
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, IBlockState blockState, IProbeHitData data) {
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
         super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
         BlockPos pos = data.getPos();
         TileEntity te = world.getTileEntity(pos);
@@ -195,7 +195,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     protected void intAddInformation(ItemStack itemStack, List<String> list) {
-        NBTTagCompound tagCompound = itemStack.getTagCompound();
+        CompoundNBT tagCompound = itemStack.getTagCompound();
         if (tagCompound != null) {
             if (tagCompound.hasKey("Energy")) {
                 long energy = tagCompound.getLong("Energy");
@@ -228,19 +228,19 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
         if (needsRedstoneCheck()) {
             checkRedstone(world, pos);
         }
     }
 
     @Override
-    public void getDrops(NonNullList<ItemStack> result, IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
+    public void getDrops(NonNullList<ItemStack> result, IBlockAccess world, BlockPos pos, BlockState metadata, int fortune) {
         TileEntity tileEntity = world.getTileEntity(pos);
 
         if (tileEntity instanceof GenericTileEntity) {
             ItemStack stack = new ItemStack(Item.getItemFromBlock(this));
-            NBTTagCompound tagCompound = new NBTTagCompound();
+            CompoundNBT tagCompound = new CompoundNBT();
             ((GenericTileEntity)tileEntity).writeRestorableToNBT(tagCompound);
 
             stack.setTagCompound(tagCompound);
@@ -253,7 +253,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public boolean removedByPlayer(IBlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest) {
+    public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest) {
         if (willHarvest) {
             return true; // If it will harvest, delay deletion of the block until after getDrops
         }
@@ -261,7 +261,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public void harvestBlock(World world, PlayerEntity player, BlockPos pos, IBlockState state, TileEntity te, ItemStack stack) {
+    public void harvestBlock(World world, PlayerEntity player, BlockPos pos, BlockState state, TileEntity te, ItemStack stack) {
         super.harvestBlock(world, player, pos, state, te, stack);
         world.setBlockToAir(pos);
     }
@@ -272,7 +272,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public TileEntity createTileEntity(World world, IBlockState metadata) {
+    public TileEntity createTileEntity(World world, BlockState metadata) {
         try {
             return tileEntityClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
@@ -282,7 +282,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     // This if this block was activated with a wrench
     private WrenchUsage testWrenchUsage(BlockPos pos, PlayerEntity player) {
-        ItemStack itemStack = player.getHeldItem(EnumHand.MAIN_HAND);
+        ItemStack itemStack = player.getHeldItem(Hand.MAIN_HAND);
         WrenchUsage wrenchUsed = WrenchUsage.NOT;
         if (!itemStack.isEmpty()) {
             Item item = itemStack.getItem();
@@ -312,7 +312,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, PlayerEntity player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
             if (((GenericTileEntity) te).onBlockActivated(state, player, hand, side, hitX, hitY, hitZ)) {
@@ -343,7 +343,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         this.moduleSupport = moduleSupport;
     }
 
-    public boolean handleModule(World world, BlockPos pos, IBlockState state, PlayerEntity player, EnumHand hand, ItemStack heldItem, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean handleModule(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) {
         if (!heldItem.isEmpty()) {
             IModuleSupport support = getModuleSupport();
             if (support != null) {
@@ -358,7 +358,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
+    public boolean rotateBlock(World world, BlockPos pos, Direction axis) {
         boolean rc = super.rotateBlock(world, pos, axis);
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof GenericTileEntity) {
@@ -367,14 +367,14 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return rc;
     }
 
-    protected boolean wrenchUse(World world, BlockPos pos, EnumFacing side, PlayerEntity player) {
+    protected boolean wrenchUse(World world, BlockPos pos, Direction side, PlayerEntity player) {
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof GenericTileEntity) {
             if (!((GenericTileEntity) tileEntity).wrenchUse(world, pos, side, player)) {
-                rotateBlock(world, pos, EnumFacing.UP);
+                rotateBlock(world, pos, Direction.UP);
             }
         } else {
-            rotateBlock(world, pos, EnumFacing.UP);
+            rotateBlock(world, pos, Direction.UP);
         }
         return true;
     }
@@ -415,7 +415,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, MobEntity placer, ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
         restoreBlockFromNBT(world, pos, stack);
         if (!world.isRemote && GeneralConfig.manageOwnership) {
@@ -433,17 +433,17 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
-    protected void setOwner(World world, BlockPos pos, EntityLivingBase entityLivingBase) {
+    protected void setOwner(World world, BlockPos pos, MobEntity MobEntity) {
         TileEntity te = world.getTileEntity(pos);
-        if (te instanceof GenericTileEntity && entityLivingBase instanceof PlayerEntity) {
+        if (te instanceof GenericTileEntity && MobEntity instanceof PlayerEntity) {
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-            PlayerEntity player = (PlayerEntity) entityLivingBase;
+            PlayerEntity player = (PlayerEntity) MobEntity;
             genericTileEntity.setOwner(player);
         }
     }
 
     @Override
-    public boolean shouldCheckWeakPower(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+    public boolean shouldCheckWeakPower(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
         return false;
     }
 
@@ -472,7 +472,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
      * @param itemStack
      */
     protected void restoreBlockFromNBT(World world, BlockPos pos, ItemStack itemStack) {
-        NBTTagCompound tagCompound = itemStack.getTagCompound();
+        CompoundNBT tagCompound = itemStack.getTagCompound();
         if (tagCompound != null) {
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof GenericTileEntity) {
@@ -493,7 +493,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+    public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
         if (hasTileEntity) {
             super.eventReceived(state, worldIn, pos, id, param);
             TileEntity tileentity = worldIn.getTileEntity(pos);
@@ -529,7 +529,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public IBlockState getActualState(IBlockState state, IBlockAccess world, BlockPos pos) {
+    public BlockState getActualState(BlockState state, IBlockAccess world, BlockPos pos) {
         TileEntity te = world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
             return ((GenericTileEntity) te).getActualState(state);
@@ -544,11 +544,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         return false;
     }
 
-    public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+    public ItemStack getItem(World world, BlockPos pos, BlockState state) {
         ItemStack stack = super.getItem(world, pos, state);
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
-            NBTTagCompound tagCompound = new NBTTagCompound();
+            CompoundNBT tagCompound = new CompoundNBT();
             ((GenericTileEntity)te).writeRestorableToNBT(tagCompound);
             stack.setTagCompound(tagCompound);
         }

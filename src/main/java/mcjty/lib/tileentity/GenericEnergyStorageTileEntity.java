@@ -6,8 +6,8 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.EnergyTools;
 import net.darkhax.tesla.api.ITeslaHolder;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -47,24 +47,24 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tagCompound) {
+    public void readFromNBT(CompoundNBT tagCompound) {
         super.readFromNBT(tagCompound);
     }
 
     @Override
-    public void readRestorableFromNBT(NBTTagCompound tagCompound) {
+    public void readRestorableFromNBT(CompoundNBT tagCompound) {
         super.readRestorableFromNBT(tagCompound);
         storage.readFromNBT(tagCompound);
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
+    public CompoundNBT writeToNBT(CompoundNBT tagCompound) {
         super.writeToNBT(tagCompound);
         return tagCompound;
     }
 
     @Override
-    public void writeRestorableToNBT(NBTTagCompound tagCompound) {
+    public void writeRestorableToNBT(CompoundNBT tagCompound) {
         super.writeRestorableToNBT(tagCompound);
         storage.writeToNBT(tagCompound);
     }
@@ -173,7 +173,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
     };
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+    public boolean hasCapability(Capability<?> capability, Direction facing) {
         if (capability == CapabilityEnergy.ENERGY || capability == EnergyTools.TESLA_HOLDER) {
             return true;
         }
@@ -181,7 +181,7 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+    public <T> T getCapability(Capability<T> capability, Direction facing) {
         if (capability == CapabilityEnergy.ENERGY) {
             return (T) energyStorage;
         } else if(capability == EnergyTools.TESLA_HOLDER) {

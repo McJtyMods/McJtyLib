@@ -71,7 +71,7 @@ public class DefaultClientProxy implements IProxy {
     public void initStateMapper(Block block, ModelResourceLocation model) {
         StateMapperBase ignoreState = new StateMapperBase() {
             @Override
-            protected ModelResourceLocation getModelResourceLocation(BlockState iBlockState) {
+            protected ModelResourceLocation getModelResourceLocation(BlockState BlockState) {
                 return model;
             }
         };

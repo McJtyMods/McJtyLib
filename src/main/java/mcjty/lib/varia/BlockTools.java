@@ -1,14 +1,14 @@
 package mcjty.lib.varia;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -61,7 +61,7 @@ public class BlockTools {
     }
 
     public static String getReadableName(World world, BlockPos pos) {
-        IBlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
         return getReadableName(state.getBlock().getItem(world, pos, state));
     }
 
@@ -69,20 +69,20 @@ public class BlockTools {
         return stack.getDisplayName();
     }
 
-    public static IBlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable IBlockState origState) {
+    public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
         if (blockStack.getItem() instanceof ItemBlock) {
             ItemBlock itemBlock = (ItemBlock) blockStack.getItem();
             if (origState == null) {
-                origState = itemBlock.getBlock().getStateForPlacement(world, pos, EnumFacing.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, EnumHand.MAIN_HAND);
+                origState = itemBlock.getBlock().getStateForPlacement(world, pos, Direction.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, Hand.MAIN_HAND);
             }
-            if (itemBlock.placeBlockAt(blockStack, player, world, pos, EnumFacing.UP, 0, 0, 0, origState)) {
+            if (itemBlock.placeBlockAt(blockStack, player, world, pos, Direction.UP, 0, 0, 0, origState)) {
                 blockStack.shrink(1);
             }
             return origState;
         } else {
-            player.setHeldItem(EnumHand.MAIN_HAND, blockStack);
+            player.setHeldItem(Hand.MAIN_HAND, blockStack);
             player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            blockStack.getItem().onItemUse(player, world, pos.down(), EnumHand.MAIN_HAND, EnumFacing.UP, 0, 0, 0);
+            blockStack.getItem().onItemUse(player, world, pos.down(), Hand.MAIN_HAND, Direction.UP, 0, 0, 0);
             return world.getBlockState(pos);
         }
     }

@@ -387,7 +387,7 @@ public class TrueTypeFont {
                 drawTextInternal(x, y, left, scaleX, scaleY, format, rgba);
                 x += getWidth(left);
             }
-            int colorCode = Minecraft.getMinecraft().fontRenderer.getColorCode(text.charAt(i + 1));//fmt.getColorIndex());
+            int colorCode = Minecraft.getInstance().fontRenderer.getColorCode(text.charAt(i + 1));//fmt.getColorIndex());
             if (colorCode != -1) {
                 float r = (colorCode >> 16) / 255.0F;
                 float g = (colorCode >> 8 & 255) / 255.0F;

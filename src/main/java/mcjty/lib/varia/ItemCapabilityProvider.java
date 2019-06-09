@@ -4,7 +4,7 @@ import net.darkhax.tesla.api.ITeslaConsumer;
 import net.darkhax.tesla.api.ITeslaHolder;
 import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -31,7 +31,7 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, I
     }
 
     @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing) {
+    public boolean hasCapability(Capability<?> capability, @Nullable Direction facing) {
         if (capability == CapabilityEnergy.ENERGY || capability == EnergyTools.TESLA_HOLDER || capability == EnergyTools.TESLA_CONSUMER || capability == EnergyTools.TESLA_PRODUCER) {
             return true;
         }
@@ -39,7 +39,7 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, I
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
+    public <T> T getCapability(Capability<T> capability, @Nullable Direction facing) {
         if (capability == CapabilityEnergy.ENERGY) {
             return (T) energyStorage;
         } else if(capability == EnergyTools.TESLA_HOLDER || capability == EnergyTools.TESLA_CONSUMER || capability == EnergyTools.TESLA_PRODUCER) {

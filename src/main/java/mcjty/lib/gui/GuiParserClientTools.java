@@ -1,7 +1,7 @@
 package mcjty.lib.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.IResource;
+import net.minecraft.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 
 import java.io.BufferedReader;
@@ -14,7 +14,7 @@ public class GuiParserClientTools {
 
     public static void parseAndHandleClient(ResourceLocation guiDescription, Consumer<GuiParser.GuiCommand> consumer) {
         try {
-            IResource resource = Minecraft.getMinecraft().getResourceManager().getResource(guiDescription);
+            IResource resource = Minecraft.getInstance().getResourceManager().getResource(guiDescription);
             try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
                 GuiParser.parse(br).forEach(consumer);
             } catch (GuiParser.ParserException e) {

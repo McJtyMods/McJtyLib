@@ -3,7 +3,7 @@ package crazypants.enderio.base.power;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 
 public interface IPowerStorage {
 
@@ -21,11 +21,11 @@ public interface IPowerStorage {
    * @param direction
    * @return
    */
-  boolean isNetworkControlledIo(@Nonnull EnumFacing direction);
+  boolean isNetworkControlledIo(@Nonnull Direction direction);
 
-  boolean isOutputEnabled(@Nonnull EnumFacing direction);
+  boolean isOutputEnabled(@Nonnull Direction direction);
 
-  boolean isInputEnabled(@Nonnull EnumFacing direction);
+  boolean isInputEnabled(@Nonnull Direction direction);
 
   int getMaxOutput();
 

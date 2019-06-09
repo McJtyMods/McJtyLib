@@ -4,9 +4,7 @@ import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.IconHolder;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
-import org.lwjgl.input.Mouse;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.Optional;
 
@@ -94,20 +92,20 @@ public class IconManager {
         return draggingIcon != null;
     }
 
-    public void draw(Minecraft mc, Gui gui) {
+    public void draw(Minecraft mc, Screen gui) {
         if (draggingIcon != null) {
             draggingIcon.draw(mc, gui, getRelativeX() - dx, getRelativeY() - dy);
         }
     }
 
     private int getRelativeX() {
-        GuiScreen gui = windowManager.getGui();
-        return Mouse.getEventX() * gui.width / gui.mc.displayWidth;
+        Screen gui = windowManager.getGui();
+        return (int) gui.getMinecraft().mouseHelper.getMouseX() * gui.width / gui.getMinecraft().mainWindow.getWidth();
     }
 
     private int getRelativeY() {
-        GuiScreen gui = windowManager.getGui();
-        return gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
+        Screen gui = windowManager.getGui();
+        return gui.height - (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / gui.getMinecraft().mainWindow.getHeight() - 1;
     }
 
 }

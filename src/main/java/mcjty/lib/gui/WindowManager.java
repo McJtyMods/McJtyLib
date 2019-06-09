@@ -4,8 +4,8 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import org.lwjgl.input.Mouse;
+import net.minecraft.client.MouseHelper;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class WindowManager {
 
     private IconManager iconManager = new IconManager(this);
-    private final GuiScreen gui;
+    private final Screen gui;
 
     private List<Window> windows = new ArrayList<>();
     private List<Window> modalWindows = new ArrayList<>();
@@ -28,11 +28,11 @@ public class WindowManager {
     // the window itself
     private int mouseWheel = -1;
 
-    public WindowManager(GuiScreen gui) {
+    public WindowManager(Screen gui) {
         this.gui = gui;
     }
 
-    public GuiScreen getGui() {
+    public Screen getGui() {
         return gui;
     }
 
@@ -83,10 +83,10 @@ public class WindowManager {
     }
 
     public void draw() {
-        mouseWheel = Mouse.getDWheel();
+        mouseWheel = 0;// @todo 1.14 Mouse.getDWheel();
         windows.stream().forEach(w -> w.draw());
         modalWindows.stream().forEach(w -> w.draw());
-        iconManager.draw(Minecraft.getMinecraft(), gui);
+        iconManager.draw(Minecraft.getInstance(), gui);
     }
 
     private Stream<Window> getInteractableWindows() {
@@ -105,14 +105,23 @@ public class WindowManager {
     }
 
     public void drawTooltips() {
-        int x = Mouse.getEventX() * gui.width / gui.mc.displayWidth;
-        int y = gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
+        Minecraft mc = gui.getMinecraft();
+        MouseHelper mouse = mc.mouseHelper;
+
+        // @todo check for 1.14
+        int mouseX = (int)(mouse.getMouseX());// * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
+        int mouseY = (int)(mouse.getMouseY());// * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
+        int x = mouseX * gui.width / mc.mainWindow.getWidth();
+        int y = gui.height - mouseY * gui.height / mc.mainWindow.getHeight() - 1;
+
+//        int x = (int)mouse.getMouseX() * gui.width / mc.mainWindow.getWidth();
+//        int y = gui.height - (int)mouse.getMouseY() * gui.height / mc.mainWindow.getHeight() - 1;
 
         getInteractableWindows().forEach(w -> {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 GenericGuiContainer<?> gui = (GenericGuiContainer<?>) this.gui;
-                gui.drawHoveringText(tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.mc.fontRenderer);
+                gui.drawHoveringText(tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().fontRenderer);
             }
         });
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();

@@ -1,6 +1,6 @@
 package mcjty.lib.tileentity;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 public class McJtyEnergyStorage {
     protected long energy;
@@ -81,7 +81,7 @@ public class McJtyEnergyStorage {
         this.maxExtract = max;
     }
 
-    public McJtyEnergyStorage readFromNBT(NBTTagCompound nbt) {
+    public McJtyEnergyStorage readFromNBT(CompoundNBT nbt) {
 
         this.energy = nbt.getLong("Energy");
 
@@ -91,7 +91,7 @@ public class McJtyEnergyStorage {
         return this;
     }
 
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
+    public CompoundNBT writeToNBT(CompoundNBT nbt) {
 
         if (energy < 0) {
             energy = 0;

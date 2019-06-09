@@ -16,7 +16,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -24,8 +24,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -81,7 +81,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
+    public ItemStack getPickBlock(BlockState state, RayTraceResult target, World world, BlockPos pos, PlayerEntity player) {
         MultipartTE.Part part = getHitPart(state, world, pos, player.getPositionEyes(0), target.hitVec);
         if (part != null) {
             return new ItemStack(Item.getItemFromBlock(part.getState().getBlock()));
@@ -91,18 +91,18 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public ItemStack getItem(World world, BlockPos pos, IBlockState state) {
+    public ItemStack getItem(World world, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+    public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
         return true; // delegated to GenericCableBakedModel#getQuads
     }
 
     @Override
-    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+    public void addCollisionBoxToList(BlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
@@ -115,19 +115,19 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     @Override
     @SideOnly(Side.CLIENT)
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+    public AxisAlignedBB getSelectedBoundingBox(BlockState state, World worldIn, BlockPos pos) {
         return AABB_EMPTY;
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+    public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
         return true;
     }
 
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, PlayerEntity player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
         Vec3d start = MultipartHelper.getPlayerEyes(player);
         Vec3d end = new Vec3d(start.x + (pos.getX() + hitX - start.x) * 3, start.y + (pos.getY() + hitY - start.y) * 3, start.z + (pos.getZ() + hitZ - start.z) * 3);
         MultipartTE.Part part = getHitPart(state, world, pos, start, end);
@@ -142,7 +142,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Nullable
-    public IBlockState getHitState(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+    public BlockState getHitState(BlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
         MultipartTE.Part part = getHitPart(blockState, world, pos, start, end);
         if (part != null) {
             return part.getState();
@@ -153,7 +153,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     @Nullable
     @Override
-    public RayTraceResult collisionRayTrace(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+    public RayTraceResult collisionRayTrace(BlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
@@ -173,7 +173,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Nullable
-    public MultipartTE.Part getHitPart(IBlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+    public MultipartTE.Part getHitPart(BlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
@@ -198,23 +198,23 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public boolean isBlockNormalCube(IBlockState blockState) {
+    public boolean isBlockNormalCube(BlockState blockState) {
         return false;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState blockState) {
+    public boolean isOpaqueCube(BlockState blockState) {
         return false;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state) {
+    public boolean isFullCube(BlockState state) {
         return false;
     }
 
     @Override
     @Optional.Method(modid = "theoneprobe")
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, IBlockState blockState, IProbeHitData data) {
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
         MultipartTE.Part part = getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
         if (part != null) {
             if (part.getTileEntity() instanceof GenericTileEntity) {
@@ -242,7 +242,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
 
     @Override
-    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+    public BlockState getExtendedState(BlockState state, IBlockAccess world, BlockPos pos) {
         IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
 
         TileEntity te = world.getTileEntity(pos);
@@ -254,12 +254,12 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(BlockState state) {
         return 0;
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
+    public BlockState getStateFromMeta(int meta) {
         return getDefaultState();
     }
 }

@@ -61,7 +61,7 @@ public class PacketDataFromServer implements IMessage {
     public void handle(Supplier<Context> supplier) {
         Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            TileEntity te = Minecraft.getMinecraft().world.getTileEntity(pos);
+            TileEntity te = Minecraft.getInstance().world.getTileEntity(pos);
             if(!(te instanceof IClientCommandHandler)) {
                 Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
                 return;

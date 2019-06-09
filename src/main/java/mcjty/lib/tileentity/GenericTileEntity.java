@@ -1,6 +1,5 @@
 package mcjty.lib.tileentity;
 
-import mcjty.lib.api.Infusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
@@ -13,41 +12,28 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.ItemStackList;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
-import mcjty.theoneprobe.api.IProbeHitData;
-import mcjty.theoneprobe.api.IProbeInfo;
-import mcjty.theoneprobe.api.ProbeMode;
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import org.lwjgl.input.Keyboard;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -80,7 +66,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void markDirtyClient() {
         markDirty();
         if (getWorld() != null) {
-            IBlockState state = getWorld().getBlockState(getPos());
+            BlockState state = getWorld().getBlockState(getPos());
             getWorld().notifyBlockUpdate(getPos(), state, state, 3);
         }
     }
@@ -100,20 +86,20 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
+    public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newSate) {
         return oldState.getBlock() != newSate.getBlock();
     }
 
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, MobEntity placer, ItemStack stack) {
     }
 
-    public void onBlockBreak(World world, BlockPos pos, IBlockState state) {
+    public void onBlockBreak(World world, BlockPos pos, BlockState state) {
     }
 
-    public void onPartAdded(PartSlot slot, IBlockState state, TileEntity multipartTile) {
+    public void onPartAdded(PartSlot slot, BlockState state, TileEntity multipartTile) {
     }
 
-    public boolean onBlockActivated(IBlockState state, PlayerEntity player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(BlockState state, PlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
         return false;
     }
 
@@ -174,16 +160,18 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void onSlotChanged(int index, ItemStack stack) {
     }
 
+
+
     @Nullable
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
-        NBTTagCompound nbtTag = new NBTTagCompound();
+    public SUpdateTileEntityPacket getUpdatePacket() {
+        CompoundNBT nbtTag = new CompoundNBT();
         this.writeClientDataToNBT(nbtTag);
-        return new SPacketUpdateTileEntity(pos, 1, nbtTag);
+        return new SUpdateTileEntityPacket(pos, 1, nbtTag);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         readClientDataFromNBT(packet.getNbtCompound());
     }
 
@@ -205,8 +193,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public NBTTagCompound getUpdateTag() {
-        NBTTagCompound updateTag = super.getUpdateTag();
+    public CompoundNBT getUpdateTag() {
+        CompoundNBT updateTag = super.getUpdateTag();
         writeClientDataToNBT(updateTag);
         return updateTag;
     }
@@ -218,7 +206,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      *
      * @param tagCompound
      */
-    public void writeClientDataToNBT(NBTTagCompound tagCompound) {
+    public void writeClientDataToNBT(CompoundNBT tagCompound) {
         writeToNBT(tagCompound);
     }
 
@@ -229,7 +217,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      *
      * @param tagCompound
      */
-    public void readClientDataFromNBT(NBTTagCompound tagCompound) {
+    public void readClientDataFromNBT(CompoundNBT tagCompound) {
         readFromNBT(tagCompound);
     }
 
@@ -246,22 +234,22 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return new Object[0];
     }
 
-    protected void readBufferFromNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
+    protected void readBufferFromNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
         readBufferFromNBT(tagCompound, "Items", inventoryHelper.getStacks());
     }
 
-    protected void readBufferFromNBT(NBTTagCompound tagCompound, String tag, ItemStackList list) {
+    protected void readBufferFromNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
         NBTTagList bufferTagList = tagCompound.getTagList(tag, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < bufferTagList.tagCount(); i++) {
-            NBTTagCompound nbtTagCompound = bufferTagList.getCompoundTagAt(i);
+            CompoundNBT CompoundNBT = bufferTagList.getCompoundTagAt(i);
             if (i < list.size()) {
-                list.set(i, new ItemStack(nbtTagCompound));
+                list.set(i, new ItemStack(CompoundNBT));
             }
         }
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound tagCompound) {
+    public void readFromNBT(CompoundNBT tagCompound) {
         super.readFromNBT(tagCompound);
         powerLevel = tagCompound.getByte("powered");
         readRestorableFromNBT(tagCompound);
@@ -273,13 +261,13 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      *
      * @param tagCompound
      */
-    public void readRestorableFromNBT(NBTTagCompound tagCompound) {
+    public void readRestorableFromNBT(CompoundNBT tagCompound) {
         if (needsRedstoneMode()) {
             int m = tagCompound.getByte("rsMode");
             rsMode = RedstoneMode.values()[m];
         }
 
-        NBTTagCompound display = tagCompound.getCompoundTag("display");
+        CompoundNBT display = tagCompound.getCompoundTag("display");
         if (display.hasKey("Name", Constants.NBT.TAG_STRING)) {
             displayName = display.getString("Name");
         }
@@ -297,24 +285,24 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
-    protected void writeBufferToNBT(NBTTagCompound tagCompound, String tag, ItemStackList list) {
+    protected void writeBufferToNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
         NBTTagList bufferTagList = new NBTTagList();
         for (ItemStack stack : list) {
-            NBTTagCompound nbtTagCompound = new NBTTagCompound();
+            CompoundNBT CompoundNBT = new CompoundNBT();
             if (!stack.isEmpty()) {
-                stack.writeToNBT(nbtTagCompound);
+                stack.writeToNBT(CompoundNBT);
             }
-            bufferTagList.appendTag(nbtTagCompound);
+            bufferTagList.appendTag(CompoundNBT);
         }
         tagCompound.setTag(tag, bufferTagList);
     }
 
-    protected void writeBufferToNBT(NBTTagCompound tagCompound, InventoryHelper inventoryHelper) {
+    protected void writeBufferToNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
         writeBufferToNBT(tagCompound, "Items", inventoryHelper.getStacks());
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound tagCompound) {
+    public CompoundNBT writeToNBT(CompoundNBT tagCompound) {
         super.writeToNBT(tagCompound);
         if (powerLevel > 0) {
             tagCompound.setByte("powered", (byte) powerLevel);
@@ -330,12 +318,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      *
      * @param tagCompound
      */
-    public void writeRestorableToNBT(NBTTagCompound tagCompound) {
+    public void writeRestorableToNBT(CompoundNBT tagCompound) {
         if (needsRedstoneMode()) {
             tagCompound.setByte("rsMode", (byte) rsMode.ordinal());
         }
         if (displayName != null) {
-            NBTTagCompound display = tagCompound.getCompoundTag("display");
+            CompoundNBT display = tagCompound.getCompoundTag("display");
             display.setString("Name", displayName);
             tagCompound.setTag("display", display);
         }
@@ -423,7 +411,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected IItemHandler invHandlerSided;
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+    public boolean hasCapability(Capability<?> capability, Direction facing) {
         if (needsCustomInvWrapper()) {
             if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
                 return true;
@@ -433,7 +421,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+    public <T> T getCapability(Capability<T> capability, Direction facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             if (needsCustomInvWrapper()) {
                 if (facing == null) {
@@ -456,75 +444,76 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return false;
     }
 
-    @Optional.Method(modid = "theoneprobe")
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, IBlockState blockState, IProbeHitData data) {
-        if (blockState.getBlock() instanceof Infusable) {
-            int infused = getInfused();
-            int pct = infused * 100 / GeneralConfig.maxInfuse;
-            probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
-        }
-        if (mode == ProbeMode.EXTENDED) {
-            if (GeneralConfig.manageOwnership) {
-                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
-                    int securityChannel = getSecurityChannel();
-                    if (securityChannel == -1) {
-                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
-                    } else {
-                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName() + " (channel " + securityChannel + ")");
-                    }
-                    if (getOwnerUUID() == null) {
-                        probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
-                    }
-                }
-            }
-        }
-    }
+//    @Optional.Method(modid = "theoneprobe")
+//    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
+//        if (blockState.getBlock() instanceof Infusable) {
+//            int infused = getInfused();
+//            int pct = infused * 100 / GeneralConfig.maxInfuse;
+//            probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
+//        }
+//        if (mode == ProbeMode.EXTENDED) {
+//            if (GeneralConfig.manageOwnership) {
+//                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
+//                    int securityChannel = getSecurityChannel();
+//                    if (securityChannel == -1) {
+//                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
+//                    } else {
+//                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName() + " (channel " + securityChannel + ")");
+//                    }
+//                    if (getOwnerUUID() == null) {
+//                        probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    @SideOnly(Side.CLIENT)
+//    @Optional.Method(modid = "waila")
+//    public void addWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+//        Block block = accessor.getBlock();
+//        if (block instanceof Infusable) {
+//            int infused = getInfused();
+//            int pct = infused * 100 / GeneralConfig.maxInfuse;
+//            currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
+//        }
+//        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+//            if (GeneralConfig.manageOwnership) {
+//                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
+//                    int securityChannel = getSecurityChannel();
+//                    if (securityChannel == -1) {
+//                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
+//                    } else {
+//                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName() + " (channel " + securityChannel + ")");
+//                    }
+//                    if (getOwnerUUID() == null) {
+//                        currenttip.add(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    @SideOnly(Side.CLIENT)
-    @Optional.Method(modid = "waila")
-    public void addWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        Block block = accessor.getBlock();
-        if (block instanceof Infusable) {
-            int infused = getInfused();
-            int pct = infused * 100 / GeneralConfig.maxInfuse;
-            currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
-        }
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-            if (GeneralConfig.manageOwnership) {
-                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
-                    int securityChannel = getSecurityChannel();
-                    if (securityChannel == -1) {
-                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
-                    } else {
-                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName() + " (channel " + securityChannel + ")");
-                    }
-                    if (getOwnerUUID() == null) {
-                        currenttip.add(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
-                    }
-                }
-            }
-        }
-    }
-
-    public IBlockState getActualState(IBlockState state) {
+    public BlockState getActualState(BlockState state) {
         return state;
     }
 
-    public int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+
+    public int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         return -1;
     }
 
-    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState metadata, int fortune) {
+    public void getDrops(NonNullList<ItemStack> drops, IBlockReader world, BlockPos pos, BlockState metadata, int fortune) {
     }
 
-    public void rotateBlock(EnumFacing axis) {
+    public void rotateBlock(Direction axis) {
 
     }
 
     /**
      * Return false if this was not handled here. In that case the default rotateBlock() will be done
      */
-    public boolean wrenchUse(World world, BlockPos pos, EnumFacing side, PlayerEntity player) {
+    public boolean wrenchUse(World world, BlockPos pos, Direction side, PlayerEntity player) {
         return false;
     }
 
@@ -548,7 +537,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     // Client side function to send a value to the server
-    public <T> void valueToServer(SimpleNetworkWrapper network, Key<T> valueKey, T value) {
+    public <T> void valueToServer(SimpleChannel network, Key<T> valueKey, T value) {
         network.sendToServer(new PacketServerCommandTyped(getPos(),
                 COMMAND_SYNC_BINDING,
                 TypedMap.builder()
@@ -565,7 +554,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
 
     @Override
-    public boolean execute(PlayerEntityMP playerMP, String command, TypedMap params) {
+    public boolean execute(PlayerEntity playerMP, String command, TypedMap params) {
         if (COMMAND_SYNC_BINDING.equals(command)) {
             syncBinding(params);
             return true;

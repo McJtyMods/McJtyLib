@@ -1,13 +1,13 @@
 package mcjty.lib.preferences;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializable<NBTTagCompound> {
+public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializable<CompoundNBT> {
 
     public PreferencesDispatcher(){
         properties = new PreferencesProperties();
@@ -16,24 +16,24 @@ public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializa
     private final PreferencesProperties properties;
 
     @Override
-    public boolean hasCapability(Capability<?> capability, EnumFacing facing) {
+    public boolean hasCapability(Capability<?> capability, Direction facing) {
         return capability == McJtyLib.PREFERENCES_CAPABILITY;
     }
 
     @Override
-    public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+    public <T> T getCapability(Capability<T> capability, Direction facing) {
         return capability == McJtyLib.PREFERENCES_CAPABILITY ? McJtyLib.PREFERENCES_CAPABILITY.cast(properties) : null;
     }
 
     @Override
-    public NBTTagCompound serializeNBT() {
-        NBTTagCompound nbt = new NBTTagCompound();
+    public CompoundNBT serializeNBT() {
+        CompoundNBT nbt = new CompoundNBT();
         properties.saveNBTData(nbt);
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
+    public void deserializeNBT(CompoundNBT nbt) {
         properties.loadNBTData(nbt);
     }
 

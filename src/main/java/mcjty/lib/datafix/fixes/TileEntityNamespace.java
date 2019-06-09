@@ -2,7 +2,7 @@ package mcjty.lib.datafix.fixes;
 
 import java.util.Map;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.datafix.IFixableData;
 
 public class TileEntityNamespace implements IFixableData {
@@ -20,7 +20,7 @@ public class TileEntityNamespace implements IFixableData {
     }
 
     @Override
-    public NBTTagCompound fixTagCompound(NBTTagCompound compound) {
+    public CompoundNBT fixTagCompound(CompoundNBT compound) {
         String s = oldToNewIdMap.get(compound.getString("id"));
 
         if (s != null) {

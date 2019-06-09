@@ -1,12 +1,12 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
@@ -28,16 +28,16 @@ public class MultipartBakedModel implements IBakedModel {
 //                int i = color.ordinal();
 //                String typeName = color.getName();
 //                tt[i] = new CableTextures();
-//                tt[i].spriteConnector = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/connector");
-//                tt[i].spriteNormalCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_netcable");
-//                tt[i].spriteNoneCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_none_netcable");
-//                tt[i].spriteEndCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_end_netcable");
-//                tt[i].spriteCornerCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_corner_netcable");
-//                tt[i].spriteThreeCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_three_netcable");
-//                tt[i].spriteCrossCable = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_cross_netcable");
+//                tt[i].spriteConnector = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/connector");
+//                tt[i].spriteNormalCable = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_netcable");
+//                tt[i].spriteNoneCable = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_none_netcable");
+//                tt[i].spriteEndCable = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_end_netcable");
+//                tt[i].spriteCornerCable = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_corner_netcable");
+//                tt[i].spriteThreeCable = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_three_netcable");
+//                tt[i].spriteCrossCable = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/" + typeName + "/normal_cross_netcable");
 //            }
 //
-//            spriteSide = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/connector_side");
+//            spriteSide = Minecraft.getInstance().getTextureMapBlocks().getAtlasSprite(Ariente.MODID + ":blocks/cables/connector_side");
 //            cableTextures = tt;
 //        }
 //    }
@@ -47,7 +47,7 @@ public class MultipartBakedModel implements IBakedModel {
     }
 
     @Override
-    public List<BakedQuad> getQuads(IBlockState state, EnumFacing side, long rand) {
+    public List<BakedQuad> getQuads(BlockState state, Direction side, long rand) {
         if (state == null) {
             return Collections.emptyList();
         }
@@ -61,9 +61,9 @@ public class MultipartBakedModel implements IBakedModel {
 
             for (Map.Entry<PartSlot, MultipartTE.Part> entry : parts.entrySet()) {
                 MultipartTE.Part part = entry.getValue();
-                IBlockState blockState = part.getState();
+                BlockState blockState = part.getState();
                 if (layer == null || blockState.getBlock().canRenderInLayer(blockState, layer)) {
-                    IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(blockState);
+                    IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(blockState);
                     try {
                         if (!(model instanceof MultipartBakedModel)) {  // @todo safety
                             quads.addAll(model.getQuads(state, side, rand++));

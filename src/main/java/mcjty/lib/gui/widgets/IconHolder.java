@@ -9,9 +9,9 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import net.java.games.input.Keyboard;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import org.lwjgl.input.Keyboard;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     private Integer borderColor = null;
     private Integer selectedBorderColor = DEFAULT_SELECTED_BORDER_COLOR;
 
-    public IconHolder(Minecraft mc, Gui gui) {
+    public IconHolder(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 
@@ -113,7 +113,9 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     @Override
     public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
-            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+//            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            // @todo 1.14
+            if (false) {
             } else {
                 if (selectable) {
                     window.setTextFocus(this);

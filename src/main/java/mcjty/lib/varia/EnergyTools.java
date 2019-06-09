@@ -12,7 +12,7 @@ import net.darkhax.tesla.api.ITeslaProducer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -50,7 +50,7 @@ public class EnergyTools {
         }
     }
 
-    public static boolean isEnergyTE(TileEntity te, @Nullable EnumFacing side) {
+    public static boolean isEnergyTE(TileEntity te, @Nullable Direction side) {
         if (te == null) {
             return false;
         }
@@ -87,7 +87,7 @@ public class EnergyTools {
     }
 
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
-    public static EnergyLevel getEnergyLevelMulti(TileEntity tileEntity, @Nullable EnumFacing side) {
+    public static EnergyLevel getEnergyLevelMulti(TileEntity tileEntity, @Nullable Direction side) {
         long maxEnergyStored;
         long energyStored;
         doCheckMods();
@@ -117,7 +117,7 @@ public class EnergyTools {
         return new EnergyLevel(energyStored, maxEnergyStored);
     }
 
-    public static EnergyLevel getEnergyLevel(TileEntity tileEntity, @Nullable EnumFacing side) {
+    public static EnergyLevel getEnergyLevel(TileEntity tileEntity, @Nullable Direction side) {
         long maxEnergyStored;
         long energyStored;
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(tileEntity, side)) {
@@ -134,7 +134,7 @@ public class EnergyTools {
         return new EnergyLevel(energyStored, maxEnergyStored);
     }
 
-    public static long receiveEnergy(TileEntity tileEntity, EnumFacing from, long maxReceive) {
+    public static long receiveEnergy(TileEntity tileEntity, Direction from, long maxReceive) {
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyReceiver(tileEntity, from)) {
             return TeslaCompatibility.receiveEnergy(tileEntity, from, maxReceive);
         } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, from)) {

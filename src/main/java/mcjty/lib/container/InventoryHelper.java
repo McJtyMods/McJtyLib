@@ -4,20 +4,18 @@ import mcjty.lib.varia.ItemStackList;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -71,31 +69,24 @@ public class InventoryHelper {
      * @param consumer
      */
     public static void handleSlot(TileEntity tileEntity, int slot, int amount, Consumer<ItemStack> consumer) {
-        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            ItemStack item = capability.getStackInSlot(slot);
-            if (!item.isEmpty()) {
-                if (amount == -1) {
-                    amount = item.getCount();
-                }
-                ItemStack stack = capability.extractItem(slot, amount, false);
-                if (!stack.isEmpty()) {
-                    consumer.accept(stack);
-                }
-            }
-        } else if (tileEntity instanceof IInventory) {
-            IInventory inventory = (IInventory) tileEntity;
-            ItemStack item = inventory.getStackInSlot(slot);
-            if (!item.isEmpty()) {
-                if (amount == -1) {
-                    amount = item.getCount();
-                }
-                ItemStack stack = inventory.decrStackSize(slot, amount);
-                if (!stack.isEmpty()) {
-                    consumer.accept(stack);
-                }
-            }
+        if (tileEntity == null) {
+            return;
         }
+        int finalAmount = amount;
+        tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
+            ItemStack item = handler.getStackInSlot(slot);
+            if (!item.isEmpty()) {
+                int a = finalAmount;
+                if (a == -1) {
+                    a = item.getCount();
+                }
+                ItemStack stack = handler.extractItem(slot, a, false);
+                if (!stack.isEmpty()) {
+                    consumer.accept(stack);
+                }
+            }
+
+        });
     }
 
     /**
@@ -103,26 +94,15 @@ public class InventoryHelper {
      * @param tileEntity
      */
     public static int getInventorySize(TileEntity tileEntity) {
-        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            if (capability == null) {
-                return 0;
-            }
-            return capability.getSlots();
-        } else if (tileEntity instanceof IInventory) {
-            IInventory inventory = (IInventory) tileEntity;
-            return inventory.getSizeInventory();
+        if (tileEntity == null) {
+            return 0;
         }
-        return 0;
+
+        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(IItemHandler::getSlots).orElse(0);
     }
 
     public static boolean isInventory(TileEntity te) {
-        if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            return true;
-        } else if (te instanceof IInventory) {
-            return true;
-        }
-        return false;
+        return te != null && te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent();
     }
 
     /**
@@ -134,22 +114,15 @@ public class InventoryHelper {
     public static Stream<ItemStack> getItems(TileEntity tileEntity, Predicate<ItemStack> predicate) {
         Stream.Builder<ItemStack> builder = Stream.builder();
 
-        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            for (int i = 0 ; i < capability.getSlots() ; i++) {
-                ItemStack itemStack = capability.getStackInSlot(i);
-                if (!itemStack.isEmpty() && predicate.test(itemStack)) {
-                    builder.add(itemStack);
+        if (tileEntity != null) {
+            tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
+                for (int i = 0; i < handler.getSlots(); i++) {
+                    ItemStack itemStack = handler.getStackInSlot(i);
+                    if (!itemStack.isEmpty() && predicate.test(itemStack)) {
+                        builder.add(itemStack);
+                    }
                 }
-            }
-        } else if (tileEntity instanceof IInventory) {
-            IInventory inventory = (IInventory) tileEntity;
-            for (int i = 0 ; i < inventory.getSizeInventory() ; i++) {
-                ItemStack itemStack = inventory.getStackInSlot(i);
-                if (!itemStack.isEmpty() && predicate.test(itemStack)) {
-                    builder.add(itemStack);
-                }
-            }
+            });
         }
         return builder.build();
     }
@@ -158,7 +131,7 @@ public class InventoryHelper {
      * Inject a module that the player is holding into the appropriate slots (slots are from start to stop inclusive both ends)
      * @return true if successful
      */
-    public static boolean installModule(PlayerEntity player, ItemStack heldItem, EnumHand hand, BlockPos pos, int start, int stop) {
+    public static boolean installModule(PlayerEntity player, ItemStack heldItem, Hand hand, BlockPos pos, int start, int stop) {
         World world = player.getEntityWorld();
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof IInventory) {
@@ -173,7 +146,7 @@ public class InventoryHelper {
                         player.setHeldItem(hand, ItemStack.EMPTY);
                     }
                     if (world.isRemote) {
-                        player.sendStatusMessage(new TextComponentString("Installed module"), false);
+                        player.sendStatusMessage(new StringTextComponent("Installed module"), false);
                     }
                     return true;
                 }
@@ -189,27 +162,11 @@ public class InventoryHelper {
      * on succcess.
      */
     @Nullable
-    public static ItemStack insertItem(World world, BlockPos pos, EnumFacing direction, ItemStack s) {
+    public static ItemStack insertItem(World world, BlockPos pos, Direction direction, ItemStack s) {
         TileEntity te = world.getTileEntity(direction == null ? pos : pos.offset(direction));
         if (te != null) {
-            EnumFacing opposite = direction == null ? null : direction.getOpposite();
-            if (te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite)) {
-                IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite);
-                s = ItemHandlerHelper.insertItem(capability, s, false);
-                if (s.isEmpty()) {
-                    return ItemStack.EMPTY;
-                }
-            } else if (te instanceof IInventory) {
-                int i = mergeItemStackSafe((IInventory) te, true, opposite, s, 0, ((IInventory) te).getSizeInventory(), null);
-                if (i == 0) {
-                    return ItemStack.EMPTY;
-                }
-                if (i <= 0) {
-                    s.setCount(0);
-                } else {
-                    s.setCount(i);
-                }
-            }
+            Direction opposite = direction == null ? null : direction.getOpposite();
+            return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite).map(handler -> ItemHandlerHelper.insertItem(handler, s, false)).orElse(ItemStack.EMPTY);
         }
         return s;
     }
@@ -247,27 +204,17 @@ public class InventoryHelper {
      * Insert multiple items in an inventory. If it didn't work nothing happens and false
      * is returned. No items will be inserted in that case.
      */
-    public static boolean insertItemsAtomic(List<ItemStack> items, TileEntity te, EnumFacing side) {
-        if (te instanceof IInventory) {
-            IInventory inventory = (IInventory) te;
-            Map<Integer, ItemStack> undo = new HashMap<>();
-            for (ItemStack item : items) {
-                int remaining = InventoryHelper.mergeItemStackSafe(inventory, false, EnumFacing.DOWN, item, 0, inventory.getSizeInventory(), undo);
-                if (remaining > 0) {
-                    undo(undo, inventory);
-                    return false;
-                }
-            }
-        } else if (te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side)) {
-            IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side);
-            if (!insertItemsItemHandlerWithUndo(capability, items, true)) {
-                return false;
-            }
-            insertItemsItemHandlerWithUndo(capability, items, false);
-        } else {
+    public static boolean insertItemsAtomic(List<ItemStack> items, TileEntity te, Direction side) {
+        if (te == null) {
             return false;
         }
-        return true;
+        return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side).map(handler -> {
+            if (!insertItemsItemHandlerWithUndo(handler, items, true)) {
+                return false;
+            }
+            insertItemsItemHandlerWithUndo(handler, items, false);
+            return true;
+        }).orElse(false);
     }
 
     public static void undo(Map<Integer,ItemStack> undo, IInventory inventory) {
@@ -283,7 +230,7 @@ public class InventoryHelper {
      * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
      * This version also checks for ISidedInventory if that's implemented by the inventory
      */
-    public static int mergeItemStackSafe(IInventory inventory, boolean checkSlots, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+    public static int mergeItemStackSafe(IInventory inventory, boolean checkSlots, Direction side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
         if (inventory instanceof ISidedInventory) {
             return mergeItemStackInternal(inventory, (ISidedInventory) inventory, checkSlots, side, result, start, stop, undo);
         } else {
@@ -299,7 +246,7 @@ public class InventoryHelper {
         return mergeItemStackInternal(inventory, null, checkSlots, null, result, start, stop, undo);
     }
 
-    private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, boolean checkSlots, EnumFacing side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
+    private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, boolean checkSlots, Direction side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
         int k = start;
 
         ItemStack itemstack1 = ItemStack.EMPTY;

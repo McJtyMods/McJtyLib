@@ -4,9 +4,9 @@ import com.google.gson.*;
 import mcjty.lib.network.PacketDumpBlockInfo;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 public class DumpBlockNBT {
 
     public static String dumpBlockNBT(@Nonnull World world, @Nonnull BlockPos pos, boolean verbose) {
-        IBlockState state = world.getBlockState(pos);
+        BlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
         Block block = state.getBlock();
 
@@ -30,7 +30,7 @@ public class DumpBlockNBT {
         jsonObject.add("meta", new JsonPrimitive(block.getMetaFromState(state)));
         if (te != null) {
             jsonObject.add("teClass", new JsonPrimitive(te.getClass().getCanonicalName()));
-            NBTTagCompound tag = new NBTTagCompound();
+            CompoundNBT tag = new CompoundNBT();
             te.writeToNBT(tag);
             if (verbose) {
                 String nbtJson = tag.toString();

@@ -20,15 +20,15 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -66,7 +66,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     private InformationString informationString;
     private InformationString informationStringWithShift;
 
-    public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+    public static final PropertyDirection FACING_HORIZ = PropertyDirection.create("facing", Direction.Plane.HORIZONTAL);
 
     public static final IProperty<?>[] HORIZ_PROPERTIES = new IProperty[]{FACING_HORIZ};
     public static final PropertyDirection FACING = PropertyDirection.create("facing");
@@ -96,17 +96,17 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return creative;
     }
 
-    public static Collection<IProperty<?>> getPropertyKeys(IBlockState state) {
+    public static Collection<IProperty<?>> getPropertyKeys(BlockState state) {
         return state.getPropertyKeys();
     }
 
-    public static boolean activateBlock(Block block, World world, BlockPos pos, IBlockState state, PlayerEntity player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public static boolean activateBlock(Block block, World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
         return block.onBlockActivated(world, pos, state, player, hand, facing, hitX, hitY, hitZ);
     }
 
     @Nonnull
     @Override
-    public PartSlot getSlotFromState(World world, BlockPos pos, IBlockState newState) {
+    public PartSlot getSlotFromState(World world, BlockPos pos, BlockState newState) {
         return PartSlot.NONE;
     }
 
@@ -141,8 +141,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     @Override
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-        IBlockState state = super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+    public BlockState getStateForPlacement(World worldIn, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, MobEntity placer) {
+        BlockState state = super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
         switch (getRotationType()) {
             case HORIZROTATION:
                 return state.withProperty(FACING_HORIZ, placer.getHorizontalFacing().getOpposite());
@@ -153,30 +153,30 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
     }
 
-    protected EnumFacing getOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
+    protected Direction getOrientation(BlockPos pos, MobEntity MobEntity) {
         switch (getRotationType()) {
             case HORIZROTATION:
-                return OrientationTools.determineOrientationHoriz(entityLivingBase);
+                return OrientationTools.determineOrientationHoriz(MobEntity);
             case ROTATION:
-                return OrientationTools.determineOrientation(pos, entityLivingBase);
+                return OrientationTools.determineOrientation(pos, MobEntity);
             default:
                 return null;
         }
     }
 
-    public EnumFacing getFrontDirection(IBlockState state) {
+    public Direction getFrontDirection(BlockState state) {
         switch (getRotationType()) {
             case HORIZROTATION:
                 return state.getValue(FACING_HORIZ);
             case ROTATION:
                 return state.getValue(FACING);
             default:
-                return EnumFacing.NORTH;
+                return Direction.NORTH;
         }
     }
 
     @Override
-    public IBlockState withRotation(IBlockState state, Rotation rot) {
+    public BlockState withRotation(BlockState state, Rotation rot) {
         switch (getRotationType()) {
             case HORIZROTATION:
                 return state.withProperty(FACING_HORIZ, rot.rotate(state.getValue(FACING_HORIZ)));
@@ -188,39 +188,39 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return state;
     }
 
-    public EnumFacing getRightDirection(IBlockState state) {
+    public Direction getRightDirection(BlockState state) {
         return getFrontDirection(state).rotateYCCW();
     }
 
-    public EnumFacing getLeftDirection(IBlockState state) {
+    public Direction getLeftDirection(BlockState state) {
         return getFrontDirection(state).rotateY();
     }
 
-    public static EnumFacing getFrontDirection(RotationType metaUsage, IBlockState state) {
+    public static Direction getFrontDirection(RotationType metaUsage, BlockState state) {
         switch (metaUsage) {
             case HORIZROTATION:
                 return OrientationTools.getOrientationHoriz(state);
             case ROTATION:
                 return OrientationTools.getOrientation(state);
             default:
-                return EnumFacing.SOUTH;
+                return Direction.SOUTH;
         }
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
+    public BlockState getStateFromMeta(int meta) {
         switch (getRotationType()) {
             case HORIZROTATION:
-                return getDefaultState().withProperty(FACING_HORIZ, EnumFacing.VALUES[meta + 2]);
+                return getDefaultState().withProperty(FACING_HORIZ, Direction.VALUES[meta + 2]);
             case ROTATION:
-                return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta & 7]);
+                return getDefaultState().withProperty(FACING, Direction.VALUES[meta & 7]);
             default:
                 return getDefaultState();
         }
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(BlockState state) {
         switch (getRotationType()) {
             case HORIZROTATION:
                 return state.getValue(FACING_HORIZ).getIndex()-2;
@@ -253,12 +253,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
+    public boolean isOpaqueCube(BlockState state) {
         return !nonopaque;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state) {
+    public boolean isFullCube(BlockState state) {
         return !nonfullcube;
     }
 
@@ -279,7 +279,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @Override
     @Optional.Method(modid = "theoneprobe")
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, IBlockState blockState, IProbeHitData data) {
+    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
     }
 
     @Override

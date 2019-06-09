@@ -11,7 +11,7 @@ import net.minecraft.client.Minecraft;
 public class SendPreferencesToClientHelper {
 
     public static void setPreferences(PacketSendPreferencesToClient prefs) {
-        PlayerEntitySP player = Minecraft.getMinecraft().player;
+        PlayerEntitySP player = Minecraft.getInstance().player;
         PreferencesProperties properties = McJtyLib.getPreferencesProperties(player);
         properties.setBuffXY(prefs.getBuffX(), prefs.getBuffY());
         properties.setStyle(prefs.getStyle().getStyle());

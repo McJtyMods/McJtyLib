@@ -55,8 +55,8 @@ public class RenderHelper {
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.rotationPitch = 0.0F;
         GlStateManager.translate(0.0F, (float) entity.getYOffset(), 0.0F);
-        Minecraft.getMinecraft().getRenderManager().playerViewY = 180F;
-        Minecraft.getMinecraft().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
+        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
+        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
         GlStateManager.popMatrix();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
@@ -80,7 +80,7 @@ public class RenderHelper {
             renderEntity((Entity) itm, x, y);
             return true;
         }
-        RenderItem itemRender = Minecraft.getMinecraft().getRenderItem();
+        RenderItem itemRender = Minecraft.getInstance().getRenderItem();
         return renderObject(mc, itemRender, x, y, itm, highlight, 200);
     }
 
@@ -188,10 +188,10 @@ public class RenderHelper {
 
     public static void renderStackOnGround(ItemStack stack, double alpha) {
         if (!stack.isEmpty()) {
-            IBakedModel ibakedmodel = Minecraft.getMinecraft().getRenderItem().getItemModelWithOverrides(stack, null, null);
+            IBakedModel ibakedmodel = Minecraft.getInstance().getRenderItem().getItemModelWithOverrides(stack, null, null);
             if (!stack.isEmpty()) {
-                Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+                Minecraft.getInstance().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                Minecraft.getInstance().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, (float) alpha);
                 GlStateManager.enableRescaleNormal();
                 GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
@@ -201,13 +201,13 @@ public class RenderHelper {
 
                 ibakedmodel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
 
-                Minecraft.getMinecraft().getRenderItem().renderItem(stack, ibakedmodel);
+                Minecraft.getInstance().getRenderItem().renderItem(stack, ibakedmodel);
                 GlStateManager.cullFace(GlStateManager.CullFace.BACK);
                 GlStateManager.popMatrix();
                 GlStateManager.disableRescaleNormal();
                 GlStateManager.disableBlend();
-                Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+                Minecraft.getInstance().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                Minecraft.getInstance().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
             }
         }
 
@@ -301,8 +301,8 @@ public class RenderHelper {
                 GlStateManager.enableDepth();
             }
 
-            PlayerEntitySP PlayerEntitysp = Minecraft.getMinecraft().player;
-            float f = PlayerEntitysp == null ? 0.0F : PlayerEntitysp.getCooldownTracker().getCooldown(stack.getItem(), Minecraft.getMinecraft().getRenderPartialTicks());
+            PlayerEntitySP PlayerEntitysp = Minecraft.getInstance().player;
+            float f = PlayerEntitysp == null ? 0.0F : PlayerEntitysp.getCooldownTracker().getCooldown(stack.getItem(), Minecraft.getInstance().getRenderPartialTicks());
 
             if (f > 0.0F) {
                 GlStateManager.disableLighting();
@@ -647,8 +647,8 @@ public class RenderHelper {
     }
 
     public static void rotateToPlayer() {
-        GlStateManager.rotate(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
     }
 
     public static int renderText(Minecraft mc, int x, int y, String txt) {

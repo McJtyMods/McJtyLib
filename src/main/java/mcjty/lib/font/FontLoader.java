@@ -56,7 +56,7 @@ public class FontLoader {
         Font font;
         TrueTypeFont out = null;
         try {
-            font = Font.createFont(type, Minecraft.getMinecraft().getResourceManager().getResource(res).getInputStream());
+            font = Font.createFont(type, Minecraft.getInstance().getResourceManager().getResource(res).getInputStream());
             font = font.deriveFont(defSize);
             out = new TrueTypeFont(font, antialias, additionalChars);
         } catch (RuntimeException | FontFormatException | IOException e) {

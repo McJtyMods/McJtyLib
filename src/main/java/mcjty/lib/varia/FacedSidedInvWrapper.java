@@ -2,7 +2,7 @@ package mcjty.lib.varia;
 
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -12,15 +12,15 @@ import net.minecraftforge.items.ItemHandlerHelper;
  */
 public class FacedSidedInvWrapper implements IItemHandlerModifiable {
     private final ISidedInventory inv;
-    private final EnumFacing facing;
+    private final Direction facing;
 
     // This version allows a 'null' facing
-    public FacedSidedInvWrapper(ISidedInventory inv, EnumFacing facing) {
+    public FacedSidedInvWrapper(ISidedInventory inv, Direction facing) {
         this.inv = inv;
         this.facing = facing;
     }
 
-    public static int getSlot(ISidedInventory inv, int slot, EnumFacing facing) {
+    public static int getSlot(ISidedInventory inv, int slot, Direction facing) {
         if (facing == null) {
             return slot;
         }

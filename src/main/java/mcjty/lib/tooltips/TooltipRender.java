@@ -23,7 +23,7 @@ public class TooltipRender {
     @SubscribeEvent
     public void onMakeTooltip(ItemTooltipEvent event) {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         ItemStack stack = event.getItemStack();
         if (stack.getItem() instanceof ITooltipExtras) {
             ITooltipExtras extras = (ITooltipExtras) stack.getItem();
@@ -86,7 +86,7 @@ public class TooltipRender {
     }
 
     private static void renderBlocks(ItemStack itemStack, int x, int y, int count, int errorAmount) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         GlStateManager.disableDepth();
         RenderItem render = mc.getRenderItem();
 

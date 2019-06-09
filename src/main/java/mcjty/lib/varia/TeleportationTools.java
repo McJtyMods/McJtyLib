@@ -4,9 +4,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerEntityMP;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -17,11 +17,11 @@ import javax.annotation.Nullable;
 
 public class TeleportationTools {
 
-    public static void performTeleport(PlayerEntity player, int dimension, BlockPos dest, @Nullable EnumFacing direction) {
+    public static void performTeleport(PlayerEntity player, int dimension, BlockPos dest, @Nullable Direction direction) {
         performTeleport(player, dimension, dest.getX() + 0.5, dest.getY() + 1.5, dest.getZ() + 0.5, direction);
     }
 
-    public static void performTeleport(PlayerEntity player, int dimension, double destX, double destY, double destZ, @Nullable EnumFacing direction) {
+    public static void performTeleport(PlayerEntity player, int dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
         int oldId = player.getEntityWorld().provider.getDimension();
 
         float rotationYaw = player.rotationYaw;
@@ -88,7 +88,7 @@ public class TeleportationTools {
      * Teleport an entity and return the new entity (as teleporting to other dimensions causes
      * entities to be killed and recreated)
      */
-    public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, EnumFacing facing) {
+    public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, Direction facing) {
         World world = entity.getEntityWorld();
         if (entity instanceof PlayerEntity) {
             performTeleport((PlayerEntity) entity, destWorld.provider.getDimension(), newX, newY, newZ, facing);
@@ -98,7 +98,7 @@ public class TeleportationTools {
             float rotationPitch = entity.rotationPitch;
 
             if (world.provider.getDimension() != destWorld.provider.getDimension()) {
-                NBTTagCompound tagCompound = new NBTTagCompound();
+                CompoundNBT tagCompound = new CompoundNBT();
                 entity.writeToNBT(tagCompound);
                 tagCompound.removeTag("Dimension");
                 Class<? extends Entity> entityClass = entity.getClass();
@@ -140,8 +140,8 @@ public class TeleportationTools {
         }
     }
 
-    private static void fixOrientation(Entity entity, double newX, double newY, double newZ, EnumFacing facing) {
-        if (facing != EnumFacing.DOWN && facing != EnumFacing.UP) {
+    private static void fixOrientation(Entity entity, double newX, double newY, double newZ, Direction facing) {
+        if (facing != Direction.DOWN && facing != Direction.UP) {
             facePosition(entity, newX, newY, newZ, new BlockPos(newX, newY, newZ).offset(facing, 4));
         }
     }

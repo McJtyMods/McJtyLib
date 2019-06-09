@@ -1,15 +1,15 @@
 package mcjty.lib.multipart;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 
 public class PartBlockId {
-    private final IBlockState state;
+    private final BlockState state;
 
-    public PartBlockId(IBlockState state) {
+    public PartBlockId(BlockState state) {
         this.state = state;
     }
 
-    public IBlockState getBlockState() {
+    public BlockState getBlockState() {
         return state;
     }
 

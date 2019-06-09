@@ -4,7 +4,7 @@ import io.netty.buffer.ByteBuf;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.varia.Logging;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
@@ -21,7 +21,7 @@ public class NetworkTools {
     public static FluidStack readFluidStack(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
         try {
-            NBTTagCompound nbt = buf.readCompoundTag();
+            CompoundNBT nbt = buf.readCompoundTag();
             return FluidStack.loadFluidStackFromNBT(nbt);
         } catch (IOException e) {
             Logging.logError("Error reading fluid stack", e);
@@ -31,7 +31,7 @@ public class NetworkTools {
 
     public static void writeFluidStack(ByteBuf dataOut, FluidStack fluidStack) {
         PacketBuffer buf = new PacketBuffer(dataOut);
-        NBTTagCompound nbt = new NBTTagCompound();
+        CompoundNBT nbt = new CompoundNBT();
         fluidStack.writeToNBT(nbt);
         try {
             buf.writeCompoundTag(nbt);
@@ -40,7 +40,7 @@ public class NetworkTools {
         }
     }
 
-    public static NBTTagCompound readTag(ByteBuf dataIn) {
+    public static CompoundNBT readTag(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
         try {
             return buf.readCompoundTag();
@@ -50,7 +50,7 @@ public class NetworkTools {
         return null;
     }
 
-    public static void writeTag(ByteBuf dataOut, NBTTagCompound tag) {
+    public static void writeTag(ByteBuf dataOut, CompoundNBT tag) {
         PacketBuffer buf = new PacketBuffer(dataOut);
         try {
             buf.writeCompoundTag(tag);
@@ -63,7 +63,7 @@ public class NetworkTools {
     public static ItemStack readItemStack(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
         try {
-            NBTTagCompound nbt = buf.readCompoundTag();
+            CompoundNBT nbt = buf.readCompoundTag();
             ItemStack stack = new ItemStack(nbt);
             int amount = buf.readInt();
             if (amount <= 0) {
@@ -81,7 +81,7 @@ public class NetworkTools {
     /// This function supports itemstacks with more then 64 items.
     public static void writeItemStack(ByteBuf dataOut, @Nonnull ItemStack itemStack) {
         PacketBuffer buf = new PacketBuffer(dataOut);
-        NBTTagCompound nbt = new NBTTagCompound();
+        CompoundNBT nbt = new CompoundNBT();
         itemStack.writeToNBT(nbt);
         try {
             buf.writeCompoundTag(nbt);

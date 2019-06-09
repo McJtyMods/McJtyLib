@@ -1,9 +1,9 @@
 package mcjty.lib.varia;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
 
-import static net.minecraft.util.EnumFacing.*;
+import static net.minecraft.util.Direction.*;
 
 public enum LogicFacing implements IStringSerializable {
     DOWN_TONORTH("down_tonorth", 0, NORTH),
@@ -40,9 +40,9 @@ public enum LogicFacing implements IStringSerializable {
 
     private final String name;
     private final int meta;
-    private final EnumFacing inputSide;
+    private final Direction inputSide;
 
-    LogicFacing(String name, int meta, EnumFacing inputSide) {
+    LogicFacing(String name, int meta, Direction inputSide) {
         this.name = name;
         this.meta = meta;
         this.inputSide = inputSide;
@@ -57,12 +57,12 @@ public enum LogicFacing implements IStringSerializable {
         return meta;
     }
 
-    public EnumFacing getInputSide() {
+    public Direction getInputSide() {
         return inputSide;
     }
 
-    public EnumFacing getSide() {
-        return EnumFacing.VALUES[ordinal() / 4];
+    public Direction getSide() {
+        return Direction.VALUES[ordinal() / 4];
     }
 
     public static LogicFacing getFacingWithMeta(LogicFacing facing, int meta) {

@@ -24,7 +24,7 @@ public class ClientEventHandler {
 
                 if (Keyboard.getEventKey() == 0 && c0 >= 32 || Keyboard.getEventKeyState()) {
                     container.keyTypedFromEvent(c0, Keyboard.getEventKey());
-                    Minecraft.getMinecraft().dispatchKeypresses();
+                    Minecraft.getInstance().dispatchKeypresses();
                 }
             }
         }

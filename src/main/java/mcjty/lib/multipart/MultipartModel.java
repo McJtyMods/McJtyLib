@@ -17,7 +17,7 @@ public class MultipartModel implements IModel {
 
     @Override
     public IBakedModel bake(IModelState state, VertexFormat format, Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-        return new MultipartBakedModel(Minecraft.getMinecraft().getTextureMapBlocks().getMissingSprite());  // @todo
+        return new MultipartBakedModel(Minecraft.getInstance().getTextureMapBlocks().getMissingSprite());  // @todo
     }
 
     @Override

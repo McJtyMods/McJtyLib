@@ -117,7 +117,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
     }
 
     private void createColorSelectorWindow(Window window, int x, int y) {
-        Minecraft mc = Minecraft.getMinecraft();
+        Minecraft mc = Minecraft.getInstance();
         GuiScreen gui = window.getWindowManager().getGui();
 
         Panel modalDialog = new Panel(mc, gui)

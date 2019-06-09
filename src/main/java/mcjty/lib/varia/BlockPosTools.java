@@ -1,6 +1,6 @@
 package mcjty.lib.varia;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
@@ -23,7 +23,7 @@ public class BlockPosTools {
         return new BlockPos((c1.getX() + c2.getX()) / 2, (c1.getY() + c2.getY()) / 2, (c1.getZ() + c2.getZ()) / 2);
     }
 
-    public static BlockPos readFromNBT(NBTTagCompound tagCompound, String tagName) {
+    public static BlockPos readFromNBT(CompoundNBT tagCompound, String tagName) {
         int[] array = tagCompound.getIntArray(tagName);
         if (array.length == 0) {
             return null;
@@ -32,7 +32,7 @@ public class BlockPosTools {
         }
     }
 
-    public static void writeToNBT(NBTTagCompound tagCompound, String tagName, BlockPos coordinate) {
+    public static void writeToNBT(CompoundNBT tagCompound, String tagName, BlockPos coordinate) {
         if (coordinate == null) {
             tagCompound.setIntArray(tagName, new int[] { });
         } else {
@@ -40,8 +40,8 @@ public class BlockPosTools {
         }
     }
 
-    public static NBTTagCompound writeToNBT(BlockPos coordinate) {
-        NBTTagCompound tagCompound = new NBTTagCompound();
+    public static CompoundNBT writeToNBT(BlockPos coordinate) {
+        CompoundNBT tagCompound = new CompoundNBT();
         writeToNBT(tagCompound, "c", coordinate);
         return tagCompound;
     }

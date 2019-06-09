@@ -1,14 +1,14 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.blocks.BaseBlock;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-import static net.minecraft.util.EnumFacing.*;
+import static net.minecraft.util.Direction.*;
 
 public class OrientationTools {
 
@@ -21,60 +21,60 @@ public class OrientationTools {
     public static final int MASK_REDSTONE_OUT = 0x4;                    // Redstone out
     public static final int MASK_STATE = 0xc;                           // If redstone is not used: state
 
-    public static int setOrientation(int metadata, EnumFacing orientation) {
+    public static int setOrientation(int metadata, Direction orientation) {
         return (metadata & ~MASK_ORIENTATION) | orientation.ordinal();
     }
 
-    public static EnumFacing getOrientationHoriz(IBlockState state) {
+    public static Direction getOrientationHoriz(BlockState state) {
         return state.getValue(BaseBlock.FACING_HORIZ);
     }
 
-    public static int setOrientationHoriz(int metadata, EnumFacing orientation) {
+    public static int setOrientationHoriz(int metadata, Direction orientation) {
         return (metadata & ~MASK_ORIENTATION_HORIZONTAL) | getHorizOrientationMeta(orientation);
     }
 
-    public static int getHorizOrientationMeta(EnumFacing orientation) {
+    public static int getHorizOrientationMeta(Direction orientation) {
         return orientation.ordinal()-2;
     }
 
-    public static EnumFacing getOrientation(IBlockState state) {
+    public static Direction getOrientation(BlockState state) {
         return ((BaseBlock)state.getBlock()).getFrontDirection(state);
     }
 
-    public static EnumFacing determineOrientation(BlockPos pos, EntityLivingBase entityLivingBase) {
-        return determineOrientation(pos.getX(), pos.getY(), pos.getZ(), entityLivingBase);
+    public static Direction determineOrientation(BlockPos pos, MobEntity MobEntity) {
+        return determineOrientation(pos.getX(), pos.getY(), pos.getZ(), MobEntity);
     }
 
-    public static EnumFacing determineOrientation(int x, int y, int z, EntityLivingBase entityLivingBase) {
-        if (MathHelper.abs((float) entityLivingBase.posX - x) < 2.0F && MathHelper.abs((float) entityLivingBase.posZ - z) < 2.0F) {
-            double d0 = entityLivingBase.posY + 1.82D - entityLivingBase.getYOffset();
+    public static Direction determineOrientation(int x, int y, int z, MobEntity MobEntity) {
+        if (MathHelper.abs((float) MobEntity.posX - x) < 2.0F && MathHelper.abs((float) MobEntity.posZ - z) < 2.0F) {
+            double d0 = MobEntity.posY + 1.82D - MobEntity.getYOffset();
 
             if (d0 - y > 2.0D) {
-                return EnumFacing.UP;
+                return Direction.UP;
             }
 
             if (y - d0 > 0.0D) {
                 return DOWN;
             }
         }
-        int i = (int) ((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D);
-        int l = ((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
-        return l == 0 ? EnumFacing.NORTH : (l == 1 ? EnumFacing.EAST : (l == 2 ? SOUTH : (l == 3 ? EnumFacing.WEST : DOWN)));
+        int i = (int) ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D);
+        int l = ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        return l == 0 ? Direction.NORTH : (l == 1 ? Direction.EAST : (l == 2 ? SOUTH : (l == 3 ? Direction.WEST : DOWN)));
     }
 
-    public static EnumFacing determineOrientationHoriz(EntityLivingBase entityLivingBase) {
-        int i = (int) ((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D);
-        int l = ((entityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
-        return l == 0 ? EnumFacing.NORTH : (l == 1 ? EnumFacing.EAST : (l == 2 ? SOUTH : (l == 3 ? EnumFacing.WEST : DOWN)));
+    public static Direction determineOrientationHoriz(MobEntity MobEntity) {
+        int i = (int) ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D);
+        int l = ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        return l == 0 ? Direction.NORTH : (l == 1 ? Direction.EAST : (l == 2 ? SOUTH : (l == 3 ? Direction.WEST : DOWN)));
     }
 
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
-    public static EnumFacing worldToBlockSpaceHoriz(EnumFacing side, IBlockState state) {
+    public static Direction worldToBlockSpaceHoriz(Direction side, BlockState state) {
         return worldToBlockSpace(side, getOrientationHoriz(state));
     }
 
-    public static EnumFacing worldToBlockSpace(EnumFacing worldSide, EnumFacing blockDirection) {
+    public static Direction worldToBlockSpace(Direction worldSide, Direction blockDirection) {
         switch (blockDirection) {
             case DOWN:
                 switch (worldSide) {
@@ -132,7 +132,7 @@ public class OrientationTools {
         }
     }
 
-    public static EnumFacing blockToWorldSpace(EnumFacing blockSide, EnumFacing blockDirection) {
+    public static Direction blockToWorldSpace(Direction blockSide, Direction blockDirection) {
         switch (blockDirection) {
             case DOWN:
                 switch (blockSide) {
@@ -190,25 +190,25 @@ public class OrientationTools {
         }
     }
 
-    public static Vec3d blockToWorldSpace(Vec3d v, IBlockState state) {
+    public static Vec3d blockToWorldSpace(Vec3d v, BlockState state) {
         return blockToWorldSpace(v, getOrientation(state));
     }
 
-    public static Vec3d worldToBlockSpace(Vec3d v, IBlockState state) {
+    public static Vec3d worldToBlockSpace(Vec3d v, BlockState state) {
         return worldToBlockSpace(v, getOrientation(state));
     }
 
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
-    public static Vec3d blockToWorldSpaceHoriz(Vec3d v, IBlockState state) {
+    public static Vec3d blockToWorldSpaceHoriz(Vec3d v, BlockState state) {
         return blockToWorldSpace(v, getOrientationHoriz(state));
     }
 
-    public static Vec3d worldToBlockSpaceHoriz(Vec3d v, IBlockState state) {
+    public static Vec3d worldToBlockSpaceHoriz(Vec3d v, BlockState state) {
         return worldToBlockSpace(v, getOrientationHoriz(state));
     }
 
-    public static Vec3d blockToWorldSpace(Vec3d v, EnumFacing side) {
+    public static Vec3d blockToWorldSpace(Vec3d v, Direction side) {
         switch (side) {
             case DOWN: return new Vec3d(v.x, v.z, v.y);        // @todo check: most likely wrong
             case UP:  return new Vec3d(v.x, v.z, v.y);         // @todo check: most likely wrong
@@ -220,7 +220,7 @@ public class OrientationTools {
         }
     }
 
-    public static Vec3d worldToBlockSpace(Vec3d v, EnumFacing side) {
+    public static Vec3d worldToBlockSpace(Vec3d v, Direction side) {
         switch (side) {
             case DOWN: return new Vec3d(v.x, v.z, v.y);        // @todo check: most likely wrong
             case UP:  return new Vec3d(v.x, v.z, v.y);         // @todo check: most likely wrong
@@ -232,21 +232,21 @@ public class OrientationTools {
         }
     }
 
-    public static EnumFacing getTopDirection(EnumFacing rotation) {
+    public static Direction getTopDirection(Direction rotation) {
         switch(rotation) {
             case DOWN:
                 return SOUTH;
             case UP:
-                return EnumFacing.NORTH;
+                return Direction.NORTH;
             default:
-                return EnumFacing.UP;
+                return Direction.UP;
         }
     }
 
-    public static EnumFacing getBottomDirection(EnumFacing rotation) {
+    public static Direction getBottomDirection(Direction rotation) {
         switch(rotation) {
             case DOWN:
-                return EnumFacing.NORTH;
+                return Direction.NORTH;
             case UP:
                 return SOUTH;
             default:
@@ -256,11 +256,11 @@ public class OrientationTools {
 
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
-    public static EnumFacing worldToBlockSpace(EnumFacing side, IBlockState state) {
+    public static Direction worldToBlockSpace(Direction side, BlockState state) {
         return worldToBlockSpace(side, getOrientation(state));
     }
 
-    public static EnumFacing getFacingFromEntity(BlockPos clickedBlock, EntityLivingBase entityIn) {
+    public static Direction getFacingFromEntity(BlockPos clickedBlock, MobEntity entityIn) {
         if (MathHelper.abs((float) entityIn.posX - clickedBlock.getX()) < 2.0F && MathHelper.abs((float) entityIn.posZ - clickedBlock.getZ()) < 2.0F) {
             double d0 = entityIn.posY + entityIn.getEyeHeight();
 
@@ -278,17 +278,17 @@ public class OrientationTools {
 
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
-    public static EnumFacing reorient(EnumFacing side, IBlockState state) {
+    public static Direction reorient(Direction side, BlockState state) {
         return reorient(side, getOrientation(state));
     }
 
     // Given the metavalue of a block, reorient the world direction to the internal block direction
     // so that the front side will be SOUTH.
-    public static EnumFacing reorientHoriz(EnumFacing side, IBlockState state) {
+    public static Direction reorientHoriz(Direction side, BlockState state) {
         return reorient(side, getOrientationHoriz(state));
     }
 
-    public static EnumFacing reorient(EnumFacing side, EnumFacing blockDirection) {
+    public static Direction reorient(Direction side, Direction blockDirection) {
         switch (blockDirection) {
             case DOWN:
                 switch (side) {

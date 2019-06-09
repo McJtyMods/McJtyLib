@@ -9,16 +9,16 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -31,7 +31,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static mcjty.lib.varia.LogicFacing.*;
-import static net.minecraft.util.EnumFacing.*;
+import static net.minecraft.util.Direction.*;
 
 /**
  * The superclass for logic slabs.
@@ -49,7 +49,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         super(mod, material, tileEntityClass, containerFactory, itemBlockFactory, name, isContainer);
     }
 
-    public static EnumFacing rotateLeft(EnumFacing downSide, EnumFacing inputSide) {
+    public static Direction rotateLeft(Direction downSide, Direction inputSide) {
         switch (downSide) {
             case DOWN:
                 return inputSide.rotateY();
@@ -67,7 +67,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         return inputSide;
     }
 
-    public static EnumFacing rotateRight(EnumFacing downSide, EnumFacing inputSide) {
+    public static Direction rotateRight(Direction downSide, Direction inputSide) {
         return rotateLeft(downSide.getOpposite(), inputSide);
     }
 
@@ -77,7 +77,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Override
-    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+    public BlockState getStateForPlacement(World worldIn, BlockPos pos, Direction side, float hitX, float hitY, float hitZ, int meta, MobEntity placer) {
         float dx = Math.abs(0.5f - hitX);
         float dy = Math.abs(0.5f - hitY);
         float dz = Math.abs(0.5f - hitZ);
@@ -157,13 +157,13 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     public static final AxisAlignedBB BLOCK_EAST = new AxisAlignedBB(0.7F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-        IBlockState blockState = world.getBlockState(pos);
+    public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess world, BlockPos pos) {
+        BlockState blockState = world.getBlockState(pos);
         if (blockState.getBlock() instanceof LogicSlabBlock) {
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof LogicTileEntity) {
                 LogicTileEntity logicTileEntity = (LogicTileEntity) te;
-                EnumFacing side = logicTileEntity.getFacing(blockState).getSide();
+                Direction side = logicTileEntity.getFacing(blockState).getSide();
                 switch (side) {
                     case DOWN:
                         return BLOCK_DOWN;
@@ -195,13 +195,13 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     /**
      * Returns the signal strength at one input of the block
      */
-    protected int getInputStrength(World world, BlockPos pos, EnumFacing side) {
+    protected int getInputStrength(World world, BlockPos pos, Direction side) {
         int power = world.getRedstonePower(pos.offset(side), side);
         if (power < 15) {
             // Check if there is no redstone wire there. If there is a 'bend' in the redstone wire it is
             // not detected with world.getRedstonePower().
             // Not exactly pretty, but it's how vanilla redstone repeaters do it.
-            IBlockState blockState = world.getBlockState(pos.offset(side));
+            BlockState blockState = world.getBlockState(pos.offset(side));
             Block b = blockState.getBlock();
             if (b == Blocks.REDSTONE_WIRE) {
                 power = Math.max(power, blockState.getValue(BlockRedstoneWire.POWER));
@@ -219,39 +219,39 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity)te;
-            EnumFacing inputSide = logicTileEntity.getFacing(world.getBlockState(pos)).getInputSide();
+            Direction inputSide = logicTileEntity.getFacing(world.getBlockState(pos)).getInputSide();
             int power = getInputStrength(world, pos, inputSide);
             logicTileEntity.setPowerInput(power);
         }
     }
 
 //    @Override
-//    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, World worldIn, BlockPos pos) {
+//    public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, World worldIn, BlockPos pos) {
 //        return null;
 //    }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
+    public boolean isOpaqueCube(BlockState state) {
         return false;
     }
 
     @Override
-    public boolean isFullBlock(IBlockState state) {
+    public boolean isFullBlock(BlockState state) {
         return false;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state) {
+    public boolean isFullCube(BlockState state) {
         return false;
     }
 
 
     @Override
-    public boolean canConnectRedstone(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+    public boolean canConnectRedstone(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
         TileEntity te = world.getTileEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity)te;
-            EnumFacing direction = logicTileEntity.getFacing(state).getInputSide();
+            Direction direction = logicTileEntity.getFacing(state).getInputSide();
             switch (direction) {
                 case NORTH:
                 case SOUTH:
@@ -268,7 +268,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Override
-    protected int getRedstoneOutput(IBlockState state, IBlockAccess world, BlockPos pos, EnumFacing side) {
+    protected int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
         TileEntity te = world.getTileEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity) te;
@@ -278,8 +278,8 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Override
-    public boolean rotateBlock(World world, BlockPos pos, EnumFacing axis) {
-        IBlockState state = world.getBlockState(pos);
+    public boolean rotateBlock(World world, BlockPos pos, Direction axis) {
+        BlockState state = world.getBlockState(pos);
         TileEntity te = world.getTileEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity) te;
@@ -302,12 +302,12 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
+    public BlockState getStateFromMeta(int meta) {
         return getDefaultState().withProperty(META_INTERMEDIATE, meta & 3);
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(BlockState state) {
         return state.getValue(META_INTERMEDIATE);
     }
 

@@ -3,12 +3,12 @@ package mcjty.lib.multipart;
 import mcjty.lib.setup.ModSetup;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -41,7 +41,7 @@ public class MultipartHelper {
         return null;
     }
 
-    public static IBlockState getBlockState(IBlockAccess access, BlockPos pos, PartSlot slot) {
+    public static BlockState getBlockState(IBlockAccess access, BlockPos pos, PartSlot slot) {
         TileEntity te = access.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
@@ -53,19 +53,19 @@ public class MultipartHelper {
     }
 
     // Return true if there are no more parts left
-    public static boolean removePart(MultipartTE multipartTE, IBlockState state, PlayerEntity player, Vec3d hitVec) {
+    public static boolean removePart(MultipartTE multipartTE, BlockState state, PlayerEntity player, Vec3d hitVec) {
         BlockPos pos = multipartTE.getPos();
         MultipartTE.Part hitPart = ModSetup.multipartBlock.getHitPart(state, multipartTE.getWorld(), pos, getPlayerEyes(player), hitVec);
         if (hitPart == null) {
             return false;
         }
 
-        IBlockState hitState = hitPart.getState();
+        BlockState hitState = hitPart.getState();
         TileEntity hitTile = hitPart.getTileEntity();
 
         ItemStack stack = new ItemStack(Item.getItemFromBlock(hitState.getBlock()));
         if (hitTile instanceof GenericTileEntity) {
-            NBTTagCompound tagCompound = new NBTTagCompound();
+            CompoundNBT tagCompound = new CompoundNBT();
             ((GenericTileEntity) hitTile).writeRestorableToNBT(tagCompound);
             ((GenericTileEntity) hitTile).onBlockBreak(multipartTE.getWorld(), multipartTE.getPos(), hitState);
             stack.setTagCompound(tagCompound);

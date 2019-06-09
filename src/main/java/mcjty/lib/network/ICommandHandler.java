@@ -2,7 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.entity.player.PlayerEntityMP;
+import net.minecraft.entity.player.PlayerEntity;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface ICommandHandler {
     /// Return true if command was handled correctly. False if not.
-    default boolean execute(PlayerEntityMP playerMP, String command, TypedMap params) {
+    default boolean execute(PlayerEntity playerMP, String command, TypedMap params) {
         return false;
     }
 

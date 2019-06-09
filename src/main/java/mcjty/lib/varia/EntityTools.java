@@ -5,7 +5,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.EntityStray;
 import net.minecraft.entity.monster.EntityWitherSkeleton;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.fixes.EntityId;
 import net.minecraft.util.text.translation.I18n;
@@ -29,7 +29,7 @@ public class EntityTools {
      * @return
      */
     public static String fixEntityId(String id) {
-        NBTTagCompound nbt = new NBTTagCompound();
+        CompoundNBT nbt = new CompoundNBT();
         nbt.setString("id", id);
         nbt = FIXER.fixTagCompound(nbt);
         return nbt.getString("id");
