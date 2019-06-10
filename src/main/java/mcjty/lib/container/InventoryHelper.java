@@ -166,7 +166,9 @@ public class InventoryHelper {
         TileEntity te = world.getTileEntity(direction == null ? pos : pos.offset(direction));
         if (te != null) {
             Direction opposite = direction == null ? null : direction.getOpposite();
-            return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite).map(handler -> ItemHandlerHelper.insertItem(handler, s, false)).orElse(ItemStack.EMPTY);
+            return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite)
+                    .map(handler -> ItemHandlerHelper.insertItem(handler, s, false))
+                    .orElse(ItemStack.EMPTY);
         }
         return s;
     }
@@ -330,7 +332,9 @@ public class InventoryHelper {
     }
 
     private static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
-        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (!result.getHasSubtypes() || result.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
+        // @todo 1.14
+//        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (!result.getHasSubtypes() || result.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
+        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (result.getDamage() == itemstack1.getDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
     }
 
     public int getCount() {
@@ -389,7 +393,7 @@ public class InventoryHelper {
                     tileEntity.markDirty();
                     return old;
                 }
-                ItemStack its = stacks.get(index).splitStack(amount);
+                ItemStack its = stacks.get(index).split(amount);
                 if (stacks.get(index).isEmpty()) {
                     stacks.set(index, ItemStack.EMPTY);
                 }

@@ -3,17 +3,13 @@ package mcjty.lib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.datafix.fixes.TileEntityNamespace;
 import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.datafix.FixTypes;
-import net.minecraftforge.common.util.ModFixs;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +22,7 @@ public class McJtyRegister {
     private static final Map<Block,MTile> tiles = new HashMap<>();
     private static final List<MItem> items = new ArrayList<>();
 
-    public static void registerLater(Block block, ModBase mod, @Nullable Function<Block, ItemBlock> itemBlockFactory) {
+    public static void registerLater(Block block, ModBase mod, @Nullable Function<Block, BlockItem> itemBlockFactory) {
         blocks.add(new MBlock(block, mod, itemBlockFactory));
     }
 

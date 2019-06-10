@@ -1,6 +1,5 @@
 package mcjty.lib.blocks;
 
-import crazypants.enderio.api.redstone.IRedstoneConnectable;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.McJtyRegister;
 import mcjty.lib.api.IModuleSupport;
@@ -14,23 +13,16 @@ import mcjty.lib.gui.GenericGuiContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.lib.varia.WrenchUsage;
-import mcjty.theoneprobe.api.IProbeHitData;
-import mcjty.theoneprobe.api.IProbeInfo;
-import mcjty.theoneprobe.api.ProbeMode;
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
@@ -39,13 +31,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.ChunkCache;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.fml.common.Optional;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,11 +40,11 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-@Optional.InterfaceList({
-        @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "enderio"),
-})
+//@Optional.InterfaceList({
+//        @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "enderio"),
+//})
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends BaseBlock
-        implements ITileEntityProvider, IRedstoneConnectable {
+        implements ITileEntityProvider /*, IRedstoneConnectable*/ {
 
     protected final Class<? extends T> tileEntityClass;
     private final BiFunction<PlayerEntity, IInventory, C> containerFactory;
@@ -67,7 +54,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private boolean infusable = this instanceof Infusable;
     private IModuleSupport moduleSupport = null;
 
-    @SideOnly(Side.CLIENT)
+    // Client side
     private BiFunction<T, C, GenericGuiContainer<? super T>> guiFactory;
 
     private int guiId = -1;
@@ -84,7 +71,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                         Material material,
                         Class<? extends T> tileEntityClass,
                         BiFunction<PlayerEntity, IInventory, C> containerFactory,
-                        Function<Block, ItemBlock> itemBlockFactory,
+                        Function<Block, BlockItem> itemBlockFactory,
                         String name, boolean isContainer) {
         super(mod, material, name, itemBlockFactory);
         this.hasTileEntity = isContainer;

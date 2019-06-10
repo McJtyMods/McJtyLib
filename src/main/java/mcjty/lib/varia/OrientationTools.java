@@ -2,6 +2,7 @@ package mcjty.lib.varia;
 
 import mcjty.lib.blocks.BaseBlock;
 import net.minecraft.block.state.BlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -260,7 +261,7 @@ public class OrientationTools {
         return worldToBlockSpace(side, getOrientation(state));
     }
 
-    public static Direction getFacingFromEntity(BlockPos clickedBlock, MobEntity entityIn) {
+    public static Direction getFacingFromEntity(BlockPos clickedBlock, Entity entityIn) {
         if (MathHelper.abs((float) entityIn.posX - clickedBlock.getX()) < 2.0F && MathHelper.abs((float) entityIn.posZ - clickedBlock.getZ()) < 2.0F) {
             double d0 = entityIn.posY + entityIn.getEyeHeight();
 
