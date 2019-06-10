@@ -14,11 +14,15 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.lib.varia.WrenchUsage;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.BlockItem;
@@ -28,13 +32,18 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.fml.network.NetworkHooks;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -74,7 +83,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                         Function<Block, BlockItem> itemBlockFactory,
                         String name, boolean isContainer) {
         super(mod, material, name, itemBlockFactory);
-        this.hasTileEntity = isContainer;
+//        this.hasTileEntity = isContainer;     // @todo 1.14 check
         this.tileEntityClass = tileEntityClass;
         this.containerFactory = containerFactory;
         McJtyRegister.registerLater(this, tileEntityClass);
@@ -109,13 +118,13 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         throw new AbstractMethodError();
     }
 
-    @Override
-    @Optional.Method(modid = "enderio")
-    public boolean shouldRedstoneConduitConnect(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull Direction from) {
-        return needsRedstoneCheck() || hasRedstoneOutput();
-    }
+//    @Override
+//    @Optional.Method(modid = "enderio")
+//    public boolean shouldRedstoneConduitConnect(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull Direction from) {
+//        return needsRedstoneCheck() || hasRedstoneOutput();
+//    }
 
-    protected int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+    protected int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         return -1;
     }
 
@@ -125,141 +134,139 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public int getWeakPower(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+    public int getWeakPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         return getRedstoneOutput(state, world, pos, side);
     }
 
     @Override
-    public int getStrongPower(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+    public int getStrongPower(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         return getRedstoneOutput(state, world, pos, side);
     }
 
     @Override
-    public void breakBlock(World world, BlockPos pos, BlockState state) {
+    public void onReplaced(BlockState state, World world, BlockPos pos, BlockState newstate, boolean isMoving) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
             if (!world.isRemote) {
                 GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-                genericTileEntity.onBlockBreak(world, pos, state);
+                genericTileEntity.onReplaced(world, pos, state);
             }
         }
 
-        super.breakBlock(world, pos, state);
+        super.onReplaced(state, world, pos, newstate, isMoving);
     }
+
+// @todo 1.14
+//    @Override
+//    @Optional.Method(modid = "theoneprobe")
+//    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
+//        super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+//        BlockPos pos = data.getPos();
+//        TileEntity te = world.getTileEntity(pos);
+//        if (te instanceof GenericTileEntity) {
+//            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
+//            genericTileEntity.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+//
+//        }
+//    }
+//
+//    @Override
+//    @Optional.Method(modid = "waila")
+//    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+//        currenttip = super.getWailaBody(itemStack, currenttip, accessor, config);
+//        TileEntity tileEntity = accessor.getTileEntity();
+//        if (tileEntity instanceof GenericTileEntity) {
+//            GenericTileEntity genericTileEntity = (GenericTileEntity) tileEntity;
+//            genericTileEntity.addWailaBody(itemStack, currenttip, accessor, config);
+//        }
+//        return currenttip;
+//    }
 
 
     @Override
-    @Optional.Method(modid = "theoneprobe")
-    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
-        super.addProbeInfo(mode, probeInfo, player, world, blockState, data);
-        BlockPos pos = data.getPos();
-        TileEntity te = world.getTileEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-            genericTileEntity.addProbeInfo(mode, probeInfo, player, world, blockState, data);
-
-        }
-    }
-
-    @Override
-    @Optional.Method(modid = "waila")
-    public List<String> getWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-        currenttip = super.getWailaBody(itemStack, currenttip, accessor, config);
-        TileEntity tileEntity = accessor.getTileEntity();
-        if (tileEntity instanceof GenericTileEntity) {
-            GenericTileEntity genericTileEntity = (GenericTileEntity) tileEntity;
-            genericTileEntity.addWailaBody(itemStack, currenttip, accessor, config);
-        }
-        return currenttip;
-    }
-
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flags) {
+    public void addInformation(ItemStack stack, @Nullable IBlockReader world, List<ITextComponent> tooltip, ITooltipFlag advanced) {
         intAddInformation(stack, tooltip);
-        super.addInformation(stack, world, tooltip, flags);
+        super.addInformation(stack, world, tooltip, advanced);
     }
 
-    protected void intAddInformation(ItemStack itemStack, List<String> list) {
-        CompoundNBT tagCompound = itemStack.getTagCompound();
+    protected void intAddInformation(ItemStack itemStack, List<ITextComponent> list) {
+        CompoundNBT tagCompound = itemStack.getTag();
         if (tagCompound != null) {
-            if (tagCompound.hasKey("Energy")) {
+            if (tagCompound.contains("Energy")) {
                 long energy = tagCompound.getLong("Energy");
-                list.add(TextFormatting.GREEN + "Energy: " + energy + " rf");
+                list.add(new StringTextComponent(TextFormatting.GREEN + "Energy: " + energy + " rf"));
             }
             if (isInfusable()) {
-                int infused = tagCompound.getInteger("infused");
+                int infused = tagCompound.getInt("infused");
                 int pct = infused * 100 / GeneralConfig.maxInfuse;
-                list.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
+                list.add(new StringTextComponent(TextFormatting.YELLOW + "Infused: " + pct + "%"));
             }
 
-            if (GeneralConfig.manageOwnership && tagCompound.hasKey("owner")) {
+            if (GeneralConfig.manageOwnership && tagCompound.contains("owner")) {
                 String owner = tagCompound.getString("owner");
                 int securityChannel = -1;
-                if (tagCompound.hasKey("secChannel")) {
-                    securityChannel = tagCompound.getInteger("secChannel");
+                if (tagCompound.contains("secChannel")) {
+                    securityChannel = tagCompound.getInt("secChannel");
                 }
 
                 if (securityChannel == -1) {
-                    list.add(TextFormatting.YELLOW + "Owned by: " + owner);
+                    list.add(new StringTextComponent(TextFormatting.YELLOW + "Owned by: " + owner));
                 } else {
-                    list.add(TextFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")");
+                    list.add(new StringTextComponent(TextFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")"));
                 }
 
-                if (!tagCompound.hasKey("idM")) {
-                    list.add(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                if (!tagCompound.contains("idM")) {
+                    list.add(new StringTextComponent(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!"));
                 }
             }
         }
     }
 
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean noIdea) {
         if (needsRedstoneCheck()) {
             checkRedstone(world, pos);
         }
     }
 
+    // @todo 1.14
+//    @Override
+//    public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder) {
+//        ServerWorld world = builder.func_216018_a();
+//        TileEntity tileEntity = world.getTileEntity(builder.pos);
+//
+//        if (tileEntity instanceof GenericTileEntity) {
+//            ItemStack stack = new ItemStack(Item.getItemFromBlock(this));
+//            CompoundNBT tagCompound = new CompoundNBT();
+//            ((GenericTileEntity)tileEntity).writeRestorableToNBT(tagCompound);
+//
+//            stack.setTagCompound(tagCompound);
+//            result.add(stack);
+//
+//            ((GenericTileEntity) tileEntity).getDrops(result, world, pos, metadata, fortune);
+//        } else {
+//            super.getDrops(result, world, pos, metadata, fortune);
+//        }
+//    }
+
+
     @Override
-    public void getDrops(NonNullList<ItemStack> result, IBlockAccess world, BlockPos pos, BlockState metadata, int fortune) {
-        TileEntity tileEntity = world.getTileEntity(pos);
-
-        if (tileEntity instanceof GenericTileEntity) {
-            ItemStack stack = new ItemStack(Item.getItemFromBlock(this));
-            CompoundNBT tagCompound = new CompoundNBT();
-            ((GenericTileEntity)tileEntity).writeRestorableToNBT(tagCompound);
-
-            stack.setTagCompound(tagCompound);
-            result.add(stack);
-
-            ((GenericTileEntity) tileEntity).getDrops(result, world, pos, metadata, fortune);
-        } else {
-            super.getDrops(result, world, pos, metadata, fortune);
-        }
-    }
-
-    @Override
-    public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest) {
+    public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, IFluidState fluid) {
         if (willHarvest) {
             return true; // If it will harvest, delay deletion of the block until after getDrops
         }
-        return super.removedByPlayer(state, world, pos, player, willHarvest);
+        return super.removedByPlayer(state, world, pos, player, willHarvest, fluid);
     }
 
     @Override
     public void harvestBlock(World world, PlayerEntity player, BlockPos pos, BlockState state, TileEntity te, ItemStack stack) {
         super.harvestBlock(world, player, pos, state, te, stack);
-        world.setBlockToAir(pos);
+        world.setBlockState(pos, Blocks.AIR.getDefaultState());
     }
 
+    @Nullable
     @Override
-    public TileEntity createNewTileEntity(World world, int i) {
-        return null;
-    }
-
-    @Override
-    public TileEntity createTileEntity(World world, BlockState metadata) {
+    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         try {
             return tileEntityClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
@@ -299,21 +306,21 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, Direction side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
-            if (((GenericTileEntity) te).onBlockActivated(state, player, hand, side, hitX, hitY, hitZ)) {
+            if (((GenericTileEntity) te).onBlockActivated(state, player, hand, result)) {
                 return true;
             }
         }
         ItemStack heldItem = player.getHeldItem(hand);
-        if (handleModule(world, pos, state, player, hand, heldItem, side, hitX, hitY, hitZ)) {
+        if (handleModule(world, pos, state, player, hand, heldItem, result)) {
             return true;
         }
         WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
         switch (wrenchUsed) {
             case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player);
-            case NORMAL:       return wrenchUse(world, pos, side,player);
+            case NORMAL:       return wrenchUse(world, pos, result.getFace(), player);
             case SNEAKING:     return wrenchSneak(world, pos, player);
             case DISABLED:     return wrenchDisabled(world, pos, player);
             case SELECT:       return wrenchSelect(world, pos, player);
@@ -330,7 +337,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         this.moduleSupport = moduleSupport;
     }
 
-    public boolean handleModule(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, Direction side, float hitX, float hitY, float hitZ) {
+    public boolean handleModule(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult result) {
         if (!heldItem.isEmpty()) {
             IModuleSupport support = getModuleSupport();
             if (support != null) {
@@ -345,23 +352,23 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public boolean rotateBlock(World world, BlockPos pos, Direction axis) {
-        boolean rc = super.rotateBlock(world, pos, axis);
+    public BlockState rotate(BlockState state, IWorld world, BlockPos pos, Rotation rot) {
+        BlockState rotated = super.rotate(state, world, pos, rot);
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof GenericTileEntity) {
-            ((GenericTileEntity) tileEntity).rotateBlock(axis);
+            ((GenericTileEntity) tileEntity).rotateBlock(rot);
         }
-        return rc;
+        return rotated;
     }
 
     protected boolean wrenchUse(World world, BlockPos pos, Direction side, PlayerEntity player) {
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof GenericTileEntity) {
             if (!((GenericTileEntity) tileEntity).wrenchUse(world, pos, side, player)) {
-                rotateBlock(world, pos, Direction.UP);
+                rotate(world.getBlockState(pos), world, pos, Rotation.CLOCKWISE_90);
             }
         } else {
-            rotateBlock(world, pos, Direction.UP);
+            rotate(world.getBlockState(pos), world, pos, Rotation.CLOCKWISE_90);
         }
         return true;
     }
@@ -395,6 +402,8 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             if (checkAccess(world, player, te)) {
                 return true;
             }
+//            NetworkHooks.openGui((ServerPlayerEntity) player, );
+            // @todo 1.14
             player.openGui(modBase, getGuiID(), world, x, y, z);
             return true;
         }

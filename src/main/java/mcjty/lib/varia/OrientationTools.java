@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.blocks.BaseBlock;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.Direction;
@@ -27,7 +27,7 @@ public class OrientationTools {
     }
 
     public static Direction getOrientationHoriz(BlockState state) {
-        return state.getValue(BaseBlock.FACING_HORIZ);
+        return state.get(BaseBlock.FACING_HORIZ);
     }
 
     public static int setOrientationHoriz(int metadata, Direction orientation) {

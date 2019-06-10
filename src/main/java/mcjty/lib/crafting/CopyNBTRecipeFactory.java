@@ -47,6 +47,8 @@ public class CopyNBTRecipeFactory implements IRecipeSerializer {
         return null;
     }
 
+    // @todo 1.14
+    /*
     @Override
     public IRecipe parse(JsonContext context, JsonObject json) {
         ShapedRecipe recipe = ShapedRecipe.factory(context, json);
@@ -91,4 +93,5 @@ public class CopyNBTRecipeFactory implements IRecipeSerializer {
             return newOutput;
         }
     }
+    */
 }

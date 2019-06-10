@@ -25,6 +25,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
@@ -94,7 +95,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, MobEntity placer, ItemStack stack) {
     }
 
-    public void onBlockBreak(World world, BlockPos pos, BlockState state) {
+    public void onReplaced(World world, BlockPos pos, BlockState state) {
     }
 
     public void onPartAdded(PartSlot slot, BlockState state, TileEntity multipartTile) {
@@ -507,7 +508,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void getDrops(NonNullList<ItemStack> drops, IBlockReader world, BlockPos pos, BlockState metadata, int fortune) {
     }
 
-    public void rotateBlock(Direction axis) {
+    public void rotateBlock(Rotation axis) {
 
     }
 
