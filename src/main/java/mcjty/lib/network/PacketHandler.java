@@ -1,7 +1,9 @@
 package mcjty.lib.network;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
@@ -25,22 +27,25 @@ public class PacketHandler {
     }
 
     public static SimpleChannel registerMessages(String modid, String channelName) {
-        SimpleChannel network = new SimpleChannel(channelName) {
-            @Override
-            public void sendToServer(IMessage message) {
-                if (message instanceof IClientServerDelayed && !canBeSent(message)) {
-                    return;
-                }
-                super.sendToServer(message);
-            }
-        };
+        SimpleChannel network = NetworkRegistry.newSimpleChannel(new ResourceLocation(McJtyLib.MODID, channelName), () -> "1.0", s -> true, s -> true);
+
+        //@todo 1.14: how to do this?
+//        SimpleChannel network = new SimpleChannel(channelName) {
+//            @Override
+//            public <MSG> void sendToServer(MSG message) {
+//                if (message instanceof IClientServerDelayed && !canBeSent(message)) {
+//                    return;
+//                }
+//                super.sendToServer(message);
+//            }
+//        };
         registerMessages(network);
         modNetworking.put(modid, network);
         return network;
     }
 
     // Only use client-side!
-    private static boolean canBeSent(IMessage message) {
+    private static <MSG> boolean canBeSent(MSG message) {
         return connected;
     }
 
@@ -50,22 +55,21 @@ public class PacketHandler {
     }
 
 
-    private static void registerMessages(SimpleChannel networkWrapper) {
+    private static void registerMessages(SimpleChannel channel) {
         int startIndex = 0;
-        SimpleChannel channel = new SimpleChannel(networkWrapper);
 
         // Server side
-        channel.registerMessageServer(startIndex++, PacketServerCommandTyped.class, PacketServerCommandTyped::toBytes, PacketServerCommandTyped::new, PacketServerCommandTyped::handle);
-        channel.registerMessageServer(startIndex++, PacketSendServerCommand.class, PacketSendServerCommand::toBytes, PacketSendServerCommand::new, PacketSendServerCommand::handle);
-        channel.registerMessageServer(startIndex++, PacketRequestDataFromServer.class, PacketRequestDataFromServer::toBytes, PacketRequestDataFromServer::new, PacketRequestDataFromServer::handle);
-        channel.registerMessageServer(startIndex++, PacketDumpItemInfo.class, PacketDumpItemInfo::toBytes, PacketDumpItemInfo::new, PacketDumpItemInfo::handle);
-        channel.registerMessageServer(startIndex++, PacketDumpBlockInfo.class, PacketDumpBlockInfo::toBytes, PacketDumpBlockInfo::new, PacketDumpBlockInfo::handle);
+        channel.registerMessage(startIndex++, PacketServerCommandTyped.class, PacketServerCommandTyped::toBytes, PacketServerCommandTyped::new, PacketServerCommandTyped::handle);
+        channel.registerMessage(startIndex++, PacketSendServerCommand.class, PacketSendServerCommand::toBytes, PacketSendServerCommand::new, PacketSendServerCommand::handle);
+        channel.registerMessage(startIndex++, PacketRequestDataFromServer.class, PacketRequestDataFromServer::toBytes, PacketRequestDataFromServer::new, PacketRequestDataFromServer::handle);
+        channel.registerMessage(startIndex++, PacketDumpItemInfo.class, PacketDumpItemInfo::toBytes, PacketDumpItemInfo::new, PacketDumpItemInfo::handle);
+        channel.registerMessage(startIndex++, PacketDumpBlockInfo.class, PacketDumpBlockInfo::toBytes, PacketDumpBlockInfo::new, PacketDumpBlockInfo::handle);
 
         // Client side
-        channel.registerMessageClient(startIndex++, PacketSendClientCommand.class, PacketSendClientCommand::toBytes, PacketSendClientCommand::new, PacketSendClientCommand::handle);
-        channel.registerMessageClient(startIndex++, PacketDataFromServer.class, PacketDataFromServer::toBytes, PacketDataFromServer::new, PacketDataFromServer::handle);
-        channel.registerMessageClient(startIndex++, PacketSendGuiData.class, PacketSendGuiData::toBytes, PacketSendGuiData::new, PacketSendGuiData::handle);
-        channel.registerMessageClient(startIndex++, PacketFinalizeLogin.class, PacketFinalizeLogin::toBytes, PacketFinalizeLogin::new, PacketFinalizeLogin::handle);
+        channel.registerMessage(startIndex++, PacketSendClientCommand.class, PacketSendClientCommand::toBytes, PacketSendClientCommand::new, PacketSendClientCommand::handle);
+        channel.registerMessage(startIndex++, PacketDataFromServer.class, PacketDataFromServer::toBytes, PacketDataFromServer::new, PacketDataFromServer::handle);
+        channel.registerMessage(startIndex++, PacketSendGuiData.class, PacketSendGuiData::toBytes, PacketSendGuiData::new, PacketSendGuiData::handle);
+        channel.registerMessage(startIndex++, PacketFinalizeLogin.class, PacketFinalizeLogin::toBytes, PacketFinalizeLogin::new, PacketFinalizeLogin::handle);
     }
 
     // From client side only: send server command

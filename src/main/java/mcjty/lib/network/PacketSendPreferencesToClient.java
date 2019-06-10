@@ -1,32 +1,26 @@
 package mcjty.lib.network;
 
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.gui.GuiStyle;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 
-public class PacketSendPreferencesToClient implements IMessage {
+import java.util.function.Supplier;
+
+public class PacketSendPreferencesToClient {
     private int buffX;
     private int buffY;
     private GuiStyle style;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
+    public PacketSendPreferencesToClient(ByteBuf buf) {
         buffX = buf.readInt();
         buffY = buf.readInt();
         style = GuiStyle.values()[buf.readInt()];
     }
 
-    @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(buffX);
         buf.writeInt(buffY);
         buf.writeInt(style.ordinal());
-    }
-
-    public PacketSendPreferencesToClient() {
     }
 
     public PacketSendPreferencesToClient(int buffX, int buffY, GuiStyle style) {
@@ -47,13 +41,12 @@ public class PacketSendPreferencesToClient implements IMessage {
         return style;
     }
 
-    public static class Handler implements IMessageHandler<PacketSendPreferencesToClient, IMessage> {
-        @Override
-        public IMessage onMessage(PacketSendPreferencesToClient message, MessageContext ctx) {
-            Minecraft.getInstance().addScheduledTask(() -> SendPreferencesToClientHelper.setPreferences(message));
-            return null;
-        }
-
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
+        ctx.enqueueWork(() -> {
+            SendPreferencesToClientHelper.setPreferences(this);
+        });
+        ctx.setPacketHandled(true);
     }
 
 }

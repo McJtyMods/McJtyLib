@@ -28,7 +28,7 @@ public class PacketSetGuiStyle {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> handle(this, ctx));
+        ctx.get().enqueueWork(() -> handle(this, ctx.get()));
         ctx.get().setPacketHandled(true);
     }
 

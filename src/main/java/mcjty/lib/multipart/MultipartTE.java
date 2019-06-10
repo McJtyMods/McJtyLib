@@ -3,8 +3,10 @@ package mcjty.lib.multipart;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -94,12 +96,12 @@ public class MultipartTE extends TileEntity {
 
 
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity packet) {
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         int oldVersion = version;
         readFromNBT(packet.getNbtCompound());
         if (world.isRemote && version != oldVersion) {
 //            dumpParts("onData");
-            world.markBlockRangeForRenderUpdate(pos, pos);
+            world.markForRerender(pos);
         }
     }
 
@@ -112,10 +114,10 @@ public class MultipartTE extends TileEntity {
 
     @Nullable
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
+    public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTag = new CompoundNBT();
         writeToNBT(nbtTag);
-        return new SPacketUpdateTileEntity(pos, 1, nbtTag);
+        return new SUpdateTileEntityPacket(pos, 1, nbtTag);
     }
 
     public void markDirtyClient() {
@@ -140,45 +142,45 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public void readFromNBT(CompoundNBT compound) {
-        super.readFromNBT(compound);
+    public void read(CompoundNBT compound) {
+        super.read(compound);
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
-        version = compound.getInteger("version");
-        NBTTagList list = compound.getTagList("parts", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0 ; i < list.tagCount() ; i++) {
-            CompoundNBT tag = list.getCompoundTagAt(i);
+        version = compound.getInt("version");
+        ListNBT list = compound.getList("parts", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0 ; i < list.size() ; i++) {
+            CompoundNBT tag = list.getCompound(i);
 
             PartSlot slot = PartSlot.byName(tag.getString("slot"));
             if (slot != null) {
                 BlockState state = NBTUtil.readBlockState(tag);
                 if (partExists(slot, state)) {
                     // Part is already there. Just update it
-                    Part part = parts.get(slot);
-                    if (tag.hasKey("te")) {
-                        CompoundNBT tc = tag.getCompoundTag("te");
+                    Part part = this.parts.get(slot);
+                    if (tag.contains("te")) {
+                        CompoundNBT tc = tag.getCompound("te");
                         TileEntity te = part.tileEntity;
                         if (te == null) {
-                            te = state.getBlock().createTileEntity(world, state);// @todo
+                            te = state.getBlock().createTileEntity(state, world);// @todo
                             if (te != null) {
                                 te.setWorld(world);
-                                te.readFromNBT(tc);
+                                te.read(tc);
                                 te.setPos(pos);
                             }
                         } else {
-                            te.readFromNBT(tc);
+                            te.read(tc);
                             te.setPos(pos);
                         }
                     }
                     newparts.put(slot, part);
                 } else {
                     TileEntity te = null;
-                    if (tag.hasKey("te")) {
-                        CompoundNBT tc = tag.getCompoundTag("te");
-                        te = state.getBlock().createTileEntity(world, state);// @todo
+                    if (tag.contains("te")) {
+                        CompoundNBT tc = tag.getCompound("te");
+                        te = state.getBlock().createTileEntity(state, world);// @todo
                         if (te != null) {
                             te.setWorld(world);
-                            te.readFromNBT(tc);
+                            te.read(tc);
                             te.setPos(pos);
                         }
                     }
@@ -187,13 +189,15 @@ public class MultipartTE extends TileEntity {
                 }
             }
         }
-        parts = newparts;
+        this.parts = newparts;
     }
 
-    @Override
-    protected void setWorldCreate(World worldIn) {
-        setWorld(worldIn);
-    }
+
+    // @todo 1.14
+//    @Override
+//    protected void setWorldCreate(World worldIn) {
+//        setWorld(worldIn);
+//    }
 
     @Override
     public void setWorld(World worldIn) {
@@ -206,44 +210,45 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public CompoundNBT writeToNBT(CompoundNBT compound) {
-        NBTTagList list = new NBTTagList();
+    public CompoundNBT write(CompoundNBT compound) {
+        ListNBT list = new ListNBT();
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
-            CompoundNBT tag = new CompoundNBT();
             PartSlot slot = entry.getKey();
             Part part = entry.getValue();
 
-            tag.setString("slot", slot.name());
             BlockState state = part.getState();
-            NBTUtil.writeBlockState(tag, state);
+            CompoundNBT tag = NBTUtil.writeBlockState(state);
+
+            tag.putString("slot", slot.name());
 
             TileEntity te = part.getTileEntity();
             if (te != null) {
                 CompoundNBT tc = new CompoundNBT();
-                tc = te.writeToNBT(tc);
-                tag.setTag("te", tc);
+                tc = te.write(tc);
+                tag.put("te", tc);
             }
 
-            list.appendTag(tag);
+            list.add(tag);
         }
-        compound.setTag("parts", list);
-        compound.setInteger("version", version);
+        compound.put("parts", list);
+        compound.putInt("version", version);
 
-        return super.writeToNBT(compound);
+        return super.write(compound);
     }
 
-    public boolean testIntersect(BlockState blockState) {
-        AxisAlignedBB box = blockState.getBoundingBox(world, pos);
-        for (Map.Entry<PartSlot, Part> entry : getParts().entrySet()) {
-            // @todo just check on slot?
-            Part part = entry.getValue();
-            AxisAlignedBB partBox = part.getState().getBoundingBox(world, pos);
-            if (box.intersects(partBox)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    // @todo 1.14
+//    public boolean testIntersect(BlockState blockState) {
+//        AxisAlignedBB box = blockState.getBoundingBox(world, pos);
+//        for (Map.Entry<PartSlot, Part> entry : getParts().entrySet()) {
+//            // @todo just check on slot?
+//            Part part = entry.getValue();
+//            AxisAlignedBB partBox = part.getState().getBoundingBox(world, pos);
+//            if (box.intersects(partBox)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//
 
 }

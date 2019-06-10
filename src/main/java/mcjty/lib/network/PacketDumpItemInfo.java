@@ -2,14 +2,13 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpItemNBT;
-import mcjty.lib.thirteen.Context;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.PlayerEntityMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.UserListOps;
-import net.minecraft.server.management.UserListOpsEntry;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraft.server.management.OpEntry;
+import net.minecraft.server.management.OpList;
+import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.Level;
 
 import java.util.function.Supplier;
@@ -17,38 +16,29 @@ import java.util.function.Supplier;
 /**
  * Debug packet to dump item info
  */
-public class PacketDumpItemInfo implements IMessage {
+public class PacketDumpItemInfo {
 
     private boolean verbose;
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-        verbose = buf.readBoolean();
-    }
-
-    @Override
     public void toBytes(ByteBuf buf) {
         buf.writeBoolean(verbose);
     }
 
-    public PacketDumpItemInfo() {
-    }
-
     public PacketDumpItemInfo(ByteBuf buf) {
-        fromBytes(buf);
+        verbose = buf.readBoolean();
     }
 
     public PacketDumpItemInfo(boolean verbose) {
         this.verbose = verbose;
     }
 
-    public void handle(Supplier<Context> supplier) {
-        Context ctx = supplier.get();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            PlayerEntityMP player = ctx.getSender();
-            MinecraftServer server = player.getEntityWorld().getMinecraftServer();
-            UserListOps oppedPlayers = server.getPlayerList().getOppedPlayers();
-            UserListOpsEntry entry = oppedPlayers.getEntry(player.getGameProfile());
+            ServerPlayerEntity player = ctx.getSender();
+            MinecraftServer server = player.getEntityWorld().getServer();
+            OpList oppedPlayers = server.getPlayerList().getOppedPlayers();
+            OpEntry entry = oppedPlayers.getEntry(player.getGameProfile());
             int perm = entry == null ? server.getOpPermissionLevel() : entry.getPermissionLevel();
             if (perm >= 1) {
                 ItemStack item = player.getHeldItemMainhand();

@@ -1,8 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.thirteen.Context;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -10,25 +9,16 @@ import java.util.function.Supplier;
  * This is sent from the server to the client after the login has occured so that packets that implement
  * IClientServerDelayed can be sent
  */
-public class PacketFinalizeLogin implements IMessage {
+public class PacketFinalizeLogin {
 
-    @Override
-    public void fromBytes(ByteBuf buf) {
-    }
-
-    @Override
     public void toBytes(ByteBuf buf) {
     }
 
-    public PacketFinalizeLogin() {
-    }
-
     public PacketFinalizeLogin(ByteBuf buf) {
-        fromBytes(buf);
     }
 
-    public void handle(Supplier<Context> supplier) {
-        Context ctx = supplier.get();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
         finalizeClientLogin();
         ctx.setPacketHandled(true);
     }

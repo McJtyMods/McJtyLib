@@ -20,13 +20,8 @@ public class NetworkTools {
 
     public static FluidStack readFluidStack(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
-        try {
-            CompoundNBT nbt = buf.readCompoundTag();
-            return FluidStack.loadFluidStackFromNBT(nbt);
-        } catch (IOException e) {
-            Logging.logError("Error reading fluid stack", e);
-        }
-        return null;
+        CompoundNBT nbt = buf.readCompoundTag();
+        return FluidStack.loadFluidStackFromNBT(nbt);
     }
 
     public static void writeFluidStack(ByteBuf dataOut, FluidStack fluidStack) {
@@ -42,12 +37,7 @@ public class NetworkTools {
 
     public static CompoundNBT readTag(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
-        try {
-            return buf.readCompoundTag();
-        } catch (IOException e) {
-            Logging.logError("Error reading tag", e);
-        }
-        return null;
+        return buf.readCompoundTag();
     }
 
     public static void writeTag(ByteBuf dataOut, CompoundNBT tag) {
@@ -62,27 +52,22 @@ public class NetworkTools {
     /// This function supports itemstacks with more then 64 items.
     public static ItemStack readItemStack(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
-        try {
-            CompoundNBT nbt = buf.readCompoundTag();
-            ItemStack stack = new ItemStack(nbt);
-            int amount = buf.readInt();
-            if (amount <= 0) {
-                stack.setCount(0);
-            } else {
-                stack.setCount(amount);
-            }
-            return stack;
-        } catch (IOException e) {
-            Logging.logError("Error reading item stack", e);
+        CompoundNBT nbt = buf.readCompoundTag();
+        ItemStack stack = ItemStack.read(nbt);
+        int amount = buf.readInt();
+        if (amount <= 0) {
+            stack.setCount(0);
+        } else {
+            stack.setCount(amount);
         }
-        return ItemStack.EMPTY;
+        return stack;
     }
 
     /// This function supports itemstacks with more then 64 items.
     public static void writeItemStack(ByteBuf dataOut, @Nonnull ItemStack itemStack) {
         PacketBuffer buf = new PacketBuffer(dataOut);
         CompoundNBT nbt = new CompoundNBT();
-        itemStack.writeToNBT(nbt);
+        itemStack.write(nbt);
         try {
             buf.writeCompoundTag(nbt);
             buf.writeInt(itemStack.getCount());

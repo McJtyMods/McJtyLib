@@ -7,11 +7,7 @@ import net.minecraft.client.Minecraft;
 
 public class ClientCommandHandlerHelper {
 
-    static void onMessage(PacketSendClientCommand message) {
-        Minecraft.getInstance().addScheduledTask(() -> handle(message));
-    }
-
-    private static void handle(PacketSendClientCommand message) {
+    static void handle(PacketSendClientCommand message) {
         String modid = message.getModid();
         String command = message.getCommand();
         TypedMap arguments = message.getArguments();

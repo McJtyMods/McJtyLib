@@ -4,7 +4,8 @@ package mcjty.lib.multipart;
 import java.util.List;
 import java.util.Map;
 
-public class PartsProperty implements IUnlistedProperty<Map<PartSlot, MultipartTE.Part>> {
+// @todo 1.14
+public class PartsProperty {}/* implements IUnlistedProperty<Map<PartSlot, MultipartTE.Part>> {
 
     private final String name;
 
@@ -32,3 +33,4 @@ public class PartsProperty implements IUnlistedProperty<Map<PartSlot, MultipartT
         return value.toString();
     }
 }
+*/

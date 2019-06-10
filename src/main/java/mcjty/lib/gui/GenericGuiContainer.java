@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.StringTextComponent;
@@ -266,16 +267,17 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
     }
 
     protected void drawWindow() {
-        drawDefaultBackground();
+        renderBackground();
         getWindowManager().draw();
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        super.drawScreen(mouseX, mouseY, partialTicks);
+    public void render(int mouseX, int mouseY, float partialTicks) {
+        super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
         drawStackTooltips(mouseX, mouseY);
     }
+
 
     @Override
     public void drawSlot(Slot slotIn) {

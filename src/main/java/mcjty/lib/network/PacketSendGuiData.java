@@ -2,12 +2,11 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
-import mcjty.lib.thirteen.Context;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -19,7 +18,7 @@ import java.util.function.Supplier;
 /**
  * Request information from the tile entity which is needed for the GUI
  */
-public class PacketSendGuiData implements IMessage {
+public class PacketSendGuiData {
     private int dimId;
     private BlockPos pos;
     private Object[] data;
@@ -61,7 +60,6 @@ public class PacketSendGuiData implements IMessage {
         CLASS_MAP.put(id++, Entry.of(BlockPos.class, NetworkTools::readPos, p -> NetworkTools.writePos(p.getLeft(), p.getRight())));
     }
 
-    @Override
     public void fromBytes(ByteBuf buf) {
         dimId = buf.readInt();
         pos = NetworkTools.readPos(buf);
@@ -77,7 +75,6 @@ public class PacketSendGuiData implements IMessage {
         triple.consumer.accept(Pair.of(buf, triple.cast(o)));
     }
 
-    @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(dimId);
         NetworkTools.writePos(buf, pos);
@@ -108,7 +105,7 @@ public class PacketSendGuiData implements IMessage {
     }
 
     public PacketSendGuiData(World world, BlockPos pos) {
-        this.dimId = world.provider.getDimension();
+        this.dimId = world.getDimension().getType().getId();
         this.pos = pos;
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
@@ -119,11 +116,11 @@ public class PacketSendGuiData implements IMessage {
         }
     }
 
-    public void handle(Supplier<Context> supplier) {
-        Context ctx = supplier.get();
+    public void handle(Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             World world = McJtyLib.proxy.getClientWorld();
-            if (world.provider.getDimension() == dimId) {
+            if (world.getDimension().getType().getId() == dimId) {
                 TileEntity te = world.getTileEntity(pos);
                 if (te instanceof GenericTileEntity) {
                     GenericTileEntity tileEntity = (GenericTileEntity) te;
