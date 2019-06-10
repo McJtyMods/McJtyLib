@@ -2,14 +2,20 @@ package mcjty.lib.container;
 
 import com.google.common.collect.Range;
 import mcjty.lib.network.PacketSendGuiData;
+import mcjty.lib.proxy.Registration;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerEntityMP;
-import net.minecraft.inventory.*;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.IContainerListener;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +28,12 @@ public class GenericContainer extends Container {
     private ContainerFactory factory;
     private GenericCrafter crafter = null;
 
+    public GenericContainer(int id) {
+        super(Registration.GENERIC_CONTAINER_TYPE, id); // @todo check?
+    }
+
     public GenericContainer(ContainerFactory factory) {
+        super(null, -1);    // @todo 1.14 check!
         this.factory = factory;
         factory.doSetup();
     }
@@ -65,7 +76,7 @@ public class GenericContainer extends Container {
             int y = slotFactory.getY();
             SlotType slotType = slotFactory.getSlotType();
             Slot slot = createSlot(slotFactory, inventory, index, x, y, slotType);
-            addSlotToContainer(slot);
+            addSlot(slot);
         }
     }
 
@@ -287,7 +298,6 @@ public class GenericContainer extends Container {
         return result;
     }
 
-
     @Override
     public ItemStack slotClick(int index, int button, ClickType mode, PlayerEntity player) {
         if (factory.isGhostSlot(index)) {
@@ -311,11 +321,11 @@ public class GenericContainer extends Container {
 
     // Call this in your detectAndSendChanges() implementation when you find one
     // of the fields you need in the GUI has changed
-    protected void notifyPlayerOfChanges(SimpleNetworkWrapper wrapper, World world, BlockPos pos) {
+    protected void notifyPlayerOfChanges(SimpleChannel wrapper, World world, BlockPos pos) {
         for (IContainerListener listener : this.listeners) {
-            if (listener instanceof PlayerEntityMP) {
-                PlayerEntityMP player = (PlayerEntityMP) listener;
-                wrapper.sendTo(new PacketSendGuiData(world, pos), player);
+            if (listener instanceof ServerPlayerEntity) {
+                ServerPlayerEntity player = (ServerPlayerEntity) listener;
+                wrapper.sendTo(new PacketSendGuiData(world, pos), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
             }
         }
     }

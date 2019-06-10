@@ -288,12 +288,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
     }
 
     @Override
-    public boolean isMouseOverSlot(Slot slotIn, int mouseX, int mouseY) {
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        Slot slot = getSlotUnderMouse();
         // Prevent slots from being hoverable if they are (partially) covered by a modal window
-        if (isPartiallyCoveredByModalWindow(slotIn)) {
+        if (isPartiallyCoveredByModalWindow(slot)) {
             return false;
         } else {
-            return super.isMouseOverSlot(slotIn, mouseX, mouseY);
+            return super.isMouseOver(mouseX, mouseY);
         }
     }
 

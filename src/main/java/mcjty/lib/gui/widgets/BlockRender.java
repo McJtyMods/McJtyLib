@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -8,13 +9,12 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.varia.ItemStackTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return this;
     }
 
-    public BlockRender(Minecraft mc, Gui gui) {
+    public BlockRender(Minecraft mc, Screen gui) {
         super(mc, gui);
         setDesiredHeight(16);
         setDesiredWidth(16);
@@ -112,24 +112,24 @@ public class BlockRender extends AbstractWidget<BlockRender> {
             RenderHelper.renderObject(mc, xx, yy, renderItem, false);
             if (hilightOnHover && isHovering()) {
                 GlStateManager.disableLighting();
-                GlStateManager.disableDepth();
+                GlStateManager.disableDepthTest();
                 GlStateManager.colorMask(true, true, true, false);
                 RenderHelper.drawVerticalGradientRect(xx, yy, xx + 16, yy + 16, -2130706433, -2130706433);
                 GlStateManager.colorMask(true, true, true, true);
 //                GlStateManager.enableLighting();
-                GlStateManager.enableDepth();
+                GlStateManager.enableDepthTest();
             }
 
             if (showLabel) {
                 String name;
                 if (renderItem instanceof ItemStack) {
-                    name = ((ItemStack) renderItem).getDisplayName();
+                    name = ((ItemStack) renderItem).getDisplayName().getFormattedText();
                 } else if (renderItem instanceof FluidStack) {
                     name = ((FluidStack) renderItem).getLocalizedName();
                 } else if (renderItem instanceof Item) {
-                    name = new ItemStack((Item) renderItem).getDisplayName();
+                    name = new ItemStack((Item) renderItem).getDisplayName().getFormattedText();
                 } else if (renderItem instanceof Block) {
-                    name = new ItemStack((Block) renderItem).getDisplayName();
+                    name = new ItemStack((Block) renderItem).getDisplayName().getFormattedText();
                 } else {
                     name = "";
                 }

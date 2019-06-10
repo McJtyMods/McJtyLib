@@ -3,7 +3,7 @@ package mcjty.lib.container;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
 public class CraftingSlot extends Slot {
