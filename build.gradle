@@ -84,10 +84,10 @@ minecraft {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.14.2-26.0.14'
+    compile ("mcjty.theoneprobe:TheOneProbe-${top_version}:deobf")
 
     //deobfCompile "mezz.jei:jei_${jei_version}"
     //deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"
-    //deobfCompile "mcjty.theoneprobe:TheOneProbe-${top_version}"
     //deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
     //deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
 
