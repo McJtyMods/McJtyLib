@@ -1,10 +1,9 @@
 package mcjty.lib.font;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -373,12 +372,12 @@ public class TrueTypeFont {
     public void drawString(float x, float y, String text, float scaleX, float scaleY, int format, float yoffset, float... rgba) {
         if (rgba.length == 0) rgba = new float[]{1f, 1f, 1f, 1f};
         GlStateManager.pushMatrix();
-        GlStateManager.scale(-scaleX, -scaleY, 1.0f);
-        GlStateManager.rotate(180, 0, 1, 0);
-        GlStateManager.translate(0, yoffset, 0);
+        GlStateManager.scalef(-scaleX, -scaleY, 1.0f);
+        GlStateManager.rotatef(180, 0, 1, 0);
+        GlStateManager.translatef(0, yoffset, 0);
 
         GlStateManager.bindTexture(fontTextureID);
-        GlStateManager.glBegin(GL11.GL_QUADS);
+        GlStateManager.begin(GL11.GL_QUADS);
 
         int i = text.indexOf(167);
         while (i != -1 && i + 1 < text.length()) {
@@ -399,7 +398,7 @@ public class TrueTypeFont {
         }
         drawTextInternal(x, y, text, scaleX, scaleY, format, rgba);
 
-        GlStateManager.glEnd();
+        GlStateManager.end();
 
         GlStateManager.popMatrix();
     }
@@ -447,7 +446,7 @@ public class TrueTypeFont {
         }
         if (rgba.length == 4)
             //worldRenderer.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-            GlStateManager.color(rgba[0], rgba[1], rgba[2], rgba[3]);
+            GlStateManager.color4f(rgba[0], rgba[1], rgba[2], rgba[3]);
         while (i >= 0 && i <= endIndex) {
 
             charCurrent = whatchars.charAt(i);

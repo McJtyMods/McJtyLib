@@ -1,26 +1,22 @@
 package mcjty.lib.varia;
 
-import net.darkhax.tesla.api.ITeslaConsumer;
-import net.darkhax.tesla.api.ITeslaHolder;
-import net.darkhax.tesla.api.ITeslaProducer;
+import mcjty.lib.api.power.IBigPower;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nullable;
 
-import mcjty.lib.api.power.IBigPower;
-
-@Optional.InterfaceList({
-    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer"),
-    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
-    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaProducer")
-})
-public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, ITeslaHolder, ITeslaConsumer, ITeslaProducer {
+// @todo 1.14
+//@Optional.InterfaceList({
+//    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer"),
+//    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder"),
+//    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaProducer")
+//})
+public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower /*, ITeslaHolder, ITeslaConsumer, ITeslaProducer*/ {
 
     private final ItemStack itemStack;
     private final IEnergyItem item;
@@ -91,13 +87,14 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower, I
         return item.getMaxEnergyStoredL(itemStack);
     }
 
-    @Override
-    public long takePower(long power, boolean simulated) {
-        return item.extractEnergyL(itemStack, power, simulated);
-    }
-
-    @Override
-    public long givePower(long power, boolean simulated) {
-        return item.receiveEnergyL(itemStack, power, simulated);
-    }
+    // @todo 1.14
+//    @Override
+//    public long takePower(long power, boolean simulated) {
+//        return item.extractEnergyL(itemStack, power, simulated);
+//    }
+//
+//    @Override
+//    public long givePower(long power, boolean simulated) {
+//        return item.receiveEnergyL(itemStack, power, simulated);
+//    }
 }

@@ -4,28 +4,21 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.tileentity.LogicTileEntity;
 import mcjty.lib.varia.LogicFacing;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRedstoneWire;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.client.renderer.block.statemap.StateMap;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.init.Blocks;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.item.BlockItem;
+import net.minecraft.state.EnumProperty;
+import net.minecraft.state.IntegerProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -38,14 +31,14 @@ import static net.minecraft.util.Direction.*;
  */
 public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Container> extends GenericBlock<T, C> {
 
-    public static PropertyInteger META_INTERMEDIATE = PropertyInteger.create("intermediate", 0, 3);
-    public static PropertyEnum<LogicFacing> LOGIC_FACING = PropertyEnum.create("logic_facing", LogicFacing.class);
+    public static IntegerProperty META_INTERMEDIATE = IntegerProperty.create("intermediate", 0, 3);
+    public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
 
     public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<PlayerEntity, IInventory, C> containerFactory, String name, boolean isContainer) {
         super(mod, material, tileEntityClass, containerFactory, name, isContainer);
     }
 
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<PlayerEntity, IInventory, C> containerFactory, Function<Block, ItemBlock> itemBlockFactory, String name, boolean isContainer) {
+    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<PlayerEntity, IInventory, C> containerFactory, Function<Block, BlockItem> itemBlockFactory, String name, boolean isContainer) {
         super(mod, material, tileEntityClass, containerFactory, itemBlockFactory, name, isContainer);
     }
 

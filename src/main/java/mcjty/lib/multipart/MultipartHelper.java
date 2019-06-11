@@ -3,9 +3,8 @@ package mcjty.lib.multipart;
 import mcjty.lib.setup.ModSetup;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerEntityMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -14,12 +13,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 public class MultipartHelper {
 
-    public static TileEntity getTileEntity(IBlockAccess access, BlockPos pos, PartSlot slot) {
+    public static TileEntity getTileEntity(IBlockReader access, BlockPos pos, PartSlot slot) {
         TileEntity te = access.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
@@ -30,7 +29,7 @@ public class MultipartHelper {
         return null;
     }
 
-    public static TileEntity getTileEntity(IBlockAccess access, PartPos pos) {
+    public static TileEntity getTileEntity(IBlockReader access, PartPos pos) {
         TileEntity te = access.getTileEntity(pos.getPos());
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(pos.getSlot());
@@ -41,7 +40,7 @@ public class MultipartHelper {
         return null;
     }
 
-    public static BlockState getBlockState(IBlockAccess access, BlockPos pos, PartSlot slot) {
+    public static BlockState getBlockState(IBlockReader access, BlockPos pos, PartSlot slot) {
         TileEntity te = access.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);

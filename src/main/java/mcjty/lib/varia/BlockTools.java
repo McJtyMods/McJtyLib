@@ -1,11 +1,11 @@
 package mcjty.lib.varia;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -31,14 +31,14 @@ public class BlockTools {
 
     public static void spawnItemStack(World world, int x, int y, int z, ItemStack itemstack) {
         if (!itemstack.isEmpty()) {
-            EntityItem entityItem = new EntityItem(world, x, y, z, itemstack);
+            ItemEntity entityItem = new ItemEntity(world, x, y, z, itemstack);
             world.spawnEntity(entityItem);
         }
     }
 
     public static Block getBlock(ItemStack stack) {
-        if (stack.getItem() instanceof ItemBlock) {
-            return ((ItemBlock) stack.getItem()).getBlock();
+        if (stack.getItem() instanceof BlockItem) {
+            return ((BlockItem) stack.getItem()).getBlock();
         } else {
             return null;
         }
@@ -57,7 +57,7 @@ public class BlockTools {
         if (nameForObject == null) {
             return "?";
         }
-        return nameForObject.getResourceDomain();
+        return nameForObject.getNamespace();
     }
 
     public static String getReadableName(World world, BlockPos pos) {
@@ -70,8 +70,8 @@ public class BlockTools {
     }
 
     public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
-        if (blockStack.getItem() instanceof ItemBlock) {
-            ItemBlock itemBlock = (ItemBlock) blockStack.getItem();
+        if (blockStack.getItem() instanceof BlockItem) {
+            BlockItem itemBlock = (BlockItem) blockStack.getItem();
             if (origState == null) {
                 origState = itemBlock.getBlock().getStateForPlacement(world, pos, Direction.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, Hand.MAIN_HAND);
             }

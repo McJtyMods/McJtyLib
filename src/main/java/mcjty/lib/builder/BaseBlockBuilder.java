@@ -5,22 +5,22 @@ import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericItemBlock;
 import mcjty.lib.multipart.PartSlot;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathNodeType;
+import net.minecraft.state.IProperty;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -28,8 +28,6 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
-
-import static net.minecraft.block.Block.FULL_BLOCK_AABB;
 
 /**
  * Build blocks using this class
@@ -42,16 +40,16 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected final ModBase mod;
     protected final String registryName;
 
-    protected CreativeTabs creativeTabs;
+    protected ItemGroup creativeTabs;
 
     protected Material material = Material.IRON;
-    protected Function<Block, ItemBlock> itemBlockFactory = GenericItemBlock::new;
+    protected Function<Block, BlockItem> itemBlockFactory = GenericItemBlock::new;
 
     protected List<IProperty<?>> extraProperties = new ArrayList<>();
 
     protected IActivateAction action = (world, pos, player, hand, side, hitX, hitY, hitZ) -> false;
     protected IClickAction clickAction = (world, pos, player) -> {};
-    protected IGetBoundingBox boundingBox = (state, source, pos) -> FULL_BLOCK_AABB;
+    //@todo 1.14 protected IGetBoundingBox boundingBox = (state, source, pos) -> FULL_BLOCK_AABB;
     protected IAddCollisionBoxToList cdBoxToList = null;
     protected IGetAIPathNodeType getAIPathNodeType = (state, world, pos) -> null;
     protected ISlotGetter slotGetter = (world, pos, newState) -> PartSlot.NONE;
@@ -70,7 +68,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         this.registryName = registryName;
     }
 
-    public T creativeTabs(CreativeTabs creativeTabs) {
+    public T creativeTabs(ItemGroup creativeTabs) {
         this.creativeTabs = creativeTabs;
         return (T) this;
     }
@@ -80,7 +78,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
-    public T itemBlockFactory(Function<Block, ItemBlock> itemBlockFactory) {
+    public T itemBlockFactory(Function<Block, BlockItem> itemBlockFactory) {
         this.itemBlockFactory = itemBlockFactory;
         return (T) this;
     }
@@ -156,7 +154,8 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     }
 
     public T boundingBox(IGetBoundingBox boundingBox) {
-        this.boundingBox = boundingBox;
+        // @todo 1.14
+//        this.boundingBox = boundingBox;
         return (T) this;
     }
 
@@ -184,12 +183,12 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             }
 
             @Override
-            public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
+            public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
             }
 
             @Override
-            public boolean doesSideBlockRendering(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+            public boolean doesSideBlockRendering(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
             }
 
@@ -223,7 +222,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             }
 
             @Override
-            public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+            public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader source, BlockPos pos) {
                 return boundingBox.getBoundingBox(state, source, pos);
             }
 
@@ -236,7 +235,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
 
             @Nullable
             @Override
-            public PathNodeType getAiPathNodeType(BlockState state, IBlockAccess world, BlockPos pos) {
+            public PathNodeType getAiPathNodeType(BlockState state, IBlockReader world, BlockPos pos) {
                 PathNodeType type = getAIPathNodeType.getAiPathNodeType(state, world, pos);
                 if (type == null) {
                     return super.getAiPathNodeType(state, world, pos);

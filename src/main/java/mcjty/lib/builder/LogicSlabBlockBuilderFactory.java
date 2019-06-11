@@ -2,18 +2,18 @@ package mcjty.lib.builder;
 
 import mcjty.lib.base.ModBase;
 import mcjty.lib.tileentity.LogicTileEntity;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemGroup;
 
 public class LogicSlabBlockBuilderFactory {
 
     private final ModBase mod;
-    private CreativeTabs creativeTabs;
+    private ItemGroup creativeTabs;
 
     public LogicSlabBlockBuilderFactory(ModBase mod) {
         this.mod = mod;
     }
 
-    public LogicSlabBlockBuilderFactory creativeTabs(CreativeTabs creativeTabs) {
+    public LogicSlabBlockBuilderFactory creativeTabs(ItemGroup creativeTabs) {
         this.creativeTabs = creativeTabs;
         return this;
     }

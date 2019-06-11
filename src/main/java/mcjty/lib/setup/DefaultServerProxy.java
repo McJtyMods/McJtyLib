@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.proxy.IProxy;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -12,25 +12,22 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.concurrent.Callable;
 
 public abstract class DefaultServerProxy implements IProxy {
 
     @Override
-    public void preInit(FMLPreInitializationEvent e) {
+    public void preInit(FMLCommonSetupEvent e) {
     }
 
     @Override
-    public void init(FMLInitializationEvent e) {
+    public void init(FMLCommonSetupEvent e) {
     }
 
     @Override
-    public void postInit(FMLPostInitializationEvent e) {
+    public void postInit(FMLCommonSetupEvent e) {
     }
 
     @Override

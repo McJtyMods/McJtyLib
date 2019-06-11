@@ -6,7 +6,6 @@ import mcjty.lib.McJtyLib;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
@@ -40,7 +39,7 @@ public class Logging {
 
     public static void log(World world, TileEntity te, String message) {
         if (doLogging) {
-            long ticks = world.getTotalWorldTime();
+            long ticks = world.getGameTime();
             if (ticks != prevTicks) {
                 prevTicks = ticks;
                 getInstance().logger.log(Level.INFO, "=== Time " + ticks + " ===");

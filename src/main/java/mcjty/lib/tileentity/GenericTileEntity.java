@@ -26,6 +26,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.NonNullList;
@@ -39,6 +40,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -71,6 +73,10 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     protected int powerLevel = 0;
+
+    public GenericTileEntity(TileEntityType<?> type) {
+        super(type);
+    }
 
     public void markDirtyClient() {
         markDirty();
@@ -217,7 +223,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * @param tagCompound
      */
     public void writeClientDataToNBT(CompoundNBT tagCompound) {
-        writeToNBT(tagCompound);
+        write(tagCompound);
     }
 
     /**
@@ -228,7 +234,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * @param tagCompound
      */
     public void readClientDataFromNBT(CompoundNBT tagCompound) {
-        readFromNBT(tagCompound);
+        read(tagCompound);
     }
 
     /**
@@ -259,8 +265,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public void readFromNBT(CompoundNBT tagCompound) {
-        super.readFromNBT(tagCompound);
+    public void read(CompoundNBT tagCompound) {
+        super.read(tagCompound);
         powerLevel = tagCompound.getByte("powered");
         readRestorableFromNBT(tagCompound);
     }
@@ -277,34 +283,34 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             rsMode = RedstoneMode.values()[m];
         }
 
-        CompoundNBT display = tagCompound.getCompoundTag("display");
-        if (display.hasKey("Name", Constants.NBT.TAG_STRING)) {
+        CompoundNBT display = tagCompound.getCompound("display");
+        if (display.contains("Name", Constants.NBT.TAG_STRING)) {
             displayName = display.getString("Name");
         }
-        infused = tagCompound.getInteger("infused");
+        infused = tagCompound.getInt("infused");
         ownerName = tagCompound.getString("owner");
-        if (tagCompound.hasKey("idM")) {
+        if (tagCompound.contains("idM")) {
             ownerUUID = new UUID(tagCompound.getLong("idM"), tagCompound.getLong("idL"));
         } else {
             ownerUUID = null;
         }
-        if (tagCompound.hasKey("secChannel")) {
-            securityChannel = tagCompound.getInteger("secChannel");
+        if (tagCompound.contains("secChannel")) {
+            securityChannel = tagCompound.getInt("secChannel");
         } else {
             securityChannel = -1;
         }
     }
 
     protected void writeBufferToNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
-        NBTTagList bufferTagList = new NBTTagList();
+        ListNBT bufferTagList = new ListNBT();
         for (ItemStack stack : list) {
             CompoundNBT CompoundNBT = new CompoundNBT();
             if (!stack.isEmpty()) {
-                stack.writeToNBT(CompoundNBT);
+                stack.write(CompoundNBT);
             }
-            bufferTagList.appendTag(CompoundNBT);
+            bufferTagList.add(CompoundNBT);
         }
-        tagCompound.setTag(tag, bufferTagList);
+        tagCompound.put(tag, bufferTagList);
     }
 
     protected void writeBufferToNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
@@ -312,10 +318,10 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public CompoundNBT writeToNBT(CompoundNBT tagCompound) {
-        super.writeToNBT(tagCompound);
+    public CompoundNBT write(CompoundNBT tagCompound) {
+        super.write(tagCompound);
         if (powerLevel > 0) {
-            tagCompound.setByte("powered", (byte) powerLevel);
+            tagCompound.putByte("powered", (byte) powerLevel);
         }
         writeRestorableToNBT(tagCompound);
         return tagCompound;
@@ -330,21 +336,21 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      */
     public void writeRestorableToNBT(CompoundNBT tagCompound) {
         if (needsRedstoneMode()) {
-            tagCompound.setByte("rsMode", (byte) rsMode.ordinal());
+            tagCompound.putByte("rsMode", (byte) rsMode.ordinal());
         }
         if (displayName != null) {
-            CompoundNBT display = tagCompound.getCompoundTag("display");
-            display.setString("Name", displayName);
-            tagCompound.setTag("display", display);
+            CompoundNBT display = tagCompound.getCompound("display");
+            display.putString("Name", displayName);
+            tagCompound.put("display", display);
         }
-        tagCompound.setInteger("infused", infused);
-        tagCompound.setString("owner", ownerName);
+        tagCompound.putInt("infused", infused);
+        tagCompound.putString("owner", ownerName);
         if (ownerUUID != null) {
-            tagCompound.setLong("idM", ownerUUID.getMostSignificantBits());
-            tagCompound.setLong("idL", ownerUUID.getLeastSignificantBits());
+            tagCompound.putLong("idM", ownerUUID.getMostSignificantBits());
+            tagCompound.putLong("idL", ownerUUID.getLeastSignificantBits());
         }
         if (securityChannel != -1) {
-            tagCompound.setInteger("secChannel", securityChannel);
+            tagCompound.putInt("secChannel", securityChannel);
         }
     }
 
@@ -358,7 +364,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             return false;
         }
         ownerUUID = player.getGameProfile().getId();
-        ownerName = player.getName();
+        ownerName = player.getName().getFormattedText();
         markDirtyClient();
 
         return true;
@@ -420,30 +426,25 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected IItemHandler invHandlerNull;
     protected IItemHandler invHandlerSided;
 
+    @Nonnull
     @Override
-    public boolean hasCapability(Capability<?> capability, Direction facing) {
-        if (needsCustomInvWrapper()) {
-            if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-                return true;
-            }
-        }
-        return super.hasCapability(capability, facing);
-    }
-
-    @Override
-    public <T> T getCapability(Capability<T> capability, Direction facing) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing) {
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
             if (needsCustomInvWrapper()) {
                 if (facing == null) {
-                    if (invHandlerNull == null) {
-                        invHandlerNull = new InvWrapper((IInventory) this);
-                    }
-                    return (T) invHandlerNull;
+                    return LazyOptional.of(() -> {
+                        if (invHandlerNull == null) {
+                            invHandlerNull = new InvWrapper((IInventory) this);
+                        }
+                        return (T) invHandlerNull;
+                    });
                 } else {
-                    if (invHandlerSided == null) {
-                        invHandlerSided = new NullSidedInvWrapper((ISidedInventory) this);
-                    }
-                    return (T) invHandlerSided;
+                    return LazyOptional.of(() -> {
+                        if (invHandlerSided == null) {
+                            invHandlerSided = new NullSidedInvWrapper((ISidedInventory) this);
+                        }
+                        return (T) invHandlerSided;
+                    });
                 }
             }
         }

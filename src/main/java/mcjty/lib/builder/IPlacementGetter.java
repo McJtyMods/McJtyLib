@@ -1,6 +1,6 @@
 package mcjty.lib.builder;
 
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;

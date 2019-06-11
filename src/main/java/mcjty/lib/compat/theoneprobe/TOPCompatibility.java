@@ -8,11 +8,10 @@ import mcjty.lib.setup.ModSetup;
 import mcjty.lib.varia.Logging;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.BlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
 import org.apache.commons.lang3.text.WordUtils;
 
 import javax.annotation.Nullable;
@@ -69,7 +68,7 @@ public class TOPCompatibility {
                     MultipartTE.Part part = ModSetup.multipartBlock.getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
                     if (part != null) {
                         pickBlock = part.getState().getBlock().getItem(world, data.getPos(), part.getState());
-                        modid = part.getState().getBlock().getRegistryName().getResourceDomain();
+                        modid = part.getState().getBlock().getRegistryName().getNamespace();
                     }
                     modid = WordUtils.capitalize(modid);
 
@@ -81,7 +80,7 @@ public class TOPCompatibility {
                                 .text(MODNAME + modid);
                     } else {
                         probeInfo.vertical()
-                                .text(NAME + STARTLOC + block.getUnlocalizedName() + ".name" + ENDLOC)
+                                .text(NAME + STARTLOC + block.getTranslationKey() + ".name" + ENDLOC)
                                 .text(MODNAME + modid);
                     }
 

@@ -3,8 +3,9 @@ package mcjty.lib.preferences;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
-import net.minecraft.entity.player.PlayerEntityMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraftforge.fml.network.NetworkDirection;
 
 public class PreferencesProperties {
 
@@ -21,26 +22,26 @@ public class PreferencesProperties {
     public PreferencesProperties() {
     }
 
-    public void tick(PlayerEntityMP player) {
+    public void tick(ServerPlayerEntity player) {
         if (dirty) {
             syncToClient(player);
         }
     }
 
-    private void syncToClient(PlayerEntityMP player) {
-        McJtyLib.networkHandler.sendTo(new PacketSendPreferencesToClient(buffX, buffY, style), player);
+    private void syncToClient(ServerPlayerEntity player) {
+        McJtyLib.networkHandler.sendTo(new PacketSendPreferencesToClient(buffX, buffY, style), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
         dirty = false;
     }
 
     public void saveNBTData(CompoundNBT compound) {
-        compound.setInteger("buffX", buffX);
-        compound.setInteger("buffY", buffY);
-        compound.setString("style", style.getStyle());
+        compound.putInt("buffX", buffX);
+        compound.putInt("buffY", buffY);
+        compound.putString("style", style.getStyle());
     }
 
     public void loadNBTData(CompoundNBT compound) {
-        buffX = compound.getInteger("buffX");
-        buffY = compound.getInteger("buffY");
+        buffX = compound.getInt("buffX");
+        buffY = compound.getInt("buffY");
         String s = compound.getString("style");
         style = GuiStyle.getStyle(s);
         if (style == null) {

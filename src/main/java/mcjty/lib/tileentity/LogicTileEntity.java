@@ -4,13 +4,10 @@ import mcjty.lib.blocks.LogicSlabBlock;
 import mcjty.lib.varia.LogicFacing;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRedstoneWire;
-import net.minecraft.block.state.BlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 
@@ -28,7 +25,7 @@ public class LogicTileEntity extends GenericTileEntity {
         if(facing == null) {
             BlockState state = getWorld().getBlockState(getPos());
             if(state.getBlock() instanceof LogicSlabBlock) {
-                setFacing(state.getValue(LOGIC_FACING));
+                setFacing(state.get(LOGIC_FACING));
             }
         }
         super.onLoad();
@@ -43,7 +40,7 @@ public class LogicTileEntity extends GenericTileEntity {
             Logging.getLogger().log(Level.WARN, "LogicTileEntity expected LogicSlabBlock but had " + state.getBlock().getClass().getName());
             return LogicFacing.DOWN_TOEAST;
         }
-        Integer meta = state.getValue(META_INTERMEDIATE);
+        Integer meta = state.get(META_INTERMEDIATE);
         return LogicFacing.getFacingWithMeta(facing, meta);
     }
 
