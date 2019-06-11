@@ -13,12 +13,16 @@ import mcjty.lib.varia.ItemStackList;
 import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
@@ -28,6 +32,9 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -44,7 +51,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
+public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler, INamedContainerProvider {
 
     public static final IValue<?>[] EMPTY_VALUES = new IValue[0];
     public static final IAction[] EMPTY_ACTIONS = new IAction[0];
@@ -87,12 +94,13 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return EMPTY_ACTIONS;
     }
 
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newSate) {
-        return oldState.getBlock() != newSate.getBlock();
-    }
+    // @todo 1.14
+//    @Override
+//    public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newSate) {
+//        return oldState.getBlock() != newSate.getBlock();
+//    }
 
-    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, MobEntity placer, ItemStack stack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
     }
 
     public void onReplaced(World world, BlockPos pos, BlockState state) {
@@ -113,7 +121,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public void checkRedstone(World world, BlockPos pos) {
-        int powered = world.isBlockIndirectlyGettingPowered(pos); //TODO: check
+        int powered = world.getRedstonePowerFromNeighbors(pos); // @todo check
         setPowerInput(powered);
     }
 
@@ -191,7 +199,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public boolean canPlayerAccess(PlayerEntity player) {
-        return !isInvalid() && player.getDistanceSq(pos.add(0.5D, 0.5D, 0.5D)) <= 64D;
+        return !isRemoved() && player.getDistanceSq(new Vec3d(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Override
@@ -241,11 +249,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     protected void readBufferFromNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
-        NBTTagList bufferTagList = tagCompound.getTagList(tag, Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < bufferTagList.tagCount(); i++) {
-            CompoundNBT CompoundNBT = bufferTagList.getCompoundTagAt(i);
+        ListNBT bufferTagList = tagCompound.getList(tag, Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < bufferTagList.size(); i++) {
+            CompoundNBT compoundNBT = bufferTagList.getCompound(i);
             if (i < list.size()) {
-                list.set(i, new ItemStack(CompoundNBT));
+                list.set(i, ItemStack.read(compoundNBT));
             }
         }
     }
@@ -578,5 +586,16 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             syncBindingHelper(params, key);
         }
         markDirtyClient();
+    }
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return new StringTextComponent("todo"); // @todo 1.14
+    }
+
+    @Nullable
+    @Override
+    public Container createMenu(int p_createMenu_1_, PlayerInventory p_createMenu_2_, PlayerEntity p_createMenu_3_) {
+        return null;
     }
 }

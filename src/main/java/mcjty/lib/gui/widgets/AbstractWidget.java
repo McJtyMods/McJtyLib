@@ -320,23 +320,23 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         if (!visible) {
             return;
         }
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         if (background1 != null) {
             mc.getTextureManager().bindTexture(background1);
             if (background2 == null) {
-                gui.drawTexturedModalRect(xx, yy, 0, 0, w, h);
+                gui.blit(xx, yy, 0, 0, w, h);
             } else {
                 if (background2Horizontal) {
-                    gui.drawTexturedModalRect(xx, yy, 0, 0, backgroundOffset, h);
+                    gui.blit(xx, yy, 0, 0, backgroundOffset, h);
                     mc.getTextureManager().bindTexture(background2);
-                    gui.drawTexturedModalRect(xx + backgroundOffset, yy, 0, 0, w - backgroundOffset, h);
+                    gui.blit(xx + backgroundOffset, yy, 0, 0, w - backgroundOffset, h);
                 } else {
-                    gui.drawTexturedModalRect(xx, yy, 0, 0, w, backgroundOffset);
+                    gui.blit(xx, yy, 0, 0, w, backgroundOffset);
                     mc.getTextureManager().bindTexture(background2);
-                    gui.drawTexturedModalRect(xx, yy + backgroundOffset, 0, 0, w, h - backgroundOffset);
+                    gui.blit(xx, yy + backgroundOffset, 0, 0, w, h - backgroundOffset);
                 }
             }
         } else if (filledRectThickness > 0) {

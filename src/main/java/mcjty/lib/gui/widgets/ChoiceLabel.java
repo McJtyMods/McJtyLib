@@ -9,8 +9,7 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import org.lwjgl.input.Keyboard;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
     private String currentChoice = null;
     private List<ChoiceEvent> choiceEvents = null;
 
-    public ChoiceLabel(Minecraft mc, Gui gui) {
+    public ChoiceLabel(Minecraft mc, Screen gui) {
         super(mc, gui);
         setText("");
     }
@@ -100,7 +99,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (button == 1) { // @todo 1.14 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                 index--;
                 if (index < 0) {
                     index = choiceList.size()-1;

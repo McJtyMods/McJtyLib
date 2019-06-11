@@ -83,8 +83,8 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.2-26.0.14'
-    compile ("mcjty.theoneprobe.workspace:TheOneProbe-${top_version}:deobf")
+    minecraft 'net.minecraftforge:forge:1.14.2-26.0.16'
+    compile ("mcjty.theoneprobe:TheOneProbe-${top_version}")
 
     //deobfCompile "mezz.jei:jei_${jei_version}"
     //deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"

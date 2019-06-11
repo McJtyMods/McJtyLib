@@ -1,8 +1,8 @@
 package mcjty.lib.gui.icons;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -113,10 +113,10 @@ public class ImageIcon implements IIcon {
     }
 
     @Override
-    public void draw(Minecraft mc, Gui gui, int x, int y) {
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    public void draw(Minecraft mc, Screen gui, int x, int y) {
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(image);
-        gui.drawTexturedModalRect(x, y, u, v, width, height);
+        gui.blit(x, y, u, v, width, height);
         if (overlays != null) {
             for (IIcon icon : overlays) {
                 icon.draw(mc, gui, x, y);

@@ -8,7 +8,7 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
     private String suffix = DEFAULT_SUFFIX;
     private List<ValueEvent> valueEvents = null;
 
-    public ScrollableLabel(Minecraft mc, Gui gui) {
+    public ScrollableLabel(Minecraft mc, Screen gui) {
         super(mc, gui);
         setFirstSelected(0);
     }

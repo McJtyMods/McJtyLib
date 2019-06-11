@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ImageEvent;
@@ -7,9 +8,8 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.IResource;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.resources.IResource;
 import net.minecraft.util.ResourceLocation;
 
 import javax.imageio.ImageIO;
@@ -35,7 +35,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     private List<ImageEvent> imageEvents = null;
     private BufferedImage bufferedImage;
 
-    public AbstractImageLabel(Minecraft mc, Gui gui) {
+    public AbstractImageLabel(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 
@@ -115,11 +115,11 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
         super.draw(x, y);
 
         if (image != null) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            gui.drawModalRectWithCustomSizedTexture(xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
+            gui.blit(xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
         }
     }
 

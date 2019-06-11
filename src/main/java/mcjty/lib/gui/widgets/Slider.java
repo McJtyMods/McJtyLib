@@ -7,7 +7,7 @@ import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
 public class Slider extends AbstractWidget<Slider> {
 
@@ -25,7 +25,7 @@ public class Slider extends AbstractWidget<Slider> {
     private Scrollable scrollable;      // Old (used as cache in case scrollableName is used)
     private String scrollableName;      // New
 
-    public Slider(Minecraft mc, Gui gui) {
+    public Slider(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 

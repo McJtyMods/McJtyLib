@@ -18,13 +18,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.fluid.IFluidState;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -40,8 +42,8 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
@@ -69,10 +71,10 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private int guiId = -1;
 
     public GenericBlock(ModBase mod,
-                           Material material,
-                           Class<? extends T> tileEntityClass,
-                           BiFunction<PlayerEntity, IInventory, C> containerFactory,
-                           String name, boolean isContainer) {
+                        Material material,
+                        Class<? extends T> tileEntityClass,
+                        BiFunction<PlayerEntity, IInventory, C> containerFactory,
+                        String name, boolean isContainer) {
         this(mod, material, tileEntityClass, containerFactory, GenericItemBlock::new, name, isContainer);
     }
 
@@ -399,19 +401,22 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 //            if (isBlockContainer && !tileEntityClass.isInstance(te)) {
 //                return false;
 //            }
+            if (!(te instanceof INamedContainerProvider)) {
+                return true;
+            }
             if (checkAccess(world, player, te)) {
                 return true;
             }
-//            NetworkHooks.openGui((ServerPlayerEntity) player, );
+            NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
             // @todo 1.14
-            player.openGui(modBase, getGuiID(), world, x, y, z);
+//            player.openGui(modBase, getGuiID(), world, x, y, z);
             return true;
         }
         return false;
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, MobEntity placer, ItemStack stack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
         restoreBlockFromNBT(world, pos, stack);
         if (!world.isRemote && GeneralConfig.manageOwnership) {
@@ -429,7 +434,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
-    protected void setOwner(World world, BlockPos pos, MobEntity MobEntity) {
+    protected void setOwner(World world, BlockPos pos, LivingEntity MobEntity) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity && MobEntity instanceof PlayerEntity) {
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
@@ -439,9 +444,10 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     @Override
-    public boolean shouldCheckWeakPower(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+    public boolean shouldCheckWeakPower(BlockState state, IWorldReader world, BlockPos pos, Direction side) {
         return false;
     }
+
 
     protected void checkRedstone(World world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
@@ -468,7 +474,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
      * @param itemStack
      */
     protected void restoreBlockFromNBT(World world, BlockPos pos, ItemStack itemStack) {
-        CompoundNBT tagCompound = itemStack.getTagCompound();
+        CompoundNBT tagCompound = itemStack.getTag();
         if (tagCompound != null) {
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof GenericTileEntity) {
@@ -490,7 +496,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     @Override
     public boolean eventReceived(BlockState state, World worldIn, BlockPos pos, int id, int param) {
-        if (hasTileEntity) {
+        if (hasTileEntity(state)) {
             super.eventReceived(state, worldIn, pos, id, param);
             TileEntity tileentity = worldIn.getTileEntity(pos);
             return tileentity == null ? false : tileentity.receiveClientEvent(id, param);
@@ -499,18 +505,18 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
-    @SideOnly(Side.CLIENT)
+    // Client side
     public BiFunction<T, C, GenericGuiContainer<? super T>> getGuiFactory() {
         return guiFactory;
     }
 
-    @SideOnly(Side.CLIENT)
+    // Client side
     public void setGuiFactory(BiFunction<T, C, GenericGuiContainer<? super T>> guiFactory) {
         this.guiFactory = guiFactory;
     }
 
-    @SideOnly(Side.CLIENT)
-    public GuiContainer createClientGui(PlayerEntity PlayerEntity, TileEntity tileEntity) {
+    // Client side
+    public ContainerScreen createClientGui(PlayerEntity PlayerEntity, TileEntity tileEntity) {
         IInventory inventory = tileEntity instanceof IInventory ? (IInventory) tileEntity : null;
         C container = containerFactory.apply(PlayerEntity, inventory);
         return getGuiFactory().apply((T) tileEntity, container);
@@ -524,14 +530,16 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         }
     }
 
-    @Override
-    public BlockState getActualState(BlockState state, IBlockAccess world, BlockPos pos) {
-        TileEntity te = world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            return ((GenericTileEntity) te).getActualState(state);
-        }
-        return super.getActualState(state, world, pos);
-    }
+
+    //@todo 1.14
+//    @Override
+//    public BlockState getActualState(BlockState state, IBlockAccess world, BlockPos pos) {
+//        TileEntity te = world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
+//        if (te instanceof GenericTileEntity) {
+//            return ((GenericTileEntity) te).getActualState(state);
+//        }
+//        return super.getActualState(state, world, pos);
+//    }
 
     protected boolean checkAccess(World world, PlayerEntity player, TileEntity te) {
         if (te instanceof GenericTileEntity) {
@@ -546,7 +554,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         if (te instanceof GenericTileEntity) {
             CompoundNBT tagCompound = new CompoundNBT();
             ((GenericTileEntity)te).writeRestorableToNBT(tagCompound);
-            stack.setTagCompound(tagCompound);
+            stack.setTag(tagCompound);
         }
         return stack;
     }

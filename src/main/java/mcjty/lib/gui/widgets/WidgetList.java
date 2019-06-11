@@ -10,9 +10,9 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +45,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     private int leftMargin = DEFAULT_LEFT_MARGIN;
     private int topMargin = DEFAULT_TOP_MARGIN;
 
-    public WidgetList(Minecraft mc, Gui gui) {
+    public WidgetList(Minecraft mc, Screen gui) {
         super(mc, gui);
         setFilledRectThickness(-1);
         setFilledBackground(StyleConfig.colorListBackground);
