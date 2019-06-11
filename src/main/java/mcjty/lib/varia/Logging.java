@@ -8,6 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +20,7 @@ public class Logging {
     private Logger logger;
 
     public static boolean debugMode = false;
-    public static boolean doLogging = false;
+    public static ForgeConfigSpec.BooleanValue doLogging;
 
     private Logging() {
         logger = LogManager.getLogger(McJtyLib.MODID);

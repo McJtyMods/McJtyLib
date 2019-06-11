@@ -1,13 +1,18 @@
 package mcjty.lib.worlddata;
 
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends WorldSavedData {
 
@@ -18,8 +23,6 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
     }
 
     public void save() {
-        World world = DimensionManager.getWorld(0);
-        world.setData(mapName, this);
         markDirty();
     }
 
@@ -36,14 +39,16 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
         return instances.size();
     }
 
-    @Nonnull
-    public static <T extends AbstractWorldData<T>> T getData(Class<T> clazz, String name) {
-        World world = DimensionManager.getWorld(0);
-        return getData(world, clazz, name);
+    private static <T extends AbstractWorldData<T>> T getData(Supplier<? extends T> supplier, String name) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        ServerWorld world = DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
+        DimensionSavedDataManager storage = world.getSavedData();
+        T data = storage.func_215752_a(supplier, name);
+        return data;
     }
 
     @Nonnull
-    public static <T extends AbstractWorldData<T>> T getData(World world, Class<T> clazz, String name) {
+    public static <T extends AbstractWorldData<T>> T getData(World world, Supplier<? extends T> supplier, String name) {
         if (world.isRemote) {
             throw new RuntimeException("Don't access this client-side!");
         }
@@ -52,19 +57,9 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
         if (data != null) {
             return data;
         }
-
-        data = (T) world.loadData(clazz, name);
-        if (data == null) {
-            try {
-                data = clazz.getConstructor(String.class).newInstance(name);
-            } catch (InstantiationException|IllegalAccessException|InvocationTargetException|NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        data = getData(supplier, name);
         instances.put(name, data);
         return data;
     }
-
-
 
 }

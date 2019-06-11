@@ -1,7 +1,6 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.McJtyRegister;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.tileentity.GenericTileEntity;

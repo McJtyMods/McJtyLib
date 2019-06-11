@@ -1,7 +1,6 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.McJtyRegister;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartTE;
 import net.minecraft.block.Block;

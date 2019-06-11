@@ -1,7 +1,6 @@
 package mcjty.lib.blocks;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.McJtyRegister;
 import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.api.Infusable;
 import mcjty.lib.api.smartwrench.SmartWrench;
@@ -16,7 +15,6 @@ import mcjty.lib.varia.WrenchUsage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;

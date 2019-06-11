@@ -1,53 +1,80 @@
 package mcjty.lib.base;
 
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.io.WritingMode;
 import mcjty.lib.varia.Logging;
-import net.minecraftforge.fml.common.FMLLog;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import org.apache.logging.log4j.Level;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 
 import java.io.File;
+import java.nio.file.Path;
 
+@Mod.EventBusSubscriber
 public class GeneralConfig {
+
+    private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
+    private static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
+
+    public static final ForgeConfigSpec SERVER_CONFIG;
+    public static final ForgeConfigSpec CLIENT_CONFIG;
+
+    static {
+        StyleConfig.init(SERVER_BUILDER, CLIENT_BUILDER);
+        GeneralConfig.init(SERVER_BUILDER, CLIENT_BUILDER);
+
+        SERVER_CONFIG = SERVER_BUILDER.build();
+        CLIENT_CONFIG = CLIENT_BUILDER.build();
+    }
+
+
+
+
     public static final String CATEGORY_GENERAL = "general";
 
-    public static int maxInfuse = 256;
+    public static ForgeConfigSpec.IntValue maxInfuse;
 
     private static File modConfigDir;
-    private static Configuration mainConfig;
+//    private static Configuration mainConfig;
 
-    public static boolean manageOwnership = true;
-    public static boolean tallChunkFriendly = false;
+    public static ForgeConfigSpec.BooleanValue manageOwnership;
+    public static ForgeConfigSpec.BooleanValue tallChunkFriendly;
 
-    public static void init(Configuration cfg) {
-        Logging.doLogging = cfg.get(CATEGORY_GENERAL, "logging", Logging.doLogging,
-                "If true dump a lot of logging information about various things. Useful for debugging.").getBoolean();
+    public static void init(ForgeConfigSpec.Builder SERVER_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+        SERVER_BUILDER.comment("General settings for all mods using mcjtylib").push(CATEGORY_GENERAL);
 
-        manageOwnership = cfg.get(CATEGORY_GENERAL, "manageOwnership", manageOwnership,
-                "If true then blocks using mcjtylib will have ownership tagged on them (useful for the rftools security manager)").getBoolean();
-        tallChunkFriendly = cfg.get(CATEGORY_GENERAL, "tallChunkFriendly", tallChunkFriendly,
-                "If true then mods using McJtyLib might try to be as friendly as possible to mods that support very tall chunks (taller then 256). No guarantees however! Set to false for more optimal performance").getBoolean();
-        maxInfuse = cfg.get(CATEGORY_GENERAL, "maxInfuse", maxInfuse,
-                "The maximum amount of dimensional shards that can be infused in a single machine").getInt();
+        Logging.doLogging = SERVER_BUILDER.comment("If true dump a lot of logging information about various things. Useful for debugging")
+                .define("logging", false);
+        manageOwnership = SERVER_BUILDER.comment("If true then blocks using mcjtylib will have ownership tagged on them (useful for the rftools security manager)")
+                .define("manageOwnership", true);
+        tallChunkFriendly = SERVER_BUILDER.comment("If true then mods using McJtyLib might try to be as friendly as possible to mods that support very tall chunks (taller then 256). No guarantees however! Set to false for more optimal performance")
+                .define("tallChunkFriendly", false);
+        maxInfuse = SERVER_BUILDER.comment("The maximum amount of dimensional shards that can be infused in a single machine")
+                .defineInRange("maxInfuse", 256, 1, Integer.MAX_VALUE);
+
+        SERVER_BUILDER.pop();
     }
 
-    public static void init(FMLCommonSetupEvent e) {
-        modConfigDir = e.getModConfigurationDirectory();
-        mainConfig = new Configuration(new File(modConfigDir.getPath(), "mcjtylib.cfg"));
-        try {
-            mainConfig.load();
-            mainConfig.addCustomCategoryComment(CATEGORY_GENERAL, "General settings for all mods using mcjtylib");
-            mainConfig.addCustomCategoryComment(StyleConfig.CATEGORY_STYLE, "Style settings for all mods using mcjtylib");
-            init(mainConfig);
-            StyleConfig.init(mainConfig);
-        } catch (RuntimeException e1) {
-            FMLLog.log(Level.ERROR, e1, "Problem loading config file: mcjtylib.cfg!");
-        } finally {
-            if (mainConfig.hasChanged()) {
-                mainConfig.save();
-            }
-        }
+
+    public static void loadConfig(ForgeConfigSpec spec, Path path) {
+        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
+                .sync()
+                .autosave()
+                .writingMode(WritingMode.REPLACE)
+                .build();
+
+        configData.load();
+        spec.setConfig(configData);
     }
 
+    @SubscribeEvent
+    public static void onLoad(final ModConfig.Loading configEvent) {
+        StyleConfig.updateColors();
+    }
+
+    @SubscribeEvent
+    public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
+        StyleConfig.updateColors();
+    }
 }

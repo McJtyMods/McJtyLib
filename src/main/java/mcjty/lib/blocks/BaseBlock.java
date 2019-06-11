@@ -1,7 +1,6 @@
 package mcjty.lib.blocks;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.McJtyRegister;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.builder.InformationString;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;

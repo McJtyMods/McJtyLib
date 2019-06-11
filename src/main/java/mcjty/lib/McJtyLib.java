@@ -1,7 +1,7 @@
 package mcjty.lib;
 
+import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.base.StyleConfig;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
@@ -11,15 +11,20 @@ import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.proxy.ClientProxy;
+import mcjty.lib.proxy.IProxy;
 import mcjty.lib.proxy.ServerProxy;
 import mcjty.lib.setup.ModSetup;
-import mcjty.lib.proxy.IProxy;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.worlddata.AbstractWorldData;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.INBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -27,6 +32,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -85,11 +91,11 @@ public class McJtyLib implements ModBase {
         // Register the setup method for modloading
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, StyleConfig.CLIENT_CONFIG);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, StyleConfig.SERVER_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
 
-        StyleConfig.loadConfig(StyleConfig.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-client.toml"));
-        StyleConfig.loadConfig(StyleConfig.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-server.toml"));
+        GeneralConfig.loadConfig(GeneralConfig.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-client.toml"));
+        GeneralConfig.loadConfig(GeneralConfig.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-server.toml"));
     }
 
     public static void registerMod(ModBase mod) {
@@ -159,16 +165,16 @@ public class McJtyLib implements ModBase {
         }
         registerCapabilities();
         networkHandler = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> "1.0", s -> true, s -> true);
-        networkHandler.registerMessage(PacketSendPreferencesToClient.Handler.class, PacketSendPreferencesToClient.class, 0, Side.CLIENT);
-        networkHandler.registerMessage(PacketSetGuiStyle.Handler.class, PacketSetGuiStyle.class, 1, Side.SERVER);
+        networkHandler.registerMessage(0, PacketSendPreferencesToClient.class, PacketSendPreferencesToClient::toBytes, PacketSendPreferencesToClient::new, PacketSendPreferencesToClient::handle);
+        networkHandler.registerMessage(1, PacketSetGuiStyle.class, PacketSetGuiStyle::toBytes, PacketSetGuiStyle::new, PacketSetGuiStyle::handle);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         init = true;
         tesla = ModList.get().isLoaded("tesla");
         cofhapiitem = ModList.get().isLoaded("cofhapi|item");
     }
 
-    public static PreferencesProperties getPreferencesProperties(PlayerEntity player) {
-        return player.getCapability(PREFERENCES_CAPABILITY, null);
+    public static LazyOptional<PreferencesProperties> getPreferencesProperties(PlayerEntity player) {
+        return player.getCapability(PREFERENCES_CAPABILITY);
     }
 
     public static class EventHandler {
@@ -179,15 +185,14 @@ public class McJtyLib implements ModBase {
         @SubscribeEvent
         public void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
             if (event.phase == TickEvent.Phase.START && !event.player.getEntityWorld().isRemote) {
-                PreferencesProperties preferencesProperties = getPreferencesProperties(event.player);
-                preferencesProperties.tick((PlayerEntityMP) event.player);
+                getPreferencesProperties(event.player).ifPresent(handler -> handler.tick((ServerPlayerEntity) event.player));
             }
         }
 
         @SubscribeEvent
         public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
             if (event.getObject() instanceof PlayerEntity) {
-                if (!event.getCapabilities().containsKey(PREFERENCES_CAPABILITY_KEY) && !event.getObject().hasCapability(PREFERENCES_CAPABILITY, null)) {
+                if (!event.getCapabilities().containsKey(PREFERENCES_CAPABILITY_KEY) && !event.getObject().getCapability(PREFERENCES_CAPABILITY).isPresent()) {
                     event.addCapability(PREFERENCES_CAPABILITY_KEY, new PreferencesDispatcher());
                 } else {
                     throw new IllegalStateException(event.getObject().toString());
@@ -204,8 +209,8 @@ public class McJtyLib implements ModBase {
                 TileEntity tileEntity = world.getTileEntity(pos);
                 if (tileEntity instanceof MultipartTE) {
                     if (!world.isRemote) {
-                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, event.getPlayerEntity(), event.getHitVec())) {
-                            world.setBlockToAir(pos);
+                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, event.getEntityPlayer(), hitVec? )) {
+                            world.setBlockState(pos, Blocks.AIR.getDefaultState());
                         }
                     }
                 }
@@ -218,13 +223,14 @@ public class McJtyLib implements ModBase {
     private static void registerCapabilities(){
         CapabilityManager.INSTANCE.register(PreferencesProperties.class, new Capability.IStorage<PreferencesProperties>() {
 
+
             @Override
-            public NBTBase writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
+            public INBT writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, NBTBase nbt) {
+            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, INBT nbt) {
                 throw new UnsupportedOperationException();
             }
 

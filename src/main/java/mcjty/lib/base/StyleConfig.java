@@ -1,33 +1,11 @@
 package mcjty.lib.base;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-@Mod.EventBusSubscriber
 public class StyleConfig {
-
-    private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
-    private static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
-
-    public static final ForgeConfigSpec SERVER_CONFIG;
-    public static final ForgeConfigSpec CLIENT_CONFIG;
-
-    static {
-        init(SERVER_BUILDER, CLIENT_BUILDER);
-
-        SERVER_CONFIG = SERVER_BUILDER.build();
-        CLIENT_CONFIG = CLIENT_BUILDER.build();
-    }
-
-
 
     public static final String CATEGORY_STYLE = "style";
 
@@ -117,7 +95,7 @@ public class StyleConfig {
     private static Map<String, ForgeConfigSpec.ConfigValue<String>> colorConfigValues = new HashMap<>();
 
     public static void init(ForgeConfigSpec.Builder SERVER_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
-        StyleConfig.CLIENT_BUILDER.push(CATEGORY_STYLE);
+        CLIENT_BUILDER.comment("Style settings for all mods using mcjtylib").push(CATEGORY_STYLE);
 
         initSetting(CLIENT_BUILDER, "colorSliderTopLeft", colorSliderTopLeft, "Color: slider top left border");
         initSetting(CLIENT_BUILDER, "colorSliderBottomRight", colorSliderBottomRight, "Color: slider bottom right border");
@@ -201,7 +179,7 @@ public class StyleConfig {
         initSetting(CLIENT_BUILDER, "colorButtonHoveringFillerGradient1", colorButtonHoveringFillerGradient1, "Color: hovering button background gradient");
         initSetting(CLIENT_BUILDER, "colorButtonHoveringFillerGradient2", colorButtonHoveringFillerGradient2, "Color: hovering button background gradient");
 
-        StyleConfig.CLIENT_BUILDER.pop();
+        CLIENT_BUILDER.pop();
     }
 
     private static void initSetting(ForgeConfigSpec.Builder CLIENT_BUILDER, String settingName, int setting, String comment) {
@@ -298,24 +276,4 @@ public class StyleConfig {
         colorButtonHoveringFillerGradient2 = resolveColor("colorButtonHoveringFillerGradient2");
     }
 
-    public static void loadConfig(ForgeConfigSpec spec, Path path) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
-                .sync()
-                .autosave()
-                .writingMode(WritingMode.REPLACE)
-                .build();
-
-        configData.load();
-        spec.setConfig(configData);
-    }
-
-    @SubscribeEvent
-    public static void onLoad(final ModConfig.Loading configEvent) {
-        updateColors();
-    }
-
-    @SubscribeEvent
-    public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
-        updateColors();
-    }
 }
