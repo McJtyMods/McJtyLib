@@ -5,21 +5,22 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.EnergyTools;
-import net.darkhax.tesla.api.ITeslaHolder;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-@Optional.InterfaceList({
-    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder")
-})
-public class GenericEnergyStorageTileEntity extends GenericTileEntity implements IBigPower, ITeslaHolder {
+// @todo 1.14
+//@Optional.InterfaceList({
+//    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaHolder")
+//})
+public class GenericEnergyStorageTileEntity extends GenericTileEntity implements IBigPower /*, ITeslaHolder*/ {
 
     public static final String CMD_GETENERGY = "getEnergy";
 
@@ -35,38 +36,40 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
         storage.modifyEnergyStored(energy);
     }
 
-    public GenericEnergyStorageTileEntity(long maxEnergy, long maxReceive) {
+    public GenericEnergyStorageTileEntity(TileEntityType<?> type, long maxEnergy, long maxReceive) {
+        super(type);
         storage = new McJtyEnergyStorage(maxEnergy);
         storage.setMaxReceive(maxReceive);
     }
 
-    public GenericEnergyStorageTileEntity(long maxEnergy, long maxReceive, long maxExtract) {
+    public GenericEnergyStorageTileEntity(TileEntityType<?> type, long maxEnergy, long maxReceive, long maxExtract) {
+        super(type);
         storage = new McJtyEnergyStorage(maxEnergy);
         storage.setMaxReceive(maxReceive);
         storage.setMaxExtract(maxExtract);
     }
 
     @Override
-    public void readFromNBT(CompoundNBT tagCompound) {
-        super.readFromNBT(tagCompound);
+    public void read(CompoundNBT tagCompound) {
+        super.read(tagCompound);
     }
 
     @Override
     public void readRestorableFromNBT(CompoundNBT tagCompound) {
         super.readRestorableFromNBT(tagCompound);
-        storage.readFromNBT(tagCompound);
+        storage.read(tagCompound);
     }
 
     @Override
-    public CompoundNBT writeToNBT(CompoundNBT tagCompound) {
-        super.writeToNBT(tagCompound);
+    public CompoundNBT write(CompoundNBT tagCompound) {
+        super.write(tagCompound);
         return tagCompound;
     }
 
     @Override
     public void writeRestorableToNBT(CompoundNBT tagCompound) {
         super.writeRestorableToNBT(tagCompound);
-        storage.writeToNBT(tagCompound);
+        storage.write(tagCompound);
     }
 
     public static long getCurrentRF() {
@@ -172,21 +175,27 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
         }
     };
 
+    @Nonnull
     @Override
-    public boolean hasCapability(Capability<?> capability, Direction facing) {
-        if (capability == CapabilityEnergy.ENERGY || capability == EnergyTools.TESLA_HOLDER) {
-            return true;
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
+        if (cap == CapabilityEnergy.ENERGY) {
+            return LazyOptional.of(() -> (T) energyStorage);
         }
-        return super.hasCapability(capability, facing);
+        // @todo 1.14
+//        } else if(capability == EnergyTools.TESLA_HOLDER) {
+//            return (T) this;
+        return super.getCapability(cap);
     }
 
+    @Nonnull
     @Override
-    public <T> T getCapability(Capability<T> capability, Direction facing) {
-        if (capability == CapabilityEnergy.ENERGY) {
-            return (T) energyStorage;
-        } else if(capability == EnergyTools.TESLA_HOLDER) {
-            return (T) this;
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction facing) {
+        if (cap == CapabilityEnergy.ENERGY) {
+            return LazyOptional.of(() -> (T) energyStorage);
         }
-        return super.getCapability(capability, facing);
+        // @todo 1.14
+//        } else if(capability == EnergyTools.TESLA_HOLDER) {
+//            return (T) this;
+        return super.getCapability(cap, facing);
     }
 }

@@ -1,29 +1,11 @@
 package mcjty.lib.compat.waila;
 
-import mcjty.lib.McJtyLib;
-import mcjty.lib.base.ModBase;
-import mcjty.lib.blocks.BaseBlock;
-import mcp.mobius.waila.api.IWailaConfigHandler;
-import mcp.mobius.waila.api.IWailaDataAccessor;
-import mcp.mobius.waila.api.IWailaDataProvider;
-import mcp.mobius.waila.api.IWailaRegistrar;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntityMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-
-import java.util.List;
-
 //import mcp.mobius.waila.api.IWailaConfigHandler;
 //import mcp.mobius.waila.api.IWailaDataAccessor;
 //import mcp.mobius.waila.api.IWailaDataProvider;
 //import mcp.mobius.waila.api.IWailaRegistrar;
 
-public class WailaCompatibility implements IWailaDataProvider {
+public class WailaCompatibility { } /* @todo 1.14 implements IWailaDataProvider {
 
     public static final WailaCompatibility INSTANCE = new WailaCompatibility();
 
@@ -88,4 +70,4 @@ public class WailaCompatibility implements IWailaDataProvider {
         return currenttip;
     }
 
-}
+}*/

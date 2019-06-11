@@ -5,19 +5,19 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
-import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+;
 
 public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
 
@@ -70,7 +70,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     private int currentChoice = -1;
     private List<ChoiceEvent> choiceEvents = null;
 
-    public ImageChoiceLabel(Minecraft mc, Gui gui) {
+    public ImageChoiceLabel(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 
@@ -118,7 +118,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     @Override
     public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
-            if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (button == 1) { // @todo 1.14 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                 currentChoice--;
                 if (currentChoice < 0) {
                     currentChoice = choiceList.size() - 1;

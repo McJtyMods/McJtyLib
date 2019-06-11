@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -11,17 +12,9 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.MathHelper;
-import org.lwjgl.input.Keyboard;
 
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,7 +37,7 @@ public class TextField extends AbstractWidget<TextField> {
     private List<TextSpecialKeyEvent> textSpecialKeyEvents = null;
     private boolean editable = DEFAULT_EDITABLE;
 
-    public TextField(Minecraft mc, Gui gui) {
+    public TextField(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 
@@ -93,93 +86,94 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                if(keyCode == Keyboard.KEY_V) {
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    String data = "";
-                    try {
-                        data = (String) clipboard.getData(DataFlavor.stringFlavor);
-                    } catch (UnsupportedFlavorException | IOException e) {
-                    }
-
-                    if (isRegionSelected()) {
-                        replaceSelectedRegion(data);
-                    } else {
-                        text = text.substring(0, cursor) + data + text.substring(cursor);
-                    }
-                    cursor += data.length();
-                    fireTextEvents(text);
-                } else if (keyCode == Keyboard.KEY_C) {
-                    if (isRegionSelected()) {
-                        GuiScreen.setClipboardString(getSelectedText());
-                    }
-                } else if (keyCode == Keyboard.KEY_X) {
-                    if (isRegionSelected()) {
-                        GuiScreen.setClipboardString(getSelectedText());
-                        replaceSelectedRegion("");
-                        fireTextEvents(text);
-                    }
-                } else if (keyCode == Keyboard.KEY_A) {
-                    selectAll();
-                }
-            } else if (keyCode == Keyboard.KEY_RETURN) {
-                fireTextEnterEvents(text);
-//                window.setTextFocus(null);
-                return false;
-            } else if (keyCode == Keyboard.KEY_ESCAPE) {
-                return false;
-            } else if (keyCode == Keyboard.KEY_BACK) {
-                if (isRegionSelected()) {
-                    replaceSelectedRegion("");
-                    fireTextEvents(text);
-                } else if (!text.isEmpty() && cursor > 0) {
-                    text = text.substring(0, cursor - 1) + text.substring(cursor);
-                    cursor--;
-                    fireTextEvents(text);
-                }
-            } else if (keyCode == Keyboard.KEY_DELETE) {
-                if (isRegionSelected()) {
-                    replaceSelectedRegion("");
-                    fireTextEvents(text);
-                } else if (cursor < text.length()) {
-                    text = text.substring(0, cursor) + text.substring(cursor + 1);
-                    fireTextEvents(text);
-                }
-            } else if (keyCode == Keyboard.KEY_HOME) {
-                updateSelection();
-                cursor = 0;
-            } else if (keyCode == Keyboard.KEY_END) {
-                updateSelection();
-                cursor = text.length();
-            } else if (keyCode == Keyboard.KEY_DOWN) {
-                fireArrowDownEvents();
-            } else if (keyCode == Keyboard.KEY_UP) {
-                fireArrowUpEvents();
-            } else if (keyCode == Keyboard.KEY_TAB) {
-                fireTabEvents();
-            } else if (keyCode == Keyboard.KEY_LEFT) {
-                updateSelection();
-                if (cursor > 0) {
-                    cursor--;
-                }
-            } else if (keyCode == Keyboard.KEY_RIGHT) {
-                updateSelection();
-                if (cursor < text.length()) {
-                    cursor++;
-                }
-            } else {
-                // e.g. F1~12, insert
-                // Char code of 0 will appear to be nothing
-                if ((int) typedChar != 0) {
-                    if (isRegionSelected()) {
-                        replaceSelectedRegion(String.valueOf(typedChar));
-                    } else {
-                        text = text.substring(0, cursor) + typedChar + text.substring(cursor);
-                    }
-                    cursor++;
-                    fireTextEvents(text);
-                }
-            }
+            // @todo 1.14
+//            if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
+//                if(keyCode == Keyboard.KEY_V) {
+//                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+//                    String data = "";
+//                    try {
+//                        data = (String) clipboard.getData(DataFlavor.stringFlavor);
+//                    } catch (UnsupportedFlavorException | IOException e) {
+//                    }
+//
+//                    if (isRegionSelected()) {
+//                        replaceSelectedRegion(data);
+//                    } else {
+//                        text = text.substring(0, cursor) + data + text.substring(cursor);
+//                    }
+//                    cursor += data.length();
+//                    fireTextEvents(text);
+//                } else if (keyCode == Keyboard.KEY_C) {
+//                    if (isRegionSelected()) {
+//                        GuiScreen.setClipboardString(getSelectedText());
+//                    }
+//                } else if (keyCode == Keyboard.KEY_X) {
+//                    if (isRegionSelected()) {
+//                        GuiScreen.setClipboardString(getSelectedText());
+//                        replaceSelectedRegion("");
+//                        fireTextEvents(text);
+//                    }
+//                } else if (keyCode == Keyboard.KEY_A) {
+//                    selectAll();
+//                }
+//            } else if (keyCode == Keyboard.KEY_RETURN) {
+//                fireTextEnterEvents(text);
+////                window.setTextFocus(null);
+//                return false;
+//            } else if (keyCode == Keyboard.KEY_ESCAPE) {
+//                return false;
+//            } else if (keyCode == Keyboard.KEY_BACK) {
+//                if (isRegionSelected()) {
+//                    replaceSelectedRegion("");
+//                    fireTextEvents(text);
+//                } else if (!text.isEmpty() && cursor > 0) {
+//                    text = text.substring(0, cursor - 1) + text.substring(cursor);
+//                    cursor--;
+//                    fireTextEvents(text);
+//                }
+//            } else if (keyCode == Keyboard.KEY_DELETE) {
+//                if (isRegionSelected()) {
+//                    replaceSelectedRegion("");
+//                    fireTextEvents(text);
+//                } else if (cursor < text.length()) {
+//                    text = text.substring(0, cursor) + text.substring(cursor + 1);
+//                    fireTextEvents(text);
+//                }
+//            } else if (keyCode == Keyboard.KEY_HOME) {
+//                updateSelection();
+//                cursor = 0;
+//            } else if (keyCode == Keyboard.KEY_END) {
+//                updateSelection();
+//                cursor = text.length();
+//            } else if (keyCode == Keyboard.KEY_DOWN) {
+//                fireArrowDownEvents();
+//            } else if (keyCode == Keyboard.KEY_UP) {
+//                fireArrowUpEvents();
+//            } else if (keyCode == Keyboard.KEY_TAB) {
+//                fireTabEvents();
+//            } else if (keyCode == Keyboard.KEY_LEFT) {
+//                updateSelection();
+//                if (cursor > 0) {
+//                    cursor--;
+//                }
+//            } else if (keyCode == Keyboard.KEY_RIGHT) {
+//                updateSelection();
+//                if (cursor < text.length()) {
+//                    cursor++;
+//                }
+//            } else {
+//                // e.g. F1~12, insert
+//                // Char code of 0 will appear to be nothing
+//                if ((int) typedChar != 0) {
+//                    if (isRegionSelected()) {
+//                        replaceSelectedRegion(String.valueOf(typedChar));
+//                    } else {
+//                        text = text.substring(0, cursor) + typedChar + text.substring(cursor);
+//                    }
+//                    cursor++;
+//                    fireTextEvents(text);
+//                }
+//            }
             return true;
         }
         return false;
@@ -245,14 +239,15 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void updateSelection() {
-        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-            // Don't clear selection as long as shift is pressed
-            if(!isRegionSelected()) {
-                selection = cursor;
-            }
-        } else {
-            clearSelection();
-        }
+        // @todo 1.14
+//        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+//            // Don't clear selection as long as shift is pressed
+//            if(!isRegionSelected()) {
+//                selection = cursor;
+//            }
+//        } else {
+//            clearSelection();
+//        }
     }
 
 

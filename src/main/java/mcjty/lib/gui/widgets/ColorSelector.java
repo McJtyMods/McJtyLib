@@ -12,9 +12,8 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
 
 import java.awt.*;
@@ -29,7 +28,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
     private Integer currentColor = null;
     private List<ColorChoiceEvent> choiceEvents = null;
 
-    public ColorSelector(Minecraft mc, Gui gui) {
+    public ColorSelector(Minecraft mc, Screen gui) {
         super(mc, gui);
         setText("");
     }
@@ -118,7 +117,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
 
     private void createColorSelectorWindow(Window window, int x, int y) {
         Minecraft mc = Minecraft.getInstance();
-        GuiScreen gui = window.getWindowManager().getGui();
+        Screen gui = window.getWindowManager().getGui();
 
         Panel modalDialog = new Panel(mc, gui)
                 .setFilledRectThickness(2)
@@ -161,7 +160,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
             fireChoiceEvents(currentColor);
         });
 
-        for (EnumDyeColor color : EnumDyeColor.values()) {
+        for (DyeColor color : DyeColor.values()) {
             int i = color.ordinal();
             int xx = i % 4;
             int yy = i / 4;

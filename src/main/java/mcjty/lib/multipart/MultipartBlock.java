@@ -30,7 +30,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     public static final AxisAlignedBB AABB_EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     public static final AxisAlignedBB AABB_CENTER = new AxisAlignedBB(.4, .4, .4, .6, .6, .6);
 
-    public static final PartsProperty PARTS = new PartsProperty("parts");
+    public static final PartsProperty PARTS = null;// @todo 1.14 new PartsProperty("parts");
 
     public MultipartBlock() {
         super(Block.Properties.create(Material.IRON)
@@ -133,26 +133,27 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
         }
     }
 
-    @Nullable
-    @Override
-    public RayTraceResult collisionRayTrace(BlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
-        TileEntity te = world.getTileEntity(pos);
-        if (te instanceof MultipartTE) {
-            MultipartTE multipartTE = (MultipartTE) te;
-            for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
-                MultipartTE.Part part = entry.getValue();
-                if (!(part.getState().getBlock() instanceof MultipartBlock)) {     // @todo safety
-                    RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
-                    if (result != null) {
-                        return result;
-                    }
-                }
-            }
-            return null;
-        } else {
-            return super.collisionRayTrace(blockState, world, pos, start, end);
-        }
-    }
+    // @todo 1.14
+//    @Nullable
+//    @Override
+//    public RayTraceResult collisionRayTrace(BlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+//        TileEntity te = world.getTileEntity(pos);
+//        if (te instanceof MultipartTE) {
+//            MultipartTE multipartTE = (MultipartTE) te;
+//            for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
+//                MultipartTE.Part part = entry.getValue();
+//                if (!(part.getState().getBlock() instanceof MultipartBlock)) {     // @todo safety
+//                    RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
+//                    if (result != null) {
+//                        return result;
+//                    }
+//                }
+//            }
+//            return null;
+//        } else {
+//            return super.collisionRayTrace(blockState, world, pos, start, end);
+//        }
+//    }
 
     @Nullable
     public MultipartTE.Part getHitPart(BlockState blockState, IBlockReader world, BlockPos pos, Vec3d start, Vec3d end) {
@@ -162,10 +163,11 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
             for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
                 MultipartTE.Part part = entry.getValue();
                 if (!(part.getState().getBlock() instanceof MultipartBlock)) {     // @todo safety
-                    RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
-                    if (result != null) {
-                        return part;
-                    }
+                    // @todo 1.14
+//                    RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
+//                    if (result != null) {
+//                        return part;
+//                    }
                 }
             }
             return null;
@@ -175,24 +177,27 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     private RayTraceResult checkIntersect(BlockPos pos, Vec3d vec3d, Vec3d vec3d1, AxisAlignedBB boundingBox) {
-        RayTraceResult raytraceresult = boundingBox.calculateIntercept(vec3d, vec3d1);
-        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX(), pos.getY(), pos.getZ()), raytraceresult.sideHit, pos);
+        // @todo 1.14
+//        RayTraceResult raytraceresult = boundingBox.calculateIntercept(vec3d, vec3d1);
+//        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX(), pos.getY(), pos.getZ()), raytraceresult.sideHit, pos);
+        return null;
     }
 
-    @Override
-    public boolean isBlockNormalCube(BlockState blockState) {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(BlockState blockState) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(BlockState state) {
-        return false;
-    }
+    // @todo 1.14
+//    @Override
+//    public boolean isBlockNormalCube(BlockState blockState) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isOpaqueCube(BlockState blockState) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isFullCube(BlockState state) {
+//        return false;
+//    }
 
     // @todo 1.14
 //    @Override

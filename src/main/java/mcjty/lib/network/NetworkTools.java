@@ -27,7 +27,7 @@ public class NetworkTools {
     public static void writeFluidStack(ByteBuf dataOut, FluidStack fluidStack) {
         PacketBuffer buf = new PacketBuffer(dataOut);
         CompoundNBT nbt = new CompoundNBT();
-        fluidStack.writeToNBT(nbt);
+        fluidStack.write(nbt);
         try {
             buf.writeCompoundTag(nbt);
         } catch (RuntimeException e) {

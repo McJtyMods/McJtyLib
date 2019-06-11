@@ -66,7 +66,7 @@ public abstract class DefaultServerProxy implements IProxy {
     }
 
     @Override
-    public void initItemModelMesher(Item item, int meta, ModelResourceLocation model) {
+    public void initItemModelMesher(Item item, ModelResourceLocation model) {
         throw new IllegalStateException("This should only be called from client side");
     }
 

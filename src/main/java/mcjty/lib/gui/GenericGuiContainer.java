@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.widgets.BlockRender;
@@ -153,7 +154,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
             GlStateManager.disableRescaleNormal();
             net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
             GlStateManager.disableLighting();
-            GlStateManager.disableDepth();
+            GlStateManager.disableDepthTest();
             int i = 0;
 
             int linesWithItemStacks = 0;

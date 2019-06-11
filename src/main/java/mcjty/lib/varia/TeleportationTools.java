@@ -1,16 +1,16 @@
 package mcjty.lib.varia;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerEntityMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.DimensionManager;
 
 import javax.annotation.Nullable;
@@ -22,7 +22,7 @@ public class TeleportationTools {
     }
 
     public static void performTeleport(PlayerEntity player, int dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
-        int oldId = player.getEntityWorld().provider.getDimension();
+        int oldId = player.getEntityWorld().getDimension().getType().getId();
 
         float rotationYaw = player.rotationYaw;
         float rotationPitch = player.rotationPitch;
@@ -42,27 +42,28 @@ public class TeleportationTools {
     /**
      * Get a world for a dimension, possibly loading it from the configuration manager.
      */
-    public static World getWorldForDimension(int id) {
-        World w = DimensionManager.getWorld(id);
+    public static World getWorldForDimension(World overworld, int id) {
+        World w = DimensionManager.getWorld(overworld.getServer(), DimensionType.getById(id), false, false);
         if (w == null) {
-            w = DimensionManager.getWorld(0).getMinecraftServer().getWorld(id);
+            w = overworld.getServer().getWorld(DimensionType.getById(id));
         }
         return w;
     }
 
 
     public static void teleportToDimension(PlayerEntity player, int dimension, double x, double y, double z) {
-        int oldDimension = player.getEntityWorld().provider.getDimension();
-        PlayerEntityMP PlayerEntityMP = (PlayerEntityMP) player;
-        MinecraftServer server = player.getEntityWorld().getMinecraftServer();
-        WorldServer worldServer = server.getWorld(dimension);
+        int oldDimension = player.getEntityWorld().getDimension().getType().getId();
+        ServerPlayerEntity PlayerEntityMP = (ServerPlayerEntity) player;
+        MinecraftServer server = player.getEntityWorld().getServer();
+        ServerWorld worldServer = server.getWorld(DimensionType.getById(dimension));
         if (worldServer == null) {
             return;
         }
         player.addExperienceLevel(0);
 
 
-        worldServer.getMinecraftServer().getPlayerList().transferPlayerToDimension(PlayerEntityMP, dimension, new McJtyLibTeleporter(worldServer, x, y, z));
+        // @todo 1.14
+//        worldServer.getServer().getPlayerList().transferPlayerToDimension(PlayerEntityMP, dimension, new McJtyLibTeleporter(worldServer, x, y, z));
         player.setPositionAndUpdate(x, y, z);
     }
 
@@ -91,23 +92,23 @@ public class TeleportationTools {
     public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, Direction facing) {
         World world = entity.getEntityWorld();
         if (entity instanceof PlayerEntity) {
-            performTeleport((PlayerEntity) entity, destWorld.provider.getDimension(), newX, newY, newZ, facing);
+            performTeleport((PlayerEntity) entity, destWorld.getDimension().getType().getId(), newX, newY, newZ, facing);
             return entity;
         } else {
             float rotationYaw = entity.rotationYaw;
             float rotationPitch = entity.rotationPitch;
 
-            if (world.provider.getDimension() != destWorld.provider.getDimension()) {
+            if (world.getDimension().getType() != destWorld.getDimension().getType()) {
                 CompoundNBT tagCompound = new CompoundNBT();
-                entity.writeToNBT(tagCompound);
-                tagCompound.removeTag("Dimension");
+                entity.writeUnlessRemoved(tagCompound);
+                tagCompound.remove("Dimension");
                 Class<? extends Entity> entityClass = entity.getClass();
                 world.removeEntity(entity);
                 entity.isDead = false;
                 world.updateEntityWithOptionalForce(entity, false);
 
                 Entity newEntity = EntityList.newEntity(entityClass, destWorld);
-                newEntity.readFromNBT(tagCompound);
+                newEntity.read(tagCompound);
                 if (facing != null) {
                     fixOrientation(newEntity, newX, newY, newZ, facing);
                 } else {

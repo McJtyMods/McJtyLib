@@ -30,7 +30,7 @@ public class DumpBlockNBT {
         if (te != null) {
             jsonObject.add("teClass", new JsonPrimitive(te.getClass().getCanonicalName()));
             CompoundNBT tag = new CompoundNBT();
-            te.writeToNBT(tag);
+            te.write(tag);
             if (verbose) {
                 String nbtJson = tag.toString();
                 JsonParser parser = new JsonParser();

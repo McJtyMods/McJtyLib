@@ -1,17 +1,6 @@
 package mcjty.lib.integration.computers;
 
-import li.cil.oc.api.Network;
-import li.cil.oc.api.driver.NamedBlock;
-import li.cil.oc.api.network.Visibility;
-import li.cil.oc.api.prefab.AbstractManagedEnvironment;
-import li.cil.oc.api.prefab.DriverSidedTileEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-
-public abstract class AbstractOCDriver extends DriverSidedTileEntity {
+public abstract class AbstractOCDriver {} /* @todo 1.14 extends DriverSidedTileEntity {
     String componentName;
     Class<? extends TileEntity> clazz;
 
@@ -62,3 +51,4 @@ public abstract class AbstractOCDriver extends DriverSidedTileEntity {
 
     public abstract AbstractManagedEnvironment createEnvironment(World world, BlockPos pos, Direction side, TileEntity tile);
 }
+*/

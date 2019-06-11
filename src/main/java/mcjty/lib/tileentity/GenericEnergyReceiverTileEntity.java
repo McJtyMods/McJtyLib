@@ -1,50 +1,46 @@
 package mcjty.lib.tileentity;
 
-import mcjty.lib.varia.EnergyTools;
-import net.darkhax.tesla.api.ITeslaConsumer;
-import net.minecraft.util.Direction;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.common.util.LazyOptional;
 
-@Optional.InterfaceList({
-    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer")
-})
-public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity implements ITeslaConsumer {
+import javax.annotation.Nonnull;
 
-    public GenericEnergyReceiverTileEntity(long maxEnergy, long maxReceive) {
-        super(maxEnergy, maxReceive);
+// @todo 1.14
+//@Optional.InterfaceList({
+//    @Optional.Interface(modid = "tesla", iface = "net.darkhax.tesla.api.ITeslaConsumer")
+//})
+public class GenericEnergyReceiverTileEntity extends GenericEnergyStorageTileEntity /*implements ITeslaConsumer*/ {
+
+    public GenericEnergyReceiverTileEntity(TileEntityType<?> type, long maxEnergy, long maxReceive) {
+        super(type, maxEnergy, maxReceive);
     }
 
-    public GenericEnergyReceiverTileEntity(long maxEnergy, long maxReceive, long maxExtract) {
-        super(maxEnergy, maxReceive, maxExtract);
+    public GenericEnergyReceiverTileEntity(TileEntityType<?> type, long maxEnergy, long maxReceive, long maxExtract) {
+        super(type, maxEnergy, maxReceive, maxExtract);
     }
 
     public void consumeEnergy(long consume) {
         modifyEnergyStored(-consume);
     }
 
+    @Nonnull
     @Override
-    public boolean hasCapability(Capability<?> capability, Direction facing) {
-        if (capability == EnergyTools.TESLA_CONSUMER) {
-            return true;
-        }
-        return super.hasCapability(capability, facing);
-    }
-
-    @Override
-    public <T> T getCapability(Capability<T> capability, Direction facing) {
-        if (capability == EnergyTools.TESLA_CONSUMER) {
-            return (T) this;
-        }
-        return super.getCapability(capability, facing);
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
+        // @todo 1.14
+//        if (capability == EnergyTools.TESLA_CONSUMER) {
+//            return (T) this;
+//        }
+        return super.getCapability(cap);
     }
 
     // -----------------------------------------------------------
     // For ITeslaConsumer
     // deliberately not @Optional so that we can reliably call this elsewhere
 
-    @Override
-    public long givePower(long power, boolean simulated) {
-        return storage.receiveEnergy(power, simulated);
-    }
+    // @todo 1.14
+//    @Override
+//    public long givePower(long power, boolean simulated) {
+//        return storage.receiveEnergy(power, simulated);
+//    }
 }

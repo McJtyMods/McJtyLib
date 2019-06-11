@@ -1,17 +1,15 @@
 package mcjty.lib.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.varia.MathTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.PlayerEntitySP;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
+;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
@@ -40,38 +38,38 @@ public class RenderHelper {
 
     public static void renderEntity(Entity entity, int xPos, int yPos, float scale) {
         GlStateManager.pushMatrix();
-        GlStateManager.color(1f, 1f, 1f);
+        GlStateManager.color3f(1f, 1f, 1f);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableColorMaterial();
         GlStateManager.pushMatrix();
-        GlStateManager.translate(xPos + 8, yPos + 16, 50F);
-        GlStateManager.scale(-scale, scale, scale);
-        GlStateManager.rotate(180F, 0.0F, 0.0F, 1.0F);
-        GlStateManager.rotate(135F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.translatef(xPos + 8, yPos + 16, 50F);
+        GlStateManager.scalef(-scale, scale, scale);
+        GlStateManager.rotatef(180F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotatef(135F, 0.0F, 1.0F, 0.0F);
         net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
-        GlStateManager.rotate(-135F, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(rot, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(0.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotatef(-135F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef(rot, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.rotationPitch = 0.0F;
-        GlStateManager.translate(0.0F, (float) entity.getYOffset(), 0.0F);
+        GlStateManager.translatef(0.0F, (float) entity.getYOffset(), 0.0F);
         Minecraft.getInstance().getRenderManager().playerViewY = 180F;
         Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
         GlStateManager.popMatrix();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
         GlStateManager.disableRescaleNormal();
-        GlStateManager.translate(0F, 0F, 0.0F);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.translatef(0F, 0F, 0.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         int i1 = 240;
         int k1 = 240;
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, i1 / 1.0F, k1 / 1.0F);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableRescaleNormal();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
         GlStateManager.disableLighting();
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
         GlStateManager.popMatrix();
     }
 
@@ -80,11 +78,11 @@ public class RenderHelper {
             renderEntity((Entity) itm, x, y);
             return true;
         }
-        RenderItem itemRender = Minecraft.getInstance().getRenderItem();
-        return renderObject(mc, itemRender, x, y, itm, highlight, 200);
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        return renderObject(mc, itemRenderer, x, y, itm, highlight, 200);
     }
 
-    public static boolean renderObject(Minecraft mc, RenderItem itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
+    public static boolean renderObject(Minecraft mc, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
         itemRender.zLevel = lvl;
 
         if (itm == null) {
@@ -108,7 +106,7 @@ public class RenderHelper {
         return renderItemStack(mc, itemRender, ItemStack.EMPTY, x, y, "", highlight);
     }
 
-    public static boolean renderIcon(Minecraft mc, RenderItem itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
+    public static boolean renderIcon(Minecraft mc, ItemRenderer itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
         //itemRender.draw(xo, yo, itm, 16, 16); //TODO: Make
         return true;
     }
@@ -119,11 +117,11 @@ public class RenderHelper {
             return false;
         }
 
-        TextureMap textureMapBlocks = mc.getTextureMapBlocks();
+        AtlasTexture textureMapBlocks = mc.getTextureMap();
         ResourceLocation fluidStill = fluid.getStill();
         TextureAtlasSprite fluidStillSprite = null;
         if (fluidStill != null) {
-            fluidStillSprite = textureMapBlocks.getTextureExtry(fluidStill.toString());
+            fluidStillSprite = textureMapBlocks.getAtlasSprite(fluidStill.toString());
         }
         if (fluidStillSprite == null) {
             fluidStillSprite = textureMapBlocks.getMissingSprite();
@@ -163,7 +161,7 @@ public class RenderHelper {
     }
 
 
-    public static boolean renderItemStackWithCount(Minecraft mc, RenderItem itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
+    public static boolean renderItemStackWithCount(Minecraft mc, ItemRenderer itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
         int size = itm.getCount();
         String amount;
         if (size <= 1) {
@@ -213,7 +211,7 @@ public class RenderHelper {
 
     }
 
-    public static boolean renderItemStack(Minecraft mc, RenderItem itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
+    public static boolean renderItemStack(Minecraft mc, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
         GlStateManager.color(1F, 1F, 1F);
 
         boolean rc = false;
@@ -224,7 +222,7 @@ public class RenderHelper {
         if (!itm.isEmpty() && itm.getItem() != null) {
             rc = true;
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0.0F, 0.0F, 32.0F);
+            GlStateManager.translatef(0.0F, 0.0F, 32.0F);
             GlStateManager.color(1F, 1F, 1F, 1F);
             GlStateManager.enableRescaleNormal();
             GlStateManager.enableLighting();
@@ -262,12 +260,12 @@ public class RenderHelper {
                 GlStateManager.disableBlend();
                 if (scaled >= 2) {
                     GlStateManager.pushMatrix();
-                    GlStateManager.scale(.5f, .5f, .5f);
+                    GlStateManager.scalef(.5f, .5f, .5f);
                     fr.drawStringWithShadow(s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215);
                     GlStateManager.popMatrix();
                 } else if (scaled == 1) {
                     GlStateManager.pushMatrix();
-                    GlStateManager.scale(.75f, .75f, .75f);
+                    GlStateManager.scalef(.75f, .75f, .75f);
                     fr.drawStringWithShadow(s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215);
                     GlStateManager.popMatrix();
                 } else {
@@ -633,7 +631,7 @@ public class RenderHelper {
 
         rotateToPlayer();
 
-        GlStateManager.rotate(rot, 0, 0, 1);
+        GlStateManager.rotatef(rot, 0, 0, 1);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -647,15 +645,15 @@ public class RenderHelper {
     }
 
     public static void rotateToPlayer() {
-        GlStateManager.rotate(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotatef(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
     }
 
     public static int renderText(Minecraft mc, int x, int y, String txt) {
         GlStateManager.color(1.0F, 1.0F, 1.0F);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0F, 0.0F, 32.0F);
+        GlStateManager.translatef(0.0F, 0.0F, 32.0F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
@@ -684,7 +682,7 @@ public class RenderHelper {
         GlStateManager.color(1.0F, 1.0F, 1.0F);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0F, 0.0F, 32.0F);
+        GlStateManager.translatef(0.0F, 0.0F, 32.0F);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();

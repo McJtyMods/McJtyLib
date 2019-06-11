@@ -98,7 +98,7 @@ public class MultipartTE extends TileEntity {
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         int oldVersion = version;
-        readFromNBT(packet.getNbtCompound());
+        read(packet.getNbtCompound());
         if (world.isRemote && version != oldVersion) {
 //            dumpParts("onData");
             world.markForRerender(pos);
@@ -108,7 +108,7 @@ public class MultipartTE extends TileEntity {
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT updateTag = super.getUpdateTag();
-        writeToNBT(updateTag);
+        write(updateTag);
         return updateTag;
     }
 
@@ -116,7 +116,7 @@ public class MultipartTE extends TileEntity {
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTag = new CompoundNBT();
-        writeToNBT(nbtTag);
+        write(nbtTag);
         return new SUpdateTileEntityPacket(pos, 1, nbtTag);
     }
 

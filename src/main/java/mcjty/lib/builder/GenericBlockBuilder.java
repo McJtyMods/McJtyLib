@@ -9,6 +9,7 @@ import mcjty.lib.container.EmptyContainerFactory;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -20,6 +21,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -100,7 +102,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             }
 
             @Override
-            protected int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+            protected int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
                 return getter.getRedstoneOutput(state, world, pos, side);
             }
 
@@ -115,12 +117,12 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             }
 
             @Override
-            public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
+            public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
             }
 
             @Override
-            public boolean doesSideBlockRendering(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+            public boolean doesSideBlockRendering(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
             }
 
@@ -154,7 +156,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
             }
 
             @Override
-            public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess source, BlockPos pos) {
+            public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader source, BlockPos pos) {
                 return boundingBox.getBoundingBox(state, source, pos);
             }
 
@@ -167,7 +169,7 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
 
             @Nullable
             @Override
-            public PathNodeType getAiPathNodeType(BlockState state, IBlockAccess world, BlockPos pos) {
+            public PathNodeType getAiPathNodeType(BlockState state, IBlockReader world, BlockPos pos) {
                 PathNodeType type = getAIPathNodeType.getAiPathNodeType(state, world, pos);
                 if (type == null) {
                     return super.getAiPathNodeType(state, world, pos);

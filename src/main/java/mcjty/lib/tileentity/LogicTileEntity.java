@@ -1,13 +1,16 @@
 package mcjty.lib.tileentity;
 
 import mcjty.lib.blocks.LogicSlabBlock;
-import mcjty.lib.varia.LogicFacing;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.LogicFacing;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 
@@ -61,8 +64,9 @@ public class LogicTileEntity extends GenericTileEntity {
         }
         powerOutput = newout;
         markDirty();
-        Direction outputSide = getFacing(getWorld().getBlockState(this.pos)).getInputSide().getOpposite();
-        getWorld().neighborChanged(this.pos.offset(outputSide), this.getBlockType(), this.pos);
+        BlockState state = getWorld().getBlockState(this.pos);
+        Direction outputSide = getFacing(state).getInputSide().getOpposite();
+        getWorld().neighborChanged(this.pos.offset(outputSide), state.getBlock(), this.pos);
         //        getWorld().notifyNeighborsOfStateChange(this.pos, this.getBlockType());
     }
 
@@ -85,7 +89,7 @@ public class LogicTileEntity extends GenericTileEntity {
             BlockState blockState = world.getBlockState(pos.offset(side));
             Block b = blockState.getBlock();
             if (b == Blocks.REDSTONE_WIRE) {
-                power = Math.max(power, blockState.getValue(BlockRedstoneWire.POWER));
+                power = Math.max(power, blockState.get(RedstoneWireBlock.POWER));
             }
         }
 
@@ -93,7 +97,7 @@ public class LogicTileEntity extends GenericTileEntity {
     }
 
     @Override
-    public int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+    public int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         if (side == getFacing(state).getInputSide()) {
             return getPowerOutput();
         } else {
@@ -102,23 +106,23 @@ public class LogicTileEntity extends GenericTileEntity {
     }
 
     @Override
-    public void readFromNBT(CompoundNBT tagCompound) {
-        super.readFromNBT(tagCompound);
-        facing = LogicFacing.VALUES[tagCompound.getInteger("lf")];
+    public void read(CompoundNBT tagCompound) {
+        super.read(tagCompound);
+        facing = LogicFacing.VALUES[tagCompound.getInt("lf")];
     }
 
     @Override
-    public CompoundNBT writeToNBT(CompoundNBT tagCompound) {
-        super.writeToNBT(tagCompound);
-        tagCompound.setInteger("lf", facing.ordinal());
+    public CompoundNBT write(CompoundNBT tagCompound) {
+        super.write(tagCompound);
+        tagCompound.putInt("lf", facing.ordinal());
         return tagCompound;
     }
 
     @Override
     public BlockState getActualState(BlockState state) {
-        int meta = state.getValue(META_INTERMEDIATE);
+        int meta = state.get(META_INTERMEDIATE);
         LogicFacing facing = getFacing(state);
         facing = LogicFacing.getFacingWithMeta(facing, meta);
-        return state.withProperty(LOGIC_FACING, facing);
+        return state.with(LOGIC_FACING, facing);
     }
 }

@@ -1,8 +1,8 @@
 package mcjty.lib.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.Direction;
 import org.lwjgl.opengl.GL11;
 
@@ -18,41 +18,41 @@ public class HudRenderHelper {
         GlStateManager.pushMatrix();
 
         if (hudPlacement == HudPlacement.HUD_FRONT) {
-            GlStateManager.translate((float) x + 0.5F, (float) y + 0.75F, (float) z + 0.5F);
+            GlStateManager.translatef((float) x + 0.5F, (float) y + 0.75F, (float) z + 0.5F);
         } else if (hudPlacement == HudPlacement.HUD_CENTER) {
-            GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
+            GlStateManager.translatef((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
         } else {
-            GlStateManager.translate((float) x + 0.5F, (float) y + 1.75F, (float) z + 0.5F);
+            GlStateManager.translatef((float) x + 0.5F, (float) y + 1.75F, (float) z + 0.5F);
         }
 
         switch (hudOrientation) {
             case HUD_SOUTH:
-                GlStateManager.rotate(-getHudAngle(orientation), 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotatef(-getHudAngle(orientation), 0.0F, 1.0F, 0.0F);
                 break;
             case HUD_TOPLAYER_HORIZ:
-                GlStateManager.rotate(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-                GlStateManager.rotate(180, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotatef(180, 0.0F, 1.0F, 0.0F);
                 break;
             case HUD_TOPLAYER:
-                GlStateManager.rotate(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-                GlStateManager.rotate(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
-                GlStateManager.rotate(180, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+                GlStateManager.rotatef(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+                GlStateManager.rotatef(180, 0.0F, 1.0F, 0.0F);
                 break;
         }
 
         if (hudPlacement == HudPlacement.HUD_FRONT || hudPlacement == HudPlacement.HUD_ABOVE_FRONT) {
-            GlStateManager.translate(0.0F, -0.2500F, -0.4375F + .9);
+            GlStateManager.translatef(0.0F, -0.2500F, -0.4375F + .9f);
         } else if (hudPlacement != HudPlacement.HUD_CENTER){
-            GlStateManager.translate(0.0F, -0.2500F, -0.4375F + .4);
+            GlStateManager.translatef(0.0F, -0.2500F, -0.4375F + .4f);
         }
 
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        Minecraft.getInstance().entityRenderer.disableLightmap();
+        Minecraft.getInstance().gameRenderer.disableLightmap();
         GlStateManager.disableBlend();
         GlStateManager.disableLighting();
 
         renderText(Minecraft.getInstance().fontRenderer, messages, 11, scale);
-        Minecraft.getInstance().entityRenderer.enableLightmap();
+        Minecraft.getInstance().gameRenderer.enableLightmap();
 
 //        RenderHelper.enableStandardItemLighting();
         GlStateManager.enableLighting();
@@ -84,11 +84,11 @@ public class HudRenderHelper {
     }
 
     private static void renderText(FontRenderer fontrenderer, List<String> messages, int lines, float scale) {
-        GlStateManager.translate(-0.5F, 0.5F, 0.07F);
+        GlStateManager.translatef(-0.5F, 0.5F, 0.07F);
         float f3 = 0.0075F;
-        GlStateManager.scale(f3 * scale, -f3 * scale, f3);
-        GlStateManager.glNormal3f(0.0F, 0.0F, 1.0F);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.scalef(f3 * scale, -f3 * scale, f3);
+        GlStateManager.normal3f(0.0F, 0.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         renderLog(fontrenderer, messages, lines);
     }

@@ -5,7 +5,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import mcjty.lib.proxy.IProxy;
 import net.java.games.input.Keyboard;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
@@ -39,47 +38,52 @@ public class DefaultClientProxy implements IProxy {
     }
     @Override
     public World getClientWorld() {
-        return Minecraft.getInstance().field_71441_e;
+        return Minecraft.getInstance().world;
     }
 
     @Override
     public PlayerEntity getClientPlayer() {
-        return Minecraft.getInstance().field_71439_g;
+        return Minecraft.getInstance().player;
     }
 
     @Override
     public void enqueueWork(Runnable runnable) {
-        Minecraft.getInstance().addScheduledTask(runnable);
+        // @todo 1.14
+//        Minecraft.getInstance().addScheduledTask(runnable);
     }
 
     @Override
     public <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule) {
-        return Minecraft.getInstance().addScheduledTask(callableToSchedule);
+        // @todo 1.14
+//        return Minecraft.getInstance().addScheduledTask(callableToSchedule);
     }
 
     @Override
     public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
-        return Minecraft.getInstance().addScheduledTask(runnableToSchedule);
+        // @todo 1.14
+//        return Minecraft.getInstance().addScheduledTask(runnableToSchedule);
     }
 
     @Override
     public void initStandardItemModel(Block block) {
-        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
+        // @todo 1.14
+//        ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
     }
 
     @Override
     public void initStateMapper(Block block, ModelResourceLocation model) {
-        StateMapperBase ignoreState = new StateMapperBase() {
-            @Override
-            protected ModelResourceLocation getModelResourceLocation(BlockState BlockState) {
-                return model;
-            }
-        };
-        ModelLoader.setCustomStateMapper(block, ignoreState);
+        // @todo 1.14
+//        StateMapperBase ignoreState = new StateMapperBase() {
+//            @Override
+//            protected ModelResourceLocation getModelResourceLocation(BlockState BlockState) {
+//                return model;
+//            }
+//        };
+//        ModelLoader.setCustomStateMapper(block, ignoreState);
     }
 
     @Override
-    public void initItemModelMesher(Item item, int meta, ModelResourceLocation model) {
+    public void initItemModelMesher(Item item, ModelResourceLocation model) {
         Minecraft.getInstance().getItemRenderer().getItemModelMesher().register(item, meta, model);
     }
 

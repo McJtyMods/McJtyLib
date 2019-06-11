@@ -6,6 +6,10 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializable<CompoundNBT> {
 
@@ -15,14 +19,19 @@ public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializa
 
     private final PreferencesProperties properties;
 
+    @Nonnull
     @Override
-    public boolean hasCapability(Capability<?> capability, Direction facing) {
-        return capability == McJtyLib.PREFERENCES_CAPABILITY;
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
+        if (cap == McJtyLib.PREFERENCES_CAPABILITY) {
+            return LazyOptional.of(() -> (T) properties);
+        }
+        return LazyOptional.empty();
     }
 
+    @Nonnull
     @Override
-    public <T> T getCapability(Capability<T> capability, Direction facing) {
-        return capability == McJtyLib.PREFERENCES_CAPABILITY ? McJtyLib.PREFERENCES_CAPABILITY.cast(properties) : null;
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        return getCapability(cap);
     }
 
     @Override

@@ -39,7 +39,7 @@ public interface IProxy {
 
     void initStateMapper(Block block, ModelResourceLocation model);
 
-    void initItemModelMesher(Item item, int meta, ModelResourceLocation model);
+    void initItemModelMesher(Item item, ModelResourceLocation model);
 
     void initTESRItemStack(Item item, int meta, Class<? extends TileEntity> clazz);
 

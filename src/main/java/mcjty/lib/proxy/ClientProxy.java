@@ -2,18 +2,19 @@ package mcjty.lib.proxy;
 
 import mcjty.lib.ClientEventHandler;
 import mcjty.lib.multipart.MultipartModelLoader;
-import mcjty.lib.setup.ModSetup;
 import mcjty.lib.setup.DefaultClientProxy;
+import mcjty.lib.setup.ModSetup;
 import mcjty.lib.tooltips.TooltipRender;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ClientProxy extends DefaultClientProxy {
 
     @Override
-    public void preInit(FMLPreInitializationEvent e) {
+    public void preInit(FMLCommonSetupEvent e) {
         super.preInit(e);
 
         MinecraftForge.EVENT_BUS.register(new TooltipRender());

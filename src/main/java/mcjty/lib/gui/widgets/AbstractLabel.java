@@ -155,7 +155,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
             mc.getTextureManager().bindTexture(image);
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;
-            gui.drawTexturedModalRect(xx, yy, u, v, iw, ih);
+            gui.blit(xx, yy, u, v, iw, ih);
         }
 
         int col = getColor();

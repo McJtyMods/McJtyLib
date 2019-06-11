@@ -1,9 +1,9 @@
 package mcjty.lib.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.PlayerEntitySP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
@@ -22,18 +22,18 @@ public class BlockOutlineRenderer {
     public static void renderHilightedBlock(BlockPos c, float partialTicks) {
         Minecraft mc = Minecraft.getInstance();
 
-        PlayerEntitySP p = mc.player;
+        ClientPlayerEntity p = mc.player;
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
 
         GlStateManager.pushMatrix();
-        GlStateManager.color(1.0f, 0, 0);
-        GlStateManager.glLineWidth(3);
-        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
+        GlStateManager.color3f(1.0f, 0, 0);
+        GlStateManager.lineWidth(3);
+        GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
 
-        GlStateManager.disableDepth();
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableDepthTest();
+        GlStateManager.disableTexture();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -45,35 +45,35 @@ public class BlockOutlineRenderer {
 
         tessellator.draw();
 
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.popMatrix();
     }
 
     /**
      * This method translates GL state relative to player position
      */
-    public static void renderOutlines(PlayerEntitySP p, Set<BlockPos> coordinates, int r, int g, int b, float partialTicks) {
+    public static void renderOutlines(ClientPlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b, float partialTicks) {
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
 
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        Minecraft.getInstance().entityRenderer.disableLightmap();
-        GlStateManager.disableDepth();
-        GlStateManager.disableTexture2D();
+        Minecraft.getInstance().gameRenderer.disableLightmap();
+        GlStateManager.disableDepthTest();
+        GlStateManager.disableTexture();
         GlStateManager.disableLighting();
-        GlStateManager.disableAlpha();
+        GlStateManager.disableAlphaTest();
         GlStateManager.depthMask(false);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
+        GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
 
         renderOutlines(coordinates, r, g, b, 4);
 
         GlStateManager.popMatrix();
 
-        Minecraft.getInstance().entityRenderer.enableLightmap();
-        GlStateManager.enableTexture2D();
+        Minecraft.getInstance().gameRenderer.enableLightmap();
+        GlStateManager.enableTexture();
     }
 
 
@@ -88,7 +88,7 @@ public class BlockOutlineRenderer {
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
 //        GlStateManager.color(r / 255.0f, g / 255.0f, b / 255.0f);
-        GL11.glLineWidth(thickness);
+        GlStateManager.lineWidth(thickness);
 
         for (BlockPos coordinate : coordinates) {
             float x = coordinate.getX();
@@ -138,13 +138,13 @@ public class BlockOutlineRenderer {
      */
     public static void renderBoxOutline(BlockPos pos) {
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        Minecraft.getInstance().entityRenderer.disableLightmap();
-        GlStateManager.disableTexture2D();
+        Minecraft.getInstance().gameRenderer.disableLightmap();
+        GlStateManager.disableTexture();
         GlStateManager.disableBlend();
         GlStateManager.disableLighting();
-        GlStateManager.disableAlpha();
-        GlStateManager.glLineWidth(2);
-        GlStateManager.color(1, 1, 1);
+        GlStateManager.disableAlphaTest();
+        GlStateManager.lineWidth(2);
+        GlStateManager.color3f(1, 1, 1);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -156,23 +156,23 @@ public class BlockOutlineRenderer {
 
         tessellator.draw();
 
-        Minecraft.getInstance().entityRenderer.enableLightmap();
-        GlStateManager.enableTexture2D();
+        Minecraft.getInstance().gameRenderer.enableLightmap();
+        GlStateManager.enableTexture();
     }
 
     /**
      * This method translates GL state relative to player position
      */
-    public static void renderHighlightedBlocks(PlayerEntitySP p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
+    public static void renderHighlightedBlocks(ClientPlayerEntity p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(-doubleX, -doubleY, -doubleZ);
+        GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
 
-        GlStateManager.disableDepth();
-        GlStateManager.enableTexture2D();
+        GlStateManager.disableDepthTest();
+        GlStateManager.enableTexture();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -201,9 +201,9 @@ public class BlockOutlineRenderer {
         tessellator.draw();
 
         GlStateManager.disableBlend();
-        GlStateManager.disableTexture2D();
-        GlStateManager.color(.5f, .3f, 0);
-        GlStateManager.glLineWidth(2);
+        GlStateManager.disableTexture();
+        GlStateManager.color3f(.5f, .3f, 0);
+        GlStateManager.lineWidth(2);
 
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);
 
@@ -214,7 +214,7 @@ public class BlockOutlineRenderer {
         }
         tessellator.draw();
 
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
         GlStateManager.popMatrix();
     }
 

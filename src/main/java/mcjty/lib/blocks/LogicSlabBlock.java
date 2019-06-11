@@ -5,21 +5,28 @@ import mcjty.lib.tileentity.LogicTileEntity;
 import mcjty.lib.varia.LogicFacing;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IntegerProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
 
+import javax.annotation.Nullable;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -69,57 +76,59 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         return BaseBlock.RotationType.NONE;
     }
 
+    @Nullable
     @Override
-    public BlockState getStateForPlacement(World worldIn, BlockPos pos, Direction side, float hitX, float hitY, float hitZ, int meta, MobEntity placer) {
-        float dx = Math.abs(0.5f - hitX);
-        float dy = Math.abs(0.5f - hitY);
-        float dz = Math.abs(0.5f - hitZ);
+    public BlockState getStateForPlacement(BlockItemUseContext context) {
+        Vec3d hit = context.func_221532_j();
+        double dx = Math.abs(0.5 - hit.x);
+        double dy = Math.abs(0.5 - hit.y);
+        double dz = Math.abs(0.5 - hit.z);
 
-        side = side.getOpposite();
+        Direction side = context.getFace().getOpposite();
 //        System.out.println("LogicSlabBlock.getStateForPlacement");
 //        System.out.println("  side = " + side);
         LogicFacing facing;
         switch (side) {
             case DOWN:
                 if (dx < dz) {
-                    facing = hitZ < 0.5 ? DOWN_TOSOUTH : DOWN_TONORTH;
+                    facing = hit.z < 0.5 ? DOWN_TOSOUTH : DOWN_TONORTH;
                 } else {
-                    facing = hitX < 0.5 ? DOWN_TOEAST : DOWN_TOWEST;
+                    facing = hit.x < 0.5 ? DOWN_TOEAST : DOWN_TOWEST;
                 }
                 break;
             case UP:
                 if (dx < dz) {
-                    facing = hitZ < 0.5 ? UP_TOSOUTH : UP_TONORTH;
+                    facing = hit.z < 0.5 ? UP_TOSOUTH : UP_TONORTH;
                 } else {
-                    facing = hitX < 0.5 ? UP_TOEAST : UP_TOWEST;
+                    facing = hit.x < 0.5 ? UP_TOEAST : UP_TOWEST;
                 }
                 break;
             case NORTH:
                 if (dx < dy) {
-                    facing = hitY < 0.5 ? NORTH_TOUP : NORTH_TODOWN;
+                    facing = hit.y < 0.5 ? NORTH_TOUP : NORTH_TODOWN;
                 } else {
-                    facing = hitX < 0.5 ? NORTH_TOEAST : NORTH_TOWEST;
+                    facing = hit.x < 0.5 ? NORTH_TOEAST : NORTH_TOWEST;
                 }
                 break;
             case SOUTH:
                 if (dx < dy) {
-                    facing = hitY < 0.5 ? SOUTH_TOUP : SOUTH_TODOWN;
+                    facing = hit.y < 0.5 ? SOUTH_TOUP : SOUTH_TODOWN;
                 } else {
-                    facing = hitX < 0.5 ? SOUTH_TOEAST : SOUTH_TOWEST;
+                    facing = hit.x < 0.5 ? SOUTH_TOEAST : SOUTH_TOWEST;
                 }
                 break;
             case WEST:
                 if (dy < dz) {
-                    facing = hitZ < 0.5 ? WEST_TOSOUTH : WEST_TONORTH;
+                    facing = hit.z < 0.5 ? WEST_TOSOUTH : WEST_TONORTH;
                 } else {
-                    facing = hitY < 0.5 ? WEST_TOUP : WEST_TODOWN;
+                    facing = hit.y < 0.5 ? WEST_TOUP : WEST_TODOWN;
                 }
                 break;
             case EAST:
                 if (dy < dz) {
-                    facing = hitZ < 0.5 ? EAST_TOSOUTH : EAST_TONORTH;
+                    facing = hit.z < 0.5 ? EAST_TOSOUTH : EAST_TONORTH;
                 } else {
-                    facing = hitY < 0.5 ? EAST_TOUP : EAST_TODOWN;
+                    facing = hit.y < 0.5 ? EAST_TOUP : EAST_TODOWN;
                 }
                 break;
             default:
@@ -129,7 +138,8 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
 //        System.out.println("  facing = " + facing);
 //        System.out.println("  facing.getInputSide() = " + facing.getInputSide());
         // LOGIC_FACING doesn't get saved to metadata, but it doesn't need to. It only needs to be available until LogicTileEntity#onLoad() runs.
-        return super.getStateForPlacement(worldIn, pos, side, hitX, hitY, hitZ, meta, placer).withProperty(META_INTERMEDIATE, facing.getMeta()).withProperty(LOGIC_FACING, facing);
+        // @todo 1.14 check: was side opposite or not?
+        return super.getStateForPlacement(context).with(META_INTERMEDIATE, facing.getMeta()).with(LOGIC_FACING, facing);
     }
 
     @Override
@@ -149,40 +159,42 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     public static final AxisAlignedBB BLOCK_WEST = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.3F, 1.0F, 1.0F);
     public static final AxisAlignedBB BLOCK_EAST = new AxisAlignedBB(0.7F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
-    @Override
-    public AxisAlignedBB getBoundingBox(BlockState state, IBlockAccess world, BlockPos pos) {
-        BlockState blockState = world.getBlockState(pos);
-        if (blockState.getBlock() instanceof LogicSlabBlock) {
-            TileEntity te = world.getTileEntity(pos);
-            if (te instanceof LogicTileEntity) {
-                LogicTileEntity logicTileEntity = (LogicTileEntity) te;
-                Direction side = logicTileEntity.getFacing(blockState).getSide();
-                switch (side) {
-                    case DOWN:
-                        return BLOCK_DOWN;
-                    case UP:
-                        return BLOCK_UP;
-                    case NORTH:
-                        return BLOCK_NORTH;
-                    case SOUTH:
-                        return BLOCK_SOUTH;
-                    case WEST:
-                        return BLOCK_WEST;
-                    case EAST:
-                        return BLOCK_EAST;
-                }
-            }
-        }
-        return BLOCK_DOWN;
-    }
+    // @todo 1.14
+//    @Override
+//    public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader world, BlockPos pos) {
+//        BlockState blockState = world.getBlockState(pos);
+//        if (blockState.getBlock() instanceof LogicSlabBlock) {
+//            TileEntity te = world.getTileEntity(pos);
+//            if (te instanceof LogicTileEntity) {
+//                LogicTileEntity logicTileEntity = (LogicTileEntity) te;
+//                Direction side = logicTileEntity.getFacing(blockState).getSide();
+//                switch (side) {
+//                    case DOWN:
+//                        return BLOCK_DOWN;
+//                    case UP:
+//                        return BLOCK_UP;
+//                    case NORTH:
+//                        return BLOCK_NORTH;
+//                    case SOUTH:
+//                        return BLOCK_SOUTH;
+//                    case WEST:
+//                        return BLOCK_WEST;
+//                    case EAST:
+//                        return BLOCK_EAST;
+//                }
+//            }
+//        }
+//        return BLOCK_DOWN;
+//    }
 
 
-    @SideOnly(Side.CLIENT)
+    // Client side
     @Override
     public void initModel() {
         super.initModel();
-        StateMap.Builder ignorePower = new StateMap.Builder().ignore(META_INTERMEDIATE);
-        ModelLoader.setCustomStateMapper(this, ignorePower.build());
+        // @todo 1.14
+//        StateMap.Builder ignorePower = new StateMap.Builder().ignore(META_INTERMEDIATE);
+//        ModelLoader.setCustomStateMapper(this, ignorePower.build());
     }
 
     /**
@@ -197,7 +209,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
             BlockState blockState = world.getBlockState(pos.offset(side));
             Block b = blockState.getBlock();
             if (b == Blocks.REDSTONE_WIRE) {
-                power = Math.max(power, blockState.getValue(BlockRedstoneWire.POWER));
+                power = Math.max(power, blockState.get(RedstoneWireBlock.POWER));
             }
         }
 
@@ -223,24 +235,25 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
 //        return null;
 //    }
 
-    @Override
-    public boolean isOpaqueCube(BlockState state) {
-        return false;
-    }
+    // @todo 1.14
+//    @Override
+//    public boolean isOpaqueCube(BlockState state) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isFullBlock(BlockState state) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean isFullCube(BlockState state) {
+//        return false;
+//    }
+
 
     @Override
-    public boolean isFullBlock(BlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(BlockState state) {
-        return false;
-    }
-
-
-    @Override
-    public boolean canConnectRedstone(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+    public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
         TileEntity te = world.getTileEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity)te;
@@ -261,7 +274,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Override
-    protected int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+    protected int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         TileEntity te = world.getTileEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity) te;
@@ -271,8 +284,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Override
-    public boolean rotateBlock(World world, BlockPos pos, Direction axis) {
-        BlockState state = world.getBlockState(pos);
+    public BlockState rotate(BlockState state, IWorld world, BlockPos pos, Rotation rot) {
         TileEntity te = world.getTileEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity) te;
@@ -286,28 +298,19 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
             }
             LogicFacing newfacing = LogicFacing.getFacingWithMeta(facing, meta);
             logicTileEntity.setFacing(newfacing);
-            world.setBlockState(pos, state.getBlock().getDefaultState()
-                    .withProperty(META_INTERMEDIATE, meta), 3);
-            logicTileEntity.rotateBlock(axis);
-            return true;
+            BlockState newstate = state.getBlock().getDefaultState().with(META_INTERMEDIATE, meta);
+            world.setBlockState(pos, newstate, 3);
+            logicTileEntity.rotateBlock(rot);
+            return newstate;
         }
-        return false;
+        return state;
     }
+
 
     @Override
-    public BlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(META_INTERMEDIATE, meta & 3);
+    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        super.fillStateContainer(builder);
+        builder.add(LOGIC_FACING).add(META_INTERMEDIATE);
     }
-
-    @Override
-    public int getMetaFromState(BlockState state) {
-        return state.getValue(META_INTERMEDIATE);
-    }
-
-    @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, LOGIC_FACING, META_INTERMEDIATE);
-    }
-
 
 }

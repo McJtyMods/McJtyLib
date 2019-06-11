@@ -7,10 +7,10 @@ import mcjty.lib.multipart.PartSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.pathfinding.PathNodeType;
@@ -18,9 +18,10 @@ import net.minecraft.state.IProperty;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -47,13 +48,13 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
 
     protected List<IProperty<?>> extraProperties = new ArrayList<>();
 
-    protected IActivateAction action = (world, pos, player, hand, side, hitX, hitY, hitZ) -> false;
+    protected IActivateAction action = (world, pos, player, hand, context) -> false;
     protected IClickAction clickAction = (world, pos, player) -> {};
     //@todo 1.14 protected IGetBoundingBox boundingBox = (state, source, pos) -> FULL_BLOCK_AABB;
     protected IAddCollisionBoxToList cdBoxToList = null;
     protected IGetAIPathNodeType getAIPathNodeType = (state, world, pos) -> null;
     protected ISlotGetter slotGetter = (world, pos, newState) -> PartSlot.NONE;
-    protected IPlacementGetter placementGetter = (world, pos, facing, hitX, hitY, hitZ, meta, placer) -> null;
+    protected IPlacementGetter placementGetter = (context) -> null;
 
     protected InformationString informationString;
     protected InformationString informationStringWithShift;
@@ -183,18 +184,18 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
             }
 
             @Override
-            public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
+            public int getLightValue(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
             }
 
             @Override
-            public boolean doesSideBlockRendering(BlockState state, IBlockReader world, BlockPos pos, Direction face) {
+            public boolean doesSideBlockRendering(BlockState state, IEnviromentBlockReader world, BlockPos pos, Direction face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
             }
 
             @Override
-            public void onBlockClicked(World worldIn, BlockPos pos, PlayerEntity playerIn) {
-                clickAction.doClick(worldIn, pos, playerIn);
+            public void onBlockClicked(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+                clickAction.doClick(world, pos, player);
             }
 
             @Nonnull
@@ -203,42 +204,45 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
                 return slotGetter.getSlotFromState(world, pos, newState);
             }
 
+            @Nullable
             @Override
-            public BlockState getStateForPlacement(World worldIn, BlockPos pos, Direction facing, float hitX, float hitY, float hitZ, int meta, MobEntity placer) {
-                BlockState state = placementGetter.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+            public BlockState getStateForPlacement(BlockItemUseContext context) {
+                BlockState state = placementGetter.getStateForPlacement(context);
                 if (state != null) {
                     return state;
                 }
-                return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, meta, placer);
+                return super.getStateForPlacement(context);
             }
 
             @Override
-            public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
-                if (!action.doActivate(worldIn, pos, playerIn, hand, facing, hitX, hitY, hitZ)) {
-                    return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+            public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+                if (!action.doActivate(world, pos, player, hand, result)) {
+                    return super.onBlockActivated(state, world, pos, player, hand, result);
                 } else {
                     return true;
                 }
             }
 
-            @Override
-            public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader source, BlockPos pos) {
-                return boundingBox.getBoundingBox(state, source, pos);
-            }
+            // @todo 1.14
+//            @Override
+//            public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader source, BlockPos pos) {
+//                return boundingBox.getBoundingBox(state, source, pos);
+//            }
+//
+//            @Override
+//            public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
+//                if (!boxToList.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState)) {
+//                    super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
+//                }
+//            }
 
-            @Override
-            public void addCollisionBoxToList(BlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-                if (!boxToList.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState)) {
-                    super.addCollisionBoxToList(state, worldIn, pos, entityBox, collidingBoxes, entityIn, isActualState);
-                }
-            }
 
             @Nullable
             @Override
-            public PathNodeType getAiPathNodeType(BlockState state, IBlockReader world, BlockPos pos) {
+            public PathNodeType getAiPathNodeType(BlockState state, IBlockReader world, BlockPos pos, @Nullable MobEntity entity) {
                 PathNodeType type = getAIPathNodeType.getAiPathNodeType(state, world, pos);
                 if (type == null) {
-                    return super.getAiPathNodeType(state, world, pos);
+                    return super.getAiPathNodeType(state, world, pos, entity);
                 }
                 return type;
             }
@@ -269,7 +273,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         if (flags.contains(BlockFlags.RENDER_NOSIDES)) {
             return (state, world, pos, face) -> world.getBlockState(pos.offset(face)).equals(state);
         } else {
-            return (state, world, pos, face) -> state.isOpaqueCube();
+            return (state, world, pos, face) -> state.isOpaqueCube(world, pos);
         }
     }
 
@@ -317,7 +321,8 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected void setupBlock(BaseBlock block) {
         block.setCreative(flags.contains(BlockFlags.CREATIVE));
         if (creativeTabs != null) {
-            block.setCreativeTab(creativeTabs);
+            // @todo 1.14
+//            block.setCreativeTab(creativeTabs);
         }
         final boolean opaque = !flags.contains(BlockFlags.NON_OPAQUE);
         block.setOpaqueCube(opaque);

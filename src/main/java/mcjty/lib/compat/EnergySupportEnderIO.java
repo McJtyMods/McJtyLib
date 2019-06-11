@@ -1,22 +1,26 @@
 package mcjty.lib.compat;
 
-import crazypants.enderio.base.power.IPowerStorage;
 import net.minecraft.tileentity.TileEntity;
 
 public class EnergySupportEnderIO {
 
     public static boolean isEnderioTileEntity(TileEntity te) {
-        return te instanceof IPowerStorage;
+        return false;
+        // @todo 1.14 return te instanceof IPowerStorage;
     }
 
     public static long getMaxEnergy(TileEntity te) {
-        IPowerStorage storage = (IPowerStorage) te;
-        return storage.getMaxEnergyStoredL();
+        return 0;
+        // @todo 1.14
+//        IPowerStorage storage = (IPowerStorage) te;
+//        return storage.getMaxEnergyStoredL();
     }
 
     public static long getCurrentEnergy(TileEntity te) {
-        IPowerStorage storage = (IPowerStorage) te;
-        return storage.getEnergyStoredL();
+        return 0;
+        // @todo 1.14
+//        IPowerStorage storage = (IPowerStorage) te;
+//        return storage.getEnergyStoredL();
     }
 
 }

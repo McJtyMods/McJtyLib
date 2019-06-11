@@ -216,7 +216,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     /**
-     * For compatibility reasons this calls writeToNBT() but for
+     * For compatibility reasons this calls write() but for
      * efficiency reasons you should override this in your tile
      * entity to only write what you need on the client.
      *
@@ -227,7 +227,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     /**
-     * For compatibility reasons this calls readFromNBT() but for
+     * For compatibility reasons this calls read() but for
      * efficiency reasons you should override this in your tile
      * entity to only read what you need on the client.
      *

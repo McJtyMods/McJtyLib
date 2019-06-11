@@ -1,27 +1,24 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.IResource;
-import net.minecraft.client.resources.IResourceManager;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipes;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.resources.IResource;
+import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.input.Keyboard;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -52,7 +49,7 @@ public class TextPage extends AbstractWidget<TextPage> {
 
     private int tabCounter = 0;
 
-    public TextPage(ModBase modBase, Minecraft mc, Gui gui) {
+    public TextPage(ModBase modBase, Minecraft mc, Screen gui) {
         super(mc, gui);
         this.modBase = modBase;
     }
@@ -110,8 +107,8 @@ public class TextPage extends AbstractWidget<TextPage> {
         try {
             return resourceManager.getResource(manualResource);
         } catch (FileNotFoundException e) {
-            String fallBackPath = manualResource.getResourcePath().replaceAll("-([a-z\\-]{2,6})_?([a-z]{0,3})", "");
-            return resourceManager.getResource(new ResourceLocation(manualResource.getResourceDomain(), fallBackPath));
+            String fallBackPath = manualResource.getPath().replaceAll("-([a-z\\-]{2,6})_?([a-z]{0,3})", "");
+            return resourceManager.getResource(new ResourceLocation(manualResource.getNamespace(), fallBackPath));
         }
     }
 
@@ -208,21 +205,22 @@ public class TextPage extends AbstractWidget<TextPage> {
             return true;
         }
         if (isEnabledAndVisible()) {
-            if (keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_LEFT) {
-                prevPage();
-                return true;
-            } else if (keyCode == Keyboard.KEY_SPACE || keyCode == Keyboard.KEY_RIGHT) {
-                nextPage();
-                return true;
-            } else if (keyCode == Keyboard.KEY_HOME) {
-                pageIndex = 0;
-                showCurrentPage();
-            } else if (keyCode == Keyboard.KEY_END) {
-                if (!pages.isEmpty()) {
-                    pageIndex = pages.size()-1;
-                    showCurrentPage();
-                }
-            }
+            // @todo 1.14
+//            if (keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_LEFT) {
+//                prevPage();
+//                return true;
+//            } else if (keyCode == Keyboard.KEY_SPACE || keyCode == Keyboard.KEY_RIGHT) {
+//                nextPage();
+//                return true;
+//            } else if (keyCode == Keyboard.KEY_HOME) {
+//                pageIndex = 0;
+//                showCurrentPage();
+//            } else if (keyCode == Keyboard.KEY_END) {
+//                if (!pages.isEmpty()) {
+//                    pageIndex = pages.size()-1;
+//                    showCurrentPage();
+//                }
+//            }
         }
         return false;
     }
@@ -252,9 +250,9 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     private void renderImage(int x, int y, Line line) {
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(line.resourceLocation);
-        gui.drawTexturedModalRect(x+4, y+1, line.u, line.v, 16, 16);
+        gui.blit(x+4, y+1, line.u, line.v, 16, 16);
 
         int dx = 22;
         String s = "";
@@ -294,13 +292,13 @@ public class TextPage extends AbstractWidget<TextPage> {
 
     private int renderRecipe(int x, int y, Line line) {
         y += 4;
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         // @TODO: need support for shapeless and better error checking
 
         if (craftingGridImage != null) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
-            gui.drawTexturedModalRect(25+x, y, craftU, craftV, 19*3, 19*3);
+            gui.blit(25+x, y, craftU, craftV, 19*3, 19*3);
         }
         int w;
         int h;
@@ -325,12 +323,12 @@ public class TextPage extends AbstractWidget<TextPage> {
                     Ingredient ingredient = ingredients.get(i + j * w);
                     if (ingredient.getMatchingStacks().length > 0) {
                         ItemStack stack = ingredient.getMatchingStacks()[0];
-                        if (stack != null && stack.getItemDamage() == 32767) {
+                        if (stack != null && stack.getDamage() == 32767) {  // @todo 1.14 (still needed?)
                             // Just pick 0 here.
-                            CompoundNBT tc = stack.getTagCompound();
-                            stack = new ItemStack(stack.getItem(), stack.getCount(), 0);
+                            CompoundNBT tc = stack.getTag();
+                            stack = new ItemStack(stack.getItem(), stack.getCount());
                             if (tc != null) {
-                                stack.setTagCompound(tc.copy());
+                                stack.setTag(tc.copy());
                             }
                         }
                         RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
@@ -339,14 +337,14 @@ public class TextPage extends AbstractWidget<TextPage> {
             }
         }
         if (arrowImage != null) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(arrowImage);
-            gui.drawTexturedModalRect(x+25+67, y+18, arrowU, arrowV, 16, 16);
+            gui.blit(x+25+67, y+18, arrowU, arrowV, 16, 16);
         }
         if (craftingGridImage != null) {
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
-            gui.drawTexturedModalRect(x+25+92, y + 16, craftU, craftV, 18, 18);
+            gui.blit(x+25+92, y + 16, craftU, craftV, 18, 18);
         }
         RenderHelper.renderObject(mc, x+25+93, y + 17, line.recipe.getRecipeOutput(), false);
         y -= 4;

@@ -55,7 +55,7 @@ import java.util.function.Function;
 //        @Optional.Interface(iface = "crazypants.enderio.api.redstone.IRedstoneConnectable", modid = "enderio"),
 //})
 public abstract class GenericBlock<T extends GenericTileEntity, C extends Container> extends BaseBlock
-        implements ITileEntityProvider /*, IRedstoneConnectable*/ {
+        /*, IRedstoneConnectable*/ {
 
     protected final Class<? extends T> tileEntityClass;
     private final BiFunction<PlayerEntity, IInventory, C> containerFactory;

@@ -2,21 +2,23 @@ package mcjty.lib.varia;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lib.gui.GuiParser;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -34,14 +36,12 @@ public class ItemStackTools {
      */
     @Nonnull
     public static ItemStack extractItem(@Nullable TileEntity tileEntity, int slot, int amount) {
-        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            return capability.extractItem(slot, amount, false);
-        } else if (tileEntity instanceof IInventory) {
-            IInventory inventory = (IInventory) tileEntity;
-            return inventory.decrStackSize(slot, amount);
+        if (tileEntity == null) {
+            return ItemStack.EMPTY;
         }
-        return ItemStack.EMPTY;
+        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .map(handler -> handler.extractItem(slot, amount, false))
+                .orElse(ItemStack.EMPTY);
     }
 
     /**
@@ -52,14 +52,12 @@ public class ItemStackTools {
      */
     @Nonnull
     public static ItemStack getStack(@Nullable TileEntity tileEntity, int slot) {
-        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            return capability.getStackInSlot(slot);
-        } else if (tileEntity instanceof IInventory) {
-            IInventory inventory = (IInventory) tileEntity;
-            return inventory.getStackInSlot(slot);
+        if (tileEntity == null) {
+            return ItemStack.EMPTY;
         }
-        return ItemStack.EMPTY;
+        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .map(handler -> handler.getStackInSlot(slot))
+                .orElse(ItemStack.EMPTY);
     }
 
     /**
@@ -70,33 +68,38 @@ public class ItemStackTools {
      * @param stack
      */
     public static void setStack(@Nullable TileEntity tileEntity, int slot, @Nonnull ItemStack stack) {
-        if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-            IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-            capability.extractItem(slot, 64, false);        // Clear slot
-            capability.insertItem(slot, stack, false);
-        } else if (tileEntity instanceof IInventory) {
-            IInventory inventory = (IInventory) tileEntity;
-            inventory.setInventorySlotContents(slot, stack);
+        if (tileEntity == null) {
+            return;
         }
+        tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(
+                handler -> {
+                    handler.extractItem(slot, 64, false);        // Clear slot
+                    handler.insertItem(slot, stack, false);
+                }
+        );
     }
 
     public static List<ItemStack> getOres(String name) {
-        return OreDictionary.getOres(name);
+//        return OreDictionary.getOres(name);
+        // @todo 1.14
+        return Collections.emptyList();
     }
 
     public static List<ItemStack> getOres(String name, boolean alwaysCreateEntry) {
-        return OreDictionary.getOres(name, alwaysCreateEntry);
+//        return OreDictionary.getOres(name, alwaysCreateEntry);
+        // @todo 1.14
+        return Collections.emptyList();
     }
 
     @Nonnull
     public static Optional<CompoundNBT> getTag(@Nonnull ItemStack stack) {
-        return Optional.ofNullable(stack.getTagCompound());
+        return Optional.ofNullable(stack.getTag());
     }
 
     @Nonnull
     public static <R> R mapTag(@Nonnull ItemStack stack, Function<CompoundNBT,R> mapping, @Nonnull R def) {
-        if (stack.hasTagCompound()) {
-            return mapping.apply(stack.getTagCompound());
+        if (stack.hasTag()) {
+            return mapping.apply(stack.getTag());
         } else {
             return def;
         }
@@ -104,7 +107,7 @@ public class ItemStackTools {
 
     @Nonnull
     public static Function<ItemStack, String> intGetter(String tag, Integer def) {
-        return stack -> Integer.toString(ItemStackTools.mapTag(stack, nbt -> nbt.getInteger(tag), def));
+        return stack -> Integer.toString(ItemStackTools.mapTag(stack, nbt -> nbt.getInt(tag), def));
     }
 
     @Nonnull
@@ -113,8 +116,8 @@ public class ItemStackTools {
     }
 
     @Nonnull
-    public static Stream<NBTBase> getListStream(CompoundNBT compound, String tag) {
-        NBTTagList list = compound.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+    public static Stream<INBT> getListStream(CompoundNBT compound, String tag) {
+        ListNBT list = compound.getList("Items", Constants.NBT.TAG_COMPOUND);
         return StreamSupport.stream(list.spliterator(), false);
     }
 
@@ -124,11 +127,8 @@ public class ItemStackTools {
         if (item.getCount() != 1) {
             object.add("amount", new JsonPrimitive(item.getCount()));
         }
-        if (item.getItemDamage() != 0) {
-            object.add("meta", new JsonPrimitive(item.getItemDamage()));
-        }
-        if (item.hasTagCompound()) {
-            String string = item.getTagCompound().toString();
+        if (item.hasTag()) {
+            String string = item.getTag().toString();
             object.add("nbt", new JsonPrimitive(string));
         }
         return object;
@@ -142,17 +142,14 @@ public class ItemStackTools {
         if (obj.has("amount")) {
             amount = obj.get("amount").getAsInt();
         }
-        int meta = 0;
-        if (obj.has("meta")) {
-            meta = obj.get("meta").getAsInt();
-        }
-        ItemStack stack = new ItemStack(item, amount, meta);
+        ItemStack stack = new ItemStack(item, amount);
         if (obj.has("nbt")) {
             try {
                 CompoundNBT nbt = JsonToNBT.getTagFromJson(obj.get("nbt").getAsString());
-                stack.setTagCompound(nbt);
-            } catch (NBTException e) {
-                // @todo What to do?
+                stack.setTag(nbt);
+            } catch (CommandSyntaxException e) {
+                e.printStackTrace();
+                // @todo
             }
         }
         return stack;
@@ -162,9 +159,8 @@ public class ItemStackTools {
         GuiParser.GuiCommand object = new GuiParser.GuiCommand(name);
         object.parameter(item.getItem().getRegistryName().toString());
         object.parameter(item.getCount());
-        object.parameter(item.getItemDamage());
-        if (item.hasTagCompound()) {
-            String string = item.getTagCompound().toString();
+        if (item.hasTag()) {
+            String string = item.getTag().toString();
             object.command(new GuiParser.GuiCommand("tag").parameter(string));
         }
         return object;
@@ -174,13 +170,12 @@ public class ItemStackTools {
         String itemName = obj.getOptionalPar(0, "minecraft:stick");
         Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
         int amount = obj.getOptionalPar(1, 1);
-        int meta = obj.getOptionalPar(2, 0);
-        ItemStack stack = new ItemStack(item, amount, meta);
+        ItemStack stack = new ItemStack(item, amount);
         obj.findCommand("tag").ifPresent(cmd -> {
             try {
                 CompoundNBT nbt = JsonToNBT.getTagFromJson(cmd.getOptionalPar(0, ""));
-                stack.setTagCompound(nbt);
-            } catch (NBTException e) {
+                stack.setTag(nbt);
+            } catch (CommandSyntaxException e) {
                 e.printStackTrace();
             }
         });

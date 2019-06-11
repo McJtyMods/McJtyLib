@@ -81,7 +81,7 @@ public class McJtyEnergyStorage {
         this.maxExtract = max;
     }
 
-    public McJtyEnergyStorage readFromNBT(CompoundNBT nbt) {
+    public McJtyEnergyStorage read(CompoundNBT nbt) {
 
         this.energy = nbt.getLong("Energy");
 
@@ -91,7 +91,7 @@ public class McJtyEnergyStorage {
         return this;
     }
 
-    public CompoundNBT writeToNBT(CompoundNBT nbt) {
+    public CompoundNBT write(CompoundNBT nbt) {
 
         if (energy < 0) {
             energy = 0;

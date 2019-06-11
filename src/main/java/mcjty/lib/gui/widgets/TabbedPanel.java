@@ -3,7 +3,8 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
+;
 
 import java.awt.Rectangle;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     private Widget<?> current = null;
     private Map<String,Widget<?>> pages = new HashMap<>();
 
-    public TabbedPanel(Minecraft mc, Gui gui) {
+    public TabbedPanel(Minecraft mc, Screen gui) {
         super(mc, gui);
     }
 

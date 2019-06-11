@@ -1,9 +1,8 @@
 package mcjty.lib.gui.widgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.screen.Screen;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,9 +27,11 @@ import static mcjty.lib.gui.widgets.TextField.TYPE_TEXTFIELD;
 import static mcjty.lib.gui.widgets.ToggleButton.TYPE_TOGGLEBUTTON;
 import static mcjty.lib.gui.widgets.WidgetList.TYPE_WIDGETLIST;
 
+;
+
 public class WidgetRepository {
 
-    private static final Map<String, BiFunction<Minecraft, Gui, Widget<?>>> FACTORIES = new HashMap<>();
+    private static final Map<String, BiFunction<Minecraft, Screen, Widget<?>>> FACTORIES = new HashMap<>();
 
     static {
         FACTORIES.put(TYPE_BLOCKRENDER, BlockRender::new);
@@ -55,8 +56,8 @@ public class WidgetRepository {
     }
 
     @Nullable
-    public static Widget<?> createWidget(String type, Minecraft minecraft, Gui gui) {
-        BiFunction<Minecraft, Gui, Widget<?>> function = FACTORIES.get(type);
+    public static Widget<?> createWidget(String type, Minecraft minecraft, Screen gui) {
+        BiFunction<Minecraft, Screen, Widget<?>> function = FACTORIES.get(type);
         if (function == null) {
             return null;
         }

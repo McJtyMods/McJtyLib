@@ -187,7 +187,7 @@ public class Window {
         }
     }
 
-    public void mouseClicked(int x, int y, int button) {
+    public void mouseClicked(double x, double y, int button) {
         if (textFocus != null) {
             textFocus = null;
             fireFocusEvents(null);

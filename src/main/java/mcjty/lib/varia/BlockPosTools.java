@@ -23,7 +23,7 @@ public class BlockPosTools {
         return new BlockPos((c1.getX() + c2.getX()) / 2, (c1.getY() + c2.getY()) / 2, (c1.getZ() + c2.getZ()) / 2);
     }
 
-    public static BlockPos readFromNBT(CompoundNBT tagCompound, String tagName) {
+    public static BlockPos read(CompoundNBT tagCompound, String tagName) {
         int[] array = tagCompound.getIntArray(tagName);
         if (array.length == 0) {
             return null;
@@ -32,7 +32,7 @@ public class BlockPosTools {
         }
     }
 
-    public static void writeToNBT(CompoundNBT tagCompound, String tagName, BlockPos coordinate) {
+    public static void write(CompoundNBT tagCompound, String tagName, BlockPos coordinate) {
         if (coordinate == null) {
             tagCompound.setIntArray(tagName, new int[] { });
         } else {
@@ -40,9 +40,9 @@ public class BlockPosTools {
         }
     }
 
-    public static CompoundNBT writeToNBT(BlockPos coordinate) {
+    public static CompoundNBT write(BlockPos coordinate) {
         CompoundNBT tagCompound = new CompoundNBT();
-        writeToNBT(tagCompound, "c", coordinate);
+        write(tagCompound, "c", coordinate);
         return tagCompound;
     }
 

@@ -10,11 +10,12 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import org.lwjgl.input.Keyboard;
+import net.minecraft.client.gui.screen.Screen;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+;
 
 public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
 
@@ -26,7 +27,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     private Integer currentColor = null;
     private List<ColorChoiceEvent> choiceEvents = null;
 
-    public ColorChoiceLabel(Minecraft mc, Gui gui) {
+    public ColorChoiceLabel(Minecraft mc, Screen gui) {
         super(mc, gui);
         setText("");
     }
@@ -91,7 +92,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
             int index = colorList.indexOf(currentColor);
-            if (button == 1 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (button == 1) {// @todo 1.14 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
                 index--;
                 if (index < 0) {
                     index = colorList.size()-1;
