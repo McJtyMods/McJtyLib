@@ -3,7 +3,6 @@ package mcjty.lib.proxy;
 import mcjty.lib.ClientEventHandler;
 import mcjty.lib.multipart.MultipartModelLoader;
 import mcjty.lib.setup.DefaultClientProxy;
-import mcjty.lib.setup.ModSetup;
 import mcjty.lib.tooltips.TooltipRender;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
@@ -27,7 +26,7 @@ public class ClientProxy extends DefaultClientProxy {
     private static class McJtyLibBlockRegister {
         @SubscribeEvent
         public void registerModels(ModelRegistryEvent event) {
-            ModSetup.multipartBlock.initModel();
+            Registration.multipartBlock.initModel();
         }
 
     }

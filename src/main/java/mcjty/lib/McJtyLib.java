@@ -209,7 +209,8 @@ public class McJtyLib implements ModBase {
                 TileEntity tileEntity = world.getTileEntity(pos);
                 if (tileEntity instanceof MultipartTE) {
                     if (!world.isRemote) {
-                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, event.getEntityPlayer(), hitVec? )) {
+                        // @todo 1.14 calculate hitvec
+                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, event.getEntityPlayer(), null/*@todo*/)) {
                             world.setBlockState(pos, Blocks.AIR.getDefaultState());
                         }
                     }

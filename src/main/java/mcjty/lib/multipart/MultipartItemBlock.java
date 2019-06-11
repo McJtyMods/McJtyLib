@@ -1,7 +1,7 @@
 package mcjty.lib.multipart;
 
 
-import mcjty.lib.setup.ModSetup;
+import mcjty.lib.proxy.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.Block;
@@ -91,7 +91,7 @@ public class MultipartItemBlock extends BlockItem {
     }
 
     private boolean canFitInside(Block block, World world, BlockPos pos, PartSlot slot) {
-        if (block != ModSetup.multipartBlock) {
+        if (block != Registration.multipartBlock) {
             return false;
         }
         TileEntity te = world.getTileEntity(pos);
@@ -142,13 +142,13 @@ public class MultipartItemBlock extends BlockItem {
             return true;
         }
 
-        BlockState multiState = ModSetup.multipartBlock.getDefaultState();
+        BlockState multiState = Registration.multipartBlock.getDefaultState();
         if (!world.setBlockState(pos, multiState, 11)) {
             return false;
         }
 
         BlockState state = world.getBlockState(pos);
-        if (state.getBlock() == ModSetup.multipartBlock) {
+        if (state.getBlock() == Registration.multipartBlock) {
             setTileEntityNBT(world, player, pos, stack);
 
             te = world.getTileEntity(pos);
