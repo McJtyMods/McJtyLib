@@ -43,7 +43,7 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         ServerWorld world = DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
         DimensionSavedDataManager storage = world.getSavedData();
-        T data = storage.func_215752_a(supplier, name);
+        T data = storage.get(supplier, name);
         return data;
     }
 

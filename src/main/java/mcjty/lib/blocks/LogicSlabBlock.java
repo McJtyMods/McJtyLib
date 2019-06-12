@@ -79,7 +79,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        Vec3d hit = context.func_221532_j();
+        Vec3d hit = context.getHitVec();
         double dx = Math.abs(0.5 - hit.x);
         double dy = Math.abs(0.5 - hit.y);
         double dz = Math.abs(0.5 - hit.z);
