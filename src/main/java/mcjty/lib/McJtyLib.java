@@ -10,10 +10,10 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.proxy.ClientProxy;
-import mcjty.lib.proxy.IProxy;
-import mcjty.lib.proxy.ServerProxy;
+import mcjty.lib.setup.ClientProxy;
+import mcjty.lib.setup.IProxy;
 import mcjty.lib.setup.ModSetup;
+import mcjty.lib.setup.ServerProxy;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.worlddata.AbstractWorldData;
@@ -27,6 +27,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -37,6 +40,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -155,8 +159,8 @@ public class McJtyLib implements ModBase {
     }
 
     public void init(final FMLCommonSetupEvent event) {
-        setup.preInit(event);
-        proxy.preInit(event);
+        setup.init(event);
+        proxy.init(event);
     }
 
     public static void preInit(final FMLCommonSetupEvent event) {
@@ -209,8 +213,18 @@ public class McJtyLib implements ModBase {
                 TileEntity tileEntity = world.getTileEntity(pos);
                 if (tileEntity instanceof MultipartTE) {
                     if (!world.isRemote) {
-                        // @todo 1.14 calculate hitvec
-                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, event.getEntityPlayer(), null/*@todo*/)) {
+
+                        // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
+                        PlayerEntity player = event.getEntityPlayer();
+                        Vec3d start = player.getEyePosition(1.0f);
+                        Vec3d vec31 = player.getLook(1.0f);
+                        float dist = 20;
+                        Vec3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
+                        RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, player);
+                        RayTraceResult result = player.getEntityWorld().rayTraceBlocks(context);
+                        Vec3d hitVec = result == null ? null : result.getHitVec();
+
+                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, player, hitVec/*@todo*/)) {
                             world.setBlockState(pos, Blocks.AIR.getDefaultState());
                         }
                     }

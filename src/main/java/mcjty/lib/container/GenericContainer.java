@@ -2,7 +2,7 @@ package mcjty.lib.container;
 
 import com.google.common.collect.Range;
 import mcjty.lib.network.PacketSendGuiData;
-import mcjty.lib.proxy.Registration;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -220,7 +220,7 @@ public class GenericContainer extends Container {
                 slot = this.inventorySlots.get(checkIndex);
                 itemstack1 = slot.getStack();
 
-                if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem() && (!par1ItemStack.getHasSubtypes() || par1ItemStack.getItemDamage() == itemstack1.getItemDamage())
+                if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem() && (par1ItemStack.getDamage() == itemstack1.getDamage())
                         && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack)) {
 
                     int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();

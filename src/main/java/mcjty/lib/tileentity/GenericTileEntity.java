@@ -201,7 +201,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public float getInfusedFactor() {
-        return ((float) infused) / GeneralConfig.maxInfuse;
+        return ((float) infused) / GeneralConfig.maxInfuse.get();
     }
 
     public boolean canPlayerAccess(PlayerEntity player) {
@@ -355,7 +355,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public boolean setOwner(PlayerEntity player) {
-        if (!GeneralConfig.manageOwnership) {
+        if (!GeneralConfig.manageOwnership.get()) {
             return false;
         }
 
@@ -371,7 +371,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public void clearOwner() {
-        if (!GeneralConfig.manageOwnership) {
+        if (!GeneralConfig.manageOwnership.get()) {
             return;
         }
         ownerUUID = null;

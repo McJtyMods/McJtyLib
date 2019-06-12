@@ -2,7 +2,6 @@ package mcjty.lib.container;
 
 import net.minecraft.item.ItemStack;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Predicate;
 

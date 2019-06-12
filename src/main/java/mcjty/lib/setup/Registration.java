@@ -1,4 +1,4 @@
-package mcjty.lib.proxy;
+package mcjty.lib.setup;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericContainer;

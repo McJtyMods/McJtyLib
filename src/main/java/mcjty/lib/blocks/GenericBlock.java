@@ -83,10 +83,8 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
                         Function<Block, BlockItem> itemBlockFactory,
                         String name, boolean isContainer) {
         super(mod, material, name, itemBlockFactory);
-//        this.hasTileEntity = isContainer;     // @todo 1.14 check
         this.tileEntityClass = tileEntityClass;
         this.containerFactory = containerFactory;
-        McJtyRegister.registerLater(this, tileEntityClass);
     }
 
     public boolean needsRedstoneCheck() {
@@ -198,11 +196,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             }
             if (isInfusable()) {
                 int infused = tagCompound.getInt("infused");
-                int pct = infused * 100 / GeneralConfig.maxInfuse;
+                int pct = infused * 100 / GeneralConfig.maxInfuse.get();
                 list.add(new StringTextComponent(TextFormatting.YELLOW + "Infused: " + pct + "%"));
             }
 
-            if (GeneralConfig.manageOwnership && tagCompound.contains("owner")) {
+            if (GeneralConfig.manageOwnership.get() && tagCompound.contains("owner")) {
                 String owner = tagCompound.getString("owner");
                 int securityChannel = -1;
                 if (tagCompound.contains("secChannel")) {
@@ -407,6 +405,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
             }
             NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
             // @todo 1.14
+            // Use ScreenManager on client
 //            player.openGui(modBase, getGuiID(), world, x, y, z);
             return true;
         }
@@ -417,7 +416,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
         restoreBlockFromNBT(world, pos, stack);
-        if (!world.isRemote && GeneralConfig.manageOwnership) {
+        if (!world.isRemote && GeneralConfig.manageOwnership.get()) {
             setOwner(world, pos, placer);
         }
 
@@ -531,7 +530,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     //@todo 1.14
 //    @Override
-//    public BlockState getActualState(BlockState state, IBlockAccess world, BlockPos pos) {
+//    public BlockState getActualState(BlockState state, IBlockReader world, BlockPos pos) {
 //        TileEntity te = world instanceof ChunkCache ? ((ChunkCache)world).getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK) : world.getTileEntity(pos);
 //        if (te instanceof GenericTileEntity) {
 //            return ((GenericTileEntity) te).getActualState(state);

@@ -59,7 +59,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190609-1.14.2'
+    mappings channel: 'snapshot', version: "${mcp_mappings}"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
@@ -83,7 +83,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.2-26.0.16'
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compile ("mcjty.theoneprobe:TheOneProbe-${top_version}")
 
     //deobfCompile "mezz.jei:jei_${jei_version}"
@@ -96,7 +96,7 @@ dependencies {
 
 jar {
     manifest {
-        attributes 'FMLAT': 'mcjtylib_ng_at.cfg'
+        attributes 'FMLAT': 'accesstransformer.cfg'
     }
 }
 
@@ -123,7 +123,7 @@ jar {
 task apiJar(type: Jar) {
     classifier = "api"
     from(sourceSets.main.output) {
-        include "mcjty/theoneprobe/api/**"
+        include "mcjty/mcjtylib/api/**"
     }
 }
 
@@ -167,13 +167,13 @@ task("uploadJars", dependsOn: "reobf") {
                             packaging 'jar'
                             description 'McJtyLib'
                             scm {
-                                url 'https://github.com/McJty/McJtyLib'
-                                connection 'scm:git:git@github.com:McJty/McJtyLib.git'
-                                developerConnection 'scm:git:git@github.com:McJty/McJtyLib.git'
+                                url 'https://github.com/McJtyMods/McJtyLib'
+                                connection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
+                                developerConnection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
                             }
                             issueManagement {
                                 system 'github'
-                                url 'https://github.com/McJty/McJtyLib/issues'
+                                url 'https://github.com/McJtyMods/McJtyLib/issues'
                             }
                             licenses {
                                 license {

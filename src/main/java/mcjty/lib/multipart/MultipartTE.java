@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static mcjty.lib.proxy.Registration.TYPE_MULTIPART;
+import static mcjty.lib.setup.Registration.TYPE_MULTIPART;
 
 public class MultipartTE extends TileEntity {
 

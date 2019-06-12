@@ -11,7 +11,6 @@ import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +26,7 @@ public class NetworkTools {
     public static void writeFluidStack(ByteBuf dataOut, FluidStack fluidStack) {
         PacketBuffer buf = new PacketBuffer(dataOut);
         CompoundNBT nbt = new CompoundNBT();
-        fluidStack.write(nbt);
+        fluidStack.writeToNBT(nbt);
         try {
             buf.writeCompoundTag(nbt);
         } catch (RuntimeException e) {
@@ -143,7 +142,8 @@ public class NetworkTools {
 
 
     public static BlockPos readPos(ByteBuf dataIn) {
-        if (GeneralConfig.tallChunkFriendly) {
+        // @todo no longer needed!
+        if (GeneralConfig.tallChunkFriendly.get()) {
             return new BlockPos(dataIn.readInt(), dataIn.readInt(), dataIn.readInt());
         } else {
             return BlockPos.fromLong(dataIn.readLong());
@@ -151,7 +151,7 @@ public class NetworkTools {
     }
 
     public static void writePos(ByteBuf dataOut, BlockPos pos) {
-        if (GeneralConfig.tallChunkFriendly) {
+        if (GeneralConfig.tallChunkFriendly.get()) {
             dataOut.writeInt(pos.getX());
             dataOut.writeInt(pos.getY());
             dataOut.writeInt(pos.getZ());

@@ -4,7 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
-import mcjty.lib.proxy.Registration;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Logging;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.block.Block;
@@ -12,6 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.InterModComms;
 import org.apache.commons.lang3.text.WordUtils;
 
 import javax.annotation.Nullable;
@@ -30,7 +31,9 @@ public class TOPCompatibility {
             return;
         }
         registered = true;
-        FMLInterModComms.sendFunctionMessage("theoneprobe", "getTheOneProbe", "mcjty.lib.compat.theoneprobe.TOPCompatibility$GetTheOneProbe");
+//        InterModComms.sendTo("theoneprobe", "getTheOneProbe", "mcjty.lib.compat.theoneprobe.TOPCompatibility$GetTheOneProbe");
+        // @todo make easier!
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> new GetTheOneProbe());
     }
 
 
@@ -53,7 +56,8 @@ public class TOPCompatibility {
                 public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
                     if (blockState.getBlock() instanceof TOPInfoProvider) {
                         TOPInfoProvider provider = (TOPInfoProvider) blockState.getBlock();
-                        provider.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+                        // @todo 1.14
+//                        provider.addProbeInfo(mode, probeInfo, player, world, blockState, data);
                     }
 
                 }

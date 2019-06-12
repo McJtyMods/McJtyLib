@@ -17,9 +17,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.*;
-import java.util.List;
 
 public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Widget<P> {
 
@@ -429,7 +428,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public boolean keyTyped(char typedChar, int keyCode) {
+    public boolean keyTyped(int keyCode, int scanCode) {
         return false;
     }
 

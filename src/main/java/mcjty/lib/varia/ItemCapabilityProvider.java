@@ -5,9 +5,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 // @todo 1.14
@@ -26,22 +28,21 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower /*
         this.item = item;
     }
 
+    @Nonnull
     @Override
-    public boolean hasCapability(Capability<?> capability, @Nullable Direction facing) {
-        if (capability == CapabilityEnergy.ENERGY || capability == EnergyTools.TESLA_HOLDER || capability == EnergyTools.TESLA_CONSUMER || capability == EnergyTools.TESLA_PRODUCER) {
-            return true;
-        }
-        return false;
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        return getCapability(cap);
     }
 
+    @Nonnull
     @Override
-    public <T> T getCapability(Capability<T> capability, @Nullable Direction facing) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability) {
         if (capability == CapabilityEnergy.ENERGY) {
-            return (T) energyStorage;
-        } else if(capability == EnergyTools.TESLA_HOLDER || capability == EnergyTools.TESLA_CONSUMER || capability == EnergyTools.TESLA_PRODUCER) {
-            return (T) this;
+            return LazyOptional.of(() -> (T) energyStorage);
+//        } else if(capability == EnergyTools.TESLA_HOLDER || capability == EnergyTools.TESLA_CONSUMER || capability == EnergyTools.TESLA_PRODUCER) {
+//            return (T) this;
         }
-        return null;
+        return LazyOptional.empty();
     }
 
     private final IEnergyStorage energyStorage = new IEnergyStorage() {

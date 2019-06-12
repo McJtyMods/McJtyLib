@@ -1,8 +1,8 @@
 package mcjty.lib.varia;
 
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import org.apache.commons.lang3.StringUtils;
 
 public class NBTTools {
@@ -11,9 +11,9 @@ public class NBTTools {
         return buffer.append(StringUtils.repeat(' ', indent));
     }
 
-    public static void convertNBTtoJson(StringBuffer buffer, NBTTagList tagList, int indent) {
-        for (int i = 0 ; i < tagList.tagCount() ; i++) {
-            CompoundNBT compound = tagList.getCompoundTagAt(i);
+    public static void convertNBTtoJson(StringBuffer buffer, ListNBT tagList, int indent) {
+        for (int i = 0 ; i < tagList.size() ; i++) {
+            CompoundNBT compound = tagList.getCompound(i);
             appendIndent(buffer, indent).append("{\n");
             convertNBTtoJson(buffer, compound, indent + 4);
             appendIndent(buffer, indent).append("},\n");
@@ -22,22 +22,22 @@ public class NBTTools {
 
     public static void convertNBTtoJson(StringBuffer buffer, CompoundNBT tagCompound, int indent) {
         boolean first = true;
-        for (Object o : tagCompound.getKeySet()) {
+        for (Object o : tagCompound.keySet()) {
             if (!first) {
                 buffer.append(",\n");
             }
             first = false;
 
             String key = (String) o;
-            NBTBase tag = tagCompound.getTag(key);
+            INBT tag = tagCompound.get(key);
             appendIndent(buffer, indent).append(key).append(':');
             if (tag instanceof CompoundNBT) {
                 CompoundNBT compound = (CompoundNBT) tag;
                 buffer.append("{\n");
                 convertNBTtoJson(buffer, compound, indent + 4);
                 appendIndent(buffer, indent).append('}');
-            } else if (tag instanceof NBTTagList) {
-                NBTTagList list = (NBTTagList) tag;
+            } else if (tag instanceof ListNBT) {
+                ListNBT list = (ListNBT) tag;
                 buffer.append("[\n");
                 convertNBTtoJson(buffer, list, indent + 4);
                 appendIndent(buffer, indent).append(']');

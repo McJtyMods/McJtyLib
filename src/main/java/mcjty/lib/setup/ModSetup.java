@@ -1,13 +1,13 @@
 package mcjty.lib.setup;
 
-import mcjty.lib.multipart.MultipartBlock;
-import net.minecraftforge.registries.ObjectHolder;
+import mcjty.lib.varia.WrenchChecker;
 
 public class ModSetup extends DefaultModSetup {
 
     @Override
     protected void setupModCompat() {
-
+        // @todo 1.14: check (right place?)
+        WrenchChecker.init();
     }
 
     @Override

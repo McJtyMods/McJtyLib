@@ -8,6 +8,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
@@ -22,6 +23,10 @@ public class LogicTileEntity extends GenericTileEntity {
     private LogicFacing facing;
 
     protected int powerOutput = 0;
+
+    public LogicTileEntity(TileEntityType<?> type) {
+        super(type);
+    }
 
     @Override
     public void onLoad() {

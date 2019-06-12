@@ -1,6 +1,7 @@
 package mcjty.lib.varia;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -102,12 +103,15 @@ public class TeleportationTools {
                 CompoundNBT tagCompound = new CompoundNBT();
                 entity.writeUnlessRemoved(tagCompound);
                 tagCompound.remove("Dimension");
-                Class<? extends Entity> entityClass = entity.getClass();
-                world.removeEntity(entity);
-                entity.isDead = false;
-                world.updateEntityWithOptionalForce(entity, false);
+                EntityType<?> type = entity.getType();
+                ((ServerWorld) world).removeEntity(entity);
+                entity.revive();
+                // @todo 1.14 check?
+                ((ServerWorld) world).updateEntity(entity);
+//                world.updateEntityWithOptionalForce(entity, false);
 
-                Entity newEntity = EntityList.newEntity(entityClass, destWorld);
+
+                Entity newEntity = type.create(destWorld);
                 newEntity.read(tagCompound);
                 if (facing != null) {
                     fixOrientation(newEntity, newX, newY, newZ, facing);
@@ -118,14 +122,14 @@ public class TeleportationTools {
                 newEntity.setLocationAndAngles(newX, newY, newZ, newEntity.rotationYaw, newEntity.rotationPitch);
                 boolean flag = newEntity.forceSpawn;
                 newEntity.forceSpawn = true;
-                destWorld.spawnEntity(newEntity);
+                destWorld.addEntity(newEntity);
                 newEntity.forceSpawn = flag;
-                destWorld.updateEntityWithOptionalForce(newEntity, false);
+                ((ServerWorld) world).updateEntity(newEntity);
 
-                entity.isDead = true;
+                entity.remove();
 
-                ((WorldServer)world).resetUpdateEntityTick();
-                ((WorldServer)destWorld).resetUpdateEntityTick();
+                ((ServerWorld)world).resetUpdateEntityTick();
+                ((ServerWorld)destWorld).resetUpdateEntityTick();
                 return newEntity;
             } else {
                 if (facing != null) {
@@ -135,7 +139,7 @@ public class TeleportationTools {
                     entity.rotationPitch = rotationPitch;
                 }
                 entity.setLocationAndAngles(newX, newY, newZ, entity.rotationYaw, entity.rotationPitch);
-                destWorld.updateEntityWithOptionalForce(entity, false);
+                ((ServerWorld) destWorld).updateEntity(entity);
                 return entity;
             }
         }

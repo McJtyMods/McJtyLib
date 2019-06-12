@@ -144,8 +144,8 @@ public class WindowManager {
         getInteractableWindows().forEach(w -> w.mouseClicked(x, y, button));
     }
 
-    public void handleMouseInput() {
-        getInteractableWindows().forEach(Window::handleMouseInput);
+    public void handleMouseInput(int k) {
+        getInteractableWindows().forEach(w -> w.handleMouseInput(k));
     }
 
     public void mouseReleased(int x, int y, int state) {
@@ -155,7 +155,7 @@ public class WindowManager {
         getInteractableWindows().forEach(w -> w.mouseMovedOrUp(x, y, state));
     }
 
-    public boolean keyTyped(char typedChar, int keyCode) {
-        return getInteractableWindows().allMatch(w -> !w.keyTyped(typedChar, keyCode));
+    public boolean keyTyped(int keyCode, int scanCode) {
+        return getInteractableWindows().allMatch(w -> !w.keyTyped(keyCode, scanCode));
     }
 }

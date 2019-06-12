@@ -1,9 +1,6 @@
 package mcjty.lib.multipart;
 
 
-import java.util.List;
-import java.util.Map;
-
 // @todo 1.14
 public class PartsProperty {}/* implements IUnlistedProperty<Map<PartSlot, MultipartTE.Part>> {
 

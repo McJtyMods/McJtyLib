@@ -1,14 +1,21 @@
 package mcjty.lib.client;
 
+import com.mojang.blaze3d.platform.GLX;
 import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.varia.MathTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
-;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -21,6 +28,8 @@ import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
+
+;
 
 public class RenderHelper {
     public static float rot = 0.0f;
@@ -64,7 +73,11 @@ public class RenderHelper {
         GlStateManager.enableRescaleNormal();
         int i1 = 240;
         int k1 = 240;
-        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, i1 / 1.0F, k1 / 1.0F);
+
+        // @todo 1.14 check if right?
+        GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
+//        OpenGlHelper.setLightmapTextureCoords(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
+
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.disableRescaleNormal();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
@@ -124,11 +137,11 @@ public class RenderHelper {
             fluidStillSprite = textureMapBlocks.getAtlasSprite(fluidStill.toString());
         }
         if (fluidStillSprite == null) {
-            fluidStillSprite = textureMapBlocks.getMissingSprite();
+            fluidStillSprite = MissingTextureSprite.func_217790_a();
         }
 
         int fluidColor = fluid.getColor(fluidStack);
-        mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+        mc.getRenderManager().textureManager.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         setGLColorFromInt(fluidColor);
         drawFluidTexture(x, y, fluidStillSprite, 100);
 
@@ -157,7 +170,7 @@ public class RenderHelper {
         float green = (color >> 8 & 0xFF) / 255.0F;
         float blue = (color & 0xFF) / 255.0F;
 
-        GlStateManager.color(red, green, blue, 1.0F);
+        GlStateManager.color4f(red, green, blue, 1.0F);
     }
 
 
@@ -186,33 +199,33 @@ public class RenderHelper {
 
     public static void renderStackOnGround(ItemStack stack, double alpha) {
         if (!stack.isEmpty()) {
-            IBakedModel ibakedmodel = Minecraft.getInstance().getRenderItem().getItemModelWithOverrides(stack, null, null);
+            IBakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getItemModelWithOverrides(stack, null, null);
             if (!stack.isEmpty()) {
-                Minecraft.getInstance().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                Minecraft.getInstance().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-                GlStateManager.color(1.0F, 1.0F, 1.0F, (float) alpha);
+                Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+                Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+                GlStateManager.color4f(1.0F, 1.0F, 1.0F, (float) alpha);
                 GlStateManager.enableRescaleNormal();
                 GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
                 GlStateManager.enableBlend();
-                GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+                GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
                 GlStateManager.pushMatrix();
 
                 ibakedmodel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
 
-                Minecraft.getInstance().getRenderItem().renderItem(stack, ibakedmodel);
+                Minecraft.getInstance().getItemRenderer().renderItem(stack, ibakedmodel);
                 GlStateManager.cullFace(GlStateManager.CullFace.BACK);
                 GlStateManager.popMatrix();
                 GlStateManager.disableRescaleNormal();
                 GlStateManager.disableBlend();
-                Minecraft.getInstance().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                Minecraft.getInstance().getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+                Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+                Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
             }
         }
 
     }
 
     public static boolean renderItemStack(Minecraft mc, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
-        GlStateManager.color(1F, 1F, 1F);
+        GlStateManager.color3f(1F, 1F, 1F);
 
         boolean rc = false;
         if (highlight) {
@@ -223,13 +236,16 @@ public class RenderHelper {
             rc = true;
             GlStateManager.pushMatrix();
             GlStateManager.translatef(0.0F, 0.0F, 32.0F);
-            GlStateManager.color(1F, 1F, 1F, 1F);
+            GlStateManager.color4f(1F, 1F, 1F, 1F);
             GlStateManager.enableRescaleNormal();
             GlStateManager.enableLighting();
             short short1 = 240;
             short short2 = 240;
             net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
-            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
+            // @todo 1.14 check if right?
+            GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, short1 / 1.0F, short2 / 1.0F);
+//            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
+
             itemRender.renderItemAndEffectIntoGUI(itm, x, y);
             renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt, txt.length() - 2);
 //            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
@@ -256,7 +272,7 @@ public class RenderHelper {
                 }
 
                 GlStateManager.disableLighting();
-                GlStateManager.disableDepth();
+                GlStateManager.disableDepthTest();
                 GlStateManager.disableBlend();
                 if (scaled >= 2) {
                     GlStateManager.pushMatrix();
@@ -272,7 +288,7 @@ public class RenderHelper {
                     fr.drawStringWithShadow(s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (yPosition + 6 + 3), 16777215);
                 }
                 GlStateManager.enableLighting();
-                GlStateManager.enableDepth();
+                GlStateManager.enableDepthTest();
                 // Fixes opaque cooldown overlay a bit lower
                 // TODO: check if enabled blending still screws things up down the line.
                 GlStateManager.enableBlend();
@@ -283,9 +299,9 @@ public class RenderHelper {
                 int j = (int) Math.round(13.0D - health * 13.0D);
                 int i = (int) Math.round(255.0D - health * 255.0D);
                 GlStateManager.disableLighting();
-                GlStateManager.disableDepth();
-                GlStateManager.disableTexture2D();
-                GlStateManager.disableAlpha();
+                GlStateManager.disableDepthTest();
+                GlStateManager.disableTexture();
+                GlStateManager.disableAlphaTest();
                 GlStateManager.disableBlend();
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder vertexbuffer = tessellator.getBuffer();
@@ -293,25 +309,25 @@ public class RenderHelper {
                 draw(vertexbuffer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
                 draw(vertexbuffer, xPosition + 2, yPosition + 13, j, 1, 255 - i, i, 0, 255);
                 GlStateManager.enableBlend();
-                GlStateManager.enableAlpha();
-                GlStateManager.enableTexture2D();
+                GlStateManager.enableAlphaTest();
+                GlStateManager.enableTexture();
                 GlStateManager.enableLighting();
-                GlStateManager.enableDepth();
+                GlStateManager.enableDepthTest();
             }
 
-            PlayerEntitySP PlayerEntitysp = Minecraft.getInstance().player;
+            ClientPlayerEntity PlayerEntitysp = Minecraft.getInstance().player;
             float f = PlayerEntitysp == null ? 0.0F : PlayerEntitysp.getCooldownTracker().getCooldown(stack.getItem(), Minecraft.getInstance().getRenderPartialTicks());
 
             if (f > 0.0F) {
                 GlStateManager.disableLighting();
-                GlStateManager.disableDepth();
-                GlStateManager.disableTexture2D();
+                GlStateManager.disableDepthTest();
+                GlStateManager.disableTexture();
                 Tessellator tessellator1 = Tessellator.getInstance();
                 BufferBuilder vertexbuffer1 = tessellator1.getBuffer();
                 draw(vertexbuffer1, xPosition, yPosition + MathTools.floor(16.0F * (1.0F - f)), 16, MathTools.ceiling(16.0F * f), 255, 255, 255, 127);
-                GlStateManager.enableTexture2D();
+                GlStateManager.enableTexture();
                 GlStateManager.enableLighting();
-                GlStateManager.enableDepth();
+                GlStateManager.enableDepthTest();
             }
         }
     }
@@ -345,10 +361,14 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.enableBlend();
-        GlStateManager.disableAlpha();
-        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GlStateManager.disableAlphaTest();
+
+        // @todo 1.14 check
+//        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -361,8 +381,8 @@ public class RenderHelper {
 
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlphaTest();
+        GlStateManager.enableTexture();
     }
 
     /**
@@ -381,10 +401,14 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.enableBlend();
-        GlStateManager.disableAlpha();
-        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GlStateManager.disableAlphaTest();
+
+        // @todo 1.14 check
+//        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -396,16 +420,16 @@ public class RenderHelper {
         tessellator.draw();
         GlStateManager.shadeModel(GL11.GL_FLAT);
         GlStateManager.disableBlend();
-        GlStateManager.enableAlpha();
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableAlphaTest();
+        GlStateManager.enableTexture();
     }
 
     public static void drawHorizontalLine(int x1, int y1, int x2, int color) {
-        Gui.drawRect(x1, y1, x2, y1 + 1, color);
+        Screen.fill(x1, y1, x2, y1 + 1, color);
     }
 
     public static void drawVerticalLine(int x1, int y1, int y2, int color) {
-        Gui.drawRect(x1, y1, x1 + 1, y2, color);
+        Screen.fill(x1, y1, x1 + 1, y2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
@@ -437,21 +461,21 @@ public class RenderHelper {
     }
 
     public static void drawColorLogic(int x, int y, int width, int height, int red, int green, int blue, GlStateManager.LogicOp colorLogic) {
-        GlStateManager.disableTexture2D();
-        GlStateManager.enableColorLogic();
-        GlStateManager.colorLogicOp(colorLogic);
+        GlStateManager.disableTexture();
+        GlStateManager.enableColorLogicOp();
+        GlStateManager.logicOp(colorLogic);
 
         draw(Tessellator.getInstance().getBuffer(), x, y, width, height, red, green, blue, 255);
 
-        GlStateManager.disableColorLogic();
-        GlStateManager.enableTexture2D();
+        GlStateManager.disableColorLogicOp();
+        GlStateManager.enableTexture();
     }
 
     /**
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThickButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Gui.drawRect(x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
+        Screen.fill(x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
         drawHorizontalLine(x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -472,7 +496,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThinButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
+        Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
         drawHorizontalLine(x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -525,7 +549,7 @@ public class RenderHelper {
      */
     public static void drawBeveledBox(int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
         drawHorizontalLine(x1, y1, x2 - 1, topleftcolor);
         drawVerticalLine(x1, y1, y2 - 1, topleftcolor);
@@ -538,12 +562,12 @@ public class RenderHelper {
      */
     public static void drawThickBeveledBox(int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
-        Gui.drawRect(x1, y1, x2 - 1, y1 + thickness, topleftcolor);
-        Gui.drawRect(x1, y1, x1 + thickness, y2 - 1, topleftcolor);
-        Gui.drawRect(x2 - thickness, y1, x2, y2 - 1, botrightcolor);
-        Gui.drawRect(x1, y2 - thickness, x2, y2, botrightcolor);
+        Screen.fill(x1, y1, x2 - 1, y1 + thickness, topleftcolor);
+        Screen.fill(x1, y1, x1 + thickness, y2 - 1, topleftcolor);
+        Screen.fill(x2 - thickness, y1, x2, y2 - 1, botrightcolor);
+        Screen.fill(x1, y2 - thickness, x2, y2, botrightcolor);
     }
 
     /**
@@ -551,7 +575,7 @@ public class RenderHelper {
      */
     public static void drawFlatBox(int x1, int y1, int x2, int y2, int border, int fill) {
         if (fill != -1) {
-            Gui.drawRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
+            Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
         }
         drawHorizontalLine(x1, y1, x2 - 1, border);
         drawVerticalLine(x1, y1, y2 - 1, border);
@@ -650,22 +674,22 @@ public class RenderHelper {
     }
 
     public static int renderText(Minecraft mc, int x, int y, String txt) {
-        GlStateManager.color(1.0F, 1.0F, 1.0F);
+        GlStateManager.color3f(1.0F, 1.0F, 1.0F);
 
         GlStateManager.pushMatrix();
         GlStateManager.translatef(0.0F, 0.0F, 32.0F);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 
         GlStateManager.disableLighting();
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
         GlStateManager.disableBlend();
         int width = mc.fontRenderer.getStringWidth(txt);
         mc.fontRenderer.drawStringWithShadow(txt, x, y, 16777215);
         GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower
         // TODO: check if enabled blending still screws things up down the line.
         GlStateManager.enableBlend();
@@ -679,22 +703,22 @@ public class RenderHelper {
     }
 
     public static int renderText(Minecraft mc, int x, int y, String txt, int color) {
-        GlStateManager.color(1.0F, 1.0F, 1.0F);
+        GlStateManager.color3f(1.0F, 1.0F, 1.0F);
 
         GlStateManager.pushMatrix();
         GlStateManager.translatef(0.0F, 0.0F, 32.0F);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
 
         GlStateManager.disableLighting();
-        GlStateManager.disableDepth();
+        GlStateManager.disableDepthTest();
         GlStateManager.disableBlend();
         int width = mc.fontRenderer.getStringWidth(txt);
         mc.fontRenderer.drawString(txt, x, y, color);
         GlStateManager.enableLighting();
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower
         // TODO: check if enabled blending still screws things up down the line.
         GlStateManager.enableBlend();

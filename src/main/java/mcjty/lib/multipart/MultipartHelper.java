@@ -1,6 +1,6 @@
 package mcjty.lib.multipart;
 
-import mcjty.lib.proxy.Registration;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.BlockState;

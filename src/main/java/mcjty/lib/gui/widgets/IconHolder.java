@@ -9,7 +9,6 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.java.games.input.Keyboard;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 

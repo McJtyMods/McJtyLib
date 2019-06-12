@@ -80,8 +80,8 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public boolean keyTyped(char typedChar, int keyCode) {
-        boolean rc = super.keyTyped(typedChar, keyCode);
+    public boolean keyTyped(int keyCode, int scanCode) {
+        boolean rc = super.keyTyped(keyCode, scanCode);
         if (rc) {
             return true;
         }
@@ -301,7 +301,7 @@ public class TextField extends AbstractWidget<TextField> {
 
         if (window.getTextFocus() == this) {
             int w = mc.fontRenderer.getStringWidth(this.text.substring(startOffset, cursor));
-            Gui.drawRect(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
+            gui.fill(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }
 

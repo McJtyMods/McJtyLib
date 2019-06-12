@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-import java.awt.*;
+import java.awt.Rectangle;
 
 public class GuiSideWindow {
     protected GuiStyle style;
@@ -31,7 +31,7 @@ public class GuiSideWindow {
     }
 
     public void initGui(final ModBase modBase, final SimpleChannel network, final Minecraft mc, Screen gui, int guiLeft, int guiTop, int xSize, int ySize) {
-        style = McJtyLib.getPreferencesProperties(mc.player).getStyle();
+        style = McJtyLib.getPreferencesProperties(mc.player).map(p -> p.getStyle()).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 
         helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
                 setTooltips("Open manual").

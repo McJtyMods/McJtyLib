@@ -4,11 +4,12 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-;
 
 import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
+
+;
 
 public class TabbedPanel extends AbstractContainerWidget<Panel> {
 

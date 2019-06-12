@@ -4,7 +4,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
-import net.minecraft.util.text.ITextComponent;
 
 public interface DefaultSidedInventory extends ISidedInventory {
 
@@ -71,38 +70,7 @@ public interface DefaultSidedInventory extends ISidedInventory {
     }
 
     @Override
-    default int getField(int id) {
-        return 0;
-    }
-
-    @Override
-    default void setField(int id, int value) {
-
-    }
-
-    @Override
-    default int getFieldCount() {
-        return 0;
-    }
-
-    @Override
     default void clear() {
 
     }
-
-    @Override
-    default String getName() {
-        return "inventory";
-    }
-
-    @Override
-    default boolean hasCustomName() {
-        return false;
-    }
-
-    @Override
-    default ITextComponent getDisplayName() {
-        return null;
-    }
-
 }

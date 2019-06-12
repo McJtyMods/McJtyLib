@@ -1,4 +1,4 @@
-package mcjty.lib.proxy;
+package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -17,11 +17,7 @@ import java.util.concurrent.Callable;
 
 public interface IProxy {
 
-    void preInit(FMLCommonSetupEvent e);
-
     void init(FMLCommonSetupEvent e);
-
-    void postInit(FMLCommonSetupEvent e);
 
     World getClientWorld();
 

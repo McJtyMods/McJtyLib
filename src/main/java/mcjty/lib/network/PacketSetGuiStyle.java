@@ -2,7 +2,6 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
-import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -34,7 +33,6 @@ public class PacketSetGuiStyle {
 
     private static void handle(PacketSetGuiStyle message, NetworkEvent.Context ctx) {
         PlayerEntity playerEntity = ctx.getSender();
-        PreferencesProperties properties = McJtyLib.getPreferencesProperties(playerEntity);
-        properties.setStyle(message.style);
+        McJtyLib.getPreferencesProperties(playerEntity).ifPresent(p -> p.setStyle(message.style));
     }
 }

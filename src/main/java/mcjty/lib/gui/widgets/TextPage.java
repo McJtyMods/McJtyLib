@@ -19,6 +19,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -199,28 +200,28 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public boolean keyTyped(char typedChar, int keyCode) {
-        boolean rc = super.keyTyped(typedChar, keyCode);
+    public boolean keyTyped(int keyCode, int scanCode) {
+        boolean rc = super.keyTyped(keyCode, scanCode);
         if (rc) {
             return true;
         }
         if (isEnabledAndVisible()) {
             // @todo 1.14
-//            if (keyCode == Keyboard.KEY_BACK || keyCode == Keyboard.KEY_LEFT) {
-//                prevPage();
-//                return true;
-//            } else if (keyCode == Keyboard.KEY_SPACE || keyCode == Keyboard.KEY_RIGHT) {
-//                nextPage();
-//                return true;
-//            } else if (keyCode == Keyboard.KEY_HOME) {
-//                pageIndex = 0;
-//                showCurrentPage();
-//            } else if (keyCode == Keyboard.KEY_END) {
-//                if (!pages.isEmpty()) {
-//                    pageIndex = pages.size()-1;
-//                    showCurrentPage();
-//                }
-//            }
+            if (keyCode == GLFW.GLFW_KEY_BACKSPACE || keyCode == GLFW.GLFW_KEY_LEFT) {
+                prevPage();
+                return true;
+            } else if (keyCode == GLFW.GLFW_KEY_SPACE || keyCode == GLFW.GLFW_KEY_RIGHT) {
+                nextPage();
+                return true;
+            } else if (keyCode == GLFW.GLFW_KEY_HOME) {
+                pageIndex = 0;
+                showCurrentPage();
+            } else if (keyCode == GLFW.GLFW_KEY_END) {
+                if (!pages.isEmpty()) {
+                    pageIndex = pages.size()-1;
+                    showCurrentPage();
+                }
+            }
         }
         return false;
     }
@@ -303,19 +304,20 @@ public class TextPage extends AbstractWidget<TextPage> {
         int w;
         int h;
         NonNullList<Ingredient> ingredients;
-        if (line.recipe instanceof ShapedRecipes) {
-            w = ((ShapedRecipes) line.recipe).getWidth();
-            h = ((ShapedRecipes) line.recipe).getHeight();
-            ingredients = line.recipe.getIngredients();
-        } else if (line.recipe instanceof ShapedOreRecipe) {
-            w = ((ShapedOreRecipe) line.recipe).getRecipeWidth();
-            h = ((ShapedOreRecipe) line.recipe).getRecipeHeight();
-            ingredients = line.recipe.getIngredients();
-        } else {
+        // @todo 1.14
+//        if (line.recipe instanceof ShapedRecipes) {
+//            w = ((ShapedRecipes) line.recipe).getWidth();
+//            h = ((ShapedRecipes) line.recipe).getHeight();
+//            ingredients = line.recipe.getIngredients();
+//        } else if (line.recipe instanceof ShapedOreRecipe) {
+//            w = ((ShapedOreRecipe) line.recipe).getRecipeWidth();
+//            h = ((ShapedOreRecipe) line.recipe).getRecipeHeight();
+//            ingredients = line.recipe.getIngredients();
+//        } else {
             w = 0;
             h = 0;
             ingredients = null;
-        }
+//        }
 
         for (int i = 0 ; i < 3 ; i++) {
             for (int j = 0 ; j < 3 ; j++) {
@@ -464,10 +466,11 @@ public class TextPage extends AbstractWidget<TextPage> {
                 if (recipe == null) {
                     // Error,
                     this.line = line;
-                } else if (!(recipe instanceof ShapedRecipes) && !(recipe instanceof ShapedOreRecipe)) {
-                    recipe = null;
-                    // Error,
-                    this.line = line;
+                    // @todo 1.14
+//                } else if (!(recipe instanceof ShapedRecipes) && !(recipe instanceof ShapedOreRecipe)) {
+//                    recipe = null;
+//                    // Error,
+//                    this.line = line;
                 } else {
                     height = 18*3+8;
                 }
@@ -502,15 +505,16 @@ public class TextPage extends AbstractWidget<TextPage> {
         if (item == null) {
             return null;
         }
-        for (Map.Entry<ResourceLocation, IRecipe> entry : ForgeRegistries.RECIPES.getEntries()) {
-            IRecipe recipe = entry.getValue();
-            if (recipe instanceof ShapedRecipes || recipe instanceof ShapedOreRecipe) {
-                ItemStack recipeOutput = recipe.getRecipeOutput();
-                if (!recipeOutput.isEmpty() && recipeOutput.isItemEqual(item)) {
-                    return recipe;
-                }
-            }
-        }
+        // @todo 1.14
+//        for (Map.Entry<ResourceLocation, IRecipe> entry : ForgeRegistries.RECIPES.getEntries()) {
+//            IRecipe recipe = entry.getValue();
+//            if (recipe instanceof ShapedRecipes || recipe instanceof ShapedOreRecipe) {
+//                ItemStack recipeOutput = recipe.getRecipeOutput();
+//                if (!recipeOutput.isEmpty() && recipeOutput.isItemEqual(item)) {
+//                    return recipe;
+//                }
+//            }
+//        }
         return null;
     }
 

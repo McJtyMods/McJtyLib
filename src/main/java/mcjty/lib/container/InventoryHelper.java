@@ -4,6 +4,7 @@ import mcjty.lib.varia.ItemStackList;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -443,7 +444,7 @@ public class InventoryHelper {
     }
 
     public static void compactStacks(List<ItemStack> stacks, int start, int max) {
-        InventoryBasic inv = new InventoryBasic("temp", true, max);
+        Inventory inv = new Inventory(max);
         for (int i = 0 ; i < max ; i++) {
             ItemStack stack = stacks.get(i+start);
             if (!stack.isEmpty()) {
@@ -460,7 +461,7 @@ public class InventoryHelper {
     }
 
     public static void compactStacks(ItemStack[] stacks, int start, int max) {
-        InventoryBasic inv = new InventoryBasic("temp", true, max);
+        Inventory inv = new Inventory(max);
         for (int i = 0 ; i < max ; i++) {
             ItemStack stack = stacks[i+start];
             if (!stack.isEmpty()) {

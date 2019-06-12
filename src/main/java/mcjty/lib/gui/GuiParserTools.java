@@ -1,16 +1,7 @@
 package mcjty.lib.gui;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.ModContainer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.function.Consumer;
 
 public class GuiParserTools {

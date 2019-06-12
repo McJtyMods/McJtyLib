@@ -1,7 +1,6 @@
 package mcjty.lib.font;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.Minecraft;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -386,7 +385,7 @@ public class TrueTypeFont {
                 drawTextInternal(x, y, left, scaleX, scaleY, format, rgba);
                 x += getWidth(left);
             }
-            int colorCode = Minecraft.getInstance().fontRenderer.getColorCode(text.charAt(i + 1));//fmt.getColorIndex());
+            int colorCode = 0;// @todo Minecraft.getInstance().fontRenderer.getColorCode(text.charAt(i + 1));//fmt.getColorIndex());
             if (colorCode != -1) {
                 float r = (colorCode >> 16) / 255.0F;
                 float g = (colorCode >> 8 & 255) / 255.0F;
@@ -548,7 +547,8 @@ public class TrueTypeFont {
 
             GL11.glTexEnvf(GL11.GL_TEXTURE_ENV, GL11.GL_TEXTURE_ENV_MODE, GL11.GL_MODULATE);
 
-            GLU.gluBuild2DMipmaps(GL11.GL_TEXTURE_2D, internalFormat, width, height, format, GL11.GL_UNSIGNED_BYTE, byteBuffer);
+            // @todo 1.14
+//            GLU.gluBuild2DMipmaps(GL11.GL_TEXTURE_2D, internalFormat, width, height, format, GL11.GL_UNSIGNED_BYTE, byteBuffer);
             return textureId.get(0);
 
         } catch (RuntimeException e) {

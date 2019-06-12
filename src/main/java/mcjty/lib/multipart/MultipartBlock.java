@@ -99,7 +99,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 //        return AABB_EMPTY;
 //    }
 //    @Override
-//    public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
+//    public boolean shouldSideBeRendered(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
 //        return true;
 //    }
 

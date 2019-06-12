@@ -8,7 +8,7 @@ import mcjty.lib.typed.Type;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.util.List;
 import java.util.Set;
 
@@ -196,7 +196,7 @@ public interface Widget<P extends Widget<P>> {
      * @param keyCode
      * @return true if key was handled
      */
-    boolean keyTyped(char typedChar, int keyCode);
+    boolean keyTyped(int keyCode, int scanCode);
 
     /**
      * Some layout managers need a layout hint.

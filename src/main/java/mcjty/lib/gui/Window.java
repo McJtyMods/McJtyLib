@@ -8,7 +8,6 @@ import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
@@ -23,12 +22,11 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
-import java.util.List;
 
 /**
  * This class represents a window. It contains a single Widget which
@@ -111,7 +109,7 @@ public class Window {
             int guiTop = (gui.height - dim[1]) / 2;
             toplevel.setBounds(new Rectangle(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]));
         }
-        Keyboard.enableRepeatEvents(true);
+        Minecraft.getInstance().keyboardListener.enableRepeatEvents(true);
     }
 
     public <T extends Widget<T>> T findChild(String name) {
@@ -188,19 +186,19 @@ public class Window {
         }
     }
 
-    public void mouseClicked(double x, double y, int button) {
+    public void mouseClicked(int x, int y, int button) {
         if (textFocus != null) {
             textFocus = null;
             fireFocusEvents(null);
         }
-        if (toplevel.in((int)x, (int)y) && toplevel.isVisible()) {
+        if (toplevel.in(x, y) && toplevel.isVisible()) {
             toplevel.setWindow(this);
-            toplevel.mouseClick((int)x, (int)y, button);
+            toplevel.mouseClick(x, y, button);
         }
     }
 
-    public void handleMouseInput() {
-        int k = Mouse.getEventButton();
+    public void handleMouseInput(int k) {
+//        int k = Mouse.getEventButton();
         if (k == -1) {
             mouseMovedOrUp(getRelativeX(), getRelativeY(), k);
         }
@@ -235,8 +233,8 @@ public class Window {
         return textFocus;
     }
 
-    public boolean keyTyped(char typedChar, int keyCode) {
-        if (keyCode == Keyboard.KEY_F12) {
+    public boolean keyTyped(int keyCode, int scanCode) {
+        if (keyCode == GLFW.GLFW_KEY_F12) {
             GuiParser.GuiCommand windowCmd = createWindowCommand();
             GuiParser.GuiCommand command = toplevel.createGuiCommand();
             toplevel.fillGuiCommand(command);
@@ -251,7 +249,7 @@ public class Window {
             }
         }
         if (textFocus != null) {
-            return textFocus.keyTyped(typedChar, keyCode);
+            return textFocus.keyTyped(keyCode, scanCode);
         }
         return false;
     }
@@ -278,23 +276,18 @@ public class Window {
 
         int dwheel;
         if (windowManager == null) {
-            dwheel = Mouse.getDWheel();
+            dwheel = 0;// @todo 1.14 Mouse.getDWheel();
         } else {
             dwheel = windowManager.getMouseWheel();
             if (dwheel == -1) {
-                dwheel = Mouse.getDWheel();
+                dwheel = 0; // @todo 1.14 Mouse.getDWheel();
             }
         }
         if (dwheel != 0) {
             toplevel.setWindow(this);
             toplevel.mouseWheel(dwheel, x, y);
         }
-        PreferencesProperties properties = McJtyLib.getPreferencesProperties(gui.mc.player);
-        if (properties != null) {
-            currentStyle = properties.getStyle();
-        } else {
-            currentStyle = GuiStyle.STYLE_FLAT_GRADIENT;
-        }
+        currentStyle = McJtyLib.getPreferencesProperties(gui.getMinecraft().player).map(p -> p.getStyle()).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 
         toplevel.setWindow(this);
         toplevel.draw(0, 0);
@@ -332,11 +325,11 @@ public class Window {
     }
 
     private int getRelativeX() {
-        return Mouse.getEventX() * gui.width / gui.mc.displayWidth;
+        return (int) gui.getMinecraft().mouseHelper.getMouseX() * gui.width / gui.getMinecraft().mainWindow.getWidth();
     }
 
     private int getRelativeY() {
-        return gui.height - Mouse.getEventY() * gui.height / gui.mc.displayHeight - 1;
+        return gui.height - (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / gui.getMinecraft().mainWindow.getHeight();
     }
 
     public Window addFocusEvent(FocusEvent event) {

@@ -2,7 +2,6 @@ package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
-import mcjty.lib.proxy.IProxy;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,15 +18,7 @@ import java.util.concurrent.Callable;
 public abstract class DefaultServerProxy implements IProxy {
 
     @Override
-    public void preInit(FMLCommonSetupEvent e) {
-    }
-
-    @Override
     public void init(FMLCommonSetupEvent e) {
-    }
-
-    @Override
-    public void postInit(FMLCommonSetupEvent e) {
     }
 
     @Override
@@ -52,7 +43,8 @@ public abstract class DefaultServerProxy implements IProxy {
 
     @Override
     public void enqueueWork(Runnable runnable) {
-        FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(runnable);
+        // @todo 1.14
+//        FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(runnable);
     }
 
     @Override

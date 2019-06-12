@@ -1,10 +1,9 @@
 package mcjty.lib.varia;
 
-import javax.annotation.Nonnull;
-
 import mcjty.lib.McJtyLib;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -12,6 +11,8 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.annotation.Nonnull;
 
 public class Logging {
     private static Logging instance = null;
@@ -39,7 +40,7 @@ public class Logging {
     }
 
     public static void log(World world, TileEntity te, String message) {
-        if (doLogging) {
+        if (doLogging.get()) {
             long ticks = world.getGameTime();
             if (ticks != prevTicks) {
                 prevTicks = ticks;
@@ -69,10 +70,10 @@ public class Logging {
     }
 
     public static void message(@Nonnull PlayerEntity player, String message) {
-        player.sendStatusMessage(new TextComponentString(message), false);
+        player.sendStatusMessage(new StringTextComponent(message), false);
     }
 
     public static void warn(@Nonnull PlayerEntity player, String message) {
-        player.sendStatusMessage(new TextComponentString(message).setStyle(new Style().setColor(TextFormatting.RED)), false);
+        player.sendStatusMessage(new StringTextComponent(message).setStyle(new Style().setColor(TextFormatting.RED)), false);
     }
 }

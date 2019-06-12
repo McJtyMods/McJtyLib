@@ -5,6 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nonnull;
+
 /**
  * Works on a ISidedInventory but just passes null to the side so only
  * one instance is needed for side == null as well as the six sides
@@ -54,6 +56,11 @@ public class NullSidedInvWrapper implements IItemHandlerModifiable {
     }
 
     @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+        return true;
+    }
+
+    @Override
     public ItemStack getStackInSlot(int slot) {
         int i = getSlot(inv, slot);
         return i == -1 ? ItemStack.EMPTY : inv.getStackInSlot(i);
@@ -98,7 +105,7 @@ public class NullSidedInvWrapper implements IItemHandlerModifiable {
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    ItemStack copy = stack.splitStack(m);
+                    ItemStack copy = stack.split(m);
                     copy.grow(stackInSlot.getCount());
                     inv.setInventorySlotContents(slot, copy);
                     return stack;
@@ -114,7 +121,7 @@ public class NullSidedInvWrapper implements IItemHandlerModifiable {
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    inv.setInventorySlotContents(slot, stack.splitStack(m));
+                    inv.setInventorySlotContents(slot, stack.split(m));
                     return stack;
                 } else {
                     int amount = -m;

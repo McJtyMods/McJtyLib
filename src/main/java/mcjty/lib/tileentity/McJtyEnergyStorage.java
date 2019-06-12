@@ -96,7 +96,7 @@ public class McJtyEnergyStorage {
         if (energy < 0) {
             energy = 0;
         }
-        nbt.setLong("Energy", energy);
+        nbt.putLong("Energy", energy);
         return nbt;
     }
 }

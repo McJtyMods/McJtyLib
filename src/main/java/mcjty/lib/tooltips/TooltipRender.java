@@ -1,12 +1,14 @@
 package mcjty.lib.tooltips;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderItem;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
@@ -29,7 +31,7 @@ public class TooltipRender {
             ITooltipExtras extras = (ITooltipExtras) stack.getItem();
             List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
             if (!items.isEmpty()) {
-                List<String> tooltip = event.getToolTip();
+                List<ITextComponent> tooltip = event.getToolTip();
                 int count = items.size();
                 int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
                 int width = Math.min(STACKS_PER_LINE, count) * 18;
@@ -39,7 +41,7 @@ public class TooltipRender {
                 }
 
                 for (int j = 0; j < lines; j++) {
-                    tooltip.add(spaces);
+                    tooltip.add(new StringTextComponent(spaces));
                 }
             }
         }
@@ -87,8 +89,8 @@ public class TooltipRender {
 
     private static void renderBlocks(ItemStack itemStack, int x, int y, int count, int errorAmount) {
         Minecraft mc = Minecraft.getInstance();
-        GlStateManager.disableDepth();
-        RenderItem render = mc.getRenderItem();
+        GlStateManager.disableDepthTest();
+        ItemRenderer render = mc.getItemRenderer();
 
         net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
@@ -101,8 +103,8 @@ public class TooltipRender {
         boolean hasReq = true;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
-        GlStateManager.scale(0.5F, 0.5F, 0.5F);
+        GlStateManager.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
+        GlStateManager.scalef(0.5F, 0.5F, 0.5F);
         mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
         GlStateManager.popMatrix();
 
@@ -115,11 +117,11 @@ public class TooltipRender {
             int w2 = mc.fontRenderer.getStringWidth(s2);
 
             GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 8 - w2 / 4, y + 17, 0);
-            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+            GlStateManager.translatef(x + 8 - w2 / 4, y + 17, 0);
+            GlStateManager.scalef(0.5F, 0.5F, 0.5F);
             mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
             GlStateManager.popMatrix();
         }
-        GlStateManager.enableDepth();
+        GlStateManager.enableDepthTest();
     }
 }

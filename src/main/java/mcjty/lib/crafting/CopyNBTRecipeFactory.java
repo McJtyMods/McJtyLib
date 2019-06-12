@@ -1,16 +1,11 @@
 package mcjty.lib.crafting;
 
 import com.google.gson.JsonObject;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.JsonUtils;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CopyNBTRecipeFactory implements IRecipeSerializer {

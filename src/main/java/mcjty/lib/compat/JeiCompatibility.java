@@ -1,12 +1,5 @@
 package mcjty.lib.compat;
 
-import mcjty.lib.gui.GenericGuiContainer;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.List;
-
 //@JEIPlugin
 public class JeiCompatibility /*implements IModPlugin*/ {
 //	@Override

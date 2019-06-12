@@ -11,7 +11,7 @@ public class SecurityTools {
 //    }
 
     public static boolean isPrivileged(PlayerEntity player, World world) {
-        return player.capabilities.isCreativeMode || world.getMinecraftServer().getPlayerList().canSendCommands(player.getGameProfile());
+        return player.abilities.isCreativeMode || world.getServer().getPlayerList().canSendCommands(player.getGameProfile());
     }
 
 }

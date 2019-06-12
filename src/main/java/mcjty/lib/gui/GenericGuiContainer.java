@@ -11,6 +11,7 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import net.minecraft.block.Block;
+import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
@@ -24,12 +25,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class GenericGuiContainer<T extends GenericTileEntity> extends ContainerScreen {
 
@@ -207,20 +207,20 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
                 yy = 4 - guiTop;
             }
 
-            this.zLevel = 300.0F;
-            this.itemRender.zLevel = 300.0F;
+//            this.zLevel = 300.0F;     // @todo 1.14
+            this.itemRenderer.zLevel = 300.0F;
             int l = -267386864;
-            this.drawGradientRect(xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
-            this.drawGradientRect(xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
-            this.drawGradientRect(xx - 3, yy - 3, xx + i + 3, yy + k + 3, l, l);
-            this.drawGradientRect(xx - 4, yy - 3, xx - 3, yy + k + 3, l, l);
-            this.drawGradientRect(xx + i + 3, yy - 3, xx + i + 4, yy + k + 3, l, l);
+            this.fillGradient(xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
+            this.fillGradient(xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
+            this.fillGradient(xx - 3, yy - 3, xx + i + 3, yy + k + 3, l, l);
+            this.fillGradient(xx - 4, yy - 3, xx - 3, yy + k + 3, l, l);
+            this.fillGradient(xx + i + 3, yy - 3, xx + i + 4, yy + k + 3, l, l);
             int i1 = 1347420415;
             int j1 = (i1 & 16711422) >> 1 | i1 & -16777216;
-            this.drawGradientRect(xx - 3, yy - 3 + 1, xx - 3 + 1, yy + k + 3 - 1, i1, j1);
-            this.drawGradientRect(xx + i + 2, yy - 3 + 1, xx + i + 3, yy + k + 3 - 1, i1, j1);
-            this.drawGradientRect(xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
-            this.drawGradientRect(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
+            this.fillGradient(xx - 3, yy - 3 + 1, xx - 3 + 1, yy + k + 3 - 1, i1, j1);
+            this.fillGradient(xx + i + 2, yy - 3 + 1, xx + i + 3, yy + k + 3 - 1, i1, j1);
+            this.fillGradient(xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
+            this.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
             for (int k1 = 0; k1 < textLines.size(); ++k1) {
                 String s1 = textLines.get(k1);
@@ -234,7 +234,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
                             font.drawStringWithShadow(s2, curx, yy, -1);
                             curx += font.getStringWidth(s2);
                         } else {
-                            RenderHelper.renderObject(mc, curx + 1, yy, o, false);
+                            RenderHelper.renderObject(getMinecraft(), curx + 1, yy, o, false);
                             curx += 20;
                             lineHasItemStacks = true;
                         }
@@ -253,10 +253,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
                 yy += 10;
             }
 
-            this.zLevel = 0.0F;
-            this.itemRender.zLevel = 0.0F;
+//            this.zLevel = 0.0F;       // @todo 1.14
+            this.itemRenderer.zLevel = 0.0F;
             GlStateManager.enableLighting();
-            GlStateManager.enableDepth();
+            GlStateManager.enableDepthTest();
             net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
             GlStateManager.enableRescaleNormal();
         }
@@ -311,8 +311,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
      * Draw tooltips for itemstacks that are in BlockRender widgets
      */
     protected void drawStackTooltips(int mouseX, int mouseY) {
-        int x = Mouse.getEventX() * width / mc.displayWidth;
-        int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+        MouseHelper mouse = getMinecraft().mouseHelper;
+        int x = (int)mouse.getMouseX() * width / getMinecraft().mainWindow.getWidth();
+        int y = height - (int)mouse.getMouseY() * height / getMinecraft().mainWindow.getHeight() - 1;
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
         if (widget instanceof BlockRender) {
             BlockRender blockRender = (BlockRender) widget;
@@ -343,15 +344,15 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
             // Protection for bad itemstacks
             list = new ArrayList<>();
         } else {
-            ITooltipFlag flag = this.mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-            list = stack.getTooltip(this.mc.player, flag);
+            ITooltipFlag flag = this.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
+            list = stack.getTooltip(this.getMinecraft().player, flag).stream().map(s -> s.getFormattedText()).collect(Collectors.toList());
         }
 
         for (int i = 0; i < list.size(); ++i) {
             if (i == 0) {
-                list.set(i, stack.getRarity().rarityColor + list.get(i));
+                list.set(i, stack.getRarity().color + list.get(i));
             } else {
-                list.set(i, TextFormatting.GRAY + list.get(i));
+                list.set(i,  TextFormatting.GRAY + list.get(i));
             }
         }
 
@@ -361,40 +362,42 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
         if (stack.getItem() != null) {
             font = stack.getItem().getFontRenderer(stack);
         }
-        this.drawHoveringText(list, x, y, (font == null ? fontRenderer : font));
+        this.renderTooltip(list, x, y, (font == null ? getMinecraft().fontRenderer : font));
     }
 
-
     @Override
-    public boolean doesGuiPauseGame() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void onGuiClosed() {
-        super.onGuiClosed();
-        Keyboard.enableRepeatEvents(false);
+    public void onClose() {
+        super.onClose();
+        getMinecraft().keyboardListener.enableRepeatEvents(false);
     }
 
     @Override
-    protected void mouseClicked(int x, int y, int button) throws IOException {
-        super.mouseClicked(x, y, button);
-        getWindowManager().mouseClicked(x, y, button);
+    public boolean mouseClicked(double x, double y, int button) {
+        boolean rc = super.mouseClicked(x, y, button);
+        getWindowManager().mouseClicked((int)x, (int)y, button);
+        return rc;
     }
 
     @Override
-    public void handleMouseInput() throws IOException {
-        super.handleMouseInput();
-        getWindowManager().handleMouseInput();
+    public boolean mouseDragged(double x, double y, int button, double scaledX, double scaledY) {
+        boolean rc = super.mouseDragged(x, y, button, scaledX, scaledY);
+        getWindowManager().handleMouseInput(button);
+        return rc;
     }
 
     /*
      * 99% sure this is the correct one
      */
     @Override
-    protected void mouseReleased(int x, int y, int state) {
-        super.mouseReleased(x, y, state);
-        getWindowManager().mouseReleased(x, y, state);
+    public boolean mouseReleased(double x, double y, int state) {
+        boolean rc = super.mouseReleased(x, y, state);
+        getWindowManager().mouseReleased((int)x, (int)y, state);
+        return rc;
     }
 
     public Window getWindow() {
@@ -402,20 +405,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
     }
 
     @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        boolean b = getWindowManager().keyTyped(typedChar, keyCode);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean b = getWindowManager().keyTyped(keyCode, scanCode);
         if (b) {
-            super.keyTyped(typedChar, keyCode);
+            return super.keyPressed(keyCode, scanCode, modifiers);
+        } else {
+            return false;
         }
     }
 
-    public void keyTypedFromEvent(char typedChar, int keyCode) {
-        if (getWindowManager().keyTyped(typedChar, keyCode)) {
-            try {
-                super.keyTyped(typedChar, keyCode);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+    public void keyTypedFromEvent(int keyCode, int scanCode) {
+        if (getWindowManager().keyTyped(keyCode, scanCode)) {
+            super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
         }
     }
 

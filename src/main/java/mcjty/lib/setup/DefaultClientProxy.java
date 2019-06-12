@@ -2,8 +2,6 @@ package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
-import mcjty.lib.proxy.IProxy;
-import net.java.games.input.Keyboard;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
@@ -12,8 +10,6 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
@@ -24,18 +20,9 @@ import java.util.concurrent.Callable;
 public class DefaultClientProxy implements IProxy {
 
     @Override
-    public void preInit(FMLCommonSetupEvent e) {
-    }
-
-    @Override
     public void init(FMLCommonSetupEvent e) {
-
     }
 
-    @Override
-    public void postInit(FMLCommonSetupEvent e) {
-
-    }
     @Override
     public World getClientWorld() {
         return Minecraft.getInstance().world;
@@ -56,12 +43,14 @@ public class DefaultClientProxy implements IProxy {
     public <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule) {
         // @todo 1.14
 //        return Minecraft.getInstance().addScheduledTask(callableToSchedule);
+        return null;
     }
 
     @Override
     public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
         // @todo 1.14
 //        return Minecraft.getInstance().addScheduledTask(runnableToSchedule);
+        return null;
     }
 
     @Override
@@ -84,37 +73,39 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public void initItemModelMesher(Item item, ModelResourceLocation model) {
-        Minecraft.getInstance().getItemRenderer().getItemModelMesher().register(item, meta, model);
+        Minecraft.getInstance().getItemRenderer().getItemModelMesher().register(item, model);
     }
 
     @Override
     public void initTESRItemStack(Item item, int meta, Class<? extends TileEntity> clazz) {
-        ForgeHooksClient.registerTESRItemStack(item, meta, clazz);
+        // @todo 1.14
+//        ForgeHooksClient.registerTESRItemStack(item, meta, clazz);
     }
 
     @Override
     public void initCustomItemModel(Item item, int meta, ModelResourceLocation model) {
-        ModelLoader.setCustomModelResourceLocation(item, meta, model);
+        // @todo 1.14
+//        ModelLoader.setCustomModelResourceLocation(item, meta, model);
     }
 
     @Override
     public boolean isJumpKeyDown() {
-        return Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindJump.getKeyCode());
+        return Minecraft.getInstance().gameSettings.keyBindJump.isKeyDown();
     }
 
     @Override
     public boolean isForwardKeyDown() {
-        return Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindForward.getKeyCode());
+        return Minecraft.getInstance().gameSettings.keyBindForward.isKeyDown();
     }
 
     @Override
     public boolean isBackKeyDown() {
-        return Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindBack.getKeyCode());
+        return Minecraft.getInstance().gameSettings.keyBindBack.isKeyDown();
     }
 
     @Override
     public boolean isSneakKeyDown() {
-        return Keyboard.isKeyDown(Minecraft.getInstance().gameSettings.keyBindSneak.getKeyCode());
+        return Minecraft.getInstance().gameSettings.keyBindSneak.isKeyDown();
     }
 
     @Override

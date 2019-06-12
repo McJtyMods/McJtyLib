@@ -32,6 +32,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ToolType;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
@@ -77,9 +78,19 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         this.modBase = mod;
         this.creative = false;
         setRegistryName(mod.getModId(), name);
-        // @todo 1.14
-//        setHarvestLevel("pickaxe", 0);
-        McJtyRegister.registerLater(this, mod, itemBlockFactory);
+    }
+
+    @Nullable
+    @Override
+    public ToolType getHarvestTool(BlockState state) {
+        // @todo 1.14 make configurable
+        return ToolType.PICKAXE;
+    }
+
+    @Override
+    public int getHarvestLevel(BlockState state) {
+        // @todo 1.14 make configurable
+        return 0;
     }
 
     public BaseBlock setCreative(boolean creative) {
@@ -126,7 +137,10 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @Override
     public void addInformation(ItemStack stack, @Nullable IBlockReader world, List<ITextComponent> tooltip, ITooltipFlag advanced) {
         InformationString i = informationString;
-        // @todo 1.14
+        // @todo 1.14: check if this actually works!
+        if (McJtyLib.proxy.isSneakKeyDown()) {
+            i = informationStringWithShift;
+        }
 //        if ((Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
 //            i = informationStringWithShift;
 //        }
@@ -228,6 +242,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
     }
 
+
     // @todo 1.14
 //    @Override
 //    public boolean isOpaqueCube(BlockState state) {
@@ -241,7 +256,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     public void setOpaqueCube(boolean opaque) {
         this.nonopaque = !opaque;
-        //@todo 1.14
+        //@todo 1.14 check until we have specific use cases
 //        this.fullBlock = this.getDefaultState().isOpaqueCube();
 //        this.lightOpacity = this.fullBlock ? 255 : 0;
 //        this.translucent = !blockMaterial.blocksLight();

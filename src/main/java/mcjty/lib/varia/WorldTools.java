@@ -4,6 +4,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class WorldTools {
 
@@ -19,11 +20,11 @@ public class WorldTools {
      * Find a biome based on ID or registry name
      */
     public static Biome findBiome(String biomeId) {
-        Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(biomeId));
+        Biome biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(biomeId));
         if (biome == null) {
-            for (Biome b : Biome.REGISTRY) {
+            for (Biome b : ForgeRegistries.BIOMES) {
                 ResourceLocation registryName = b.getRegistryName();
-                if (registryName != null && biomeId.equals(registryName.getResourcePath())) {
+                if (registryName != null && biomeId.equals(registryName.getPath())) {
                     biome = b;
                     break;
                 }

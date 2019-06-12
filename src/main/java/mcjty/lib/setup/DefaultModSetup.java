@@ -1,15 +1,12 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.varia.WrenchChecker;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.util.function.Supplier;
 
 public abstract class DefaultModSetup {
@@ -18,11 +15,10 @@ public abstract class DefaultModSetup {
     private Logger logger;
     protected ItemGroup creativeTab;
 
-    public void preInit(FMLCommonSetupEvent e) {
+    public void init(FMLCommonSetupEvent e) {
         logger = LogManager.getLogger();
         createTabs();
         McJtyLib.preInit(e);
-        GeneralConfig.init(e);
 //        modConfigDir = e.getModConfigurationDirectory();
 
         setupConfig();
@@ -43,18 +39,6 @@ public abstract class DefaultModSetup {
             }
         };
     }
-
-    public void init(FMLCommonSetupEvent e) {
-
-    }
-
-    public void postInit(FMLCommonSetupEvent e) {
-        WrenchChecker.init();
-    }
-
-//    public File getModConfigDir() {
-//        return modConfigDir;
-//    }
 
     public Logger getLogger() {
         return logger;

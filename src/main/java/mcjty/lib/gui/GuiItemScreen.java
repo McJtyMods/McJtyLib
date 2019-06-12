@@ -6,7 +6,6 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-import java.io.IOException;
 import java.util.List;
 
 public class GuiItemScreen extends Screen {
@@ -45,29 +44,35 @@ public class GuiItemScreen extends Screen {
     @Override
     public boolean mouseClicked(double x, double y, int button) {
         boolean rc = super.mouseClicked(x, y, button);
-        window.mouseClicked(x, y, button);
-        sideWindow.getWindow().mouseClicked(x, y, button);
+        window.mouseClicked((int)x, (int)y, button);
+        sideWindow.getWindow().mouseClicked((int)x, (int)y, button);
         return rc;
     }
 
     @Override
-    public void handleMouseInput() throws IOException {
-        super.handleMouseInput();
-        window.handleMouseInput();
-        sideWindow.getWindow().handleMouseInput();
+    public boolean mouseDragged(double x, double y, int button, double scaledX, double scaledY) {
+        boolean rc = super.mouseDragged(x, y, button, scaledX, scaledX);
+        // @todo 1.14
+        window.handleMouseInput(button);
+        sideWindow.getWindow().handleMouseInput(button);
+        return rc;
+    }
+
+
+    @Override
+    public boolean mouseReleased(double x, double y, int state) {
+        boolean rc = super.mouseReleased(x, y, state);
+        window.mouseMovedOrUp((int)x, (int)y, state);
+        sideWindow.getWindow().mouseMovedOrUp((int)x, (int)y, state);
+        return rc;
     }
 
     @Override
-    protected void mouseReleased(int x, int y, int state) {
-        super.mouseReleased(x, y, state);
-        window.mouseMovedOrUp(x, y, state);
-        sideWindow.getWindow().mouseMovedOrUp(x, y, state);
-    }
-
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        super.keyTyped(typedChar, keyCode);
-        window.keyTyped(typedChar, keyCode);
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean rc = super.keyPressed(keyCode, scanCode, modifiers);
+//        window.keyTyped(typedChar, keyCode);
+        window.keyTyped(keyCode, scanCode);
+        return rc;
     }
 
     public void drawWindow() {
@@ -77,14 +82,14 @@ public class GuiItemScreen extends Screen {
         List<String> tooltips = window.getTooltips();
         Minecraft mc = getMinecraft();
         if (tooltips != null) {
-            int x = Mouse.getEventX() * width / mc.displayWidth;
-            int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+            int x = (int) mc.mouseHelper.getMouseX() * width / mc.mainWindow.getWidth();
+            int y = height - (int) mc.mouseHelper.getMouseY() * height / mc.mainWindow.getHeight() - 1;
             renderTooltip(tooltips, x-guiLeft, y-guiTop, mc.fontRenderer);
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
-            int x = Mouse.getEventX() * width / mc.displayWidth;
-            int y = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+            int x = (int)mc.mouseHelper.getMouseX() * width / mc.mainWindow.getWidth();
+            int y = height - (int)mc.mouseHelper.getMouseY() * height / mc.mainWindow.getHeight() - 1;
             renderTooltip(tooltips, x - guiLeft, y - guiTop, mc.fontRenderer);
         }
     }

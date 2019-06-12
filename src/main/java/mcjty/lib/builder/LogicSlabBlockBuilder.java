@@ -9,13 +9,19 @@ import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.container.EmptyContainerFactory;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.LogicTileEntity;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.IProperty;
+import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 
 import static mcjty.lib.blocks.LogicSlabBlock.LOGIC_FACING;
@@ -113,7 +119,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
-            protected int getRedstoneOutput(BlockState state, IBlockAccess world, BlockPos pos, Direction side) {
+            protected int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
                 return getter.getRedstoneOutput(state, world, pos, side);
             }
 
@@ -128,29 +134,30 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
             }
 
             @Override
-            public int getLightValue(BlockState state, IBlockAccess world, BlockPos pos) {
+            public int getLightValue(BlockState state, IEnviromentBlockReader world, BlockPos pos) {
                 return getLightValue.getLightValue(state, world, pos);
             }
 
             @Override
-            protected BlockStateContainer createBlockState() {
-                return new BlockStateContainer(this, getProperties());
+            protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+                super.fillStateContainer(builder);
+                builder.add(properties);
             }
 
             @Override
-            public boolean doesSideBlockRendering(BlockState state, IBlockAccess world, BlockPos pos, Direction face) {
+            public boolean doesSideBlockRendering(BlockState state, IEnviromentBlockReader world, BlockPos pos, Direction face) {
                 return renderControl.doesSideBlockRendering(state, world, pos, face);
             }
 
             @Override
-            public void onBlockClicked(World worldIn, BlockPos pos, PlayerEntity playerIn) {
-                clickAction.doClick(worldIn, pos, playerIn);
+            public void onBlockClicked(BlockState state, World world, BlockPos pos, PlayerEntity player) {
+                clickAction.doClick(world, pos, player);
             }
 
             @Override
-            public boolean onBlockActivated(World worldIn, BlockPos pos, BlockState state, PlayerEntity playerIn, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
-                if (!action.doActivate(worldIn, pos, playerIn, hand, facing, hitX, hitY, hitZ)) {
-                    return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+            public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+                if (!action.doActivate(world, pos, player, hand, result)) {
+                    return super.onBlockActivated(state, world, pos, player, hand, result);
                 } else {
                     return true;
                 }
