@@ -36,7 +36,6 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
             .hardnessAndResistance(2.0f)
             .sound(SoundType.METAL));
         setRegistryName(McJtyLib.MODID, "multipart");
-        McJtyRegister.registerLater(this, McJtyLib.instance, MultipartItemBlock::new);
 //        setHarvestLevel("pickaxe", 0);    // @todo 1.14
         // @todo TEMPORARY!
 //        setCreativeTab(CreativeTabs.MISC);

@@ -20,6 +20,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -192,9 +193,9 @@ public class Window {
             textFocus = null;
             fireFocusEvents(null);
         }
-        if (toplevel.in(x, y) && toplevel.isVisible()) {
+        if (toplevel.in((int)x, (int)y) && toplevel.isVisible()) {
             toplevel.setWindow(this);
-            toplevel.mouseClick(x, y, button);
+            toplevel.mouseClick((int)x, (int)y, button);
         }
     }
 

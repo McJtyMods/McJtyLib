@@ -7,15 +7,16 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+
+import static mcjty.lib.proxy.Registration.TYPE_MULTIPART;
 
 public class MultipartTE extends TileEntity {
 
@@ -40,9 +41,8 @@ public class MultipartTE extends TileEntity {
     private Map<PartSlot, Part> parts = new HashMap<>();
     private int version = 0;    // To update rendering client-side
 
-    @Override
-    public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newSate) {
-        return oldState.getBlock() != newSate.getBlock();
+    public MultipartTE() {
+        super(TYPE_MULTIPART);
     }
 
     private void dumpParts(String prefix) {
@@ -55,8 +55,8 @@ public class MultipartTE extends TileEntity {
             BlockState state = entry.getValue().state;
             System.out.println("    SLOT: " + entry.getKey().name() +
                     "    " + state.getBlock().getRegistryName().toString());
-            for (Map.Entry<IProperty<?>, Comparable<?>> e : state.getProperties().entrySet()) {
-                System.out.println("        PROP: " + e.getKey() + " = " + e.getValue());
+            for (IProperty<?> property : state.getProperties()) {
+                System.out.println("        PROP: " + property + " = " + state.get(property));
             }
 
         }

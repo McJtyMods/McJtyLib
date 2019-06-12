@@ -8,10 +8,9 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nonnull;
@@ -26,7 +25,6 @@ public class DumpBlockNBT {
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("block", new JsonPrimitive(block.getRegistryName().toString()));
-        jsonObject.add("meta", new JsonPrimitive(block.getMetaFromState(state)));
         if (te != null) {
             jsonObject.add("teClass", new JsonPrimitive(te.getClass().getCanonicalName()));
             CompoundNBT tag = new CompoundNBT();
@@ -38,7 +36,7 @@ public class DumpBlockNBT {
                 jsonObject.add("nbt", element);
             } else {
                 JsonArray array = new JsonArray();
-                for (String key : tag.getKeySet()) {
+                for (String key : tag.keySet()) {
                     array.add(new JsonPrimitive(key));
                 }
                 jsonObject.add("nbt", array);
@@ -50,7 +48,7 @@ public class DumpBlockNBT {
     }
 
     // Use client-side
-    public static void dumpBlock(@Nullable SimpleNetworkWrapper network, @Nonnull World world, @Nonnull BlockPos pos, boolean verbose) {
+    public static void dumpBlock(@Nullable SimpleChannel network, @Nonnull World world, @Nonnull BlockPos pos, boolean verbose) {
         String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
         Logging.getLogger().log(Level.INFO, "### Client side ###");
         Logging.getLogger().log(Level.INFO, output);
@@ -60,21 +58,22 @@ public class DumpBlockNBT {
     }
 
     // Use client-side
-    public static void dumpFocusedBlock(@Nullable SimpleNetworkWrapper network, @Nonnull PlayerEntity player, boolean liquids, boolean verbose) {
-        Vec3d start = player.getPositionEyes(1.0f);
+    public static void dumpFocusedBlock(@Nullable SimpleChannel network, @Nonnull PlayerEntity player, boolean liquids, boolean verbose) {
+        Vec3d start = player.getEyePosition(1.0f);
         Vec3d vec31 = player.getLook(1.0f);
         float dist = 20;
-        Vec3d end = start.addVector(vec31.x * dist, vec31.y * dist, vec31.z * dist);
-        RayTraceResult result = player.getEntityWorld().rayTraceBlocks(start, end, liquids);
-        if (result == null || result.typeOfHit != RayTraceResult.Type.BLOCK) {
+        Vec3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
+        RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, liquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, player);
+        RayTraceResult result = player.getEntityWorld().rayTraceBlocks(context);
+        if (result == null || result.getType() != RayTraceResult.Type.BLOCK) {
             return;
         }
 
-        String output = DumpBlockNBT.dumpBlockNBT(player.getEntityWorld(), result.getBlockPos(), verbose);
+        String output = DumpBlockNBT.dumpBlockNBT(player.getEntityWorld(), ((BlockRayTraceResult) result).getPos(), verbose);
         Logging.getLogger().log(Level.INFO, "### Client side ###");
         Logging.getLogger().log(Level.INFO, output);
         if (network != null) {
-            network.sendToServer(new PacketDumpBlockInfo(player.getEntityWorld(), result.getBlockPos(), verbose));
+            network.sendToServer(new PacketDumpBlockInfo(player.getEntityWorld(), ((BlockRayTraceResult) result).getPos(), verbose));
         }
     }
 }

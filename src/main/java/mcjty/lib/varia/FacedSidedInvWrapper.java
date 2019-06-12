@@ -6,6 +6,8 @@ import net.minecraft.util.Direction;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nonnull;
+
 /**
  * Works on a ISidedInventory. Uses normal IInventory methods if side == null
  * and otherwise the correct sided api from ISidedInventory
@@ -72,6 +74,11 @@ public class FacedSidedInvWrapper implements IItemHandlerModifiable {
     }
 
     @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+        return true;
+    }
+
+    @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 
         if (stack.isEmpty()) {
@@ -110,7 +117,7 @@ public class FacedSidedInvWrapper implements IItemHandlerModifiable {
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    ItemStack copy = stack.splitStack(m);
+                    ItemStack copy = stack.split(m);
                     copy.grow(stackInSlot.getCount());
                     inv.setInventorySlotContents(slot, copy);
                     return stack;
@@ -126,7 +133,7 @@ public class FacedSidedInvWrapper implements IItemHandlerModifiable {
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    inv.setInventorySlotContents(slot, stack.splitStack(m));
+                    inv.setInventorySlotContents(slot, stack.split(m));
                     return stack;
                 } else {
                     int amount = -m;

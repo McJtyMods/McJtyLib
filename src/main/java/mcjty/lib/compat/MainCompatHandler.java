@@ -1,19 +1,19 @@
 package mcjty.lib.compat;
 
 import mcjty.lib.compat.theoneprobe.TOPCompatibility;
-import net.minecraftforge.fml.common.Loader;
-import mcjty.lib.compat.waila.WailaCompatibility;
+import net.minecraftforge.fml.ModList;
 
 public class MainCompatHandler {
 
     public static void registerWaila() {
-        if (Loader.isModLoaded("waila")) {
-            WailaCompatibility.register();
+        if (ModList.get().isLoaded("waila")) {
+            // @todo 1.14
+//            WailaCompatibility.register();
         }
     }
 
     public static void registerTOP() {
-        if (Loader.isModLoaded("theoneprobe")) {
+        if (ModList.get().isLoaded("theoneprobe")) {
             TOPCompatibility.register();
         }
     }

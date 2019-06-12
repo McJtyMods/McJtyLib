@@ -34,9 +34,9 @@ public class BlockPosTools {
 
     public static void write(CompoundNBT tagCompound, String tagName, BlockPos coordinate) {
         if (coordinate == null) {
-            tagCompound.setIntArray(tagName, new int[] { });
+            tagCompound.putIntArray(tagName, new int[] { });
         } else {
-            tagCompound.setIntArray(tagName, new int[] { coordinate.getX(), coordinate.getY(), coordinate.getZ() });
+            tagCompound.putIntArray(tagName, new int[] { coordinate.getX(), coordinate.getY(), coordinate.getZ() });
         }
     }
 

@@ -3,9 +3,11 @@ package mcjty.lib.proxy;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.multipart.MultipartBlock;
+import mcjty.lib.multipart.MultipartItemBlock;
 import mcjty.lib.multipart.MultipartTE;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -20,6 +22,8 @@ public class Registration {
     public static ContainerType GENERIC_CONTAINER_TYPE;
     @ObjectHolder("mcjtylib:multipart")
     public static MultipartBlock multipartBlock;
+    @ObjectHolder("mcjtylib:multipart")
+    public static MultipartItemBlock multipartItemBlock;
 
     public static TileEntityType<?> TYPE_MULTIPART;
 
@@ -37,5 +41,10 @@ public class Registration {
     @SubscribeEvent
     public static void onBlockRegister(final RegistryEvent.Register<Block> e) {
         e.getRegistry().register(new MultipartBlock());
+    }
+
+    @SubscribeEvent
+    public static void onItemRegister(final RegistryEvent.Register<Item> e) {
+        e.getRegistry().register(new MultipartItemBlock(multipartBlock));
     }
 }

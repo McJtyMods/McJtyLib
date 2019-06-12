@@ -6,11 +6,16 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -32,7 +37,7 @@ public class BlockTools {
     public static void spawnItemStack(World world, int x, int y, int z, ItemStack itemstack) {
         if (!itemstack.isEmpty()) {
             ItemEntity entityItem = new ItemEntity(world, x, y, z, itemstack);
-            world.spawnEntity(entityItem);
+            world.addEntity(entityItem);
         }
     }
 
@@ -46,7 +51,7 @@ public class BlockTools {
 
     public static String getModid(ItemStack stack) {
         if (!stack.isEmpty()) {
-            return stack.getItem().getRegistryName().getResourceDomain();
+            return stack.getItem().getRegistryName().getNamespace();
         } else {
             return "";
         }
@@ -66,23 +71,25 @@ public class BlockTools {
     }
 
     public static String getReadableName(ItemStack stack) {
-        return stack.getDisplayName();
+        return stack.getDisplayName().getFormattedText();
     }
 
     public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
+        BlockRayTraceResult trace = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, pos, false);
+        BlockItemUseContext context = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, trace));
         if (blockStack.getItem() instanceof BlockItem) {
             BlockItem itemBlock = (BlockItem) blockStack.getItem();
             if (origState == null) {
-                origState = itemBlock.getBlock().getStateForPlacement(world, pos, Direction.UP, 0, 0, 0, blockStack.getItem().getMetadata(blockStack), player, Hand.MAIN_HAND);
+                origState = itemBlock.getBlock().getStateForPlacement(context);
             }
-            if (itemBlock.placeBlockAt(blockStack, player, world, pos, Direction.UP, 0, 0, 0, origState)) {
+            if (itemBlock.tryPlace(context) == ActionResultType.SUCCESS) {
                 blockStack.shrink(1);
             }
             return origState;
         } else {
             player.setHeldItem(Hand.MAIN_HAND, blockStack);
             player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            blockStack.getItem().onItemUse(player, world, pos.down(), Hand.MAIN_HAND, Direction.UP, 0, 0, 0);
+            blockStack.getItem().onItemUse(context);
             return world.getBlockState(pos);
         }
     }

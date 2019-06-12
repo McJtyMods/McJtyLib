@@ -6,7 +6,7 @@ import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nonnull;
@@ -21,9 +21,8 @@ public class DumpItemNBT {
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("item", new JsonPrimitive(item.getItem().getRegistryName().toString()));
-        jsonObject.add("meta", new JsonPrimitive(item.getItemDamage()));
-        if (item.hasTagCompound()) {
-            CompoundNBT tag = item.getTagCompound();
+        if (item.hasTag()) {
+            CompoundNBT tag = item.getTag();
             if (verbose) {
                 String nbtJson = tag.toString();
                 JsonParser parser = new JsonParser();
@@ -31,7 +30,7 @@ public class DumpItemNBT {
                 jsonObject.add("nbt", element);
             } else {
                 JsonArray array = new JsonArray();
-                for (String key : tag.getKeySet()) {
+                for (String key : tag.keySet()) {
                     array.add(new JsonPrimitive(key));
                 }
                 jsonObject.add("nbt", array);
@@ -43,7 +42,7 @@ public class DumpItemNBT {
     }
 
     // Use client-side
-    public static void dumpHeldItem(@Nullable SimpleNetworkWrapper network, @Nonnull PlayerEntity player, boolean verbose) {
+    public static void dumpHeldItem(@Nullable SimpleChannel network, @Nonnull PlayerEntity player, boolean verbose) {
         ItemStack item = player.getHeldItemMainhand();
         if (item.isEmpty()) {
             return;

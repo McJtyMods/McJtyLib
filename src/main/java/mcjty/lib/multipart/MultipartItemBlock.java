@@ -8,21 +8,17 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import java.util.Collections;
-import java.util.Set;
 
 public class MultipartItemBlock extends BlockItem {
 
@@ -31,62 +27,67 @@ public class MultipartItemBlock extends BlockItem {
     }   // @todo 1.14
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, Direction side, PlayerEntity player, ItemStack stack) {
+    protected boolean canPlace(BlockItemUseContext context, BlockState state) {
         // Return true to make this work all the time.
         return true;
     }
 
 
-    public EnumActionResult onItemUse(PlayerEntity player, World world, BlockPos pos, Hand hand, Direction facing, float hitX, float hitY, float hitZ) {
-        BlockState BlockState = world.getBlockState(pos);
-        Block block = BlockState.getBlock();
+    @Override
+    public ActionResultType tryPlace(BlockItemUseContext context) {
+        World world = context.getWorld();
+        BlockPos pos = context.getPos();
+        PlayerEntity player = context.getPlayer();
 
-        ItemStack itemstack = player.getHeldItem(hand);
+        BlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+
+        ItemStack itemstack = context.getItem();
         if (itemstack.isEmpty()) {
-            return EnumActionResult.FAIL;
+            return ActionResultType.FAIL;
         }
 
-        int meta = this.getMetadata(itemstack.getMetadata());
-        BlockState toPlace = this.block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
+        BlockState toPlace = this.getBlock().getStateForPlacement(context);
         PartSlot slot = PartSlot.NONE;
-        if (this.block instanceof IPartBlock) {
-            slot = ((IPartBlock) this.block).getSlotFromState(world, pos, toPlace);
+        if (this.getBlock() instanceof IPartBlock) {
+            slot = ((IPartBlock) this.getBlock()).getSlotFromState(world, pos, toPlace);
         }
 
-        if (!block.isReplaceable(world, pos) && !canFitInside(block, world, pos, slot)) {
-            pos = pos.offset(facing);
-            BlockState = world.getBlockState(pos);
-            block = BlockState.getBlock();
+        if (!block.isReplaceable(toPlace, context) && !canFitInside(block, world, pos, slot)) {
+            pos = pos.offset(context.getFace());
+            state = world.getBlockState(pos);
+            block = state.getBlock();
         }
 
-        if (player.canPlayerEdit(pos, facing, itemstack)) {
+        context = BlockItemUseContext.func_221536_a(context, pos, context.getFace());
+
+        if (player.canPlayerEdit(pos, context.getFace(), itemstack)) {
             // We have to call getStateForPlacement again to be sure it is ok for this position as well
-            toPlace = this.block.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
-            if (this.block instanceof IPartBlock) {
-                slot = ((IPartBlock) this.block).getSlotFromState(world, pos, toPlace);
+            toPlace = this.getBlock().getStateForPlacement(context);
+            if (this.getBlock() instanceof IPartBlock) {
+                slot = ((IPartBlock) this.getBlock()).getSlotFromState(world, pos, toPlace);
             }
 
             if (canFitInside(block, world, pos, slot)) {
-                if (placeBlockAtInternal(itemstack, player, world, pos, facing, hitX, hitY, hitZ, toPlace, slot)) {
+                if (placeBlockAtInternal(itemstack, player, world, pos, toPlace, slot)) {
                     SoundType soundtype = toPlace.getBlock().getSoundType(toPlace, world, pos, player);
                     world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                     itemstack.shrink(1);
                 }
-                return EnumActionResult.SUCCESS;
-            } else if (world.mayPlace(this.block, pos, false, facing, null)) {
-                if (placeBlockAtInternal(itemstack, player, world, pos, facing, hitX, hitY, hitZ, toPlace, slot)) {
+                return ActionResultType.SUCCESS;
+            } else if (true /* @todo 1.14 world.mayPlace(this.getBlock(), pos, false, facing, null)*/) {
+                if (placeBlockAtInternal(itemstack, player, world, pos, toPlace, slot)) {
                     SoundType soundtype = toPlace.getBlock().getSoundType(toPlace, world, pos, player);
                     world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                     itemstack.shrink(1);
                 }
 
-                return EnumActionResult.SUCCESS;
+                return ActionResultType.SUCCESS;
             } else {
-                return EnumActionResult.FAIL;
+                return ActionResultType.FAIL;
             }
         } else {
-            return EnumActionResult.FAIL;
+            return ActionResultType.FAIL;
         }
     }
 
@@ -121,22 +122,22 @@ public class MultipartItemBlock extends BlockItem {
 //    }
 
     private TileEntity createTileEntity(World world, BlockState state) {
-        return state.getBlock().createTileEntity(world, state);
+        return state.getBlock().createTileEntity(state, world);
     }
 
     @Override
-    public boolean placeBlockAt(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side, float hitX, float hitY, float hitZ, BlockState newState) {
+    protected boolean placeBlock(BlockItemUseContext context, BlockState state) {
         // Not implemented
         return false;
     }
 
-    private boolean placeBlockAtInternal(ItemStack stack, PlayerEntity player, World world, BlockPos pos, Direction side, float hitX, float hitY, float hitZ, BlockState newState,
+    private boolean placeBlockAtInternal(ItemStack stack, PlayerEntity player, World world, BlockPos pos, BlockState newState,
                                          @Nonnull PartSlot slot) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             TileEntity tileEntity = createTileEntity(world, newState);
-            if (tileEntity instanceof GenericTileEntity && stack.getTagCompound() != null) {
-                ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTagCompound());
+            if (tileEntity instanceof GenericTileEntity && stack.getTag() != null) {
+                ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
             }
             ((MultipartTE) te).addPart(slot, newState, tileEntity);
             return true;
@@ -154,8 +155,8 @@ public class MultipartItemBlock extends BlockItem {
             te = world.getTileEntity(pos);
             if (te instanceof MultipartTE) {
                 TileEntity tileEntity = createTileEntity(world, newState);
-                if (tileEntity instanceof GenericTileEntity && stack.hasTagCompound()) {
-                    ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTagCompound());
+                if (tileEntity instanceof GenericTileEntity && stack.hasTag()) {
+                    ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
                 }
                 ((MultipartTE) te).addPart(slot, newState, tileEntity);
                 return true;
@@ -163,8 +164,8 @@ public class MultipartItemBlock extends BlockItem {
 
             newState.getBlock().onBlockPlacedBy(world, pos, newState, player, stack);
 
-            if (player instanceof PlayerEntityMP) {
-                CriteriaTriggers.PLACED_BLOCK.trigger((PlayerEntityMP) player, pos, stack);
+            if (player instanceof ServerPlayerEntity) {
+                CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayerEntity) player, pos, stack);
             }
         }
 
@@ -212,36 +213,13 @@ public class MultipartItemBlock extends BlockItem {
         float f6 = f3 * f4;
         float f7 = f2 * f4;
         double reach = 5.0D;
-        if (playerIn instanceof PlayerEntityMP) {
-            reach = ((PlayerEntityMP) playerIn).interactionManager.getBlockReachDistance();
+        if (playerIn instanceof ServerPlayerEntity) {
+            // @todo 1.14
+//            reach = ((ServerPlayerEntity) playerIn).interactionManager.getBlockReachDistance();
         }
-        Vec3d vec31 = vec3.addVector(f6 * reach, f5 * reach, f7 * reach);
-        return worldIn.rayTraceBlocks(vec3, vec31, useLiquids, !useLiquids, false);
+        Vec3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
+        RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
+        return worldIn.rayTraceBlocks(context);
     }
 
-
-    /*
-     * Add a new cable to a bundle adjacent to the given coordinate.
-     */
-    private void addCable(World world, BlockPos pos, Direction directionHit, float hitX, float hitY, float hitZ) {
-        BlockPos adjacentC = pos.offset(directionHit.getOpposite());
-        Vec3d vector;
-        if (world.isSideSolid(adjacentC, directionHit)) {
-            vector = new Vec3d(adjacentC.getX() + hitX + directionHit.getDirectionVec().getX() / 10.0f, adjacentC.getY() + hitY + directionHit.getDirectionVec().getY() / 10.0f, adjacentC.getZ() + hitZ + directionHit.getDirectionVec().getZ() / 10.0f);
-        } else {
-            Set<Integer> excluded = Collections.emptySet();
-
-            vector = new Vec3d(pos.getX() + .5f, pos.getY() + .5f, pos.getZ() + .5f);
-//            Optional<BundleTE> bundleTE = BlockTools.getTE(BundleTE.class, world, adjacentC);
-//            if (bundleTE.isPresent()) {
-//                CableSection connectableSection = bundleTE.get().findConnectableSection(type, subType, excluded);
-//                if (connectableSection != null) {
-//                    vector = connectableSection.getVector().addVector(directionHit.getDirectionVec().getX(), directionHit.getDirectionVec().getY(), directionHit.getDirectionVec().getZ());
-//                }
-//            }
-        }
-
-        final Vec3d finalVector = vector;
-//        BlockTools.getTE(BundleTE.class, world, pos).ifPresent(p -> p.addCableToNetwork(type, subType, finalVector));
-    }
 }

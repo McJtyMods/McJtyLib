@@ -5,14 +5,12 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -67,7 +65,7 @@ public class MultipartHelper {
             CompoundNBT tagCompound = new CompoundNBT();
             ((GenericTileEntity) hitTile).writeRestorableToNBT(tagCompound);
             ((GenericTileEntity) hitTile).onReplaced(multipartTE.getWorld(), multipartTE.getPos(), hitState);
-            stack.setTagCompound(tagCompound);
+            stack.setTag(tagCompound);
         }
         BlockTools.spawnItemStack(multipartTE.getWorld(), pos.getX(), pos.getY(), pos.getZ(), stack);
 
@@ -87,11 +85,13 @@ public class MultipartHelper {
         float f6 = f3 * f4;
         float f7 = f2 * f4;
         double reach = 5.0D;
-        if (playerIn instanceof net.minecraft.entity.player.PlayerEntityMP) {
-            reach = ((PlayerEntityMP)playerIn).interactionManager.getBlockReachDistance();
+        if (playerIn instanceof ServerPlayerEntity) {
+            // @todo 1.14
+//            reach = ((ServerPlayerEntity)playerIn).interactionManager.getBlockReachDistance();
         }
-        Vec3d vec31 = vec3.addVector(f6 * reach, f5 * reach, f7 * reach);
-        return worldIn.rayTraceBlocks(vec3, vec31, useLiquids, !useLiquids, false);
+        Vec3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
+        RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
+        return worldIn.rayTraceBlocks(context);
     }
 
     public static Vec3d getPlayerEyes(PlayerEntity playerIn) {

@@ -2,56 +2,33 @@ package mcjty.lib.varia;
 
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
+
 public class CapabilityTools {
 
-    public static boolean hasItemCapabilitySafe(TileEntity tileEntity) {
+    @Nonnull
+    public static LazyOptional<IItemHandler> getItemCapabilitySafe(TileEntity tileEntity) {
         try {
-            if (tileEntity != null && tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
-                return true;
-            }
-            return false;
+            return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
         } catch (RuntimeException e) {
             reportWrongBlock(tileEntity, e);
-            return false;
+            return LazyOptional.empty();
         }
     }
 
-    public static IItemHandler getItemCapabilitySafe(TileEntity tileEntity) {
+    @Nonnull
+    public static LazyOptional<IFluidHandler> getFluidCapabilitySafe(TileEntity tileEntity) {
         try {
-            return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
         } catch (RuntimeException e) {
             reportWrongBlock(tileEntity, e);
-            return null;
-        }
-    }
-
-    public static IFluidHandler hasFluidCapabilitySafe(TileEntity tileEntity) {
-        try {
-            if (tileEntity != null && tileEntity.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null)) {
-                IFluidHandler capability = tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
-                if (capability == null) {
-                    reportWrongBlock(tileEntity, null);
-                }
-                return capability;
-            }
-            return null;
-        } catch (RuntimeException e) {
-            reportWrongBlock(tileEntity, e);
-            return null;
-        }
-    }
-
-    public static IFluidHandler getFluidCapabilitySafe(TileEntity tileEntity) {
-        try {
-            return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
-        } catch (RuntimeException e) {
-            reportWrongBlock(tileEntity, e);
-            return null;
+            return LazyOptional.empty();
         }
     }
 

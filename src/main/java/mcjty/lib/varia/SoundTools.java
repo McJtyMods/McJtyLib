@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
-import net.minecraft.entity.player.PlayerEntityMP;
-import net.minecraft.network.play.server.SPacketSoundEffect;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.server.SPlaySoundEffectPacket;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
@@ -11,10 +11,10 @@ public class SoundTools {
 
     // Server side: play a sound to all nearby players
     public static void playSound(World worldObj, SoundEvent soundName, double x, double y, double z, double volume, double pitch) {
-        SPacketSoundEffect soundEffect = new SPacketSoundEffect(soundName, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
+        SPlaySoundEffectPacket soundEffect = new SPlaySoundEffectPacket(soundName, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
 
-        for (int j = 0; j < worldObj.playerEntities.size(); ++j) {
-            PlayerEntityMP PlayerEntitymp = (PlayerEntityMP)worldObj.playerEntities.get(j);
+        for (int j = 0; j < worldObj.getPlayers().size(); ++j) {
+            ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity)worldObj.getPlayers().get(j);
             BlockPos chunkcoordinates = PlayerEntitymp.getPosition();
             double d7 = x - chunkcoordinates.getX();
             double d8 = y - chunkcoordinates.getY();
