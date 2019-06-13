@@ -255,7 +255,7 @@ public class McJtyLib implements ModBase {
     }
 
     static {
-        PREFERENCES_CAPABILITY_KEY = new ResourceLocation(MODID, "Preferences");
+        PREFERENCES_CAPABILITY_KEY = new ResourceLocation(MODID, "preferences");
     }
 
 }
