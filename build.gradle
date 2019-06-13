@@ -52,7 +52,7 @@ group= "com.github.mcjty" // http://maven.apache.org/guides/mini/guide-naming-co
 archivesBaseName = "mcjtylib"
 
 if (System.getenv('BUILD_NUMBER') != null) {
-    version += "-${System.getenv('BUILD_NUMBER')}"
+    version += ".${System.getenv('BUILD_NUMBER')}"
 }
 
 sourceCompatibility = 1.8
