@@ -1,6 +1,6 @@
 package mcjty.lib.preferences;
 
-import mcjty.lib.McJtyLib;
+import mcjty.lib.setup.ModSetup;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -22,7 +22,7 @@ public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializa
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
-        if (cap == McJtyLib.PREFERENCES_CAPABILITY) {
+        if (cap == ModSetup.PREFERENCES_CAPABILITY) {
             return LazyOptional.of(() -> (T) properties);
         }
         return LazyOptional.empty();

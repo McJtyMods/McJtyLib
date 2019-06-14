@@ -1,6 +1,5 @@
 package mcjty.lib.setup;
 
-import mcjty.lib.McJtyLib;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -18,7 +17,6 @@ public abstract class DefaultModSetup {
     public void init(FMLCommonSetupEvent e) {
         logger = LogManager.getLogger();
         createTabs();
-        McJtyLib.preInit(e);
 //        modConfigDir = e.getModConfigurationDirectory();
 
         setupConfig();
