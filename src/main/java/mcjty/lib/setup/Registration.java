@@ -45,6 +45,6 @@ public class Registration {
 
     @SubscribeEvent
     public static void onItemRegister(final RegistryEvent.Register<Item> e) {
-        e.getRegistry().register(new MultipartItemBlock(multipartBlock));
+        e.getRegistry().register(new MultipartItemBlock(multipartBlock).setRegistryName(multipartBlock.getRegistryName()));
     }
 }
