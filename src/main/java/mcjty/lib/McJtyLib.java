@@ -9,19 +9,13 @@ import mcjty.lib.setup.IProxy;
 import mcjty.lib.setup.ModSetup;
 import mcjty.lib.setup.ServerProxy;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.Logging;
-import mcjty.lib.worlddata.AbstractWorldData;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -76,18 +70,6 @@ public class McJtyLib implements ModBase {
         for (ModBase mod : mods.values()) {
             consumer.accept(mod);
         }
-    }
-
-    @SubscribeEvent
-    public void serverStarted(FMLServerAboutToStartEvent event) {
-        Logging.log("Preparing all world data");
-        AbstractWorldData.clearInstances();
-    }
-
-    @SubscribeEvent
-    public void serverStopped(FMLServerStoppedEvent event) {
-        Logging.log("Cleaning up all world data: " + AbstractWorldData.getDataCount() + " data blobs");
-        AbstractWorldData.clearInstances();
     }
 
     @Override
