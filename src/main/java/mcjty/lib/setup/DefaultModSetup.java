@@ -16,7 +16,6 @@ public abstract class DefaultModSetup {
 
     public void init(FMLCommonSetupEvent e) {
         logger = LogManager.getLogger();
-        createTabs();
 //        modConfigDir = e.getModConfigurationDirectory();
 
         setupConfig();
@@ -26,8 +25,6 @@ public abstract class DefaultModSetup {
     protected abstract void setupModCompat();
 
     protected abstract void setupConfig();
-
-    public abstract void createTabs();
 
     protected void createTab(String name, Supplier<ItemStack> stack) {
         creativeTab = new ItemGroup(name) {

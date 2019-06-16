@@ -86,10 +86,6 @@ public class ModSetup extends DefaultModSetup {
 
     }
 
-    @Override
-    public void createTabs() {
-    }
-
     public static class EventHandler {
 
         private EventHandler(){
