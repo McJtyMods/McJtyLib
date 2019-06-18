@@ -78,7 +78,7 @@ public class Window {
                             String channel = cmd.getOptionalPar(0, "");
                             String teCommand = cmd.getOptionalPar(1, "");
                             event(channel, (source, params) ->
-                                    ((GenericGuiContainer<?>) gui).sendServerCommand(wrapper, teCommand, params));
+                                    ((GenericGuiContainer<?,?>) gui).sendServerCommand(wrapper, teCommand, params));
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
                     toplevel = new Panel(Minecraft.getInstance(), gui);
@@ -103,7 +103,7 @@ public class Window {
 
         if (dim[0] != -1 || dim[1] != -1) {
             if (gui instanceof GenericGuiContainer) {
-                ((GenericGuiContainer<?>) gui).setWindowDimensions(dim[0], dim[1]);
+                ((GenericGuiContainer<?,?>) gui).setWindowDimensions(dim[0], dim[1]);
             }
             int guiLeft = (gui.width - dim[0]) / 2;
             int guiTop = (gui.height - dim[1]) / 2;
@@ -386,7 +386,7 @@ public class Window {
     }
 
     private void sendAction(SimpleChannel network, IAction action) {
-        ((GenericGuiContainer<?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
+        ((GenericGuiContainer<?,?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
                 TypedMap.builder()
                         .put(GenericTileEntity.PARAM_KEY, action.getKey())
                         .build());
@@ -417,7 +417,7 @@ public class Window {
 
         event(componentName, (source, params) -> {
             Type<V> type = value.getKey().getType();
-            ((GenericGuiContainer<?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
+            ((GenericGuiContainer<?,?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
                     TypedMap.builder()
                             // @todo this conversion can fail!
                             .put(value.getKey(), type.convert(component.getGenericValue(type)))

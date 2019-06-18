@@ -13,7 +13,7 @@ public class ClientEventHandler {
     @SubscribeEvent
     public void onKeyboardInput(GuiScreenEvent.KeyboardKeyEvent event) {
         if (event.getGui() instanceof GenericGuiContainer) {
-            GenericGuiContainer<?> container = (GenericGuiContainer<?>) event.getGui();
+            GenericGuiContainer<?,?> container = (GenericGuiContainer<?,?>) event.getGui();
             Widget<?> focus = container.getWindow().getTextFocus();
             if (focus != null) {
                 event.setCanceled(true);

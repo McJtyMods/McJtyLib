@@ -120,7 +120,7 @@ public class WindowManager {
         getInteractableWindows().forEach(w -> {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
-                GenericGuiContainer<?> gui = (GenericGuiContainer<?>) this.gui;
+                GenericGuiContainer<?,?> gui = (GenericGuiContainer<?,?>) this.gui;
                 gui.drawHoveringText(tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().fontRenderer);
             }
         });

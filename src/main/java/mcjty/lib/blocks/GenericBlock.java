@@ -64,7 +64,7 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     private IModuleSupport moduleSupport = null;
 
     // Client side
-    private BiFunction<T, C, GenericGuiContainer<? super T>> guiFactory;
+    private BiFunction<T, C, GenericGuiContainer<? super T, ? super C>> guiFactory;
 
     private int guiId = -1;
 
@@ -503,12 +503,12 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
     }
 
     // Client side
-    public BiFunction<T, C, GenericGuiContainer<? super T>> getGuiFactory() {
+    public BiFunction<T, C, GenericGuiContainer<? super T, ? super C>> getGuiFactory() {
         return guiFactory;
     }
 
     // Client side
-    public void setGuiFactory(BiFunction<T, C, GenericGuiContainer<? super T>> guiFactory) {
+    public void setGuiFactory(BiFunction<T, C, GenericGuiContainer<? super T, ? super C>> guiFactory) {
         this.guiFactory = guiFactory;
     }
 

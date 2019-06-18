@@ -3,6 +3,7 @@ package mcjty.lib.gui;
 import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.PacketSendServerCommand;
@@ -31,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class GenericGuiContainer<T extends GenericTileEntity> extends ContainerScreen {
+public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends GenericContainer> extends ContainerScreen<C> {
 
     protected ModBase modBase;
     protected SimpleChannel network;
@@ -57,7 +58,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity> extends C
         this.ySize = y;
     }
 
-    public GenericGuiContainer(ModBase mod, SimpleChannel network, T tileEntity, Container container, PlayerInventory inventory, int manual, String manualNode) {
+    public GenericGuiContainer(ModBase mod, SimpleChannel network, T tileEntity, C container, PlayerInventory inventory, int manual, String manualNode) {
         super(container, inventory, new StringTextComponent("test"));   // @todo
         this.modBase = mod;
         this.network = network;
