@@ -3,7 +3,6 @@ package mcjty.lib.gui;
 import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
-import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.PacketSendServerCommand;
@@ -26,13 +25,13 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends GenericContainer> extends ContainerScreen<C> {
+public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends Container> extends ContainerScreen<C> {
 
     protected ModBase modBase;
     protected SimpleChannel network;
