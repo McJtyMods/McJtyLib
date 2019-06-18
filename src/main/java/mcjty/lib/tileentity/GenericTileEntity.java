@@ -10,14 +10,11 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.ItemStackList;
-import mcjty.lib.varia.NullSidedInvWrapper;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
@@ -38,13 +35,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -416,39 +408,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     @Override
     public boolean receiveDataFromServer(String command, @Nonnull TypedMap result) {
         return false;
-    }
-
-
-    protected boolean needsCustomInvWrapper() {
-        return false;
-    }
-
-    protected IItemHandler invHandlerNull;
-    protected IItemHandler invHandlerSided;
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing) {
-        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-            if (needsCustomInvWrapper()) {
-                if (facing == null) {
-                    return LazyOptional.of(() -> {
-                        if (invHandlerNull == null) {
-                            invHandlerNull = new InvWrapper((IInventory) this);
-                        }
-                        return (T) invHandlerNull;
-                    });
-                } else {
-                    return LazyOptional.of(() -> {
-                        if (invHandlerSided == null) {
-                            invHandlerSided = new NullSidedInvWrapper((ISidedInventory) this);
-                        }
-                        return (T) invHandlerSided;
-                    });
-                }
-            }
-        }
-        return super.getCapability(capability, facing);
     }
 
     public boolean checkAccess(PlayerEntity player) {
