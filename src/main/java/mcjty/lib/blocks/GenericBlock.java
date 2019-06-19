@@ -262,6 +262,11 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         world.setBlockState(pos, Blocks.AIR.getDefaultState());
     }
 
+    @Override
+    public boolean hasTileEntity(BlockState state) {
+        return true;
+    }
+
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
