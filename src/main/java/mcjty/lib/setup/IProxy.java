@@ -47,5 +47,8 @@ public interface IProxy {
 
     boolean isSneakKeyDown();
 
+    // This version goes directly to LWJGL
+    boolean isShiftKeyDown();
+
     IAnimationStateMachine load(ResourceLocation location, ImmutableMap<String, ITimeValue> parameters);
 }

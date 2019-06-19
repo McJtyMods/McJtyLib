@@ -93,6 +93,11 @@ public abstract class DefaultServerProxy implements IProxy {
     }
 
     @Override
+    public boolean isShiftKeyDown() {
+        throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
     public IAnimationStateMachine load(ResourceLocation location, ImmutableMap<String, ITimeValue> parameters) {
         throw new IllegalStateException("This should only be called from client side");
     }

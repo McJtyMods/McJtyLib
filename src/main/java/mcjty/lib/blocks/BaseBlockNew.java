@@ -87,7 +87,7 @@ public class BaseBlockNew extends Block implements WailaInfoProvider, TOPInfoPro
 
         InformationString i = informationString;
         // @todo 1.14: check if this actually works!
-        if (McJtyLib.proxy.isSneakKeyDown()) {
+        if (McJtyLib.proxy.isShiftKeyDown()) {
             i = informationStringWithShift;
         }
 //        if ((Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {

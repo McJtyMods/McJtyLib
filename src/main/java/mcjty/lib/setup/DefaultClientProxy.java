@@ -2,9 +2,11 @@ package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
+import net.java.games.input.Keyboard;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -14,6 +16,7 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.Callable;
 
@@ -106,6 +109,12 @@ public class DefaultClientProxy implements IProxy {
     @Override
     public boolean isSneakKeyDown() {
         return Minecraft.getInstance().gameSettings.keyBindSneak.isKeyDown();
+    }
+
+    @Override
+    public boolean isShiftKeyDown() {
+        long handle = Minecraft.getInstance().mainWindow.getHandle();
+        return InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT) || InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
     @Override
