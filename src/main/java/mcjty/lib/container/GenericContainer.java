@@ -7,16 +7,14 @@ import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.IContainerListener;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.inventory.container.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +32,12 @@ public class GenericContainer extends Container {
 
     public GenericContainer(ContainerFactory factory) {
         super(null, -1);    // @todo 1.14 check!
+        this.factory = factory;
+        factory.doSetup();
+    }
+
+    public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory) {
+        super(type, id);
         this.factory = factory;
         factory.doSetup();
     }
