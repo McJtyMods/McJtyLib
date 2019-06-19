@@ -2,14 +2,14 @@ package mcjty.lib.container;
 
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
-public class CraftingSlot extends Slot {
+public class CraftingSlot extends SlotItemHandler {
     private final GenericCrafter crafter;
 
-    public CraftingSlot(IInventory inventory, int index, int x, int y, GenericCrafter crafter) {
+    public CraftingSlot(IItemHandler inventory, int index, int x, int y, GenericCrafter crafter) {
         super(inventory, index, x, y);
         this.crafter = crafter;
     }

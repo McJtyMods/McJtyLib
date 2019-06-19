@@ -6,13 +6,14 @@ import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -22,40 +23,37 @@ import java.util.Map;
  * Generic container support.
  */
 public class GenericContainer extends Container {
-    protected Map<String,IInventory> inventories = new HashMap<>();
+    protected Map<String,IItemHandler> inventories = new HashMap<>();
     private ContainerFactory factory;
     private GenericCrafter crafter = null;
+    protected final BlockPos pos;
 
-    public GenericContainer(int id) {
-        super(Registration.GENERIC_CONTAINER_TYPE, id); // @todo check?
-    }
-
-    public GenericContainer(ContainerFactory factory) {
-        super(null, -1);    // @todo 1.14 check!
-        this.factory = factory;
-        factory.doSetup();
-    }
-
-    public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory) {
+    public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory, BlockPos pos) {
         super(type, id);
         this.factory = factory;
+        this.pos = pos;
         factory.doSetup();
     }
 
-    public void addInventory(String name, IInventory inventory) {
+    public void addInventory(String name, IItemHandler inventory) {
         inventories.put(name, inventory);
     }
 
-    public IInventory getInventory(String name) {
+    public BlockPos getPos() {
+        return pos;
+    }
+
+    public IItemHandler getInventory(String name) {
         return inventories.get(name);
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity PlayerEntity) {
-        for (IInventory inventory : inventories.values()) {
-            if (!inventory.isUsableByPlayer(PlayerEntity)) {
-                return false;
-            }
+    public boolean canInteractWith(PlayerEntity player) {
+        for (IItemHandler inventory : inventories.values()) {
+            // @todo
+//            if (!inventory.isUsableByPlayer(player)) {
+//                return false;
+//            }
         }
         return true;
     }
@@ -74,7 +72,7 @@ public class GenericContainer extends Container {
 
     public void generateSlots() {
         for (SlotFactory slotFactory : factory.getSlots()) {
-            IInventory inventory = inventories.get(slotFactory.getInventoryName());
+            IItemHandler inventory = inventories.get(slotFactory.getInventoryName());
             int index = slotFactory.getIndex();
             int x = slotFactory.getX();
             int y = slotFactory.getY();
@@ -84,7 +82,7 @@ public class GenericContainer extends Container {
         }
     }
 
-    protected Slot createSlot(SlotFactory slotFactory, final IInventory inventory, final int index, final int x, final int y, SlotType slotType) {
+    protected Slot createSlot(SlotFactory slotFactory, final IItemHandler inventory, final int index, final int x, final int y, SlotType slotType) {
         Slot slot;
         if (slotType == SlotType.SLOT_GHOST) {
             slot = new GhostSlot(inventory, index, x, y);
@@ -92,7 +90,7 @@ public class GenericContainer extends Container {
             slot = new GhostOutputSlot(inventory, index, x, y);
         } else if (slotType == SlotType.SLOT_SPECIFICITEM) {
             final SlotDefinition slotDefinition = slotFactory.getSlotDefinition();
-            slot = new Slot(inventory, index, x, y) {
+            slot = new SlotItemHandler(inventory, index, x, y) {
                 @Override
                 public boolean isItemValid(ItemStack stack) {
                     return slotDefinition.itemStackMatches(stack);

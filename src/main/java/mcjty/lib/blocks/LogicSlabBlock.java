@@ -72,8 +72,8 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Override
-    public BaseBlock.RotationType getRotationType() {
-        return BaseBlock.RotationType.NONE;
+    public RotationType getRotationType() {
+        return RotationType.NONE;
     }
 
     @Nullable

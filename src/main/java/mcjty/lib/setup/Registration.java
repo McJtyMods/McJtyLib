@@ -1,7 +1,6 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.container.GenericContainer;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartItemBlock;
 import mcjty.lib.multipart.MultipartTE;
@@ -30,12 +29,6 @@ public class Registration {
     @SubscribeEvent
     public static void registerTiles(final RegistryEvent.Register<TileEntityType<?>> registry) {
         registry.getRegistry().register(TYPE_MULTIPART = TileEntityType.Builder.create(MultipartTE::new).build(null).setRegistryName(new ResourceLocation(McJtyLib.MODID, "multipart")));
-    }
-
-    @SubscribeEvent
-    public static void onContainerTypeRegister(final RegistryEvent.Register<ContainerType<?>> e) {
-        e.getRegistry().register(
-                new ContainerType<>((id, inv) -> new GenericContainer(id)).setRegistryName(McJtyLib.MODID, "generic"));
     }
 
     @SubscribeEvent

@@ -1,16 +1,16 @@
 package mcjty.lib.container;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 /**
  * A slot typically used for crafting grids.
  */
-public class GhostSlot extends Slot {
+public class GhostSlot extends SlotItemHandler {
 
-    public GhostSlot(IInventory inventory, int index, int x, int y) {
+    public GhostSlot(IItemHandler inventory, int index, int x, int y) {
         super(inventory, index, x, y);
     }
 

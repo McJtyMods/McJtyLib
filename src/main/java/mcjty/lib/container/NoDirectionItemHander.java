@@ -3,11 +3,12 @@ package mcjty.lib.container;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
-public class NoDirectionItemHander implements IItemHandler {
+public class NoDirectionItemHander implements IItemHandlerModifiable {
 
     private final InventoryHelper helper;
     private final GenericTileEntity te;
@@ -139,6 +140,11 @@ public class NoDirectionItemHander implements IItemHandler {
             te.markDirtyQuick();
             return decrStackSize;
         }
+    }
+
+    @Override
+    public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
+        helper.setStackInSlot(slot, stack);
     }
 
     @Override

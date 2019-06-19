@@ -3,6 +3,7 @@ package mcjty.lib.builder;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericItemBlock;
+import mcjty.lib.blocks.RotationType;
 import mcjty.lib.multipart.PartSlot;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -62,7 +63,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
     protected Set<BlockFlags> flags = new HashSet<>();
     protected int lightValue = -1;
 
-    protected BaseBlock.RotationType rotationType = BaseBlock.RotationType.ROTATION;
+    protected RotationType rotationType = RotationType.ROTATION;
 
     public BaseBlockBuilder(ModBase mod, String registryName) {
         this.mod = mod;
@@ -114,7 +115,7 @@ public class BaseBlockBuilder<T extends BaseBlockBuilder<T>> {
         return (T) this;
     }
 
-    public T rotationType(BaseBlock.RotationType rotationType) {
+    public T rotationType(RotationType rotationType) {
         this.rotationType = rotationType;
         return (T) this;
     }

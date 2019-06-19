@@ -3,7 +3,7 @@ package mcjty.lib.varia;
 import mcjty.lib.blocks.BaseBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -43,13 +43,13 @@ public class OrientationTools {
         return ((BaseBlock)state.getBlock()).getFrontDirection(state);
     }
 
-    public static Direction determineOrientation(BlockPos pos, MobEntity MobEntity) {
-        return determineOrientation(pos.getX(), pos.getY(), pos.getZ(), MobEntity);
+    public static Direction determineOrientation(BlockPos pos, LivingEntity entity) {
+        return determineOrientation(pos.getX(), pos.getY(), pos.getZ(), entity);
     }
 
-    public static Direction determineOrientation(int x, int y, int z, MobEntity MobEntity) {
-        if (MathHelper.abs((float) MobEntity.posX - x) < 2.0F && MathHelper.abs((float) MobEntity.posZ - z) < 2.0F) {
-            double d0 = MobEntity.posY + 1.82D - MobEntity.getYOffset();
+    public static Direction determineOrientation(int x, int y, int z, LivingEntity entity) {
+        if (MathHelper.abs((float) entity.posX - x) < 2.0F && MathHelper.abs((float) entity.posZ - z) < 2.0F) {
+            double d0 = entity.posY + 1.82D - entity.getYOffset();
 
             if (d0 - y > 2.0D) {
                 return Direction.UP;
@@ -59,12 +59,12 @@ public class OrientationTools {
                 return DOWN;
             }
         }
-        int i = (int) ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D);
-        int l = ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        int i = (int) ((entity.rotationYaw * 4.0F / 360.0F) + 0.5D);
+        int l = ((entity.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
         return l == 0 ? Direction.NORTH : (l == 1 ? Direction.EAST : (l == 2 ? SOUTH : (l == 3 ? Direction.WEST : DOWN)));
     }
 
-    public static Direction determineOrientationHoriz(MobEntity MobEntity) {
+    public static Direction determineOrientationHoriz(LivingEntity MobEntity) {
         int i = (int) ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D);
         int l = ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
         return l == 0 ? Direction.NORTH : (l == 1 ? Direction.EAST : (l == 2 ? SOUTH : (l == 3 ? Direction.WEST : DOWN)));

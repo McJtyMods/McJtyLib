@@ -113,12 +113,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return PartSlot.NONE;
     }
 
-    public enum RotationType {
-        HORIZROTATION,
-        ROTATION,
-        NONE
-    }
-
     public RotationType getRotationType() {
         return RotationType.ROTATION;
     }

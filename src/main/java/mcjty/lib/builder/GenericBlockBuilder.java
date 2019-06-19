@@ -4,6 +4,7 @@ import mcjty.lib.api.IModuleSupport;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericBlock;
+import mcjty.lib.blocks.RotationType;
 import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.container.EmptyContainerFactory;
 import mcjty.lib.container.GenericContainer;
@@ -86,13 +87,14 @@ public class GenericBlockBuilder<T extends GenericTileEntity> extends BaseBlockB
 
         GenericBlock<T, GenericContainer> block = new GenericBlock<T, GenericContainer>(mod, material, tileEntityClass,
                 (player, tileEntity) -> {
-                    GenericContainer c = new GenericContainer(containerFactory);
-                    if (tileEntity != null) {
-                        c.addInventory(ContainerFactory.CONTAINER_CONTAINER, tileEntity);
-                    }
-                    c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
-                    c.generateSlots();
-                    return c;
+//                    GenericContainer c = new GenericContainer(containerFactory);
+                    // @todo REMOVE THIS ENTIRE CLASS
+//                    if (tileEntity != null) {
+//                        c.addInventory(ContainerFactory.CONTAINER_CONTAINER, tileEntity);
+//                    }
+//                    c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
+//                    c.generateSlots();
+                    return null;
                 },
                 itemBlockFactory, registryName, true) {
 

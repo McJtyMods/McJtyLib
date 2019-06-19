@@ -5,6 +5,7 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.blocks.GenericBlock;
 import mcjty.lib.blocks.LogicSlabBlock;
+import mcjty.lib.blocks.RotationType;
 import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.container.EmptyContainerFactory;
 import mcjty.lib.container.GenericContainer;
@@ -43,7 +44,7 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
 
     public LogicSlabBlockBuilder(ModBase mod, String registryName) {
         super(mod, registryName);
-        rotationType(BaseBlock.RotationType.NONE);
+        rotationType(RotationType.NONE);
     }
 
     public LogicSlabBlockBuilder<T> tileEntityClass(Class<T> tileEntityClass) {
@@ -94,13 +95,14 @@ public class LogicSlabBlockBuilder<T extends LogicTileEntity> extends BaseBlockB
 
         GenericBlock<T, GenericContainer> block = new LogicSlabBlock<T, GenericContainer>(mod, material, tileEntityClass,
                 (player, inventory) -> {
-                    GenericContainer c = new GenericContainer(containerFactory);
-                    if (inventory != null) {
-                        c.addInventory(ContainerFactory.CONTAINER_CONTAINER, inventory);
-                    }
-                    c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
-                    c.generateSlots();
-                    return c;
+//                    GenericContainer c = new GenericContainer(containerFactory);
+                    // @todo REMOVE THIS ENTIRE CLASS
+//                    if (inventory != null) {
+//                        c.addInventory(ContainerFactory.CONTAINER_CONTAINER, inventory);
+//                    }
+//                    c.addInventory(ContainerFactory.CONTAINER_PLAYER, player.inventory);
+//                    c.generateSlots();
+                    return null;
                 },
                 itemBlockFactory, registryName, true) {
 
