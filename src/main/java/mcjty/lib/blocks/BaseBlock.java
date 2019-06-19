@@ -19,9 +19,9 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Rotation;
@@ -62,11 +62,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     private InformationString informationString;
     private InformationString informationStringWithShift;
 
-    public static final DirectionProperty FACING_HORIZ = DirectionProperty.create("facing", Direction.Plane.HORIZONTAL);
-
-    public static final IProperty<?>[] HORIZ_PROPERTIES = new IProperty[]{FACING_HORIZ};
-    public static final DirectionProperty FACING = DirectionProperty.create("facing");
-    public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{FACING};
+    public static final IProperty<?>[] HORIZ_PROPERTIES = new IProperty[]{BlockStateProperties.HORIZONTAL_FACING};
+    public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{BlockStateProperties.FACING};
 
     public BaseBlock(ModBase mod,
                         Material material,
@@ -157,9 +154,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         BlockState state = super.getStateForPlacement(context);
         switch (getRotationType()) {
             case HORIZROTATION:
-                return state.with(FACING_HORIZ, placer.getHorizontalFacing().getOpposite());
+                return state.with(BlockStateProperties.HORIZONTAL_FACING, placer.getHorizontalFacing().getOpposite());
             case ROTATION:
-                return state.with(FACING, OrientationTools.getFacingFromEntity(pos, placer));
+                return state.with(BlockStateProperties.FACING, OrientationTools.getFacingFromEntity(pos, placer));
             default:
                 return state;
         }
@@ -179,9 +176,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public Direction getFrontDirection(BlockState state) {
         switch (getRotationType()) {
             case HORIZROTATION:
-                return state.get(FACING_HORIZ);
+                return state.get(BlockStateProperties.HORIZONTAL_FACING);
             case ROTATION:
-                return state.get(FACING);
+                return state.get(BlockStateProperties.FACING);
             default:
                 return Direction.NORTH;
         }
@@ -191,9 +188,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public BlockState rotate(BlockState state, IWorld world, BlockPos pos, Rotation rot) {
         switch (getRotationType()) {
             case HORIZROTATION:
-                return state.with(FACING_HORIZ, rot.rotate(state.get(FACING_HORIZ)));
+                return state.with(BlockStateProperties.HORIZONTAL_FACING, rot.rotate(state.get(BlockStateProperties.HORIZONTAL_FACING)));
             case ROTATION:
-                return state.with(FACING, rot.rotate(state.get(FACING)));
+                return state.with(BlockStateProperties.FACING, rot.rotate(state.get(BlockStateProperties.FACING)));
             case NONE:
                 return state;
         }

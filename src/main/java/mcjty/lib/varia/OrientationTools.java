@@ -4,6 +4,7 @@ import mcjty.lib.blocks.BaseBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -27,7 +28,7 @@ public class OrientationTools {
     }
 
     public static Direction getOrientationHoriz(BlockState state) {
-        return state.get(BaseBlock.FACING_HORIZ);
+        return state.get(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     public static int setOrientationHoriz(int metadata, Direction orientation) {
