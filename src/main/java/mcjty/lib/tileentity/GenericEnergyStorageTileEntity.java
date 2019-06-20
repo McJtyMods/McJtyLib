@@ -52,24 +52,16 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
     @Override
     public void read(CompoundNBT tagCompound) {
         super.read(tagCompound);
-    }
-
-    @Override
-    public void readRestorableFromNBT(CompoundNBT tagCompound) {
-        super.readRestorableFromNBT(tagCompound);
         storage.read(tagCompound);
+
     }
 
+    @Nonnull
     @Override
     public CompoundNBT write(CompoundNBT tagCompound) {
         super.write(tagCompound);
-        return tagCompound;
-    }
-
-    @Override
-    public void writeRestorableToNBT(CompoundNBT tagCompound) {
-        super.writeRestorableToNBT(tagCompound);
         storage.write(tagCompound);
+        return tagCompound;
     }
 
     public static long getCurrentRF() {

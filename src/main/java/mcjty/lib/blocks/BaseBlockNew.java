@@ -241,8 +241,6 @@ public class BaseBlockNew extends Block implements WailaInfoProvider, TOPInfoPro
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.onBlockPlacedBy(world, pos, state, placer, stack);
-        // @todo
-//        restoreBlockFromNBT(world, pos, stack);
         if (!world.isRemote && GeneralConfig.manageOwnership.get()) {
             setOwner(world, pos, placer);
         }

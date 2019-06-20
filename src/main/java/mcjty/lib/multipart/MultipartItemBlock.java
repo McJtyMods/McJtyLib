@@ -137,7 +137,8 @@ public class MultipartItemBlock extends BlockItem {
         if (te instanceof MultipartTE) {
             TileEntity tileEntity = createTileEntity(world, newState);
             if (tileEntity instanceof GenericTileEntity && stack.getTag() != null) {
-                ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
+                // @todo how to do this?
+//                ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
             }
             ((MultipartTE) te).addPart(slot, newState, tileEntity);
             return true;
@@ -156,7 +157,8 @@ public class MultipartItemBlock extends BlockItem {
             if (te instanceof MultipartTE) {
                 TileEntity tileEntity = createTileEntity(world, newState);
                 if (tileEntity instanceof GenericTileEntity && stack.hasTag()) {
-                    ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
+                    // @todo how to do this?
+//                    ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
                 }
                 ((MultipartTE) te).addPart(slot, newState, tileEntity);
                 return true;

@@ -63,7 +63,8 @@ public class MultipartHelper {
         ItemStack stack = new ItemStack(Item.getItemFromBlock(hitState.getBlock()));
         if (hitTile instanceof GenericTileEntity) {
             CompoundNBT tagCompound = new CompoundNBT();
-            ((GenericTileEntity) hitTile).writeRestorableToNBT(tagCompound);
+            // @todo how to fix the restorable parts from NBT?
+//            ((GenericTileEntity) hitTile).writeRestorableToNBT(tagCompound);
             ((GenericTileEntity) hitTile).onReplaced(multipartTE.getWorld(), multipartTE.getPos(), hitState);
             stack.setTag(tagCompound);
         }

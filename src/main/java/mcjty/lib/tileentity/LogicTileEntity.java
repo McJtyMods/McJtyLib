@@ -15,6 +15,8 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 
+import javax.annotation.Nonnull;
+
 import static mcjty.lib.blocks.LogicSlabBlock.LOGIC_FACING;
 import static mcjty.lib.blocks.LogicSlabBlock.META_INTERMEDIATE;
 
@@ -116,6 +118,7 @@ public class LogicTileEntity extends GenericTileEntity {
         facing = LogicFacing.VALUES[tagCompound.getInt("lf")];
     }
 
+    @Nonnull
     @Override
     public CompoundNBT write(CompoundNBT tagCompound) {
         super.write(tagCompound);

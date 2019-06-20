@@ -260,16 +260,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void read(CompoundNBT tagCompound) {
         super.read(tagCompound);
         powerLevel = tagCompound.getByte("powered");
-        readRestorableFromNBT(tagCompound);
-    }
-
-    /**
-     * Override this method to recover all information that you want
-     * to recover from an ItemBlock in the player's inventory.
-     *
-     * @param tagCompound
-     */
-    public void readRestorableFromNBT(CompoundNBT tagCompound) {
         if (needsRedstoneMode()) {
             int m = tagCompound.getByte("rsMode");
             rsMode = RedstoneMode.values()[m];
@@ -281,11 +271,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
         infused = tagCompound.getInt("infused");
         ownerName = tagCompound.getString("owner");
-        if (tagCompound.contains("idM")) {
-            ownerUUID = new UUID(tagCompound.getLong("idM"), tagCompound.getLong("idL"));
-        } else {
-            ownerUUID = null;
-        }
+        ownerUUID = tagCompound.getUniqueId("ownerId");
         if (tagCompound.contains("secChannel")) {
             securityChannel = tagCompound.getInt("secChannel");
         } else {
@@ -310,23 +296,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
+    @Nonnull
     public CompoundNBT write(CompoundNBT tagCompound) {
         super.write(tagCompound);
         if (powerLevel > 0) {
             tagCompound.putByte("powered", (byte) powerLevel);
         }
-        writeRestorableToNBT(tagCompound);
-        return tagCompound;
-    }
-
-    /**
-     * Override this method to store all information that you want
-     * to store in an ItemBlock in the player's inventory (when the block
-     * is picked up with a wrench).
-     *
-     * @param tagCompound
-     */
-    public void writeRestorableToNBT(CompoundNBT tagCompound) {
         if (needsRedstoneMode()) {
             tagCompound.putByte("rsMode", (byte) rsMode.ordinal());
         }
@@ -338,12 +313,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         tagCompound.putInt("infused", infused);
         tagCompound.putString("owner", ownerName);
         if (ownerUUID != null) {
-            tagCompound.putLong("idM", ownerUUID.getMostSignificantBits());
-            tagCompound.putLong("idL", ownerUUID.getLeastSignificantBits());
+            tagCompound.putUniqueId("ownerId", ownerUUID);
         }
         if (securityChannel != -1) {
             tagCompound.putInt("secChannel", securityChannel);
         }
+        return tagCompound;
     }
 
     public boolean setOwner(PlayerEntity player) {

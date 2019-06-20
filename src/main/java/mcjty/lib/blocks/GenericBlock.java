@@ -479,9 +479,9 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
         CompoundNBT tagCompound = itemStack.getTag();
         if (tagCompound != null) {
             TileEntity te = world.getTileEntity(pos);
-            if (te instanceof GenericTileEntity) {
-                ((GenericTileEntity)te).readRestorableFromNBT(tagCompound);
-            }
+//            if (te instanceof GenericTileEntity) {
+//                ((GenericTileEntity)te).readRestorableFromNBT(tagCompound);
+//            }
         }
     }
 
@@ -552,12 +552,12 @@ public abstract class GenericBlock<T extends GenericTileEntity, C extends Contai
 
     public ItemStack getItem(World world, BlockPos pos, BlockState state) {
         ItemStack stack = super.getItem(world, pos, state);
-        TileEntity te = world.getTileEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            CompoundNBT tagCompound = new CompoundNBT();
-            ((GenericTileEntity)te).writeRestorableToNBT(tagCompound);
-            stack.setTag(tagCompound);
-        }
+//        TileEntity te = world.getTileEntity(pos);
+//        if (te instanceof GenericTileEntity) {
+//            CompoundNBT tagCompound = new CompoundNBT();
+//            ((GenericTileEntity)te).writeRestorableToNBT(tagCompound);
+//            stack.setTag(tagCompound);
+//        }
         return stack;
     }
 }
