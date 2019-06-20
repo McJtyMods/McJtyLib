@@ -56,10 +56,10 @@ public class McJtyLib implements ModBase {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, GeneralConfig.COMMON_CONFIG);
 
         GeneralConfig.loadConfig(GeneralConfig.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-client.toml"));
-        GeneralConfig.loadConfig(GeneralConfig.SERVER_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-server.toml"));
+        GeneralConfig.loadConfig(GeneralConfig.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-common.toml"));
     }
 
     public static void registerMod(ModBase mod) {
