@@ -19,6 +19,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -56,7 +57,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
-    private String displayName = null;
     private int infused = 0;
 
     private String ownerName = "";
@@ -242,6 +242,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return new Object[0];
     }
 
+    @Override
+    public void read(CompoundNBT tagCompound) {
+        super.read(tagCompound);
+        readInfo(tagCompound);
+    }
+
     protected void readBufferFromNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
         readBufferFromNBT(tagCompound, "Items", inventoryHelper.getStacks());
     }
@@ -256,27 +262,34 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
-    @Override
-    public void read(CompoundNBT tagCompound) {
-        super.read(tagCompound);
-        powerLevel = tagCompound.getByte("powered");
-        if (needsRedstoneMode()) {
-            int m = tagCompound.getByte("rsMode");
-            rsMode = RedstoneMode.values()[m];
-        }
+    protected void readInfo(CompoundNBT tagCompound) {
+        if (tagCompound.contains("Info")) {
+            CompoundNBT infoTag = tagCompound.getCompound("Info");
+            powerLevel = infoTag.getByte("powered");
+            if (needsRedstoneMode()) {
+                int m = infoTag.getByte("rsMode");
+                rsMode = RedstoneMode.values()[m];
+            }
 
-        CompoundNBT display = tagCompound.getCompound("display");
-        if (display.contains("Name", Constants.NBT.TAG_STRING)) {
-            displayName = display.getString("Name");
-        }
-        infused = tagCompound.getInt("infused");
-        ownerName = tagCompound.getString("owner");
-        ownerUUID = tagCompound.getUniqueId("ownerId");
-        if (tagCompound.contains("secChannel")) {
-            securityChannel = tagCompound.getInt("secChannel");
+            infused = infoTag.getInt("infused");
+            ownerName = infoTag.getString("owner");
+            ownerUUID = infoTag.getUniqueId("ownerId");
+            if (infoTag.contains("secChannel")) {
+                securityChannel = infoTag.getInt("secChannel");
+            } else {
+                securityChannel = -1;
+            }
         } else {
             securityChannel = -1;
         }
+    }
+
+    @Override
+    @Nonnull
+    public CompoundNBT write(CompoundNBT tagCompound) {
+        super.write(tagCompound);
+        writeInfo(tagCompound);
+        return tagCompound;
     }
 
     protected void writeBufferToNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
@@ -295,30 +308,23 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         writeBufferToNBT(tagCompound, "Items", inventoryHelper.getStacks());
     }
 
-    @Override
-    @Nonnull
-    public CompoundNBT write(CompoundNBT tagCompound) {
-        super.write(tagCompound);
+    protected void writeInfo(CompoundNBT tagCompound) {
+        CompoundNBT infoTag = new CompoundNBT();
         if (powerLevel > 0) {
-            tagCompound.putByte("powered", (byte) powerLevel);
+            infoTag.putByte("powered", (byte) powerLevel);
         }
         if (needsRedstoneMode()) {
-            tagCompound.putByte("rsMode", (byte) rsMode.ordinal());
+            infoTag.putByte("rsMode", (byte) rsMode.ordinal());
         }
-        if (displayName != null) {
-            CompoundNBT display = tagCompound.getCompound("display");
-            display.putString("Name", displayName);
-            tagCompound.put("display", display);
-        }
-        tagCompound.putInt("infused", infused);
-        tagCompound.putString("owner", ownerName);
+        infoTag.putInt("infused", infused);
+        infoTag.putString("owner", ownerName);
         if (ownerUUID != null) {
-            tagCompound.putUniqueId("ownerId", ownerUUID);
+            infoTag.putUniqueId("ownerId", ownerUUID);
         }
         if (securityChannel != -1) {
-            tagCompound.putInt("secChannel", securityChannel);
+            infoTag.putInt("secChannel", securityChannel);
         }
-        return tagCompound;
+        tagCompound.put("Info", infoTag);
     }
 
     public boolean setOwner(PlayerEntity player) {
