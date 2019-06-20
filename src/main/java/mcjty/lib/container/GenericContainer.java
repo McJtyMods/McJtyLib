@@ -1,15 +1,17 @@
 package mcjty.lib.container;
 
 import com.google.common.collect.Range;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.network.PacketSendGuiData;
-import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.*;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.IItemHandler;
@@ -330,5 +332,18 @@ public class GenericContainer extends Container {
                 wrapper.sendTo(new PacketSendGuiData(world, pos), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
             }
         }
+    }
+
+    public static ContainerType<Container> createContainerType(String registryName) {
+        ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
+            BlockPos pos = data.readBlockPos();
+            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
+            if (!(te instanceof INamedContainerProvider)) {
+                throw new IllegalStateException("Something went wrong getting the GUI");
+            }
+            return ((INamedContainerProvider) te).createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer());
+        });
+        containerType.setRegistryName(registryName);
+        return containerType;
     }
 }
