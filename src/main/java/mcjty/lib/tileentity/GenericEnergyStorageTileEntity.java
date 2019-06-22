@@ -133,57 +133,49 @@ public class GenericEnergyStorageTileEntity extends GenericTileEntity implements
     // -----------------------------------------------------------
     // For IEnergyStorage
 
-    private final IEnergyStorage energyStorage = new IEnergyStorage() {
-        private final boolean isReceiver = GenericEnergyStorageTileEntity.this instanceof GenericEnergyReceiverTileEntity;
+    private LazyOptional<IEnergyStorage> energyStorage = LazyOptional.of(this::createEnergyStorage);
 
-        @Override
-        public int receiveEnergy(int maxReceive, boolean simulate) {
-            return isReceiver ? (int)storage.receiveEnergy(maxReceive, simulate) : 0;
-        }
+    private IEnergyStorage createEnergyStorage() {
+        return new IEnergyStorage() {
+            private final boolean isReceiver = GenericEnergyStorageTileEntity.this instanceof GenericEnergyReceiverTileEntity;
 
-        @Override
-        public int extractEnergy(int maxExtract, boolean simulate) {
-            return 0;
-        }
+            @Override
+            public int receiveEnergy(int maxReceive, boolean simulate) {
+                return isReceiver ? (int)storage.receiveEnergy(maxReceive, simulate) : 0;
+            }
 
-        @Override
-        public int getEnergyStored() {
-            return EnergyTools.getIntEnergyStored(storage.getEnergyStored(), storage.getMaxEnergyStored());
-        }
+            @Override
+            public int extractEnergy(int maxExtract, boolean simulate) {
+                return 0;
+            }
 
-        @Override
-        public int getMaxEnergyStored() {
-            return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
-        }
+            @Override
+            public int getEnergyStored() {
+                return EnergyTools.getIntEnergyStored(storage.getEnergyStored(), storage.getMaxEnergyStored());
+            }
 
-        @Override
-        public boolean canExtract() {
-            return false;
-        }
+            @Override
+            public int getMaxEnergyStored() {
+                return EnergyTools.unsignedClampToInt(storage.getMaxEnergyStored());
+            }
 
-        @Override
-        public boolean canReceive() {
-            return isReceiver;
-        }
-    };
+            @Override
+            public boolean canExtract() {
+                return false;
+            }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
-        if (cap == CapabilityEnergy.ENERGY) {
-            return LazyOptional.of(() -> (T) energyStorage);
-        }
-        // @todo 1.14
-//        } else if(capability == EnergyTools.TESLA_HOLDER) {
-//            return (T) this;
-        return super.getCapability(cap);
+            @Override
+            public boolean canReceive() {
+                return isReceiver;
+            }
+        };
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction facing) {
         if (cap == CapabilityEnergy.ENERGY) {
-            return LazyOptional.of(() -> (T) energyStorage);
+            return energyStorage.cast();
         }
         // @todo 1.14
 //        } else if(capability == EnergyTools.TESLA_HOLDER) {
