@@ -1,20 +1,23 @@
 package mcjty.lib.container;
 
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.varia.ItemStackList;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
-public class NoDirectionItemHander implements IItemHandlerModifiable {
+public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
 
     private final InventoryHelper helper;
     private final GenericTileEntity te;
 
-    public NoDirectionItemHander(InventoryHelper helper, GenericTileEntity te) {
-        this.helper = helper;
+    public NoDirectionItemHander(GenericTileEntity te, ContainerFactory factory, int count) {
+        this.helper = new InventoryHelper(te, factory, count);
         this.te = te;
     }
 
@@ -145,6 +148,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable {
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
         helper.setStackInSlot(slot, stack);
+        te.markDirtyQuick();
     }
 
     @Override
@@ -163,5 +167,30 @@ public class NoDirectionItemHander implements IItemHandlerModifiable {
 
     public boolean isItemExtractable(int slot, @Nonnull ItemStack stack) {
         return true;
+    }
+
+    @Override
+    public ListNBT serializeNBT() {
+        ItemStackList list = helper.getStacks();
+        ListNBT bufferTagList = new ListNBT();
+        for (ItemStack stack : list) {
+            CompoundNBT compoundNBT = new CompoundNBT();
+            if (!stack.isEmpty()) {
+                stack.write(compoundNBT);
+            }
+            bufferTagList.add(compoundNBT);
+        }
+        return bufferTagList;
+    }
+
+    @Override
+    public void deserializeNBT(ListNBT nbt) {
+        ItemStackList list = helper.getStacks();
+        for (int i = 0; i < nbt.size(); i++) {
+            CompoundNBT compoundNBT = nbt.getCompound(i);
+            if (i < list.size()) {
+                list.set(i, ItemStack.read(compoundNBT));
+            }
+        }
     }
 }

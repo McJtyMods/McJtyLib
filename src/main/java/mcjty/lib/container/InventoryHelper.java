@@ -1,10 +1,8 @@
 package mcjty.lib.container;
 
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.ItemStackList;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -14,23 +12,23 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InventoryHelper {
-    private final TileEntity tileEntity;
+    private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
     private ItemStackList stacks;
     private int count;
 
-    public InventoryHelper(TileEntity tileEntity, ContainerFactory containerFactory, int count) {
+    public InventoryHelper(GenericTileEntity tileEntity, ContainerFactory containerFactory, int count) {
         this.tileEntity = tileEntity;
         this.containerFactory = containerFactory;
         stacks = ItemStackList.create(count);
@@ -135,13 +133,19 @@ public class InventoryHelper {
     public static boolean installModule(PlayerEntity player, ItemStack heldItem, Hand hand, BlockPos pos, int start, int stop) {
         World world = player.getEntityWorld();
         TileEntity te = world.getTileEntity(pos);
-        if (te instanceof IInventory) {
-            IInventory inventory = (IInventory) te;
+        if (te == null) {
+            return false;
+        }
+        return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(inventory -> {
             for (int i = start ; i <= stop  ; i++) {
                 if (inventory.getStackInSlot(i).isEmpty()) {
                     ItemStack copy = heldItem.copy();
                     copy.setCount(1);
-                    inventory.setInventorySlotContents(i, copy);
+                    if (inventory instanceof IItemHandlerModifiable) {
+                        ((IItemHandlerModifiable) inventory).setStackInSlot(i, copy);
+                    } else {
+                        throw new IllegalStateException("Not an IItemHandlerModifiable!");
+                    }
                     heldItem.shrink(1);
                     if (heldItem.isEmpty()) {
                         player.setHeldItem(hand, ItemStack.EMPTY);
@@ -152,8 +156,8 @@ public class InventoryHelper {
                     return true;
                 }
             }
-        }
-        return false;
+            return false;
+        }).orElse(false);
     }
 
 
@@ -218,118 +222,6 @@ public class InventoryHelper {
             insertItemsItemHandlerWithUndo(handler, items, false);
             return true;
         }).orElse(false);
-    }
-
-    public static void undo(Map<Integer,ItemStack> undo, IInventory inventory) {
-        for (Map.Entry<Integer, ItemStack> entry : undo.entrySet()) {
-            inventory.setInventorySlotContents(entry.getKey(), entry.getValue());
-        }
-    }
-
-
-
-    /**
-     * Merges provided ItemStack with the first available one in this inventory. It will return the amount
-     * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
-     * This version also checks for ISidedInventory if that's implemented by the inventory
-     */
-    public static int mergeItemStackSafe(IInventory inventory, boolean checkSlots, Direction side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
-        if (inventory instanceof ISidedInventory) {
-            return mergeItemStackInternal(inventory, (ISidedInventory) inventory, checkSlots, side, result, start, stop, undo);
-        } else {
-            return mergeItemStackInternal(inventory, null, checkSlots, side, result, start, stop, undo);
-        }
-    }
-
-    /**
-     * Merges provided ItemStack with the first available one in this inventory. It will return the amount
-     * of items that could not be merged. Also fills the undo buffer in case you want to undo the operation.
-     */
-    public static int mergeItemStack(IInventory inventory, boolean checkSlots, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
-        return mergeItemStackInternal(inventory, null, checkSlots, null, result, start, stop, undo);
-    }
-
-    private static int mergeItemStackInternal(IInventory inventory, ISidedInventory sidedInventory, boolean checkSlots, Direction side, ItemStack result, int start, int stop, Map<Integer,ItemStack> undo) {
-        int k = start;
-
-        ItemStack itemstack1 = ItemStack.EMPTY;
-        int itemsToPlace = result.getCount();
-
-        if (result.isStackable()) {
-            while (itemsToPlace > 0 && (k < stop)) {
-                itemstack1 = inventory.getStackInSlot(k);
-
-                if (isItemStackConsideredEqual(result, itemstack1)
-                        && (sidedInventory == null || sidedInventory.canInsertItem(k, result, side))
-                        && ((!checkSlots) || inventory.isItemValidForSlot(k, result))) {
-                    int l = itemstack1.getCount() + itemsToPlace;
-
-                    if (l <= result.getMaxStackSize()) {
-                        if (undo != null) {
-                            // Only put on undo map if the key is not already present.
-                            if (!undo.containsKey(k)) {
-                                undo.put(k, itemstack1.copy());
-                            }
-                        }
-                        itemsToPlace = 0;
-                        if (l <= 0) {
-                            itemstack1.setCount(0);
-                        } else {
-                            itemstack1.setCount(l);
-                        }
-                        inventory.markDirty();
-                    } else if (itemstack1.getCount() < result.getMaxStackSize()) {
-                        if (undo != null) {
-                            if (!undo.containsKey(k)) {
-                                undo.put(k, itemstack1.copy());
-                            }
-                        }
-                        itemsToPlace -= result.getMaxStackSize() - itemstack1.getCount();
-                        int amount = result.getMaxStackSize();
-                        if (amount <= 0) {
-                            itemstack1.setCount(0);
-                        } else {
-                            itemstack1.setCount(amount);
-                        }
-                        inventory.markDirty();
-                    }
-                }
-
-                ++k;
-            }
-        }
-
-        if (itemsToPlace > 0) {
-            k = start;
-
-            while (k < stop) {
-                itemstack1 = inventory.getStackInSlot(k);
-
-                if (itemstack1.isEmpty()
-                        && (sidedInventory == null || sidedInventory.canInsertItem(k, result, side))
-                        && ((!checkSlots) || inventory.isItemValidForSlot(k, result))) {
-                    if (undo != null) {
-                        if (!undo.containsKey(k)) {
-                            undo.put(k, ItemStack.EMPTY);
-                        }
-                    }
-                    ItemStack copy = result.copy();
-                    if (itemsToPlace <= 0) {
-                        copy.setCount(0);
-                    } else {
-                        copy.setCount(itemsToPlace);
-                    }
-                    inventory.setInventorySlotContents(k, copy);
-                    inventory.markDirty();
-                    itemsToPlace = 0;
-                    break;
-                }
-
-                ++k;
-            }
-        }
-
-        return itemsToPlace;
     }
 
     private static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
@@ -436,44 +328,6 @@ public class InventoryHelper {
                 }
             }
             tileEntity.markDirty();
-        }
-    }
-
-    public static void compactStacks(InventoryHelper helper, int start, int max) {
-        compactStacks(helper.stacks, start, max);
-    }
-
-    public static void compactStacks(List<ItemStack> stacks, int start, int max) {
-        Inventory inv = new Inventory(max);
-        for (int i = 0 ; i < max ; i++) {
-            ItemStack stack = stacks.get(i+start);
-            if (!stack.isEmpty()) {
-                mergeItemStack(inv, false, stack, 0, max, null);
-            }
-        }
-        for (int i = 0 ; i < max ; i++) {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getCount() == 0) {
-                stack = ItemStack.EMPTY;
-            }
-            stacks.set(i+start, stack);
-        }
-    }
-
-    public static void compactStacks(ItemStack[] stacks, int start, int max) {
-        Inventory inv = new Inventory(max);
-        for (int i = 0 ; i < max ; i++) {
-            ItemStack stack = stacks[i+start];
-            if (!stack.isEmpty()) {
-                mergeItemStack(inv, false, stack, 0, max, null);
-            }
-        }
-        for (int i = 0 ; i < max ; i++) {
-            ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getCount() == 0) {
-                stack = ItemStack.EMPTY;
-            }
-            stacks[i+start] = stack;
         }
     }
 }

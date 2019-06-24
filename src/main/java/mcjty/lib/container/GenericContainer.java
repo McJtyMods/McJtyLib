@@ -5,10 +5,12 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.network.PacketSendGuiData;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.extensions.IForgeContainerType;
@@ -16,6 +18,7 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -35,6 +38,10 @@ public class GenericContainer extends Container {
         this.factory = factory;
         this.pos = pos;
         factory.doSetup();
+    }
+
+    public void addIntegerListener(IntReferenceHolder holder) {
+        func_216958_a(holder);
     }
 
     public void addInventory(String name, IItemHandler inventory) {
@@ -70,6 +77,12 @@ public class GenericContainer extends Container {
 
     public void setCrafter(GenericCrafter crafter) {
         this.crafter = crafter;
+    }
+
+    public void setupInventories(IItemHandler itemHandler, PlayerInventory inventory) {
+        addInventory(ContainerFactory.CONTAINER_CONTAINER, itemHandler);
+        addInventory(ContainerFactory.CONTAINER_PLAYER, new InvWrapper(inventory));
+        generateSlots();
     }
 
     public void generateSlots() {
