@@ -84,7 +84,7 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    if (project(':TheOneProbe') != null) {
+    if (findProject(':TheOneProbe') != null) {
         compile project(':TheOneProbe')
     } else {
         compile fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-${top_version}") {
