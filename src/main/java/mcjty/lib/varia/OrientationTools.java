@@ -23,6 +23,8 @@ public class OrientationTools {
     public static final int MASK_REDSTONE_OUT = 0x4;                    // Redstone out
     public static final int MASK_STATE = 0xc;                           // If redstone is not used: state
 
+    public static Direction[] DIRECTION_VALUES = Direction.values();
+
     public static int setOrientation(int metadata, Direction orientation) {
         return (metadata & ~MASK_ORIENTATION) | orientation.ordinal();
     }
