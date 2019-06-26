@@ -81,10 +81,6 @@ public class ModSetup extends DefaultModSetup {
         WrenchChecker.init();
     }
 
-    @Override
-    protected void setupConfig() {
-
-    }
 
     public static class EventHandler {
 
