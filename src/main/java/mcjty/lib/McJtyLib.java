@@ -4,10 +4,7 @@ import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.setup.ClientProxy;
-import mcjty.lib.setup.IProxy;
-import mcjty.lib.setup.ModSetup;
-import mcjty.lib.setup.ServerProxy;
+import mcjty.lib.setup.*;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.common.util.LazyOptional;
@@ -15,6 +12,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -37,7 +35,7 @@ public class McJtyLib implements ModBase {
     public static final String VERSION = "3.5.3";
     public static final String MODID = "mcjtylib";
 
-    public static IProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
+    public static IProxy proxy = DistExecutor.runForDist(() -> () -> new DefaultClientProxy(), () -> () -> new DefaultServerProxy());
     public static ModSetup setup = new ModSetup();
 
     public static McJtyLib instance;
@@ -53,7 +51,8 @@ public class McJtyLib implements ModBase {
     public McJtyLib() {
         instance = this;
         // Register the setup method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::init);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> setup.init(event));
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLClientSetupEvent event) -> ClientRegistration.init(event));
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, GeneralConfig.COMMON_CONFIG);
@@ -104,11 +103,6 @@ public class McJtyLib implements ModBase {
             return false;
         }
         return command.execute(player, arguments);
-    }
-
-    public void init(final FMLCommonSetupEvent event) {
-        setup.init(event);
-        proxy.init(event);
     }
 
     public static LazyOptional<PreferencesProperties> getPreferencesProperties(PlayerEntity player) {

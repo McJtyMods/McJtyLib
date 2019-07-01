@@ -5,21 +5,18 @@ import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.concurrent.Callable;
 
-public abstract class DefaultServerProxy implements IProxy {
-
-    @Override
-    public void init(FMLCommonSetupEvent e) {
-    }
+public class DefaultServerProxy implements IProxy {
 
     @Override
     public World getClientWorld() {
@@ -29,6 +26,11 @@ public abstract class DefaultServerProxy implements IProxy {
     @Override
     public PlayerEntity getClientPlayer() {
         throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
+    public NetworkManager getNetworkManager(PlayerEntity player) {
+        return ((ServerPlayerEntity) player).connection.netManager;
     }
 
     @Override

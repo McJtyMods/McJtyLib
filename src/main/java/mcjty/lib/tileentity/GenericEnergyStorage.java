@@ -63,12 +63,22 @@ public class GenericEnergyStorage implements IEnergyStorage {
     }
 
     public void consumeEnergy(long energy) {
-        if (energy > capacity - this.energy) {
-            energy = capacity - this.energy;
-        } else if (energy < -this.energy) {
-            energy = -this.energy;
+        this.energy -= energy;
+        if (this.energy < 0) {
+            this.energy = 0;
+        } else if (this.energy > capacity) {
+            this.energy = capacity;
         }
+        tileEntity.markDirtyQuick();
+    }
+
+    public void produceEnergy(long energy) {
         this.energy += energy;
+        if (this.energy < 0) {
+            this.energy = 0;
+        } else if (this.energy > capacity) {
+            this.energy = capacity;
+        }
         tileEntity.markDirtyQuick();
     }
 

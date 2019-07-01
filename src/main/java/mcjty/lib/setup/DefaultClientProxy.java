@@ -2,29 +2,24 @@ package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
-import net.java.games.input.Keyboard;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.Callable;
 
 public class DefaultClientProxy implements IProxy {
-
-    @Override
-    public void init(FMLCommonSetupEvent e) {
-    }
 
     @Override
     public World getClientWorld() {
@@ -34,6 +29,11 @@ public class DefaultClientProxy implements IProxy {
     @Override
     public PlayerEntity getClientPlayer() {
         return Minecraft.getInstance().player;
+    }
+
+    @Override
+    public NetworkManager getNetworkManager(PlayerEntity player) {
+        return Minecraft.getInstance().getConnection().getNetworkManager();
     }
 
     @Override

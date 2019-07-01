@@ -36,7 +36,7 @@ import static net.minecraft.util.Direction.*;
 /**
  * The superclass for logic slabs.
  */
-public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Container> extends BaseBlockNew {
+public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Container> extends BaseBlock {
 
     public static IntegerProperty META_INTERMEDIATE = IntegerProperty.create("intermediate", 0, 3);
     public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
@@ -203,6 +203,7 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         return power;
     }
 
+    @Override
     @Deprecated
     protected void checkRedstone(World world, BlockPos pos) {
         // Old behaviour

@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
 //        @Optional.Interface(iface = "mcjty.lib.compat.waila.WailaInfoProvider", modid = "waila"),
 //        @Optional.Interface(iface = "mcjty.lib.compat.theoneprobe.TOPInfoProvider", modid = "theoneprobe")
 //})
-public class BaseBlockNew extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock {
+public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock {
 
     private final boolean infusable;
     private final boolean hasGui;
@@ -69,7 +69,7 @@ public class BaseBlockNew extends Block implements WailaInfoProvider, TOPInfoPro
     public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{BlockStateProperties.FACING};
     public static final IProperty<?>[] NONE_PROPERTIES = new IProperty[0];
 
-    public BaseBlockNew(String name, BlockBuilder builder) {
+    public BaseBlock(String name, BlockBuilder builder) {
         super(builder.getProperties());
         setRegistryName(name);
         this.infusable = builder.isInfusable();
@@ -86,13 +86,9 @@ public class BaseBlockNew extends Block implements WailaInfoProvider, TOPInfoPro
         intAddInformation(stack, tooltip);
 
         InformationString i = informationString;
-        // @todo 1.14: check if this actually works!
         if (McJtyLib.proxy.isShiftKeyDown()) {
             i = informationStringWithShift;
         }
-//        if ((Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT))) {
-//            i = informationStringWithShift;
-//        }
         if (i != null) {
             addLocalizedInformation(i, stack, tooltip);
         }
@@ -251,11 +247,23 @@ public class BaseBlockNew extends Block implements WailaInfoProvider, TOPInfoPro
             genericTileEntity.onBlockPlacedBy(world, pos, state, placer, stack);
         }
 
-        // @todo
-//        if (needsRedstoneCheck()) {
-//            checkRedstone(world, pos);
-//        }
+        checkRedstone(world, pos);
     }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
+        super.neighborChanged(state, world, pos, blockIn, fromPos, p_220069_6_);
+        checkRedstone(world, pos);
+    }
+
+    protected void checkRedstone(World world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            ((GenericTileEntity) te).checkRedstone(world, pos);
+        }
+    }
+
 
     protected void setOwner(World world, BlockPos pos, LivingEntity entity) {
         TileEntity te = world.getTileEntity(pos);

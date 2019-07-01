@@ -6,22 +6,22 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.concurrent.Callable;
 
 public interface IProxy {
 
-    void init(FMLCommonSetupEvent e);
-
     World getClientWorld();
 
     PlayerEntity getClientPlayer();
+
+    NetworkManager getNetworkManager(PlayerEntity player);
 
     <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule);
 

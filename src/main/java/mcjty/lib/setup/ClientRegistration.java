@@ -7,14 +7,11 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-public class ClientProxy extends DefaultClientProxy {
+public class ClientRegistration {
 
-    @Override
-    public void init(FMLCommonSetupEvent e) {
-        super.init(e);
-
+    public static void init(FMLClientSetupEvent e) {
         MinecraftForge.EVENT_BUS.register(new TooltipRender());
         MinecraftForge.EVENT_BUS.register(new McJtyLibBlockRegister());
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());

@@ -1,7 +1,6 @@
 package mcjty.lib.container;
 
 import mcjty.lib.gui.GuiParser;
-import mcjty.lib.gui.GuiParserTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
@@ -18,7 +17,6 @@ public class ContainerFactory {
     private Map<Integer,SlotDefinition> indexToType = new HashMap<>();
     private Map<SlotDefinition,SlotRanges> slotRangesMap = new HashMap<>();
     private List<SlotFactory> slots = new ArrayList<>();
-    private final ResourceLocation containerDescriptor;
 
     public static final String CONTAINER_CONTAINER = "container";
     public static final String CONTAINER_PLAYER = "player";
@@ -30,26 +28,9 @@ public class ContainerFactory {
     private int[] accessibleOutputSlots;
 
     public ContainerFactory() {
-        containerDescriptor = null;
-    }
-
-    public ContainerFactory(ResourceLocation containerDescriptor) {
-        this.containerDescriptor = containerDescriptor;
-
     }
 
     protected void setup() {
-        if (containerDescriptor != null) {
-            GuiParserTools.parseAndHandleServer(containerDescriptor, command -> {
-                if ("container".equals(command.getId())) {
-                    command.commands()
-                            .filter(cmd -> "slot".equals(cmd.getId()))
-                            .forEach(this::handleSlotCommand);
-                    command.findCommand("playerslots")
-                            .ifPresent(cmd -> layoutPlayerInventorySlots(cmd.getOptionalPar(0, 0), cmd.getOptionalPar(1, 0)));
-                }
-            });
-        }
     }
 
     private void handleSlotCommand(GuiParser.GuiCommand slotCmd) {

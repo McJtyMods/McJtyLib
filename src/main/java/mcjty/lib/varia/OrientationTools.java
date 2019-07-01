@@ -1,6 +1,6 @@
 package mcjty.lib.varia;
 
-import mcjty.lib.blocks.BaseBlockNew;
+import mcjty.lib.blocks.BaseBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -42,7 +42,7 @@ public class OrientationTools {
     }
 
     public static Direction getOrientation(BlockState state) {
-        return ((BaseBlockNew)state.getBlock()).getFrontDirection(state);
+        return ((BaseBlock)state.getBlock()).getFrontDirection(state);
     }
 
     public static Direction determineOrientation(BlockPos pos, LivingEntity entity) {
