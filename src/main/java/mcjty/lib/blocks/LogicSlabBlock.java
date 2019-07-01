@@ -36,17 +36,13 @@ import static net.minecraft.util.Direction.*;
 /**
  * The superclass for logic slabs.
  */
-public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Container> extends GenericBlock<T, C> {
+public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Container> extends BaseBlockNew {
 
     public static IntegerProperty META_INTERMEDIATE = IntegerProperty.create("intermediate", 0, 3);
     public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
 
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<PlayerEntity, IInventory, C> containerFactory, String name, boolean isContainer) {
-        super(mod, material, tileEntityClass, containerFactory, name, isContainer);
-    }
-
     public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<PlayerEntity, IInventory, C> containerFactory, Function<Block, BlockItem> itemBlockFactory, String name, boolean isContainer) {
-        super(mod, material, tileEntityClass, containerFactory, itemBlockFactory, name, isContainer);
+        super(name, null);  // @todo
     }
 
     public static Direction rotateLeft(Direction downSide, Direction inputSide) {
@@ -142,15 +138,15 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         return super.getStateForPlacement(context).with(META_INTERMEDIATE, facing.getMeta()).with(LOGIC_FACING, facing);
     }
 
-    @Override
-    public boolean hasRedstoneOutput() {
-        return true;
-    }
-
-    @Override
-    public boolean needsRedstoneCheck() {
-        return true;
-    }
+//    @Override
+//    public boolean hasRedstoneOutput() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean needsRedstoneCheck() {
+//        return true;
+//    }
 
     public static final AxisAlignedBB BLOCK_DOWN = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 0.3F, 1.0F);
     public static final AxisAlignedBB BLOCK_UP = new AxisAlignedBB(0.0F, 0.7F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -188,15 +184,6 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
 //    }
 
 
-    // Client side
-    @Override
-    public void initModel() {
-        super.initModel();
-        // @todo 1.14
-//        StateMap.Builder ignorePower = new StateMap.Builder().ignore(META_INTERMEDIATE);
-//        ModelLoader.setCustomStateMapper(this, ignorePower.build());
-    }
-
     /**
      * Returns the signal strength at one input of the block
      */
@@ -217,7 +204,6 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     }
 
     @Deprecated
-    @Override
     protected void checkRedstone(World world, BlockPos pos) {
         // Old behaviour
         // @todo remove once all implementations do this in the TE.checkRedstone
@@ -273,7 +259,6 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
         return false;
     }
 
-    @Override
     protected int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         TileEntity te = world.getTileEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
