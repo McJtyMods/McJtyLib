@@ -72,6 +72,22 @@ public class PacketHandler {
         channel.registerMessage(startIndex++, PacketFinalizeLogin.class, PacketFinalizeLogin::toBytes, PacketFinalizeLogin::new, PacketFinalizeLogin::handle);
     }
 
+    public static void registerStandardMessages(SimpleChannel channel) {
+
+        // Server side
+        channel.registerMessage(nextPacketID(), PacketServerCommandTyped.class, PacketServerCommandTyped::toBytes, PacketServerCommandTyped::new, PacketServerCommandTyped::handle);
+        channel.registerMessage(nextPacketID(), PacketSendServerCommand.class, PacketSendServerCommand::toBytes, PacketSendServerCommand::new, PacketSendServerCommand::handle);
+        channel.registerMessage(nextPacketID(), PacketRequestDataFromServer.class, PacketRequestDataFromServer::toBytes, PacketRequestDataFromServer::new, PacketRequestDataFromServer::handle);
+        channel.registerMessage(nextPacketID(), PacketDumpItemInfo.class, PacketDumpItemInfo::toBytes, PacketDumpItemInfo::new, PacketDumpItemInfo::handle);
+        channel.registerMessage(nextPacketID(), PacketDumpBlockInfo.class, PacketDumpBlockInfo::toBytes, PacketDumpBlockInfo::new, PacketDumpBlockInfo::handle);
+
+        // Client side
+        channel.registerMessage(nextPacketID(), PacketSendClientCommand.class, PacketSendClientCommand::toBytes, PacketSendClientCommand::new, PacketSendClientCommand::handle);
+        channel.registerMessage(nextPacketID(), PacketDataFromServer.class, PacketDataFromServer::toBytes, PacketDataFromServer::new, PacketDataFromServer::handle);
+        channel.registerMessage(nextPacketID(), PacketSendGuiData.class, PacketSendGuiData::toBytes, PacketSendGuiData::new, PacketSendGuiData::handle);
+        channel.registerMessage(nextPacketID(), PacketFinalizeLogin.class, PacketFinalizeLogin::toBytes, PacketFinalizeLogin::new, PacketFinalizeLogin::handle);
+    }
+
     // From client side only: send server command
     public static void sendCommand(SimpleChannel network, String modid, String command, @Nonnull TypedMap arguments) {
         network.sendToServer(new PacketSendServerCommand(modid, command, arguments));
