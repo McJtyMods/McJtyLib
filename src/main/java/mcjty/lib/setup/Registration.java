@@ -1,12 +1,14 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.crafting.CopyNBTRecipeSerializer;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartItemBlock;
 import mcjty.lib.multipart.MultipartTE;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -17,13 +19,17 @@ import net.minecraftforge.registries.ObjectHolder;
 @Mod.EventBusSubscriber(modid = McJtyLib.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Registration {
 
-    @ObjectHolder("mcjtylib:generic")
+    @ObjectHolder(McJtyLib.MODID + ":generic")
     public static ContainerType GENERIC_CONTAINER_TYPE;
-    @ObjectHolder("mcjtylib:multipart")
-    public static MultipartBlock multipartBlock;
-    @ObjectHolder("mcjtylib:multipart")
-    public static MultipartItemBlock multipartItemBlock;
+    @ObjectHolder(McJtyLib.MODID + ":multipart")
+    public static MultipartBlock MULTIPART_BLOCK;
+    @ObjectHolder(McJtyLib.MODID + ":multipart")
+    public static MultipartItemBlock MULTIPART_ITEMBLOCK;
 
+    @ObjectHolder(McJtyLib.MODID + ":copy_nbt")
+    public static CopyNBTRecipeSerializer COPYNBT_SERIALIZER;
+
+    @ObjectHolder(McJtyLib.MODID + ":multipart")
     public static TileEntityType<?> TYPE_MULTIPART;
 
     @SubscribeEvent
@@ -38,6 +44,11 @@ public class Registration {
 
     @SubscribeEvent
     public static void onItemRegister(final RegistryEvent.Register<Item> e) {
-        e.getRegistry().register(new MultipartItemBlock(multipartBlock).setRegistryName(multipartBlock.getRegistryName()));
+        e.getRegistry().register(new MultipartItemBlock(MULTIPART_BLOCK).setRegistryName(MULTIPART_BLOCK.getRegistryName()));
+    }
+
+    @SubscribeEvent
+    public static void onRecipeRegister(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
+        e.getRegistry().register(new CopyNBTRecipeSerializer().setRegistryName(new ResourceLocation(McJtyLib.MODID, "copy_nbt")));
     }
 }

@@ -22,7 +22,7 @@ public class ClientRegistration {
     private static class McJtyLibBlockRegister {
         @SubscribeEvent
         public void registerModels(ModelRegistryEvent event) {
-            Registration.multipartBlock.initModel();
+            Registration.MULTIPART_BLOCK.initModel();
         }
 
     }

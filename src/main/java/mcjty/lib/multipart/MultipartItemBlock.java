@@ -92,7 +92,7 @@ public class MultipartItemBlock extends BlockItem {
     }
 
     private boolean canFitInside(Block block, World world, BlockPos pos, PartSlot slot) {
-        if (block != Registration.multipartBlock) {
+        if (block != Registration.MULTIPART_BLOCK) {
             return false;
         }
         TileEntity te = world.getTileEntity(pos);
@@ -144,13 +144,13 @@ public class MultipartItemBlock extends BlockItem {
             return true;
         }
 
-        BlockState multiState = Registration.multipartBlock.getDefaultState();
+        BlockState multiState = Registration.MULTIPART_BLOCK.getDefaultState();
         if (!world.setBlockState(pos, multiState, 11)) {
             return false;
         }
 
         BlockState state = world.getBlockState(pos);
-        if (state.getBlock() == Registration.multipartBlock) {
+        if (state.getBlock() == Registration.MULTIPART_BLOCK) {
             setTileEntityNBT(world, player, pos, stack);
 
             te = world.getTileEntity(pos);
