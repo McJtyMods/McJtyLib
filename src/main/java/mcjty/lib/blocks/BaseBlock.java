@@ -6,6 +6,7 @@ import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.builder.BlockBuilder;
 import mcjty.lib.builder.InformationString;
 import mcjty.lib.compat.CofhApiItemCompatibility;
+import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.multipart.IPartBlock;
@@ -64,6 +65,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     private final InformationString informationStringWithShift;
     private final ToolType toolType;
     private final int harvestLevel;
+    private final TOPDriver topDriver;
 
     public static final IProperty<?>[] HORIZ_PROPERTIES = new IProperty[]{BlockStateProperties.HORIZONTAL_FACING};
     public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{BlockStateProperties.FACING};
@@ -79,6 +81,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         this.informationStringWithShift = builder.getInformationStringWithShift();
         this.toolType = builder.getToolType();
         this.harvestLevel = builder.getHarvestLevel();
+        this.topDriver = builder.getTopDriver();
     }
 
     @Override
@@ -459,5 +462,10 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 tooltip.add(new StringTextComponent(s));
             }
         }
+    }
+
+    @Override
+    public TOPDriver getProbeDriver() {
+        return topDriver;
     }
 }

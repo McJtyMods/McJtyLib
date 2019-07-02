@@ -1,6 +1,8 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.compat.theoneprobe.McJtyLibTOPDriver;
+import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -154,7 +156,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 //    }
 
     @Nullable
-    public MultipartTE.Part getHitPart(BlockState blockState, IBlockReader world, BlockPos pos, Vec3d start, Vec3d end) {
+    public static MultipartTE.Part getHitPart(BlockState blockState, IBlockReader world, BlockPos pos, Vec3d start, Vec3d end) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
@@ -196,6 +198,12 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 //    public boolean isFullCube(BlockState state) {
 //        return false;
 //    }
+
+    @Override
+    public TOPDriver getProbeDriver() {
+        return McJtyLibTOPDriver.DRIVER;
+    }
+
 
     // @todo 1.14
 //    @Override

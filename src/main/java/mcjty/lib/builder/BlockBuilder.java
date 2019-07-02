@@ -1,5 +1,7 @@
 package mcjty.lib.builder;
 
+import mcjty.lib.compat.theoneprobe.McJtyLibTOPDriver;
+import mcjty.lib.compat.theoneprobe.TOPDriver;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -24,6 +26,7 @@ public class BlockBuilder {
     private Supplier<TileEntity> tileEntitySupplier;
     private ToolType toolType = ToolType.PICKAXE;
     private int harvestLevel = 0;
+    private TOPDriver topDriver = McJtyLibTOPDriver.DRIVER;
 
     public Block.Properties getProperties() {
         return properties;
@@ -57,10 +60,19 @@ public class BlockBuilder {
         return harvestLevel;
     }
 
+    public TOPDriver getTopDriver() {
+        return topDriver;
+    }
+
     // ----------------------------------------------------------------------
 
     public BlockBuilder properties(Block.Properties properties) {
         this.properties = properties;
+        return this;
+    }
+
+    public BlockBuilder topDriver(TOPDriver driver) {
+        this.topDriver = driver;
         return this;
     }
 

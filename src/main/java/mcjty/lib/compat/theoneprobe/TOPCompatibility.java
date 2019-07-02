@@ -56,8 +56,10 @@ public class TOPCompatibility {
                 public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
                     if (blockState.getBlock() instanceof TOPInfoProvider) {
                         TOPInfoProvider provider = (TOPInfoProvider) blockState.getBlock();
-                        // @todo 1.14
-//                        provider.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+                        TOPDriver driver = provider.getProbeDriver();
+                        if (driver != null) {
+                            driver.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+                        }
                     }
 
                 }
