@@ -339,14 +339,13 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @SuppressWarnings("deprecation")
     @Override
     public void onReplaced(BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState newstate, boolean isMoving) {
-        TileEntity te = world.getTileEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            if (!world.isRemote) {
+        if (!world.isRemote) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof GenericTileEntity) {
                 GenericTileEntity genericTileEntity = (GenericTileEntity) te;
                 genericTileEntity.onReplaced(world, pos, state);
             }
         }
-
         super.onReplaced(state, world, pos, newstate, isMoving);
     }
 

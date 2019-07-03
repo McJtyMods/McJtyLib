@@ -13,6 +13,13 @@ public class Tools {
         }
     }
 
+    public static <INPUT extends BASE, BASE> void safeConsume(BASE o, Consumer<INPUT> consumer) {
+        try {
+            consumer.accept((INPUT) o);
+        } catch (ClassCastException ignore) {
+        }
+    }
+
     public static <INPUT extends BASE, BASE, RET> RET safeMap(BASE o, Function<INPUT, RET> consumer, String error) {
         try {
             return consumer.apply((INPUT) o);
