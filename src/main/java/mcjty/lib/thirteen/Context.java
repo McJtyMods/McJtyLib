@@ -1,7 +1,7 @@
 package mcjty.lib.thirteen;
 
-import mcjty.lib.McJtyLib;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
@@ -15,7 +15,7 @@ public class Context {
     }
 
     public void enqueueWork(Runnable runnable) {
-        McJtyLib.proxy.enqueueWork(runnable);
+        FMLCommonHandler.instance().getWorldThread(context.netHandler).addScheduledTask(runnable);
     }
 
     @Nullable
