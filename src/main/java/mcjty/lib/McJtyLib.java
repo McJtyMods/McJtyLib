@@ -56,7 +56,7 @@ import java.util.function.Consumer;
         dependencies = "after:forge@[14.23.5.2800,);after:enderio@[5.0.21,)")
 public class McJtyLib implements ModBase {
 
-    public static final String VERSION = "3.5.3";
+    public static final String VERSION = "3.5.4";
     public static final String PROVIDES = "mcjtylib_ng";
 
     private static final ResourceLocation PREFERENCES_CAPABILITY_KEY;
