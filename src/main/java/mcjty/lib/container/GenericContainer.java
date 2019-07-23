@@ -41,7 +41,7 @@ public class GenericContainer extends Container {
     }
 
     public void addIntegerListener(IntReferenceHolder holder) {
-        func_216958_a(holder);
+        trackInt(holder);
     }
 
     public void addInventory(String name, IItemHandler inventory) {

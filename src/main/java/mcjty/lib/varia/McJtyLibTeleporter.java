@@ -2,8 +2,8 @@ package mcjty.lib.varia;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ServerWorld;
 import net.minecraft.world.Teleporter;
+import net.minecraft.world.server.ServerWorld;
 
 public class McJtyLibTeleporter extends Teleporter {
     private final ServerWorld worldServerInstance;

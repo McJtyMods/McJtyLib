@@ -101,7 +101,8 @@ public class MultipartTE extends TileEntity {
         read(packet.getNbtCompound());
         if (world.isRemote && version != oldVersion) {
 //            dumpParts("onData");
-            world.markForRerender(pos);
+            world.func_225319_b(pos, null, null);
+//            world.markForRerender(pos);
         }
     }
 
