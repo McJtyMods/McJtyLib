@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -26,6 +27,11 @@ public class DefaultServerProxy implements IProxy {
     @Override
     public PlayerEntity getClientPlayer() {
         throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
+    public RecipeManager getRecipeManager(World world) {
+        return world.getServer().getRecipeManager();
     }
 
     @Override

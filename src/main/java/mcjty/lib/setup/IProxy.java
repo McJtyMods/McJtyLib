@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -18,6 +19,8 @@ import java.util.concurrent.Callable;
 public interface IProxy {
 
     World getClientWorld();
+
+    RecipeManager getRecipeManager(World world);
 
     PlayerEntity getClientPlayer();
 

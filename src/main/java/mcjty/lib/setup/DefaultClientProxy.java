@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -29,6 +30,11 @@ public class DefaultClientProxy implements IProxy {
     @Override
     public PlayerEntity getClientPlayer() {
         return Minecraft.getInstance().player;
+    }
+
+    @Override
+    public RecipeManager getRecipeManager(World world) {
+        return Minecraft.getInstance().world.getRecipeManager();
     }
 
     @Override
