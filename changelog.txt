@@ -1,3 +1,6 @@
+3.5.6:
+- Update to latest Forge
+
 3.5.5:
 - Update to 1.14.4
 
