@@ -64,6 +64,7 @@ public class TextField extends AbstractWidget<TextField> {
     public TextField setText(String text) {
         this.text = text;
         cursor = text.length();
+        selection = -1;
         if (startOffset >= cursor) {
             startOffset = cursor-1;
             if (startOffset < 0) {
@@ -93,35 +94,36 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-                if(keyCode == Keyboard.KEY_V) {
-                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                    String data = "";
-                    try {
-                        data = (String) clipboard.getData(DataFlavor.stringFlavor);
-                    } catch (UnsupportedFlavorException | IOException e) {
-                    }
-
-                    if (isRegionSelected()) {
-                        replaceSelectedRegion(data);
-                    } else {
-                        text = text.substring(0, cursor) + data + text.substring(cursor);
-                    }
-                    cursor += data.length();
-                    fireTextEvents(text);
-                } else if (keyCode == Keyboard.KEY_C) {
-                    if (isRegionSelected()) {
-                        GuiScreen.setClipboardString(getSelectedText());
-                    }
-                } else if (keyCode == Keyboard.KEY_X) {
-                    if (isRegionSelected()) {
-                        GuiScreen.setClipboardString(getSelectedText());
-                        replaceSelectedRegion("");
-                        fireTextEvents(text);
-                    }
-                } else if (keyCode == Keyboard.KEY_A) {
-                    selectAll();
+            boolean control = Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL);
+            boolean shift = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+            if (keyCode == Keyboard.KEY_V && control) {
+                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                String data = "";
+                try {
+                    data = (String) clipboard.getData(DataFlavor.stringFlavor);
+                } catch (UnsupportedFlavorException | IOException ignored) {
                 }
+
+                if (isRegionSelected()) {
+                    replaceSelectedRegion(data);
+                } else {
+                    text = text.substring(0, cursor) + data + text.substring(cursor);
+                }
+                cursor += data.length();
+                fireTextEvents(text);
+            } else if (keyCode == Keyboard.KEY_C && control) {
+                if (isRegionSelected()) {
+                    GuiScreen.setClipboardString(getSelectedText());
+                }
+            } else if (keyCode == Keyboard.KEY_X && control) {
+                if (isRegionSelected()) {
+                    GuiScreen.setClipboardString(getSelectedText());
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                }
+            } else if (keyCode == Keyboard.KEY_A && control) {
+                selectAll();
+
             } else if (keyCode == Keyboard.KEY_RETURN) {
                 fireTextEnterEvents(text);
 //                window.setTextFocus(null);
@@ -160,12 +162,20 @@ public class TextField extends AbstractWidget<TextField> {
             } else if (keyCode == Keyboard.KEY_LEFT) {
                 updateSelection();
                 if (cursor > 0) {
-                    cursor--;
+                    if (control) {
+                        cursor = findNextWord(true);
+                    } else {
+                        cursor--;
+                    }
                 }
             } else if (keyCode == Keyboard.KEY_RIGHT) {
                 updateSelection();
                 if (cursor < text.length()) {
-                    cursor++;
+                    if (control) {
+                        cursor = findNextWord(false);
+                    } else {
+                        cursor++;
+                    }
                 }
             } else {
                 // e.g. F1~12, insert
@@ -256,6 +266,36 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
 
+    /**
+     * Try to match a word by that is surrounded by either whitespace or ends of the text.
+     *
+     * @param reversed If {@code true}, when it will search towards left, otherwise towards right.
+     * @return Index, either end or beginning of a word. When {@code reversed}, it will return the beginning and otherwise the end.
+     */
+    private int findNextWord(boolean reversed) {
+        int change = reversed ? -1 : 1;
+        int i = cursor;
+        char last = ' ';
+        while (true) {
+            i += change;
+            if (i < 0 || i >= text.length()) {
+                break;
+            }
+
+            char c  = text.charAt(i);
+            if (c == ' ' && last != ' ') {
+                break;
+            }
+            last = c;
+        }
+
+        if (reversed) {
+            return i - change;
+        }
+        return i;
+    }
+
+
     @Override
     public void draw(int x, int y) {
         super.draw(x, y);
@@ -288,9 +328,6 @@ public class TextField extends AbstractWidget<TextField> {
                 int selectionStart = getSelectionStart();
                 int selectionEnd = getSelectionEnd();
 
-                // Text: abcdefghijklmn
-                // Rendered: abcdefg, length=7
-                //                 ^6
                 int renderedStart = MathHelper.clamp(selectionStart - startOffset, 0, renderedText.length());
                 int renderedEnd = MathHelper.clamp(selectionEnd - startOffset, 0, renderedText.length());
 
@@ -298,7 +335,7 @@ public class TextField extends AbstractWidget<TextField> {
                 String renderedPreSelection = renderedText.substring(0, renderedStart);
                 int selectionX = textX + mc.fontRenderer.getStringWidth(renderedPreSelection);
                 int selectionWidth = mc.fontRenderer.getStringWidth(renderedSelection);
-                RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.fontRenderer.FONT_HEIGHT, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
+                RenderHelper.drawColorLogic(selectionX, textY, selectionWidth, mc.fontRenderer.FONT_HEIGHT, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
             }
         } else {
             mc.fontRenderer.drawString(renderedText, textX, textY, 0xffa0a0a0);
@@ -382,7 +419,8 @@ public class TextField extends AbstractWidget<TextField> {
     public void removeTextEnterEvent(TextEnterEvent event) {
         if (textEnterEvents != null) {
             textEnterEvents.remove(event);
-        };
+        }
+
     }
 
     private void fireTextEnterEvents(String newText) {
