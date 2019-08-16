@@ -12,7 +12,7 @@ public class EmptyContainer extends GenericContainer {
 
     // @todo REMOVE ME
     public EmptyContainer(PlayerEntity player, IInventory inventory) {
-        super(null, 0, EmptyContainerFactory.getInstance(), BlockPos.ZERO);
+        super(null, 0, EmptyContainerFactory.getInstance(), BlockPos.ZERO, null);
     }
 
     public EmptyContainer(PlayerEntity player) {

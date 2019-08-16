@@ -3,6 +3,7 @@ package mcjty.lib.container;
 import com.google.common.collect.Range;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.network.PacketSendGuiData;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -32,11 +33,13 @@ public class GenericContainer extends Container {
     private ContainerFactory factory;
     private GenericCrafter crafter = null;
     protected final BlockPos pos;
+    protected final GenericTileEntity te;
 
-    public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory, BlockPos pos) {
+    public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity te) {
         super(type, id);
         this.factory = factory;
         this.pos = pos;
+        this.te = te;
         factory.doSetup();
     }
 
@@ -112,9 +115,9 @@ public class GenericContainer extends Container {
                 }
             };
         } else if (slotType == SlotType.SLOT_CRAFTRESULT) {
-            slot = new CraftingSlot(inventory, index, x, y, crafter);
+            slot = new CraftingSlot(inventory, te, index, x, y, crafter);
         } else {
-            slot = new BaseSlot(inventory, index, x, y);
+            slot = new BaseSlot(inventory, te, index, x, y);
         }
         return slot;
     }

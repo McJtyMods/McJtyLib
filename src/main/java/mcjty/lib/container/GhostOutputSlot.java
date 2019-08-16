@@ -30,10 +30,4 @@ public class GhostOutputSlot extends SlotItemHandler {
     public boolean isItemValid(ItemStack stack) {
         return false;
     }
-
-    @Override
-    public void putStack(ItemStack stack) {
-        inventory.setInventorySlotContents(getSlotIndex(), stack);
-        onSlotChanged();
-    }
 }

@@ -6,15 +6,18 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class BaseSlot extends SlotItemHandler {
-    public BaseSlot(IItemHandler inventory, int index, int x, int y) {
+
+    private final GenericTileEntity te;
+
+    public BaseSlot(IItemHandler inventory, GenericTileEntity te, int index, int x, int y) {
         super(inventory, index, x, y);
+        this.te = te;
     }
 
     @Override
     public void putStack(ItemStack stack) {
-        if (inventory instanceof GenericTileEntity) {
-            GenericTileEntity genericTileEntity = (GenericTileEntity) inventory;
-            genericTileEntity.onSlotChanged(getSlotIndex(), stack);
+        if (te != null) {
+            te.onSlotChanged(getSlotIndex(), stack);
         }
         super.putStack(stack);
     }

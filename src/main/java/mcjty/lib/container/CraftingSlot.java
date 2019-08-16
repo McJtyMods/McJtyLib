@@ -8,17 +8,18 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class CraftingSlot extends SlotItemHandler {
     private final GenericCrafter crafter;
+    private final GenericTileEntity te;
 
-    public CraftingSlot(IItemHandler inventory, int index, int x, int y, GenericCrafter crafter) {
+    public CraftingSlot(IItemHandler inventory, GenericTileEntity te, int index, int x, int y, GenericCrafter crafter) {
         super(inventory, index, x, y);
         this.crafter = crafter;
+        this.te = te;
     }
 
     @Override
     public void putStack(ItemStack stack) {
-        if (inventory instanceof GenericTileEntity) {
-            GenericTileEntity genericTileEntity = (GenericTileEntity) inventory;
-            genericTileEntity.onSlotChanged(getSlotIndex(), stack);
+        if (te != null) {
+            te.onSlotChanged(getSlotIndex(), stack);
         }
         super.putStack(stack);
     }

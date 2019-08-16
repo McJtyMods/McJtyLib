@@ -44,7 +44,6 @@ public class GhostSlot extends SlotItemHandler {
         if (!stack.isEmpty()) {
             stack.setCount(1);
         }
-        inventory.setInventorySlotContents(getSlotIndex(), stack);
-        onSlotChanged();
+        super.putStack(stack);
     }
 }
