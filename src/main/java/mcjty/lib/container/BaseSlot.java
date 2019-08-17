@@ -21,4 +21,8 @@ public class BaseSlot extends SlotItemHandler {
         }
         super.putStack(stack);
     }
+
+    public GenericTileEntity getTe() {
+        return te;
+    }
 }
