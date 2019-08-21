@@ -1,17 +1,13 @@
 package mcjty.lib.blocks;
 
-import mcjty.lib.base.ModBase;
+import mcjty.lib.builder.BlockBuilder;
 import mcjty.lib.tileentity.LogicTileEntity;
 import mcjty.lib.varia.LogicFacing;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IntegerProperty;
@@ -27,8 +23,6 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static mcjty.lib.varia.LogicFacing.*;
 import static net.minecraft.util.Direction.*;
@@ -41,8 +35,8 @@ public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Contai
     public static IntegerProperty META_INTERMEDIATE = IntegerProperty.create("intermediate", 0, 3);
     public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
 
-    public LogicSlabBlock(ModBase mod, Material material, Class<? extends T> tileEntityClass, BiFunction<PlayerEntity, IInventory, C> containerFactory, Function<Block, BlockItem> itemBlockFactory, String name, boolean isContainer) {
-        super(name, null);  // @todo
+    public LogicSlabBlock(String name, BlockBuilder builder) {
+        super(name, builder);
     }
 
     public static Direction rotateLeft(Direction downSide, Direction inputSide) {
