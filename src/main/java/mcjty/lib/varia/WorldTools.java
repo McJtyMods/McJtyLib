@@ -1,9 +1,14 @@
 package mcjty.lib.varia;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class WorldTools {
@@ -14,6 +19,22 @@ public class WorldTools {
         }
         return world.isBlockLoaded(pos);
 //        return world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null && world.getChunkFromBlockCoords(pos).isLoaded();
+    }
+
+    public static ServerWorld getOverworld() {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
+    }
+
+    // @todo try to avoid and use DimensionType instead!
+    public static ServerWorld getWorld(int dimensionId) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return DimensionManager.getWorld(server, DimensionType.getById(dimensionId), false, false);
+    }
+
+    public static ServerWorld getWorld(DimensionType type) {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return DimensionManager.getWorld(server, type, false, false);
     }
 
     /**

@@ -3,12 +3,11 @@ package mcjty.lib.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -70,7 +69,7 @@ public class PacketServerCommandTyped {
             if (dimensionId == null) {
                 world = playerEntity.getEntityWorld();
             } else {
-                world = DimensionManager.getWorld(playerEntity.getServer(), DimensionType.getById(dimensionId), false, false);  // @todo 1.14 check?
+                world = WorldTools.getWorld(dimensionId);
             }
             if (world == null) {
                 return;

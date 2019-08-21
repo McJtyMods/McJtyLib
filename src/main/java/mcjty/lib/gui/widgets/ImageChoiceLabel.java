@@ -118,7 +118,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     @Override
     public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
-            if (button == 1) { // @todo 1.14 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (button == 1) { // @todo 1.14 || McJtyLib.proxy.isShiftKeyDown()) {
                 currentChoice--;
                 if (currentChoice < 0) {
                     currentChoice = choiceList.size() - 1;

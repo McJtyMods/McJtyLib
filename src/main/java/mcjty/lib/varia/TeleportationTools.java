@@ -12,7 +12,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
 
@@ -43,10 +43,11 @@ public class TeleportationTools {
     /**
      * Get a world for a dimension, possibly loading it from the configuration manager.
      */
-    public static World getWorldForDimension(World overworld, int id) {
-        World w = DimensionManager.getWorld(overworld.getServer(), DimensionType.getById(id), false, false);
+    public static World getWorldForDimension(int id) {
+        World w = WorldTools.getWorld(id);
         if (w == null) {
-            w = overworld.getServer().getWorld(DimensionType.getById(id));
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            w = server.getWorld(DimensionType.getById(id));
         }
         return w;
     }

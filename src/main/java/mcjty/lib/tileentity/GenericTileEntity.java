@@ -428,7 +428,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 //            int pct = infused * 100 / GeneralConfig.maxInfuse;
 //            currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
 //        }
-//        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+//        if (McJtyLib.proxy.isShiftKeyDown()) {
 //            if (GeneralConfig.manageOwnership) {
 //                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
 //                    int securityChannel = getSecurityChannel();

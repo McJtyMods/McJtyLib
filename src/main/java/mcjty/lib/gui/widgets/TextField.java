@@ -240,7 +240,7 @@ public class TextField extends AbstractWidget<TextField> {
 
     private void updateSelection() {
         // @todo 1.14
-//        if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+//        if (McJtyLib.proxy.isShiftKeyDown()) {
 //            // Don't clear selection as long as shift is pressed
 //            if(!isRegionSelected()) {
 //                selection = cursor;

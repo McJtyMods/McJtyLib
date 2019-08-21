@@ -3,14 +3,13 @@ package mcjty.lib.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpBlockNBT;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.OpEntry;
 import net.minecraft.server.management.OpList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.Level;
 
@@ -52,7 +51,7 @@ public class PacketDumpBlockInfo {
             OpEntry entry = oppedPlayers.getEntry(player.getGameProfile());
             int perm = entry == null ? server.getOpPermissionLevel() : entry.getPermissionLevel();
             if (perm >= 1) {
-                World world = DimensionManager.getWorld(server, DimensionType.getById(dimid), false, false);    // @todo check 1.14
+                World world = WorldTools.getWorld(dimid);
                 String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
                 Logging.getLogger().log(Level.INFO, "### Server side ###");
                 Logging.getLogger().log(Level.INFO, output);

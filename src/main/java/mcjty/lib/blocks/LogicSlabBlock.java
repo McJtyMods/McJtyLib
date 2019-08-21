@@ -7,7 +7,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.inventory.container.Container;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IntegerProperty;
@@ -30,7 +29,7 @@ import static net.minecraft.util.Direction.*;
 /**
  * The superclass for logic slabs.
  */
-public abstract class LogicSlabBlock<T extends LogicTileEntity, C extends Container> extends BaseBlock {
+public abstract class LogicSlabBlock extends BaseBlock {
 
     public static IntegerProperty META_INTERMEDIATE = IntegerProperty.create("intermediate", 0, 3);
     public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);

@@ -99,7 +99,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            if (button == 1) { // @todo 1.14 || Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (button == 1) { // @todo 1.14 || McJtyLib.proxy.isShiftKeyDown()) {
                 index--;
                 if (index < 0) {
                     index = choiceList.size()-1;

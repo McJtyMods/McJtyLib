@@ -112,7 +112,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     @Override
     public Widget<?> mouseClick(int x, int y, int button) {
         if (isEnabledAndVisible()) {
-//            if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+//            if (McJtyLib.proxy.isShiftKeyDown()) {
             // @todo 1.14
             if (false) {
             } else {
