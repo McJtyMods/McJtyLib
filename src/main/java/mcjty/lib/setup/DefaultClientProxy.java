@@ -12,6 +12,7 @@ import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.animation.ITimeValue;
@@ -35,6 +36,11 @@ public class DefaultClientProxy implements IProxy {
     @Override
     public RecipeManager getRecipeManager(World world) {
         return Minecraft.getInstance().world.getRecipeManager();
+    }
+
+    @Override
+    public RayTraceResult getClientMouseOver() {
+        return Minecraft.getInstance().objectMouseOver;
     }
 
     @Override

@@ -10,6 +10,7 @@ import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
@@ -23,6 +24,8 @@ public interface IProxy {
     RecipeManager getRecipeManager(World world);
 
     PlayerEntity getClientPlayer();
+
+    RayTraceResult getClientMouseOver();
 
     NetworkManager getNetworkManager(PlayerEntity player);
 

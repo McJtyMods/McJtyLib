@@ -11,6 +11,7 @@ import net.minecraft.item.crafting.RecipeManager;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
@@ -37,6 +38,11 @@ public class DefaultServerProxy implements IProxy {
     @Override
     public NetworkManager getNetworkManager(PlayerEntity player) {
         return ((ServerPlayerEntity) player).connection.netManager;
+    }
+
+    @Override
+    public RayTraceResult getClientMouseOver() {
+        throw new IllegalStateException("This should only be called from client side");
     }
 
     @Override
