@@ -32,6 +32,15 @@ public class WorldTools {
         return DimensionManager.getWorld(server, DimensionType.getById(dimensionId), false, false);
     }
 
+    public static ServerWorld loadWorld(int dimensionId) {
+        ServerWorld world = getWorld(dimensionId);
+        if (world == null) {
+            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+            return server.getWorld(DimensionType.getById(dimensionId));
+        }
+        return world;
+    }
+
     public static ServerWorld getWorld(DimensionType type) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return DimensionManager.getWorld(server, type, false, false);

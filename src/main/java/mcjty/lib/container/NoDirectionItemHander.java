@@ -16,6 +16,11 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
     private final InventoryHelper helper;
     private final GenericTileEntity te;
 
+    // Called when something changed
+    protected void onUpdate(int index) {
+        te.markDirtyQuick();
+    }
+
     public NoDirectionItemHander(GenericTileEntity te, ContainerFactory factory, int count) {
         this.helper = new InventoryHelper(te, factory, count);
         this.te = te;
@@ -65,7 +70,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                     ItemStack copy = stack.copy();
                     copy.grow(stackInSlot.getCount());
                     helper.setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
-                    te.markDirtyQuick();
+                    onUpdate(slot);
                 }
 
                 return ItemStack.EMPTY;
@@ -76,7 +81,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                     ItemStack copy = stack.split(m);
                     copy.grow(stackInSlot.getCount());
                     helper.setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
-                    te.markDirtyQuick();
+                    onUpdate(slot);
                     return stack;
                 } else {
                     stack.shrink(m);
@@ -94,7 +99,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                 stack = stack.copy();
                 if (!simulate) {
                     helper.setInventorySlotContents(stack.getMaxStackSize(), slot, stack.split(m));
-                    te.markDirtyQuick();
+                    onUpdate(slot);
                     return stack;
                 } else {
                     stack.shrink(m);
@@ -103,7 +108,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
             } else {
                 if (!simulate) {
                     helper.setInventorySlotContents(stack.getMaxStackSize(), slot, stack);
-                    te.markDirtyQuick();
+                    onUpdate(slot);
                 }
                 return ItemStack.EMPTY;
             }
@@ -140,7 +145,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
             int m = Math.min(stackInSlot.getCount(), amount);
 
             ItemStack decrStackSize = helper.decrStackSize(slot, m);
-            te.markDirtyQuick();
+            onUpdate(slot);
             return decrStackSize;
         }
     }
@@ -148,7 +153,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
         helper.setStackInSlot(slot, stack);
-        te.markDirtyQuick();
+        onUpdate(slot);
     }
 
     @Override
