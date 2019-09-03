@@ -6,6 +6,7 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -163,7 +164,7 @@ public class BlockOutlineRenderer {
     /**
      * This method translates GL state relative to player position
      */
-    public static void renderHighlightedBlocks(ClientPlayerEntity p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
+    public static void renderHighlightedBlocks(PlayerEntity p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
         double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
         double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
         double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
