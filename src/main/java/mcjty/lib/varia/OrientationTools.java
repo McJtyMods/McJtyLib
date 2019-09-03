@@ -24,6 +24,7 @@ public class OrientationTools {
     public static final int MASK_STATE = 0xc;                           // If redstone is not used: state
 
     public static Direction[] DIRECTION_VALUES = Direction.values();
+    public static Direction[] HORIZONTAL_DIRECTION_VALUES = new Direction[] { NORTH, SOUTH, WEST, EAST };
 
     public static int setOrientation(int metadata, Direction orientation) {
         return (metadata & ~MASK_ORIENTATION) | orientation.ordinal();

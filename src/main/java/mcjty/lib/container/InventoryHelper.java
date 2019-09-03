@@ -35,6 +35,10 @@ public class InventoryHelper {
         this.count = count;
     }
 
+    public ContainerFactory getContainerFactory() {
+        return containerFactory;
+    }
+
     public void setNewCount(int newcount) {
         this.count = newcount;
         ItemStackList newstacks = ItemStackList.create(newcount);
