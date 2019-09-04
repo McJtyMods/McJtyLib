@@ -43,6 +43,10 @@ public class GenericContainer extends Container {
         factory.doSetup();
     }
 
+    public GenericTileEntity getTe() {
+        return te;
+    }
+
     public void addIntegerListener(IntReferenceHolder holder) {
         trackInt(holder);
     }
