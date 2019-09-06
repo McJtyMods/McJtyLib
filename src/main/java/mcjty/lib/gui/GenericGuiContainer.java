@@ -268,12 +268,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void drawWindow() {
+        if (window == null) {
+            return;
+        }
         renderBackground();
         getWindowManager().draw();
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
+        if (window == null) {
+            return;
+        }
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
         drawStackTooltips(mouseX, mouseY);
@@ -379,14 +385,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     @Override
     public boolean mouseClicked(double x, double y, int button) {
         boolean rc = super.mouseClicked(x, y, button);
-        getWindowManager().mouseClicked((int)x, (int)y, button);
+        if (window != null) {
+            getWindowManager().mouseClicked((int) x, (int) y, button);
+        }
         return rc;
     }
 
     @Override
     public boolean mouseDragged(double x, double y, int button, double scaledX, double scaledY) {
         boolean rc = super.mouseDragged(x, y, button, scaledX, scaledY);
-        getWindowManager().handleMouseInput(button);
+        if (window != null) {
+            getWindowManager().handleMouseInput(button);
+        }
         return rc;
     }
 
@@ -396,7 +406,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     @Override
     public boolean mouseReleased(double x, double y, int state) {
         boolean rc = super.mouseReleased(x, y, state);
-        getWindowManager().mouseReleased((int)x, (int)y, state);
+        if (window != null) {
+            getWindowManager().mouseReleased((int) x, (int) y, state);
+        }
         return rc;
     }
 
@@ -406,7 +418,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean b = getWindowManager().keyTyped(keyCode, scanCode);
+        boolean b = window == null || getWindowManager().keyTyped(keyCode, scanCode);
         if (b) {
             return super.keyPressed(keyCode, scanCode, modifiers);
         } else {
@@ -415,8 +427,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public void keyTypedFromEvent(int keyCode, int scanCode) {
-        if (getWindowManager().keyTyped(keyCode, scanCode)) {
-            super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
+        if (window != null) {
+            if (getWindowManager().keyTyped(keyCode, scanCode)) {
+                super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
+            }
         }
     }
 
