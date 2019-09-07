@@ -158,4 +158,8 @@ public class WindowManager {
     public boolean keyTyped(int keyCode, int scanCode) {
         return getInteractableWindows().allMatch(w -> !w.keyTyped(keyCode, scanCode));
     }
+
+    public boolean charTyped(char typedChar, int keyCode) {
+        return getInteractableWindows().allMatch(w -> !w.charTyped(typedChar, keyCode));
+    }
 }

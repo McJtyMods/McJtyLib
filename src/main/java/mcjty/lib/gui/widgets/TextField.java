@@ -5,15 +5,12 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.TextEnterEvent;
-import mcjty.lib.gui.events.TextEvent;
-import mcjty.lib.gui.events.TextSpecialKeyEvent;
-import mcjty.lib.typed.Key;
-import mcjty.lib.typed.Type;
-import mcjty.lib.typed.TypedMap;
+import mcjty.lib.gui.events.*;
+import mcjty.lib.typed.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +55,7 @@ public class TextField extends AbstractWidget<TextField> {
         this.text = text;
         cursor = text.length();
         if (startOffset >= cursor) {
-            startOffset = cursor-1;
+            startOffset = cursor - 1;
             if (startOffset < 0) {
                 startOffset = 0;
             }
@@ -86,94 +83,99 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            // @todo 1.14
-//            if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-//                if(keyCode == Keyboard.KEY_V) {
-//                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-//                    String data = "";
-//                    try {
-//                        data = (String) clipboard.getData(DataFlavor.stringFlavor);
-//                    } catch (UnsupportedFlavorException | IOException e) {
-//                    }
-//
-//                    if (isRegionSelected()) {
-//                        replaceSelectedRegion(data);
-//                    } else {
-//                        text = text.substring(0, cursor) + data + text.substring(cursor);
-//                    }
-//                    cursor += data.length();
-//                    fireTextEvents(text);
-//                } else if (keyCode == Keyboard.KEY_C) {
-//                    if (isRegionSelected()) {
-//                        GuiScreen.setClipboardString(getSelectedText());
-//                    }
-//                } else if (keyCode == Keyboard.KEY_X) {
-//                    if (isRegionSelected()) {
-//                        GuiScreen.setClipboardString(getSelectedText());
-//                        replaceSelectedRegion("");
-//                        fireTextEvents(text);
-//                    }
-//                } else if (keyCode == Keyboard.KEY_A) {
-//                    selectAll();
-//                }
-//            } else if (keyCode == Keyboard.KEY_RETURN) {
-//                fireTextEnterEvents(text);
-////                window.setTextFocus(null);
-//                return false;
-//            } else if (keyCode == Keyboard.KEY_ESCAPE) {
-//                return false;
-//            } else if (keyCode == Keyboard.KEY_BACK) {
-//                if (isRegionSelected()) {
-//                    replaceSelectedRegion("");
-//                    fireTextEvents(text);
-//                } else if (!text.isEmpty() && cursor > 0) {
-//                    text = text.substring(0, cursor - 1) + text.substring(cursor);
-//                    cursor--;
-//                    fireTextEvents(text);
-//                }
-//            } else if (keyCode == Keyboard.KEY_DELETE) {
-//                if (isRegionSelected()) {
-//                    replaceSelectedRegion("");
-//                    fireTextEvents(text);
-//                } else if (cursor < text.length()) {
-//                    text = text.substring(0, cursor) + text.substring(cursor + 1);
-//                    fireTextEvents(text);
-//                }
-//            } else if (keyCode == Keyboard.KEY_HOME) {
-//                updateSelection();
-//                cursor = 0;
-//            } else if (keyCode == Keyboard.KEY_END) {
-//                updateSelection();
-//                cursor = text.length();
-//            } else if (keyCode == Keyboard.KEY_DOWN) {
-//                fireArrowDownEvents();
-//            } else if (keyCode == Keyboard.KEY_UP) {
-//                fireArrowUpEvents();
-//            } else if (keyCode == Keyboard.KEY_TAB) {
-//                fireTabEvents();
-//            } else if (keyCode == Keyboard.KEY_LEFT) {
-//                updateSelection();
-//                if (cursor > 0) {
-//                    cursor--;
-//                }
-//            } else if (keyCode == Keyboard.KEY_RIGHT) {
-//                updateSelection();
-//                if (cursor < text.length()) {
-//                    cursor++;
-//                }
-//            } else {
-//                // e.g. F1~12, insert
-//                // Char code of 0 will appear to be nothing
-//                if ((int) typedChar != 0) {
-//                    if (isRegionSelected()) {
-//                        replaceSelectedRegion(String.valueOf(typedChar));
-//                    } else {
-//                        text = text.substring(0, cursor) + typedChar + text.substring(cursor);
-//                    }
-//                    cursor++;
-//                    fireTextEvents(text);
-//                }
-//            }
+            if (Screen.hasControlDown()) {
+                if (keyCode == GLFW.GLFW_KEY_V) {
+                    String data = Minecraft.getInstance().keyboardListener.getClipboardString();
+                    if (isRegionSelected()) {
+                        replaceSelectedRegion(data);
+                    } else {
+                        text = text.substring(0, cursor) + data + text.substring(cursor);
+                    }
+                    cursor += data.length();
+                    fireTextEvents(text);
+                } else if (keyCode == GLFW.GLFW_KEY_C) {
+                    if (isRegionSelected()) {
+                        Minecraft.getInstance().keyboardListener.setClipboardString(getSelectedText());
+                    }
+                } else if (keyCode == GLFW.GLFW_KEY_X) {
+                    if (isRegionSelected()) {
+                        Minecraft.getInstance().keyboardListener.setClipboardString(getSelectedText());
+                        replaceSelectedRegion("");
+                        fireTextEvents(text);
+                    }
+                } else if (keyCode == GLFW.GLFW_KEY_A) {
+                    selectAll();
+                }
+            } else if (keyCode == GLFW.GLFW_KEY_ENTER) {
+                fireTextEnterEvents(text);
+//                window.setTextFocus(null);
+                return false;
+            } else if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                return false;
+            } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
+                if (isRegionSelected()) {
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                } else if (!text.isEmpty() && cursor > 0) {
+                    text = text.substring(0, cursor - 1) + text.substring(cursor);
+                    cursor--;
+                    fireTextEvents(text);
+                }
+            } else if (keyCode == GLFW.GLFW_KEY_DELETE) {
+                if (isRegionSelected()) {
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                } else if (cursor < text.length()) {
+                    text = text.substring(0, cursor) + text.substring(cursor + 1);
+                    fireTextEvents(text);
+                }
+            } else if (keyCode == GLFW.GLFW_KEY_HOME) {
+                updateSelection();
+                cursor = 0;
+            } else if (keyCode == GLFW.GLFW_KEY_END) {
+                updateSelection();
+                cursor = text.length();
+            } else if (keyCode == GLFW.GLFW_KEY_DOWN) {
+                fireArrowDownEvents();
+            } else if (keyCode == GLFW.GLFW_KEY_UP) {
+                fireArrowUpEvents();
+            } else if (keyCode == GLFW.GLFW_KEY_TAB) {
+                fireTabEvents();
+            } else if (keyCode == GLFW.GLFW_KEY_LEFT) {
+                updateSelection();
+                if (cursor > 0) {
+                    cursor--;
+                }
+            } else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
+                updateSelection();
+                if (cursor < text.length()) {
+                    cursor++;
+                }
+            }
+            // We only handle non-ASCII character key inputs here, so the rest will be passed to #charTyped(char, int)
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean charTyped(char typedChar, int keyCode) {
+        if (super.charTyped(typedChar, keyCode)) {
+            return true;
+        }
+        if (!isEnabledAndVisible() || !editable) {
+            return false;
+        }
+        // e.g. F1~12, insert
+        // Char code of 0 will appear to be nothing
+        if ((int) typedChar != 0) {
+            if (isRegionSelected()) {
+                replaceSelectedRegion(String.valueOf(typedChar));
+            } else {
+                text = text.substring(0, cursor) + typedChar + text.substring(cursor);
+            }
+            cursor++;
+            fireTextEvents(text);
             return true;
         }
         return false;
@@ -181,7 +183,7 @@ public class TextField extends AbstractWidget<TextField> {
 
     private int calculateVerticalOffset() {
         int h = mc.fontRenderer.FONT_HEIGHT;
-        return (bounds.height - h)/2;
+        return (bounds.height - h) / 2;
     }
 
     private void ensureVisible() {
@@ -189,7 +191,7 @@ public class TextField extends AbstractWidget<TextField> {
             startOffset = cursor;
         } else {
             int w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
-            while (w > bounds.width-12) {
+            while (w > bounds.width - 12) {
                 startOffset++;
                 w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
             }
@@ -239,15 +241,14 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void updateSelection() {
-        // @todo 1.14
-//        if (McJtyLib.proxy.isShiftKeyDown()) {
-//            // Don't clear selection as long as shift is pressed
-//            if(!isRegionSelected()) {
-//                selection = cursor;
-//            }
-//        } else {
-//            clearSelection();
-//        }
+        if (Screen.hasShiftDown()) {
+            // Don't clear selection as long as shift is pressed
+            if (!isRegionSelected()) {
+                selection = cursor;
+            }
+        } else {
+            clearSelection();
+        }
     }
 
 
@@ -301,7 +302,7 @@ public class TextField extends AbstractWidget<TextField> {
 
         if (window.getTextFocus() == this) {
             int w = mc.fontRenderer.getStringWidth(this.text.substring(startOffset, cursor));
-            gui.fill(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
+            Screen.fill(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }
 
@@ -377,7 +378,8 @@ public class TextField extends AbstractWidget<TextField> {
     public void removeTextEnterEvent(TextEnterEvent event) {
         if (textEnterEvents != null) {
             textEnterEvents.remove(event);
-        };
+        }
+        ;
     }
 
     private void fireTextEnterEvents(String newText) {

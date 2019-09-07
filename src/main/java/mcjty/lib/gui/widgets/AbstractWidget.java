@@ -432,6 +432,11 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         return false;
     }
 
+    @Override
+    public boolean charTyped(char typedChar, int keyCode) {
+        return false;
+    }
+
     /**
      * Mark this widget as dirty so that the system knows a new relayout is needed.
      */

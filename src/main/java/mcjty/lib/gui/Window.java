@@ -254,6 +254,13 @@ public class Window {
         return false;
     }
 
+    public boolean charTyped(char typedChar, int keyCode) {
+        if (textFocus != null) {
+            return textFocus.charTyped(typedChar, keyCode);
+        }
+        return false;
+    }
+
     private GuiParser.GuiCommand createWindowCommand() {
         GuiParser.GuiCommand windowCmd = new GuiParser.GuiCommand("window");
         windowCmd.command(new GuiParser.GuiCommand("size")

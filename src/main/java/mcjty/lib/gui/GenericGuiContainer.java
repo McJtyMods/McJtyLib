@@ -426,6 +426,16 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
+    @Override
+    public boolean charTyped(char charTyped, int keyCode) {
+        boolean b = window == null || getWindowManager().charTyped(charTyped, keyCode);
+        if (b) {
+            return super.charTyped(charTyped, keyCode);
+        } else {
+            return false;
+        }
+    }
+
     public void keyTypedFromEvent(int keyCode, int scanCode) {
         if (window != null) {
             if (getWindowManager().keyTyped(keyCode, scanCode)) {
