@@ -19,11 +19,11 @@ import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 
@@ -131,7 +131,7 @@ public class RenderHelper {
         }
 
         AtlasTexture textureMapBlocks = mc.getTextureMap();
-        ResourceLocation fluidStill = fluid.getStill();
+        ResourceLocation fluidStill = fluid.getAttributes().getStillTexture();
         TextureAtlasSprite fluidStillSprite = null;
         if (fluidStill != null) {
             fluidStillSprite = textureMapBlocks.getAtlasSprite(fluidStill.toString());
@@ -140,7 +140,7 @@ public class RenderHelper {
             fluidStillSprite = MissingTextureSprite.func_217790_a();
         }
 
-        int fluidColor = fluid.getColor(fluidStack);
+        int fluidColor = fluid.getAttributes().getColor(fluidStack);
         mc.getRenderManager().textureManager.bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
         setGLColorFromInt(fluidColor);
         drawFluidTexture(x, y, fluidStillSprite, 100);

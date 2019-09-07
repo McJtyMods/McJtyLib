@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.DyeColor;
 import net.minecraft.util.ResourceLocation;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -165,11 +165,11 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
             int xx = i % 4;
             int yy = i / 4;
             Button colorLabel = new Button(mc, gui)
-                    .setColor(color.func_218388_g())
+                    .setColor(color.getTextColor())
                     .setTooltips(color.getName())
-                    .setFilledBackground(0xff000000 | color.func_218388_g())
+                    .setFilledBackground(0xff000000 | color.getTextColor())
                     .addButtonEvent(parent -> {
-                        currentColor = color.func_218388_g() & 0xffffff;
+                        currentColor = color.getTextColor() & 0xffffff;
                         setSelectedColor(red, green, blue, current, currentColor);
                         fireChoiceEvents(currentColor);
                     })
