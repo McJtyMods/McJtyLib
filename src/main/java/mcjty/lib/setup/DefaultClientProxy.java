@@ -35,7 +35,7 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public RecipeManager getRecipeManager(World world) {
-        return Minecraft.getInstance().world.getRecipeManager();
+        return world.getRecipeManager();
     }
 
     @Override

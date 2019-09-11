@@ -15,6 +15,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
@@ -42,7 +43,7 @@ public class InventoryHelper {
     public void setNewCount(int newcount) {
         this.count = newcount;
         ItemStackList newstacks = ItemStackList.create(newcount);
-        for (int i = 0 ; i < Math.min(stacks.size(), newstacks.size()) ; i++) {
+        for (int i = 0; i < Math.min(stacks.size(), newstacks.size()); i++) {
             newstacks.set(i, stacks.get(i));
         }
         stacks = newstacks;
@@ -56,6 +57,7 @@ public class InventoryHelper {
 
     /**
      * Handle a slot from an inventory and consume it
+     *
      * @param tileEntity
      * @param slot
      * @param consumer
@@ -66,9 +68,10 @@ public class InventoryHelper {
 
     /**
      * Handle a slot from an inventory and consume it
+     *
      * @param tileEntity
      * @param slot
-     * @param amount (use -1 for entire stack)
+     * @param amount     (use -1 for entire stack)
      * @param consumer
      */
     public static void handleSlot(TileEntity tileEntity, int slot, int amount, Consumer<ItemStack> consumer) {
@@ -94,6 +97,7 @@ public class InventoryHelper {
 
     /**
      * Get the size of the inventory
+     *
      * @param tileEntity
      */
     public static int getInventorySize(TileEntity tileEntity) {
@@ -110,6 +114,7 @@ public class InventoryHelper {
 
     /**
      * Return a stream of items in an inventory matching the predicate
+     *
      * @param tileEntity
      * @param predicate
      * @return
@@ -132,6 +137,7 @@ public class InventoryHelper {
 
     /**
      * Inject a module that the player is holding into the appropriate slots (slots are from start to stop inclusive both ends)
+     *
      * @return true if successful
      */
     public static boolean installModule(PlayerEntity player, ItemStack heldItem, Hand hand, BlockPos pos, int start, int stop) {
@@ -141,7 +147,7 @@ public class InventoryHelper {
             return false;
         }
         return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(inventory -> {
-            for (int i = start ; i <= stop  ; i++) {
+            for (int i = start; i <= stop; i++) {
                 if (inventory.getStackInSlot(i).isEmpty()) {
                     ItemStack copy = heldItem.copy();
                     copy.setCount(1);
@@ -196,7 +202,7 @@ public class InventoryHelper {
         List<ItemStack> s = stacks.stream().map(ItemStack::copy).collect(Collectors.toList());
         for (int i = 0; i < dest.getSlots(); i++) {
             boolean empty = true;
-            for (int j = 0 ; j < stacks.size() ; j++) {
+            for (int j = 0; j < stacks.size(); j++) {
                 ItemStack stack = dest.insertItem(i, s.get(j), simulate);
                 if (!stack.isEmpty()) {
                     empty = false;
@@ -228,7 +234,7 @@ public class InventoryHelper {
         }).orElse(false);
     }
 
-    private static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
+    public static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
         // @todo 1.14
 //        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (!result.getHasSubtypes() || result.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
         return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (result.getDamage() == itemstack1.getDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
@@ -252,6 +258,7 @@ public class InventoryHelper {
 
     /**
      * This function sets a stack in a slot but doesn't check if this slot allows it.
+     *
      * @param index
      * @param stack
      */
@@ -334,4 +341,20 @@ public class InventoryHelper {
             tileEntity.markDirty();
         }
     }
+
+    @Nonnull
+    public static ItemStack insertItemRanged(IItemHandler dest, @Nonnull ItemStack stack, int start, int stop, boolean simulate) {
+        if (dest == null || stack.isEmpty())
+            return stack;
+
+        for (int i = start; i < stop; i++) {
+            stack = dest.insertItem(i, stack, simulate);
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+        }
+
+        return stack;
+    }
+
 }
