@@ -1,6 +1,7 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
@@ -44,6 +45,7 @@ public class ModSetup extends DefaultModSetup {
 
     private static void registerCapabilities(){
         CapabilityContainerProvider.register();
+        CapabilityInfusable.register();
         PreferencesProperties.register();
     }
 
