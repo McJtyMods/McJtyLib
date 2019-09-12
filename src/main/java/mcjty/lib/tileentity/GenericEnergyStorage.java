@@ -1,5 +1,6 @@
 package mcjty.lib.tileentity;
 
+import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.varia.EnergyTools;
 import net.minecraft.util.IntReferenceHolder;
@@ -97,7 +98,7 @@ public class GenericEnergyStorage implements IEnergyStorage {
         return isReceiver;
     }
 
-    public void addIntegerListeners(GenericContainer container) {
+    public void addIntegerListeners(IGenericContainer container) {
         // Least significant part
         container.addIntegerListener(new IntReferenceHolder() {
             @Override

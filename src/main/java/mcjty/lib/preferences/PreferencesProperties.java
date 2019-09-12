@@ -5,6 +5,10 @@ import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.network.NetworkDirection;
 
 public class PreferencesProperties {
@@ -94,4 +98,21 @@ public class PreferencesProperties {
         return buffY;
     }
 
+    public static void register() {
+        CapabilityManager.INSTANCE.register(PreferencesProperties.class, new Capability.IStorage<PreferencesProperties>() {
+
+            @Override
+            public INBT writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, INBT nbt) {
+                throw new UnsupportedOperationException();
+            }
+
+        }, () -> {
+            throw new UnsupportedOperationException();
+        });
+    }
 }

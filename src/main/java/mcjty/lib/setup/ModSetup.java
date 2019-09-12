@@ -8,15 +8,14 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
+import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.varia.WrenchChecker;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.INBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceContext;
@@ -26,7 +25,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -45,22 +43,8 @@ public class ModSetup extends DefaultModSetup {
     public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
 
     private static void registerCapabilities(){
-        CapabilityManager.INSTANCE.register(PreferencesProperties.class, new Capability.IStorage<PreferencesProperties>() {
-
-
-            @Override
-            public INBT writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, INBT nbt) {
-                throw new UnsupportedOperationException();
-            }
-
-        }, () -> {
-            throw new UnsupportedOperationException();
-        });
+        CapabilityContainerProvider.register();
+        PreferencesProperties.register();
     }
 
     @Override

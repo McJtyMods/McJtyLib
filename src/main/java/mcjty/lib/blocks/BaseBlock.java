@@ -11,6 +11,7 @@ import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
+import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.OrientationTools;
 import mcjty.lib.varia.WrenchChecker;
@@ -22,7 +23,6 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -59,7 +59,6 @@ import java.util.regex.Pattern;
 public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock {
 
     private final boolean infusable;
-    private final boolean hasGui;
     private final Supplier<TileEntity> tileEntitySupplier;
     private final InformationString informationString;
     private final InformationString informationStringWithShift;
@@ -75,7 +74,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         super(builder.getProperties());
         setRegistryName(name);
         this.infusable = builder.isInfusable();
-        this.hasGui = builder.isHasGui();
         this.tileEntitySupplier = builder.getTileEntitySupplier();
         this.informationString = builder.getInformationString();
         this.informationStringWithShift = builder.getInformationStringWithShift();
@@ -219,21 +217,20 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     protected boolean openGui(World world, int x, int y, int z, PlayerEntity player) {
-        if (hasGui) {
+        TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
+        if (te == null) {
+            return false;
+        }
+        return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> {
             if (world.isRemote) {
-                return true;
-            }
-            TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-            if (!(te instanceof INamedContainerProvider)) {
                 return true;
             }
             if (checkAccess(world, player, te)) {
                 return true;
             }
-            NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
+            NetworkHooks.openGui((ServerPlayerEntity) player, h, te.getPos());
             return true;
-        }
-        return false;
+        }).orElse(false);
     }
 
 

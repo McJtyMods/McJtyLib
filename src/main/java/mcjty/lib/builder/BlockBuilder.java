@@ -19,7 +19,6 @@ public class BlockBuilder {
             .sound(SoundType.METAL);
 
     private Block.Properties properties = STANDARD_IRON;
-    private boolean hasGui = false;
     private boolean infusable = false;
     private InformationString informationString;
     private InformationString informationStringWithShift;
@@ -30,10 +29,6 @@ public class BlockBuilder {
 
     public Block.Properties getProperties() {
         return properties;
-    }
-
-    public boolean isHasGui() {
-        return hasGui;
     }
 
     public boolean isInfusable() {
@@ -73,11 +68,6 @@ public class BlockBuilder {
 
     public BlockBuilder topDriver(TOPDriver driver) {
         this.topDriver = driver;
-        return this;
-    }
-
-    public BlockBuilder hasGui() {
-        this.hasGui = true;
         return this;
     }
 

@@ -2,6 +2,8 @@ package mcjty.lib.container;
 
 import com.google.common.collect.Range;
 import mcjty.lib.McJtyLib;
+import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.network.PacketSendGuiData;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
@@ -28,7 +30,7 @@ import java.util.Map;
 /**
  * Generic container support.
  */
-public class GenericContainer extends Container {
+public class GenericContainer extends Container implements IGenericContainer {
     protected Map<String,IItemHandler> inventories = new HashMap<>();
     private ContainerFactory factory;
     private GenericCrafter crafter = null;
@@ -43,10 +45,16 @@ public class GenericContainer extends Container {
         factory.doSetup();
     }
 
+    @Override
+    public Container getAsContainer() {
+        return this;
+    }
+
     public GenericTileEntity getTe() {
         return te;
     }
 
+    @Override
     public void addIntegerListener(IntReferenceHolder holder) {
         trackInt(holder);
     }
@@ -86,6 +94,7 @@ public class GenericContainer extends Container {
         this.crafter = crafter;
     }
 
+    @Override
     public void setupInventories(IItemHandler itemHandler, PlayerInventory inventory) {
         addInventory(ContainerFactory.CONTAINER_CONTAINER, itemHandler);
         addInventory(ContainerFactory.CONTAINER_PLAYER, new InvWrapper(inventory));
@@ -358,10 +367,10 @@ public class GenericContainer extends Container {
         ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
             TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
-            if (!(te instanceof INamedContainerProvider)) {
+            if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
-            return ((INamedContainerProvider) te).createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer());
+            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> h.createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer())).orElseThrow(RuntimeException::new);
         });
         containerType.setRegistryName(registryName);
         return containerType;
