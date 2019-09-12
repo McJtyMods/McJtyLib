@@ -284,8 +284,16 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
+    protected CompoundNBT getOrCreateInfo(CompoundNBT tagCompound) {
+        if (tagCompound.contains("Info")) {
+            return tagCompound.getCompound("Info");
+        }
+        CompoundNBT data = new CompoundNBT();
+        tagCompound.put("Info", data);
+        return data;
+    }
+
     @Override
-    @Nonnull
     public CompoundNBT write(CompoundNBT tagCompound) {
         super.write(tagCompound);
         writeInfo(tagCompound);
@@ -309,7 +317,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     protected void writeInfo(CompoundNBT tagCompound) {
-        CompoundNBT infoTag = new CompoundNBT();
+        CompoundNBT infoTag = getOrCreateInfo(tagCompound);
         if (powerLevel > 0) {
             infoTag.putByte("powered", (byte) powerLevel);
         }

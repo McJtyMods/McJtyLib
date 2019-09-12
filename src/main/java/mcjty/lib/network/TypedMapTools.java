@@ -1,16 +1,13 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TypedMapTools {
 
@@ -20,6 +17,7 @@ public class TypedMapTools {
         if (typeToIndex == null) {
             typeToIndex = new HashMap<>();
             registerMapping(Type.STRING, ArgumentType.TYPE_STRING);
+            registerMapping(Type.UUID, ArgumentType.TYPE_UUID);
             registerMapping(Type.INTEGER, ArgumentType.TYPE_INTEGER);
             registerMapping(Type.BLOCKPOS, ArgumentType.TYPE_BLOCKPOS);
             registerMapping(Type.BOOLEAN, ArgumentType.TYPE_BOOLEAN);
@@ -41,7 +39,7 @@ public class TypedMapTools {
         return typeToIndex.get(type);
     }
 
-    public static TypedMap readArguments(ByteBuf buf) {
+    public static TypedMap readArguments(PacketBuffer buf) {
         TypedMap.Builder args = TypedMap.builder();
         int size = buf.readInt();
         if (size != 0) {
@@ -51,6 +49,9 @@ public class TypedMapTools {
                 switch (type) {
                     case TYPE_STRING:
                         args.put(new Key<>(key, Type.STRING), NetworkTools.readString(buf));
+                        break;
+                    case TYPE_UUID:
+                        args.put(new Key<>(key, Type.UUID), buf.readUniqueId());
                         break;
                     case TYPE_INTEGER:
                         args.put(new Key<>(key, Type.INTEGER), buf.readInt());
@@ -125,7 +126,7 @@ public class TypedMapTools {
         return args.build();
     }
 
-    public static void writeArguments(ByteBuf buf, TypedMap args) {
+    public static void writeArguments(PacketBuffer buf, TypedMap args) {
         buf.writeInt(args.size());
         for (Key<?> key : args.getKeys()) {
             NetworkTools.writeString(buf, key.getName());
@@ -134,6 +135,9 @@ public class TypedMapTools {
             switch (argumentType) {
                 case TYPE_STRING:
                     NetworkTools.writeString(buf, (String) args.get(key));
+                    break;
+                case TYPE_UUID:
+                    buf.writeUniqueId((UUID) args.get(key));
                     break;
                 case TYPE_INTEGER:
                     buf.writeInt((Integer) args.get(key));
@@ -218,7 +222,8 @@ public class TypedMapTools {
         TYPE_LONG(6),
         TYPE_STRING_LIST(7),
         TYPE_ITEMSTACK_LIST(8),
-        TYPE_POS_LIST(9);
+        TYPE_POS_LIST(9),
+        TYPE_UUID(10);
 
         private final int index;
         private static final Map<Integer, ArgumentType> mapping = new HashMap<>();

@@ -1,8 +1,10 @@
 package mcjty.lib.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.PacketSendServerCommand;
@@ -10,16 +12,20 @@ import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;
 import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -450,4 +456,19 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         network.sendToServer(new PacketSendServerCommand(modid, command, TypedMap.EMPTY));
     }
 
+    // Register a container/gui on the client side
+    public static <C extends GenericContainer, S extends GenericGuiContainer<T,C>, T extends GenericTileEntity> void register(
+            ContainerType<C> type,
+            GuiSupplier<C, S, T> guiSupplier) {
+        ScreenManager.IScreenFactory<C, S> factory = (container, inventory, title) -> {
+            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(container.getPos());
+            return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid tile entity!");
+        };
+        ScreenManager.registerFactory(type, factory);
+    }
+
+    @FunctionalInterface
+    public static interface GuiSupplier<C extends GenericContainer, S extends GenericGuiContainer, T extends GenericTileEntity> {
+        S create(T tile, C container, PlayerInventory inventory);
+    }
 }

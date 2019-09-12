@@ -1,10 +1,10 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -24,7 +24,7 @@ public class PacketServerCommandTyped {
     protected String command;
     protected TypedMap params;
 
-    public PacketServerCommandTyped(ByteBuf buf) {
+    public PacketServerCommandTyped(PacketBuffer buf) {
         pos = NetworkTools.readPos(buf);
         command = NetworkTools.readString(buf);
         params = TypedMapTools.readArguments(buf);
@@ -49,7 +49,7 @@ public class PacketServerCommandTyped {
         this.dimensionId = dimensionId;
     }
 
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         NetworkTools.writePos(buf, pos);
         NetworkTools.writeString(buf, command);
         TypedMapTools.writeArguments(buf, params);

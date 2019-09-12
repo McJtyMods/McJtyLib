@@ -1,9 +1,9 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import javax.annotation.Nonnull;
@@ -15,13 +15,13 @@ public class PacketSendServerCommand {
     private String command;
     private TypedMap arguments;
 
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         NetworkTools.writeString(buf, modid);
         NetworkTools.writeString(buf, command);
         TypedMapTools.writeArguments(buf, arguments);
     }
 
-    public PacketSendServerCommand(ByteBuf buf) {
+    public PacketSendServerCommand(PacketBuffer buf) {
         modid = NetworkTools.readString(buf);
         command = NetworkTools.readString(buf);
         arguments = TypedMapTools.readArguments(buf);

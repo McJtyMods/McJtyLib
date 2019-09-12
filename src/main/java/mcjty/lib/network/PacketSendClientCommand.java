@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.TypedMap;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import javax.annotation.Nonnull;
@@ -26,13 +26,13 @@ public class PacketSendClientCommand {
         return arguments;
     }
 
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         NetworkTools.writeString(buf, modid);
         NetworkTools.writeString(buf, command);
         TypedMapTools.writeArguments(buf, arguments);
     }
 
-    public PacketSendClientCommand(ByteBuf buf) {
+    public PacketSendClientCommand(PacketBuffer buf) {
         modid = NetworkTools.readString(buf);
         command = NetworkTools.readString(buf);
         arguments = TypedMapTools.readArguments(buf);

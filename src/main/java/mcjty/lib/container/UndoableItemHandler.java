@@ -16,9 +16,9 @@ public class UndoableItemHandler implements IItemHandlerModifiable {
         this.handler = handler;
     }
 
-    private void remember(int slot) {
+    public void remember(int slot) {
         if (!undo.containsKey(slot)) {
-            undo.put(slot, handler.getStackInSlot(slot));
+            undo.put(slot, handler.getStackInSlot(slot).copy());
         }
     }
 

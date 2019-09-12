@@ -1,10 +1,10 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -24,14 +24,14 @@ public class PacketRequestDataFromServer {
     protected TypedMap params;
     private String modid;
 
-    public PacketRequestDataFromServer(ByteBuf buf) {
+    public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = NetworkTools.readPos(buf);
         command = NetworkTools.readString(buf);
         params = TypedMapTools.readArguments(buf);
         modid = NetworkTools.readString(buf);
     }
 
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         NetworkTools.writePos(buf, pos);
         NetworkTools.writeString(buf, command);
         TypedMapTools.writeArguments(buf, params);

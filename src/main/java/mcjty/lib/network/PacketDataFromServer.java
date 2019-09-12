@@ -1,9 +1,9 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -18,7 +18,7 @@ public class PacketDataFromServer {
     private TypedMap result;
     private String command;
 
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         NetworkTools.writePos(buf, pos);
 
         NetworkTools.writeString(buf, command);
@@ -29,7 +29,7 @@ public class PacketDataFromServer {
         }
     }
 
-    public PacketDataFromServer(ByteBuf buf) {
+    public PacketDataFromServer(PacketBuffer buf) {
         pos = NetworkTools.readPos(buf);
 
         command = NetworkTools.readString(buf);
