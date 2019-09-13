@@ -1,12 +1,13 @@
 package mcjty.lib.tileentity;
 
 import mcjty.lib.api.container.IGenericContainer;
-import mcjty.lib.container.GenericContainer;
 import mcjty.lib.varia.EnergyTools;
+import net.minecraft.nbt.LongNBT;
 import net.minecraft.util.IntReferenceHolder;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class GenericEnergyStorage implements IEnergyStorage {
+public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<LongNBT> {
 
     private final GenericTileEntity tileEntity;
     private final boolean isReceiver;
@@ -81,6 +82,16 @@ public class GenericEnergyStorage implements IEnergyStorage {
             this.energy = capacity;
         }
         tileEntity.markDirtyQuick();
+    }
+
+    @Override
+    public LongNBT serializeNBT() {
+        return new LongNBT(energy);
+    }
+
+    @Override
+    public void deserializeNBT(LongNBT nbt) {
+        energy = nbt.getLong();
     }
 
     @Override

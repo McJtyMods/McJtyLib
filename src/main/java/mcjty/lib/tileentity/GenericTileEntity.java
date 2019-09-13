@@ -32,7 +32,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -238,9 +241,26 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     @Override
     public void read(CompoundNBT tagCompound) {
         super.read(tagCompound);
+        readCaps(tagCompound);
         readInfo(tagCompound);
     }
 
+    protected void readCaps(CompoundNBT tagCompound) {
+        if (tagCompound.contains("Info")) {
+            CompoundNBT infoTag = tagCompound.getCompound("Info");
+            getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
+        }
+        getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .filter(h -> h instanceof INBTSerializable)
+                .map(h -> (INBTSerializable) h)
+                .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Constants.NBT.TAG_COMPOUND)));
+        getCapability(CapabilityEnergy.ENERGY)
+                .filter(h -> h instanceof INBTSerializable)
+                .map(h -> (INBTSerializable) h)
+                .ifPresent(h -> h.deserializeNBT(tagCompound.get("Energy")));
+    }
+
+    @Deprecated
     protected void readBufferFromNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
         readBufferFromNBT(tagCompound, "Items", inventoryHelper.getStacks());
     }
@@ -258,7 +278,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected void readInfo(CompoundNBT tagCompound) {
         if (tagCompound.contains("Info")) {
             CompoundNBT infoTag = tagCompound.getCompound("Info");
-            getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
             powerLevel = infoTag.getByte("powered");
             if (needsRedstoneMode()) {
                 int m = infoTag.getByte("rsMode");
@@ -289,8 +308,22 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     @Override
     public CompoundNBT write(CompoundNBT tagCompound) {
         super.write(tagCompound);
+        writeCaps(tagCompound);
         writeInfo(tagCompound);
         return tagCompound;
+    }
+
+    protected void writeCaps(CompoundNBT tagCompound) {
+        CompoundNBT infoTag = getOrCreateInfo(tagCompound);
+        getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> infoTag.putInt("infused", h.getInfused()));
+        getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .filter(h -> h instanceof INBTSerializable)
+                .map(h -> (INBTSerializable) h)
+                .ifPresent(h -> tagCompound.put("Items", h.serializeNBT()));
+        getCapability(CapabilityEnergy.ENERGY)
+                .filter(h -> h instanceof INBTSerializable)
+                .map(h -> (INBTSerializable) h)
+                .ifPresent(h -> tagCompound.put("Energy", h.serializeNBT()));
     }
 
     protected void writeBufferToNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
@@ -311,7 +344,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     protected void writeInfo(CompoundNBT tagCompound) {
         CompoundNBT infoTag = getOrCreateInfo(tagCompound);
-        getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> infoTag.putInt("infused", h.getInfused()));
         if (powerLevel > 0) {
             infoTag.putByte("powered", (byte) powerLevel);
         }
