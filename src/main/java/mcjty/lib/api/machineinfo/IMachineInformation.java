@@ -1,10 +1,10 @@
-package mcjty.lib.api;
+package mcjty.lib.api.machineinfo;
 
 /**
- * Implement this interface on your Tile Entity if you want the 'Machine Information Module'
+ * Implement this capability based interface in your TE if you want the 'Machine Information Module'
  * from RFTools to be able to display information from your block.
  */
-public interface MachineInformation {
+public interface IMachineInformation {
 
     /// Get the amount of tags that this machine supports.
     int getTagCount();
