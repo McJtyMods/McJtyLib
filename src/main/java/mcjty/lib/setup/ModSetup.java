@@ -4,6 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.machineinfo.CapabilityMachineInformation;
+import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
@@ -51,6 +52,7 @@ public class ModSetup extends DefaultModSetup {
         CapabilityInfusable.register();
         CapabilityMachineInformation.register();
         CapabilityPowerInformation.register();
+        CapabilityModuleSupport.register();
         PreferencesProperties.register();
     }
 

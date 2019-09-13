@@ -1,9 +1,10 @@
-package mcjty.lib.api;
+package mcjty.lib.api.module;
 
 import net.minecraft.item.ItemStack;
 
 /**
- * Implement this for your block if you want to support automatic insertion of modules
+ * Implement this capability based interface in your TE if you want to support
+ * automatic insertion of modules
  */
 public interface IModuleSupport {
 

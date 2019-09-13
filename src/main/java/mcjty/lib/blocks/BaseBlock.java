@@ -1,6 +1,8 @@
 package mcjty.lib.blocks;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.builder.BlockBuilder;
@@ -9,9 +11,9 @@ import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
+import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
-import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.OrientationTools;
 import mcjty.lib.varia.WrenchChecker;
@@ -170,10 +172,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             }
         }
         ItemStack heldItem = player.getHeldItem(hand);
-        // @todo
-//        if (handleModule(world, pos, state, player, hand, heldItem, result)) {
-//            return true;
-//        }
+        if (handleModule(world, pos, state, player, hand, heldItem, result)) {
+            return true;
+        }
         WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
         switch (wrenchUsed) {
             case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player);
@@ -182,6 +183,23 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             case DISABLED:     return wrenchDisabled(world, pos, player);
             case SELECT:       return wrenchSelect(world, pos, player);
             case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player);
+        }
+        return false;
+    }
+
+    public boolean handleModule(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult result) {
+        if (!heldItem.isEmpty()) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te != null) {
+                return te.getCapability(CapabilityModuleSupport.MODULE_CAPABILITY).map(h -> {
+                    if (h.isModule(heldItem)) {
+                        if (InventoryHelper.installModule(player, heldItem, hand, pos, h.getFirstSlot(), h.getLastSlot())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).orElse(false);
+            }
         }
         return false;
     }
