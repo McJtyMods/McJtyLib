@@ -1,19 +1,16 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
-import mcjty.lib.api.machineinfo.CapabilityMachineInformation;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.network.PacketHandler;
-import mcjty.lib.network.PacketSendPreferencesToClient;
-import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.varia.WrenchChecker;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -50,7 +47,6 @@ public class ModSetup extends DefaultModSetup {
     private static void registerCapabilities(){
         CapabilityContainerProvider.register();
         CapabilityInfusable.register();
-        CapabilityMachineInformation.register();
         CapabilityPowerInformation.register();
         CapabilityModuleSupport.register();
         PreferencesProperties.register();
