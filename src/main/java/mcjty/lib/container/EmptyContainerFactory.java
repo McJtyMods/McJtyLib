@@ -7,6 +7,10 @@ public class EmptyContainerFactory extends ContainerFactory {
 
     private static EmptyContainerFactory instance = null;
 
+    public EmptyContainerFactory() {
+        super(0);
+    }
+
     public static synchronized EmptyContainerFactory getInstance() {
         if (instance == null) {
             instance = new EmptyContainerFactory();

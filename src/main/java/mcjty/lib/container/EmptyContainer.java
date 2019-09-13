@@ -10,12 +10,7 @@ import net.minecraft.util.math.BlockPos;
  */
 public class EmptyContainer extends GenericContainer {
 
-    public static final ContainerFactory CONTAINER_FACTORY = new ContainerFactory() {
-        @Override
-        protected void setup() {
-        }
-    };
-
+    public static final ContainerFactory CONTAINER_FACTORY = new ContainerFactory(0);
 
     public EmptyContainer(PlayerEntity player, IInventory inventory) {
         super(null, 0, EmptyContainerFactory.getInstance(), BlockPos.ZERO, null);

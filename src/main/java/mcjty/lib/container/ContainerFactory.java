@@ -26,8 +26,14 @@ public class ContainerFactory {
     private int[] accessibleSlots;
     private int[] accessibleInputSlots;
     private int[] accessibleOutputSlots;
+    private final int containerSlots;
 
-    public ContainerFactory() {
+    public ContainerFactory(int containerSlots) {
+        this.containerSlots = containerSlots;
+    }
+
+    public int getContainerSlots() {
+        return containerSlots;
     }
 
     protected void setup() {
@@ -69,7 +75,7 @@ public class ContainerFactory {
             dim[0] = cmd.getOptionalPar(0, 0);
             dim[1] = cmd.getOptionalPar(1, 0);
         });
-        addSlotBox(slotDefinition, CONTAINER_CONTAINER, slots.size(), pos[0], pos[1], dim[0], 18, dim[1], 18);
+        box(slotDefinition, CONTAINER_CONTAINER, slots.size(), pos[0], pos[1], dim[0], dim[1]);
     }
 
     public void doSetup() {
@@ -184,7 +190,7 @@ public class ContainerFactory {
         return getSlotType(index) == SlotType.SLOT_PLAYERHOTBAR;
     }
 
-    public void addSlot(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y) {
+    public void slot(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y) {
         SlotFactory slotFactory = new SlotFactory(slotDefinition, inventoryName, index, x, y);
         int slotIndex = slots.size();
         slots.add(slotFactory);
@@ -198,30 +204,34 @@ public class ContainerFactory {
         indexToType.put(slotIndex, slotDefinition);
     }
 
-    public int addSlotRange(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y, int amount, int dx) {
+    public int range(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y, int amount, int dx) {
         for (int i = 0 ; i < amount ; i++) {
-            addSlot(slotDefinition, inventoryName, index, x, y);
+            slot(slotDefinition, inventoryName, index, x, y);
             x += dx;
             index++;
         }
         return index;
     }
 
-    public int addSlotBox(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
+    public int box(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
         for (int j = 0 ; j < verAmount ; j++) {
-            index = addSlotRange(slotDefinition, inventoryName, index, x, y, horAmount, dx);
+            index = range(slotDefinition, inventoryName, index, x, y, horAmount, dx);
             y += dy;
         }
         return index;
     }
 
-    protected void layoutPlayerInventorySlots(int leftCol, int topRow) {
+    public int box(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y, int horAmount, int verAmount) {
+        return box(slotDefinition, inventoryName, index, x, y, horAmount, verAmount);
+    }
+
+    protected void playerSlots(int leftCol, int topRow) {
         // Player inventory
-        addSlotBox(new SlotDefinition(SlotType.SLOT_PLAYERINV), CONTAINER_PLAYER, 9, leftCol, topRow, 9, 18, 3, 18);
+        box(new SlotDefinition(SlotType.SLOT_PLAYERINV), CONTAINER_PLAYER, 9, leftCol, topRow, 9, 3);
 
         // Hotbar
         topRow += 58;
-        addSlotRange(new SlotDefinition(SlotType.SLOT_PLAYERHOTBAR), CONTAINER_PLAYER, 0, leftCol, topRow, 9, 18);
+        range(new SlotDefinition(SlotType.SLOT_PLAYERHOTBAR), CONTAINER_PLAYER, 0, leftCol, topRow, 9, 18);
 
     }
 
