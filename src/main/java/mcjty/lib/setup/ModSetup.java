@@ -5,6 +5,7 @@ import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
+import mcjty.lib.network.PacketHandler;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesDispatcher;
@@ -54,8 +55,7 @@ public class ModSetup extends DefaultModSetup {
         super.init(e);
         registerCapabilities();
         McJtyLib.networkHandler = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> "1.0", s -> true, s -> true);
-        McJtyLib.networkHandler.registerMessage(0, PacketSendPreferencesToClient.class, PacketSendPreferencesToClient::toBytes, PacketSendPreferencesToClient::new, PacketSendPreferencesToClient::handle);
-        McJtyLib.networkHandler.registerMessage(1, PacketSetGuiStyle.class, PacketSetGuiStyle::toBytes, PacketSetGuiStyle::new, PacketSetGuiStyle::handle);
+        PacketHandler.registerMessages(McJtyLib.networkHandler);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
         McJtyLib.tesla = ModList.get().isLoaded("tesla");
         McJtyLib.cofhapiitem = ModList.get().isLoaded("cofhapi|item");
