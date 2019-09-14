@@ -222,7 +222,7 @@ public class ContainerFactory {
     }
 
     public int box(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y, int horAmount, int verAmount) {
-        return box(slotDefinition, inventoryName, index, x, y, horAmount, verAmount);
+        return box(slotDefinition, inventoryName, index, x, y, horAmount, 18, verAmount, 18);
     }
 
     protected void playerSlots(int leftCol, int topRow) {
