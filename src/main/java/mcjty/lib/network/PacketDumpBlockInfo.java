@@ -10,6 +10,7 @@ import net.minecraft.server.management.OpEntry;
 import net.minecraft.server.management.OpList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.Level;
 
@@ -20,24 +21,24 @@ import java.util.function.Supplier;
  */
 public class PacketDumpBlockInfo {
 
-    private int dimid;
+    private DimensionType dimid;
     private BlockPos pos;
     private boolean verbose;
 
     public void toBytes(ByteBuf buf) {
-        buf.writeInt(dimid);
+        buf.writeInt(dimid.getId());
         NetworkTools.writePos(buf, pos);
         buf.writeBoolean(verbose);
     }
 
     public PacketDumpBlockInfo(ByteBuf buf) {
-        dimid = buf.readInt();
+        dimid = DimensionType.getById(buf.readInt());
         pos = NetworkTools.readPos(buf);
         verbose = buf.readBoolean();
     }
 
     public PacketDumpBlockInfo(World world, BlockPos pos, boolean verbose) {
-        this.dimid = world.getDimension().getType().getId();
+        this.dimid = world.getDimension().getType();
         this.pos = pos;
         this.verbose = verbose;
     }

@@ -26,17 +26,23 @@ public class WorldTools {
         return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
     }
 
-    // @todo try to avoid and use DimensionType instead!
-    public static ServerWorld getWorld(int dimensionId) {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return DimensionManager.getWorld(server, DimensionType.getById(dimensionId), false, false);
-    }
+//    // @todo try to avoid and use DimensionType instead!
+//    @Deprecated
+//    public static ServerWorld getWorld(int dimensionId) {
+//        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+//        return DimensionManager.getWorld(server, DimensionType.getById(dimensionId), false, false);
+//    }
+//
+//    @Deprecated
+//    public static ServerWorld loadWorld(int dimensionId) {
+//        return loadWorld(DimensionType.getById(dimensionId));
+//    }
 
-    public static ServerWorld loadWorld(int dimensionId) {
-        ServerWorld world = getWorld(dimensionId);
+    public static ServerWorld loadWorld(DimensionType type) {
+        ServerWorld world = getWorld(type);
         if (world == null) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            return server.getWorld(DimensionType.getById(dimensionId));
+            return server.getWorld(type);
         }
         return world;
     }

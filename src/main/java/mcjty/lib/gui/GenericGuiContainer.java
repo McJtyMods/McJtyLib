@@ -28,6 +28,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
@@ -444,7 +445,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), null, command, params));
     }
 
-    public void sendServerCommand(SimpleChannel network, int dimensionId, String command, TypedMap params) {
+    public void sendServerCommand(SimpleChannel network, DimensionType dimensionId, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), dimensionId, command, params));
     }
 
