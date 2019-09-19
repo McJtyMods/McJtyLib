@@ -17,8 +17,8 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
 
     private final String name;
     private BiFunction<Integer, PlayerEntity, C> containerSupplier;
-    private LazyOptional<? extends IItemHandler> itemHandler;
-    private LazyOptional<? extends GenericEnergyStorage> energyHandler;
+    private LazyOptional<? extends IItemHandler> itemHandler = LazyOptional.empty();
+    private LazyOptional<? extends GenericEnergyStorage> energyHandler = LazyOptional.empty();
 
     public DefaultContainerProvider(String name) {
         this.name = name;

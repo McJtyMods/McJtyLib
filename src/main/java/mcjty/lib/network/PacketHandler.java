@@ -1,9 +1,6 @@
 package mcjty.lib.network;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
@@ -26,22 +23,8 @@ public class PacketHandler {
         return packetId++;
     }
 
-    public static SimpleChannel registerMessages(String modid, String channelName) {
-        SimpleChannel network = NetworkRegistry.newSimpleChannel(new ResourceLocation(McJtyLib.MODID, channelName), () -> "1.0", s -> true, s -> true);
-
-        //@todo 1.14: how to do this?
-//        SimpleChannel network = new SimpleChannel(channelName) {
-//            @Override
-//            public <MSG> void sendToServer(MSG message) {
-//                if (message instanceof IClientServerDelayed && !canBeSent(message)) {
-//                    return;
-//                }
-//                super.sendToServer(message);
-//            }
-//        };
-        registerMessages(network);
+    public static void registerMessageHandler(String modid, SimpleChannel network) {
         modNetworking.put(modid, network);
-        return network;
     }
 
     // Only use client-side!
