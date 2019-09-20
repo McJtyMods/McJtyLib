@@ -13,7 +13,9 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +81,11 @@ public class TextField extends AbstractWidget<TextField> {
         return null;
     }
 
+    private static boolean isControlDown() {
+        long handle = Minecraft.getInstance().mainWindow.getHandle();
+        return InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_CONTROL);
+    }
+
     @Override
     public boolean keyTyped(int keyCode, int scanCode) {
         boolean rc = super.keyTyped(keyCode, scanCode);
@@ -86,94 +93,109 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            // @todo 1.14
-//            if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL)) {
-//                if(keyCode == Keyboard.KEY_V) {
-//                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-//                    String data = "";
-//                    try {
-//                        data = (String) clipboard.getData(DataFlavor.stringFlavor);
-//                    } catch (UnsupportedFlavorException | IOException e) {
-//                    }
-//
+            long handle = Minecraft.getInstance().mainWindow.getHandle();
+            if (isControlDown()) {
+                if(keyCode == GLFW.GLFW_KEY_V) {
+                    String data = GLFW.glfwGetClipboardString(handle);
+                    if (data != null) {
+                        if (isRegionSelected()) {
+                            replaceSelectedRegion(data);
+                        } else {
+                            text = text.substring(0, cursor) + data + text.substring(cursor);
+                        }
+                        cursor += data.length();
+                        fireTextEvents(text);
+                    }
+                } else if (keyCode == GLFW.GLFW_KEY_C) {
+                    if (isRegionSelected()) {
+                        GLFW.glfwSetClipboardString(handle, getSelectedText());
+                    }
+                } else if (keyCode == GLFW.GLFW_KEY_X) {
+                    if (isRegionSelected()) {
+                        GLFW.glfwSetClipboardString(handle, getSelectedText());
+                        replaceSelectedRegion("");
+                        fireTextEvents(text);
+                    }
+                } else if (keyCode == GLFW.GLFW_KEY_A) {
+                    selectAll();
+                }
+            } else if (keyCode == GLFW.GLFW_KEY_ENTER) {
+                fireTextEnterEvents(text);
+//                window.setTextFocus(null);
+                return false;
+            } else if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                return false;
+            } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
+                if (isRegionSelected()) {
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                } else if (!text.isEmpty() && cursor > 0) {
+                    text = text.substring(0, cursor - 1) + text.substring(cursor);
+                    cursor--;
+                    fireTextEvents(text);
+                }
+            } else if (keyCode == GLFW.GLFW_KEY_DELETE) {
+                if (isRegionSelected()) {
+                    replaceSelectedRegion("");
+                    fireTextEvents(text);
+                } else if (cursor < text.length()) {
+                    text = text.substring(0, cursor) + text.substring(cursor + 1);
+                    fireTextEvents(text);
+                }
+            } else if (keyCode == GLFW.GLFW_KEY_HOME) {
+                updateSelection();
+                cursor = 0;
+            } else if (keyCode == GLFW.GLFW_KEY_END) {
+                updateSelection();
+                cursor = text.length();
+            } else if (keyCode == GLFW.GLFW_KEY_DOWN) {
+                fireArrowDownEvents();
+            } else if (keyCode == GLFW.GLFW_KEY_UP) {
+                fireArrowUpEvents();
+            } else if (keyCode == GLFW.GLFW_KEY_TAB) {
+                fireTabEvents();
+            } else if (keyCode == GLFW.GLFW_KEY_LEFT) {
+                updateSelection();
+                if (cursor > 0) {
+                    cursor--;
+                }
+            } else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
+                updateSelection();
+                if (cursor < text.length()) {
+                    cursor++;
+                }
+            } else {
+                // e.g. F1~12, insert
+                // Char code of 0 will appear to be nothing
+                if ((int) keyCode != 0) {
+
+//                    InputMappings.Input input = InputMappings.getInputByCode(keyCode, scanCode);
+//                    String translationKey = input.getTranslationKey();
+//                    System.out.println("keyCode = " + keyCode + "," + scanCode);
 //                    if (isRegionSelected()) {
-//                        replaceSelectedRegion(data);
+//                        replaceSelectedRegion(Character.toString((char) keyCode));
 //                    } else {
-//                        text = text.substring(0, cursor) + data + text.substring(cursor);
-//                    }
-//                    cursor += data.length();
-//                    fireTextEvents(text);
-//                } else if (keyCode == Keyboard.KEY_C) {
-//                    if (isRegionSelected()) {
-//                        GuiScreen.setClipboardString(getSelectedText());
-//                    }
-//                } else if (keyCode == Keyboard.KEY_X) {
-//                    if (isRegionSelected()) {
-//                        GuiScreen.setClipboardString(getSelectedText());
-//                        replaceSelectedRegion("");
-//                        fireTextEvents(text);
-//                    }
-//                } else if (keyCode == Keyboard.KEY_A) {
-//                    selectAll();
-//                }
-//            } else if (keyCode == Keyboard.KEY_RETURN) {
-//                fireTextEnterEvents(text);
-////                window.setTextFocus(null);
-//                return false;
-//            } else if (keyCode == Keyboard.KEY_ESCAPE) {
-//                return false;
-//            } else if (keyCode == Keyboard.KEY_BACK) {
-//                if (isRegionSelected()) {
-//                    replaceSelectedRegion("");
-//                    fireTextEvents(text);
-//                } else if (!text.isEmpty() && cursor > 0) {
-//                    text = text.substring(0, cursor - 1) + text.substring(cursor);
-//                    cursor--;
-//                    fireTextEvents(text);
-//                }
-//            } else if (keyCode == Keyboard.KEY_DELETE) {
-//                if (isRegionSelected()) {
-//                    replaceSelectedRegion("");
-//                    fireTextEvents(text);
-//                } else if (cursor < text.length()) {
-//                    text = text.substring(0, cursor) + text.substring(cursor + 1);
-//                    fireTextEvents(text);
-//                }
-//            } else if (keyCode == Keyboard.KEY_HOME) {
-//                updateSelection();
-//                cursor = 0;
-//            } else if (keyCode == Keyboard.KEY_END) {
-//                updateSelection();
-//                cursor = text.length();
-//            } else if (keyCode == Keyboard.KEY_DOWN) {
-//                fireArrowDownEvents();
-//            } else if (keyCode == Keyboard.KEY_UP) {
-//                fireArrowUpEvents();
-//            } else if (keyCode == Keyboard.KEY_TAB) {
-//                fireTabEvents();
-//            } else if (keyCode == Keyboard.KEY_LEFT) {
-//                updateSelection();
-//                if (cursor > 0) {
-//                    cursor--;
-//                }
-//            } else if (keyCode == Keyboard.KEY_RIGHT) {
-//                updateSelection();
-//                if (cursor < text.length()) {
-//                    cursor++;
-//                }
-//            } else {
-//                // e.g. F1~12, insert
-//                // Char code of 0 will appear to be nothing
-//                if ((int) typedChar != 0) {
-//                    if (isRegionSelected()) {
-//                        replaceSelectedRegion(String.valueOf(typedChar));
-//                    } else {
-//                        text = text.substring(0, cursor) + typedChar + text.substring(cursor);
+//                        text = text.substring(0, cursor) + Character.toString((char) keyCode) + text.substring(cursor);
 //                    }
 //                    cursor++;
 //                    fireTextEvents(text);
-//                }
-//            }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean charTyped(char codePoint) {
+        if (isEnabledAndVisible() && editable) {
+            if (isRegionSelected()) {
+                replaceSelectedRegion(Character.toString(codePoint));
+            } else {
+                text = text.substring(0, cursor) + Character.toString(codePoint) + text.substring(cursor);
+            }
+            cursor++;
+            fireTextEvents(text);
             return true;
         }
         return false;

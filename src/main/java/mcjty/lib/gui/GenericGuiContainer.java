@@ -441,6 +441,15 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
+    public void charTypedFromEvent(char codePoint) {
+        if (window != null) {
+            if (getWindowManager().charTyped(codePoint)) {
+                // @todo 1.14?
+//                super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
+            }
+        }
+    }
+
     public void sendServerCommand(SimpleChannel network, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), null, command, params));
     }

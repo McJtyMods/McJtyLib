@@ -11,6 +11,25 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
+    public void onGuiInput(GuiScreenEvent.KeyboardCharTypedEvent event) {
+        if (event.getGui() instanceof GenericGuiContainer) {
+            GenericGuiContainer<?,?> container = (GenericGuiContainer<?,?>) event.getGui();
+            Widget<?> focus = container.getWindow().getTextFocus();
+            if (focus != null) {
+                event.setCanceled(true);
+                container.charTypedFromEvent(event.getCodePoint());
+                // @todo 1.14 check
+//                int c0 = event.getKeyCode();
+//                if (Keyboard.getEventKey() == 0 && c0 >= 32 || Keyboard.getEventKeyState()) {
+//                    container.keyTypedFromEvent(c0, Keyboard.getEventKey());
+//                    Minecraft.getInstance().dispatchKeypresses();
+//                }
+            }
+        }
+
+    }
+
+    @SubscribeEvent
     public void onKeyboardInput(GuiScreenEvent.KeyboardKeyEvent event) {
         if (event.getGui() instanceof GenericGuiContainer) {
             GenericGuiContainer<?,?> container = (GenericGuiContainer<?,?>) event.getGui();

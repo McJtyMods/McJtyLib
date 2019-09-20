@@ -233,6 +233,13 @@ public class Window {
         return textFocus;
     }
 
+    public boolean charTyped(char codePoint) {
+        if (textFocus != null) {
+            return textFocus.charTyped(codePoint);
+        }
+        return false;
+    }
+
     public boolean keyTyped(int keyCode, int scanCode) {
         if (keyCode == GLFW.GLFW_KEY_F12) {
             GuiParser.GuiCommand windowCmd = createWindowCommand();
