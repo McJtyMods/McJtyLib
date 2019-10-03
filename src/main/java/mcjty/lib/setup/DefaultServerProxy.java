@@ -112,6 +112,16 @@ public class DefaultServerProxy implements IProxy {
     }
 
     @Override
+    public boolean isAltKeyDown() {
+        throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
+    public boolean isCtrlKeyDown() {
+        throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
     public IAnimationStateMachine load(ResourceLocation location, ImmutableMap<String, ITimeValue> parameters) {
         throw new IllegalStateException("This should only be called from client side");
     }

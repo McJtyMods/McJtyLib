@@ -4,8 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.RecipeManager;
@@ -17,7 +17,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.concurrent.Callable;
 
@@ -125,8 +124,17 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public boolean isShiftKeyDown() {
-        long handle = Minecraft.getInstance().mainWindow.getHandle();
-        return InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT) || InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
+        return Screen.hasShiftDown();
+    }
+
+    @Override
+    public boolean isAltKeyDown() {
+        return Screen.hasAltDown();
+    }
+
+    @Override
+    public boolean isCtrlKeyDown() {
+        return Screen.hasControlDown();
     }
 
     @Override
