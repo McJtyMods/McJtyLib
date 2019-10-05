@@ -1,6 +1,6 @@
 package mcjty.lib;
 
-import mcjty.lib.gui.GenericGuiContainer;
+import mcjty.lib.gui.IKeyReceiver;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -12,8 +12,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void onGuiInput(GuiScreenEvent.KeyboardCharTypedEvent event) {
-        if (event.getGui() instanceof GenericGuiContainer) {
-            GenericGuiContainer<?,?> container = (GenericGuiContainer<?,?>) event.getGui();
+        if (event.getGui() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getGui();
             Widget<?> focus = container.getWindow().getTextFocus();
             if (focus != null) {
                 event.setCanceled(true);
@@ -31,8 +31,8 @@ public class ClientEventHandler {
 
     @SubscribeEvent
     public void onKeyboardInput(GuiScreenEvent.KeyboardKeyEvent event) {
-        if (event.getGui() instanceof GenericGuiContainer) {
-            GenericGuiContainer<?,?> container = (GenericGuiContainer<?,?>) event.getGui();
+        if (event.getGui() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getGui();
             Widget<?> focus = container.getWindow().getTextFocus();
             if (focus != null) {
                 event.setCanceled(true);

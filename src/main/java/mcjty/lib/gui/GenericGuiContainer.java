@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends Container> extends ContainerScreen<C> {
+public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends Container> extends ContainerScreen<C> implements IKeyReceiver {
 
     protected ModBase modBase;
     protected SimpleChannel network;
@@ -419,6 +419,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         return rc;
     }
 
+    @Override
     public Window getWindow() {
         return window;
     }
@@ -433,6 +434,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
+    @Override
     public void keyTypedFromEvent(int keyCode, int scanCode) {
         if (window != null) {
             if (getWindowManager().keyTyped(keyCode, scanCode)) {
@@ -441,6 +443,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
+    @Override
     public void charTypedFromEvent(char codePoint) {
         if (window != null) {
             if (getWindowManager().charTyped(codePoint)) {
