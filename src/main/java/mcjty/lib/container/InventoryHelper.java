@@ -217,23 +217,6 @@ public class InventoryHelper {
         return false;
     }
 
-    /**
-     * Insert multiple items in an inventory. If it didn't work nothing happens and false
-     * is returned. No items will be inserted in that case.
-     */
-    public static boolean insertItemsAtomic(List<ItemStack> items, TileEntity te, Direction side) {
-        if (te == null) {
-            return false;
-        }
-        return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side).map(handler -> {
-            if (!insertItemsItemHandlerWithUndo(handler, items, true)) {
-                return false;
-            }
-            insertItemsItemHandlerWithUndo(handler, items, false);
-            return true;
-        }).orElse(false);
-    }
-
     public static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
         // @todo 1.14
 //        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (!result.getHasSubtypes() || result.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
