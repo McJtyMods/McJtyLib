@@ -1,13 +1,25 @@
 package mcjty.lib.varia;
 
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Tuple;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class FluidTools {
 
@@ -31,7 +43,7 @@ public class FluidTools {
     public static FluidStack convertBucketToFluid(@Nonnull ItemStack bucket) {
         // @todo 1.14: return null in LazyOptional?
         return FluidUtil.getFluidHandler(bucket).map(handler -> {
-            for (int i = 0 ; i < handler.getTanks() ; i++) {
+            for (int i = 0; i < handler.getTanks(); i++) {
                 FluidStack contents = handler.getFluidInTank(i);
                 if (!contents.isEmpty()) {
                     return contents;
@@ -44,7 +56,7 @@ public class FluidTools {
 
     public static boolean isEmptyContainer(@Nonnull ItemStack itemStack) {
         return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            for (int i = 0 ; i < handler.getTanks() ; i++) {
+            for (int i = 0; i < handler.getTanks(); i++) {
                 if (handler.getTankCapacity(i) > 0) {
                     FluidStack contents = handler.getFluidInTank(i);
                     if (contents.isEmpty()) {
@@ -60,7 +72,7 @@ public class FluidTools {
 
     public static boolean isFilledContainer(@Nonnull ItemStack itemStack) {
         return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            for (int i = 0 ; i < handler.getTanks() ; i++) {
+            for (int i = 0; i < handler.getTanks(); i++) {
                 FluidStack contents = handler.getFluidInTank(i);
                 if (contents.isEmpty() || contents.getAmount() < handler.getTankCapacity(i)) {
                     return false;
@@ -95,6 +107,36 @@ public class FluidTools {
         }).orElse(ItemStack.EMPTY);
     }
 
+    @Nonnull
+    public static FluidStack pickupFluidBlock(World world, BlockPos pos, @Nonnull Predicate<FluidStack> action, @Nonnull Runnable clearBlock) {
+        BlockState blockstate = world.getBlockState(pos);
+        IFluidState fluidstate = world.getFluidState(pos);
+        Material material = blockstate.getMaterial();
+        Fluid fluid = fluidstate.getFluid();
+
+        if (blockstate.getBlock() instanceof IBucketPickupHandler && fluid != Fluids.EMPTY) {
+            FluidStack stack = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
+            if (action.test(stack)) {
+                return new FluidStack(((IBucketPickupHandler) blockstate.getBlock()).pickupFluid(world, pos, blockstate), FluidAttributes.BUCKET_VOLUME);
+            }
+            return stack;
+        } else if (blockstate.getBlock() instanceof FlowingFluidBlock) {
+            FluidStack stack = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
+            if (action.test(stack)) {
+                clearBlock.run();
+            }
+            return stack;
+        } else if (material == Material.OCEAN_PLANT || material == Material.SEA_GRASS) {
+            FluidStack stack = new FluidStack(Fluids.WATER, FluidAttributes.BUCKET_VOLUME);
+            if (action.test(stack)) {
+                TileEntity tileentity = blockstate.getBlock().hasTileEntity(blockstate) ? world.getTileEntity(pos) : null;
+                Block.spawnDrops(blockstate, world, pos, tileentity);
+                clearBlock.run();
+            }
+            return stack;
+        }
+        return FluidStack.EMPTY;
+    }
     /**
      * Get the capacity (in mb) of the given container for the given fluid
      */
