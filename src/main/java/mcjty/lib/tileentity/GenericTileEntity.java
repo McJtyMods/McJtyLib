@@ -70,7 +70,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         markDirty();
         if (getWorld() != null) {
             BlockState state = getWorld().getBlockState(getPos());
-            getWorld().notifyBlockUpdate(getPos(), state, state, 3);
+            getWorld().notifyBlockUpdate(getPos(), state, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         }
     }
 
