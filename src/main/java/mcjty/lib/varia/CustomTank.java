@@ -6,22 +6,15 @@ import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
-import java.util.function.Predicate;
 
 public class CustomTank implements IFluidHandler, IFluidTank {
 
-    protected Predicate<FluidStack> validator;
     @Nonnull
     protected FluidStack fluid = FluidStack.EMPTY;
     protected int capacity;
 
     public CustomTank(int capacity) {
-        this(capacity, e -> true);
-    }
-
-    public CustomTank(int capacity, Predicate<FluidStack> validator) {
         this.capacity = capacity;
-        this.validator = validator;
     }
 
     public CustomTank setCapacity(int capacity) {
@@ -29,16 +22,9 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         return this;
     }
 
-    public CustomTank setValidator(Predicate<FluidStack> validator) {
-        if (validator != null) {
-            this.validator = validator;
-        }
-        return this;
-    }
-
     @Override
     public boolean isFluidValid(FluidStack stack) {
-        return validator.test(stack);
+        return true;
     }
 
     @Override
