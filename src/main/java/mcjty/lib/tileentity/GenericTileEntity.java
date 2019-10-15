@@ -4,20 +4,17 @@ import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
-import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.network.*;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.ItemStackList;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
@@ -260,21 +257,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
                 .ifPresent(h -> h.deserializeNBT(tagCompound.get("Energy")));
     }
 
-    @Deprecated
-    protected void readBufferFromNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
-        readBufferFromNBT(tagCompound, "Items", inventoryHelper.getStacks());
-    }
-
-    protected void readBufferFromNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
-        ListNBT bufferTagList = tagCompound.getList(tag, Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < bufferTagList.size(); i++) {
-            CompoundNBT compoundNBT = bufferTagList.getCompound(i);
-            if (i < list.size()) {
-                list.set(i, ItemStack.read(compoundNBT));
-            }
-        }
-    }
-
     protected void readInfo(CompoundNBT tagCompound) {
         if (tagCompound.contains("Info")) {
             CompoundNBT infoTag = tagCompound.getCompound("Info");
@@ -324,22 +306,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> tagCompound.put("Energy", h.serializeNBT()));
-    }
-
-    protected void writeBufferToNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
-        ListNBT bufferTagList = new ListNBT();
-        for (ItemStack stack : list) {
-            CompoundNBT CompoundNBT = new CompoundNBT();
-            if (!stack.isEmpty()) {
-                stack.write(CompoundNBT);
-            }
-            bufferTagList.add(CompoundNBT);
-        }
-        tagCompound.put(tag, bufferTagList);
-    }
-
-    protected void writeBufferToNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
-        writeBufferToNBT(tagCompound, "Items", inventoryHelper.getStacks());
     }
 
     protected void writeInfo(CompoundNBT tagCompound) {
