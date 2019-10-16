@@ -13,6 +13,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.Tags;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,10 +86,10 @@ public class BaseRecipeProvider extends RecipeProvider {
         super(datagen);
         add('d', Items.DIAMOND);
         add('e', Items.EMERALD);
-        add('o', Items.ENDER_PEARL);
+        add('o', Tags.Items.ENDER_PEARLS);
         add('r', Items.REDSTONE);
         add('R', Items.REDSTONE_BLOCK);
-        add('i', Items.IRON_INGOT);
+        add('i', Tags.Items.INGOTS_IRON);
         add('p', Items.PAPER);
         add('c', ItemTags.COALS);
         add('B', Blocks.BRICKS);
