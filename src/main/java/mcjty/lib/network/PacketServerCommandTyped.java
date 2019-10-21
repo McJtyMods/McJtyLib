@@ -26,7 +26,7 @@ public class PacketServerCommandTyped {
     protected TypedMap params;
 
     public PacketServerCommandTyped(PacketBuffer buf) {
-        pos = NetworkTools.readPos(buf);
+        pos = buf.readBlockPos();
         command = NetworkTools.readString(buf);
         params = TypedMapTools.readArguments(buf);
         if (buf.readBoolean()) {
@@ -51,7 +51,7 @@ public class PacketServerCommandTyped {
     }
 
     public void toBytes(PacketBuffer buf) {
-        NetworkTools.writePos(buf, pos);
+        buf.writeBlockPos(pos);
         NetworkTools.writeString(buf, command);
         TypedMapTools.writeArguments(buf, params);
         if (dimensionId != null) {

@@ -1,16 +1,13 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.varia.Logging;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,33 +42,6 @@ public class NetworkTools {
             buf.writeCompoundTag(tag);
         } catch (RuntimeException e) {
             Logging.logError("Error writing tag", e);
-        }
-    }
-
-    /// This function supports itemstacks with more then 64 items.
-    public static ItemStack readItemStack(ByteBuf dataIn) {
-        PacketBuffer buf = new PacketBuffer(dataIn);
-        CompoundNBT nbt = buf.readCompoundTag();
-        ItemStack stack = ItemStack.read(nbt);
-        int amount = buf.readInt();
-        if (amount <= 0) {
-            stack.setCount(0);
-        } else {
-            stack.setCount(amount);
-        }
-        return stack;
-    }
-
-    /// This function supports itemstacks with more then 64 items.
-    public static void writeItemStack(ByteBuf dataOut, @Nonnull ItemStack itemStack) {
-        PacketBuffer buf = new PacketBuffer(dataOut);
-        CompoundNBT nbt = new CompoundNBT();
-        itemStack.write(nbt);
-        try {
-            buf.writeCompoundTag(nbt);
-            buf.writeInt(itemStack.getCount());
-        } catch (RuntimeException e) {
-            Logging.logError("Error writing item stack", e);
         }
     }
 
@@ -141,25 +111,6 @@ public class NetworkTools {
     }
 
 
-    public static BlockPos readPos(ByteBuf dataIn) {
-        // @todo no longer needed!
-        if (GeneralConfig.tallChunkFriendly.get()) {
-            return new BlockPos(dataIn.readInt(), dataIn.readInt(), dataIn.readInt());
-        } else {
-            return BlockPos.fromLong(dataIn.readLong());
-        }
-    }
-
-    public static void writePos(ByteBuf dataOut, BlockPos pos) {
-        if (GeneralConfig.tallChunkFriendly.get()) {
-            dataOut.writeInt(pos.getX());
-            dataOut.writeInt(pos.getY());
-            dataOut.writeInt(pos.getZ());
-        } else {
-            dataOut.writeLong(pos.toLong());
-        }
-    }
-
     public static <T extends Enum<T>> void writeEnum(ByteBuf buf, T value, T nullValue) {
         if (value == null) {
             buf.writeInt(nullValue.ordinal());
@@ -204,45 +155,20 @@ public class NetworkTools {
         }
     }
 
-    @Nullable
-    public static List<BlockPos> readPosList(ByteBuf buf) {
-        List<BlockPos> list = null;
-        int size = buf.readInt();
-        if (size != -1) {
-            list = new ArrayList<>(size);
-            for (int i = 0 ; i < size ; i++) {
-                BlockPos item = readPos(buf);
-                list.add(item);
-            }
-        }
-        return list;
-    }
-
-    public static void writePosList(ByteBuf buf, @Nullable List<BlockPos> list) {
-        if (list == null) {
-            buf.writeInt(-1);
-        } else {
-            buf.writeInt(list.size());
-            for (BlockPos item : list) {
-                writePos(buf, item);
-            }
-        }
-    }
-
     @Nonnull
-    public static List<ItemStack> readItemStackList(ByteBuf buf) {
+    public static List<ItemStack> readItemStackList(PacketBuffer buf) {
         int size = buf.readInt();
         List<ItemStack> outputs = new ArrayList<>(size);
         for (int i = 0 ; i < size ; i++) {
-            outputs.add(NetworkTools.readItemStack(buf));
+            outputs.add(buf.readItemStack());
         }
         return outputs;
     }
 
-    public static void writeItemStackList(ByteBuf buf, @Nonnull List<ItemStack> outputs) {
+    public static void writeItemStackList(PacketBuffer buf, @Nonnull List<ItemStack> outputs) {
         buf.writeInt(outputs.size());
         for (ItemStack output : outputs) {
-            NetworkTools.writeItemStack(buf, output);
+            buf.writeItemStack(output);
         }
     }
 }

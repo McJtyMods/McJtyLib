@@ -1,8 +1,8 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.tileentity.GenericTileEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -25,16 +25,16 @@ public class PacketSendGuiData {
 
     private static class Entry<T> {
         private final Class<T> clazz;
-        private final Function<ByteBuf, ? extends T> func;
-        private final Consumer<Pair<ByteBuf, ? extends T>> consumer;
+        private final Function<PacketBuffer, ? extends T> func;
+        private final Consumer<Pair<PacketBuffer, ? extends T>> consumer;
 
-        private Entry(Class<T> clazz, Function<ByteBuf, ? extends T> func, Consumer<Pair<ByteBuf, ? extends T>> consumer) {
+        private Entry(Class<T> clazz, Function<PacketBuffer, ? extends T> func, Consumer<Pair<PacketBuffer, ? extends T>> consumer) {
             this.clazz = clazz;
             this.func = func;
             this.consumer = consumer;
         }
 
-        public static <T> Entry<T> of(Class<T> clazz, Function<ByteBuf, ? extends T> func, Consumer<Pair<ByteBuf, ? extends T>> consumer) {
+        public static <T> Entry<T> of(Class<T> clazz, Function<PacketBuffer, ? extends T> func, Consumer<Pair<PacketBuffer, ? extends T>> consumer) {
             return new Entry<>(clazz, func, consumer);
         }
 
@@ -51,18 +51,18 @@ public class PacketSendGuiData {
     private static final Map<Integer,Entry<?>> CLASS_MAP = new HashMap<>();
     static {
         int id = 0;
-        CLASS_MAP.put(id++, Entry.of(Integer.class, ByteBuf::readInt, p -> p.getLeft().writeInt(p.getRight())));
+        CLASS_MAP.put(id++, Entry.of(Integer.class, PacketBuffer::readInt, p -> p.getLeft().writeInt(p.getRight())));
         CLASS_MAP.put(id++, Entry.of(String.class, NetworkTools::readString, p -> NetworkTools.writeString(p.getLeft(), p.getRight())));
-        CLASS_MAP.put(id++, Entry.of(Float.class, ByteBuf::readFloat, p -> p.getLeft().writeFloat(p.getRight())));
-        CLASS_MAP.put(id++, Entry.of(Boolean.class, ByteBuf::readBoolean, p -> p.getLeft().writeBoolean(p.getRight())));
-        CLASS_MAP.put(id++, Entry.of(Byte.class, ByteBuf::readByte, p -> p.getLeft().writeByte(p.getRight())));
-        CLASS_MAP.put(id++, Entry.of(Long.class, ByteBuf::readLong, p -> p.getLeft().writeLong(p.getRight())));
-        CLASS_MAP.put(id++, Entry.of(BlockPos.class, NetworkTools::readPos, p -> NetworkTools.writePos(p.getLeft(), p.getRight())));
+        CLASS_MAP.put(id++, Entry.of(Float.class, PacketBuffer::readFloat, p -> p.getLeft().writeFloat(p.getRight())));
+        CLASS_MAP.put(id++, Entry.of(Boolean.class, PacketBuffer::readBoolean, p -> p.getLeft().writeBoolean(p.getRight())));
+        CLASS_MAP.put(id++, Entry.of(Byte.class, PacketBuffer::readByte, p -> p.getLeft().writeByte(p.getRight())));
+        CLASS_MAP.put(id++, Entry.of(Long.class, PacketBuffer::readLong, p -> p.getLeft().writeLong(p.getRight())));
+        CLASS_MAP.put(id++, Entry.of(BlockPos.class, PacketBuffer::readBlockPos , p -> p.getLeft().writeBlockPos(p.getRight())));
     }
 
-    public void fromBytes(ByteBuf buf) {
+    public void fromBytes(PacketBuffer buf) {
         dimId = buf.readInt();
-        pos = NetworkTools.readPos(buf);
+        pos = buf.readBlockPos();
         int size = buf.readShort();
         data = new Object[size];
         for (int i = 0 ; i < size ; i++) {
@@ -71,13 +71,13 @@ public class PacketSendGuiData {
         }
     }
 
-    private static <T> void acceptCasted(Entry<T> triple, ByteBuf buf, Object o) {
+    private static <T> void acceptCasted(Entry<T> triple, PacketBuffer buf, Object o) {
         triple.consumer.accept(Pair.of(buf, triple.cast(o)));
     }
 
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         buf.writeInt(dimId);
-        NetworkTools.writePos(buf, pos);
+        buf.writeBlockPos(pos);
         buf.writeShort(data.length);
         for (Object o : data) {
             boolean ok = false;
@@ -100,7 +100,7 @@ public class PacketSendGuiData {
     public PacketSendGuiData() {
     }
 
-    public PacketSendGuiData(ByteBuf buf) {
+    public PacketSendGuiData(PacketBuffer buf) {
         fromBytes(buf);
     }
 

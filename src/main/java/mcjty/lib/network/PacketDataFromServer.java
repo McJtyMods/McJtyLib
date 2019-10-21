@@ -19,8 +19,7 @@ public class PacketDataFromServer {
     private String command;
 
     public void toBytes(PacketBuffer buf) {
-        NetworkTools.writePos(buf, pos);
-
+        buf.writeBlockPos(pos);
         NetworkTools.writeString(buf, command);
 
         buf.writeBoolean(result != null);
@@ -30,7 +29,7 @@ public class PacketDataFromServer {
     }
 
     public PacketDataFromServer(PacketBuffer buf) {
-        pos = NetworkTools.readPos(buf);
+        pos = buf.readBlockPos();
 
         command = NetworkTools.readString(buf);
 

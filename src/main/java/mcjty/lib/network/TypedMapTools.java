@@ -67,14 +67,14 @@ public class TypedMapTools {
                         break;
                     case TYPE_BLOCKPOS:
                         if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.BLOCKPOS), NetworkTools.readPos(buf));
+                            args.put(new Key<>(key, Type.BLOCKPOS), buf.readBlockPos());
                         } else {
                             args.put(new Key<>(key, Type.BLOCKPOS), null);
                         }
                         break;
                     case TYPE_STACK:
                         if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.ITEMSTACK), NetworkTools.readItemStack(buf));
+                            args.put(new Key<>(key, Type.ITEMSTACK), buf.readItemStack());
                         } else {
                             args.put(new Key<>(key, Type.ITEMSTACK), null);
                         }
@@ -99,7 +99,7 @@ public class TypedMapTools {
                         } else {
                             List<ItemStack> list = new ArrayList<>(s);
                             for (int j = 0; j < s; j++) {
-                                list.add(NetworkTools.readItemStack(buf));
+                                list.add(buf.readItemStack());
                             }
                             args.put(new Key<>(key, Type.ITEMSTACK_LIST), list);
                         }
@@ -112,7 +112,7 @@ public class TypedMapTools {
                         } else {
                             List<BlockPos> list = new ArrayList<>(s);
                             for (int j = 0; j < s; j++) {
-                                list.add(NetworkTools.readPos(buf));
+                                list.add(buf.readBlockPos());
                             }
                             args.put(new Key<>(key, Type.POS_LIST), list);
                         }
@@ -146,7 +146,7 @@ public class TypedMapTools {
                     BlockPos pos = (BlockPos) args.get(key);
                     if (pos != null) {
                         buf.writeBoolean(true);
-                        NetworkTools.writePos(buf, pos);
+                        buf.writeBlockPos(pos);
                     } else {
                         buf.writeBoolean(false);
                     }
@@ -162,7 +162,7 @@ public class TypedMapTools {
                     ItemStack stack = (ItemStack) args.get(key);
                     if (stack != null) {
                         buf.writeBoolean(true);
-                        NetworkTools.writeItemStack(buf, stack);
+                        buf.writeItemStack(stack);
                     } else {
                         buf.writeBoolean(false);
                     }
@@ -188,7 +188,7 @@ public class TypedMapTools {
                     if (list != null) {
                         buf.writeInt(list.size());
                         for (ItemStack s : list) {
-                            NetworkTools.writeItemStack(buf, s);
+                            buf.writeItemStack(s);
                         }
                     } else {
                         buf.writeInt(-1);
@@ -200,7 +200,7 @@ public class TypedMapTools {
                     if (list != null) {
                         buf.writeInt(list.size());
                         for (BlockPos s : list) {
-                            NetworkTools.writePos(buf, s);
+                            buf.writeBlockPos(s);
                         }
                     } else {
                         buf.writeInt(-1);

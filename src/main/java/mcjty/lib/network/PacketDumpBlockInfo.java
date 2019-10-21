@@ -1,10 +1,10 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpBlockNBT;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.OpEntry;
 import net.minecraft.server.management.OpList;
@@ -25,15 +25,15 @@ public class PacketDumpBlockInfo {
     private BlockPos pos;
     private boolean verbose;
 
-    public void toBytes(ByteBuf buf) {
+    public void toBytes(PacketBuffer buf) {
         buf.writeInt(dimid.getId());
-        NetworkTools.writePos(buf, pos);
+        buf.writeBlockPos(pos);
         buf.writeBoolean(verbose);
     }
 
-    public PacketDumpBlockInfo(ByteBuf buf) {
+    public PacketDumpBlockInfo(PacketBuffer buf) {
         dimid = DimensionType.getById(buf.readInt());
-        pos = NetworkTools.readPos(buf);
+        pos = buf.readBlockPos();
         verbose = buf.readBoolean();
     }
 
