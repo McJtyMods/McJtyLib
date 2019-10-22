@@ -20,6 +20,7 @@ import mcjty.lib.varia.WrenchChecker;
 import mcjty.lib.varia.WrenchUsage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
@@ -218,9 +219,17 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     protected boolean wrenchSneak(World world, BlockPos pos, PlayerEntity player) {
         // @todo
-//        breakAndRemember(world, player, pos);
+        breakAndRemember(world, player, pos);
         return true;
     }
+
+    protected void breakAndRemember(World world, PlayerEntity player, BlockPos pos) {
+        if (!world.isRemote) {
+            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos), ItemStack.EMPTY);
+            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+        }
+    }
+
 
     protected boolean wrenchDisabled(World world, BlockPos pos, PlayerEntity player) {
         return false;
