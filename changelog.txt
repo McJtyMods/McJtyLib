@@ -1,3 +1,6 @@
+Upcoming:
+- Fixes to the infusing system
+
 3.5.6:
 - Update to latest Forge
 

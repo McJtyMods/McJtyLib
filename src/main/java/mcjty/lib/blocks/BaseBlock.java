@@ -85,6 +85,21 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         this.topDriver = builder.getTopDriver();
     }
 
+    public static int getInfused(CompoundNBT tag) {
+        return tag.getCompound("BlockEntityTag").getCompound("Info").getInt("infused");
+    }
+
+    public static void setInfused(CompoundNBT tag, int infused) {
+        if (!tag.contains("BlockEntityTag")) {
+            tag.put("BlockEntityTag", new CompoundNBT());
+        }
+        tag = tag.getCompound("BlockEntityTag");
+        if (!tag.contains("Info")) {
+            tag.put("Info", new CompoundNBT());
+        }
+        tag.getCompound("Info").putInt("infused", infused);
+    }
+
     @Override
     public void addInformation(ItemStack stack, @Nullable IBlockReader world, List<ITextComponent> tooltip, ITooltipFlag advanced) {
         intAddInformation(stack, tooltip);
@@ -106,7 +121,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 list.add(new StringTextComponent(TextFormatting.GREEN + "Energy: " + energy + " rf"));
             }
             if (isInfusable()) {
-                int infused = tagCompound.getInt("infused");
+                int infused = getInfused(tagCompound);
                 int pct = infused * 100 / GeneralConfig.maxInfuse.get();
                 list.add(new StringTextComponent(TextFormatting.YELLOW + "Infused: " + pct + "%"));
             }
