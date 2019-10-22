@@ -112,7 +112,7 @@ public class WindowManager {
         int mouseX = (int)(mouse.getMouseX());// * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
         int mouseY = (int)(mouse.getMouseY());// * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
         int x = mouseX * gui.width / mc.mainWindow.getWidth();
-        int y = gui.height - mouseY * gui.height / mc.mainWindow.getHeight() - 1;
+        int y = mouseY * gui.height / mc.mainWindow.getHeight() - 1;
 
 //        int x = (int)mouse.getMouseX() * gui.width / mc.mainWindow.getWidth();
 //        int y = gui.height - (int)mouse.getMouseY() * gui.height / mc.mainWindow.getHeight() - 1;

@@ -336,7 +336,8 @@ public class Window {
     }
 
     private int getRelativeY() {
-        return gui.height - (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / gui.getMinecraft().mainWindow.getHeight();
+//        return gui.height - (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / gui.getMinecraft().mainWindow.getHeight();
+        return (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / gui.getMinecraft().mainWindow.getHeight();
     }
 
     public Window addFocusEvent(FocusEvent event) {

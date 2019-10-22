@@ -83,13 +83,13 @@ public class GuiItemScreen extends Screen {
         Minecraft mc = getMinecraft();
         if (tooltips != null) {
             int x = (int) mc.mouseHelper.getMouseX() * width / mc.mainWindow.getWidth();
-            int y = height - (int) mc.mouseHelper.getMouseY() * height / mc.mainWindow.getHeight() - 1;
+            int y = (int) mc.mouseHelper.getMouseY() * height / mc.mainWindow.getHeight() - 1;
             renderTooltip(tooltips, x-guiLeft, y-guiTop, mc.fontRenderer);
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
             int x = (int)mc.mouseHelper.getMouseX() * width / mc.mainWindow.getWidth();
-            int y = height - (int)mc.mouseHelper.getMouseY() * height / mc.mainWindow.getHeight() - 1;
+            int y = (int)mc.mouseHelper.getMouseY() * height / mc.mainWindow.getHeight() - 1;
             renderTooltip(tooltips, x - guiLeft, y - guiTop, mc.fontRenderer);
         }
     }
