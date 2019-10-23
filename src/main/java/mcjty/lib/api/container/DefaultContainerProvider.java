@@ -12,13 +12,14 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 public class DefaultContainerProvider<C extends IGenericContainer> implements INamedContainerProvider {
 
     private final String name;
     private BiFunction<Integer, PlayerEntity, C> containerSupplier;
-    private LazyOptional<? extends IItemHandler> itemHandler = LazyOptional.empty();
-    private LazyOptional<? extends GenericEnergyStorage> energyHandler = LazyOptional.empty();
+    private Supplier<? extends IItemHandler> itemHandler = () -> null;
+    private Supplier<? extends GenericEnergyStorage> energyHandler = () -> null;
 
     public DefaultContainerProvider(String name) {
         this.name = name;
@@ -35,11 +36,21 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     }
 
     public DefaultContainerProvider<C> itemHandler(LazyOptional<? extends IItemHandler> itemHandler) {
+        this.itemHandler = () -> itemHandler.map(h -> h).orElseThrow(RuntimeException::new);
+        return this;
+    }
+
+    public DefaultContainerProvider<C> itemHandler(Supplier<? extends IItemHandler> itemHandler) {
         this.itemHandler = itemHandler;
         return this;
     }
 
     public DefaultContainerProvider<C> energyHandler(LazyOptional<? extends GenericEnergyStorage> energyHandler) {
+        this.energyHandler = () -> energyHandler.map(h -> h).orElseThrow(RuntimeException::new);
+        return this;
+    }
+
+    public DefaultContainerProvider<C> energyHandler(Supplier<? extends GenericEnergyStorage> energyHandler) {
         this.energyHandler = energyHandler;
         return this;
     }
@@ -48,8 +59,14 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     @Override
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         C container = containerSupplier.apply(windowId, playerEntity);
-        itemHandler.ifPresent(h -> container.setupInventories(h, playerInventory));
-        energyHandler.ifPresent(e -> e.addIntegerListeners(container));
+        IItemHandler itemHandler = this.itemHandler.get();
+        if (itemHandler != null) {
+            container.setupInventories(itemHandler, playerInventory);
+        }
+        GenericEnergyStorage energyHandler = this.energyHandler.get();
+        if (energyHandler != null) {
+            energyHandler.addIntegerListeners(container);
+        }
         return container.getAsContainer();
     }
 }
