@@ -1,28 +1,31 @@
 package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-
-import java.util.concurrent.Callable;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class DefaultServerProxy implements IProxy {
 
     @Override
     public World getClientWorld() {
         throw new IllegalStateException("This should only be called from client side");
+    }
+
+    @Override
+    public World getWorld() {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
     }
 
     @Override
@@ -36,22 +39,7 @@ public class DefaultServerProxy implements IProxy {
     }
 
     @Override
-    public NetworkManager getNetworkManager(PlayerEntity player) {
-        return ((ServerPlayerEntity) player).connection.netManager;
-    }
-
-    @Override
     public RayTraceResult getClientMouseOver() {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule) {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
         throw new IllegalStateException("This should only be called from client side");
     }
 
@@ -68,21 +56,6 @@ public class DefaultServerProxy implements IProxy {
 
     @Override
     public void initStateMapper(Block block, ModelResourceLocation model) {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public void initItemModelMesher(Item item, ModelResourceLocation model) {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public void initTESRItemStack(Item item, int meta, Class<? extends TileEntity> clazz) {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public void initCustomItemModel(Item item, int meta, ModelResourceLocation model) {
         throw new IllegalStateException("This should only be called from client side");
     }
 
