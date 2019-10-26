@@ -98,7 +98,7 @@ public class BaseRecipeProvider extends RecipeProvider {
         add('b', Items.BUCKET);
         add('T', Items.REDSTONE_TORCH);
         add('D', Blocks.DIRT);
-        add('G', Blocks.GLASS);
+        add('G', Tags.Items.GLASS);
         add('O', Blocks.OBSIDIAN);
     }
 }
