@@ -323,7 +323,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         if (securityChannel != -1) {
             infoTag.putInt("secChannel", securityChannel);
         }
-        tagCompound.put("Info", infoTag);
     }
 
     public boolean setOwner(PlayerEntity player) {
