@@ -1,4 +1,4 @@
-Upcoming:
+3.5.10:
 - Fixes to the infusing system
 
 3.5.6:
