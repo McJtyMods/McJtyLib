@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed tracking of integers by splitting them into shorts. This fixes the energy display in guis
+
 3.5.10:
 - Fixes to the infusing system
 

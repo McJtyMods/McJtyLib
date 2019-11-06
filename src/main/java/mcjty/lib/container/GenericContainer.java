@@ -56,7 +56,50 @@ public class GenericContainer extends Container implements IGenericContainer {
 
     @Override
     public void addIntegerListener(IntReferenceHolder holder) {
-        trackInt(holder);
+        trackInt(new IntReferenceHolder() {
+            private int lastKnown;
+
+            @Override
+            public int get() {
+                return holder.get() & 0xffff;
+            }
+
+            @Override
+            public void set(int val) {
+                int full = holder.get();
+                holder.set((full & 0xffff0000) | (val & 0xffff));
+            }
+
+            @Override
+            public boolean isDirty() {
+                int i = this.get();
+                boolean flag = i != this.lastKnown;
+                this.lastKnown = i;
+                return flag;
+            }
+        });
+        trackInt(new IntReferenceHolder() {
+            private int lastKnown;
+
+            @Override
+            public int get() {
+                return (holder.get() >> 16) & 0xffff;
+            }
+
+            @Override
+            public void set(int val) {
+                int full = holder.get();
+                holder.set((full & 0x0000ffff) | ((val & 0xffff) << 16));
+            }
+
+            @Override
+            public boolean isDirty() {
+                int i = this.get();
+                boolean flag = i != this.lastKnown;
+                this.lastKnown = i;
+                return flag;
+            }
+        });
     }
 
     public void addInventory(String name, IItemHandler inventory) {
