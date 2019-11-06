@@ -27,14 +27,14 @@ public class PacketSendClientCommand {
     }
 
     public void toBytes(PacketBuffer buf) {
-        NetworkTools.writeString(buf, modid);
-        NetworkTools.writeString(buf, command);
+        buf.writeString(modid);
+        buf.writeString(command);
         TypedMapTools.writeArguments(buf, arguments);
     }
 
     public PacketSendClientCommand(PacketBuffer buf) {
-        modid = NetworkTools.readString(buf);
-        command = NetworkTools.readString(buf);
+        modid = buf.readString();
+        command = buf.readString();
         arguments = TypedMapTools.readArguments(buf);
     }
 

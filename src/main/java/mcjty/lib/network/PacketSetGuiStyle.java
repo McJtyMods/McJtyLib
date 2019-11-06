@@ -1,8 +1,8 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -14,12 +14,12 @@ public class PacketSetGuiStyle {
 
     private String style;
 
-    public PacketSetGuiStyle(ByteBuf buf) {
-        style = NetworkTools.readString(buf);
+    public PacketSetGuiStyle(PacketBuffer buf) {
+        style = buf.readString();
     }
 
-    public void toBytes(ByteBuf buf) {
-        NetworkTools.writeString(buf, style);
+    public void toBytes(PacketBuffer buf) {
+        buf.writeString(style);
     }
 
     public PacketSetGuiStyle(String style) {

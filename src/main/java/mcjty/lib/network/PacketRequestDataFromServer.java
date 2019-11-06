@@ -26,16 +26,16 @@ public class PacketRequestDataFromServer {
 
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        command = NetworkTools.readString(buf);
+        command = buf.readString();
         params = TypedMapTools.readArguments(buf);
-        modid = NetworkTools.readString(buf);
+        modid = buf.readString();
     }
 
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
-        NetworkTools.writeString(buf, command);
+        buf.writeString(command);
         TypedMapTools.writeArguments(buf, params);
-        NetworkTools.writeString(buf, modid);
+        buf.writeString(modid);
     }
 
     public PacketRequestDataFromServer(String modid, BlockPos pos, String command, TypedMap params) {

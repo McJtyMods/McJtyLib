@@ -1,8 +1,8 @@
 package mcjty.lib.network;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -20,7 +20,7 @@ public class PacketDataFromServer {
 
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
-        NetworkTools.writeString(buf, command);
+        buf.writeString(command);
 
         buf.writeBoolean(result != null);
         if (result != null) {
@@ -30,8 +30,7 @@ public class PacketDataFromServer {
 
     public PacketDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
-
-        command = NetworkTools.readString(buf);
+        command = buf.readString();
 
         boolean resultPresent = buf.readBoolean();
         if (resultPresent) {
@@ -50,7 +49,7 @@ public class PacketDataFromServer {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            TileEntity te = Minecraft.getInstance().world.getTileEntity(pos);
+            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
             if(!(te instanceof IClientCommandHandler)) {
                 Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
                 return;
