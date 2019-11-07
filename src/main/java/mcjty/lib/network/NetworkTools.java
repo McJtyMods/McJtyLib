@@ -31,38 +31,29 @@ public class NetworkTools {
         }
     }
 
-    public static String readStringUTF8(ByteBuf dataIn) {
+    public static String readStringUTF8(PacketBuffer dataIn) {
         int s = dataIn.readInt();
         if (s == -1) {
             return null;
         }
-        if (s == 0) {
-            return "";
-        }
-        byte[] dst = new byte[s];
-        dataIn.readBytes(dst);
-        return new String(dst, java.nio.charset.StandardCharsets.UTF_8);
+        return dataIn.readString();
     }
 
-    public static void writeStringUTF8(ByteBuf dataOut, String str) {
+    public static void writeStringUTF8(PacketBuffer dataOut, String str) {
         if (str == null) {
             dataOut.writeInt(-1);
             return;
         }
-        byte[] bytes = str.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-        dataOut.writeInt(bytes.length);
-        if (bytes.length > 0) {
-            dataOut.writeBytes(bytes);
-        }
+        dataOut.writeString(str);
     }
 
-    public static void writeStringList(ByteBuf dataOut, @Nonnull List<String> list) {
+    public static void writeStringList(PacketBuffer dataOut, @Nonnull List<String> list) {
         dataOut.writeInt(list.size());
         list.stream().forEach(s -> writeStringUTF8(dataOut, s));
     }
 
     @Nonnull
-    public static List<String> readStringList(ByteBuf dataIn) {
+    public static List<String> readStringList(PacketBuffer dataIn) {
         int size = dataIn.readInt();
         List<String> list = new ArrayList<>(size);
         for (int i = 0 ; i < size ; i++) {
