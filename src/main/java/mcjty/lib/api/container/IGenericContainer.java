@@ -7,6 +7,8 @@ import net.minecraftforge.items.IItemHandler;
 
 public interface IGenericContainer {
 
+    void addShortListener(IntReferenceHolder holder);
+
     void addIntegerListener(IntReferenceHolder holder);
 
     void setupInventories(IItemHandler itemHandler, PlayerInventory inventory);

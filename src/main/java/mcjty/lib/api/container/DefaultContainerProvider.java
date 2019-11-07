@@ -5,12 +5,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -20,6 +23,8 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     private BiFunction<Integer, PlayerEntity, C> containerSupplier;
     private Supplier<? extends IItemHandler> itemHandler = () -> null;
     private Supplier<? extends GenericEnergyStorage> energyHandler = () -> null;
+    private List<IntReferenceHolder> integerListeners = new ArrayList<>();
+    private List<IntReferenceHolder> shortListeners = new ArrayList<>();
 
     public DefaultContainerProvider(String name) {
         this.name = name;
@@ -55,6 +60,16 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         return this;
     }
 
+    public DefaultContainerProvider<C> integerListener(IntReferenceHolder holder) {
+        integerListeners.add(holder);
+        return this;
+    }
+
+    public DefaultContainerProvider<C> shortListener(IntReferenceHolder holder) {
+        shortListeners.add(holder);
+        return this;
+    }
+
     @Nullable
     @Override
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
@@ -67,6 +82,13 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         if (energyHandler != null) {
             energyHandler.addIntegerListeners(container);
         }
+        for (IntReferenceHolder listener : integerListeners) {
+            container.addIntegerListener(listener);
+        }
+        for (IntReferenceHolder listener : shortListeners) {
+            container.addShortListener(listener);
+        }
+
         return container.getAsContainer();
     }
 }

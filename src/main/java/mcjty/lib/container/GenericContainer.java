@@ -55,6 +55,11 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
+    public void addShortListener(IntReferenceHolder holder) {
+        trackInt(holder);
+    }
+
+    @Override
     public void addIntegerListener(IntReferenceHolder holder) {
         trackInt(new IntReferenceHolder() {
             private int lastKnown;
