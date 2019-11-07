@@ -497,8 +497,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     /**
      * Call this client-side to this TE to request data from the server
      */
-    public void requestDataFromServer(String modid, String command, @Nonnull TypedMap params) {
-        PacketHandler.modNetworking.get(modid).sendToServer(new PacketRequestDataFromServer(modid, pos, command, params));
+    public void requestDataFromServer(SimpleChannel channel, String command, @Nonnull TypedMap params) {
+        channel.sendToServer(new PacketRequestDataFromServer(pos, command, params));
     }
 
 

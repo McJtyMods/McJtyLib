@@ -4,8 +4,6 @@ import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
 
 public class PacketHandler {
 
@@ -17,14 +15,8 @@ public class PacketHandler {
     // For the client-info packet system:
     private static int packetId = INTERNAL_PACKETS;
 
-    public static Map<String, SimpleChannel> modNetworking = new HashMap<>();
-
     public static int nextPacketID() {
         return packetId++;
-    }
-
-    public static void registerMessageHandler(String modid, SimpleChannel network) {
-        modNetworking.put(modid, network);
     }
 
     // Only use client-side!
@@ -62,7 +54,6 @@ public class PacketHandler {
         // Server side
         channel.registerMessage(nextPacketID(), PacketServerCommandTyped.class, PacketServerCommandTyped::toBytes, PacketServerCommandTyped::new, PacketServerCommandTyped::handle);
         channel.registerMessage(nextPacketID(), PacketSendServerCommand.class, PacketSendServerCommand::toBytes, PacketSendServerCommand::new, PacketSendServerCommand::handle);
-        channel.registerMessage(nextPacketID(), PacketRequestDataFromServer.class, PacketRequestDataFromServer::toBytes, PacketRequestDataFromServer::new, PacketRequestDataFromServer::handle);
         channel.registerMessage(nextPacketID(), PacketDumpItemInfo.class, PacketDumpItemInfo::toBytes, PacketDumpItemInfo::new, PacketDumpItemInfo::handle);
         channel.registerMessage(nextPacketID(), PacketDumpBlockInfo.class, PacketDumpBlockInfo::toBytes, PacketDumpBlockInfo::new, PacketDumpBlockInfo::handle);
 

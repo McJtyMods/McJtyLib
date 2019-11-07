@@ -32,8 +32,7 @@ public class NetworkTools {
     }
 
     public static String readStringUTF8(PacketBuffer dataIn) {
-        int s = dataIn.readInt();
-        if (s == -1) {
+        if (!dataIn.readBoolean()) {
             return null;
         }
         return dataIn.readString();
@@ -41,9 +40,10 @@ public class NetworkTools {
 
     public static void writeStringUTF8(PacketBuffer dataOut, String str) {
         if (str == null) {
-            dataOut.writeInt(-1);
+            dataOut.writeBoolean(false);
             return;
         }
+        dataOut.writeBoolean(true);
         dataOut.writeString(str);
     }
 

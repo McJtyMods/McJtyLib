@@ -2,8 +2,6 @@ package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -22,30 +20,26 @@ public class PacketRequestDataFromServer {
     protected BlockPos pos;
     protected String command;
     protected TypedMap params;
-    private String modid;
 
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
         command = buf.readString();
         params = TypedMapTools.readArguments(buf);
-        modid = buf.readString();
     }
 
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
         buf.writeString(command);
         TypedMapTools.writeArguments(buf, params);
-        buf.writeString(modid);
     }
 
-    public PacketRequestDataFromServer(String modid, BlockPos pos, String command, TypedMap params) {
+    public PacketRequestDataFromServer(BlockPos pos, String command, TypedMap params) {
         this.pos = pos;
         this.command = command;
         this.params = params;
-        this.modid = modid;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
+    public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             TileEntity te = ctx.getSender().getEntityWorld().getTileEntity(pos);
@@ -60,14 +54,36 @@ public class PacketRequestDataFromServer {
                 return;
             }
 
-            sendReplyToClient(this, result, ctx.getSender());
+            PacketDataFromServer msg = new PacketDataFromServer(pos, command, result);
+            channel.sendTo(msg, ctx.getSender().connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
         });
         ctx.setPacketHandled(true);
     }
 
-    private void sendReplyToClient(PacketRequestDataFromServer message, TypedMap result, PlayerEntity player) {
-        SimpleChannel wrapper = PacketHandler.modNetworking.get(message.modid);
-        PacketDataFromServer msg = new PacketDataFromServer(message.pos, message.command, result);
-        wrapper.sendTo(msg, ((ServerPlayerEntity) player).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-    }
+//    public void handle(Supplier<NetworkEvent.Context> supplier) {
+//        NetworkEvent.Context ctx = supplier.get();
+//        ctx.enqueueWork(() -> {
+//            TileEntity te = ctx.getSender().getEntityWorld().getTileEntity(pos);
+//            if(!(te instanceof ICommandHandler)) {
+//                Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
+//                return;
+//            }
+//            ICommandHandler commandHandler = (ICommandHandler) te;
+//            TypedMap result = commandHandler.executeWithResult(command, params);
+//            if (result == null) {
+//                Logging.log("Command " + command + " was not handled!");
+//                return;
+//            }
+//
+//
+//            sendReplyToClient(this, result, ctx.getSender());
+//        });
+//        ctx.setPacketHandled(true);
+//    }
+
+//    private void sendReplyToClient(PacketRequestDataFromServer message, TypedMap result, PlayerEntity player) {
+//        SimpleChannel wrapper = PacketHandler.modNetworking.get(message.modid);
+//        PacketDataFromServer msg = new PacketDataFromServer(message.pos, message.command, result);
+//        wrapper.sendTo(msg, ((ServerPlayerEntity) player).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+//    }
 }
