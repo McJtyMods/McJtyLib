@@ -26,17 +26,10 @@ public class WorldTools {
         return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
     }
 
-//    // @todo try to avoid and use DimensionType instead!
-//    @Deprecated
-//    public static ServerWorld getWorld(int dimensionId) {
-//        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-//        return DimensionManager.getWorld(server, DimensionType.getById(dimensionId), false, false);
-//    }
-//
-//    @Deprecated
-//    public static ServerWorld loadWorld(int dimensionId) {
-//        return loadWorld(DimensionType.getById(dimensionId));
-//    }
+    public static ServerWorld getOverworld(World world) {
+        MinecraftServer server = world.getServer();
+        return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
+    }
 
     public static ServerWorld loadWorld(DimensionType type) {
         ServerWorld world = getWorld(type);
