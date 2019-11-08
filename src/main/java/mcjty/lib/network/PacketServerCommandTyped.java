@@ -70,7 +70,7 @@ public class PacketServerCommandTyped {
             if (dimensionId == null) {
                 world = playerEntity.getEntityWorld();
             } else {
-                world = WorldTools.getWorld(dimensionId);
+                world = WorldTools.getWorld(playerEntity.world, dimensionId);
             }
             if (world == null) {
                 return;

@@ -45,6 +45,11 @@ public class WorldTools {
         return DimensionManager.getWorld(server, type, false, false);
     }
 
+    public static ServerWorld getWorld(World world, DimensionType type) {
+        MinecraftServer server = world.getServer();
+        return DimensionManager.getWorld(server, type, false, false);
+    }
+
     /**
      * Find a biome based on ID or registry name
      */

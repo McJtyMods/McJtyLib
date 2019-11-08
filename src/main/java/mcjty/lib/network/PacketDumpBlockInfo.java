@@ -52,7 +52,7 @@ public class PacketDumpBlockInfo {
             OpEntry entry = oppedPlayers.getEntry(player.getGameProfile());
             int perm = entry == null ? server.getOpPermissionLevel() : entry.getPermissionLevel();
             if (perm >= 1) {
-                World world = WorldTools.getWorld(dimid);
+                World world = WorldTools.getWorld(player.world, dimid);
                 String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
                 Logging.getLogger().log(Level.INFO, "### Server side ###");
                 Logging.getLogger().log(Level.INFO, output);

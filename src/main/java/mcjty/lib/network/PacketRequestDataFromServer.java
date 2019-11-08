@@ -59,31 +59,4 @@ public class PacketRequestDataFromServer {
         });
         ctx.setPacketHandled(true);
     }
-
-//    public void handle(Supplier<NetworkEvent.Context> supplier) {
-//        NetworkEvent.Context ctx = supplier.get();
-//        ctx.enqueueWork(() -> {
-//            TileEntity te = ctx.getSender().getEntityWorld().getTileEntity(pos);
-//            if(!(te instanceof ICommandHandler)) {
-//                Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
-//                return;
-//            }
-//            ICommandHandler commandHandler = (ICommandHandler) te;
-//            TypedMap result = commandHandler.executeWithResult(command, params);
-//            if (result == null) {
-//                Logging.log("Command " + command + " was not handled!");
-//                return;
-//            }
-//
-//
-//            sendReplyToClient(this, result, ctx.getSender());
-//        });
-//        ctx.setPacketHandled(true);
-//    }
-
-//    private void sendReplyToClient(PacketRequestDataFromServer message, TypedMap result, PlayerEntity player) {
-//        SimpleChannel wrapper = PacketHandler.modNetworking.get(message.modid);
-//        PacketDataFromServer msg = new PacketDataFromServer(message.pos, message.command, result);
-//        wrapper.sendTo(msg, ((ServerPlayerEntity) player).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-//    }
 }
