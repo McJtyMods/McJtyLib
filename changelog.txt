@@ -1,5 +1,7 @@
-Upcoming:
+3.5.11:
 - Fixed tracking of integers by splitting them into shorts. This fixes the energy display in guis
+- Made AbstractWorldData usage safer/cleaner by passing in a world instance as much as possible
+- Various networking cleanups and fixes
 
 3.5.10:
 - Fixes to the infusing system
