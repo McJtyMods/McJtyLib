@@ -30,7 +30,7 @@ public class PacketDataFromServer {
 
     public PacketDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        command = buf.readString();
+        command = buf.readString(32767);
 
         boolean resultPresent = buf.readBoolean();
         if (resultPresent) {

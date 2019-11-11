@@ -23,7 +23,7 @@ public class PacketRequestDataFromServer {
 
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        command = buf.readString();
+        command = buf.readString(32767);
         params = TypedMapTools.readArguments(buf);
     }
 

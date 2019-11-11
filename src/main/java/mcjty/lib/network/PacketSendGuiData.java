@@ -52,7 +52,7 @@ public class PacketSendGuiData {
     static {
         int id = 0;
         CLASS_MAP.put(id++, Entry.of(Integer.class, PacketBuffer::readInt, p -> p.getLeft().writeInt(p.getRight())));
-        CLASS_MAP.put(id++, Entry.of(String.class, PacketBuffer::readString, p -> p.getLeft().writeString(p.getRight())));
+        CLASS_MAP.put(id++, Entry.of(String.class, buf -> buf.readString(32767), p -> p.getLeft().writeString(p.getRight())));
         CLASS_MAP.put(id++, Entry.of(Float.class, PacketBuffer::readFloat, p -> p.getLeft().writeFloat(p.getRight())));
         CLASS_MAP.put(id++, Entry.of(Boolean.class, PacketBuffer::readBoolean, p -> p.getLeft().writeBoolean(p.getRight())));
         CLASS_MAP.put(id++, Entry.of(Byte.class, PacketBuffer::readByte, p -> p.getLeft().writeByte(p.getRight())));

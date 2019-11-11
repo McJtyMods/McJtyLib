@@ -44,11 +44,11 @@ public class TypedMapTools {
         int size = buf.readInt();
         if (size != 0) {
             for (int i = 0 ; i < size ; i++) {
-                String key = buf.readString();
+                String key = buf.readString(32767);
                 ArgumentType type = ArgumentType.getType(buf.readByte());
                 switch (type) {
                     case TYPE_STRING:
-                        args.put(new Key<>(key, Type.STRING), buf.readString());
+                        args.put(new Key<>(key, Type.STRING), buf.readString(32767));
                         break;
                     case TYPE_UUID:
                         args.put(new Key<>(key, Type.UUID), buf.readUniqueId());

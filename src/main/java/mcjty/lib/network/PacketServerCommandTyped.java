@@ -27,7 +27,7 @@ public class PacketServerCommandTyped {
 
     public PacketServerCommandTyped(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        command = buf.readString();
+        command = buf.readString(32767);
         params = TypedMapTools.readArguments(buf);
         if (buf.readBoolean()) {
             dimensionId = DimensionType.getById(buf.readInt());

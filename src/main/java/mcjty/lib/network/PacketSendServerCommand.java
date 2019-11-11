@@ -22,8 +22,8 @@ public class PacketSendServerCommand {
     }
 
     public PacketSendServerCommand(PacketBuffer buf) {
-        modid = buf.readString();
-        command = buf.readString();
+        modid = buf.readString(32767);
+        command = buf.readString(32767);
         arguments = TypedMapTools.readArguments(buf);
     }
 

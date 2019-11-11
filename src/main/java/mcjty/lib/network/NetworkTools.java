@@ -35,7 +35,7 @@ public class NetworkTools {
         if (!dataIn.readBoolean()) {
             return null;
         }
-        return dataIn.readString();
+        return dataIn.readString(32767);
     }
 
     public static void writeStringUTF8(PacketBuffer dataOut, String str) {

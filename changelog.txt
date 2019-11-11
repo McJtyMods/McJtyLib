@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a networking problem on servers
+
 3.5.11:
 - Fixed tracking of integers by splitting them into shorts. This fixes the energy display in guis
 - Made AbstractWorldData usage safer/cleaner by passing in a world instance as much as possible

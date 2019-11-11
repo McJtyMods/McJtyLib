@@ -15,7 +15,7 @@ public class PacketSetGuiStyle {
     private String style;
 
     public PacketSetGuiStyle(PacketBuffer buf) {
-        style = buf.readString();
+        style = buf.readString(32767);
     }
 
     public void toBytes(PacketBuffer buf) {
