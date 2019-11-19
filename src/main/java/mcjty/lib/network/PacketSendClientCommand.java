@@ -7,11 +7,13 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
+@SuppressWarnings("ALL")
 public class PacketSendClientCommand {
 
-    private String modid;
-    private String command;
-    private TypedMap arguments;
+    // Package visible for unit tests
+    String modid;
+    String command;
+    TypedMap arguments;
 
 
     public String getModid() {

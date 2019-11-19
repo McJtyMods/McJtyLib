@@ -13,10 +13,12 @@ import java.util.function.Supplier;
 /**
  * This packet is used (typically by PacketRequestDataFromServer) to send back a data to the client.
  */
+@SuppressWarnings("ALL")
 public class PacketDataFromServer {
-    private BlockPos pos;
-    private TypedMap result;
-    private String command;
+    // Package visible for unittests
+    BlockPos pos;
+    TypedMap result;
+    String command;
 
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
@@ -32,8 +34,7 @@ public class PacketDataFromServer {
         pos = buf.readBlockPos();
         command = buf.readString(32767);
 
-        boolean resultPresent = buf.readBoolean();
-        if (resultPresent) {
+        if (buf.readBoolean()) {
             result = TypedMapTools.readArguments(buf);
         } else {
             result = null;

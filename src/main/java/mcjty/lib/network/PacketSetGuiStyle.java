@@ -12,7 +12,8 @@ import java.util.function.Supplier;
  */
 public class PacketSetGuiStyle {
 
-    private String style;
+    // Package visible for unit tests
+    String style;
 
     public PacketSetGuiStyle(PacketBuffer buf) {
         style = buf.readString(32767);

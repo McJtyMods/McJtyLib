@@ -60,7 +60,6 @@ public class PacketHandler {
         // Client side
         channel.registerMessage(nextPacketID(), PacketSendClientCommand.class, PacketSendClientCommand::toBytes, PacketSendClientCommand::new, PacketSendClientCommand::handle);
         channel.registerMessage(nextPacketID(), PacketDataFromServer.class, PacketDataFromServer::toBytes, PacketDataFromServer::new, PacketDataFromServer::handle);
-        channel.registerMessage(nextPacketID(), PacketSendGuiData.class, PacketSendGuiData::toBytes, PacketSendGuiData::new, PacketSendGuiData::handle);
         channel.registerMessage(nextPacketID(), PacketFinalizeLogin.class, PacketFinalizeLogin::toBytes, PacketFinalizeLogin::new, PacketFinalizeLogin::handle);
     }
 

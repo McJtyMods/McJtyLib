@@ -4,21 +4,19 @@ import com.google.common.collect.Range;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.IGenericContainer;
-import mcjty.lib.network.PacketSendGuiData;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.*;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
@@ -397,17 +395,6 @@ public class GenericContainer extends Container implements IGenericContainer {
             return ItemStack.EMPTY;
         } else {
             return super.slotClick(index, button, mode, player);
-        }
-    }
-
-    // Call this in your detectAndSendChanges() implementation when you find one
-    // of the fields you need in the GUI has changed
-    protected void notifyPlayerOfChanges(SimpleChannel wrapper, World world, BlockPos pos) {
-        for (IContainerListener listener : this.listeners) {
-            if (listener instanceof ServerPlayerEntity) {
-                ServerPlayerEntity player = (ServerPlayerEntity) listener;
-                wrapper.sendTo(new PacketSendGuiData(world, pos), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-            }
         }
     }
 
