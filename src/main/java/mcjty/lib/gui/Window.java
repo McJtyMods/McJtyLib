@@ -78,7 +78,7 @@ public class Window {
                             String channel = cmd.getOptionalPar(0, "");
                             String teCommand = cmd.getOptionalPar(1, "");
                             event(channel, (source, params) ->
-                                    ((GenericGuiContainer<?,?>) gui).sendServerCommand(wrapper, teCommand, params));
+                                    ((GenericGuiContainer<?,?>) gui).sendServerCommandTyped(wrapper, teCommand, params));
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
                     toplevel = new Panel(Minecraft.getInstance(), gui);
@@ -394,7 +394,7 @@ public class Window {
     }
 
     private void sendAction(SimpleChannel network, IAction action) {
-        ((GenericGuiContainer<?,?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_ACTION,
+        ((GenericGuiContainer<?,?>)gui).sendServerCommandTyped(network, GenericTileEntity.COMMAND_SYNC_ACTION,
                 TypedMap.builder()
                         .put(GenericTileEntity.PARAM_KEY, action.getKey())
                         .build());
@@ -425,7 +425,7 @@ public class Window {
 
         event(componentName, (source, params) -> {
             Type<V> type = value.getKey().getType();
-            ((GenericGuiContainer<?,?>)gui).sendServerCommand(network, GenericTileEntity.COMMAND_SYNC_BINDING,
+            ((GenericGuiContainer<?,?>)gui).sendServerCommandTyped(network, GenericTileEntity.COMMAND_SYNC_BINDING,
                     TypedMap.builder()
                             // @todo this conversion can fail!
                             .put(value.getKey(), type.convert(component.getGenericValue(type)))

@@ -38,7 +38,7 @@ public class GuiItemScreen extends Screen {
         super.init();
         guiLeft = (this.width - xSize) / 2;
         guiTop = (this.height - ySize) / 2;
-        sideWindow.initGui(modBase, network, getMinecraft(), this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(modBase, getMinecraft(), this, guiLeft, guiTop, xSize, ySize);
     }
 
     @Override
