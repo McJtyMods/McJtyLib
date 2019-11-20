@@ -129,9 +129,9 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
             return ItemStack.EMPTY;
         }
 
-//        if (!isItemExtractable(slot, stackInSlot)) {
-//            return ItemStack.EMPTY;
-//        }
+        if (!isItemExtractable(slot, stackInSlot)) {
+            return ItemStack.EMPTY;
+        }
 
         if (simulate) {
             if (stackInSlot.getCount() < amount) {

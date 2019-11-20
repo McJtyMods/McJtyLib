@@ -1,5 +1,6 @@
 Upcoming:
 - Fixed a bug in the rotate functionality of the wrench
+- Extracting from machines with output slots should now only extract from those slots
 
 3.5.13:
 - Fixed a serious networking problem which could cause 'invalid discriminator spam' on servers
