@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a bug in the rotate functionality of the wrench
+
 3.5.13:
 - Fixed a serious networking problem which could cause 'invalid discriminator spam' on servers
 
