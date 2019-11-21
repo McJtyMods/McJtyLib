@@ -1,16 +1,13 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TypedMapTools {
 
@@ -20,6 +17,7 @@ public class TypedMapTools {
         if (typeToIndex == null) {
             typeToIndex = new HashMap<>();
             registerMapping(Type.STRING, ArgumentType.TYPE_STRING);
+            registerMapping(Type.UUID, ArgumentType.TYPE_UUID);
             registerMapping(Type.INTEGER, ArgumentType.TYPE_INTEGER);
             registerMapping(Type.BLOCKPOS, ArgumentType.TYPE_BLOCKPOS);
             registerMapping(Type.BOOLEAN, ArgumentType.TYPE_BOOLEAN);
@@ -41,16 +39,19 @@ public class TypedMapTools {
         return typeToIndex.get(type);
     }
 
-    public static TypedMap readArguments(ByteBuf buf) {
+    public static TypedMap readArguments(PacketBuffer buf) {
         TypedMap.Builder args = TypedMap.builder();
         int size = buf.readInt();
         if (size != 0) {
             for (int i = 0 ; i < size ; i++) {
-                String key = NetworkTools.readString(buf);
+                String key = buf.readString(32767);
                 ArgumentType type = ArgumentType.getType(buf.readByte());
                 switch (type) {
                     case TYPE_STRING:
-                        args.put(new Key<>(key, Type.STRING), NetworkTools.readString(buf));
+                        args.put(new Key<>(key, Type.STRING), buf.readString(32767));
+                        break;
+                    case TYPE_UUID:
+                        args.put(new Key<>(key, Type.UUID), buf.readUniqueId());
                         break;
                     case TYPE_INTEGER:
                         args.put(new Key<>(key, Type.INTEGER), buf.readInt());
@@ -66,14 +67,14 @@ public class TypedMapTools {
                         break;
                     case TYPE_BLOCKPOS:
                         if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.BLOCKPOS), NetworkTools.readPos(buf));
+                            args.put(new Key<>(key, Type.BLOCKPOS), buf.readBlockPos());
                         } else {
                             args.put(new Key<>(key, Type.BLOCKPOS), null);
                         }
                         break;
                     case TYPE_STACK:
                         if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.ITEMSTACK), NetworkTools.readItemStack(buf));
+                            args.put(new Key<>(key, Type.ITEMSTACK), buf.readItemStack());
                         } else {
                             args.put(new Key<>(key, Type.ITEMSTACK), null);
                         }
@@ -98,7 +99,7 @@ public class TypedMapTools {
                         } else {
                             List<ItemStack> list = new ArrayList<>(s);
                             for (int j = 0; j < s; j++) {
-                                list.add(NetworkTools.readItemStack(buf));
+                                list.add(buf.readItemStack());
                             }
                             args.put(new Key<>(key, Type.ITEMSTACK_LIST), list);
                         }
@@ -111,7 +112,7 @@ public class TypedMapTools {
                         } else {
                             List<BlockPos> list = new ArrayList<>(s);
                             for (int j = 0; j < s; j++) {
-                                list.add(NetworkTools.readPos(buf));
+                                list.add(buf.readBlockPos());
                             }
                             args.put(new Key<>(key, Type.POS_LIST), list);
                         }
@@ -125,15 +126,18 @@ public class TypedMapTools {
         return args.build();
     }
 
-    public static void writeArguments(ByteBuf buf, TypedMap args) {
+    public static void writeArguments(PacketBuffer buf, TypedMap args) {
         buf.writeInt(args.size());
         for (Key<?> key : args.getKeys()) {
-            NetworkTools.writeString(buf, key.getName());
+            buf.writeString(key.getName());
             ArgumentType argumentType = getArgumentType(key.getType());
             buf.writeByte(argumentType.ordinal());
             switch (argumentType) {
                 case TYPE_STRING:
-                    NetworkTools.writeString(buf, (String) args.get(key));
+                    buf.writeString((String) args.get(key));
+                    break;
+                case TYPE_UUID:
+                    buf.writeUniqueId((UUID) args.get(key));
                     break;
                 case TYPE_INTEGER:
                     buf.writeInt((Integer) args.get(key));
@@ -142,7 +146,7 @@ public class TypedMapTools {
                     BlockPos pos = (BlockPos) args.get(key);
                     if (pos != null) {
                         buf.writeBoolean(true);
-                        NetworkTools.writePos(buf, pos);
+                        buf.writeBlockPos(pos);
                     } else {
                         buf.writeBoolean(false);
                     }
@@ -158,7 +162,7 @@ public class TypedMapTools {
                     ItemStack stack = (ItemStack) args.get(key);
                     if (stack != null) {
                         buf.writeBoolean(true);
-                        NetworkTools.writeItemStack(buf, stack);
+                        buf.writeItemStack(stack);
                     } else {
                         buf.writeBoolean(false);
                     }
@@ -184,7 +188,7 @@ public class TypedMapTools {
                     if (list != null) {
                         buf.writeInt(list.size());
                         for (ItemStack s : list) {
-                            NetworkTools.writeItemStack(buf, s);
+                            buf.writeItemStack(s);
                         }
                     } else {
                         buf.writeInt(-1);
@@ -196,7 +200,7 @@ public class TypedMapTools {
                     if (list != null) {
                         buf.writeInt(list.size());
                         for (BlockPos s : list) {
-                            NetworkTools.writePos(buf, s);
+                            buf.writeBlockPos(s);
                         }
                     } else {
                         buf.writeInt(-1);
@@ -218,7 +222,8 @@ public class TypedMapTools {
         TYPE_LONG(6),
         TYPE_STRING_LIST(7),
         TYPE_ITEMSTACK_LIST(8),
-        TYPE_POS_LIST(9);
+        TYPE_POS_LIST(9),
+        TYPE_UUID(10);
 
         private final int index;
         private static final Map<Integer, ArgumentType> mapping = new HashMap<>();

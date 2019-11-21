@@ -1,6 +1,8 @@
 package mcjty.lib.blocks;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.builder.BlockBuilder;
@@ -9,6 +11,7 @@ import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
+import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -17,12 +20,12 @@ import mcjty.lib.varia.WrenchChecker;
 import mcjty.lib.varia.WrenchUsage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -59,7 +62,6 @@ import java.util.regex.Pattern;
 public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock {
 
     private final boolean infusable;
-    private final boolean hasGui;
     private final Supplier<TileEntity> tileEntitySupplier;
     private final InformationString informationString;
     private final InformationString informationStringWithShift;
@@ -75,13 +77,27 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         super(builder.getProperties());
         setRegistryName(name);
         this.infusable = builder.isInfusable();
-        this.hasGui = builder.isHasGui();
         this.tileEntitySupplier = builder.getTileEntitySupplier();
         this.informationString = builder.getInformationString();
         this.informationStringWithShift = builder.getInformationStringWithShift();
         this.toolType = builder.getToolType();
         this.harvestLevel = builder.getHarvestLevel();
         this.topDriver = builder.getTopDriver();
+    }
+
+    public static int getInfused(CompoundNBT tag) {
+        return tag.getCompound("BlockEntityTag").getCompound("Info").getInt("infused");
+    }
+
+    public static void setInfused(CompoundNBT tag, int infused) {
+        if (!tag.contains("BlockEntityTag")) {
+            tag.put("BlockEntityTag", new CompoundNBT());
+        }
+        tag = tag.getCompound("BlockEntityTag");
+        if (!tag.contains("Info")) {
+            tag.put("Info", new CompoundNBT());
+        }
+        tag.getCompound("Info").putInt("infused", infused);
     }
 
     @Override
@@ -105,7 +121,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 list.add(new StringTextComponent(TextFormatting.GREEN + "Energy: " + energy + " rf"));
             }
             if (isInfusable()) {
-                int infused = tagCompound.getInt("infused");
+                int infused = getInfused(tagCompound);
                 int pct = infused * 100 / GeneralConfig.maxInfuse.get();
                 list.add(new StringTextComponent(TextFormatting.YELLOW + "Infused: " + pct + "%"));
             }
@@ -172,10 +188,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             }
         }
         ItemStack heldItem = player.getHeldItem(hand);
-        // @todo
-//        if (handleModule(world, pos, state, player, hand, heldItem, result)) {
-//            return true;
-//        }
+        if (handleModule(world, pos, state, player, hand, heldItem, result)) {
+            return true;
+        }
         WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
         switch (wrenchUsed) {
             case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player);
@@ -184,6 +199,23 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             case DISABLED:     return wrenchDisabled(world, pos, player);
             case SELECT:       return wrenchSelect(world, pos, player);
             case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player);
+        }
+        return false;
+    }
+
+    public boolean handleModule(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult result) {
+        if (!heldItem.isEmpty()) {
+            TileEntity te = world.getTileEntity(pos);
+            if (te != null) {
+                return te.getCapability(CapabilityModuleSupport.MODULE_CAPABILITY).map(h -> {
+                    if (h.isModule(heldItem)) {
+                        if (InventoryHelper.installModule(player, heldItem, hand, pos, h.getFirstSlot(), h.getLastSlot())) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).orElse(false);
+            }
         }
         return false;
     }
@@ -202,9 +234,17 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     protected boolean wrenchSneak(World world, BlockPos pos, PlayerEntity player) {
         // @todo
-//        breakAndRemember(world, player, pos);
+        breakAndRemember(world, player, pos);
         return true;
     }
+
+    protected void breakAndRemember(World world, PlayerEntity player, BlockPos pos) {
+        if (!world.isRemote) {
+            harvestBlock(world, player, pos, world.getBlockState(pos), world.getTileEntity(pos), ItemStack.EMPTY);
+            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+        }
+    }
+
 
     protected boolean wrenchDisabled(World world, BlockPos pos, PlayerEntity player) {
         return false;
@@ -219,21 +259,20 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     protected boolean openGui(World world, int x, int y, int z, PlayerEntity player) {
-        if (hasGui) {
+        TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
+        if (te == null) {
+            return false;
+        }
+        return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> {
             if (world.isRemote) {
-                return true;
-            }
-            TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
-            if (!(te instanceof INamedContainerProvider)) {
                 return true;
             }
             if (checkAccess(world, player, te)) {
                 return true;
             }
-            NetworkHooks.openGui((ServerPlayerEntity) player, (INamedContainerProvider) te, te.getPos());
+            NetworkHooks.openGui((ServerPlayerEntity) player, h, te.getPos());
             return true;
-        }
-        return false;
+        }).orElse(false);
     }
 
 
@@ -416,9 +455,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         switch (getRotationType()) {
             case HORIZROTATION:
                 state = state.with(BlockStateProperties.HORIZONTAL_FACING, rot.rotate(state.get(BlockStateProperties.HORIZONTAL_FACING)));
+                break;
             case ROTATION:
                 state = state.with(BlockStateProperties.FACING, rot.rotate(state.get(BlockStateProperties.FACING)));
+                break;
             case NONE:
+                break;
         }
         TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity instanceof GenericTileEntity) {

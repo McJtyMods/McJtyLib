@@ -1,8 +1,10 @@
 package mcjty.lib.gui;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.PacketSendServerCommand;
@@ -10,18 +12,23 @@ import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;
 import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
@@ -31,10 +38,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends Container> extends ContainerScreen<C> {
+public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends Container> extends ContainerScreen<C> implements IKeyReceiver {
 
     protected ModBase modBase;
-    protected SimpleChannel network;
 
     protected Window window;
     private WindowManager windowManager;
@@ -57,10 +63,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         this.ySize = y;
     }
 
-    public GenericGuiContainer(ModBase mod, SimpleChannel network, T tileEntity, C container, PlayerInventory inventory, int manual, String manualNode) {
+    public GenericGuiContainer(ModBase mod, T tileEntity, C container, PlayerInventory inventory, int manual, String manualNode) {
         super(container, inventory, new StringTextComponent("test"));   // @todo
         this.modBase = mod;
-        this.network = network;
         this.tileEntity = tileEntity;
         sideWindow = new GuiSideWindow(manual, manualNode);
         windowManager = null;
@@ -79,7 +84,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public void init() {
         windowManager = null;
         super.init();
-        sideWindow.initGui(modBase, network, minecraft, this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(modBase, minecraft, this, guiLeft, guiTop, xSize, ySize);
     }
 
     /**
@@ -412,6 +417,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         return rc;
     }
 
+    @Override
     public Window getWindow() {
         return window;
     }
@@ -427,15 +433,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public boolean charTyped(char charTyped, int keyCode) {
-        boolean b = window == null || getWindowManager().charTyped(charTyped, keyCode);
-        if (b) {
-            return super.charTyped(charTyped, keyCode);
-        } else {
-            return false;
-        }
-    }
-
     public void keyTypedFromEvent(int keyCode, int scanCode) {
         if (window != null) {
             if (getWindowManager().keyTyped(keyCode, scanCode)) {
@@ -444,20 +441,45 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
-    public void sendServerCommand(SimpleChannel network, String command, TypedMap params) {
+    @Override
+    public void charTypedFromEvent(char codePoint) {
+        if (window != null) {
+            if (getWindowManager().charTyped(codePoint)) {
+                // @todo 1.14?
+//                super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
+            }
+        }
+    }
+
+    public void sendServerCommandTyped(SimpleChannel network, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), null, command, params));
     }
 
-    public void sendServerCommand(SimpleChannel network, int dimensionId, String command, TypedMap params) {
+    public void sendServerCommandTyped(SimpleChannel network, DimensionType dimensionId, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), dimensionId, command, params));
     }
 
-    public void sendServerCommand(String modid, String command, @Nonnull TypedMap arguments) {
+    public void sendServerCommand(SimpleChannel network, String modid, String command, @Nonnull TypedMap arguments) {
         network.sendToServer(new PacketSendServerCommand(modid, command, arguments));
     }
 
-    public void sendServerCommand(String modid, String command) {
+    public void sendServerCommand(SimpleChannel network, String modid, String command) {
         network.sendToServer(new PacketSendServerCommand(modid, command, TypedMap.EMPTY));
     }
 
+    // Register a container/gui on the client side
+    public static <C extends GenericContainer, S extends GenericGuiContainer<T,C>, T extends GenericTileEntity> void register(
+            ContainerType<C> type,
+            GuiSupplier<C, S, T> guiSupplier) {
+        ScreenManager.IScreenFactory<C, S> factory = (container, inventory, title) -> {
+            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(container.getPos());
+            return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid tile entity!");
+        };
+        ScreenManager.registerFactory(type, factory);
+    }
+
+    @FunctionalInterface
+    public static interface GuiSupplier<C extends GenericContainer, S extends GenericGuiContainer, T extends GenericTileEntity> {
+        S create(T tile, C container, PlayerInventory inventory);
+    }
 }

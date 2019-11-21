@@ -1,10 +1,7 @@
 package mcjty.lib.typed;
 
 import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 public final class TypedMap {
 
@@ -49,5 +46,18 @@ public final class TypedMap {
         public TypedMap build() {
             return new TypedMap(map);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TypedMap typedMap = (TypedMap) o;
+        return Objects.equals(map, typedMap.map);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(map);
     }
 }

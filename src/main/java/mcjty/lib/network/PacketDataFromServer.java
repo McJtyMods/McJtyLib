@@ -1,9 +1,9 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -13,15 +13,16 @@ import java.util.function.Supplier;
 /**
  * This packet is used (typically by PacketRequestDataFromServer) to send back a data to the client.
  */
+@SuppressWarnings("ALL")
 public class PacketDataFromServer {
-    private BlockPos pos;
-    private TypedMap result;
-    private String command;
+    // Package visible for unittests
+    BlockPos pos;
+    TypedMap result;
+    String command;
 
-    public void toBytes(ByteBuf buf) {
-        NetworkTools.writePos(buf, pos);
-
-        NetworkTools.writeString(buf, command);
+    public void toBytes(PacketBuffer buf) {
+        buf.writeBlockPos(pos);
+        buf.writeString(command);
 
         buf.writeBoolean(result != null);
         if (result != null) {
@@ -29,13 +30,11 @@ public class PacketDataFromServer {
         }
     }
 
-    public PacketDataFromServer(ByteBuf buf) {
-        pos = NetworkTools.readPos(buf);
+    public PacketDataFromServer(PacketBuffer buf) {
+        pos = buf.readBlockPos();
+        command = buf.readString(32767);
 
-        command = NetworkTools.readString(buf);
-
-        boolean resultPresent = buf.readBoolean();
-        if (resultPresent) {
+        if (buf.readBoolean()) {
             result = TypedMapTools.readArguments(buf);
         } else {
             result = null;
@@ -51,7 +50,7 @@ public class PacketDataFromServer {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            TileEntity te = Minecraft.getInstance().world.getTileEntity(pos);
+            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
             if(!(te instanceof IClientCommandHandler)) {
                 Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
                 return;

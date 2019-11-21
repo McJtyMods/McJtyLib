@@ -5,10 +5,15 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.*;
-import mcjty.lib.typed.*;
+import mcjty.lib.gui.events.TextEnterEvent;
+import mcjty.lib.gui.events.TextEvent;
+import mcjty.lib.gui.events.TextSpecialKeyEvent;
+import mcjty.lib.typed.Key;
+import mcjty.lib.typed.Type;
+import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
@@ -76,6 +81,11 @@ public class TextField extends AbstractWidget<TextField> {
         return null;
     }
 
+    private static boolean isControlDown() {
+        long handle = Minecraft.getInstance().mainWindow.getHandle();
+        return InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_CONTROL);
+    }
+
     @Override
     public boolean keyTyped(int keyCode, int scanCode) {
         boolean rc = super.keyTyped(keyCode, scanCode);
@@ -83,23 +93,26 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            if (Screen.hasControlDown()) {
-                if (keyCode == GLFW.GLFW_KEY_V) {
-                    String data = Minecraft.getInstance().keyboardListener.getClipboardString();
-                    if (isRegionSelected()) {
-                        replaceSelectedRegion(data);
-                    } else {
-                        text = text.substring(0, cursor) + data + text.substring(cursor);
+            long handle = Minecraft.getInstance().mainWindow.getHandle();
+            if (isControlDown()) {
+                if(keyCode == GLFW.GLFW_KEY_V) {
+                    String data = GLFW.glfwGetClipboardString(handle);
+                    if (data != null) {
+                        if (isRegionSelected()) {
+                            replaceSelectedRegion(data);
+                        } else {
+                            text = text.substring(0, cursor) + data + text.substring(cursor);
+                        }
+                        cursor += data.length();
+                        fireTextEvents(text);
                     }
-                    cursor += data.length();
-                    fireTextEvents(text);
                 } else if (keyCode == GLFW.GLFW_KEY_C) {
                     if (isRegionSelected()) {
-                        Minecraft.getInstance().keyboardListener.setClipboardString(getSelectedText());
+                        GLFW.glfwSetClipboardString(handle, getSelectedText());
                     }
                 } else if (keyCode == GLFW.GLFW_KEY_X) {
                     if (isRegionSelected()) {
-                        Minecraft.getInstance().keyboardListener.setClipboardString(getSelectedText());
+                        GLFW.glfwSetClipboardString(handle, getSelectedText());
                         replaceSelectedRegion("");
                         fireTextEvents(text);
                     }
@@ -152,27 +165,18 @@ public class TextField extends AbstractWidget<TextField> {
                     cursor++;
                 }
             }
-            // We only handle non-ASCII character key inputs here, so the rest will be passed to #charTyped(char, int)
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean charTyped(char typedChar, int keyCode) {
-        if (super.charTyped(typedChar, keyCode)) {
-            return true;
-        }
-        if (!isEnabledAndVisible() || !editable) {
-            return false;
-        }
-        // e.g. F1~12, insert
-        // Char code of 0 will appear to be nothing
-        if ((int) typedChar != 0) {
+    public boolean charTyped(char codePoint) {
+        if (isEnabledAndVisible() && editable) {
             if (isRegionSelected()) {
-                replaceSelectedRegion(String.valueOf(typedChar));
+                replaceSelectedRegion(Character.toString(codePoint));
             } else {
-                text = text.substring(0, cursor) + typedChar + text.substring(cursor);
+                text = text.substring(0, cursor) + Character.toString(codePoint) + text.substring(cursor);
             }
             cursor++;
             fireTextEvents(text);
@@ -379,7 +383,6 @@ public class TextField extends AbstractWidget<TextField> {
         if (textEnterEvents != null) {
             textEnterEvents.remove(event);
         }
-        ;
     }
 
     private void fireTextEnterEvents(String newText) {

@@ -9,7 +9,7 @@ public class SlotDefinition {
     private final SlotType type;
     private final Predicate<ItemStack> validItems;
 
-    public SlotDefinition(SlotType type, ItemStack... itemStacks) {
+    SlotDefinition(SlotType type, ItemStack... itemStacks) {
         this.type = type;
         this.validItems = stack -> {
             for (ItemStack itemStack : itemStacks) {
@@ -21,7 +21,7 @@ public class SlotDefinition {
         };
     }
 
-    public SlotDefinition(SlotType type, Class<?> itemClass) {
+    SlotDefinition(SlotType type, Class<?> itemClass) {
         this.type = type;
         this.validItems = stack -> {
             if (itemClass != null && itemClass.isInstance(stack.getItem())) {
@@ -31,12 +31,39 @@ public class SlotDefinition {
         };
     }
 
-    public SlotDefinition(SlotType type, Predicate<ItemStack> validItems) {
+    SlotDefinition(SlotType type, Predicate<ItemStack> validItems) {
         this.type = type;
         this.validItems = validItems;
     }
 
 
+    public static SlotDefinition specific(ItemStack... stacks) {
+        return new SlotDefinition(SlotType.SLOT_SPECIFICITEM, stacks);
+    }
+
+    public static SlotDefinition specific(Predicate<ItemStack> validItems) {
+        return new SlotDefinition(SlotType.SLOT_SPECIFICITEM, validItems);
+    }
+
+    public static SlotDefinition output() {
+        return new SlotDefinition(SlotType.SLOT_OUTPUT);
+    }
+
+    public static SlotDefinition input() {
+        return new SlotDefinition(SlotType.SLOT_INPUT);
+    }
+
+    public static SlotDefinition container() {
+        return new SlotDefinition(SlotType.SLOT_CONTAINER);
+    }
+
+    public static SlotDefinition ghost() {
+        return new SlotDefinition(SlotType.SLOT_GHOST);
+    }
+
+    public static SlotDefinition ghostOut() {
+        return new SlotDefinition(SlotType.SLOT_GHOSTOUT);
+    }
 
     public SlotType getType() {
         return type;

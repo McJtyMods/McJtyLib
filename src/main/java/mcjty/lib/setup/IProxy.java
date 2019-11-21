@@ -21,29 +21,20 @@ public interface IProxy {
 
     World getClientWorld();
 
+    // Return current world on client and overworld on server
+    World getWorld();
+
     RecipeManager getRecipeManager(World world);
 
     PlayerEntity getClientPlayer();
 
     RayTraceResult getClientMouseOver();
 
-    NetworkManager getNetworkManager(PlayerEntity player);
-
-    <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule);
-
-    ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule);
-
     void enqueueWork(Runnable runnable);
 
     void initStandardItemModel(Block block);
 
-    void initCustomItemModel(Item item, int meta, ModelResourceLocation model);
-
     void initStateMapper(Block block, ModelResourceLocation model);
-
-    void initItemModelMesher(Item item, ModelResourceLocation model);
-
-    void initTESRItemStack(Item item, int meta, Class<? extends TileEntity> clazz);
 
     boolean isJumpKeyDown();
 
@@ -53,8 +44,14 @@ public interface IProxy {
 
     boolean isSneakKeyDown();
 
-    // This version goes directly to LWJGL
+    // This version directly checks the actual key
     boolean isShiftKeyDown();
+
+    // This version directly checks the actual key
+    boolean isAltKeyDown();
+
+    // This version directly checks the actual key
+    boolean isCtrlKeyDown();
 
     IAnimationStateMachine load(ResourceLocation location, ImmutableMap<String, ITimeValue> parameters);
 }

@@ -1,29 +1,31 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
+@SuppressWarnings("PackageVisibleField")
 public class PacketSendServerCommand {
 
-    private String modid;
-    private String command;
-    private TypedMap arguments;
+    // Package visible for unit tests
+    String modid;
+    String command;
+    TypedMap arguments;
 
-    public void toBytes(ByteBuf buf) {
-        NetworkTools.writeString(buf, modid);
-        NetworkTools.writeString(buf, command);
+    public void toBytes(PacketBuffer buf) {
+        buf.writeString(modid);
+        buf.writeString(command);
         TypedMapTools.writeArguments(buf, arguments);
     }
 
-    public PacketSendServerCommand(ByteBuf buf) {
-        modid = NetworkTools.readString(buf);
-        command = NetworkTools.readString(buf);
+    public PacketSendServerCommand(PacketBuffer buf) {
+        modid = buf.readString(32767);
+        command = buf.readString(32767);
         arguments = TypedMapTools.readArguments(buf);
     }
 

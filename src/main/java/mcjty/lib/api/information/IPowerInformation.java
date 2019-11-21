@@ -3,10 +3,10 @@ package mcjty.lib.api.information;
 import javax.annotation.Nullable;
 
 /**
- * Implement this interface on your tile entity so that other
+ * Implement this capability based interface in your TE so that other
  * mods (like The One Probe) can request information from your block.
  */
-public interface IMachineInformation {
+public interface IPowerInformation {
 
     /**
      * Get the energy consumption or production of this machine at this moment.

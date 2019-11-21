@@ -1,15 +1,16 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpBlockNBT;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.OpEntry;
 import net.minecraft.server.management.OpList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.Level;
 
@@ -20,24 +21,24 @@ import java.util.function.Supplier;
  */
 public class PacketDumpBlockInfo {
 
-    private int dimid;
+    private DimensionType dimid;
     private BlockPos pos;
     private boolean verbose;
 
-    public void toBytes(ByteBuf buf) {
-        buf.writeInt(dimid);
-        NetworkTools.writePos(buf, pos);
+    public void toBytes(PacketBuffer buf) {
+        buf.writeInt(dimid.getId());
+        buf.writeBlockPos(pos);
         buf.writeBoolean(verbose);
     }
 
-    public PacketDumpBlockInfo(ByteBuf buf) {
-        dimid = buf.readInt();
-        pos = NetworkTools.readPos(buf);
+    public PacketDumpBlockInfo(PacketBuffer buf) {
+        dimid = DimensionType.getById(buf.readInt());
+        pos = buf.readBlockPos();
         verbose = buf.readBoolean();
     }
 
     public PacketDumpBlockInfo(World world, BlockPos pos, boolean verbose) {
-        this.dimid = world.getDimension().getType().getId();
+        this.dimid = world.getDimension().getType();
         this.pos = pos;
         this.verbose = verbose;
     }
@@ -51,7 +52,7 @@ public class PacketDumpBlockInfo {
             OpEntry entry = oppedPlayers.getEntry(player.getGameProfile());
             int perm = entry == null ? server.getOpPermissionLevel() : entry.getPermissionLevel();
             if (perm >= 1) {
-                World world = WorldTools.getWorld(dimid);
+                World world = WorldTools.getWorld(player.world, dimid);
                 String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
                 Logging.getLogger().log(Level.INFO, "### Server side ###");
                 Logging.getLogger().log(Level.INFO, output);

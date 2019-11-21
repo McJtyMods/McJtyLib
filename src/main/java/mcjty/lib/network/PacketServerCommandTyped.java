@@ -1,13 +1,14 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -20,16 +21,16 @@ import java.util.function.Supplier;
 public class PacketServerCommandTyped {
 
     protected BlockPos pos;
-    protected Integer dimensionId;
+    protected DimensionType dimensionId;
     protected String command;
     protected TypedMap params;
 
-    public PacketServerCommandTyped(ByteBuf buf) {
-        pos = NetworkTools.readPos(buf);
-        command = NetworkTools.readString(buf);
+    public PacketServerCommandTyped(PacketBuffer buf) {
+        pos = buf.readBlockPos();
+        command = buf.readString(32767);
         params = TypedMapTools.readArguments(buf);
         if (buf.readBoolean()) {
-            dimensionId = buf.readInt();
+            dimensionId = DimensionType.getById(buf.readInt());
         } else {
             dimensionId = null;
         }
@@ -42,20 +43,20 @@ public class PacketServerCommandTyped {
         this.dimensionId = null;
     }
 
-    public PacketServerCommandTyped(BlockPos pos, Integer dimensionId, String command, TypedMap params) {
+    public PacketServerCommandTyped(BlockPos pos, DimensionType dimensionId, String command, TypedMap params) {
         this.pos = pos;
         this.command = command;
         this.params = params;
         this.dimensionId = dimensionId;
     }
 
-    public void toBytes(ByteBuf buf) {
-        NetworkTools.writePos(buf, pos);
-        NetworkTools.writeString(buf, command);
+    public void toBytes(PacketBuffer buf) {
+        buf.writeBlockPos(pos);
+        buf.writeString(command);
         TypedMapTools.writeArguments(buf, params);
         if (dimensionId != null) {
             buf.writeBoolean(true);
-            buf.writeInt(dimensionId);
+            buf.writeInt(dimensionId.getId());
         } else {
             buf.writeBoolean(false);
         }
@@ -69,7 +70,7 @@ public class PacketServerCommandTyped {
             if (dimensionId == null) {
                 world = playerEntity.getEntityWorld();
             } else {
-                world = WorldTools.getWorld(dimensionId);
+                world = WorldTools.getWorld(playerEntity.world, dimensionId);
             }
             if (world == null) {
                 return;

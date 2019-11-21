@@ -1,26 +1,20 @@
 package mcjty.lib.tileentity;
 
+import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
-import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.network.*;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.ItemStackList;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
@@ -32,12 +26,13 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -46,7 +41,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler, INamedContainerProvider {
+public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
 
     public static final IValue<?>[] EMPTY_VALUES = new IValue[0];
     public static final IAction[] EMPTY_ACTIONS = new IAction[0];
@@ -56,8 +51,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public static final Key<String> PARAM_KEY = new Key<>("key", Type.STRING);
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
-
-    private int infused = 0;
 
     private String ownerName = "";
     private UUID ownerUUID = null;
@@ -74,7 +67,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         markDirty();
         if (getWorld() != null) {
             BlockState state = getWorld().getBlockState(getPos());
-            getWorld().notifyBlockUpdate(getPos(), state, state, 3);
+            getWorld().notifyBlockUpdate(getPos(), state, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         }
     }
 
@@ -183,18 +176,18 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         readClientDataFromNBT(packet.getNbtCompound());
     }
 
-    public void setInfused(int infused) {
-        this.infused = infused;
-        markDirtyClient();
-    }
-
-    public int getInfused() {
-        return infused;
-    }
-
-    public float getInfusedFactor() {
-        return ((float) infused) / GeneralConfig.maxInfuse.get();
-    }
+//    public void setInfused(int infused) {
+//        this.infused = infused;
+//        markDirtyClient();
+//    }
+//
+//    public int getInfused() {
+//        return infused;
+//    }
+//
+//    public float getInfusedFactor() {
+//        return ((float) infused) / GeneralConfig.maxInfuse.get();
+//    }
 
     public boolean canPlayerAccess(PlayerEntity player) {
         return !isRemoved() && player.getDistanceSq(new Vec3d(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
@@ -245,21 +238,23 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     @Override
     public void read(CompoundNBT tagCompound) {
         super.read(tagCompound);
+        readCaps(tagCompound);
         readInfo(tagCompound);
     }
 
-    protected void readBufferFromNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
-        readBufferFromNBT(tagCompound, "Items", inventoryHelper.getStacks());
-    }
-
-    protected void readBufferFromNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
-        ListNBT bufferTagList = tagCompound.getList(tag, Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < bufferTagList.size(); i++) {
-            CompoundNBT compoundNBT = bufferTagList.getCompound(i);
-            if (i < list.size()) {
-                list.set(i, ItemStack.read(compoundNBT));
-            }
+    protected void readCaps(CompoundNBT tagCompound) {
+        if (tagCompound.contains("Info")) {
+            CompoundNBT infoTag = tagCompound.getCompound("Info");
+            getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
         }
+        getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .filter(h -> h instanceof INBTSerializable)
+                .map(h -> (INBTSerializable) h)
+                .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Constants.NBT.TAG_COMPOUND)));
+        getCapability(CapabilityEnergy.ENERGY)
+                .filter(h -> h instanceof INBTSerializable)
+                .map(h -> (INBTSerializable) h)
+                .ifPresent(h -> h.deserializeNBT(tagCompound.get("Energy")));
     }
 
     protected void readInfo(CompoundNBT tagCompound) {
@@ -271,7 +266,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
                 rsMode = RedstoneMode.values()[m];
             }
 
-            infused = infoTag.getInt("infused");
             ownerName = infoTag.getString("owner");
             ownerUUID = infoTag.getUniqueId("ownerId");
             if (infoTag.contains("secChannel")) {
@@ -284,39 +278,44 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
+    protected CompoundNBT getOrCreateInfo(CompoundNBT tagCompound) {
+        if (tagCompound.contains("Info")) {
+            return tagCompound.getCompound("Info");
+        }
+        CompoundNBT data = new CompoundNBT();
+        tagCompound.put("Info", data);
+        return data;
+    }
+
     @Override
-    @Nonnull
     public CompoundNBT write(CompoundNBT tagCompound) {
         super.write(tagCompound);
+        writeCaps(tagCompound);
         writeInfo(tagCompound);
         return tagCompound;
     }
 
-    protected void writeBufferToNBT(CompoundNBT tagCompound, String tag, ItemStackList list) {
-        ListNBT bufferTagList = new ListNBT();
-        for (ItemStack stack : list) {
-            CompoundNBT CompoundNBT = new CompoundNBT();
-            if (!stack.isEmpty()) {
-                stack.write(CompoundNBT);
-            }
-            bufferTagList.add(CompoundNBT);
-        }
-        tagCompound.put(tag, bufferTagList);
-    }
-
-    protected void writeBufferToNBT(CompoundNBT tagCompound, InventoryHelper inventoryHelper) {
-        writeBufferToNBT(tagCompound, "Items", inventoryHelper.getStacks());
+    protected void writeCaps(CompoundNBT tagCompound) {
+        CompoundNBT infoTag = getOrCreateInfo(tagCompound);
+        getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> infoTag.putInt("infused", h.getInfused()));
+        getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .filter(h -> h instanceof INBTSerializable)
+                .map(h -> (INBTSerializable) h)
+                .ifPresent(h -> tagCompound.put("Items", h.serializeNBT()));
+        getCapability(CapabilityEnergy.ENERGY)
+                .filter(h -> h instanceof INBTSerializable)
+                .map(h -> (INBTSerializable) h)
+                .ifPresent(h -> tagCompound.put("Energy", h.serializeNBT()));
     }
 
     protected void writeInfo(CompoundNBT tagCompound) {
-        CompoundNBT infoTag = new CompoundNBT();
+        CompoundNBT infoTag = getOrCreateInfo(tagCompound);
         if (powerLevel > 0) {
             infoTag.putByte("powered", (byte) powerLevel);
         }
         if (needsRedstoneMode()) {
             infoTag.putByte("rsMode", (byte) rsMode.ordinal());
         }
-        infoTag.putInt("infused", infused);
         infoTag.putString("owner", ownerName);
         if (ownerUUID != null) {
             infoTag.putUniqueId("ownerId", ownerUUID);
@@ -324,7 +323,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         if (securityChannel != -1) {
             infoTag.putInt("secChannel", securityChannel);
         }
-        tagCompound.put("Info", infoTag);
     }
 
     public boolean setOwner(PlayerEntity player) {
@@ -499,8 +497,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     /**
      * Call this client-side to this TE to request data from the server
      */
-    public void requestDataFromServer(String modid, String command, @Nonnull TypedMap params) {
-        PacketHandler.modNetworking.get(modid).sendToServer(new PacketRequestDataFromServer(modid, pos, command, params));
+    public void requestDataFromServer(SimpleChannel channel, String command, @Nonnull TypedMap params) {
+        channel.sendToServer(new PacketRequestDataFromServer(pos, command, params));
     }
 
 
@@ -527,16 +525,5 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             syncBindingHelper(params, key);
         }
         markDirtyClient();
-    }
-
-    @Override
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent("todo"); // @todo 1.14
-    }
-
-    @Nullable
-    @Override
-    public Container createMenu(int p_createMenu_1_, PlayerInventory p_createMenu_2_, PlayerEntity p_createMenu_3_) {
-        return null;
     }
 }

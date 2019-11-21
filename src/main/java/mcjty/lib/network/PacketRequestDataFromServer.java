@@ -1,10 +1,8 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -22,30 +20,26 @@ public class PacketRequestDataFromServer {
     protected BlockPos pos;
     protected String command;
     protected TypedMap params;
-    private String modid;
 
-    public PacketRequestDataFromServer(ByteBuf buf) {
-        pos = NetworkTools.readPos(buf);
-        command = NetworkTools.readString(buf);
+    public PacketRequestDataFromServer(PacketBuffer buf) {
+        pos = buf.readBlockPos();
+        command = buf.readString(32767);
         params = TypedMapTools.readArguments(buf);
-        modid = NetworkTools.readString(buf);
     }
 
-    public void toBytes(ByteBuf buf) {
-        NetworkTools.writePos(buf, pos);
-        NetworkTools.writeString(buf, command);
+    public void toBytes(PacketBuffer buf) {
+        buf.writeBlockPos(pos);
+        buf.writeString(command);
         TypedMapTools.writeArguments(buf, params);
-        NetworkTools.writeString(buf, modid);
     }
 
-    public PacketRequestDataFromServer(String modid, BlockPos pos, String command, TypedMap params) {
+    public PacketRequestDataFromServer(BlockPos pos, String command, TypedMap params) {
         this.pos = pos;
         this.command = command;
         this.params = params;
-        this.modid = modid;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
+    public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             TileEntity te = ctx.getSender().getEntityWorld().getTileEntity(pos);
@@ -60,14 +54,9 @@ public class PacketRequestDataFromServer {
                 return;
             }
 
-            sendReplyToClient(this, result, ctx.getSender());
+            PacketDataFromServer msg = new PacketDataFromServer(pos, command, result);
+            channel.sendTo(msg, ctx.getSender().connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
         });
         ctx.setPacketHandled(true);
-    }
-
-    private void sendReplyToClient(PacketRequestDataFromServer message, TypedMap result, PlayerEntity player) {
-        SimpleChannel wrapper = PacketHandler.modNetworking.get(message.modid);
-        PacketDataFromServer msg = new PacketDataFromServer(message.pos, message.command, result);
-        wrapper.sendTo(msg, ((ServerPlayerEntity) player).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 }

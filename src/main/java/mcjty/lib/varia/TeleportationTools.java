@@ -5,30 +5,36 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.server.*;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.fml.hooks.BasicEventHooks;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import javax.annotation.Nullable;
 
 public class TeleportationTools {
 
-    public static void performTeleport(PlayerEntity player, int dimension, BlockPos dest, @Nullable Direction direction) {
+    public static void performTeleport(PlayerEntity player, DimensionType dimension, BlockPos dest, @Nullable Direction direction) {
         performTeleport(player, dimension, dest.getX() + 0.5, dest.getY() + 1.5, dest.getZ() + 0.5, direction);
     }
 
-    public static void performTeleport(PlayerEntity player, int dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
-        int oldId = player.getEntityWorld().getDimension().getType().getId();
+    public static void performTeleport(PlayerEntity player, DimensionType dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
+        DimensionType oldId = player.getEntityWorld().getDimension().getType();
 
         float rotationYaw = player.rotationYaw;
         float rotationPitch = player.rotationPitch;
 
-        if (oldId != dimension) {
+        if (!oldId.equals(dimension)) {
             teleportToDimension(player, dimension, destX, destY, destZ);
         }
         if (direction != null) {
@@ -43,31 +49,73 @@ public class TeleportationTools {
     /**
      * Get a world for a dimension, possibly loading it from the configuration manager.
      */
-    public static World getWorldForDimension(int id) {
-        World w = WorldTools.getWorld(id);
+    public static World getWorldForDimension(DimensionType type) {
+        World w = WorldTools.getWorld(type);
         if (w == null) {
             MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            w = server.getWorld(DimensionType.getById(id));
+            w = server.getWorld(type);
         }
         return w;
     }
 
 
-    public static void teleportToDimension(PlayerEntity player, int dimension, double x, double y, double z) {
-        int oldDimension = player.getEntityWorld().getDimension().getType().getId();
-        ServerPlayerEntity PlayerEntityMP = (ServerPlayerEntity) player;
+    public static void teleportToDimension(PlayerEntity player, DimensionType dimension, double x, double y, double z) {
+        DimensionType oldDimension = player.getEntityWorld().getDimension().getType();
+        ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
         MinecraftServer server = player.getEntityWorld().getServer();
-        ServerWorld worldServer = server.getWorld(DimensionType.getById(dimension));
+        ServerWorld worldServer = server.getWorld(dimension);
         if (worldServer == null) {
             return;
         }
         player.addExperienceLevel(0);
 
-
-        // @todo 1.14
-//        worldServer.getServer().getPlayerList().transferPlayerToDimension(PlayerEntityMP, dimension, new McJtyLibTeleporter(worldServer, x, y, z));
-        player.setPositionAndUpdate(x, y, z);
+        changeDim(serverPlayer, new BlockPos(x, y, z), dimension);
+//        player.setPositionAndUpdate(x, y, z);
     }
+
+    public static void changeDim(ServerPlayerEntity player, BlockPos pos, DimensionType type) { // copy from ServerPlayerEntity#changeDimension
+        if (!ForgeHooks.onTravelToDimension(player, type)) {
+            return;
+        }
+
+//        player.isInvulnerableDimensionChange();
+        DimensionType dimensiontype = player.dimension;
+
+        ServerWorld srcWorld = player.server.getWorld(dimensiontype);
+        player.dimension = type;
+        ServerWorld destWorld = player.server.getWorld(type);
+        WorldInfo worldinfo = player.world.getWorldInfo();
+        player.connection.sendPacket(new SRespawnPacket(type, worldinfo.getGenerator(), player.interactionManager.getGameType()));
+        player.connection.sendPacket(new SServerDifficultyPacket(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
+        PlayerList playerlist = player.server.getPlayerList();
+        playerlist.updatePermissionLevel(player);
+        srcWorld.removeEntity(player, true);
+        player.revive();
+        float f = player.rotationPitch;
+        float f1 = player.rotationYaw;
+
+        player.setLocationAndAngles(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, f1, f);
+        srcWorld.getProfiler().endSection();
+        srcWorld.getProfiler().startSection("placing");
+        player.setLocationAndAngles(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, f1, f);
+
+        srcWorld.getProfiler().endSection();
+        player.setWorld(destWorld);
+        destWorld.func_217447_b(player);
+        player.connection.setPlayerLocation(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, f1, f);
+        player.interactionManager.setWorld(destWorld);
+        player.connection.sendPacket(new SPlayerAbilitiesPacket(player.abilities));
+        playerlist.sendWorldInfo(player, destWorld);
+        playerlist.sendInventory(player);
+
+        for(EffectInstance effectinstance : player.getActivePotionEffects()) {
+            player.connection.sendPacket(new SPlayEntityEffectPacket(player.getEntityId(), effectinstance));
+        }
+
+        player.connection.sendPacket(new SPlaySoundEventPacket(1032, BlockPos.ZERO, 0, false));
+        BasicEventHooks.firePlayerChangedDimensionEvent(player, dimensiontype, type);
+    }
+
 
     private static void facePosition(Entity entity, double newX, double newY, double newZ, BlockPos dest) {
         double d0 = dest.getX() - newX;
@@ -94,7 +142,7 @@ public class TeleportationTools {
     public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, Direction facing) {
         World world = entity.getEntityWorld();
         if (entity instanceof PlayerEntity) {
-            performTeleport((PlayerEntity) entity, destWorld.getDimension().getType().getId(), newX, newY, newZ, facing);
+            performTeleport((PlayerEntity) entity, destWorld.getDimension().getType(), newX, newY, newZ, facing);
             return entity;
         } else {
             float rotationYaw = entity.rotationYaw;

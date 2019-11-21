@@ -2,21 +2,21 @@ package mcjty.lib.container;
 
 import com.google.common.collect.Range;
 import mcjty.lib.McJtyLib;
-import mcjty.lib.network.PacketSendGuiData;
+import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.*;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * Generic container support.
  */
-public class GenericContainer extends Container {
+public class GenericContainer extends Container implements IGenericContainer {
     protected Map<String,IItemHandler> inventories = new HashMap<>();
     private ContainerFactory factory;
     private GenericCrafter crafter = null;
@@ -43,12 +43,66 @@ public class GenericContainer extends Container {
         factory.doSetup();
     }
 
+    @Override
+    public Container getAsContainer() {
+        return this;
+    }
+
     public GenericTileEntity getTe() {
         return te;
     }
 
-    public void addIntegerListener(IntReferenceHolder holder) {
+    @Override
+    public void addShortListener(IntReferenceHolder holder) {
         trackInt(holder);
+    }
+
+    @Override
+    public void addIntegerListener(IntReferenceHolder holder) {
+        trackInt(new IntReferenceHolder() {
+            private int lastKnown;
+
+            @Override
+            public int get() {
+                return holder.get() & 0xffff;
+            }
+
+            @Override
+            public void set(int val) {
+                int full = holder.get();
+                holder.set((full & 0xffff0000) | (val & 0xffff));
+            }
+
+            @Override
+            public boolean isDirty() {
+                int i = this.get();
+                boolean flag = i != this.lastKnown;
+                this.lastKnown = i;
+                return flag;
+            }
+        });
+        trackInt(new IntReferenceHolder() {
+            private int lastKnown;
+
+            @Override
+            public int get() {
+                return (holder.get() >> 16) & 0xffff;
+            }
+
+            @Override
+            public void set(int val) {
+                int full = holder.get();
+                holder.set((full & 0x0000ffff) | ((val & 0xffff) << 16));
+            }
+
+            @Override
+            public boolean isDirty() {
+                int i = this.get();
+                boolean flag = i != this.lastKnown;
+                this.lastKnown = i;
+                return flag;
+            }
+        });
     }
 
     public void addInventory(String name, IItemHandler inventory) {
@@ -86,6 +140,7 @@ public class GenericContainer extends Container {
         this.crafter = crafter;
     }
 
+    @Override
     public void setupInventories(IItemHandler itemHandler, PlayerInventory inventory) {
         addInventory(ContainerFactory.CONTAINER_CONTAINER, itemHandler);
         addInventory(ContainerFactory.CONTAINER_PLAYER, new InvWrapper(inventory));
@@ -343,25 +398,14 @@ public class GenericContainer extends Container {
         }
     }
 
-    // Call this in your detectAndSendChanges() implementation when you find one
-    // of the fields you need in the GUI has changed
-    protected void notifyPlayerOfChanges(SimpleChannel wrapper, World world, BlockPos pos) {
-        for (IContainerListener listener : this.listeners) {
-            if (listener instanceof ServerPlayerEntity) {
-                ServerPlayerEntity player = (ServerPlayerEntity) listener;
-                wrapper.sendTo(new PacketSendGuiData(world, pos), player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-            }
-        }
-    }
-
     public static ContainerType<Container> createContainerType(String registryName) {
         ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
             TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
-            if (!(te instanceof INamedContainerProvider)) {
+            if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
-            return ((INamedContainerProvider) te).createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer());
+            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> h.createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer())).orElseThrow(RuntimeException::new);
         });
         containerType.setRegistryName(registryName);
         return containerType;

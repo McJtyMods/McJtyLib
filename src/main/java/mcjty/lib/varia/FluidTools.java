@@ -1,13 +1,25 @@
 package mcjty.lib.varia;
 
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.fluid.IFluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Tuple;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class FluidTools {
 
@@ -22,7 +34,7 @@ public class FluidTools {
     public static ItemStack convertFluidToBucket(@Nonnull FluidStack fluidStack) {
         //                return FluidContainerRegistry.fillFluidContainer(fluidStack, new ItemStack(Items.BUCKET));
         return FluidUtil.getFluidHandler(new ItemStack(Items.BUCKET)).map(handler -> {
-            handler.fill(fluidStack, true);
+            handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
             return handler.getContainer();
         }).orElse(ItemStack.EMPTY);
     }
@@ -31,10 +43,9 @@ public class FluidTools {
     public static FluidStack convertBucketToFluid(@Nonnull ItemStack bucket) {
         // @todo 1.14: return null in LazyOptional?
         return FluidUtil.getFluidHandler(bucket).map(handler -> {
-            IFluidTankProperties[] tankProperties = handler.getTankProperties();
-            for (IFluidTankProperties properties : tankProperties) {
-                FluidStack contents = properties.getContents();
-                if (contents != null) {
+            for (int i = 0; i < handler.getTanks(); i++) {
+                FluidStack contents = handler.getFluidInTank(i);
+                if (!contents.isEmpty()) {
                     return contents;
                 }
             }
@@ -45,13 +56,12 @@ public class FluidTools {
 
     public static boolean isEmptyContainer(@Nonnull ItemStack itemStack) {
         return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            IFluidTankProperties[] tankProperties = handler.getTankProperties();
-            for (IFluidTankProperties properties : tankProperties) {
-                if (properties.canFill() && properties.getCapacity() > 0) {
-                    FluidStack contents = properties.getContents();
-                    if (contents == null) {
+            for (int i = 0; i < handler.getTanks(); i++) {
+                if (handler.getTankCapacity(i) > 0) {
+                    FluidStack contents = handler.getFluidInTank(i);
+                    if (contents.isEmpty()) {
                         return true;
-                    } else if (contents.amount > 0) {
+                    } else if (contents.getAmount() > 0) {
                         return false;
                     }
                 }
@@ -62,14 +72,9 @@ public class FluidTools {
 
     public static boolean isFilledContainer(@Nonnull ItemStack itemStack) {
         return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            IFluidTankProperties[] tankProperties = handler.getTankProperties();
-            for (IFluidTankProperties properties : tankProperties) {
-                if (!properties.canDrain()) {
-                    return false;
-                }
-
-                FluidStack contents = properties.getContents();
-                if (contents == null || contents.amount < properties.getCapacity()) {
+            for (int i = 0; i < handler.getTanks(); i++) {
+                FluidStack contents = handler.getFluidInTank(i);
+                if (contents.isEmpty() || contents.getAmount() < handler.getTankCapacity(i)) {
                     return false;
                 }
             }
@@ -83,7 +88,7 @@ public class FluidTools {
         ItemStack empty = container.copy();
         empty.setCount(1);
         return FluidUtil.getFluidHandler(empty).map(handler -> {
-            if (handler.drain(Integer.MAX_VALUE, true) != null) {
+            if (!handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE).isEmpty()) {
                 return handler.getContainer();
             }
             return ItemStack.EMPTY;
@@ -94,7 +99,7 @@ public class FluidTools {
     @Nonnull
     public static ItemStack fillContainer(@Nonnull FluidStack fluidStack, @Nonnull ItemStack itemStack) {
         return FluidUtil.getFluidHandler(itemStack.copy()).map(handler -> {
-            int filled = handler.fill(fluidStack, true);
+            int filled = handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
             if (filled == 0) {
                 return ItemStack.EMPTY;
             }
@@ -102,18 +107,49 @@ public class FluidTools {
         }).orElse(ItemStack.EMPTY);
     }
 
+    @Nonnull
+    public static FluidStack pickupFluidBlock(World world, BlockPos pos, @Nonnull Predicate<FluidStack> action, @Nonnull Runnable clearBlock) {
+        BlockState blockstate = world.getBlockState(pos);
+        IFluidState fluidstate = world.getFluidState(pos);
+        Material material = blockstate.getMaterial();
+        Fluid fluid = fluidstate.getFluid();
+
+        if (blockstate.getBlock() instanceof IBucketPickupHandler && fluid != Fluids.EMPTY) {
+            FluidStack stack = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
+            if (action.test(stack)) {
+                return new FluidStack(((IBucketPickupHandler) blockstate.getBlock()).pickupFluid(world, pos, blockstate), FluidAttributes.BUCKET_VOLUME);
+            }
+            return stack;
+        } else if (blockstate.getBlock() instanceof FlowingFluidBlock) {
+            FluidStack stack = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
+            if (action.test(stack)) {
+                clearBlock.run();
+            }
+            return stack;
+        } else if (material == Material.OCEAN_PLANT || material == Material.SEA_GRASS) {
+            FluidStack stack = new FluidStack(Fluids.WATER, FluidAttributes.BUCKET_VOLUME);
+            if (action.test(stack)) {
+                TileEntity tileentity = blockstate.getBlock().hasTileEntity(blockstate) ? world.getTileEntity(pos) : null;
+                Block.spawnDrops(blockstate, world, pos, tileentity);
+                clearBlock.run();
+            }
+            return stack;
+        }
+        return FluidStack.EMPTY;
+    }
     /**
      * Get the capacity (in mb) of the given container for the given fluid
      */
-    public static int getCapacity(@Nonnull FluidStack fluidStack, @Nonnull ItemStack itemStack) {
-        return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            IFluidTankProperties[] tankProperties = handler.getTankProperties();
-            for (IFluidTankProperties properties : tankProperties) {
-                if (properties.canDrainFluidType(fluidStack)) {
-                    return properties.getCapacity();
-                }
-            }
-            return 0;
-        }).orElse(0);
-    }
+    // @todo 1.14
+//    public static int getCapacity(@Nonnull FluidStack fluidStack, @Nonnull ItemStack itemStack) {
+//        return FluidUtil.getFluidHandler(itemStack).map(handler -> {
+//            IFluidTankProperties[] tankProperties = handler.getTankProperties();
+//            for (IFluidTankProperties properties : tankProperties) {
+//                if (properties.canDrainFluidType(fluidStack)) {
+//                    return properties.getCapacity();
+//                }
+//            }
+//            return 0;
+//        }).orElse(0);
+//    }
 }

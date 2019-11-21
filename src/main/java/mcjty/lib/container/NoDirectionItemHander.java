@@ -21,8 +21,8 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
         te.markDirtyQuick();
     }
 
-    public NoDirectionItemHander(GenericTileEntity te, ContainerFactory factory, int count) {
-        this.helper = new InventoryHelper(te, factory, count);
+    public NoDirectionItemHander(GenericTileEntity te, ContainerFactory factory) {
+        this.helper = new InventoryHelper(te, factory, factory.getContainerSlots());
         this.te = te;
     }
 

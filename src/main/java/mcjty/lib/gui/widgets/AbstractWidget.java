@@ -433,7 +433,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public boolean charTyped(char typedChar, int keyCode) {
+    public boolean charTyped(char codePoint) {
         return false;
     }
 

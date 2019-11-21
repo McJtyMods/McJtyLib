@@ -1,3 +1,21 @@
+Upcoming:
+- Fixed a bug in the rotate functionality of the wrench
+- Extracting from machines with output slots should now only extract from those slots
+
+3.5.13:
+- Fixed a serious networking problem which could cause 'invalid discriminator spam' on servers
+
+3.5.12:
+- Fixed a networking problem on servers
+
+3.5.11:
+- Fixed tracking of integers by splitting them into shorts. This fixes the energy display in guis
+- Made AbstractWorldData usage safer/cleaner by passing in a world instance as much as possible
+- Various networking cleanups and fixes
+
+3.5.10:
+- Fixes to the infusing system
+
 3.5.6:
 - Update to latest Forge
 

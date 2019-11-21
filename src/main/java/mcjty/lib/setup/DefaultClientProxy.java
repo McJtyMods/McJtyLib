@@ -1,30 +1,28 @@
 package mcjty.lib.setup;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.ListenableFuture;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.animation.ITimeValue;
 import net.minecraftforge.common.model.animation.IAnimationStateMachine;
-import org.lwjgl.glfw.GLFW;
-
-import java.util.concurrent.Callable;
 
 public class DefaultClientProxy implements IProxy {
 
     @Override
     public World getClientWorld() {
+        return Minecraft.getInstance().world;
+    }
+
+    @Override
+    public World getWorld() {
         return Minecraft.getInstance().world;
     }
 
@@ -35,7 +33,7 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public RecipeManager getRecipeManager(World world) {
-        return Minecraft.getInstance().world.getRecipeManager();
+        return world.getRecipeManager();
     }
 
     @Override
@@ -44,28 +42,9 @@ public class DefaultClientProxy implements IProxy {
     }
 
     @Override
-    public NetworkManager getNetworkManager(PlayerEntity player) {
-        return Minecraft.getInstance().getConnection().getNetworkManager();
-    }
-
-    @Override
     public void enqueueWork(Runnable runnable) {
         // @todo 1.14
 //        Minecraft.getInstance().addScheduledTask(runnable);
-    }
-
-    @Override
-    public <V> ListenableFuture<V> addScheduledTaskClient(Callable<V> callableToSchedule) {
-        // @todo 1.14
-//        return Minecraft.getInstance().addScheduledTask(callableToSchedule);
-        return null;
-    }
-
-    @Override
-    public ListenableFuture<Object> addScheduledTaskClient(Runnable runnableToSchedule) {
-        // @todo 1.14
-//        return Minecraft.getInstance().addScheduledTask(runnableToSchedule);
-        return null;
     }
 
     @Override
@@ -84,23 +63,6 @@ public class DefaultClientProxy implements IProxy {
 //            }
 //        };
 //        ModelLoader.setCustomStateMapper(block, ignoreState);
-    }
-
-    @Override
-    public void initItemModelMesher(Item item, ModelResourceLocation model) {
-        Minecraft.getInstance().getItemRenderer().getItemModelMesher().register(item, model);
-    }
-
-    @Override
-    public void initTESRItemStack(Item item, int meta, Class<? extends TileEntity> clazz) {
-        // @todo 1.14
-//        ForgeHooksClient.registerTESRItemStack(item, meta, clazz);
-    }
-
-    @Override
-    public void initCustomItemModel(Item item, int meta, ModelResourceLocation model) {
-        // @todo 1.14
-//        ModelLoader.setCustomModelResourceLocation(item, meta, model);
     }
 
     @Override
@@ -125,8 +87,17 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public boolean isShiftKeyDown() {
-        long handle = Minecraft.getInstance().mainWindow.getHandle();
-        return InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_SHIFT) || InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_SHIFT);
+        return Screen.hasShiftDown();
+    }
+
+    @Override
+    public boolean isAltKeyDown() {
+        return Screen.hasAltDown();
+    }
+
+    @Override
+    public boolean isCtrlKeyDown() {
+        return Screen.hasControlDown();
     }
 
     @Override

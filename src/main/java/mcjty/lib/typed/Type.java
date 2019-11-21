@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A Type object represents a given type.
@@ -19,6 +20,7 @@ public final class Type<V> {
     public static final Type<Double> DOUBLE = create(Double.class);
     public static final Type<Long> LONG = create(Long.class);
     public static final Type<String> STRING = create(String.class);
+    public static final Type<UUID> UUID = create(UUID.class);
     public static final Type<Boolean> BOOLEAN = create(Boolean.class);
     public static final Type<BlockPos> BLOCKPOS = create(BlockPos.class);
     public static final Type<ItemStack> ITEMSTACK = create(ItemStack.class);

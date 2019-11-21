@@ -1,6 +1,6 @@
 package mcjty.lib.compat.theoneprobe;
 
-import mcjty.lib.api.Infusable;
+import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blocks.BaseBlock;
 import mcjty.lib.multipart.MultipartBlock;
@@ -44,12 +44,12 @@ public class McJtyLibTOPDriver implements TOPDriver {
     public void addStandardProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
         TileEntity te = world.getTileEntity(data.getPos());
         if (te instanceof GenericTileEntity) {
-            GenericTileEntity generic = (GenericTileEntity) te;
-            if (blockState.getBlock() instanceof Infusable) {
-                int infused = generic.getInfused();
+            te.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> {
+                int infused = h.getInfused();
                 int pct = infused * 100 / GeneralConfig.maxInfuse.get();
                 probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
-            }
+            });
+            GenericTileEntity generic = (GenericTileEntity) te;
             if (mode == ProbeMode.EXTENDED) {
                 if (GeneralConfig.manageOwnership.get()) {
                     if (generic.getOwnerName() != null && !generic.getOwnerName().isEmpty()) {
