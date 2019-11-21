@@ -3,14 +3,18 @@ package mcjty.lib.client;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class HudRenderHelper {
 
-    public static void renderHud(List<String> messages,
+    public static void renderHudItems(List<Pair<ItemStack, String>> messages,
                                  HudPlacement hudPlacement,
                                  HudOrientation hudOrientation,
                                  Direction orientation,
@@ -62,6 +66,15 @@ public class HudRenderHelper {
         GlStateManager.popMatrix();
     }
 
+    public static void renderHud(List<String> messages,
+                                 HudPlacement hudPlacement,
+                                 HudOrientation hudOrientation,
+                                 Direction orientation,
+                                 double x, double y, double z, float scale) {
+        renderHudItems(messages.stream().map(s -> Pair.of(ItemStack.EMPTY, s)).collect(Collectors.toList()),
+                hudPlacement, hudOrientation, orientation, x, y, z, scale);
+    }
+
     private static float getHudAngle(Direction orientation) {
         float f3 = 0.0f;
 
@@ -83,7 +96,7 @@ public class HudRenderHelper {
         return f3;
     }
 
-    private static void renderText(FontRenderer fontrenderer, List<String> messages, int lines, float scale) {
+    private static void renderText(FontRenderer fontrenderer, List<Pair<ItemStack, String>> messages, int lines, float scale) {
         GlStateManager.translatef(-0.5F, 0.5F, 0.07F);
         float f3 = 0.0075F;
         GlStateManager.scalef(f3 * scale, -f3 * scale, f3);
@@ -93,16 +106,28 @@ public class HudRenderHelper {
         renderLog(fontrenderer, messages, lines);
     }
 
-    private static void renderLog(FontRenderer fontrenderer, List<String> messages, int lines) {
+    private static void renderLog(FontRenderer fontrenderer, List<Pair<ItemStack, String>> messages, int lines) {
         int currenty = 7;
         int height = 10;
         int logsize = messages.size();
         int i = 0;
-        for (String s : messages) {
+        for (Pair<ItemStack, String> pair : messages) {
+            ItemStack stack = pair.getLeft();
+            String s = pair.getRight();
             if (i >= logsize - lines) {
                 // Check if this module has enough room
                 if (currenty + height <= 124) {
-                    fontrenderer.drawString(fontrenderer.trimStringToWidth(s, 115), 7, currenty, 0xffffff);
+                    String prefix = "";
+                    if (!stack.isEmpty()) {
+                        GlStateManager.pushMatrix();
+                        GlStateManager.translatef(0, 0, -150);
+                        ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
+                        itemRender.renderItemAndEffectIntoGUI(stack, 0, currenty);
+                        prefix = "    ";
+                        GlStateManager.popMatrix();
+                    }
+
+                    fontrenderer.drawString(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff);
                     currenty += height;
                 }
             }
