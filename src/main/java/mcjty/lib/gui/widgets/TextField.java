@@ -157,12 +157,20 @@ public class TextField extends AbstractWidget<TextField> {
             } else if (keyCode == GLFW.GLFW_KEY_LEFT) {
                 updateSelection();
                 if (cursor > 0) {
-                    cursor--;
+                    if (Screen.hasControlDown()) {
+                        cursor = findNextWord(true);
+                    } else {
+                        cursor--;
+                    }
                 }
             } else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
                 updateSelection();
                 if (cursor < text.length()) {
-                    cursor++;
+                    if (Screen.hasControlDown()) {
+                        cursor = findNextWord(false);
+                    } else {
+                        cursor++;
+                    }
                 }
             }
             return true;
@@ -176,7 +184,7 @@ public class TextField extends AbstractWidget<TextField> {
             if (isRegionSelected()) {
                 replaceSelectedRegion(Character.toString(codePoint));
             } else {
-                text = text.substring(0, cursor) + Character.toString(codePoint) + text.substring(cursor);
+                text = text.substring(0, cursor) + codePoint + text.substring(cursor);
             }
             cursor++;
             fireTextEvents(text);
@@ -255,6 +263,34 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
+    /**
+     * Try to match a word by that is surrounded by either whitespace or ends of the text.
+     *
+     * @param reversed If {@code true}, when it will search towards left, otherwise towards right.
+     * @return Index, either end or beginning of a word. When {@code reversed}, it will return the beginning and otherwise the end.
+     */
+    private int findNextWord(boolean reversed) {
+        int change = reversed ? -1 : 1;
+        int i = cursor;
+        char last = ' ';
+        while (true) {
+            i += change;
+            if (i < 0 || i >= text.length()) {
+                break;
+            }
+
+            char c = text.charAt(i);
+            if (c == ' ' && last != ' ') {
+                break;
+            }
+            last = c;
+        }
+
+        if (reversed) {
+            return i - change;
+        }
+        return i;
+    }
 
     @Override
     public void draw(int x, int y) {
@@ -288,9 +324,6 @@ public class TextField extends AbstractWidget<TextField> {
                 int selectionStart = getSelectionStart();
                 int selectionEnd = getSelectionEnd();
 
-                // Text: abcdefghijklmn
-                // Rendered: abcdefg, length=7
-                //                 ^6
                 int renderedStart = MathHelper.clamp(selectionStart - startOffset, 0, renderedText.length());
                 int renderedEnd = MathHelper.clamp(selectionEnd - startOffset, 0, renderedText.length());
 
