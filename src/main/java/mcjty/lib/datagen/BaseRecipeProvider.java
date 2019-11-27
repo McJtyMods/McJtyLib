@@ -2,10 +2,7 @@ package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import net.minecraft.block.Blocks;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.data.RecipeProvider;
-import net.minecraft.data.ShapedRecipeBuilder;
+import net.minecraft.data.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
@@ -70,6 +67,14 @@ public class BaseRecipeProvider extends RecipeProvider {
     protected void build(Consumer<IFinishedRecipe> consumer, ShapedRecipeBuilder builder, String... lines) {
         buildIntern(consumer, s -> builder.patternLine(s), (c, i) -> builder.key(c, i), lines);
         builder.setGroup(group).build(consumer);
+    }
+
+    protected void build(Consumer<IFinishedRecipe> consumer, ShapelessRecipeBuilder builder) {
+        builder.setGroup(group).build(consumer);
+    }
+
+    protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, ShapelessRecipeBuilder builder) {
+        builder.setGroup(group).build(consumer, id);
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, CopyNBTRecipeBuilder builder, String... lines) {

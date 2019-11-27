@@ -80,6 +80,14 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         return LootTable.builder().addLootPool(builder);
     }
 
+    protected LootTable.Builder createSimpleTable(String name, Item item) {
+        LootPool.Builder builder = LootPool.builder()
+                .name(name)
+                .rolls(ConstantRange.of(1))
+                .addEntry(ItemLootEntry.builder(item));
+        return LootTable.builder().addLootPool(builder);
+    }
+
     @Override
     public void act(DirectoryCache cache) {
         addTables();
