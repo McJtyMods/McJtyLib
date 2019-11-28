@@ -382,7 +382,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof GenericTileEntity) {
                 GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-                genericTileEntity.onReplaced(world, pos, state);
+                genericTileEntity.onReplaced(world, pos, state, newstate);
             }
         }
         super.onReplaced(state, world, pos, newstate, isMoving);

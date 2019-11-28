@@ -126,11 +126,11 @@ public class LogicTileEntity extends GenericTileEntity {
         return tagCompound;
     }
 
-    @Override
-    public BlockState getActualState(BlockState state) {
-        int meta = state.get(META_INTERMEDIATE);
-        LogicFacing facing = getFacing(state);
-        facing = LogicFacing.getFacingWithMeta(facing, meta);
-        return state.with(LOGIC_FACING, facing);
-    }
+    // @todo 1.14
+//    public BlockState getActualState(BlockState state) {
+//        int meta = state.get(META_INTERMEDIATE);
+//        LogicFacing facing = getFacing(state);
+//        facing = LogicFacing.getFacingWithMeta(facing, meta);
+//        return state.with(LOGIC_FACING, facing);
+//    }
 }

@@ -5,7 +5,10 @@ import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
 import mcjty.lib.multipart.PartSlot;
-import mcjty.lib.network.*;
+import mcjty.lib.network.IClientCommandHandler;
+import mcjty.lib.network.ICommandHandler;
+import mcjty.lib.network.PacketRequestDataFromServer;
+import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -94,7 +97,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
     }
 
-    public void onReplaced(World world, BlockPos pos, BlockState state) {
+    public void onReplaced(World world, BlockPos pos, BlockState state, BlockState newstate) {
     }
 
     public void onPartAdded(PartSlot slot, BlockState state, TileEntity multipartTile) {
@@ -442,11 +445,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 //            }
 //        }
 //    }
-
-    public BlockState getActualState(BlockState state) {
-        return state;
-    }
-
 
     public int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         return -1;
