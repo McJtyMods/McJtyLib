@@ -43,14 +43,14 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         LootPool.Builder builder = LootPool.builder()
                 .name(name)
                 .rolls(ConstantRange.of(1))
-                .addEntry(AlternativesLootEntry.func_216149_a(
+                .addEntry(AlternativesLootEntry.builder(
                         ItemLootEntry.builder(block)
                                 .acceptCondition(MatchTool.builder(ItemPredicate.Builder.create()
                                         .enchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.IntBound.atLeast(1))))),
                         ItemLootEntry.builder(lootItem)
-                                .acceptFunction(SetCount.func_215932_a(new RandomValueRange(min, max)))
-                                .acceptFunction(ApplyBonus.func_215865_a(Enchantments.FORTUNE, 1))
-                                .acceptFunction(ExplosionDecay.func_215863_b())
+                                .acceptFunction(SetCount.builder(new RandomValueRange(min, max)))
+                                .acceptFunction(ApplyBonus.uniformBonusCount(Enchantments.FORTUNE, 1))
+                                .acceptFunction(ExplosionDecay.builder())
                         )
                 );
         return LootTable.builder().addLootPool(builder);
