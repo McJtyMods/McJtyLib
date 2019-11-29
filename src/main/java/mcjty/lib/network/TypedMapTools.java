@@ -48,7 +48,7 @@ public class TypedMapTools {
                 ArgumentType type = ArgumentType.getType(buf.readByte());
                 switch (type) {
                     case TYPE_STRING:
-                        args.put(new Key<>(key, Type.STRING), buf.readString(32767));
+                        args.put(new Key<>(key, Type.STRING), NetworkTools.readStringUTF8(buf));
                         break;
                     case TYPE_UUID:
                         args.put(new Key<>(key, Type.UUID), buf.readUniqueId());
@@ -134,7 +134,7 @@ public class TypedMapTools {
             buf.writeByte(argumentType.ordinal());
             switch (argumentType) {
                 case TYPE_STRING:
-                    buf.writeString((String) args.get(key));
+                    NetworkTools.writeStringUTF8(buf, (String)args.get(key));
                     break;
                 case TYPE_UUID:
                     buf.writeUniqueId((UUID) args.get(key));
