@@ -167,11 +167,15 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
     }
 
     public boolean isItemInsertable(int slot, @Nonnull ItemStack stack) {
-        return helper.getContainerFactory().isInputSlot(slot) || helper.getContainerFactory().isSpecificItemSlot(slot);
+        return true;
     }
 
     public boolean isItemExtractable(int slot, @Nonnull ItemStack stack) {
-        return helper.getContainerFactory().isOutputSlot(slot);
+        return true;
+    }
+
+    public ContainerFactory getContainerFactory() {
+        return helper.getContainerFactory();
     }
 
     @Override
