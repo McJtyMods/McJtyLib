@@ -105,8 +105,10 @@ public class GenericContainer extends Container implements IGenericContainer {
         });
     }
 
-    public void addInventory(String name, IItemHandler inventory) {
-        inventories.put(name, inventory);
+    public void addInventory(String name, @Nullable IItemHandler inventory) {
+        if (inventory != null) {
+            inventories.put(name, inventory);
+        }
     }
 
     public BlockPos getPos() {

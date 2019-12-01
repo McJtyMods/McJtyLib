@@ -75,9 +75,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
         C container = containerSupplier.apply(windowId, playerEntity);
         IItemHandler itemHandler = this.itemHandler.get();
-        if (itemHandler != null) {
-            container.setupInventories(itemHandler, playerInventory);
-        }
+        container.setupInventories(itemHandler, playerInventory);
         GenericEnergyStorage energyHandler = this.energyHandler.get();
         if (energyHandler != null) {
             energyHandler.addIntegerListeners(container);

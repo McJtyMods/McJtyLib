@@ -1,5 +1,6 @@
 Upcoming:
 - Fixed bugs in the way automation/gui handles itemhandlers
+- Fixed a problem in guis where there is supposed to be a player inventory but the block itself has no inventory
 
 3.5.14:
 - Fixed a bug in the rotate functionality of the wrench

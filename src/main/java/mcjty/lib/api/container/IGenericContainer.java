@@ -5,13 +5,15 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nullable;
+
 public interface IGenericContainer {
 
     void addShortListener(IntReferenceHolder holder);
 
     void addIntegerListener(IntReferenceHolder holder);
 
-    void setupInventories(IItemHandler itemHandler, PlayerInventory inventory);
+    void setupInventories(@Nullable IItemHandler itemHandler, PlayerInventory inventory);
 
     Container getAsContainer();
 }
