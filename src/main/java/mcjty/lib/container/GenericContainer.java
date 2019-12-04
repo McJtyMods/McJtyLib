@@ -412,4 +412,16 @@ public class GenericContainer extends Container implements IGenericContainer {
         containerType.setRegistryName(registryName);
         return containerType;
     }
+
+    public static <T extends Container> ContainerType<T> createContainerType() {
+        ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
+            BlockPos pos = data.readBlockPos();
+            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
+            if (te == null) {
+                throw new IllegalStateException("Something went wrong getting the GUI");
+            }
+            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> h.createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer())).orElseThrow(RuntimeException::new);
+        });
+        return (ContainerType<T>) containerType;
+    }
 }
