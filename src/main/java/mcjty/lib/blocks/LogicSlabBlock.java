@@ -38,6 +38,10 @@ public abstract class LogicSlabBlock extends BaseBlock {
         super(name, builder);
     }
 
+    public LogicSlabBlock(BlockBuilder builder) {
+        super(builder);
+    }
+
     public static Direction rotateLeft(Direction downSide, Direction inputSide) {
         switch (downSide) {
             case DOWN:
