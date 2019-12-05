@@ -34,10 +34,6 @@ public abstract class LogicSlabBlock extends BaseBlock {
     public static IntegerProperty META_INTERMEDIATE = IntegerProperty.create("intermediate", 0, 3);
     public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
 
-    public LogicSlabBlock(String name, BlockBuilder builder) {
-        super(name, builder);
-    }
-
     public LogicSlabBlock(BlockBuilder builder) {
         super(builder);
     }

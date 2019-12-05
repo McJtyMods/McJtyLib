@@ -73,11 +73,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{BlockStateProperties.FACING};
     public static final IProperty<?>[] NONE_PROPERTIES = new IProperty[0];
 
-    public BaseBlock(String name, BlockBuilder builder) {
-        this(builder);
-        setRegistryName(name);
-    }
-
     public BaseBlock(BlockBuilder builder) {
         super(builder.getProperties());
         this.infusable = builder.isInfusable();
