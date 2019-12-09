@@ -257,7 +257,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         getCapability(CapabilityEnergy.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
-                .ifPresent(h -> h.deserializeNBT(tagCompound.get("Energy")));
+                .ifPresent(h -> {
+                    if (tagCompound.contains("Energy")) {
+                        h.deserializeNBT(tagCompound.get("Energy"));
+                    }
+                });
     }
 
     protected void readInfo(CompoundNBT tagCompound) {
