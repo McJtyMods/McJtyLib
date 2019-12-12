@@ -192,8 +192,8 @@ public interface Widget<P extends Widget<P>> {
     /**
      * Handle a keyboard event.
      *
-     * @param typedChar
      * @param keyCode
+     * @param scanCode
      * @return true if key was handled
      */
     boolean keyTyped(int keyCode, int scanCode);
