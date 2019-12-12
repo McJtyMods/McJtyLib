@@ -250,10 +250,18 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             CompoundNBT infoTag = tagCompound.getCompound("Info");
             getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
         }
+        readItemHandlerCap(tagCompound);
+        readEnergyCap(tagCompound);
+    }
+
+    protected void readItemHandlerCap(CompoundNBT tagCompound) {
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Constants.NBT.TAG_COMPOUND)));
+    }
+
+    protected void readEnergyCap(CompoundNBT tagCompound) {
         getCapability(CapabilityEnergy.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
@@ -305,10 +313,18 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected void writeCaps(CompoundNBT tagCompound) {
         CompoundNBT infoTag = getOrCreateInfo(tagCompound);
         getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> infoTag.putInt("infused", h.getInfused()));
+        writeItemHandlerCap(tagCompound);
+        writeEnergyCap(tagCompound);
+    }
+
+    protected void writeItemHandlerCap(CompoundNBT tagCompound) {
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> tagCompound.put("Items", h.serializeNBT()));
+    }
+
+    protected void writeEnergyCap(CompoundNBT tagCompound) {
         getCapability(CapabilityEnergy.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
