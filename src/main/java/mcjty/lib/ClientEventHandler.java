@@ -30,7 +30,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onKeyboardInput(GuiScreenEvent.KeyboardKeyEvent event) {
+    public void onKeyboardInput(GuiScreenEvent.KeyboardKeyPressedEvent event) {
         if (event.getGui() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getGui();
             Widget<?> focus = container.getWindow().getTextFocus();

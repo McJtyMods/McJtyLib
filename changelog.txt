@@ -1,3 +1,7 @@
+Upcoming:
+- hnOsmium0001 did some improvements on text editing in McJtyLib gui's. For example, you can now use ctrl-arrow to move between words
+- Some further improvements on input handling
+
 3.5.16:
 - Various changes and fixes
 

@@ -118,6 +118,16 @@ public class TextField extends AbstractWidget<TextField> {
                     }
                 } else if (keyCode == GLFW.GLFW_KEY_A) {
                     selectAll();
+                } else if (keyCode == GLFW.GLFW_KEY_LEFT) {
+                    updateSelection();
+                    if (cursor > 0) {
+                        cursor = findNextWord(true);
+                    }
+                } else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
+                    updateSelection();
+                    if (cursor < text.length()) {
+                        cursor = findNextWord(false);
+                    }
                 }
             } else if (keyCode == GLFW.GLFW_KEY_ENTER) {
                 fireTextEnterEvents(text);
@@ -157,20 +167,12 @@ public class TextField extends AbstractWidget<TextField> {
             } else if (keyCode == GLFW.GLFW_KEY_LEFT) {
                 updateSelection();
                 if (cursor > 0) {
-                    if (Screen.hasControlDown()) {
-                        cursor = findNextWord(true);
-                    } else {
-                        cursor--;
-                    }
+                    cursor--;
                 }
             } else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
                 updateSelection();
                 if (cursor < text.length()) {
-                    if (Screen.hasControlDown()) {
-                        cursor = findNextWord(false);
-                    } else {
-                        cursor++;
-                    }
+                    cursor++;
                 }
             }
             return true;
