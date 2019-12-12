@@ -1,3 +1,6 @@
+3.5.16:
+- Various changes and fixes
+
 3.5.15:
 - Fixed bugs in the way automation/gui handles itemhandlers
 - Fixed a problem in guis where there is supposed to be a player inventory but the block itself has no inventory
