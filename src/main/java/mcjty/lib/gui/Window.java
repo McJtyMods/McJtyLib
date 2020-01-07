@@ -332,12 +332,22 @@ public class Window {
     }
 
     private int getRelativeX() {
-        return (int) gui.getMinecraft().mouseHelper.getMouseX() * gui.width / gui.getMinecraft().mainWindow.getWidth();
+        int windowWidth = gui.getMinecraft().mainWindow.getWidth();
+        if (windowWidth == 0) {
+            return 0;
+        } else {
+            return (int) gui.getMinecraft().mouseHelper.getMouseX() * gui.width / windowWidth;
+        }
     }
 
     private int getRelativeY() {
-//        return gui.height - (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / gui.getMinecraft().mainWindow.getHeight();
-        return (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / gui.getMinecraft().mainWindow.getHeight();
+        int windowHeight = gui.getMinecraft().mainWindow.getHeight();
+        if (windowHeight == 0) {
+            return 0;
+        } else {
+//            return gui.height - (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / windowHeight;
+            return (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / windowHeight;
+        }
     }
 
     public Window addFocusEvent(FocusEvent event) {
