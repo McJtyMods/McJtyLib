@@ -164,7 +164,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void onSlotChanged(int index, ItemStack stack) {
     }
 
-
+    @Override
+    public void handleUpdateTag(CompoundNBT tag) {
+        super.handleUpdateTag(tag);
+        readClientDataFromNBT(tag);
+    }
 
     @Nullable
     @Override
