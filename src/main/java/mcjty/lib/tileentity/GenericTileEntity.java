@@ -179,7 +179,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         readClientDataFromNBT(packet.getNbtCompound());
     }
 
-//    public void setInfused(int infused) {
+    @Override
+    public void handleUpdateTag(CompoundNBT tag) {
+
+    }
+
+    //    public void setInfused(int infused) {
 //        this.infused = infused;
 //        markDirtyClient();
 //    }
