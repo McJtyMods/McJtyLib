@@ -1,3 +1,6 @@
+Upcoming:
+- Elec332 fixed a problem in TE client data not being correct in some cases after a player joins the world
+
 3.5.17:
 - hnOsmium0001 did some improvements on text editing in McJtyLib gui's. For example, you can now use ctrl-arrow to move between words
 - Some further improvements on input handling
