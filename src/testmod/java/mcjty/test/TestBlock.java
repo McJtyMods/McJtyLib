@@ -3,8 +3,8 @@ package mcjty.test;
 import mcjty.lib.container.GenericBlock;
 import mcjty.lib.container.GenericGuiContainer;
 import net.minecraft.block.material.Material;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+
 
 public class TestBlock extends GenericBlock<TestTileEntity, TestContainer> {
 
