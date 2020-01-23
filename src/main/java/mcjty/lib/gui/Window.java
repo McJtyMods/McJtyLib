@@ -332,7 +332,7 @@ public class Window {
     }
 
     private int getRelativeX() {
-        int windowWidth = gui.getMinecraft().mainWindow.getWidth();
+        int windowWidth = gui.getMinecraft().getMainWindow().getWidth();
         if (windowWidth == 0) {
             return 0;
         } else {
@@ -341,7 +341,7 @@ public class Window {
     }
 
     private int getRelativeY() {
-        int windowHeight = gui.getMinecraft().mainWindow.getHeight();
+        int windowHeight = gui.getMinecraft().getMainWindow().getHeight();
         if (windowHeight == 0) {
             return 0;
         } else {

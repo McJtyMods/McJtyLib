@@ -82,7 +82,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private static boolean isControlDown() {
-        long handle = Minecraft.getInstance().mainWindow.getHandle();
+        long handle = Minecraft.getInstance().getMainWindow().getHandle();
         return InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 
@@ -93,7 +93,7 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            long handle = Minecraft.getInstance().mainWindow.getHandle();
+            long handle = Minecraft.getInstance().getMainWindow().getHandle();
             if (isControlDown()) {
                 if(keyCode == GLFW.GLFW_KEY_V) {
                     String data = GLFW.glfwGetClipboardString(handle);

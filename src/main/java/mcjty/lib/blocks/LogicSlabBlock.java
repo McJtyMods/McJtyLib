@@ -3,6 +3,7 @@ package mcjty.lib.blocks;
 import mcjty.lib.builder.BlockBuilder;
 import mcjty.lib.tileentity.LogicTileEntity;
 import mcjty.lib.varia.LogicFacing;
+import mcjty.lib.varia.OrientationTools;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -45,13 +46,13 @@ public abstract class LogicSlabBlock extends BaseBlock {
             case UP:
                 return inputSide.rotateYCCW();
             case NORTH:
-                return inputSide.rotateAround(Axis.Z);
+                return OrientationTools.rotateAround(inputSide, Axis.Z);
             case SOUTH:
-                return inputSide.getOpposite().rotateAround(Axis.Z);
+                return OrientationTools.rotateAround(inputSide.getOpposite(), Axis.Z);
             case WEST:
-                return inputSide.rotateAround(Axis.X);
+                return OrientationTools.rotateAround(inputSide, Axis.X);
             case EAST:
-                return inputSide.getOpposite().rotateAround(Axis.X);
+                return OrientationTools.rotateAround(inputSide.getOpposite(), Axis.X);
         }
         return inputSide;
     }

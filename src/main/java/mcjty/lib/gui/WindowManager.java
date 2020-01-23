@@ -109,13 +109,13 @@ public class WindowManager {
         MouseHelper mouse = mc.mouseHelper;
 
         // @todo check for 1.14
-        int mouseX = (int)(mouse.getMouseX());// * (double) mc.mainWindow.getScaledWidth() / (double) mc.mainWindow.getWidth());
-        int mouseY = (int)(mouse.getMouseY());// * (double) mc.mainWindow.getScaledHeight() / (double) mc.mainWindow.getHeight());
-        int x = mouseX * gui.width / mc.mainWindow.getWidth();
-        int y = mouseY * gui.height / mc.mainWindow.getHeight() - 1;
+        int mouseX = (int)(mouse.getMouseX());// * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
+        int mouseY = (int)(mouse.getMouseY());// * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
+        int x = mouseX * gui.width / mc.getMainWindow().getWidth();
+        int y = mouseY * gui.height / mc.getMainWindow().getHeight() - 1;
 
-//        int x = (int)mouse.getMouseX() * gui.width / mc.mainWindow.getWidth();
-//        int y = gui.height - (int)mouse.getMouseY() * gui.height / mc.mainWindow.getHeight() - 1;
+//        int x = (int)mouse.getMouseX() * gui.width / mc.getMainWindow().getWidth();
+//        int y = gui.height - (int)mouse.getMouseY() * gui.height / mc.getMainWindow().getHeight() - 1;
 
         getInteractableWindows().forEach(w -> {
             List<String> tooltips = w.getTooltips();
@@ -124,7 +124,7 @@ public class WindowManager {
                 gui.drawHoveringText(tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().fontRenderer);
             }
         });
-        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+        net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
     }
 
     public Optional<Widget<?>> findWidgetAtPosition(int x, int y) {

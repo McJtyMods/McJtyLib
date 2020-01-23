@@ -102,7 +102,9 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public IAnimationStateMachine load(ResourceLocation location, ImmutableMap<String, ITimeValue> parameters) {
-        return ModelLoaderRegistry.loadASM(location, parameters);
+//        return ModelLoaderRegistry.loadASM(location, parameters);
+        // @todo 1.15
+        return null;
     }
 
 }

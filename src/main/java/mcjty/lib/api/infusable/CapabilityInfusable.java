@@ -16,7 +16,7 @@ public class CapabilityInfusable {
         CapabilityManager.INSTANCE.register(IInfusable.class, new Capability.IStorage<IInfusable>() {
             @Override
             public INBT writeNBT(Capability<IInfusable> capability, IInfusable instance, Direction side) {
-                return new IntNBT(instance.getInfused());
+                return IntNBT.valueOf(instance.getInfused());
             }
 
             @Override

@@ -34,6 +34,7 @@ import net.minecraft.state.IProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Rotation;
@@ -156,7 +157,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 wrenchUsed = getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
             }
         }
-        if (wrenchUsed == WrenchUsage.NORMAL && player.isSneaking()) {
+        if (wrenchUsed == WrenchUsage.NORMAL && player.func_225608_bj_ /*isSneaking*/()) {
             wrenchUsed = WrenchUsage.SNEAKING;
         }
         return wrenchUsed;
@@ -166,7 +167,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         if (item instanceof SmartWrench) {
             switch(((SmartWrench)item).getMode(itemStack)) {
                 case MODE_WRENCH: return WrenchUsage.NORMAL;
-                case MODE_SELECT: return player.isSneaking() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
+                case MODE_SELECT: return player.func_225608_bj_ /*isSneaking*/() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
                 default:          throw new RuntimeException("SmartWrench in unknown mode!");
             }
         } else if (McJtyLib.cofhapiitem && CofhApiItemCompatibility.isToolHammer(item)) {
@@ -179,27 +180,28 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
-            if (((GenericTileEntity) te).onBlockActivated(state, player, hand, result)) {
-                return true;
+            ActionResultType resultType = ((GenericTileEntity) te).onBlockActivated(state, player, hand, result);
+            if (resultType != ActionResultType.FAIL) {
+                return resultType;
             }
         }
         ItemStack heldItem = player.getHeldItem(hand);
         if (handleModule(world, pos, state, player, hand, heldItem, result)) {
-            return true;
+            return ActionResultType.SUCCESS;
         }
         WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
         switch (wrenchUsed) {
-            case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player);
-            case NORMAL:       return wrenchUse(world, pos, result.getFace(), player);
-            case SNEAKING:     return wrenchSneak(world, pos, player);
-            case DISABLED:     return wrenchDisabled(world, pos, player);
-            case SELECT:       return wrenchSelect(world, pos, player);
-            case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player);
+            case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
+            case NORMAL:       return wrenchUse(world, pos, result.getFace(), player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
+            case SNEAKING:     return wrenchSneak(world, pos, player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
+            case DISABLED:     return wrenchDisabled(world, pos, player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
+            case SELECT:       return wrenchSelect(world, pos, player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
+            case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
         }
-        return false;
+        return ActionResultType.PASS;
     }
 
     public boolean handleModule(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult result) {

@@ -92,7 +92,7 @@ public class TooltipRender {
         GlStateManager.disableDepthTest();
         ItemRenderer render = mc.getItemRenderer();
 
-        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+        net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
         render.renderItemIntoGUI(itemStack, x, y);
 
         //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));

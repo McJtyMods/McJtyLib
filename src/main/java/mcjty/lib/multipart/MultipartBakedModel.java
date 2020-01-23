@@ -43,6 +43,11 @@ public class MultipartBakedModel implements IBakedModel {
     }
 
     @Override
+    public boolean func_230044_c_() {
+        return false;
+    }
+
+    @Override
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand) {
         if (state == null) {
             return Collections.emptyList();

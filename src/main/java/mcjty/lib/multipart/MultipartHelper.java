@@ -96,9 +96,9 @@ public class MultipartHelper {
     }
 
     public static Vec3d getPlayerEyes(PlayerEntity playerIn) {
-        double x = playerIn.posX;
-        double y = playerIn.posY + playerIn.getEyeHeight();
-        double z = playerIn.posZ;
+        double x = playerIn.getPosX();
+        double y = playerIn.getPosY() + playerIn.getEyeHeight();
+        double z = playerIn.getPosZ();
         return new Vec3d(x, y, z);
     }
 

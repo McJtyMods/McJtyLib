@@ -24,12 +24,12 @@ public class BlockOutlineRenderer {
         Minecraft mc = Minecraft.getInstance();
 
         ClientPlayerEntity p = mc.player;
-        double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
-        double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
-        double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
+        double doubleX = p.lastTickPosX + (p.getPosX() - p.lastTickPosX) * partialTicks;
+        double doubleY = p.lastTickPosY + (p.getPosY() - p.lastTickPosY) * partialTicks;
+        double doubleZ = p.lastTickPosZ + (p.getPosZ() - p.lastTickPosZ) * partialTicks;
 
         GlStateManager.pushMatrix();
-        GlStateManager.color3f(1.0f, 0, 0);
+        GlStateManager.color4f(1.0f, 0, 0, 1.0f);
         GlStateManager.lineWidth(3);
         GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
 
@@ -54,12 +54,12 @@ public class BlockOutlineRenderer {
      * This method translates GL state relative to player position
      */
     public static void renderOutlines(ClientPlayerEntity p, Set<BlockPos> coordinates, int r, int g, int b, float partialTicks) {
-        double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
-        double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
-        double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
+        double doubleX = p.lastTickPosX + (p.getPosX() - p.lastTickPosX) * partialTicks;
+        double doubleY = p.lastTickPosY + (p.getPosY() - p.lastTickPosY) * partialTicks;
+        double doubleZ = p.lastTickPosZ + (p.getPosZ() - p.lastTickPosZ) * partialTicks;
 
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        Minecraft.getInstance().gameRenderer.disableLightmap();
+        Minecraft.getInstance().gameRenderer.getLightTexture().disableLightmap();
         GlStateManager.disableDepthTest();
         GlStateManager.disableTexture();
         GlStateManager.disableLighting();
@@ -73,7 +73,7 @@ public class BlockOutlineRenderer {
 
         GlStateManager.popMatrix();
 
-        Minecraft.getInstance().gameRenderer.enableLightmap();
+        Minecraft.getInstance().gameRenderer.getLightTexture().enableLightmap();
         GlStateManager.enableTexture();
     }
 
@@ -139,13 +139,13 @@ public class BlockOutlineRenderer {
      */
     public static void renderBoxOutline(BlockPos pos) {
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-        Minecraft.getInstance().gameRenderer.disableLightmap();
+        Minecraft.getInstance().gameRenderer.getLightTexture().disableLightmap();
         GlStateManager.disableTexture();
         GlStateManager.disableBlend();
         GlStateManager.disableLighting();
         GlStateManager.disableAlphaTest();
         GlStateManager.lineWidth(2);
-        GlStateManager.color3f(1, 1, 1);
+        GlStateManager.color4f(1, 1, 1, 1);
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
@@ -157,7 +157,7 @@ public class BlockOutlineRenderer {
 
         tessellator.draw();
 
-        Minecraft.getInstance().gameRenderer.enableLightmap();
+        Minecraft.getInstance().gameRenderer.getLightTexture().enableLightmap();
         GlStateManager.enableTexture();
     }
 
@@ -165,9 +165,9 @@ public class BlockOutlineRenderer {
      * This method translates GL state relative to player position
      */
     public static void renderHighlightedBlocks(PlayerEntity p, BlockPos base, Set<BlockPos> coordinates, ResourceLocation texture, float partialTicks) {
-        double doubleX = p.lastTickPosX + (p.posX - p.lastTickPosX) * partialTicks;
-        double doubleY = p.lastTickPosY + (p.posY - p.lastTickPosY) * partialTicks;
-        double doubleZ = p.lastTickPosZ + (p.posZ - p.lastTickPosZ) * partialTicks;
+        double doubleX = p.lastTickPosX + (p.getPosX() - p.lastTickPosX) * partialTicks;
+        double doubleY = p.lastTickPosY + (p.getPosY() - p.lastTickPosY) * partialTicks;
+        double doubleZ = p.lastTickPosZ + (p.getPosZ() - p.lastTickPosZ) * partialTicks;
 
         GlStateManager.pushMatrix();
         GlStateManager.translated(-doubleX, -doubleY, -doubleZ);
@@ -180,7 +180,7 @@ public class BlockOutlineRenderer {
 
         Minecraft.getInstance().getTextureManager().bindTexture(texture);
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 //        tessellator.setColorRGBA(255, 255, 255, 64);
 //        tessellator.setBrightness(240);
 
@@ -203,7 +203,7 @@ public class BlockOutlineRenderer {
 
         GlStateManager.disableBlend();
         GlStateManager.disableTexture();
-        GlStateManager.color3f(.5f, .3f, 0);
+        GlStateManager.color4f(.5f, .3f, 0, 1);
         GlStateManager.lineWidth(2);
 
         buffer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION_COLOR);

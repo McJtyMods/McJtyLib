@@ -376,7 +376,8 @@ public class TrueTypeFont {
         GlStateManager.translatef(0, yoffset, 0);
 
         GlStateManager.bindTexture(fontTextureID);
-        GlStateManager.begin(GL11.GL_QUADS);
+        // @todo 1.15 needs rework
+//        GlStateManager.begin(GL11.GL_QUADS);
 
         int i = text.indexOf(167);
         while (i != -1 && i + 1 < text.length()) {
@@ -397,7 +398,8 @@ public class TrueTypeFont {
         }
         drawTextInternal(x, y, text, scaleX, scaleY, format, rgba);
 
-        GlStateManager.end();
+        // @todo 1.15
+//        GlStateManager.end();
 
         GlStateManager.popMatrix();
     }

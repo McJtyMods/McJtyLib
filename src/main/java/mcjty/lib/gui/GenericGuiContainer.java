@@ -262,7 +262,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             this.itemRenderer.zLevel = 0.0F;
             GlStateManager.enableLighting();
             GlStateManager.enableDepthTest();
-            net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
+            net.minecraft.client.renderer.RenderHelper.func_227780_a_();
             GlStateManager.enableRescaleNormal();
         }
     }
@@ -323,8 +323,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
      */
     protected void drawStackTooltips(int mouseX, int mouseY) {
         MouseHelper mouse = getMinecraft().mouseHelper;
-        int x = (int)mouse.getMouseX() * width / getMinecraft().mainWindow.getWidth();
-        int y = height - (int)mouse.getMouseY() * height / getMinecraft().mainWindow.getHeight() - 1;
+        int x = (int)mouse.getMouseX() * width / getMinecraft().getMainWindow().getWidth();
+        int y = height - (int)mouse.getMouseY() * height / getMinecraft().getMainWindow().getHeight() - 1;
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
         if (widget instanceof BlockRender) {
             BlockRender blockRender = (BlockRender) widget;
