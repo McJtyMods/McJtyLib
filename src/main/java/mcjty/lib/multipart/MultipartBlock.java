@@ -16,11 +16,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -79,10 +80,11 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
 
-    @Override
-    public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
-        return true; // delegated to GenericCableBakedModel#getQuads
-    }
+    // @todo 1.15
+//    @Override
+//    public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
+//        return true; // delegated to GenericCableBakedModel#getQuads
+//    }
 
     // @todo 1.14
 //    @Override
@@ -107,7 +109,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
 
     @Override
-    public boolean onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
         Vec3d hit = result.getHitVec();
         Direction facing = result.getFace();
         Vec3d start = MultipartHelper.getPlayerEyes(player);
@@ -120,7 +122,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
                 return part.getState().getBlock().onBlockActivated(part.getState(), world, pos, player, hand, result);
             }
         }
-        return false;
+        return ActionResultType.PASS;
     }
 
     @Nullable

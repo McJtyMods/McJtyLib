@@ -1,8 +1,8 @@
 package mcjty.lib.builder;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.util.BlockRenderLayer;
 
 public interface ICanRenderInLayer {
-    boolean canRenderInLayer(BlockState state, BlockRenderLayer layer);
+    // @todo 1.15
+//    boolean canRenderInLayer(BlockState state, BlockRenderLayer layer);
 }

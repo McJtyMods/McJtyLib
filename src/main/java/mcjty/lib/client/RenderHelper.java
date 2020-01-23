@@ -47,7 +47,7 @@ public class RenderHelper {
 
     public static void renderEntity(Entity entity, int xPos, int yPos, float scale) {
         GlStateManager.pushMatrix();
-        GlStateManager.color3f(1f, 1f, 1f);
+        GlStateManager.color4f(1f, 1f, 1f, 1f);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableColorMaterial();
         GlStateManager.pushMatrix();
@@ -55,15 +55,16 @@ public class RenderHelper {
         GlStateManager.scalef(-scale, scale, scale);
         GlStateManager.rotatef(180F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotatef(135F, 0.0F, 1.0F, 0.0F);
-        net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
+        net.minecraft.client.renderer.RenderHelper.func_227780_a_();
         GlStateManager.rotatef(-135F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(rot, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.rotationPitch = 0.0F;
         GlStateManager.translatef(0.0F, (float) entity.getYOffset(), 0.0F);
-        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
-        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
+        // @todo 1.15
+//        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
+//        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
         GlStateManager.popMatrix();
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 
@@ -75,7 +76,8 @@ public class RenderHelper {
         int k1 = 240;
 
         // @todo 1.14 check if right?
-        GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
+        // @todo 1.15
+//        GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
 //        OpenGlHelper.setLightmapTextureCoords(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
 
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -130,14 +132,14 @@ public class RenderHelper {
             return false;
         }
 
-        AtlasTexture textureMapBlocks = mc.getTextureMap();
         ResourceLocation fluidStill = fluid.getAttributes().getStillTexture();
         TextureAtlasSprite fluidStillSprite = null;
         if (fluidStill != null) {
-            fluidStillSprite = textureMapBlocks.getAtlasSprite(fluidStill.toString());
+            fluidStillSprite = Minecraft.getInstance().getTextureGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidStill);
         }
         if (fluidStillSprite == null) {
-            fluidStillSprite = MissingTextureSprite.func_217790_a();
+            // @todo 1.15
+//            fluidStillSprite = MissingTextureSprite.func_217790_a();
         }
 
         int fluidColor = fluid.getAttributes().getColor(fluidStack);
@@ -149,10 +151,10 @@ public class RenderHelper {
     }
 
     private static void drawFluidTexture(double xCoord, double yCoord, TextureAtlasSprite textureSprite, double zLevel) {
-        double uMin = textureSprite.getMinU();
-        double uMax = textureSprite.getMaxU();
-        double vMin = textureSprite.getMinV();
-        double vMax = textureSprite.getMaxV();
+        float uMin = textureSprite.getMinU();
+        float uMax = textureSprite.getMaxU();
+        float vMin = textureSprite.getMinV();
+        float vMax = textureSprite.getMaxV();
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexBuffer = tessellator.getBuffer();
@@ -202,18 +204,20 @@ public class RenderHelper {
             IBakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getItemModelWithOverrides(stack, null, null);
             if (!stack.isEmpty()) {
                 Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-                Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+                Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmapDirect(false, false);
                 GlStateManager.color4f(1.0F, 1.0F, 1.0F, (float) alpha);
                 GlStateManager.enableRescaleNormal();
                 GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
                 GlStateManager.enableBlend();
-                GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+                GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
                 GlStateManager.pushMatrix();
 
-                ibakedmodel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
+                // @todo 1.15
+//                ibakedmodel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
+//                Minecraft.getInstance().getItemRenderer().renderItem(stack, ibakedmodel);
 
-                Minecraft.getInstance().getItemRenderer().renderItem(stack, ibakedmodel);
-                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
+                // @todo 1.15
+//                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
                 GlStateManager.popMatrix();
                 GlStateManager.disableRescaleNormal();
                 GlStateManager.disableBlend();
@@ -225,7 +229,7 @@ public class RenderHelper {
     }
 
     public static boolean renderItemStack(Minecraft mc, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
-        GlStateManager.color3f(1F, 1F, 1F);
+        GlStateManager.color4f(1F, 1F, 1F, 1f);
 
         boolean rc = false;
         if (highlight) {
@@ -241,9 +245,10 @@ public class RenderHelper {
             GlStateManager.enableLighting();
             short short1 = 240;
             short short2 = 240;
-            net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+            net.minecraft.client.renderer.RenderHelper.func_227780_a_();
             // @todo 1.14 check if right?
-            GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, short1 / 1.0F, short2 / 1.0F);
+            // @todo 1.15
+//            GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, short1 / 1.0F, short2 / 1.0F);
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             itemRender.renderItemAndEffectIntoGUI(itm, x, y);
@@ -367,7 +372,7 @@ public class RenderHelper {
 
         // @todo 1.14 check
 //        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
@@ -407,7 +412,7 @@ public class RenderHelper {
 
         // @todo 1.14 check
 //        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
 
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
         Tessellator tessellator = Tessellator.getInstance();
@@ -463,7 +468,7 @@ public class RenderHelper {
     public static void drawColorLogic(int x, int y, int width, int height, int red, int green, int blue, GlStateManager.LogicOp colorLogic) {
         GlStateManager.disableTexture();
         GlStateManager.enableColorLogicOp();
-        GlStateManager.logicOp(colorLogic);
+        GlStateManager.logicOp(colorLogic.opcode);
 
         draw(Tessellator.getInstance().getBuffer(), x, y, width, height, red, green, blue, 255);
 
@@ -625,11 +630,11 @@ public class RenderHelper {
         RenderHelper.rotateToPlayer();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-        buffer.pos(-scale, -scale, 0.0D).tex(0.0D, 0.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(-scale, scale, 0.0D).tex(0.0D, 1.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(scale, scale, 0.0D).tex(1.0D, 1.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(scale, -scale, 0.0D).tex(1.0D, 0.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR);
+        buffer.pos(-scale, -scale, 0.0D).tex(0.0f, 0.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(-scale, scale, 0.0D).tex(0.0f, 1.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(scale, scale, 0.0D).tex(1.0f, 1.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(scale, -scale, 0.0D).tex(1.0f, 0.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
         tessellator.draw();
         GlStateManager.popMatrix();
     }
@@ -669,19 +674,20 @@ public class RenderHelper {
     }
 
     public static void rotateToPlayer() {
-        GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotatef(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+        // @todo 1.15
+//        GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+//        GlStateManager.rotatef(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
     }
 
     public static int renderText(Minecraft mc, int x, int y, String txt) {
-        GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1f);
 
         GlStateManager.pushMatrix();
         GlStateManager.translatef(0.0F, 0.0F, 32.0F);
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
-        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+        net.minecraft.client.renderer.RenderHelper.func_227780_a_();
 
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
@@ -703,14 +709,14 @@ public class RenderHelper {
     }
 
     public static int renderText(Minecraft mc, int x, int y, String txt, int color) {
-        GlStateManager.color3f(1.0F, 1.0F, 1.0F);
+        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0f);
 
         GlStateManager.pushMatrix();
         GlStateManager.translatef(0.0F, 0.0F, 32.0F);
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
-        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+        net.minecraft.client.renderer.RenderHelper.func_227780_a_();
 
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
@@ -775,10 +781,10 @@ public class RenderHelper {
         int b2 = settings.getBrightness() & 65535;
 
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0.0D, 0.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1.0D, 0.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1.0D, 1.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0.0D, 1.0D).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(p1.getX(), p1.getY(), p1.getZ()).tex(0.0f, 0.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1.0f, 0.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1.0f, 1.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0.0f, 1.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
     }
 
     public static class Vector {

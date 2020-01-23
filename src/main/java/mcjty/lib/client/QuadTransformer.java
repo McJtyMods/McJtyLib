@@ -1,12 +1,14 @@
 package mcjty.lib.client;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector4f;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -25,29 +27,32 @@ public class QuadTransformer {
             float y = Float.intBitsToFloat(inData[offset + 1]);
             float z = Float.intBitsToFloat(inData[offset + 2]);
 
-            Vector4f pos = new Vector4f(x, y, z, 1);
-            transform.transform(pos);
-            if (pos.w != 1.0f) {
-                pos.scale(1 / pos.w);
-            }
+            // @todo 1.15
+//            Vector4f pos = new Vector4f(x, y, z, 1);
+//            transform.func_226597_a_(pos);
+//            if (pos.getW() != 1.0f) {
+//                float v = 1 / pos.getW();
+//                pos.scale(new Vector3f(v, v, v));
+//            }
 
-            outData[offset] = Float.floatToRawIntBits(pos.x);
-            outData[offset + 1] = Float.floatToRawIntBits(pos.y);
-            outData[offset + 2] = Float.floatToRawIntBits(pos.z);
+//            outData[offset] = Float.floatToRawIntBits(pos.getX());
+//            outData[offset + 1] = Float.floatToRawIntBits(pos.getY());
+//            outData[offset + 2] = Float.floatToRawIntBits(pos.getZ());
         }
     }
 
     private static int findPositionIndex(VertexFormat fmt) {
         int positionIndex;
         VertexFormatElement positionElement = null;
-        for (positionIndex = 0; positionIndex < fmt.getElementCount(); positionIndex++) {
-            VertexFormatElement el = fmt.getElement(positionIndex);
+        ImmutableList<VertexFormatElement> list = fmt.func_227894_c_().asList();
+        for (positionIndex = 0; positionIndex < list.size(); positionIndex++) {
+            VertexFormatElement el = list.get(positionIndex);
             if (el.getUsage() == VertexFormatElement.Usage.POSITION) {
                 positionElement = el;
                 break;
             }
         }
-        if (positionIndex == fmt.getElementCount() || positionElement == null) {
+        if (positionIndex == list.size() || positionElement == null) {
             throw new RuntimeException("WAT? Position not found");
         }
         if (positionElement.getType() != VertexFormatElement.Type.FLOAT) {
@@ -67,13 +72,13 @@ public class QuadTransformer {
      * @return A new BakedQuad object with the new position.
      */
     public static BakedQuad processOne(BakedQuad input, Matrix4f transform) {
-        VertexFormat fmt = input.getFormat();
+        VertexFormat fmt = null; // @todo 1.15 input.getFormat();
         int positionIndex = findPositionIndex(fmt);
 
         int[] data = input.getVertexData();
         processVertices(transform, fmt, positionIndex, data, data);
 
-        return new BakedQuad(data, input.getTintIndex(), input.getFace(), input.getSprite(), input.shouldApplyDiffuseLighting(), fmt);
+        return new BakedQuad(data, input.getTintIndex(), input.getFace(), input.func_187508_a(), input.shouldApplyDiffuseLighting());
     }
 
     /**
@@ -88,7 +93,7 @@ public class QuadTransformer {
             return Collections.emptyList();
         }
 
-        VertexFormat fmt = inputs.get(0).getFormat();
+        VertexFormat fmt = null; // @todo 1.15 inputs.get(0).getFormat();
         int positionIndex = findPositionIndex(fmt);
 
         List<BakedQuad> outputs = Lists.newArrayList();
@@ -97,7 +102,7 @@ public class QuadTransformer {
             int[] outData = Arrays.copyOf(inData, inData.length);
             processVertices(transform, fmt, positionIndex, inData, outData);
 
-            outputs.add(new BakedQuad(outData, input.getTintIndex(), input.getFace(), input.getSprite(), input.shouldApplyDiffuseLighting(), fmt));
+            outputs.add(new BakedQuad(outData, input.getTintIndex(), input.getFace(), input.func_187508_a(), input.shouldApplyDiffuseLighting()));
         }
         return outputs;
     }
@@ -114,7 +119,7 @@ public class QuadTransformer {
             return;
         }
 
-        VertexFormat fmt = inputs.get(0).getFormat();
+        VertexFormat fmt = null; // @todo 1.15 inputs.get(0).getFormat();
         int positionIndex = findPositionIndex(fmt);
 
         for (BakedQuad input : inputs) {

@@ -104,7 +104,7 @@ public class ModSetup extends DefaultModSetup {
                     if (!world.isRemote) {
 
                         // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
-                        PlayerEntity player = event.getEntityPlayer();
+                        PlayerEntity player = event.getPlayer();
                         Vec3d start = player.getEyePosition(1.0f);
                         Vec3d vec31 = player.getLook(1.0f);
                         float dist = 20;

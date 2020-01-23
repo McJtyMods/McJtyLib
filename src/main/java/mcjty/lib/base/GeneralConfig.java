@@ -74,7 +74,7 @@ public class GeneralConfig {
     }
 
     @SubscribeEvent
-    public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
+    public static void onFileChange(final ModConfig.Reloading configEvent) {
         StyleConfig.updateColors();
     }
 }

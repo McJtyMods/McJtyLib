@@ -9,6 +9,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
@@ -164,9 +165,9 @@ public class MultipartTE extends TileEntity {
                         if (te == null) {
                             te = state.getBlock().createTileEntity(state, world);// @todo
                             if (te != null) {
-                                te.setWorld(world);
+                                te.setWorldAndPos(world, pos);
                                 te.read(tc);
-                                te.setPos(pos);
+                                te.setWorldAndPos(world, pos);
                             }
                         } else {
                             te.read(tc);
@@ -180,9 +181,9 @@ public class MultipartTE extends TileEntity {
                         CompoundNBT tc = tag.getCompound("te");
                         te = state.getBlock().createTileEntity(state, world);// @todo
                         if (te != null) {
-                            te.setWorld(world);
+                            te.setWorldAndPos(world, pos);
                             te.read(tc);
-                            te.setPos(pos);
+                            te.setWorldAndPos(world, pos);
                         }
                     }
                     Part part = new Part(state, te);
@@ -200,12 +201,13 @@ public class MultipartTE extends TileEntity {
 //        setWorld(worldIn);
 //    }
 
+
     @Override
-    public void setWorld(World worldIn) {
-        super.setWorld(worldIn);
+    public void setWorldAndPos(World worldIn, BlockPos pos) {
+        super.setWorldAndPos(worldIn, pos);
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             if (entry.getValue().getTileEntity() != null) {
-                entry.getValue().getTileEntity().setWorld(world);
+                entry.getValue().getTileEntity().setWorldAndPos(worldIn, pos);
             }
         }
     }

@@ -16,7 +16,8 @@ public class ClientRegistration {
         MinecraftForge.EVENT_BUS.register(new McJtyLibBlockRegister());
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
 
-        ModelLoaderRegistry.registerLoader(new MultipartModelLoader());
+        // @todo 1.15
+//        ModelLoaderRegistry.registerLoader(new MultipartModelLoader());
     }
 
     private static class McJtyLibBlockRegister {

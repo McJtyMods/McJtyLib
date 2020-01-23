@@ -204,9 +204,9 @@ public class MultipartItemBlock extends BlockItem {
     private RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, PlayerEntity playerIn, boolean useLiquids) {
         float pitch = playerIn.rotationPitch;
         float yaw = playerIn.rotationYaw;
-        double x = playerIn.posX;
-        double y = playerIn.posY + playerIn.getEyeHeight();
-        double z = playerIn.posZ;
+        double x = playerIn.getPosX();
+        double y = playerIn.getPosY() + playerIn.getEyeHeight();
+        double z = playerIn.getPosZ();
         Vec3d vec3 = new Vec3d(x, y, z);
         float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
         float f3 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
