@@ -55,7 +55,7 @@ public class RenderHelper {
         GlStateManager.scalef(-scale, scale, scale);
         GlStateManager.rotatef(180F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotatef(135F, 0.0F, 1.0F, 0.0F);
-        net.minecraft.client.renderer.RenderHelper.func_227780_a_();
+        net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
         GlStateManager.rotatef(-135F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(rot, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
@@ -245,7 +245,7 @@ public class RenderHelper {
             GlStateManager.enableLighting();
             short short1 = 240;
             short short2 = 240;
-            net.minecraft.client.renderer.RenderHelper.func_227780_a_();
+            net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
             // @todo 1.14 check if right?
             // @todo 1.15
 //            GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, short1 / 1.0F, short2 / 1.0F);
@@ -687,7 +687,7 @@ public class RenderHelper {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
-        net.minecraft.client.renderer.RenderHelper.func_227780_a_();
+        net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
 
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
@@ -716,7 +716,7 @@ public class RenderHelper {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
         GlStateManager.enableLighting();
-        net.minecraft.client.renderer.RenderHelper.func_227780_a_();
+        net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
 
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();

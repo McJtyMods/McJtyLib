@@ -157,7 +157,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 wrenchUsed = getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
             }
         }
-        if (wrenchUsed == WrenchUsage.NORMAL && player.func_225608_bj_ /*isSneaking*/()) {
+        if (wrenchUsed == WrenchUsage.NORMAL && player.isShiftKeyDown /*isSneaking*/()) {
             wrenchUsed = WrenchUsage.SNEAKING;
         }
         return wrenchUsed;
@@ -167,7 +167,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         if (item instanceof SmartWrench) {
             switch(((SmartWrench)item).getMode(itemStack)) {
                 case MODE_WRENCH: return WrenchUsage.NORMAL;
-                case MODE_SELECT: return player.func_225608_bj_ /*isSneaking*/() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
+                case MODE_SELECT: return player.isShiftKeyDown /*isSneaking*/() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
                 default:          throw new RuntimeException("SmartWrench in unknown mode!");
             }
         } else if (McJtyLib.cofhapiitem && CofhApiItemCompatibility.isToolHammer(item)) {
@@ -184,7 +184,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof GenericTileEntity) {
             ActionResultType resultType = ((GenericTileEntity) te).onBlockActivated(state, player, hand, result);
-            if (resultType != ActionResultType.FAIL) {
+            if (resultType != ActionResultType.PASS) {
                 return resultType;
             }
         }

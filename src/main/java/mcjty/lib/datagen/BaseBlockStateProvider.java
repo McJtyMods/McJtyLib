@@ -17,21 +17,18 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     }
 
     public ModelFile frontBasedModel(String modelName, ResourceLocation texture) {
-        return null;
-        // @todo 1.15
-//        return cube(modelName,
-//                new ResourceLocation("rftoolsbase", "block/base/machinebottom"),
-//                new ResourceLocation("rftoolsbase", "block/base/machinetop"),
-//                texture,
-//                new ResourceLocation("rftoolsbase", "block/base/machineside"),
-//                new ResourceLocation("rftoolsbase", "block/base/machineside"),
-//                new ResourceLocation("rftoolsbase", "block/base/machineside"));
+        return models().cube(modelName,
+                new ResourceLocation("rftoolsbase", "block/base/machinebottom"),
+                new ResourceLocation("rftoolsbase", "block/base/machinetop"),
+                texture,
+                new ResourceLocation("rftoolsbase", "block/base/machineside"),
+                new ResourceLocation("rftoolsbase", "block/base/machineside"),
+                new ResourceLocation("rftoolsbase", "block/base/machineside"));
     }
 
     public void singleTextureBlock(Block block, String modelName, String textureName) {
-        // @todo 1.15
-//        ModelFile model = cubeAll(modelName, modLoc(textureName));
-//        simpleBlock(block, model);
+        ModelFile model = models().cubeAll(modelName, modLoc(textureName));
+        simpleBlock(block, model);
     }
 
     public void horizontalOrientedBlock(Block block, ModelFile model) {

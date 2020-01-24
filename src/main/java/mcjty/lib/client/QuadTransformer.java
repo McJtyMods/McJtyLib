@@ -44,7 +44,7 @@ public class QuadTransformer {
     private static int findPositionIndex(VertexFormat fmt) {
         int positionIndex;
         VertexFormatElement positionElement = null;
-        ImmutableList<VertexFormatElement> list = fmt.func_227894_c_().asList();
+        ImmutableList<VertexFormatElement> list = fmt.getElements().asList();
         for (positionIndex = 0; positionIndex < list.size(); positionIndex++) {
             VertexFormatElement el = list.get(positionIndex);
             if (el.getUsage() == VertexFormatElement.Usage.POSITION) {

@@ -262,7 +262,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             this.itemRenderer.zLevel = 0.0F;
             GlStateManager.enableLighting();
             GlStateManager.enableDepthTest();
-            net.minecraft.client.renderer.RenderHelper.func_227780_a_();
+            net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
             GlStateManager.enableRescaleNormal();
         }
     }

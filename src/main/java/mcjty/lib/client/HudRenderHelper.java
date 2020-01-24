@@ -34,7 +34,7 @@ public class HudRenderHelper {
             matrixStack.translate((float) x + 0.5F, (float) y + 1.75F, (float) z + 0.5F);
         }
 
-        Quaternion quaternion = Minecraft.getInstance().getRenderManager().func_229098_b_();
+        Quaternion quaternion = Minecraft.getInstance().getRenderManager().getCameraOrientation();
         switch (hudOrientation) {
             case HUD_SOUTH:
                 matrixStack.rotate(new Quaternion(new Vector3f(0, 1, 0), -getHudAngle(orientation), true));
@@ -134,7 +134,7 @@ public class HudRenderHelper {
                         // @todo 1.15 this needs more work! we ignore 'currenty'!
                         ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
                         IBakedModel ibakedmodel = itemRender.getItemModelWithOverrides(stack, Minecraft.getInstance().world, (LivingEntity)null);
-                        itemRender.func_229111_a_(stack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, buffer, 0, 0, ibakedmodel);
+                        itemRender.renderItem(stack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, buffer, 0, 0, ibakedmodel);
 
 //                        itemRender.renderItemAndEffectIntoGUI(stack, 0, currenty);
                         prefix = "    ";
