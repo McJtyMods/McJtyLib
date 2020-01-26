@@ -28,7 +28,7 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
 
     protected void putVertex(BakedQuadBuilder builder, Vec3d normal,
                            double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
-        ImmutableList<VertexFormatElement> elements = DefaultVertexFormats.BLOCK.getElements().asList();
+        ImmutableList<VertexFormatElement> elements = builder.getVertexFormat().getElements().asList();
         for (int e = 0; e < elements.size(); e++) {
             switch (elements.get(e).getUsage()) {
                 case POSITION:
@@ -52,7 +52,7 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
                             break;
                     }
                 case NORMAL:
-                    builder.put(e, (float) normal.x, (float) normal.y, (float) normal.z, 0f);
+                    builder.put(e, (float) normal.x, (float) normal.y, (float) normal.z);
                     break;
                 default:
                     builder.put(e);
