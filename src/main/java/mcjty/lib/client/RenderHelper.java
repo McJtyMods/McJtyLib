@@ -1,7 +1,8 @@
 package mcjty.lib.client;
 
-import com.mojang.blaze3d.platform.GLX;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.varia.MathTools;
 import net.minecraft.block.Block;
@@ -9,13 +10,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
@@ -429,6 +426,50 @@ public class RenderHelper {
         GlStateManager.enableTexture();
     }
 
+    /**
+     * Draws a rectangle with a horizontal gradient between the specified colors.
+     * x2 and y2 are not included.
+     */
+    public static void drawHorizontalGradientRect(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int color1, int color2) {
+//        this.zLevel = 300.0F;
+        float zLevel = 0.0f;
+
+        float f = (color1 >> 24 & 255) / 255.0F;
+        float f1 = (color1 >> 16 & 255) / 255.0F;
+        float f2 = (color1 >> 8 & 255) / 255.0F;
+        float f3 = (color1 & 255) / 255.0F;
+        float f4 = (color2 >> 24 & 255) / 255.0F;
+        float f5 = (color2 >> 16 & 255) / 255.0F;
+        float f6 = (color2 >> 8 & 255) / 255.0F;
+        float f7 = (color2 & 255) / 255.0F;
+//        GlStateManager.disableTexture();
+//        GlStateManager.enableBlend();
+//        GlStateManager.disableAlphaTest();
+
+        // @todo 1.14 check
+//        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+
+
+//        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
+
+//        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+//        Tessellator tessellator = Tessellator.getInstance();
+//        BufferBuilder buffer = tessellator.getBuffer();
+//        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+        IVertexBuilder builder = buffer.getBuffer(RenderType.solid());// @todo 1.15 THIS IS WRONG! NEEDS QUADS
+
+        Matrix4f positionMatrix = matrixStack.getLast().getPositionMatrix();
+        builder.pos(positionMatrix, x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
+        builder.pos(positionMatrix, x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
+        builder.pos(positionMatrix, x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
+        builder.pos(positionMatrix, x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
+//        GlStateManager.shadeModel(GL11.GL_FLAT);
+//        GlStateManager.disableBlend();
+//        GlStateManager.enableAlphaTest();
+//        GlStateManager.enableTexture();
+    }
+
     public static void drawHorizontalLine(int x1, int y1, int x2, int color) {
         Screen.fill(x1, y1, x2, y1 + 1, color);
     }
@@ -541,6 +582,13 @@ public class RenderHelper {
     /**
      * Draw a button box. x2 and y2 are not included.
      */
+    public static void drawFlatButtonBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        drawBeveledBox(matrixStack, buffer, x1, y1, x2, y2, bright, dark, average);
+    }
+
+    /**
+     * Draw a button box. x2 and y2 are not included.
+     */
     public static void drawFlatButtonBoxGradient(int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
         drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
         drawHorizontalLine(x1, y1, x2 - 1, bright);
@@ -563,7 +611,20 @@ public class RenderHelper {
     }
 
     /**
-     * Draw a thick beveled box. x2 and y2 are not included.
+     * Draw a beveled box. x2 and y2 are not included. Use this version for GUI's
+     */
+    public static void drawBeveledBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
+        if (fillcolor != -1) {
+            fill(matrixStack, buffer, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+        }
+        fill(matrixStack, buffer, x1, y1, x2 - 1, y1 + 1, topleftcolor);
+        fill(matrixStack, buffer, x1, y1, x1 + 1, y2 - 1, topleftcolor);
+        fill(matrixStack, buffer, x2 - 1, y1, x2 - 1 + 1, y2 - 1, botrightcolor);
+        fill(matrixStack, buffer, x1, y2 - 1, x2, y2 - 1 + 1, botrightcolor);
+    }
+
+    /**
+     * Draw a thick beveled box. x2 and y2 are not included. Use this version for batched rendering
      */
     public static void drawThickBeveledBox(int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
@@ -873,5 +934,37 @@ public class RenderHelper {
         buffer.pos(mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
     }
 
+    public static void fill(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int color) {
+        Matrix4f positionMatrix = matrixStack.getLast().getPositionMatrix();
+        int swapper;
+        if (x1 < x2) {
+            swapper = x1;
+            x1 = x2;
+            x2 = swapper;
+        }
+
+        if (y1 < y2) {
+            swapper = y1;
+            y1 = y2;
+            y2 = swapper;
+        }
+
+        float a = (color >> 24 & 255) / 255.0F;
+        float r = (color >> 16 & 255) / 255.0F;
+        float g = (color >> 8 & 255) / 255.0F;
+        float b = (color & 255) / 255.0F;
+        IVertexBuilder builder = buffer.getBuffer(RenderType.lines());
+//        RenderSystem.enableBlend();
+//        RenderSystem.disableTexture();
+//        RenderSystem.defaultBlendFunc();
+//        builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
+        builder.pos(positionMatrix, x1, y2, 0.0F).color(r, g, b, a).endVertex();
+        builder.pos(positionMatrix, x2, y2, 0.0F).color(r, g, b, a).endVertex();
+        builder.pos(positionMatrix, x2, y1, 0.0F).color(r, g, b, a).endVertex();
+        builder.pos(positionMatrix, x1, y1, 0.0F).color(r, g, b, a).endVertex();
+//        builder.finishDrawing();
+//        RenderSystem.enableTexture();
+//        RenderSystem.disableBlend();
+    }
 
 }
