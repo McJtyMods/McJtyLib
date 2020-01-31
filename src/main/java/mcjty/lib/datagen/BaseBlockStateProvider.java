@@ -31,7 +31,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         simpleBlock(block, model);
     }
 
-    public void horizontalOrientedBlock(Block block, ModelFile model) {
+    public VariantBlockStateBuilder horizontalOrientedBlock(Block block, ModelFile model) {
         VariantBlockStateBuilder builder = getVariantBuilder(block);
         builder.partialState().with(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH)
                 .modelForState().modelFile(model)
@@ -48,5 +48,34 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 .modelForState().modelFile(model)
                 .rotationY(90)
                 .addModel();
+        return builder;
+    }
+
+    public VariantBlockStateBuilder orientedBlock(Block block, ModelFile model) {
+        VariantBlockStateBuilder builder = getVariantBuilder(block);
+        builder.partialState().with(BlockStateProperties.FACING, Direction.NORTH)
+                .modelForState().modelFile(model)
+                .addModel();
+        builder.partialState().with(BlockStateProperties.FACING, Direction.SOUTH)
+                .modelForState().modelFile(model)
+                .rotationY(180)
+                .addModel();
+        builder.partialState().with(BlockStateProperties.FACING, Direction.WEST)
+                .modelForState().modelFile(model)
+                .rotationY(270)
+                .addModel();
+        builder.partialState().with(BlockStateProperties.FACING, Direction.EAST)
+                .modelForState().modelFile(model)
+                .rotationY(90)
+                .addModel();
+        builder.partialState().with(BlockStateProperties.FACING, Direction.UP)
+                .modelForState().modelFile(model)
+                .rotationX(-90)
+                .addModel();
+        builder.partialState().with(BlockStateProperties.FACING, Direction.DOWN)
+                .modelForState().modelFile(model)
+                .rotationX(90)
+                .addModel();
+        return builder;
     }
 }
