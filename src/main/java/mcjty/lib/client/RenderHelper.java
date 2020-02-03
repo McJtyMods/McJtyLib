@@ -430,7 +430,7 @@ public class RenderHelper {
      * Draws a rectangle with a horizontal gradient between the specified colors.
      * x2 and y2 are not included.
      */
-    public static void drawHorizontalGradientRect(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int color1, int color2) {
+    public static void drawHorizontalGradientRect(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int color1, int color2, int lightmap) {
 //        this.zLevel = 300.0F;
         float zLevel = 0.0f;
 
@@ -457,13 +457,13 @@ public class RenderHelper {
 //        BufferBuilder buffer = tessellator.getBuffer();
 //        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
-        IVertexBuilder builder = buffer.getBuffer(RenderType.solid());// @todo 1.15 THIS IS WRONG! NEEDS QUADS
+        IVertexBuilder builder = buffer.getBuffer(CustomRenderTypes.QUADS_NOTEXTURE);
 
         Matrix4f positionMatrix = matrixStack.getLast().getPositionMatrix();
-        builder.pos(positionMatrix, x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
-        builder.pos(positionMatrix, x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
-        builder.pos(positionMatrix, x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
-        builder.pos(positionMatrix, x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
+        builder.pos(positionMatrix, x1, y1, zLevel).color(f1, f2, f3, f).lightmap(lightmap).endVertex();
+        builder.pos(positionMatrix, x1, y2, zLevel).color(f1, f2, f3, f).lightmap(lightmap).endVertex();
+        builder.pos(positionMatrix, x2, y2, zLevel).color(f5, f6, f7, f4).lightmap(lightmap).endVertex();
+        builder.pos(positionMatrix, x2, y1, zLevel).color(f5, f6, f7, f4).lightmap(lightmap).endVertex();
 //        GlStateManager.shadeModel(GL11.GL_FLAT);
 //        GlStateManager.disableBlend();
 //        GlStateManager.enableAlphaTest();
@@ -582,8 +582,8 @@ public class RenderHelper {
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawFlatButtonBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        drawBeveledBox(matrixStack, buffer, x1, y1, x2, y2, bright, dark, average);
+    public static void drawFlatButtonBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int bright, int average, int dark, int lightmap) {
+        drawBeveledBox(matrixStack, buffer, x1, y1, x2, y2, bright, dark, average, lightmap);
     }
 
     /**
@@ -613,14 +613,14 @@ public class RenderHelper {
     /**
      * Draw a beveled box. x2 and y2 are not included. Use this version for GUI's
      */
-    public static void drawBeveledBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
+    public static void drawBeveledBox(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor, int lightmap) {
         if (fillcolor != -1) {
-            fill(matrixStack, buffer, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            fill(matrixStack, buffer, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor, lightmap);
         }
-        fill(matrixStack, buffer, x1, y1, x2 - 1, y1 + 1, topleftcolor);
-        fill(matrixStack, buffer, x1, y1, x1 + 1, y2 - 1, topleftcolor);
-        fill(matrixStack, buffer, x2 - 1, y1, x2 - 1 + 1, y2 - 1, botrightcolor);
-        fill(matrixStack, buffer, x1, y2 - 1, x2, y2 - 1 + 1, botrightcolor);
+        fill(matrixStack, buffer, x1, y1, x2 - 1, y1 + 1, topleftcolor, lightmap);
+        fill(matrixStack, buffer, x1, y1, x1 + 1, y2 - 1, topleftcolor, lightmap);
+        fill(matrixStack, buffer, x2 - 1, y1, x2 - 1 + 1, y2 - 1, botrightcolor, lightmap);
+        fill(matrixStack, buffer, x1, y2 - 1, x2, y2 - 1 + 1, botrightcolor, lightmap);
     }
 
     /**
@@ -934,7 +934,8 @@ public class RenderHelper {
         buffer.pos(mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
     }
 
-    public static void fill(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int color) {
+    public static void fill(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int color,
+                            int lightmap) {
         Matrix4f positionMatrix = matrixStack.getLast().getPositionMatrix();
         int swapper;
         if (x1 < x2) {
@@ -953,15 +954,15 @@ public class RenderHelper {
         float r = (color >> 16 & 255) / 255.0F;
         float g = (color >> 8 & 255) / 255.0F;
         float b = (color & 255) / 255.0F;
-        IVertexBuilder builder = buffer.getBuffer(RenderType.lines());
+        IVertexBuilder builder = buffer.getBuffer(CustomRenderTypes.QUADS_NOTEXTURE);
 //        RenderSystem.enableBlend();
 //        RenderSystem.disableTexture();
 //        RenderSystem.defaultBlendFunc();
 //        builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        builder.pos(positionMatrix, x1, y2, 0.0F).color(r, g, b, a).endVertex();
-        builder.pos(positionMatrix, x2, y2, 0.0F).color(r, g, b, a).endVertex();
-        builder.pos(positionMatrix, x2, y1, 0.0F).color(r, g, b, a).endVertex();
-        builder.pos(positionMatrix, x1, y1, 0.0F).color(r, g, b, a).endVertex();
+        builder.pos(positionMatrix, x1, y2, -1F).color(r, g, b, a).lightmap(lightmap).endVertex();
+        builder.pos(positionMatrix, x2, y2, -1F).color(r, g, b, a).lightmap(lightmap).endVertex();
+        builder.pos(positionMatrix, x2, y1, -1F).color(r, g, b, a).lightmap(lightmap).endVertex();
+        builder.pos(positionMatrix, x1, y1, -1F).color(r, g, b, a).lightmap(lightmap).endVertex();
 //        builder.finishDrawing();
 //        RenderSystem.enableTexture();
 //        RenderSystem.disableBlend();

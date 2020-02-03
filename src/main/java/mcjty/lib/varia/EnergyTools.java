@@ -102,11 +102,8 @@ public class EnergyTools {
         } else if (enderio && EnergySupportEnderIO.isEnderioTileEntity(tileEntity)) {
             maxEnergyStored = EnergySupportEnderIO.getMaxEnergy(tileEntity);
             energyStored = EnergySupportEnderIO.getCurrentEnergy(tileEntity);
-            // @todo 1.14
-//        } else if (tileEntity != null && tileEntity.hasCapability(CapabilityEnergy.ENERGY, side)) {
-//            IEnergyStorage energy = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
-//            maxEnergyStored = energy.getMaxEnergyStored();
-//            energyStored = energy.getEnergyStored();
+        } else if (tileEntity != null) {
+            return tileEntity.getCapability(CapabilityEnergy.ENERGY, side).map(h -> new EnergyLevel(h.getEnergyStored(), h.getMaxEnergyStored())).orElse(new EnergyLevel(0, 0));
         } else {
             maxEnergyStored = 0;
             energyStored = 0;
