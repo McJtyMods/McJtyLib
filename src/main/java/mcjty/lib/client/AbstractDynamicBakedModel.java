@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -32,7 +31,7 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
         for (int e = 0; e < elements.size(); e++) {
             switch (elements.get(e).getUsage()) {
                 case POSITION:
-                    builder.put(e, (float)x, (float)y, (float)z, 1.0f);
+                    builder.put(e, (float)x, (float)y, (float)z);
                     break;
                 case COLOR:
                     builder.put(e, r, g, b, a);
@@ -51,6 +50,7 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
                             builder.put(e);
                             break;
                     }
+                    break;
                 case NORMAL:
                     builder.put(e, (float) normal.x, (float) normal.y, (float) normal.z);
                     break;
