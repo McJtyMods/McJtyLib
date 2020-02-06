@@ -904,34 +904,34 @@ public class RenderHelper {
         return new Vector(a.x * f, a.y * f, a.z * f);
     }
 
-    public static void renderHighLightedBlocksOutline(BufferBuilder buffer, float mx, float my, float mz, float r, float g, float b, float a) {
-        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+    public static void renderHighLightedBlocksOutline(IVertexBuilder buffer, Matrix4f positionMatrix, float mx, float my, float mz, float r, float g, float b, float a) {
+        buffer.pos(positionMatrix, mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.pos(mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.pos(mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.pos(mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.pos(mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.pos(positionMatrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
     }
 
     public static void fill(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int color,
