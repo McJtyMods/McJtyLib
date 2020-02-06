@@ -23,6 +23,20 @@ public class CustomRenderTypes extends RenderType {
 //    }
 
 
+    private static final LineState THICK_LINES = new LineState(OptionalDouble.of(2.0D));
+
+    public static final RenderType OVERLAY_LINES = get("overlay_lines",
+            DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINES, 256,
+            RenderType.State.builder().line(THICK_LINES)
+                    .layer(PROJECTION_LAYERING)
+                    .transparency(TRANSLUCENT_TRANSPARENCY)
+                    .texture(NO_TEXTURE)
+                    .depthTest(DEPTH_ALWAYS)
+                    .cull(CULL_DISABLED)
+                    .lightmap(LIGHTMAP_DISABLED)
+                    .writeMask(COLOR_WRITE)
+                    .build(false));
+
     public static final RenderType QUADS_NOTEXTURE = get("quads_notexture",
             DefaultVertexFormats.POSITION_COLOR_LIGHTMAP, GL11.GL_QUADS, 2097152, true, false,
             RenderType.State.builder()
