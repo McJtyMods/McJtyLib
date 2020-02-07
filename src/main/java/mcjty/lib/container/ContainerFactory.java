@@ -23,9 +23,6 @@ public class ContainerFactory {
 
     private boolean setupDone = false;
     private boolean slotsSetup = false;
-    private int[] accessibleSlots;
-    private int[] accessibleInputSlots;
-    private int[] accessibleOutputSlots;
     private final int containerSlots;
 
     public ContainerFactory(int containerSlots) {
@@ -85,32 +82,6 @@ public class ContainerFactory {
         }
     }
 
-    protected void setupAccessibleSlots() {
-        if (slotsSetup) {
-            return;
-        }
-        doSetup();
-        slotsSetup = true;
-        List<Integer> s = new ArrayList<>();
-        List<Integer> si = new ArrayList<>();
-        List<Integer> so = new ArrayList<>();
-        int index = 0;
-        for (SlotFactory slotFactory : slots) {
-            if (slotFactory.getSlotType() == SlotType.SLOT_INPUT) {
-                s.add(index);
-                si.add(index);
-            }
-            if (slotFactory.getSlotType() == SlotType.SLOT_OUTPUT) {
-                s.add(index);
-                so.add(index);
-            }
-            index++;
-        }
-        accessibleSlots = convertList(s);
-        accessibleInputSlots = convertList(si);
-        accessibleOutputSlots = convertList(so);
-    }
-
     private static int[] convertList(List<Integer> list) {
         int[] s = new int[list.size()];
         for (int i = 0 ; i < list.size() ; i++) {
@@ -121,21 +92,6 @@ public class ContainerFactory {
 
     public Map<SlotDefinition, SlotRanges> getSlotRangesMap() {
         return slotRangesMap;
-    }
-
-    public int[] getAccessibleSlots() {
-        setupAccessibleSlots();
-        return accessibleSlots;
-    }
-
-    public int[] getAccessibleInputSlots() {
-        setupAccessibleSlots();
-        return accessibleInputSlots;
-    }
-
-    public int[] getAccessibleOutputSlots() {
-        setupAccessibleSlots();
-        return accessibleOutputSlots;
     }
 
     public Iterable<SlotFactory> getSlots() {
