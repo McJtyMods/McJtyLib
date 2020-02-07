@@ -2,6 +2,7 @@ package mcjty.lib.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.varia.MathTools;
@@ -20,9 +21,11 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 
 import javax.annotation.Nullable;
 
@@ -91,7 +94,7 @@ public class RenderHelper {
             return true;
         }
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        return renderObject(mc, itemRenderer, x, y, itm, highlight, 200);
+        return renderObject(mc, itemRenderer, x, y, itm, highlight, 100);
     }
 
     public static boolean renderObject(Minecraft mc, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
@@ -226,44 +229,103 @@ public class RenderHelper {
     }
 
     public static boolean renderItemStack(Minecraft mc, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
-        GlStateManager.color4f(1F, 1F, 1F, 1f);
+        RenderSystem.color4f(1F, 1F, 1F, 1f);
 
         boolean rc = false;
         if (highlight) {
-            GlStateManager.disableLighting();
+            RenderSystem.disableLighting();
             drawVerticalGradientRect(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
         }
         if (!itm.isEmpty() && itm.getItem() != null) {
             rc = true;
-            GlStateManager.pushMatrix();
-            GlStateManager.translatef(0.0F, 0.0F, 32.0F);
-            GlStateManager.color4f(1F, 1F, 1F, 1F);
-            GlStateManager.enableRescaleNormal();
-            GlStateManager.enableLighting();
-            short short1 = 240;
-            short short2 = 240;
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(0.0F, 0.0F, 32.0F);
+            RenderSystem.color4f(1F, 1F, 1F, 1F);
+            RenderSystem.enableRescaleNormal();
+            RenderSystem.enableLighting();
             net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
             // @todo 1.14 check if right?
             // @todo 1.15
-//            GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, short1 / 1.0F, short2 / 1.0F);
+            RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, (float) 240, (float) 240);
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             itemRender.renderItemAndEffectIntoGUI(itm, x, y);
             renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt, txt.length() - 2);
 //            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
-            GlStateManager.popMatrix();
-            GlStateManager.disableRescaleNormal();
-            GlStateManager.disableLighting();
+            RenderSystem.popMatrix();
+            RenderSystem.disableRescaleNormal();
+            RenderSystem.disableLighting();
         }
 
         return rc;
     }
 
+    private static void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
+                                                    int scaled) {
+        if (!stack.isEmpty()) {
+            ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+            MatrixStack matrixstack = new MatrixStack();
+            if (stack.getCount() != 1 || text != null) {
+                String s = text == null ? String.valueOf(stack.getCount()) : text;
+                matrixstack.translate(0.0D, 0.0D, (itemRenderer.zLevel + 200.0F));
+                IRenderTypeBuffer.Impl buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+
+                if (scaled >= 2) {
+                    RenderSystem.pushMatrix();
+                    RenderSystem.scalef(.5f, .5f, .5f);
+                    fr.renderString(s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215, true, matrixstack.getLast().getPositionMatrix(), buffer, false, 0, 15728880);
+                    RenderSystem.popMatrix();
+                } else if (scaled == 1) {
+                    RenderSystem.pushMatrix();
+                    RenderSystem.scalef(.75f, .75f, .75f);
+                    fr.renderString(s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215, true, matrixstack.getLast().getPositionMatrix(), buffer, false, 0, 15728880);
+                    RenderSystem.popMatrix();
+                } else {
+                    fr.renderString(s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (float)(yPosition + 6 + 3), 16777215, true, matrixstack.getLast().getPositionMatrix(), buffer, false, 0, 15728880);
+                }
+
+                buffer.finish();
+            }
+
+            if (stack.getItem().showDurabilityBar(stack)) {
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableTexture();
+                RenderSystem.disableAlphaTest();
+                RenderSystem.disableBlend();
+                Tessellator tessellator = Tessellator.getInstance();
+                BufferBuilder bufferbuilder = tessellator.getBuffer();
+                double health = stack.getItem().getDurabilityForDisplay(stack);
+                int i = Math.round(13.0F - (float)health * 13.0F);
+                int j = stack.getItem().getRGBDurabilityForDisplay(stack);
+                draw(bufferbuilder, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
+                draw(bufferbuilder, xPosition + 2, yPosition + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
+                RenderSystem.enableBlend();
+                RenderSystem.enableAlphaTest();
+                RenderSystem.enableTexture();
+                RenderSystem.enableDepthTest();
+            }
+
+            ClientPlayerEntity clientplayerentity = Minecraft.getInstance().player;
+            float f3 = clientplayerentity == null ? 0.0F : clientplayerentity.getCooldownTracker().getCooldown(stack.getItem(), Minecraft.getInstance().getRenderPartialTicks());
+            if (f3 > 0.0F) {
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableTexture();
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                Tessellator tessellator1 = Tessellator.getInstance();
+                BufferBuilder bufferbuilder1 = tessellator1.getBuffer();
+                draw(bufferbuilder1, xPosition, yPosition + MathHelper.floor(16.0F * (1.0F - f3)), 16, MathHelper.ceil(16.0F * f3), 255, 255, 255, 127);
+                RenderSystem.enableTexture();
+                RenderSystem.enableDepthTest();
+            }
+
+        }
+    }
 
     /**
      * Renders the stack size and/or damage bar for the given ItemStack.
      */
-    private static void renderItemOverlayIntoGUI(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
+    private static void renderItemOverlayIntoGUIOld(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
                                                  int scaled) {
         if (!stack.isEmpty()) {
             int stackSize = stack.getCount();
@@ -273,63 +335,63 @@ public class RenderHelper {
                     s = TextFormatting.RED + String.valueOf(stackSize);
                 }
 
-                GlStateManager.disableLighting();
-                GlStateManager.disableDepthTest();
-                GlStateManager.disableBlend();
+                RenderSystem.disableLighting();
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableBlend();
                 if (scaled >= 2) {
-                    GlStateManager.pushMatrix();
-                    GlStateManager.scalef(.5f, .5f, .5f);
+                    RenderSystem.pushMatrix();
+                    RenderSystem.scalef(.5f, .5f, .5f);
                     fr.drawStringWithShadow(s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215);
-                    GlStateManager.popMatrix();
+                    RenderSystem.popMatrix();
                 } else if (scaled == 1) {
-                    GlStateManager.pushMatrix();
-                    GlStateManager.scalef(.75f, .75f, .75f);
+                    RenderSystem.pushMatrix();
+                    RenderSystem.scalef(.75f, .75f, .75f);
                     fr.drawStringWithShadow(s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215);
-                    GlStateManager.popMatrix();
+                    RenderSystem.popMatrix();
                 } else {
                     fr.drawStringWithShadow(s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (yPosition + 6 + 3), 16777215);
                 }
-                GlStateManager.enableLighting();
-                GlStateManager.enableDepthTest();
+                RenderSystem.enableLighting();
+                RenderSystem.enableDepthTest();
                 // Fixes opaque cooldown overlay a bit lower
                 // TODO: check if enabled blending still screws things up down the line.
-                GlStateManager.enableBlend();
+                RenderSystem.enableBlend();
             }
 
             if (stack.getItem().showDurabilityBar(stack)) {
                 double health = stack.getItem().getDurabilityForDisplay(stack);
                 int j = (int) Math.round(13.0D - health * 13.0D);
                 int i = (int) Math.round(255.0D - health * 255.0D);
-                GlStateManager.disableLighting();
-                GlStateManager.disableDepthTest();
-                GlStateManager.disableTexture();
-                GlStateManager.disableAlphaTest();
-                GlStateManager.disableBlend();
+                RenderSystem.disableLighting();
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableTexture();
+                RenderSystem.disableAlphaTest();
+                RenderSystem.disableBlend();
                 Tessellator tessellator = Tessellator.getInstance();
                 BufferBuilder vertexbuffer = tessellator.getBuffer();
                 draw(vertexbuffer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
                 draw(vertexbuffer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
                 draw(vertexbuffer, xPosition + 2, yPosition + 13, j, 1, 255 - i, i, 0, 255);
-                GlStateManager.enableBlend();
-                GlStateManager.enableAlphaTest();
-                GlStateManager.enableTexture();
-                GlStateManager.enableLighting();
-                GlStateManager.enableDepthTest();
+                RenderSystem.enableBlend();
+                RenderSystem.enableAlphaTest();
+                RenderSystem.enableTexture();
+                RenderSystem.enableLighting();
+                RenderSystem.enableDepthTest();
             }
 
             ClientPlayerEntity PlayerEntitysp = Minecraft.getInstance().player;
             float f = PlayerEntitysp == null ? 0.0F : PlayerEntitysp.getCooldownTracker().getCooldown(stack.getItem(), Minecraft.getInstance().getRenderPartialTicks());
 
             if (f > 0.0F) {
-                GlStateManager.disableLighting();
-                GlStateManager.disableDepthTest();
-                GlStateManager.disableTexture();
+                RenderSystem.disableLighting();
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableTexture();
                 Tessellator tessellator1 = Tessellator.getInstance();
                 BufferBuilder vertexbuffer1 = tessellator1.getBuffer();
                 draw(vertexbuffer1, xPosition, yPosition + MathTools.floor(16.0F * (1.0F - f)), 16, MathTools.ceiling(16.0F * f), 255, 255, 255, 127);
-                GlStateManager.enableTexture();
-                GlStateManager.enableLighting();
-                GlStateManager.enableDepthTest();
+                RenderSystem.enableTexture();
+                RenderSystem.enableLighting();
+                RenderSystem.enableDepthTest();
             }
         }
     }

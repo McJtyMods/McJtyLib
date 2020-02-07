@@ -1,4 +1,11 @@
 Upcoming:
+- Small GenericContainer refactoring. Removed unused code
+- Fix in how itemstacks are rendered
+
+4.0.0-alpha:
+- First release for 1.15.2
+
+Upcoming:
 - Elec332 fixed a problem in TE client data not being correct in some cases after a player joins the world
 
 3.5.17:

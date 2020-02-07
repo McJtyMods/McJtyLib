@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -109,15 +109,19 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
             int yy = y + bounds.y + offsetY;
+            mc.getItemRenderer().zLevel = 100;
+            this.window.getGui().setBlitOffset(100);
             RenderHelper.renderObject(mc, xx, yy, renderItem, false);
+            mc.getItemRenderer().zLevel = 0;
+            this.window.getGui().setBlitOffset(0);
             if (hilightOnHover && isHovering()) {
-                GlStateManager.disableLighting();
-                GlStateManager.disableDepthTest();
-                GlStateManager.colorMask(true, true, true, false);
+                RenderSystem.disableLighting();
+                RenderSystem.disableDepthTest();
+                RenderSystem.colorMask(true, true, true, false);
                 RenderHelper.drawVerticalGradientRect(xx, yy, xx + 16, yy + 16, -2130706433, -2130706433);
-                GlStateManager.colorMask(true, true, true, true);
-//                GlStateManager.enableLighting();
-                GlStateManager.enableDepthTest();
+                RenderSystem.colorMask(true, true, true, true);
+//                RenderSystem.enableLighting();
+                RenderSystem.enableDepthTest();
             }
 
             if (showLabel) {
