@@ -5,10 +5,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ExistingFileHelper;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.client.model.generators.VariantBlockStateBuilder;
+import net.minecraftforge.client.model.generators.*;
 
 public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
@@ -24,6 +21,46 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
                 new ResourceLocation("rftoolsbase", "block/base/machineside"));
+    }
+
+    public void applyRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
+        switch (direction) {
+            case DOWN:
+                builder.rotationX(90).addModel();
+                break;
+            case UP:
+                builder.rotationX(-90).addModel();
+                break;
+            case NORTH:
+                builder.addModel();
+                break;
+            case SOUTH:
+                builder.rotationY(180).addModel();
+                break;
+            case WEST:
+                builder.rotationY(270).addModel();
+                break;
+            case EAST:
+                builder.rotationY(90).addModel();
+                break;
+        }
+    }
+
+    public void applyHorizRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
+        switch (direction) {
+            case NORTH:
+                builder.addModel();
+                break;
+            case SOUTH:
+                builder.rotationY(180).addModel();
+                break;
+            case WEST:
+                builder.rotationY(270).addModel();
+                break;
+            case EAST:
+                builder.rotationY(90).addModel();
+                break;
+        }
     }
 
     public void singleTextureBlock(Block block, String modelName, String textureName) {
@@ -77,5 +114,26 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 .rotationX(90)
                 .addModel();
         return builder;
+    }
+
+    protected void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thickness) {
+        innerCube(dimCellFrame, txtName, 0f, 0f, 0f, thickness, 16f, thickness);
+        innerCube(dimCellFrame, txtName, 16f-thickness, 0f, 0f, 16f, 16f, thickness);
+        innerCube(dimCellFrame, txtName, 0f, 0f, 16f-thickness, thickness, 16f, 16f);
+        innerCube(dimCellFrame, txtName, 16f-thickness, 0f, 16f-thickness, 16f, 16f, 16f);
+
+        innerCube(dimCellFrame, txtName, thickness, 0f, 0f, 16f-thickness, thickness, thickness);
+        innerCube(dimCellFrame, txtName, thickness, 16f-thickness, 0f, 16f-thickness, 16f, thickness);
+        innerCube(dimCellFrame, txtName, thickness, 0f, 16f-thickness, 16f-thickness, thickness, 16f);
+        innerCube(dimCellFrame, txtName, thickness, 16f-thickness, 16f-thickness, 16f-thickness, 16f, 16f);
+
+        innerCube(dimCellFrame, txtName, 0f, 0f, thickness, thickness, thickness, 16f-thickness);
+        innerCube(dimCellFrame, txtName, 16f-thickness, 0f, thickness, 16f, thickness, 16f-thickness);
+        innerCube(dimCellFrame, txtName, 0f, 16f-thickness, thickness, thickness, 16f, 16f-thickness);
+        innerCube(dimCellFrame, txtName, 16f-thickness, 16f-thickness, thickness, 16f, 16f, 16f-thickness);
+    }
+
+    protected void innerCube(BlockModelBuilder builder, String txtName, float fx, float fy, float fz, float tx, float ty, float tz) {
+        builder.element().from(fx, fy, fz).to(tx, ty, tz).allFaces((direction, faceBuilder) -> faceBuilder.texture(txtName)).end();
     }
 }

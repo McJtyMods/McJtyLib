@@ -18,6 +18,11 @@ public abstract class BaseItemModelProvider extends ItemModelProvider {
                 .parent(new ModelFile.UncheckedModelFile(modLoc(model)));
     }
 
+    public void parentedItem(Item item, String model) {
+        getBuilder(item.getRegistryName().getPath())
+                .parent(new ModelFile.UncheckedModelFile(modLoc(model)));
+    }
+
     public void itemGenerated(Item item, String texture) {
         getBuilder(item.getRegistryName().getPath()).parent(getExistingFile(mcLoc("item/generated")))
                 .texture("layer0", texture);
