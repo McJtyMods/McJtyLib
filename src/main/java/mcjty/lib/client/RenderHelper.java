@@ -882,6 +882,25 @@ public class RenderHelper {
     /**
      * Draw a beam with some thickness.
      */
+    public static void drawBeam(Matrix4f matrix, IVertexBuilder builder, TextureAtlasSprite sprite, Vector S, Vector E, Vector P, float width) {
+        Vector PS = Sub(S, P);
+        Vector SE = Sub(E, S);
+
+        Vector normal = Cross(PS, SE);
+        normal = normal.normalize();
+
+        Vector half = Mul(normal, width);
+        Vector p1 = Add(S, half);
+        Vector p2 = Sub(S, half);
+        Vector p3 = Add(E, half);
+        Vector p4 = Sub(E, half);
+
+        drawQuad(matrix, builder, sprite, p1, p3, p4, p2, DEFAULT_SETTINGS);
+    }
+
+    /**
+     * Draw a beam with some thickness.
+     */
     public static void drawBeam(Vector S, Vector E, Vector P, RenderSettings settings) {
         Vector PS = Sub(S, P);
         Vector SE = Sub(E, S);
@@ -908,6 +927,17 @@ public class RenderHelper {
         buffer.pos(p2.getX(), p2.getY(), p2.getZ()).tex(1.0f, 0.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
         buffer.pos(p3.getX(), p3.getY(), p3.getZ()).tex(1.0f, 1.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
         buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0.0f, 1.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+    }
+
+    private static void drawQuad(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector p1, Vector p2, Vector p3, Vector p4,
+                                 RenderSettings settings) {
+        int b1 = settings.getBrightness() >> 16 & 65535;
+        int b2 = settings.getBrightness() & 65535;
+
+        buffer.pos(matrix, p1.getX(), p1.getY(), p1.getZ()).tex(sprite.getMinU(), sprite.getMinV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(matrix, p2.getX(), p2.getY(), p2.getZ()).tex(sprite.getMaxU(), sprite.getMinV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(matrix, p3.getX(), p3.getY(), p3.getZ()).tex(sprite.getMaxU(), sprite.getMaxV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        buffer.pos(matrix, p4.getX(), p4.getY(), p4.getZ()).tex(sprite.getMinU(), sprite.getMaxV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
     }
 
     public static class Vector {

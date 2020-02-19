@@ -116,21 +116,32 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         return builder;
     }
 
-    protected void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thickness) {
-        innerCube(dimCellFrame, txtName, 0f, 0f, 0f, thickness, 16f, thickness);
-        innerCube(dimCellFrame, txtName, 16f-thickness, 0f, 0f, 16f, 16f, thickness);
-        innerCube(dimCellFrame, txtName, 0f, 0f, 16f-thickness, thickness, 16f, 16f);
-        innerCube(dimCellFrame, txtName, 16f-thickness, 0f, 16f-thickness, 16f, 16f, 16f);
+    protected void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thick) {
+        createFrame(dimCellFrame, txtName, thick, true, true);
+    }
 
-        innerCube(dimCellFrame, txtName, thickness, 0f, 0f, 16f-thickness, thickness, thickness);
-        innerCube(dimCellFrame, txtName, thickness, 16f-thickness, 0f, 16f-thickness, 16f, thickness);
-        innerCube(dimCellFrame, txtName, thickness, 0f, 16f-thickness, 16f-thickness, thickness, 16f);
-        innerCube(dimCellFrame, txtName, thickness, 16f-thickness, 16f-thickness, 16f-thickness, 16f, 16f);
+    protected void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thick, boolean doTop, boolean doBottom) {
+        // Vertical bars
+        innerCube(dimCellFrame, txtName, 0f, 0f, 0f,                   thick, 16f, thick);
+        innerCube(dimCellFrame, txtName, 16f-thick, 0f, 0f,        16f, 16f, thick);
+        innerCube(dimCellFrame, txtName, 0f, 0f, 16f-thick,            thick, 16f, 16f);
+        innerCube(dimCellFrame, txtName, 16f-thick, 0f, 16f-thick, 16f, 16f, 16f);
 
-        innerCube(dimCellFrame, txtName, 0f, 0f, thickness, thickness, thickness, 16f-thickness);
-        innerCube(dimCellFrame, txtName, 16f-thickness, 0f, thickness, 16f, thickness, 16f-thickness);
-        innerCube(dimCellFrame, txtName, 0f, 16f-thickness, thickness, thickness, 16f, 16f-thickness);
-        innerCube(dimCellFrame, txtName, 16f-thickness, 16f-thickness, thickness, 16f, 16f, 16f-thickness);
+        if (doTop) {
+            // Top bars
+            innerCube(dimCellFrame, txtName, thick, 16f - thick, 0f, 16f - thick, 16f, thick);
+            innerCube(dimCellFrame, txtName, thick, 16f - thick, 16f - thick, 16f - thick, 16f, 16f);
+            innerCube(dimCellFrame, txtName, 0f, 16f - thick, thick, thick, 16f, 16f - thick);
+            innerCube(dimCellFrame, txtName, 16f - thick, 16f - thick, thick, 16f, 16f, 16f - thick);
+        }
+
+        if (doBottom) {
+            // Bottom bars
+            innerCube(dimCellFrame, txtName, thick, 0f, 0f, 16f - thick, thick, thick);
+            innerCube(dimCellFrame, txtName, thick, 0f, 16f - thick, 16f - thick, thick, 16f);
+            innerCube(dimCellFrame, txtName, 0f, 0f, thick, thick, thick, 16f - thick);
+            innerCube(dimCellFrame, txtName, 16f - thick, 0f, thick, 16f, thick, 16f - thick);
+        }
     }
 
     protected void innerCube(BlockModelBuilder builder, String txtName, float fx, float fy, float fz, float tx, float ty, float tz) {
