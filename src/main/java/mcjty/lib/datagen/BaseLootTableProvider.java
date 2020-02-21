@@ -12,6 +12,7 @@ import net.minecraft.data.IDataProvider;
 import net.minecraft.data.LootTableProvider;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
+import net.minecraft.state.Property;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.*;
 import net.minecraft.world.storage.loot.conditions.MatchTool;
@@ -56,6 +57,24 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         return LootTable.builder().addLootPool(builder);
     }
 
+    protected void addBlockStateTable(Block block, Property property) {
+        lootTables.put(block, createBlockStateTable(block.getRegistryName().getPath(), block, property));
+    }
+
+    protected LootTable.Builder createBlockStateTable(String name, Block block, Property property) {
+        LootPool.Builder builder = LootPool.builder()
+                .name(block.getRegistryName().getPath())
+                .rolls(ConstantRange.of(1))
+                .addEntry(ItemLootEntry.builder(block)
+                        .acceptFunction(CopyBlockState.func_227545_a_(block).func_227552_a_(property))
+                );
+        return LootTable.builder().addLootPool(builder);
+    }
+
+    protected void addStandardTable(Block block) {
+        lootTables.put(block, createStandardTable(block.getRegistryName().getPath(), block));
+    }
+
     protected LootTable.Builder createStandardTable(String name, Block block) {
         LootPool.Builder builder = LootPool.builder()
                 .name(name)
@@ -70,6 +89,10 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
                                 .func_216075_a(DynamicLootEntry.func_216162_a(new ResourceLocation("minecraft", "contents"))))
                 );
         return LootTable.builder().addLootPool(builder);
+    }
+
+    protected void addSimpleTable(Block block) {
+        lootTables.put(block, createSimpleTable(block.getRegistryName().getPath(), block));
     }
 
     protected LootTable.Builder createSimpleTable(String name, Block block) {

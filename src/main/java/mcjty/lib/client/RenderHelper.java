@@ -934,10 +934,30 @@ public class RenderHelper {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
 
-        buffer.pos(matrix, p1.getX(), p1.getY(), p1.getZ()).tex(sprite.getMinU(), sprite.getMinV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(matrix, p2.getX(), p2.getY(), p2.getZ()).tex(sprite.getMaxU(), sprite.getMinV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(matrix, p3.getX(), p3.getY(), p3.getZ()).tex(sprite.getMaxU(), sprite.getMaxV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        buffer.pos(matrix, p4.getX(), p4.getY(), p4.getZ()).tex(sprite.getMinU(), sprite.getMaxV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        vt(buffer, matrix, p1.getX(), p1.getY(), p1.getZ(), sprite.getMinU(), sprite.getMinV(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, p2.getX(), p2.getY(), p2.getZ(), sprite.getMaxU(), sprite.getMinV(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, p3.getX(), p3.getY(), p3.getZ(), sprite.getMaxU(), sprite.getMaxV(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, p4.getX(), p4.getY(), p4.getZ(), sprite.getMinU(), sprite.getMaxV(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+    }
+
+    public static void vt(IVertexBuilder renderer, Matrix4f matrix, float x, float y, float z, float u, float v) {
+        renderer
+                .pos(matrix, x, y, z)
+                .color(1.0f, 1.0f, 1.0f, 1.0f)
+                .tex(u, v)
+                .lightmap(0xf000f0)
+                .normal(1, 0, 0)
+                .endVertex();
+    }
+
+    public static void vt(IVertexBuilder renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int lu, int lv, int r, int g, int b, int a) {
+        renderer
+                .pos(matrix, x, y, z)
+                .color(r, g, b, a)
+                .tex(u, v)
+                .lightmap(lu, lv)
+                .normal(1, 0, 0)
+                .endVertex();
     }
 
     public static class Vector {
