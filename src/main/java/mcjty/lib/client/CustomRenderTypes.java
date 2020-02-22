@@ -1,5 +1,6 @@
 package mcjty.lib.client;
 
+import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -23,11 +24,28 @@ public class CustomRenderTypes extends RenderType {
 //    }
 
 
+    public static final RenderType TRANSLUCENT_ADD = get("translucent_add", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+            State.builder().shadeModel(SHADE_ENABLED)
+                    .lightmap(LIGHTMAP_ENABLED)
+                    .texture(BLOCK_SHEET_MIPPED)
+                    .transparency(ADDITIVE_TRANSPARENCY)
+                    .writeMask(COLOR_WRITE)
+                    .build(true));
+
+    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = get("translucent_add_noloightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+            State.builder().shadeModel(SHADE_ENABLED)
+                    .lightmap(RenderState.LIGHTMAP_DISABLED)
+                    .texture(BLOCK_SHEET_MIPPED)
+                    .transparency(ADDITIVE_TRANSPARENCY)
+                    .writeMask(COLOR_WRITE)
+                    .build(true));
+
+
     private static final LineState THICK_LINES = new LineState(OptionalDouble.of(2.0D));
 
     public static final RenderType OVERLAY_LINES = get("overlay_lines",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINES, 256,
-            RenderType.State.builder().line(THICK_LINES)
+            State.builder().line(THICK_LINES)
                     .layer(PROJECTION_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .texture(NO_TEXTURE)
@@ -39,14 +57,14 @@ public class CustomRenderTypes extends RenderType {
 
     public static final RenderType QUADS_NOTEXTURE = get("quads_notexture",
             DefaultVertexFormats.POSITION_COLOR_LIGHTMAP, GL11.GL_QUADS, 2097152, true, false,
-            RenderType.State.builder()
+            State.builder()
                     .texture(NO_TEXTURE)
                     .shadeModel(SHADE_ENABLED).lightmap(LIGHTMAP_ENABLED)
                     .build(false));
 
     public static final RenderType LINES_LIGHTMAP = get("lines_lightmap",
             DefaultVertexFormats.POSITION_COLOR_LIGHTMAP, GL11.GL_LINES, 256, true, false,
-            RenderType.State.builder()
+            State.builder()
                     .line(new LineState(OptionalDouble.of(1.0)))
                     .texture(NO_TEXTURE)
                     .shadeModel(SHADE_ENABLED).lightmap(LIGHTMAP_ENABLED)

@@ -16,6 +16,7 @@ import net.minecraftforge.fml.InterModComms;
 import org.apache.commons.lang3.text.WordUtils;
 
 import javax.annotation.Nullable;
+import java.util.function.Function;
 
 import static mcjty.theoneprobe.api.IProbeInfo.ENDLOC;
 import static mcjty.theoneprobe.api.IProbeInfo.STARTLOC;
@@ -37,7 +38,7 @@ public class TOPCompatibility {
     }
 
 
-    public static class GetTheOneProbe implements com.google.common.base.Function<ITheOneProbe, Void> {
+    public static class GetTheOneProbe implements Function<ITheOneProbe, Void> {
 
         public static ITheOneProbe probe;
 
