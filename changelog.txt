@@ -1,3 +1,6 @@
+Upcoming:
+- Helper for big itemstack sending
+
 4.0.1-alpha:
 - Small GenericContainer refactoring. Removed unused code
 - Fix in how itemstacks are rendered

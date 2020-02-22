@@ -62,6 +62,26 @@ public class NetworkTools {
         return list;
     }
 
+    /// This function supports itemstacks with more then 64 items.
+    public static ItemStack readItemStack(PacketBuffer buf) {
+        CompoundNBT nbt = buf.readCompoundTag();
+        ItemStack stack = ItemStack.read(nbt);
+        stack.setCount(buf.readInt());
+        return stack;
+    }
+
+    /// This function supports itemstacks with more then 64 items.
+    public static void writeItemStack(PacketBuffer buf, ItemStack itemStack) {
+        CompoundNBT nbt = new CompoundNBT();
+        itemStack.write(nbt);
+        try {
+            buf.writeCompoundTag(nbt);
+            buf.writeInt(itemStack.getCount());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static <T extends Enum<T>> void writeEnum(ByteBuf buf, T value, T nullValue) {
         if (value == null) {

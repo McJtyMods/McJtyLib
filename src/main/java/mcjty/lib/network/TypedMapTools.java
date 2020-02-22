@@ -74,7 +74,7 @@ public class TypedMapTools {
                         break;
                     case TYPE_STACK:
                         if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.ITEMSTACK), buf.readItemStack());
+                            args.put(new Key<>(key, Type.ITEMSTACK), NetworkTools.readItemStack(buf));
                         } else {
                             args.put(new Key<>(key, Type.ITEMSTACK), null);
                         }
@@ -99,7 +99,7 @@ public class TypedMapTools {
                         } else {
                             List<ItemStack> list = new ArrayList<>(s);
                             for (int j = 0; j < s; j++) {
-                                list.add(buf.readItemStack());
+                                list.add(NetworkTools.readItemStack(buf));
                             }
                             args.put(new Key<>(key, Type.ITEMSTACK_LIST), list);
                         }
@@ -162,7 +162,7 @@ public class TypedMapTools {
                     ItemStack stack = (ItemStack) args.get(key);
                     if (stack != null) {
                         buf.writeBoolean(true);
-                        buf.writeItemStack(stack);
+                        NetworkTools.writeItemStack(buf, stack);
                     } else {
                         buf.writeBoolean(false);
                     }
@@ -188,7 +188,7 @@ public class TypedMapTools {
                     if (list != null) {
                         buf.writeInt(list.size());
                         for (ItemStack s : list) {
-                            buf.writeItemStack(s);
+                            NetworkTools.writeItemStack(buf, s);
                         }
                     } else {
                         buf.writeInt(-1);
