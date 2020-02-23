@@ -14,7 +14,6 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;
-import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -328,9 +327,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
      * Draw tooltips for itemstacks that are in BlockRender widgets
      */
     protected void drawStackTooltips(int mouseX, int mouseY) {
-        MouseHelper mouse = getMinecraft().mouseHelper;
-        int x = (int)mouse.getMouseX() * width / getMinecraft().getMainWindow().getWidth();
-        int y =  (int)mouse.getMouseY() * height / getMinecraft().getMainWindow().getHeight();
+        int x = GuiTools.getRelativeX(window.getGui());
+        int y = GuiTools.getRelativeY(window.getGui());
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
         if (widget instanceof BlockRender) {
             BlockRender blockRender = (BlockRender) widget;

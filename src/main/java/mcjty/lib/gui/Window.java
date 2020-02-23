@@ -345,7 +345,6 @@ public class Window {
         if (windowHeight == 0) {
             return 0;
         } else {
-//            return gui.height - (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / windowHeight;
             return (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / windowHeight;
         }
     }

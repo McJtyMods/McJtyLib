@@ -100,12 +100,20 @@ public class IconManager {
 
     private int getRelativeX() {
         Screen gui = windowManager.getGui();
-        return (int) gui.getMinecraft().mouseHelper.getMouseX() * gui.width / gui.getMinecraft().getMainWindow().getWidth();
+        int width = gui.getMinecraft().getMainWindow().getWidth();
+        if (width <= 0) {
+            return 0;
+        }
+        return (int) gui.getMinecraft().mouseHelper.getMouseX() * gui.width / width;
     }
 
     private int getRelativeY() {
         Screen gui = windowManager.getGui();
-        return gui.height - (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / gui.getMinecraft().getMainWindow().getHeight() - 1;
+        int height = gui.getMinecraft().getMainWindow().getHeight();
+        if (height <= 0) {
+            return 0;
+        }
+        return (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / height;
     }
 
 }

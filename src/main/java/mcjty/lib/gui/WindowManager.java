@@ -4,7 +4,6 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
@@ -105,17 +104,8 @@ public class WindowManager {
     }
 
     public void drawTooltips() {
-        Minecraft mc = gui.getMinecraft();
-        MouseHelper mouse = mc.mouseHelper;
-
-        // @todo check for 1.14
-        int mouseX = (int)(mouse.getMouseX());// * (double) mc.getMainWindow().getScaledWidth() / (double) mc.getMainWindow().getWidth());
-        int mouseY = (int)(mouse.getMouseY());// * (double) mc.getMainWindow().getScaledHeight() / (double) mc.getMainWindow().getHeight());
-        int x = mouseX * gui.width / mc.getMainWindow().getWidth();
-        int y = mouseY * gui.height / mc.getMainWindow().getHeight() - 1;
-
-//        int x = (int)mouse.getMouseX() * gui.width / mc.getMainWindow().getWidth();
-//        int y = gui.height - (int)mouse.getMouseY() * gui.height / mc.getMainWindow().getHeight() - 1;
+        int x = GuiTools.getRelativeX(gui);
+        int y = GuiTools.getRelativeY(gui);
 
         getInteractableWindows().forEach(w -> {
             List<String> tooltips = w.getTooltips();
