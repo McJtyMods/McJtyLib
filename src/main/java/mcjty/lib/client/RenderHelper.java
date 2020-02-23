@@ -267,21 +267,21 @@ public class RenderHelper {
             MatrixStack matrixstack = new MatrixStack();
             if (stack.getCount() != 1 || text != null) {
                 String s = text == null ? String.valueOf(stack.getCount()) : text;
-                matrixstack.translate(0.0D, 0.0D, (itemRenderer.zLevel + 200.0F));
+                RenderSystem.translated(0.0D, 0.0D, (itemRenderer.zLevel + 200.0F));
                 IRenderTypeBuffer.Impl buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
 
                 if (scaled >= 2) {
                     RenderSystem.pushMatrix();
                     RenderSystem.scalef(.5f, .5f, .5f);
-                    fr.renderString(s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215, true, matrixstack.getLast().getPositionMatrix(), buffer, false, 0, 15728880);
+                    fr.drawStringWithShadow(s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215);
                     RenderSystem.popMatrix();
                 } else if (scaled == 1) {
                     RenderSystem.pushMatrix();
                     RenderSystem.scalef(.75f, .75f, .75f);
-                    fr.renderString(s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215, true, matrixstack.getLast().getPositionMatrix(), buffer, false, 0, 15728880);
+                    fr.drawStringWithShadow(s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215);
                     RenderSystem.popMatrix();
                 } else {
-                    fr.renderString(s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (float)(yPosition + 6 + 3), 16777215, true, matrixstack.getLast().getPositionMatrix(), buffer, false, 0, 15728880);
+                    fr.drawStringWithShadow(s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (float)(yPosition + 6 + 3), 16777215);
                 }
 
                 buffer.finish();
