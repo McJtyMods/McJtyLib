@@ -1,5 +1,6 @@
 Upcoming:
 - Helper for big itemstack sending
+- Fixed a problem with itemstack tooltips not rendering properly in gui's
 
 4.0.1-alpha:
 - Small GenericContainer refactoring. Removed unused code

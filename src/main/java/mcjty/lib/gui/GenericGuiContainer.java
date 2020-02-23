@@ -324,7 +324,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     protected void drawStackTooltips(int mouseX, int mouseY) {
         MouseHelper mouse = getMinecraft().mouseHelper;
         int x = (int)mouse.getMouseX() * width / getMinecraft().getMainWindow().getWidth();
-        int y = height - (int)mouse.getMouseY() * height / getMinecraft().getMainWindow().getHeight() - 1;
+        int y =  (int)mouse.getMouseY() * height / getMinecraft().getMainWindow().getHeight();
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
         if (widget instanceof BlockRender) {
             BlockRender blockRender = (BlockRender) widget;
