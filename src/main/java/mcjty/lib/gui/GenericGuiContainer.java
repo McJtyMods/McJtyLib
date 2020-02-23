@@ -1,6 +1,6 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
@@ -156,10 +156,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     public void drawHoveringText(List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
         if (!textLines.isEmpty()) {
-            GlStateManager.disableRescaleNormal();
+            RenderSystem.pushMatrix();
+            RenderSystem.disableRescaleNormal();
             net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
-            GlStateManager.disableLighting();
-            GlStateManager.disableDepthTest();
+            RenderSystem.disableLighting();
+            RenderSystem.disableDepthTest();
             int i = 0;
 
             int linesWithItemStacks = 0;
@@ -213,6 +214,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             }
 
 //            this.zLevel = 300.0F;     // @todo 1.14
+            setBlitOffset(300);
             this.itemRenderer.zLevel = 300.0F;
             int l = -267386864;
             this.fillGradient(xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
@@ -226,6 +228,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             this.fillGradient(xx + i + 2, yy - 3 + 1, xx + i + 3, yy + k + 3 - 1, i1, j1);
             this.fillGradient(xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
             this.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
+
+            RenderSystem.translated(0.0D, 0.0D, (double)this.itemRenderer.zLevel);
 
             for (int k1 = 0; k1 < textLines.size(); ++k1) {
                 String s1 = textLines.get(k1);
@@ -259,11 +263,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             }
 
 //            this.zLevel = 0.0F;       // @todo 1.14
+            setBlitOffset(0);
             this.itemRenderer.zLevel = 0.0F;
-            GlStateManager.enableLighting();
-            GlStateManager.enableDepthTest();
+            RenderSystem.enableLighting();
+            RenderSystem.enableDepthTest();
             net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
-            GlStateManager.enableRescaleNormal();
+            RenderSystem.enableRescaleNormal();
+            RenderSystem.popMatrix();
         }
     }
 

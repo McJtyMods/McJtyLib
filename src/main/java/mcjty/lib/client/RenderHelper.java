@@ -239,7 +239,6 @@ public class RenderHelper {
         if (!itm.isEmpty() && itm.getItem() != null) {
             rc = true;
             RenderSystem.pushMatrix();
-            RenderSystem.translatef(0.0F, 0.0F, 32.0F);
             RenderSystem.color4f(1F, 1F, 1F, 1F);
             RenderSystem.enableRescaleNormal();
             RenderSystem.enableLighting();
@@ -264,7 +263,6 @@ public class RenderHelper {
                                                     int scaled) {
         if (!stack.isEmpty()) {
             ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-            MatrixStack matrixstack = new MatrixStack();
             if (stack.getCount() != 1 || text != null) {
                 String s = text == null ? String.valueOf(stack.getCount()) : text;
                 RenderSystem.translated(0.0D, 0.0D, (itemRenderer.zLevel + 200.0F));
