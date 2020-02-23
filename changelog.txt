@@ -1,4 +1,4 @@
-Upcoming:
+4.0.2-alpha:
 - Helper for big itemstack sending
 - Fixed a problem with itemstack tooltips not rendering properly in gui's
 - Fixed a problem with tooltips in gui's not rendering at the correct 'z' level
