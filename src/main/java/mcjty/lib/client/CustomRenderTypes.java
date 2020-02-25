@@ -1,5 +1,7 @@
 package mcjty.lib.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.RenderState;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -68,5 +70,22 @@ public class CustomRenderTypes extends RenderType {
                     .line(new LineState(OptionalDouble.of(1.0)))
                     .texture(NO_TEXTURE)
                     .shadeModel(SHADE_ENABLED).lightmap(LIGHTMAP_ENABLED)
+                    .build(false));
+
+    public static final RenderState.TransparencyState LINESTRIP_TRANSP = new RenderState.TransparencyState("linestrip_transp", () -> {
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
+    }, () -> {
+        RenderSystem.disableBlend();
+        RenderSystem.defaultBlendFunc();
+    });
+
+    public static final RenderType LINESTRIP = get("linestrip",
+            DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINE_STRIP, 256, true, false,
+            State.builder()
+                    .line(new LineState(OptionalDouble.of(2.0)))
+                    .transparency(LINESTRIP_TRANSP)
+                    .texture(NO_TEXTURE)
+                    .shadeModel(SHADE_ENABLED).lightmap(RenderState.LIGHTMAP_DISABLED)
                     .build(false));
 }

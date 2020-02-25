@@ -740,6 +740,16 @@ public class RenderHelper {
         tessellator.draw();
     }
 
+    public static void drawTexturedModalRect(Matrix4f positionMatrix, IVertexBuilder builder, int x, int y, int textureX, int textureY, int width, int height, int totw, int toth, float parentU, float parentV) {
+        float f = 1.0f / totw;
+        float f1 = 1.0f / toth;
+        float zLevel = 50;
+        builder.pos(positionMatrix, (x + 0), (y + height), zLevel).tex(parentU + ((textureX + 0) * f), parentV + ((textureY + height) * f1)).endVertex();
+        builder.pos(positionMatrix, (x + width), (y + height), zLevel).tex(parentU + ((textureX + width) * f), parentV + ((textureY + height) * f1)).endVertex();
+        builder.pos(positionMatrix, (x + width), (y + 0), zLevel).tex(parentU + ((textureX + width) * f), parentV + ((textureY + 0) * f1)).endVertex();
+        builder.pos(positionMatrix, (x + 0), (y + 0), zLevel).tex(parentU + ((textureX + 0) * f), parentV + ((textureY + 0) * f1)).endVertex();
+    }
+
     public static void renderBillboardQuadBright(double scale) {
         renderBillboardQuadBright(scale, DEFAULT_SETTINGS);
     }
