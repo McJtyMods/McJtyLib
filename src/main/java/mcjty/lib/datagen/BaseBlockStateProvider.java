@@ -1,11 +1,15 @@
 package mcjty.lib.datagen;
 
+import mcjty.lib.blocks.LogicSlabBlock;
+import mcjty.lib.varia.LogicFacing;
 import net.minecraft.block.Block;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.*;
+
+import static net.minecraftforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
 
 public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
@@ -21,6 +25,37 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
                 new ResourceLocation("rftoolsbase", "block/base/machineside"));
+    }
+
+    public ModelFile logicSlabModel(String modelName, ResourceLocation texture, ModelBuilder.FaceRotation faceRotation) {
+        BlockModelBuilder model = models().getBuilder(BLOCK_FOLDER + "/" + modelName)
+                .parent(models().getExistingFile(mcLoc("block")));
+        model.element().from(0, 0, 0).to(16, 4, 16)
+                .face(Direction.DOWN).cullface(Direction.DOWN).texture("down").end()
+                .face(Direction.UP).texture("up").uvs(0, 0, 16, 16).rotation(faceRotation).end()
+                .face(Direction.EAST).cullface(Direction.EAST).texture("side").end()
+                .face(Direction.WEST).cullface(Direction.WEST).texture("side").end()
+                .face(Direction.NORTH).cullface(Direction.NORTH).texture("side").end()
+                .face(Direction.SOUTH).cullface(Direction.SOUTH).texture("side").end()
+                .end()
+                .texture("side", new ResourceLocation("rftoolsbase", "block/base/machineside"))
+                .texture("down", new ResourceLocation("rftoolsbase", "block/base/machinebottom"))
+                .texture("up", texture);
+        return model;
+    }
+
+    public void registerLogicSlabBlock(LogicSlabBlock block, String modelPrefix, ResourceLocation topTexture) {
+        ModelFile models[] = new ModelFile[4];
+        models[0] = logicSlabModel(modelPrefix + "_0", topTexture, ModelBuilder.FaceRotation.ZERO);
+        models[1] = logicSlabModel(modelPrefix + "_1", topTexture, ModelBuilder.FaceRotation.CLOCKWISE_90);
+        models[2] = logicSlabModel(modelPrefix + "_2", topTexture, ModelBuilder.FaceRotation.UPSIDE_DOWN);
+        models[3] = logicSlabModel(modelPrefix + "_3", topTexture, ModelBuilder.FaceRotation.COUNTERCLOCKWISE_90);
+        VariantBlockStateBuilder builder = getVariantBuilder(block);
+        for (LogicFacing value : LogicFacing.VALUES) {
+            Direction direction = value.getSide();
+            applyRotation(builder.partialState().with(LogicSlabBlock.LOGIC_FACING, value)
+                    .modelForState().modelFile(models[value.getRotationStep()]), direction);
+        }
     }
 
     public void applyRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
@@ -122,10 +157,10 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
     protected void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thick, boolean doTop, boolean doBottom) {
         // Vertical bars
-        innerCube(dimCellFrame, txtName, 0f, 0f, 0f,                   thick, 16f, thick);
-        innerCube(dimCellFrame, txtName, 16f-thick, 0f, 0f,        16f, 16f, thick);
-        innerCube(dimCellFrame, txtName, 0f, 0f, 16f-thick,            thick, 16f, 16f);
-        innerCube(dimCellFrame, txtName, 16f-thick, 0f, 16f-thick, 16f, 16f, 16f);
+        innerCube(dimCellFrame, txtName, 0f, 0f, 0f, thick, 16f, thick);
+        innerCube(dimCellFrame, txtName, 16f - thick, 0f, 0f, 16f, 16f, thick);
+        innerCube(dimCellFrame, txtName, 0f, 0f, 16f - thick, thick, 16f, 16f);
+        innerCube(dimCellFrame, txtName, 16f - thick, 0f, 16f - thick, 16f, 16f, 16f);
 
         if (doTop) {
             // Top bars

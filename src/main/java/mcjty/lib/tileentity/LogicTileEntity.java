@@ -15,14 +15,9 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.Level;
 
-import javax.annotation.Nonnull;
-
 import static mcjty.lib.blocks.LogicSlabBlock.LOGIC_FACING;
-import static mcjty.lib.blocks.LogicSlabBlock.META_INTERMEDIATE;
 
 public class LogicTileEntity extends GenericTileEntity {
-
-    private LogicFacing facing;
 
     protected int powerOutput = 0;
 
@@ -30,19 +25,9 @@ public class LogicTileEntity extends GenericTileEntity {
         super(type);
     }
 
-    @Override
-    public void onLoad() {
-        if(facing == null) {
-            BlockState state = getWorld().getBlockState(getPos());
-            if(state.getBlock() instanceof LogicSlabBlock) {
-                setFacing(state.get(LOGIC_FACING));
-            }
-        }
-        super.onLoad();
-    }
-
     public LogicFacing getFacing(BlockState state) {
         // Should not be needed but apparently it sometimes is
+        LogicFacing facing = state.get(LOGIC_FACING);
         if (facing == null) {
             Logging.getLogger().log(Level.WARN, "LogicTileEntity has null facing!");
             return LogicFacing.DOWN_TOEAST;
@@ -50,15 +35,7 @@ public class LogicTileEntity extends GenericTileEntity {
             Logging.getLogger().log(Level.WARN, "LogicTileEntity expected LogicSlabBlock but had " + state.getBlock().getClass().getName());
             return LogicFacing.DOWN_TOEAST;
         }
-        Integer meta = state.get(META_INTERMEDIATE);
-        return LogicFacing.getFacingWithMeta(facing, meta);
-    }
-
-    public void setFacing(LogicFacing facing) {
-        if(facing != this.facing) {
-            this.facing = facing;
-            markDirty();
-        }
+        return facing;
     }
 
     public int getPowerOutput() {
@@ -115,14 +92,11 @@ public class LogicTileEntity extends GenericTileEntity {
     @Override
     public void read(CompoundNBT tagCompound) {
         super.read(tagCompound);
-        facing = LogicFacing.VALUES[tagCompound.getInt("lf")];
     }
 
-    @Nonnull
     @Override
     public CompoundNBT write(CompoundNBT tagCompound) {
         super.write(tagCompound);
-        tagCompound.putInt("lf", facing.ordinal());
         return tagCompound;
     }
 

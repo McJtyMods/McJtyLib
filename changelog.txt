@@ -1,3 +1,7 @@
+Upcoming:
+- Helpers for blockstate generation
+- Fixes for the logic blocks
+
 4.0.2-alpha:
 - Helper for big itemstack sending
 - Fixed a problem with itemstack tooltips not rendering properly in gui's

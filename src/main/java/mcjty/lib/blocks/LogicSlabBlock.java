@@ -10,7 +10,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.EnumProperty;
-import net.minecraft.state.IntegerProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -32,7 +31,6 @@ import static net.minecraft.util.Direction.*;
  */
 public abstract class LogicSlabBlock extends BaseBlock {
 
-    public static IntegerProperty META_INTERMEDIATE = IntegerProperty.create("intermediate", 0, 3);
     public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
 
     public LogicSlabBlock(BlockBuilder builder) {
@@ -129,7 +127,7 @@ public abstract class LogicSlabBlock extends BaseBlock {
 //        System.out.println("  facing.getInputSide() = " + facing.getInputSide());
         // LOGIC_FACING doesn't get saved to metadata, but it doesn't need to. It only needs to be available until LogicTileEntity#onLoad() runs.
         // @todo 1.14 check: was side opposite or not?
-        return super.getStateForPlacement(context).with(META_INTERMEDIATE, facing.getMeta()).with(LOGIC_FACING, facing);
+        return super.getStateForPlacement(context).with(LOGIC_FACING, facing);
     }
 
 //    @Override
@@ -265,22 +263,15 @@ public abstract class LogicSlabBlock extends BaseBlock {
 
     @Override
     public BlockState rotate(BlockState state, IWorld world, BlockPos pos, Rotation rot) {
-        TileEntity te = world.getTileEntity(pos);
-        if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
-            LogicTileEntity logicTileEntity = (LogicTileEntity) te;
-            LogicFacing facing = logicTileEntity.getFacing(state);
-            int meta = facing.getMeta();
-            switch (meta) {
-                case 0: meta = 2; break;
-                case 1: meta = 3; break;
-                case 2: meta = 1; break;
-                case 3: meta = 0; break;
-            }
-            LogicFacing newfacing = LogicFacing.getFacingWithMeta(facing, meta);
-            logicTileEntity.setFacing(newfacing);
-            BlockState newstate = state.getBlock().getDefaultState().with(META_INTERMEDIATE, meta);
+        if (state.getBlock() instanceof LogicSlabBlock) {
+            LogicFacing facing = state.get(LOGIC_FACING);
+            LogicFacing newfacing = LogicFacing.rotate(facing);
+            BlockState newstate = state.getBlock().getDefaultState().with(LOGIC_FACING, newfacing);
             world.setBlockState(pos, newstate, 3);
-            logicTileEntity.rotateBlock(rot);
+            TileEntity te = world.getTileEntity(pos);
+            if (te instanceof LogicTileEntity) {
+                ((LogicTileEntity) te).rotateBlock(rot);
+            }
             return newstate;
         }
         return state;
@@ -290,7 +281,7 @@ public abstract class LogicSlabBlock extends BaseBlock {
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
-        builder.add(LOGIC_FACING).add(META_INTERMEDIATE);
+        builder.add(LOGIC_FACING);
     }
 
 }
