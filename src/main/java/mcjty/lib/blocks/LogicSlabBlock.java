@@ -70,9 +70,13 @@ public abstract class LogicSlabBlock extends BaseBlock {
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
         Vec3d hit = context.getHitVec();
-        double dx = Math.abs(0.5 - hit.x);
-        double dy = Math.abs(0.5 - hit.y);
-        double dz = Math.abs(0.5 - hit.z);
+        BlockPos pos = context.getPos();
+        double hx = hit.x - pos.getX();
+        double hy = hit.y - pos.getY();
+        double hz = hit.z - pos.getZ();
+        double dx = Math.abs(0.5 - hx);
+        double dy = Math.abs(0.5 - hy);
+        double dz = Math.abs(0.5 - hz);
 
         Direction side = context.getFace().getOpposite();
 //        System.out.println("LogicSlabBlock.getStateForPlacement");
@@ -81,44 +85,44 @@ public abstract class LogicSlabBlock extends BaseBlock {
         switch (side) {
             case DOWN:
                 if (dx < dz) {
-                    facing = hit.z < 0.5 ? DOWN_TOSOUTH : DOWN_TONORTH;
+                    facing = hz < 0.5 ? DOWN_TOSOUTH : DOWN_TONORTH;
                 } else {
-                    facing = hit.x < 0.5 ? DOWN_TOEAST : DOWN_TOWEST;
+                    facing = hx < 0.5 ? DOWN_TOEAST : DOWN_TOWEST;
                 }
                 break;
             case UP:
                 if (dx < dz) {
-                    facing = hit.z < 0.5 ? UP_TOSOUTH : UP_TONORTH;
+                    facing = hz < 0.5 ? UP_TOSOUTH : UP_TONORTH;
                 } else {
-                    facing = hit.x < 0.5 ? UP_TOEAST : UP_TOWEST;
+                    facing = hx < 0.5 ? UP_TOEAST : UP_TOWEST;
                 }
                 break;
             case NORTH:
                 if (dx < dy) {
-                    facing = hit.y < 0.5 ? NORTH_TOUP : NORTH_TODOWN;
+                    facing = hy < 0.5 ? NORTH_TOUP : NORTH_TODOWN;
                 } else {
-                    facing = hit.x < 0.5 ? NORTH_TOEAST : NORTH_TOWEST;
+                    facing = hx < 0.5 ? NORTH_TOEAST : NORTH_TOWEST;
                 }
                 break;
             case SOUTH:
                 if (dx < dy) {
-                    facing = hit.y < 0.5 ? SOUTH_TOUP : SOUTH_TODOWN;
+                    facing = hy < 0.5 ? SOUTH_TOUP : SOUTH_TODOWN;
                 } else {
-                    facing = hit.x < 0.5 ? SOUTH_TOEAST : SOUTH_TOWEST;
+                    facing = hx < 0.5 ? SOUTH_TOEAST : SOUTH_TOWEST;
                 }
                 break;
             case WEST:
                 if (dy < dz) {
-                    facing = hit.z < 0.5 ? WEST_TOSOUTH : WEST_TONORTH;
+                    facing = hz < 0.5 ? WEST_TOSOUTH : WEST_TONORTH;
                 } else {
-                    facing = hit.y < 0.5 ? WEST_TOUP : WEST_TODOWN;
+                    facing = hy < 0.5 ? WEST_TOUP : WEST_TODOWN;
                 }
                 break;
             case EAST:
                 if (dy < dz) {
-                    facing = hit.z < 0.5 ? EAST_TOSOUTH : EAST_TONORTH;
+                    facing = hz < 0.5 ? EAST_TOSOUTH : EAST_TONORTH;
                 } else {
-                    facing = hit.y < 0.5 ? EAST_TOUP : EAST_TODOWN;
+                    facing = hy < 0.5 ? EAST_TOUP : EAST_TODOWN;
                 }
                 break;
             default:
@@ -129,6 +133,7 @@ public abstract class LogicSlabBlock extends BaseBlock {
 //        System.out.println("  facing.getInputSide() = " + facing.getInputSide());
         // LOGIC_FACING doesn't get saved to metadata, but it doesn't need to. It only needs to be available until LogicTileEntity#onLoad() runs.
         // @todo 1.14 check: was side opposite or not?
+        System.out.println("facing = " + facing + ", " + facing.getRotationStep());
         return super.getStateForPlacement(context).with(LOGIC_FACING, facing);
     }
 

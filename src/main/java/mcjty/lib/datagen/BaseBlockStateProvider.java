@@ -47,9 +47,9 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     public void registerLogicSlabBlock(LogicSlabBlock block, String modelPrefix, ResourceLocation topTexture) {
         ModelFile models[] = new ModelFile[4];
         models[0] = logicSlabModel(modelPrefix + "_0", topTexture, ModelBuilder.FaceRotation.ZERO);
-        models[1] = logicSlabModel(modelPrefix + "_1", topTexture, ModelBuilder.FaceRotation.CLOCKWISE_90);
-        models[2] = logicSlabModel(modelPrefix + "_2", topTexture, ModelBuilder.FaceRotation.UPSIDE_DOWN);
-        models[3] = logicSlabModel(modelPrefix + "_3", topTexture, ModelBuilder.FaceRotation.COUNTERCLOCKWISE_90);
+        models[1] = logicSlabModel(modelPrefix + "_1", topTexture, ModelBuilder.FaceRotation.UPSIDE_DOWN);
+        models[2] = logicSlabModel(modelPrefix + "_2", topTexture, ModelBuilder.FaceRotation.COUNTERCLOCKWISE_90);
+        models[3] = logicSlabModel(modelPrefix + "_3", topTexture, ModelBuilder.FaceRotation.CLOCKWISE_90);
         VariantBlockStateBuilder builder = getVariantBuilder(block);
         for (LogicFacing value : LogicFacing.VALUES) {
             Direction direction = value.getSide();
@@ -67,16 +67,16 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 builder.addModel();
                 break;
             case NORTH:
-                builder.rotationX(90).addModel();
-                break;
-            case SOUTH:
                 builder.rotationX(-90).addModel();
                 break;
-            case WEST:
-                builder.rotationY(270).addModel();
+            case SOUTH:
+                builder.rotationX(90).addModel();
                 break;
             case EAST:
-                builder.rotationY(90).addModel();
+                builder.rotationX(90).rotationY(270).addModel();
+                break;
+            case WEST:
+                builder.rotationX(90).rotationY(90).addModel();
                 break;
         }
     }
