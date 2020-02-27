@@ -14,9 +14,11 @@ import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Rotation;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -140,12 +142,31 @@ public abstract class LogicSlabBlock extends BaseBlock {
 //        return true;
 //    }
 
-    public static final AxisAlignedBB BLOCK_DOWN = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 0.3F, 1.0F);
-    public static final AxisAlignedBB BLOCK_UP = new AxisAlignedBB(0.0F, 0.7F, 0.0F, 1.0F, 1.0F, 1.0F);
-    public static final AxisAlignedBB BLOCK_NORTH = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.3F);
-    public static final AxisAlignedBB BLOCK_SOUTH = new AxisAlignedBB(0.0F, 0.0F, 0.7F, 1.0F, 1.0F, 1.0F);
-    public static final AxisAlignedBB BLOCK_WEST = new AxisAlignedBB(0.0F, 0.0F, 0.0F, 0.3F, 1.0F, 1.0F);
-    public static final AxisAlignedBB BLOCK_EAST = new AxisAlignedBB(0.7F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_DOWN = VoxelShapes.create(0.0F, 0.0F, 0.0F, 1.0F, 0.25F, 1.0F);
+    public static final VoxelShape BLOCK_UP = VoxelShapes.create(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_NORTH = VoxelShapes.create(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.25F);
+    public static final VoxelShape BLOCK_SOUTH = VoxelShapes.create(0.0F, 0.0F, 0.75F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_WEST = VoxelShapes.create(0.0F, 0.0F, 0.0F, 0.25F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_EAST = VoxelShapes.create(0.75F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+        switch (state.get(LOGIC_FACING).getSide()) {
+            case DOWN:
+                return BLOCK_DOWN;
+            case UP:
+                return BLOCK_UP;
+            case NORTH:
+                return BLOCK_NORTH;
+            case SOUTH:
+                return BLOCK_SOUTH;
+            case WEST:
+                return BLOCK_WEST;
+            case EAST:
+                return BLOCK_EAST;
+        }
+        return BLOCK_DOWN;
+    }
 
     // @todo 1.14
 //    @Override

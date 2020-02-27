@@ -53,8 +53,31 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         VariantBlockStateBuilder builder = getVariantBuilder(block);
         for (LogicFacing value : LogicFacing.VALUES) {
             Direction direction = value.getSide();
-            applyRotation(builder.partialState().with(LogicSlabBlock.LOGIC_FACING, value)
+            applyLogicSlabRotation(builder.partialState().with(LogicSlabBlock.LOGIC_FACING, value)
                     .modelForState().modelFile(models[value.getRotationStep()]), direction);
+        }
+    }
+
+    public void applyLogicSlabRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
+        switch (direction) {
+            case UP:
+                builder.rotationY(180).addModel();
+                break;
+            case DOWN:
+                builder.addModel();
+                break;
+            case NORTH:
+                builder.rotationX(90).addModel();
+                break;
+            case SOUTH:
+                builder.rotationX(-90).addModel();
+                break;
+            case WEST:
+                builder.rotationY(270).addModel();
+                break;
+            case EAST:
+                builder.rotationY(90).addModel();
+                break;
         }
     }
 

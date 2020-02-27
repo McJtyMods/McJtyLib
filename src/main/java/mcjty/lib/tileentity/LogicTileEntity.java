@@ -26,16 +26,7 @@ public class LogicTileEntity extends GenericTileEntity {
     }
 
     public LogicFacing getFacing(BlockState state) {
-        // Should not be needed but apparently it sometimes is
-        LogicFacing facing = state.get(LOGIC_FACING);
-        if (facing == null) {
-            Logging.getLogger().log(Level.WARN, "LogicTileEntity has null facing!");
-            return LogicFacing.DOWN_TOEAST;
-        } else if (!(state.getBlock() instanceof LogicSlabBlock)) {
-            Logging.getLogger().log(Level.WARN, "LogicTileEntity expected LogicSlabBlock but had " + state.getBlock().getClass().getName());
-            return LogicFacing.DOWN_TOEAST;
-        }
-        return facing;
+        return state.get(LOGIC_FACING);
     }
 
     public int getPowerOutput() {
@@ -48,7 +39,7 @@ public class LogicTileEntity extends GenericTileEntity {
         }
         powerOutput = newout;
         markDirty();
-        BlockState state = getWorld().getBlockState(this.pos);
+        BlockState state = getBlockState();
         Direction outputSide = getFacing(state).getInputSide().getOpposite();
         getWorld().neighborChanged(this.pos.offset(outputSide), state.getBlock(), this.pos);
         //        getWorld().notifyNeighborsOfStateChange(this.pos, this.getBlockType());
