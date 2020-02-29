@@ -1,7 +1,5 @@
 package mcjty.lib.tileentity;
 
-import mcjty.lib.blocks.LogicSlabBlock;
-import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.LogicFacing;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -13,7 +11,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import org.apache.logging.log4j.Level;
 
 import static mcjty.lib.blocks.LogicSlabBlock.LOGIC_FACING;
 
