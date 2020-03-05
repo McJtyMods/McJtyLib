@@ -22,7 +22,7 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
     }
 
     public static TextureAtlasSprite getTexture(ResourceLocation resource) {
-        return Minecraft.getInstance().getTextureGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resource);
+        return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resource);
     }
 
     protected void putVertex(BakedQuadBuilder builder, Vec3d normal,

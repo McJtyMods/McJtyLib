@@ -135,7 +135,7 @@ public class RenderHelper {
         ResourceLocation fluidStill = fluid.getAttributes().getStillTexture();
         TextureAtlasSprite fluidStillSprite = null;
         if (fluidStill != null) {
-            fluidStillSprite = Minecraft.getInstance().getTextureGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidStill);
+            fluidStillSprite = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidStill);
         }
         if (fluidStillSprite == null) {
             // @todo 1.15
@@ -519,7 +519,7 @@ public class RenderHelper {
 
         IVertexBuilder builder = buffer.getBuffer(CustomRenderTypes.QUADS_NOTEXTURE);
 
-        Matrix4f positionMatrix = matrixStack.getLast().getPositionMatrix();
+        Matrix4f positionMatrix = matrixStack.getLast().getMatrix();
         builder.pos(positionMatrix, x1, y1, zLevel).color(f1, f2, f3, f).lightmap(lightmap).endVertex();
         builder.pos(positionMatrix, x1, y2, zLevel).color(f1, f2, f3, f).lightmap(lightmap).endVertex();
         builder.pos(positionMatrix, x2, y2, zLevel).color(f5, f6, f7, f4).lightmap(lightmap).endVertex();
@@ -1056,7 +1056,7 @@ public class RenderHelper {
 
     public static void fill(MatrixStack matrixStack, IRenderTypeBuffer buffer, int x1, int y1, int x2, int y2, int color,
                             int lightmap) {
-        Matrix4f positionMatrix = matrixStack.getLast().getPositionMatrix();
+        Matrix4f positionMatrix = matrixStack.getLast().getMatrix();
         int swapper;
         if (x1 < x2) {
             swapper = x1;

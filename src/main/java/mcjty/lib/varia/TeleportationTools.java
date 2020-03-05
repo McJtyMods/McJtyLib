@@ -101,7 +101,7 @@ public class TeleportationTools {
 
         srcWorld.getProfiler().endSection();
         player.setWorld(destWorld);
-        destWorld.func_217447_b(player);
+        destWorld.addDuringPortalTeleport(player);
         player.connection.setPlayerLocation(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, f1, f);
         player.interactionManager.setWorld(destWorld);
         player.connection.sendPacket(new SPlayerAbilitiesPacket(player.abilities));

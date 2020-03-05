@@ -26,16 +26,16 @@ public class CustomRenderTypes extends RenderType {
 //    }
 
 
-    public static final RenderType TRANSLUCENT_ADD = get("translucent_add", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
-            State.builder().shadeModel(SHADE_ENABLED)
+    public static final RenderType TRANSLUCENT_ADD = makeType("translucent_add", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+            State.getBuilder().shadeModel(SHADE_ENABLED)
                     .lightmap(LIGHTMAP_ENABLED)
                     .texture(BLOCK_SHEET_MIPPED)
                     .transparency(ADDITIVE_TRANSPARENCY)
                     .writeMask(COLOR_WRITE)
                     .build(true));
 
-    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = get("translucent_add_noloightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
-            State.builder().shadeModel(SHADE_ENABLED)
+    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = makeType("translucent_add_noloightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+            State.getBuilder().shadeModel(SHADE_ENABLED)
                     .lightmap(RenderState.LIGHTMAP_DISABLED)
                     .texture(BLOCK_SHEET_MIPPED)
                     .transparency(ADDITIVE_TRANSPARENCY)
@@ -45,9 +45,9 @@ public class CustomRenderTypes extends RenderType {
 
     private static final LineState THICK_LINES = new LineState(OptionalDouble.of(2.0D));
 
-    public static final RenderType OVERLAY_LINES = get("overlay_lines",
+    public static final RenderType OVERLAY_LINES = makeType("overlay_lines",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINES, 256,
-            State.builder().line(THICK_LINES)
+            State.getBuilder().line(THICK_LINES)
                     .layer(PROJECTION_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .texture(NO_TEXTURE)
@@ -57,16 +57,16 @@ public class CustomRenderTypes extends RenderType {
                     .writeMask(COLOR_WRITE)
                     .build(false));
 
-    public static final RenderType QUADS_NOTEXTURE = get("quads_notexture",
+    public static final RenderType QUADS_NOTEXTURE = makeType("quads_notexture",
             DefaultVertexFormats.POSITION_COLOR_LIGHTMAP, GL11.GL_QUADS, 2097152, true, false,
-            State.builder()
+            State.getBuilder()
                     .texture(NO_TEXTURE)
                     .shadeModel(SHADE_ENABLED).lightmap(LIGHTMAP_ENABLED)
                     .build(false));
 
-    public static final RenderType LINES_LIGHTMAP = get("lines_lightmap",
+    public static final RenderType LINES_LIGHTMAP = makeType("lines_lightmap",
             DefaultVertexFormats.POSITION_COLOR_LIGHTMAP, GL11.GL_LINES, 256, true, false,
-            State.builder()
+            State.getBuilder()
                     .line(new LineState(OptionalDouble.of(1.0)))
                     .texture(NO_TEXTURE)
                     .shadeModel(SHADE_ENABLED).lightmap(LIGHTMAP_ENABLED)
@@ -80,9 +80,9 @@ public class CustomRenderTypes extends RenderType {
         RenderSystem.defaultBlendFunc();
     });
 
-    public static final RenderType LINESTRIP = get("linestrip",
+    public static final RenderType LINESTRIP = makeType("linestrip",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINE_STRIP, 256, true, false,
-            State.builder()
+            State.getBuilder()
                     .line(new LineState(OptionalDouble.of(2.0)))
                     .transparency(LINESTRIP_TRANSP)
                     .texture(NO_TEXTURE)

@@ -141,7 +141,7 @@ public class HudRenderHelper {
                         matrixStack.pop();
                     }
 
-                    fontrenderer.renderString(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff, false, matrixStack.getLast().getPositionMatrix(), buffer, false, 0, 140);
+                    fontrenderer.renderString(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff, false, matrixStack.getLast().getMatrix(), buffer, false, 0, 140);
 //                    fontrenderer.drawString(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff);
                     currenty += height;
                 }
