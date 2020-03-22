@@ -1,4 +1,4 @@
-Upcoming:
+4.0.3-alpha:
 - Helpers for blockstate generation
 - Fixes for the logic blocks
 
