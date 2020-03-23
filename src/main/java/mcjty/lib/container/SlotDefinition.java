@@ -65,6 +65,10 @@ public class SlotDefinition {
         return new SlotDefinition(SlotType.SLOT_GHOSTOUT);
     }
 
+    public static SlotDefinition craftResult() {
+        return new SlotDefinition(SlotType.SLOT_CRAFTRESULT);
+    }
+
     public SlotType getType() {
         return type;
     }
