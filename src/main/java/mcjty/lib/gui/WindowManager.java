@@ -51,6 +51,10 @@ public class WindowManager {
                 .ifPresent(window -> window.setTextFocus(w));
     }
 
+    public Widget<?> getTextFocus() {
+        return getInteractableWindows().map(Window::getTextFocus).filter(Objects::nonNull).findFirst().orElse(null);
+    }
+
     public WindowManager addWindow(Window w) {
         windows.add(w);
         w.setWindowManager(this);
