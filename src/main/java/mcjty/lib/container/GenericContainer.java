@@ -40,6 +40,9 @@ public class GenericContainer extends Container implements IGenericContainer {
         this.factory = factory;
         this.pos = pos;
         this.te = te;
+        if (te instanceof GenericCrafter) {
+            crafter = (GenericCrafter) te;
+        }
         factory.doSetup();
     }
 
