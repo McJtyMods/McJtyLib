@@ -176,8 +176,8 @@ public class InventoryHelper {
      * well as IInventory. Returns an itemstack with whatever could not be inserted or empty item
      * on succcess.
      */
-    @Nullable
-    public static ItemStack insertItem(World world, BlockPos pos, Direction direction, ItemStack s) {
+    @Nonnull
+    public static ItemStack insertItem(World world, BlockPos pos, Direction direction, @Nonnull ItemStack s) {
         TileEntity te = world.getTileEntity(direction == null ? pos : pos.offset(direction));
         if (te != null) {
             Direction opposite = direction == null ? null : direction.getOpposite();
