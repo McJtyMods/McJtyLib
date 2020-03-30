@@ -1,3 +1,6 @@
+Upcoming:
+- Small fix for block placement (as used by the builder)
+
 4.0.3-alpha:
 - Helpers for blockstate generation
 - Fixes for the logic blocks

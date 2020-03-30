@@ -82,6 +82,7 @@ public class BlockTools {
         return stack.getDisplayName().getFormattedText();
     }
 
+    @Nullable
     public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
         BlockRayTraceResult trace = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, pos, false);
         BlockItemUseContext context = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, trace));
@@ -89,6 +90,10 @@ public class BlockTools {
             BlockItem itemBlock = (BlockItem) blockStack.getItem();
             if (origState == null) {
                 origState = itemBlock.getBlock().getStateForPlacement(context);
+                if (origState == null) {
+                    // Cannot place!
+                    return null;
+                }
             }
             if (itemBlock.tryPlace(context) == ActionResultType.SUCCESS) {
                 blockStack.shrink(1);
