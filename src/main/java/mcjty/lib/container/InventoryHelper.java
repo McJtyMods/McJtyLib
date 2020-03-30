@@ -16,7 +16,6 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -133,6 +132,29 @@ public class InventoryHelper {
             });
         }
         return builder.build();
+    }
+
+    /**
+     * Return the first item in an inventory matching the predicate
+     *
+     * @param tileEntity
+     * @param predicate
+     * @return
+     */
+    @Nonnull
+    public static ItemStack getFirstMatchingItem(TileEntity tileEntity, Predicate<ItemStack> predicate) {
+        if (tileEntity != null) {
+            return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(handler -> {
+                for (int i = 0; i < handler.getSlots(); i++) {
+                    ItemStack itemStack = handler.getStackInSlot(i);
+                    if (!itemStack.isEmpty() && predicate.test(itemStack)) {
+                        return itemStack;
+                    }
+                }
+                return ItemStack.EMPTY;
+            }).orElse(ItemStack.EMPTY);
+        }
+        return ItemStack.EMPTY;
     }
 
     /**
