@@ -27,6 +27,16 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 new ResourceLocation("rftoolsbase", "block/base/machineside"));
     }
 
+    public ModelFile topBasedModel(String modelName, ResourceLocation texture) {
+        return models().cube(modelName,
+                new ResourceLocation("rftoolsbase", "block/base/machinebottom"),
+                texture,
+                new ResourceLocation("rftoolsbase", "block/base/machineside"),
+                new ResourceLocation("rftoolsbase", "block/base/machineside"),
+                new ResourceLocation("rftoolsbase", "block/base/machineside"),
+                new ResourceLocation("rftoolsbase", "block/base/machineside"));
+    }
+
     public ModelFile logicSlabModel(String modelName, ResourceLocation texture, ModelBuilder.FaceRotation faceRotation) {
         BlockModelBuilder model = models().getBuilder(BLOCK_FOLDER + "/" + modelName)
                 .parent(models().getExistingFile(mcLoc("block")));
@@ -44,7 +54,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         return model;
     }
 
-    public void registerLogicSlabBlock(LogicSlabBlock block, String modelPrefix, ResourceLocation topTexture) {
+    public void logicSlabBlock(LogicSlabBlock block, String modelPrefix, ResourceLocation topTexture) {
         ModelFile models[] = new ModelFile[4];
         models[0] = logicSlabModel(modelPrefix + "_0", topTexture, ModelBuilder.FaceRotation.ZERO);
         models[1] = logicSlabModel(modelPrefix + "_1", topTexture, ModelBuilder.FaceRotation.UPSIDE_DOWN);
