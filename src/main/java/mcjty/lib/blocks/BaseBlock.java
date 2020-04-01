@@ -7,6 +7,7 @@ import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.builder.BlockBuilder;
 import mcjty.lib.builder.InformationString;
+import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
@@ -15,6 +16,7 @@ import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tooltips.ITooltipSettings;
 import mcjty.lib.varia.OrientationTools;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.lib.varia.WrenchUsage;
@@ -56,16 +58,13 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-//@Optional.InterfaceList({
-//        @Optional.Interface(iface = "mcjty.lib.compat.waila.WailaInfoProvider", modid = "waila"),
-//        @Optional.Interface(iface = "mcjty.lib.compat.theoneprobe.TOPInfoProvider", modid = "theoneprobe")
-//})
-public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock {
+public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings {
 
     private final boolean infusable;
     private final Supplier<TileEntity> tileEntitySupplier;
     private final InformationString informationString;
     private final InformationString informationStringWithShift;
+    private final TooltipBuilder tooltipBuilder;
     private final ToolType toolType;
     private final int harvestLevel;
     private final TOPDriver topDriver;
@@ -80,6 +79,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         this.tileEntitySupplier = builder.getTileEntitySupplier();
         this.informationString = builder.getInformationString();
         this.informationStringWithShift = builder.getInformationStringWithShift();
+        this.tooltipBuilder = builder.getTooltipBuilder();
         this.toolType = builder.getToolType();
         this.harvestLevel = builder.getHarvestLevel();
         this.topDriver = builder.getTopDriver();
@@ -104,12 +104,18 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public void addInformation(ItemStack stack, @Nullable IBlockReader world, List<ITextComponent> tooltip, ITooltipFlag advanced) {
         intAddInformation(stack, tooltip);
 
-        InformationString i = informationString;
-        if (McJtyLib.proxy.isShiftKeyDown()) {
-            i = informationStringWithShift;
-        }
-        if (i != null) {
-            addLocalizedInformation(i, stack, tooltip);
+        if (tooltipBuilder.isActive()) {
+            // Use the new system
+            tooltipBuilder.makeTooltip(getRegistryName(), stack, tooltip);
+        } else {
+            // Old system
+            InformationString i = informationString;
+            if (McJtyLib.proxy.isShiftKeyDown()) {
+                i = informationStringWithShift;
+            }
+            if (i != null) {
+                addLocalizedInformation(i, stack, tooltip);
+            }
         }
     }
 

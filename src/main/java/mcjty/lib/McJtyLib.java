@@ -12,10 +12,8 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -55,9 +53,6 @@ public class McJtyLib implements ModBase {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, GeneralConfig.COMMON_CONFIG);
-
-        GeneralConfig.loadConfig(GeneralConfig.CLIENT_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-client.toml"));
-        GeneralConfig.loadConfig(GeneralConfig.COMMON_CONFIG, FMLPaths.CONFIGDIR.get().resolve("mcjtylib-common.toml"));
     }
 
     public static void registerMod(ModBase mod) {

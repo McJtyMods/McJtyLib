@@ -22,6 +22,7 @@ public class BlockBuilder {
     private boolean infusable = false;
     private InformationString informationString;
     private InformationString informationStringWithShift;
+    private TooltipBuilder tooltipBuilder = new TooltipBuilder();
     private Supplier<TileEntity> tileEntitySupplier;
     private ToolType toolType = ToolType.PICKAXE;
     private int harvestLevel = 0;
@@ -33,6 +34,10 @@ public class BlockBuilder {
 
     public boolean isInfusable() {
         return infusable;
+    }
+
+    public TooltipBuilder getTooltipBuilder() {
+        return tooltipBuilder;
     }
 
     public InformationString getInformationString() {
@@ -73,6 +78,16 @@ public class BlockBuilder {
 
     public BlockBuilder infusable() {
         this.infusable = true;
+        return this;
+    }
+
+    public BlockBuilder info(InfoLine... lines) {
+        tooltipBuilder.info(lines);
+        return this;
+    }
+
+    public BlockBuilder infoShift(InfoLine... lines) {
+        tooltipBuilder.infoShift(lines);
         return this;
     }
 

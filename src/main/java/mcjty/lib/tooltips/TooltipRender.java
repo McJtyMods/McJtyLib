@@ -3,6 +3,8 @@ package mcjty.lib.tooltips;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -44,6 +46,16 @@ public class TooltipRender {
                     tooltip.add(new StringTextComponent(spaces));
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onTooltipPre(RenderTooltipEvent.Pre event) {
+        Item item = event.getStack().getItem();
+        if (item instanceof ITooltipSettings) {
+            event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) item).getMaxWidth()));
+        } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof ITooltipSettings) {
+            event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) ((BlockItem) item).getBlock()).getMaxWidth()));
         }
     }
 
