@@ -1,6 +1,7 @@
 package mcjty.lib.builder;
 
 import mcjty.lib.McJtyLib;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
@@ -17,6 +18,7 @@ public class TooltipBuilder {
 
     private InfoLine[] infoLines;
     private InfoLine[] shiftInfoLines;
+    private InfoLine[] advancedInfoLines;
 
     public TooltipBuilder info(InfoLine... lines) {
         infoLines = lines;
@@ -25,6 +27,11 @@ public class TooltipBuilder {
 
     public TooltipBuilder infoShift(InfoLine... lines) {
         shiftInfoLines = lines;
+        return this;
+    }
+
+    public TooltipBuilder infoAdvanced(InfoLine... lines) {
+        advancedInfoLines = lines;
         return this;
     }
 
@@ -37,7 +44,7 @@ public class TooltipBuilder {
     }
 
 
-    public void makeTooltip(@Nonnull ResourceLocation id, @Nonnull ItemStack stack, @Nonnull List<ITextComponent> tooltip) {
+    public void makeTooltip(@Nonnull ResourceLocation id, @Nonnull ItemStack stack, @Nonnull List<ITextComponent> tooltip, ITooltipFlag flag) {
         String namespace = id.getNamespace();
         String path = id.getPath();
         String prefix = "message." + namespace + "." + path + ".";
@@ -45,6 +52,14 @@ public class TooltipBuilder {
         if (infoLines == null || (McJtyLib.proxy.isShiftKeyDown() && shiftInfoLines != null)) {
             lines = shiftInfoLines;
         }
+        addLines(stack, tooltip, prefix, lines);
+
+        if (advancedInfoLines != null && flag.isAdvanced()) {
+            addLines(stack, tooltip, prefix, advancedInfoLines);
+        }
+    }
+
+    private void addLines(@Nonnull ItemStack stack, @Nonnull List<ITextComponent> tooltip, String prefix, InfoLine[] lines) {
         for (InfoLine line : lines) {
             if (line.getCondition().test(stack)) {
                 ITextComponent component;
@@ -60,8 +75,6 @@ public class TooltipBuilder {
                 tooltip.add(component);
             }
         }
-
-
     }
 
     public boolean isActive() {
