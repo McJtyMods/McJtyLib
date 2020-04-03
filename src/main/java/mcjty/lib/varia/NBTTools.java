@@ -1,11 +1,28 @@
 package mcjty.lib.varia;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import org.apache.commons.lang3.StringUtils;
 
 public class NBTTools {
+
+    public static int getInt(ItemStack stack, String name, int def) {
+        CompoundNBT tag = stack.getTag();
+        if (tag == null) {
+            return def;
+        }
+        return tag.getInt(name);
+    }
+
+    public static String getString(ItemStack stack, String name, String def) {
+        CompoundNBT tag = stack.getTag();
+        if (tag == null) {
+            return def;
+        }
+        return tag.getString(name);
+    }
 
     public static StringBuffer appendIndent(StringBuffer buffer, int indent) {
         return buffer.append(StringUtils.repeat(' ', indent));

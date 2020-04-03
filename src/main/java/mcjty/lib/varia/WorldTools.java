@@ -21,6 +21,14 @@ public class WorldTools {
 //        return world.getChunkProvider().getLoadedChunk(pos.getX() >> 4, pos.getZ() >> 4) != null && world.getChunkFromBlockCoords(pos).isLoaded();
     }
 
+    public static String getDimensionName(World world) {
+        return getDimensionName(world.getDimension().getType());
+    }
+
+    public static String getDimensionName(DimensionType type) {
+        return type.getRegistryName().toString();
+    }
+
     public static ServerWorld getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);

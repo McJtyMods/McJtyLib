@@ -13,6 +13,8 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class TooltipBuilder {
 
@@ -62,17 +64,34 @@ public class TooltipBuilder {
     private void addLines(@Nonnull ItemStack stack, @Nonnull List<ITextComponent> tooltip, String prefix, InfoLine[] lines) {
         for (InfoLine line : lines) {
             if (line.getCondition().test(stack)) {
-                ITextComponent component;
-                if (line.getTranslationKey() != null) {
-                    component = stylize(line.getTranslationKey(), line.getStyles());
+                if (line.getRepeatingParameter() != null) {
+                    line.getRepeatingParameter().apply(stack).forEach(s -> {
+                        ITextComponent component;
+                        if (line.getTranslationKey() != null) {
+                            component = stylize(line.getTranslationKey(), line.getStyles());
+                        } else {
+                            component = stylize(prefix + line.getSuffix(), line.getStyles());
+                        }
+                        component.appendSibling(new StringTextComponent(TextFormatting.WHITE + s));
+                        tooltip.add(component);
+                    });
                 } else {
-                    component = stylize(prefix + line.getSuffix(), line.getStyles());
+                    ITextComponent component;
+                    if (line.getTranslationKey() != null) {
+                        component = stylize(line.getTranslationKey(), line.getStyles());
+                    } else {
+                        component = stylize(prefix + line.getSuffix(), line.getStyles());
+                    }
+                    if (line.getInformationGetter() != null) {
+                        String extra = line.getInformationGetter().apply(stack);
+                        if (extra != null) {
+                            component.appendSibling(new StringTextComponent(TextFormatting.WHITE + extra));
+                            tooltip.add(component);
+                        } // Else we don't add the entire component
+                    } else {
+                        tooltip.add(component);
+                    }
                 }
-                if (line.getInformationGetter() != null) {
-                    String extra = line.getInformationGetter().apply(stack);
-                    component.appendSibling(new StringTextComponent(TextFormatting.WHITE + extra));
-                }
-                tooltip.add(component);
             }
         }
     }
@@ -82,36 +101,38 @@ public class TooltipBuilder {
     }
 
     public static final InfoLine key(String key) {
-        return new InfoLine(key, null, itemStack -> true, null, TextFormatting.YELLOW);
+        return new InfoLine(key, null, stack -> true, null, null, TextFormatting.YELLOW);
     }
 
     public static final InfoLine header() {
-        return new InfoLine(null, "header", itemStack -> true, null, TextFormatting.GREEN);
+        return new InfoLine(null, "header", stack -> true, null, null, TextFormatting.GREEN);
     }
 
     public static final InfoLine warning(Predicate<ItemStack> condition) {
-        return new InfoLine(null, "warning", condition, null, TextFormatting.RED);
+        return new InfoLine(null, "warning", condition, null, null, TextFormatting.RED);
     }
 
     public static final InfoLine warning() {
-        return new InfoLine(null, "warning", itemStack -> true, null, TextFormatting.RED);
+        return new InfoLine(null, "warning", stack -> true, null, null, TextFormatting.RED);
     }
 
     public static final InfoLine gold(Predicate<ItemStack> condition) {
-        return new InfoLine(null, "gold", condition, null, TextFormatting.GOLD);
+        return new InfoLine(null, "gold", condition, null, null, TextFormatting.GOLD);
     }
 
     public static final InfoLine gold() {
-        return new InfoLine(null, "gold", itemStack -> true, null, TextFormatting.GOLD);
+        return new InfoLine(null, "gold", stack -> true, null, null, TextFormatting.GOLD);
     }
 
     public static final InfoLine parameter(String suffix, Function<ItemStack, String> getter) {
-        return new InfoLine(null, suffix, itemStack -> true,
-                getter, TextFormatting.GRAY, TextFormatting.BOLD);
+        return new InfoLine(null, suffix, stack -> true, getter, null, TextFormatting.GRAY, TextFormatting.BOLD);
     }
 
     public static final InfoLine parameter(String suffix, Predicate<ItemStack> condition, Function<ItemStack, String> getter) {
-        return new InfoLine(null, suffix, condition,
-                getter, TextFormatting.GRAY, TextFormatting.BOLD);
+        return new InfoLine(null, suffix, condition, getter, null, TextFormatting.GRAY, TextFormatting.BOLD);
+    }
+
+    public static final InfoLine repeatingParameter(String suffix, Function<ItemStack, Stream<String>> repeater) {
+        return new InfoLine(null, suffix, stack -> true, null, repeater, TextFormatting.GRAY, TextFormatting.BOLD);
     }
 }

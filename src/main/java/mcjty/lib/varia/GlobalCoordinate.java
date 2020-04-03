@@ -39,5 +39,10 @@ public class GlobalCoordinate {
         result = 31 * result + dimension.getId();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return BlockPosTools.toString(coordinate) + " (" + WorldTools.getDimensionName(dimension) + ")";
+    }
 }
 
