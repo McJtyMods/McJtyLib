@@ -5,11 +5,9 @@ import mcjty.lib.compat.theoneprobe.TOPDriver;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.ToolType;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class BlockBuilder {
@@ -20,8 +18,6 @@ public class BlockBuilder {
 
     private Block.Properties properties = STANDARD_IRON;
     private boolean infusable = false;
-    private InformationString informationString;
-    private InformationString informationStringWithShift;
     private TooltipBuilder tooltipBuilder = new TooltipBuilder();
     private Supplier<TileEntity> tileEntitySupplier;
     private ToolType toolType = ToolType.PICKAXE;
@@ -38,14 +34,6 @@ public class BlockBuilder {
 
     public TooltipBuilder getTooltipBuilder() {
         return tooltipBuilder;
-    }
-
-    public InformationString getInformationString() {
-        return informationString;
-    }
-
-    public InformationString getInformationStringWithShift() {
-        return informationStringWithShift;
     }
 
     public Supplier<TileEntity> getTileEntitySupplier() {
@@ -91,23 +79,8 @@ public class BlockBuilder {
         return this;
     }
 
-    public BlockBuilder info(String informationString) {
-        this.informationString = new InformationString(informationString);
-        return this;
-    }
-
-    public BlockBuilder infoParameter(Function<ItemStack, String> parameter) {
-        this.informationString.addParameter(parameter);
-        return this;
-    }
-
-    public BlockBuilder infoExtended(String informationString) {
-        this.informationStringWithShift = new InformationString(informationString);
-        return this;
-    }
-
-    public BlockBuilder infoExtendedParameter(Function<ItemStack, String> parameter) {
-        this.informationStringWithShift.addParameter(parameter);
+    public BlockBuilder infoAdvanced(InfoLine... lines) {
+        tooltipBuilder.infoAdvanced(lines);
         return this;
     }
 

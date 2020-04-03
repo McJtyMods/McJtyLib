@@ -82,7 +82,7 @@ public class TooltipBuilder {
     }
 
     public static final InfoLine key(String key) {
-        return new InfoLine(key, null, itemStack -> true, null, TextFormatting.WHITE);
+        return new InfoLine(key, null, itemStack -> true, null, TextFormatting.YELLOW);
     }
 
     public static final InfoLine header() {

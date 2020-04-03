@@ -6,7 +6,6 @@ import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.builder.BlockBuilder;
-import mcjty.lib.builder.InformationString;
 import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
@@ -23,7 +22,6 @@ import mcjty.lib.varia.WrenchUsage;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -50,20 +48,16 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fml.network.NetworkHooks;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings {
 
     private final boolean infusable;
     private final Supplier<TileEntity> tileEntitySupplier;
-    private final InformationString informationString;
-    private final InformationString informationStringWithShift;
     private final TooltipBuilder tooltipBuilder;
     private final ToolType toolType;
     private final int harvestLevel;
@@ -77,8 +71,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         super(builder.getProperties());
         this.infusable = builder.isInfusable();
         this.tileEntitySupplier = builder.getTileEntitySupplier();
-        this.informationString = builder.getInformationString();
-        this.informationStringWithShift = builder.getInformationStringWithShift();
         this.tooltipBuilder = builder.getTooltipBuilder();
         this.toolType = builder.getToolType();
         this.harvestLevel = builder.getHarvestLevel();
@@ -105,17 +97,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         intAddInformation(stack, tooltip);
 
         if (tooltipBuilder.isActive()) {
-            // Use the new system
-            tooltipBuilder.makeTooltip(getRegistryName(), stack, tooltip);
-        } else {
-            // Old system
-            InformationString i = informationString;
-            if (McJtyLib.proxy.isShiftKeyDown()) {
-                i = informationStringWithShift;
-            }
-            if (i != null) {
-                addLocalizedInformation(i, stack, tooltip);
-            }
+            tooltipBuilder.makeTooltip(getRegistryName(), stack, tooltip, advanced);
         }
     }
 
@@ -492,23 +474,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return OrientationTools.getOrientation(state);
             default:
                 return Direction.SOUTH;
-        }
-    }
-
-    private static final Pattern COMPILE = Pattern.compile("@", Pattern.LITERAL);
-
-    public static void addLocalizedInformation(InformationString informationString, ItemStack stack, List<ITextComponent> tooltip) {
-        if (informationString != null) {
-            Object[] parameters = new Object[informationString.getInformationStringParameters().size()];
-            for (int i = 0 ; i < parameters.length ; i++) {
-                parameters[i] = informationString.getInformationStringParameters().get(i).apply(stack);
-            }
-            String translated = I18n.format(informationString.getString(), parameters);
-            translated = COMPILE.matcher(translated).replaceAll("\u00a7");
-            String[] split = StringUtils.split(translated, "\n");
-            for (String s : split) {
-                tooltip.add(new StringTextComponent(s));
-            }
         }
     }
 
