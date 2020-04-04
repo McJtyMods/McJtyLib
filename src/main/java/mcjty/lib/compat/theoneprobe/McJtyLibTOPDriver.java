@@ -42,15 +42,15 @@ public class McJtyLibTOPDriver implements TOPDriver {
     }
 
     public void addStandardProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
+        if (mode == ProbeMode.EXTENDED) {
         TileEntity te = world.getTileEntity(data.getPos());
         if (te instanceof GenericTileEntity) {
-            te.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> {
-                int infused = h.getInfused();
-                int pct = infused * 100 / GeneralConfig.maxInfuse.get();
-                probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
-            });
             GenericTileEntity generic = (GenericTileEntity) te;
-            if (mode == ProbeMode.EXTENDED) {
+                te.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> {
+                    int infused = h.getInfused();
+                    int pct = infused * 100 / GeneralConfig.maxInfuse.get();
+                    probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
+                });
                 if (GeneralConfig.manageOwnership.get()) {
                     if (generic.getOwnerName() != null && !generic.getOwnerName().isEmpty()) {
                         int securityChannel = generic.getSecurityChannel();

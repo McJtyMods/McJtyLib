@@ -13,7 +13,6 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class TooltipBuilder {
@@ -100,39 +99,47 @@ public class TooltipBuilder {
         return infoLines != null || shiftInfoLines != null;
     }
 
-    public static final InfoLine key(String key) {
+    public static InfoLine key(String key) {
         return new InfoLine(key, null, stack -> true, null, null, TextFormatting.YELLOW);
     }
 
-    public static final InfoLine header() {
+    public static InfoLine header() {
         return new InfoLine(null, "header", stack -> true, null, null, TextFormatting.GREEN);
     }
 
-    public static final InfoLine warning(Predicate<ItemStack> condition) {
+    public static InfoLine warning(Predicate<ItemStack> condition) {
         return new InfoLine(null, "warning", condition, null, null, TextFormatting.RED);
     }
 
-    public static final InfoLine warning() {
+    public static InfoLine warning() {
         return new InfoLine(null, "warning", stack -> true, null, null, TextFormatting.RED);
     }
 
-    public static final InfoLine gold(Predicate<ItemStack> condition) {
+    public static InfoLine gold(Predicate<ItemStack> condition) {
         return new InfoLine(null, "gold", condition, null, null, TextFormatting.GOLD);
     }
 
-    public static final InfoLine gold() {
+    public static InfoLine gold() {
         return new InfoLine(null, "gold", stack -> true, null, null, TextFormatting.GOLD);
     }
 
-    public static final InfoLine parameter(String suffix, Function<ItemStack, String> getter) {
+    public static InfoLine general(String suffix, TextFormatting... styles) {
+        return new InfoLine(null, suffix, stack -> true, null, null, styles);
+    }
+
+    public static InfoLine general(String suffix, Predicate<ItemStack> condition, TextFormatting... styles) {
+        return new InfoLine(null, suffix, condition, null, null, styles);
+    }
+
+    public static InfoLine parameter(String suffix, Function<ItemStack, String> getter) {
         return new InfoLine(null, suffix, stack -> true, getter, null, TextFormatting.GRAY, TextFormatting.BOLD);
     }
 
-    public static final InfoLine parameter(String suffix, Predicate<ItemStack> condition, Function<ItemStack, String> getter) {
+    public static InfoLine parameter(String suffix, Predicate<ItemStack> condition, Function<ItemStack, String> getter) {
         return new InfoLine(null, suffix, condition, getter, null, TextFormatting.GRAY, TextFormatting.BOLD);
     }
 
-    public static final InfoLine repeatingParameter(String suffix, Function<ItemStack, Stream<String>> repeater) {
+    public static InfoLine repeatingParameter(String suffix, Function<ItemStack, Stream<String>> repeater) {
         return new InfoLine(null, suffix, stack -> true, null, repeater, TextFormatting.GRAY, TextFormatting.BOLD);
     }
 }
