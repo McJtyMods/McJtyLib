@@ -14,7 +14,12 @@ public class ClientEventHandler {
     public void onGuiInput(GuiScreenEvent.KeyboardCharTypedEvent event) {
         if (event.getGui() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getGui();
-            Widget<?> focus = container.getWindow().getWindowManager().getTextFocus();
+            Widget<?> focus;
+            if (container.getWindow().getWindowManager() == null) {
+                focus = container.getWindow().getTextFocus();
+            } else {
+                focus = container.getWindow().getWindowManager().getTextFocus();
+            }
             if (focus != null) {
                 event.setCanceled(true);
                 container.charTypedFromEvent(event.getCodePoint());
@@ -33,7 +38,12 @@ public class ClientEventHandler {
     public void onKeyboardInput(GuiScreenEvent.KeyboardKeyPressedEvent event) {
         if (event.getGui() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getGui();
-            Widget<?> focus = container.getWindow().getWindowManager().getTextFocus();
+            Widget<?> focus;
+            if (container.getWindow().getWindowManager() == null) {
+                focus = container.getWindow().getTextFocus();
+            } else {
+                focus = container.getWindow().getWindowManager().getTextFocus();
+            }
             if (focus != null) {
                 event.setCanceled(true);
                 container.keyTypedFromEvent(event.getKeyCode(), event.getScanCode());
