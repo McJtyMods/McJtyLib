@@ -303,6 +303,10 @@ public class LogicSlabBlock extends BaseBlock {
         return state;
     }
 
+    @Override
+    public boolean canProvidePower(BlockState state) {
+        return true;
+    }
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {

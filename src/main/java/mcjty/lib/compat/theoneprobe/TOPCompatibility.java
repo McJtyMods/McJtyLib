@@ -34,7 +34,7 @@ public class TOPCompatibility {
         registered = true;
 //        InterModComms.sendTo("theoneprobe", "getTheOneProbe", "mcjty.lib.compat.theoneprobe.TOPCompatibility$GetTheOneProbe");
         // @todo make easier!
-        InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> new GetTheOneProbe());
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", GetTheOneProbe::new);
     }
 
 
