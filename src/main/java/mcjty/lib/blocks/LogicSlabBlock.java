@@ -31,7 +31,7 @@ import static net.minecraft.util.Direction.*;
 /**
  * The superclass for logic slabs.
  */
-public abstract class LogicSlabBlock extends BaseBlock {
+public class LogicSlabBlock extends BaseBlock {
 
     public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
 
