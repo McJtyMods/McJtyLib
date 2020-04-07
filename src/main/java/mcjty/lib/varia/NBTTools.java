@@ -6,21 +6,28 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 public class NBTTools {
 
-    public static <T> T getInfoNBT(ItemStack stack, String name, Function<CompoundNBT, Function<String, T>> getter, T def) {
+    public static <T> T getInfoNBT(ItemStack stack, BiFunction<CompoundNBT, String, T> getter, String name, T def) {
         CompoundNBT tag = stack.getTag();
         if (tag == null) {
             return def;
         }
         CompoundNBT info = tag.getCompound("BlockEntityTag").getCompound("Info");
         if (info.contains(name)) {
-            return getter.apply(info).apply(name);
+            return getter.apply(info, name);
         } else {
             return def;
         }
+    }
+
+    public static <T> void setInfoNBT(ItemStack stack, TriConsumer<CompoundNBT, String, T> setter, String name, T value) {
+        CompoundNBT entityTag = stack.getOrCreateChildTag("BlockEntityTag");
+        CompoundNBT info = entityTag.getCompound("Info");
+        setter.accept(info, name, value);
+        entityTag.put("Info", info);
     }
 
     public static boolean hasInfoNBT(ItemStack stack, String name) {

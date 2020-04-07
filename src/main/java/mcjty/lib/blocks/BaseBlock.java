@@ -16,6 +16,7 @@ import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tooltips.ITooltipSettings;
+import mcjty.lib.varia.NBTTools;
 import mcjty.lib.varia.OrientationTools;
 import mcjty.lib.varia.WrenchChecker;
 import mcjty.lib.varia.WrenchUsage;
@@ -77,19 +78,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         this.topDriver = builder.getTopDriver();
     }
 
-    public static int getInfused(CompoundNBT tag) {
-        return tag.getCompound("BlockEntityTag").getCompound("Info").getInt("infused");
-    }
-
-    public static void setInfused(CompoundNBT tag, int infused) {
-        if (!tag.contains("BlockEntityTag")) {
-            tag.put("BlockEntityTag", new CompoundNBT());
-        }
-        tag = tag.getCompound("BlockEntityTag");
-        if (!tag.contains("Info")) {
-            tag.put("Info", new CompoundNBT());
-        }
-        tag.getCompound("Info").putInt("infused", infused);
+    public static void setInfused(ItemStack stack, int infused) {
+        NBTTools.setInfoNBT(stack, CompoundNBT::putInt, "infused", infused);
     }
 
     @Override
@@ -109,7 +99,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 list.add(new StringTextComponent(TextFormatting.GREEN + "Energy: " + energy + " rf"));
             }
             if (isInfusable()) {
-                int infused = getInfused(tagCompound);
+                int infused = getInfused(itemStack);
                 int pct = infused * 100 / GeneralConfig.maxInfuse.get();
                 list.add(new StringTextComponent(TextFormatting.YELLOW + "Infused: " + pct + "%"));
             }
@@ -134,6 +124,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
     }
 
+    public static int getInfused(ItemStack itemStack) {
+        return NBTTools.getInfoNBT(itemStack, CompoundNBT::getInt, "infused", 0);
+    }
 
     // This if this block was activated with a wrench
     private WrenchUsage testWrenchUsage(BlockPos pos, PlayerEntity player) {

@@ -1,5 +1,6 @@
 package mcjty.lib.network;
 
+import mcjty.lib.varia.TriConsumer;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -20,7 +21,4 @@ public class ChannelBoundHandler<T> implements BiConsumer<T, Supplier<NetworkEve
         innerHandler.accept(message, channel, ctx);
     }
 
-    public interface TriConsumer<K, V, S> {
-        void accept(K k, V v, S s);
-    }
 }
