@@ -309,6 +309,11 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     @Override
+    public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+        return getRedstoneOutput(blockState, blockAccess, pos, side);
+    }
+
+    @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         super.fillStateContainer(builder);
         builder.add(LOGIC_FACING);

@@ -6,7 +6,31 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.function.Function;
+
 public class NBTTools {
+
+    public static <T> T getInfoNBT(ItemStack stack, String name, Function<CompoundNBT, Function<String, T>> getter, T def) {
+        CompoundNBT tag = stack.getTag();
+        if (tag == null) {
+            return def;
+        }
+        CompoundNBT info = tag.getCompound("BlockEntityTag").getCompound("Info");
+        if (info.contains(name)) {
+            return getter.apply(info).apply(name);
+        } else {
+            return def;
+        }
+    }
+
+    public static boolean hasInfoNBT(ItemStack stack, String name) {
+        CompoundNBT tag = stack.getTag();
+        if (tag == null) {
+            return false;
+        }
+        CompoundNBT info = tag.getCompound("BlockEntityTag").getCompound("Info");
+        return info.contains(name);
+    }
 
     public static int getInt(ItemStack stack, String name, int def) {
         CompoundNBT tag = stack.getTag();
