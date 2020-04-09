@@ -178,6 +178,7 @@ public class LogicSlabBlock extends BaseBlock {
     @Override
     @Deprecated
     protected void checkRedstone(World world, BlockPos pos) {
+        super.checkRedstone(world, pos);
         // Old behaviour
         // @todo remove once all implementations do this in the TE.checkRedstone
         TileEntity te = world.getTileEntity(pos);
