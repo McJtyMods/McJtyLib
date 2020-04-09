@@ -124,6 +124,10 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
+    public int getPowerLevel() {
+        return powerLevel;
+    }
+
     public RedstoneMode getRSMode() {
         return rsMode;
     }

@@ -1,6 +1,7 @@
 package mcjty.lib;
 
 import mcjty.lib.gui.IKeyReceiver;
+import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -8,6 +9,36 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class ClientEventHandler {
 
     public ClientEventHandler(){
+    }
+
+    @SubscribeEvent
+    public void onMouseClicked(GuiScreenEvent.MouseClickedEvent event) {
+        if (event.getGui() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getGui();
+            WindowManager manager = container.getWindow().getWindowManager();
+            if (manager != null) {
+                if (manager.getModalWindows().findFirst().isPresent()) {
+                    // There is a modal window. Eat this event and send it directly to the window
+                    manager.mouseClicked((int)event.getMouseX(), (int)event.getMouseY(), event.getButton());
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onMouseReleased(GuiScreenEvent.MouseReleasedEvent event) {
+        if (event.getGui() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getGui();
+            WindowManager manager = container.getWindow().getWindowManager();
+            if (manager != null) {
+                if (manager.getModalWindows().findFirst().isPresent()) {
+                    // There is a modal window. Eat this event and send it directly to the window
+                    manager.mouseReleased((int)event.getMouseX(), (int)event.getMouseY(), event.getButton());
+                    event.setCanceled(true);
+                }
+            }
+        }
     }
 
     @SubscribeEvent

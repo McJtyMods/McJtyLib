@@ -23,6 +23,7 @@ import static mcjty.lib.gui.widgets.Panel.TYPE_PANEL;
 import static mcjty.lib.gui.widgets.ScrollableLabel.TYPE_SCROLLABLELABEL;
 import static mcjty.lib.gui.widgets.Slider.TYPE_SLIDER;
 import static mcjty.lib.gui.widgets.TabbedPanel.TYPE_TABBEDPANEL;
+import static mcjty.lib.gui.widgets.TagSelector.TYPE_TAGSELECTOR;
 import static mcjty.lib.gui.widgets.TextField.TYPE_TEXTFIELD;
 import static mcjty.lib.gui.widgets.ToggleButton.TYPE_TOGGLEBUTTON;
 import static mcjty.lib.gui.widgets.WidgetList.TYPE_WIDGETLIST;
@@ -53,6 +54,7 @@ public class WidgetRepository {
 //        FACTORIES.put(TYPE_TEXTPAGE, (minecraft, gui) -> new TextPage(minecraft, gui));
         FACTORIES.put(TYPE_TOGGLEBUTTON, ToggleButton::new);
         FACTORIES.put(TYPE_WIDGETLIST, WidgetList::new);
+        FACTORIES.put(TYPE_TAGSELECTOR, TagSelector::new);
     }
 
     @Nullable

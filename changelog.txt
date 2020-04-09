@@ -1,6 +1,7 @@
 Upcoming:
 - Small fix for block placement (as used by the builder)
 - Support for better item tooltip system
+- Many cleanups and fixes for logic blocks
 
 4.0.3-alpha:
 - Helpers for blockstate generation

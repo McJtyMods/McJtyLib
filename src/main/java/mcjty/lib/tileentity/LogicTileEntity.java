@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -76,23 +75,4 @@ public class LogicTileEntity extends GenericTileEntity {
             return 0;
         }
     }
-
-    @Override
-    public void read(CompoundNBT tagCompound) {
-        super.read(tagCompound);
-    }
-
-    @Override
-    public CompoundNBT write(CompoundNBT tagCompound) {
-        super.write(tagCompound);
-        return tagCompound;
-    }
-
-    // @todo 1.14
-//    public BlockState getActualState(BlockState state) {
-//        int meta = state.get(META_INTERMEDIATE);
-//        LogicFacing facing = getFacing(state);
-//        facing = LogicFacing.getFacingWithMeta(facing, meta);
-//        return state.with(LOGIC_FACING, facing);
-//    }
 }
