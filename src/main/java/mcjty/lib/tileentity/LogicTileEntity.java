@@ -52,7 +52,7 @@ public class LogicTileEntity extends GenericTileEntity {
     /**
      * Returns the signal strength at one input of the block
      */
-    protected int getInputStrength(World world, BlockPos pos, Direction side) {
+    public int getInputStrength(World world, BlockPos pos, Direction side) {
         int power = world.getRedstonePower(pos.offset(side), side);
         if (power < 15) {
             // Check if there is no redstone wire there. If there is a 'bend' in the redstone wire it is

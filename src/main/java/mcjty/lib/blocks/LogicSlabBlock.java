@@ -33,7 +33,7 @@ import static net.minecraft.util.Direction.*;
  */
 public class LogicSlabBlock extends BaseBlock {
 
-    public static EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
+    public static final EnumProperty<LogicFacing> LOGIC_FACING = EnumProperty.create("logic_facing", LogicFacing.class);
 
     public LogicSlabBlock(BlockBuilder builder) {
         super(builder);
@@ -79,8 +79,6 @@ public class LogicSlabBlock extends BaseBlock {
         double dz = Math.abs(0.5 - hz);
 
         Direction side = context.getFace().getOpposite();
-//        System.out.println("LogicSlabBlock.getStateForPlacement");
-//        System.out.println("  side = " + side);
         LogicFacing facing;
         switch (side) {
             case DOWN:
@@ -129,23 +127,8 @@ public class LogicSlabBlock extends BaseBlock {
                 facing = DOWN_TOWEST;
                 break;
         }
-//        System.out.println("  facing = " + facing);
-//        System.out.println("  facing.getInputSide() = " + facing.getInputSide());
-        // LOGIC_FACING doesn't get saved to metadata, but it doesn't need to. It only needs to be available until LogicTileEntity#onLoad() runs.
-        // @todo 1.14 check: was side opposite or not?
-        System.out.println("facing = " + facing + ", " + facing.getRotationStep());
         return super.getStateForPlacement(context).with(LOGIC_FACING, facing);
     }
-
-//    @Override
-//    public boolean hasRedstoneOutput() {
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean needsRedstoneCheck() {
-//        return true;
-//    }
 
     public static final VoxelShape BLOCK_DOWN = VoxelShapes.create(0.0F, 0.0F, 0.0F, 1.0F, 0.25F, 1.0F);
     public static final VoxelShape BLOCK_UP = VoxelShapes.create(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F);
@@ -172,35 +155,6 @@ public class LogicSlabBlock extends BaseBlock {
         }
         return BLOCK_DOWN;
     }
-
-    // @todo 1.14
-//    @Override
-//    public AxisAlignedBB getBoundingBox(BlockState state, IBlockReader world, BlockPos pos) {
-//        BlockState blockState = world.getBlockState(pos);
-//        if (blockState.getBlock() instanceof LogicSlabBlock) {
-//            TileEntity te = world.getTileEntity(pos);
-//            if (te instanceof LogicTileEntity) {
-//                LogicTileEntity logicTileEntity = (LogicTileEntity) te;
-//                Direction side = logicTileEntity.getFacing(blockState).getSide();
-//                switch (side) {
-//                    case DOWN:
-//                        return BLOCK_DOWN;
-//                    case UP:
-//                        return BLOCK_UP;
-//                    case NORTH:
-//                        return BLOCK_NORTH;
-//                    case SOUTH:
-//                        return BLOCK_SOUTH;
-//                    case WEST:
-//                        return BLOCK_WEST;
-//                    case EAST:
-//                        return BLOCK_EAST;
-//                }
-//            }
-//        }
-//        return BLOCK_DOWN;
-//    }
-
 
     /**
      * Returns the signal strength at one input of the block
@@ -234,28 +188,6 @@ public class LogicSlabBlock extends BaseBlock {
             logicTileEntity.setPowerInput(power);
         }
     }
-
-//    @Override
-//    public AxisAlignedBB getCollisionBoundingBox(BlockState blockState, World worldIn, BlockPos pos) {
-//        return null;
-//    }
-
-    // @todo 1.14
-//    @Override
-//    public boolean isOpaqueCube(BlockState state) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isFullBlock(BlockState state) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isFullCube(BlockState state) {
-//        return false;
-//    }
-
 
     @Override
     public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {

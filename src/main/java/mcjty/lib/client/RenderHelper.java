@@ -20,16 +20,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import javax.annotation.Nullable;
-
-;
 
 public class RenderHelper {
     public static float rot = 0.0f;
@@ -43,6 +43,62 @@ public class RenderHelper {
     public static void renderEntity(Entity entity, int xPos, int yPos) {
         float f1 = 10F;
         renderEntity(entity, xPos, yPos, f1);
+    }
+
+    // Adjust the given matrix to the specified direction
+    public static void adjustTransformToDirection(MatrixStack matrixStack, Direction facing) {
+        matrixStack.translate(0.5F, 0.5F, 0.5F);
+
+        switch (facing) {
+            case DOWN:
+                matrixStack.rotate(Vector3f.XP.rotationDegrees(90.0F));
+                break;
+            case UP:
+                matrixStack.rotate(Vector3f.XP.rotationDegrees(-90.0F));
+                break;
+            case NORTH:
+                matrixStack.rotate(Vector3f.YP.rotationDegrees(-180.0F));
+                break;
+            case SOUTH:
+                break;
+            case WEST:
+                matrixStack.rotate(Vector3f.YP.rotationDegrees(-90.0F));
+                break;
+            case EAST:
+                matrixStack.rotate(Vector3f.YP.rotationDegrees(90.0F));
+                break;
+        }
+
+        matrixStack.translate(-0.5F, -0.5F, -0.5F);
+    }
+
+    public static void renderNorthSouthQuad(IVertexBuilder builder, Matrix4f matrix, TextureAtlasSprite sprite, ModelBuilder.FaceRotation rotation, float offset) {
+        switch (rotation) {
+            case ZERO:
+                RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getMinU(), sprite.getMaxV());
+                RenderHelper.vt(builder, matrix, 1, 1, .73f, sprite.getMaxU(), sprite.getMaxV());
+                RenderHelper.vt(builder, matrix, 1, 0, .73f, sprite.getMaxU(), sprite.getMinV());
+                RenderHelper.vt(builder, matrix, 0, 0, .73f, sprite.getMinU(), sprite.getMinV());
+                break;
+            case CLOCKWISE_90:
+                RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getMaxU(), sprite.getMinV());
+                RenderHelper.vt(builder, matrix, 1, 1, .73f, sprite.getMinU(), sprite.getMinV());
+                RenderHelper.vt(builder, matrix, 1, 0, .73f, sprite.getMinU(), sprite.getMaxV());
+                RenderHelper.vt(builder, matrix, 0, 0, .73f, sprite.getMaxU(), sprite.getMaxV());
+                break;
+            case UPSIDE_DOWN:
+                RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getMinU(), sprite.getMinV());
+                RenderHelper.vt(builder, matrix, 1, 1, .73f, sprite.getMinU(), sprite.getMaxV());
+                RenderHelper.vt(builder, matrix, 1, 0, .73f, sprite.getMaxU(), sprite.getMaxV());
+                RenderHelper.vt(builder, matrix, 0, 0, .73f, sprite.getMaxU(), sprite.getMinV());
+                break;
+            case COUNTERCLOCKWISE_90:
+                RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getMaxU(), sprite.getMaxV());
+                RenderHelper.vt(builder, matrix, 1, 1, .73f, sprite.getMaxU(), sprite.getMinV());
+                RenderHelper.vt(builder, matrix, 1, 0, .73f, sprite.getMinU(), sprite.getMinV());
+                RenderHelper.vt(builder, matrix, 0, 0, .73f, sprite.getMinU(), sprite.getMaxV());
+                break;
+        }
     }
 
     public static void renderEntity(Entity entity, int xPos, int yPos, float scale) {

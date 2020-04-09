@@ -71,7 +71,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     public void applyLogicSlabRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
         switch (direction) {
             case UP:
-                builder.rotationY(180).addModel();
+                builder.rotationX(180).addModel();
                 break;
             case DOWN:
                 builder.addModel();
