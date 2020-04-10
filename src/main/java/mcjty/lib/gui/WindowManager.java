@@ -121,12 +121,12 @@ public class WindowManager {
         net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
     }
 
-    public Optional<Widget<?>> findWidgetAtPosition(int x, int y) {
+    public Optional<Widget<?>> findWidgetAtPosition(double x, double y) {
         Stream<Widget<?>> s = windows.stream().map(w -> w.getWidgetAtPosition(x, y));
         return s.filter(Objects::nonNull).findFirst();
     }
 
-    public void mouseClicked(int x, int y, int button) {
+    public void mouseClicked(double x, double y, int button) {
         if ((!iconManager.isClickHoldToDrag()) && iconManager.isDragging()) {
             if (button == 1) {
                 iconManager.cancelDragging();
@@ -138,15 +138,19 @@ public class WindowManager {
         getInteractableWindows().forEach(w -> w.mouseClicked(x, y, button));
     }
 
-    public void handleMouseInput(int k) {
-        getInteractableWindows().forEach(w -> w.handleMouseInput(k));
+    public void mouseDragged(double x, double y, int button) {
+        getInteractableWindows().forEach(w -> w.mouseDragged(x, y, button));
     }
 
-    public void mouseReleased(int x, int y, int state) {
+    public void mouseScrolled(double x, double y, double amount) {
+        getInteractableWindows().forEach(w -> w.mouseScrolled(x, y, amount));
+    }
+
+    public void mouseReleased(double x, double y, int state) {
         if (iconManager.isClickHoldToDrag() && iconManager.isDragging()) {
             iconManager.stopDragging(x, y);
         }
-        getInteractableWindows().forEach(w -> w.mouseMovedOrUp(x, y, state));
+        getInteractableWindows().forEach(w -> w.mouseReleased(x, y, state));
     }
 
     public boolean keyTyped(int keyCode, int scanCode) {

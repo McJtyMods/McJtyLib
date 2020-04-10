@@ -73,9 +73,9 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
-            createColorSelectorWindow(window, x, y);
+            createColorSelectorWindow(window, (int)x, (int)y);
         }
         return null;
     }

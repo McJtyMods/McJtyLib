@@ -150,7 +150,7 @@ public class Slider extends AbstractWidget<Slider> {
         return size;
     }
 
-    private void updateScrollable(int x, int y) {
+    private void updateScrollable(double x, double y) {
         int first;
         int divider = scrollable.getMaximum() - scrollable.getCountSelected();
         if (divider <= 0) {
@@ -158,10 +158,10 @@ public class Slider extends AbstractWidget<Slider> {
         } else {
             if (horizontal) {
                 int size = calculateKnobSize(divider, bounds.width);
-                first = ((x-bounds.x-dx) * divider) / (bounds.width-4-size);
+                first = (int) (((x-bounds.x-dx) * divider) / (bounds.width-4-size));
             } else {
                 int size = calculateKnobSize(divider, bounds.height);
-                first = ((y-bounds.y-dy) * divider) / (bounds.height-4-size);
+                first = (int) (((y-bounds.y-dy) * divider) / (bounds.height-4-size));
             }
         }
         if (first > divider) {
@@ -174,7 +174,7 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public boolean mouseWheel(int amount, int x, int y) {
+    public boolean mouseScrolled(double x, double y, double amount) {
         int first = scrollable.getFirstSelected();
 
         int divider = scrollable.getMaximum() - scrollable.getCountSelected();
@@ -199,7 +199,7 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         super.mouseClick(x, y, button);
         dragging = true;
         findScrollable(window);
@@ -210,20 +210,20 @@ public class Slider extends AbstractWidget<Slider> {
         if (horizontal) {
             int size = calculateKnobSize(divider, bounds.width);
             first = calculateKnobOffset(divider, size, bounds.width);
-            dx = x-bounds.x-first;
+            dx = (int) (x-bounds.x-first);
             dy = 0;
         } else {
             int size = calculateKnobSize(divider, bounds.height);
             first = calculateKnobOffset(divider, size, bounds.height);
             dx = 0;
-            dy = y-bounds.y-first;
+            dy = (int) (y-bounds.y-first);
         }
 
         return this;
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(double x, double y, int button) {
         super.mouseRelease(x, y, button);
         if (dragging) {
             updateScrollable(x, y);
@@ -232,7 +232,7 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(double x, double y) {
         super.mouseMove(x, y);
         if (dragging) {
             updateScrollable(x, y);

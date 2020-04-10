@@ -44,26 +44,32 @@ public class GuiItemScreen extends Screen {
     @Override
     public boolean mouseClicked(double x, double y, int button) {
         boolean rc = super.mouseClicked(x, y, button);
-        window.mouseClicked((int)x, (int)y, button);
-        sideWindow.getWindow().mouseClicked((int)x, (int)y, button);
+        window.mouseClicked(x, y, button);
+        sideWindow.getWindow().mouseClicked(x, y, button);
         return rc;
     }
 
     @Override
     public boolean mouseDragged(double x, double y, int button, double scaledX, double scaledY) {
         boolean rc = super.mouseDragged(x, y, button, scaledX, scaledX);
-        // @todo 1.14
-        window.handleMouseInput(button);
-        sideWindow.getWindow().handleMouseInput(button);
+        window.mouseDragged(x, y, button);
+        sideWindow.getWindow().mouseDragged(x, y, button);
         return rc;
     }
 
+    @Override
+    public boolean mouseScrolled(double x, double y, double amount) {
+        boolean rc = super.mouseScrolled(x, y, amount);
+        window.mouseScrolled(x, y, amount);
+        sideWindow.getWindow().mouseScrolled(x, y, amount);
+        return rc;
+    }
 
     @Override
     public boolean mouseReleased(double x, double y, int state) {
         boolean rc = super.mouseReleased(x, y, state);
-        window.mouseMovedOrUp((int)x, (int)y, state);
-        sideWindow.getWindow().mouseMovedOrUp((int)x, (int)y, state);
+        window.mouseReleased(x, y, state);
+        sideWindow.getWindow().mouseReleased(x, y, state);
         return rc;
     }
 

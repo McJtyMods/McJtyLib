@@ -52,7 +52,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Widget<?> getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(double x, double y) {
         if (current == null) {
             return this;
         }
@@ -93,7 +93,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         super.mouseClick(x, y, button);
 
         setChildBounds();
@@ -111,7 +111,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(double x, double y, int button) {
         super.mouseRelease(x, y, button);
 
         setChildBounds();
@@ -125,7 +125,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(double x, double y) {
         super.mouseMove(x, y);
 
         setChildBounds();

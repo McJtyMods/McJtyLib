@@ -93,7 +93,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             if (choiceList.isEmpty()) {
                 return null;

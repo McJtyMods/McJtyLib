@@ -89,7 +89,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             int index = colorList.indexOf(currentColor);
             if (button == 1) {// @todo 1.14 || McJtyLib.proxy.isShiftKeyDown()) {

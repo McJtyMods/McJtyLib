@@ -4,6 +4,7 @@ import mcjty.lib.gui.IKeyReceiver;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class ClientEventHandler {
@@ -11,22 +12,22 @@ public class ClientEventHandler {
     public ClientEventHandler(){
     }
 
-    @SubscribeEvent
-    public void onMouseMoved(GuiScreenEvent.MouseDragEvent event) {
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void onMouseDragged(GuiScreenEvent.MouseDragEvent.Pre event) {
         if (event.getGui() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getGui();
             WindowManager manager = container.getWindow().getWindowManager();
             if (manager != null) {
                 if (manager.getModalWindows().findFirst().isPresent()) {
                     // There is a modal window. Eat this event and send it directly to the window
-                    manager.handleMouseInput(event.getMouseButton());
+                    manager.mouseDragged(event.getMouseX(), event.getMouseY(), event.getMouseButton());
                     event.setCanceled(true);
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onMouseScolled(GuiScreenEvent.MouseScrollEvent.Pre event) {
         if (event.getGui() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getGui();
@@ -34,14 +35,14 @@ public class ClientEventHandler {
             if (manager != null) {
                 if (manager.getModalWindows().findFirst().isPresent()) {
                     // There is a modal window. Eat this event and send it directly to the window
-//                    manager.(event.getMouseButton());
+                    manager.mouseScrolled(event.getMouseX(), event.getMouseY(), event.getScrollDelta());
                     event.setCanceled(true);
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onMouseClicked(GuiScreenEvent.MouseClickedEvent event) {
         if (event.getGui() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getGui();
@@ -49,14 +50,14 @@ public class ClientEventHandler {
             if (manager != null) {
                 if (manager.getModalWindows().findFirst().isPresent()) {
                     // There is a modal window. Eat this event and send it directly to the window
-                    manager.mouseClicked((int)event.getMouseX(), (int)event.getMouseY(), event.getButton());
+                    manager.mouseClicked(event.getMouseX(), event.getMouseY(), event.getButton());
                     event.setCanceled(true);
                 }
             }
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onMouseReleased(GuiScreenEvent.MouseReleasedEvent event) {
         if (event.getGui() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getGui();
@@ -64,7 +65,7 @@ public class ClientEventHandler {
             if (manager != null) {
                 if (manager.getModalWindows().findFirst().isPresent()) {
                     // There is a modal window. Eat this event and send it directly to the window
-                    manager.mouseReleased((int)event.getMouseX(), (int)event.getMouseY(), event.getButton());
+                    manager.mouseReleased(event.getMouseX(), event.getMouseY(), event.getButton());
                     event.setCanceled(true);
                 }
             }

@@ -51,7 +51,7 @@ public class IconManager {
         origin = null;
     }
 
-    public void stopDragging(int x, int y) {
+    public void stopDragging(double x, double y) {
         if (draggingIcon == null) {
             return;
         }
@@ -79,7 +79,7 @@ public class IconManager {
         origin = null;
     }
 
-    private IconHolder findClosestIconHolder(int x, int y) {
+    private IconHolder findClosestIconHolder(double x, double y) {
         Optional<Widget<?>> widget = windowManager.findWidgetAtPosition(x, y);
         if (widget.isPresent() && widget.get() instanceof IconHolder) {
             return (IconHolder) widget.get();

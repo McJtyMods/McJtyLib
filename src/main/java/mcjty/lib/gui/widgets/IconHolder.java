@@ -101,16 +101,16 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(double x, double y) {
         if (isEnabledAndVisible()) {
-            int dx = x - this.bounds.x - border;
-            int dy = y - this.bounds.y - border;
+            int dx = (int) (x - this.bounds.x - border);
+            int dy = (int) (y - this.bounds.y - border);
             fireIconHover(icon, dx, dy);
         }
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
 //            if (McJtyLib.proxy.isShiftKeyDown()) {
             // @todo 1.14
@@ -119,8 +119,8 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 if (selectable) {
                     window.setTextFocus(this);
                 }
-                int dx = x - this.bounds.x - border;
-                int dy = y - this.bounds.y - border;
+                int dx = (int) (x - this.bounds.x - border);
+                int dy = (int) (y - this.bounds.y - border);
                 fireIconHolderClicked(icon, dx, dy);
                 if (icon != null) {
                     if (fireIconClicked(icon, dx, dy)) {

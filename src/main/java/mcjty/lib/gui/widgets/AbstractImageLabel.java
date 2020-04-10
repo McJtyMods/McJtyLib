@@ -57,11 +57,11 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             dragging = true;
-            int u = x - bounds.x;
-            int v = y - bounds.y;
+            int u = (int) (x - bounds.x);
+            int v = (int) (y - bounds.y);
             fireImageEvents("click", u, v, pickColor(u, v));
             return this;
         }
@@ -69,22 +69,22 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     }
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(double x, double y) {
         if (dragging && in(x, y) && isEnabledAndVisible()) {
-            int u = x - bounds.x;
-            int v = y - bounds.y;
+            int u = (int) (x - bounds.x);
+            int v = (int) (y - bounds.y);
             fireImageEvents("move", u, v, pickColor(u, v));
         }
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(double x, double y, int button) {
         super.mouseRelease(x, y, button);
         if (dragging) {
             dragging = false;
             if(in(x, y)) {
-                int u = x - bounds.x;
-                int v = y - bounds.y;
+                int u = (int) (x - bounds.x);
+                int v = (int) (y - bounds.y);
                 fireImageEvents("release", u, v, pickColor(u, v));
             }
         }

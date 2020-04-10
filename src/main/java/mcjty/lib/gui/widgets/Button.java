@@ -43,7 +43,7 @@ public class Button extends AbstractLabel<Button> {
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             pressed = true;
             return this;
@@ -52,7 +52,7 @@ public class Button extends AbstractLabel<Button> {
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(double x, double y, int button) {
         super.mouseRelease(x, y, button);
         if (pressed) {
             pressed = false;

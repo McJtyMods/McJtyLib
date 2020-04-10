@@ -22,10 +22,11 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.*;
 
 /**
@@ -178,7 +179,7 @@ public class Window {
         }
     }
 
-    public Widget<?> getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(double x, double y) {
         if (toplevel.in(x, y) && toplevel.isVisible()) {
             return toplevel.getWidgetAtPosition(x, y);
         } else {
@@ -186,7 +187,7 @@ public class Window {
         }
     }
 
-    public void mouseClicked(int x, int y, int button) {
+    public void mouseClicked(double x, double y, int button) {
         if (textFocus != null) {
             textFocus = null;
             fireFocusEvents(null);
@@ -197,22 +198,19 @@ public class Window {
         }
     }
 
-    public void handleMouseInput(int k) {
-//        int k = Mouse.getEventButton();
-        if (k == -1) {
-        System.out.println("k = " + k);
-            mouseMovedOrUp(getRelativeX(), getRelativeY(), k);
-        }
+    public void mouseDragged(double x, double y, int button) {
+        toplevel.setWindow(this);
+        toplevel.mouseMove(x, y);
     }
 
-    public void mouseMovedOrUp(int x, int y, int button) {
+    public void mouseScrolled(double x, double y, double amount) {
         toplevel.setWindow(this);
-        // -1 == mouse move
-        if (button != -1) {
-//            toplevel.mouseRelease(x, y, button);
-        } else {
-            toplevel.mouseMove(x, y);
-        }
+        toplevel.mouseScrolled(x, y, amount);
+    }
+
+    public void mouseReleased(double x, double y, int button) {
+        toplevel.setWindow(this);
+        toplevel.mouseRelease(x, y, button);
     }
 
     public void setTextFocus(Widget<?> focus) {
@@ -293,7 +291,7 @@ public class Window {
         }
         if (dwheel != 0) {
             toplevel.setWindow(this);
-            toplevel.mouseWheel(dwheel, x, y);
+            toplevel.mouseScrolled(x, y, dwheel);
         }
         currentStyle = McJtyLib.getPreferencesProperties(gui.getMinecraft().player).map(p -> p.getStyle()).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 

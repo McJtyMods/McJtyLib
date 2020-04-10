@@ -31,6 +31,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -304,15 +305,25 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
+    @Nullable
     @Override
-    public boolean isMouseOver(double mouseX, double mouseY) {
-        Slot slot = getSlotUnderMouse();
-        // Prevent slots from being hoverable if they are (partially) covered by a modal window
-        if (isPartiallyCoveredByModalWindow(slot)) {
-            return false;
-        } else {
-            return super.isMouseOver(mouseX, mouseY);
+    public Slot getSlotUnderMouse() {
+        Slot slot = super.getSlotUnderMouse();
+        if (slot == null) {
+            return null;
         }
+        if (isPartiallyCoveredByModalWindow(slot)) {
+            return null;
+        }
+        return slot;
+    }
+
+    @Override
+    public boolean isSlotSelected(Slot slotIn, double mouseX, double mouseY) {
+        if (isPartiallyCoveredByModalWindow(slotIn)) {
+            return false;
+        }
+        return super.isSlotSelected(slotIn, mouseX, mouseY);
     }
 
     private boolean isPartiallyCoveredByModalWindow(Slot slotIn) {
@@ -395,7 +406,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public boolean mouseClicked(double x, double y, int button) {
         boolean rc = super.mouseClicked(x, y, button);
         if (window != null) {
-            getWindowManager().mouseClicked((int) x, (int) y, button);
+            getWindowManager().mouseClicked(x, y, button);
         }
         return rc;
     }
@@ -404,19 +415,28 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public boolean mouseDragged(double x, double y, int button, double scaledX, double scaledY) {
         boolean rc = super.mouseDragged(x, y, button, scaledX, scaledY);
         if (window != null) {
-            getWindowManager().handleMouseInput(button);
+            getWindowManager().mouseDragged(x, y, button);
         }
         return rc;
+    }
+
+    @Override
+    public boolean mouseScrolled(double x, double y, double amount) {
+        boolean rc = super.mouseScrolled(x, y, amount);
+        if (window != null) {
+            getWindowManager().mouseScrolled(x, y, amount);
+        }
+        return false;
     }
 
     /*
      * 99% sure this is the correct one
      */
     @Override
-    public boolean mouseReleased(double x, double y, int state) {
-        boolean rc = super.mouseReleased(x, y, state);
+    public boolean mouseReleased(double x, double y, int button) {
+        boolean rc = super.mouseReleased(x, y, button);
         if (window != null) {
-            getWindowManager().mouseReleased((int) x, (int) y, state);
+            getWindowManager().mouseReleased(x, y, button);
         }
         return rc;
     }

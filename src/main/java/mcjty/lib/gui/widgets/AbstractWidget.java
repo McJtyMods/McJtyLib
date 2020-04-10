@@ -124,7 +124,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public Widget<?> getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(double x, double y) {
         return this;
     }
 
@@ -307,7 +307,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public boolean in(int x, int y) {
+    public boolean in(double x, double y) {
         if (bounds == null) {
             return false;
         } else {
@@ -410,20 +410,20 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         return null;
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(double x, double y, int button) {
     }
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(double x, double y) {
     }
 
     @Override
-    public boolean mouseWheel(int amount, int x, int y) {
+    public boolean mouseScrolled(double x, double y, double amount) {
         return false;
     }
 

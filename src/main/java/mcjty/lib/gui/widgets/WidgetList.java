@@ -136,7 +136,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public Widget<?> getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(double x, double y) {
         x -= bounds.x;
         y -= bounds.y;
 
@@ -168,7 +168,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         // Use the function above to force reset of the slider in case the contents changed so that it doesn't look weird.
-        mouseWheel(0, x, y);
+        mouseScrolled(x, y, 0);
 
         super.draw(x, y);
         int xx = x + bounds.x + leftMargin;
@@ -229,7 +229,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }}
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(double x, double y) {
         if (!isEnabledAndVisible()) {
             return;
         }
@@ -252,8 +252,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
         if (propagateEventsToChildren && newSelected != -1) {
             Widget<?> child = getSelectedWidgetSafe(newSelected);
-            int xx = x-bounds.x;
-            int yy = y-bounds.y;
+            double xx = x-bounds.x;
+            double yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
                 child.mouseMove(xx, yy);
             }
@@ -261,7 +261,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         if (!isEnabledAndVisible()) {
             return null;
         }
@@ -289,8 +289,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
         if (propagateEventsToChildren && selected != -1) {
             Widget<?> child = getSelectedWidgetSafe(selected);
-            int xx = x-bounds.x;
-            int yy = y-bounds.y;
+            double xx = x-bounds.x;
+            double yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
                 child.mouseClick(xx, yy, button);
             }
@@ -306,7 +306,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(double x, double y, int button) {
         if (!isEnabledAndVisible()) {
             return;
         }
@@ -316,8 +316,8 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
 
         if (propagateEventsToChildren && selected != -1) {
             Widget<?> child = getSelectedWidgetSafe(selected);
-            int xx = x-bounds.x;
-            int yy = y-bounds.y;
+            double xx = x-bounds.x;
+            double yy = y-bounds.y;
             if (child != null && child.in(xx, yy) && child.isVisible()) {
                 child.mouseRelease(xx, yy, button);
             }
@@ -335,7 +335,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public boolean mouseWheel(int amount, int x, int y) {
+    public boolean mouseScrolled(double x, double y, double amount) {
         int divider = getMaximum() - getCountSelected();
         if (divider <= 0) {
             first = 0;

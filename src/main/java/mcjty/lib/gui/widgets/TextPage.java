@@ -160,7 +160,7 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public TextPage mouseClick(int x, int y, int button) {
+    public TextPage mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             window.setTextFocus(this);
             for (Link link : links) {

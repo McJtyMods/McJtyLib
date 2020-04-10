@@ -2,6 +2,9 @@ Upcoming:
 - Small fix for block placement (as used by the builder)
 - Support for better item tooltip system
 - Many cleanups and fixes for logic blocks
+- Much better handling of modal windows and general window manager refactor
+- Working support for the mouse wheel in McJtyLib gui's
+- New 'tag' selector to be used by blocks/items that used to use the old oredictionary
 
 4.0.3-alpha:
 - Helpers for blockstate generation

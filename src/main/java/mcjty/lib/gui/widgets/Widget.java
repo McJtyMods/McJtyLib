@@ -128,14 +128,16 @@ public interface Widget<P extends Widget<P>> {
     /**
      * Check if a coordinate is in the bounds of this widget.
      */
-    boolean in(int x, int y);
+    boolean in(double x, double y);
 
     /**
      * Find the widget at the given position. It can be assumed in this function that it
      * is only called for valid coordaintes that are guaranteed to be in this widget. So widgets
      * that don't have children should just return themselves.
+     * @param x
+     * @param y
      */
-    Widget<?> getWidgetAtPosition(int x, int y);
+    Widget<?> getWidgetAtPosition(double x, double y);
 
     /**
      * Draw this widget on the GUI at the specific position. This position is usually supplied by the
@@ -161,33 +163,33 @@ public interface Widget<P extends Widget<P>> {
      * @param button
      * @return a reference to the widget that wants focus (or null if not)
      */
-    Widget<?> mouseClick(int x, int y, int button);
+    Widget<?> mouseClick(double x, double y, int button);
 
     /**
      * Handle a mouse release for this widget.
-     *  @param x
+     * @param x
      * @param y
      * @param button
      */
-    void mouseRelease(int x, int y, int button);
+    void mouseRelease(double x, double y, int button);
 
     /**
      * Handle a mouse move event.
-     *  @param x
+     * @param x
      * @param y
      */
-    void mouseMove(int x, int y);
+    void mouseMove(double x, double y);
 
     /**
      * Handle mousewheel.
      *
      *
-     * @param amount
      * @param x
      * @param y
+     * @param amount
      * @return true if handled
      */
-    boolean mouseWheel(int amount, int x, int y);
+    boolean mouseScrolled(double x, double y, double amount);
 
     /**
      * Handle a keyboard event.

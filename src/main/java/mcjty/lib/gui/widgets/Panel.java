@@ -25,7 +25,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Widget<?> getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(double x, double y) {
         if (isDirty()) {
             layout.doLayout(getChildren(), bounds.width, bounds.height);
             markClean();
@@ -70,7 +70,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public Widget<Panel> mouseClick(int x, int y, int button) {
+    public Widget<Panel> mouseClick(double x, double y, int button) {
         super.mouseClick(x, y, button);
 
         x -= bounds.x;
@@ -87,7 +87,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void mouseRelease(int x, int y, int button) {
+    public void mouseRelease(double x, double y, int button) {
         super.mouseRelease(x, y, button);
         x -= bounds.x;
         y -= bounds.y;
@@ -106,7 +106,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void mouseMove(int x, int y) {
+    public void mouseMove(double x, double y) {
         super.mouseMove(x, y);
 
         x -= bounds.x;

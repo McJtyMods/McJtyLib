@@ -69,7 +69,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public Widget<?> mouseClick(int x, int y, int button) {
+    public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible() && editable) {
             window.setTextFocus(this);
             if (button == 1) {
