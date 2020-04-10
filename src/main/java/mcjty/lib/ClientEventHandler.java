@@ -12,6 +12,36 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
+    public void onMouseMoved(GuiScreenEvent.MouseDragEvent event) {
+        if (event.getGui() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getGui();
+            WindowManager manager = container.getWindow().getWindowManager();
+            if (manager != null) {
+                if (manager.getModalWindows().findFirst().isPresent()) {
+                    // There is a modal window. Eat this event and send it directly to the window
+                    manager.handleMouseInput(event.getMouseButton());
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onMouseScolled(GuiScreenEvent.MouseScrollEvent.Pre event) {
+        if (event.getGui() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getGui();
+            WindowManager manager = container.getWindow().getWindowManager();
+            if (manager != null) {
+                if (manager.getModalWindows().findFirst().isPresent()) {
+                    // There is a modal window. Eat this event and send it directly to the window
+//                    manager.(event.getMouseButton());
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     public void onMouseClicked(GuiScreenEvent.MouseClickedEvent event) {
         if (event.getGui() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getGui();

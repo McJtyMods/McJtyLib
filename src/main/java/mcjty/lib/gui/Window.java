@@ -200,6 +200,7 @@ public class Window {
     public void handleMouseInput(int k) {
 //        int k = Mouse.getEventButton();
         if (k == -1) {
+        System.out.println("k = " + k);
             mouseMovedOrUp(getRelativeX(), getRelativeY(), k);
         }
     }
@@ -208,7 +209,7 @@ public class Window {
         toplevel.setWindow(this);
         // -1 == mouse move
         if (button != -1) {
-            toplevel.mouseRelease(x, y, button);
+//            toplevel.mouseRelease(x, y, button);
         } else {
             toplevel.mouseMove(x, y);
         }
