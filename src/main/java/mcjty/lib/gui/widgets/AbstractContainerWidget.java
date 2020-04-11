@@ -4,7 +4,7 @@ import mcjty.lib.gui.GuiParser;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +23,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
     }
 
     @Override
-    public Widget<?> getWidgetAtPosition(int x, int y) {
+    public Widget<?> getWidgetAtPosition(double x, double y) {
         x -= bounds.x;
         y -= bounds.y;
 
@@ -37,13 +37,13 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
     }
 
     @Override
-    public boolean mouseWheel(int amount, int x, int y) {
+    public boolean mouseScrolled(double x, double y, double amount) {
         x -= bounds.x;
         y -= bounds.y;
 
         for (Widget<?> child : children) {
             if (child.in(x, y) && child.isVisible()) {
-                if (child.mouseWheel(amount, x, y)) {
+                if (child.mouseScrolled(x, y, amount)) {
                     return true;
                 }
             }
