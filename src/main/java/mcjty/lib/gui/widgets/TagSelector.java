@@ -3,25 +3,17 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
+import mcjty.lib.gui.TagSelectorWindow;
 import mcjty.lib.gui.Window;
-import mcjty.lib.gui.events.DefaultSelectionEvent;
-import mcjty.lib.gui.events.SelectionEvent;
 import mcjty.lib.gui.events.TagChoiceEvent;
-import mcjty.lib.gui.layout.HorizontalLayout;
-import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class TagSelector extends AbstractLabel<TagSelector> {
@@ -31,7 +23,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
 
     private String currentTag = null;
     private List<TagChoiceEvent> choiceEvents = null;
-    private String filter = "";
+    private final TagSelectorWindow selector = new TagSelectorWindow();
     private String type = "item";
 
     public TagSelector(Minecraft mc, Screen gui) {
@@ -88,106 +80,14 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     @Override
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
-            createTagSelectorWindow(window, (int) x, (int) y);
+            selector.create(window, (int) x, (int) y, type, t -> {
+                setCurrentTag(t);
+                fireChoiceEvents(t);
+            }, this::getCurrentTag, false);
         }
         return null;
     }
 
-    private List<String> getTags() {
-        if ("item".equals(type)) {
-            return ItemTags.getCollection().getRegisteredTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
-        } else {
-            return BlockTags.getCollection().getRegisteredTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
-        }
-    }
-
-    private void refreshList(WidgetList list) {
-        list.removeChildren();
-        String currentTag = getCurrentTag();
-        int sel = -1;
-        List<String> tags = getTags();
-        for (String tag : tags) {
-            if (tag.contains(filter)) {
-                Panel panel = new Panel(mc, gui).setLayout(new HorizontalLayout().setHorizontalMargin(0).setSpacing(0));
-                panel.setUserObject(tag);
-                panel.addChild(new Label(mc, gui).setText(tag));
-                list.addChild(panel);
-                if (tag.equals(currentTag)) {
-                    sel = list.getChildCount() - 1;
-                }
-            }
-        }
-
-        list.setSelected(sel);
-    }
-
-    private void createTagSelectorWindow(Window window, int x, int y) {
-        Minecraft mc = Minecraft.getInstance();
-        Screen gui = window.getWindowManager().getGui();
-
-        Panel modalDialog = new Panel(mc, gui)
-                .setFilledRectThickness(2)
-                .setLayout(new PositionalLayout());
-        int wx = (int) (window.getToplevel().getBounds().getX() + 20);
-        int wy = (int) (window.getToplevel().getBounds().getY() + 20);
-        modalDialog.setBounds(new Rectangle(wx, wy, 200, 156));
-
-        WidgetList list = new WidgetList(mc, gui)
-                .setName("list")
-                .setLayoutHint(new PositionalLayout.PositionalHint(5, 20, 180, 115));
-        Slider slider = new Slider(mc, gui).setDesiredWidth(10).setVertical().setScrollableName("list")
-                .setLayoutHint(new PositionalLayout.PositionalHint(187, 20, 10, 115));
-
-        Button clear = new Button(mc, gui)
-                .setLayoutHint(new PositionalLayout.PositionalHint(5, 156 - 20, 60, 15))
-                .setText("Clear");
-
-        Button close = new Button(mc, gui)
-                .setLayoutHint(new PositionalLayout.PositionalHint(200 - 65, 156 - 20, 60, 15))
-                .setText("Close");
-
-        refreshList(list);
-
-        TextField filterField = new TextField(mc, gui)
-                .setText(filter)
-                .addTextEvent((parent, newText) -> {
-                    filter = newText;
-                    refreshList(list);
-                })
-                .setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 180, 14));
-
-        modalDialog.addChildren(close, clear, list, slider, filterField);
-
-        Window modalWindow = window.getWindowManager().createModalWindow(modalDialog);
-
-        list.addSelectionEvent(new DefaultSelectionEvent() {
-            @Override
-            public void select(Widget<?> parent, int index) {
-                selectTag(index, list);
-            }
-
-            @Override
-            public void doubleClick(Widget<?> parent, int index) {
-                selectTag(index, list);
-                window.getWindowManager().closeWindow(modalWindow);
-            }
-        });
-
-        close.addButtonEvent(parent -> window.getWindowManager().closeWindow(modalWindow));
-        clear.addButtonEvent(parent -> {
-            setCurrentTag(null);
-            fireChoiceEvents(null);
-            window.getWindowManager().closeWindow(modalWindow);
-        });
-    }
-
-    private void selectTag(int index, WidgetList list) {
-        if (index < list.getChildCount()) {
-            Object t = list.getChild(index).getUserObject();
-            setCurrentTag((String) t);
-            fireChoiceEvents((String) t);
-        }
-    }
 
     public TagSelector addChoiceEvent(TagChoiceEvent event) {
         if (choiceEvents == null) {
