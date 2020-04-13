@@ -37,7 +37,7 @@ public class TooltipRender {
                 int count = items.size();
                 int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
                 int width = Math.min(STACKS_PER_LINE, count) * 18;
-                String spaces = "\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
+                String spaces = "";//"\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
                 while (mc.fontRenderer.getStringWidth(spaces) < width) {
                     spaces += " ";
                 }
@@ -52,10 +52,14 @@ public class TooltipRender {
     @SubscribeEvent
     public void onTooltipPre(RenderTooltipEvent.Pre event) {
         Item item = event.getStack().getItem();
-        if (item instanceof ITooltipSettings) {
-            event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) item).getMaxWidth()));
-        } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof ITooltipSettings) {
-            event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) ((BlockItem) item).getBlock()).getMaxWidth()));
+        if (item instanceof ITooltipExtras) {
+
+        } else {
+            if (item instanceof ITooltipSettings) {
+                event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) item).getMaxWidth()));
+            } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof ITooltipSettings) {
+                event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) ((BlockItem) item).getBlock()).getMaxWidth()));
+            }
         }
     }
 
@@ -69,7 +73,7 @@ public class TooltipRender {
             int count = items.size();
 
             int bx = event.getX();
-            int by = event.getY();
+            int by = event.getY()+3;
 
             List<String> tooltip = event.getLines();
             int lines = (((count - 1) / STACKS_PER_LINE) + 1);
@@ -77,7 +81,8 @@ public class TooltipRender {
             int height = lines * 20 + 1;
 
             for (String s : tooltip) {
-                if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r")) {
+                if (s.startsWith("    ")) {
+//                if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r")) {
                     break;
                 } else {
                     by += 10;
@@ -105,7 +110,10 @@ public class TooltipRender {
         ItemRenderer render = mc.getItemRenderer();
 
         net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
+        GlStateManager.pushMatrix();
+        GlStateManager.translatef(0, 0, 400f);
         render.renderItemIntoGUI(itemStack, x, y);
+        GlStateManager.popMatrix();
 
         //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
         String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString((int) ((float) count));
@@ -114,15 +122,17 @@ public class TooltipRender {
 
         boolean hasReq = true;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
-        GlStateManager.scalef(0.5F, 0.5F, 0.5F);
-        mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
-        GlStateManager.popMatrix();
+        if (errorAmount != -2) {
+            GlStateManager.pushMatrix();
+            GlStateManager.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
+            GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+            mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
+            GlStateManager.popMatrix();
+        }
 
         int missingCount = 0;
 
-        if (errorAmount != -1) {
+        if (errorAmount >= 0) {
             String fs = Integer.toString(errorAmount);
             //String s2 = TextFormatting.BOLD + "(" + fs + ")";
             String s2 = "(" + fs + ")";
