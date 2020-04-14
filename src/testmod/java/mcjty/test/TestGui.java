@@ -12,13 +12,10 @@ import mcjty.lib.gui.layout.HorizontalLayout;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.layout.VerticalLayout;
 import mcjty.lib.gui.widgets.Button;
-import mcjty.lib.gui.widgets.*;
 import mcjty.lib.gui.widgets.Label;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.TextField;
 import net.minecraft.util.ResourceLocation;
-
-import java.awt.*;
 
 public class TestGui extends GenericGuiContainer<TestTileEntity> {
     public static final int SIDEWIDTH = 80;
@@ -53,14 +50,14 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
                 .addChild(editorPanel)
                 .addChild(controlPanel)
                 .addChild(gridPanel);
-        toplevel.setBounds(new Rectangle(guiLeft, guiTop, xSize, ySize));
+        toplevel.bounds(guiLeft, guiTop, xSize, ySize);
         window = new Window(this, toplevel);
 
         // --- Side window ---
         Panel listPanel = setupListPanel();
         Panel sidePanel = new Panel(mc, this).setLayout(new PositionalLayout()).setBackground(sideBackground)
                 .addChild(listPanel);
-        sidePanel.setBounds(new Rectangle(guiLeft-SIDEWIDTH, guiTop, SIDEWIDTH, ySize));
+        sidePanel.bounds(guiLeft-SIDEWIDTH, guiTop, SIDEWIDTH, ySize);
         sideWindow = new Window(this, sidePanel);
     }
 
@@ -74,10 +71,10 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     private Panel setupGridPanel() {
 
         Panel panel = new Panel(mc, this).setLayout(new PositionalLayout())
-                .setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 246, 113));
+                .setLayoutHint(5, 5, 246, 113);
 
         WidgetList list = new WidgetList(mc, this)
-                .setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 236, 113))
+                .setLayoutHint(0, 0, 236, 113)
                 .setPropagateEventsToChildren(true)
                 .setInvisibleSelection(true)
                 .setDrawHorizontalLines(false)
@@ -85,7 +82,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         Slider slider = new Slider(mc, this)
                 .setVertical()
                 .setScrollable(list)
-                .setLayoutHint(new PositionalLayout.PositionalHint(237, 0, 9, 113));
+                .setLayoutHint(237, 0, 9, 113);
 
         for (int y = 0 ; y < 10 ; y++) {
             Panel rowPanel = new Panel(mc, this).setLayout(new HorizontalLayout().setSpacing(-1).setHorizontalMargin(0).setVerticalMargin(0));
@@ -117,7 +114,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 //        int topy = 0;
 //        for (int x = 0 ; x < 13 ; x++) {
 //            for (int y = 0 ; y < 6 ; y++) {
-//                IconHolder holder = new IconHolder(mc, this).setLayoutHint(new PositionalLayout.PositionalHint(leftx + x*19, topy + y*19, 18, 18)).setBorder(1);
+//                IconHolder holder = new IconHolder(mc, this).setLayoutHint(leftx + x*19, topy + y*19, 18, 18).setBorder(1);
 //                panel.addChild(holder);
 //            }
 //        }
@@ -139,7 +136,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
     }
 
     private Panel setupControlPanel() {
-        return new Panel(mc, this).setLayout(new VerticalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(26, 157, 58, 50))
+        return new Panel(mc, this).setLayout(new VerticalLayout()).setLayoutHint(26, 157, 58, 50)
                 .addChild(new Button(mc, this).setText("Load").setDesiredHeight(15))
                 .addChild(new Button(mc, this).setText("Save").setDesiredHeight(15))
                 .addChild(new Button(mc, this).setText("Clear").setDesiredHeight(15));
@@ -147,7 +144,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
     private Panel setupListPanel() {
         WidgetList list = new WidgetList(mc, this)
-                .setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 62, 220))
+                .setLayoutHint(0, 0, 62, 220)
                 .setPropagateEventsToChildren(true)
                 .setInvisibleSelection(true)
                 .setDrawHorizontalLines(false)
@@ -155,7 +152,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         Slider slider = new Slider(mc, this)
                 .setVertical()
                 .setScrollable(list)
-                .setLayoutHint(new PositionalLayout.PositionalHint(62, 0, 9, 220));
+                .setLayoutHint(62, 0, 9, 220);
 
         int x = 0;
         for (int i = 0 ; i < 16 ; i++) {
@@ -178,7 +175,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
             list.addChild(childPanel);
         }
 
-        return new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(5, 5, 72, 220))
+        return new Panel(mc, this).setLayout(new PositionalLayout()).setLayoutHint(5, 5, 72, 220)
                 .addChild(list)
                 .addChild(slider);
 //                .setFilledRectThickness(-2)
@@ -190,16 +187,16 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
                 .setText(labelName)
                 .setHorizontalAlignment(HorizontalAlignment.ALIGH_LEFT)
                 .setDesiredHeight(13)
-                .setLayoutHint(new PositionalLayout.PositionalHint(0, 0, 55, 13));
+                .setLayoutHint(0, 0, 55, 13);
         TextField field = new TextField(mc, this)
                 .setText(tempDefault)
                 .setDesiredHeight(13)
-                .setLayoutHint(new PositionalLayout.PositionalHint(0, 12, 49, 13));
+                .setLayoutHint(0, 12, 49, 13);
         Button button = new Button(mc, this)
                 .setText("...")
                 .setDesiredHeight(13)
                 .addButtonEvent(w -> openValueEditor())
-                .setLayoutHint(new PositionalLayout.PositionalHint(50, 12, 11, 13));
+                .setLayoutHint(50, 12, 11, 13);
 
         return new Panel(mc, this).setLayout(new PositionalLayout())
                 .addChild(label)
@@ -212,7 +209,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         Panel panel = new Panel(mc, this)
                 .setLayout(new VerticalLayout())
                 .setFilledBackground(0xff666666, 0xffaaaaaa);
-        panel.setBounds(new Rectangle(50, 50, 200, 100));
+        panel.bounds(50, 50, 200, 100);
         Window modalWindow = getWindowManager().createModalWindow(panel);
         panel.addChild(new Label(mc, this).setText("Label"));
         panel.addChild(new Button(mc, this)
@@ -224,7 +221,7 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
         Panel slotPanel = createValuePanel("Slot:", "<var 3>");
         Panel amountPanel = createValuePanel("Amount:", "<64>");
 
-        return new Panel(mc, this).setLayout(new HorizontalLayout()).setLayoutHint(new PositionalLayout.PositionalHint(4, 123, 249, 30))
+        return new Panel(mc, this).setLayout(new HorizontalLayout()).setLayoutHint(4, 123, 249, 30)
                 .addChild(slotPanel)
                 .addChild(amountPanel)
                 .setFilledRectThickness(-1)

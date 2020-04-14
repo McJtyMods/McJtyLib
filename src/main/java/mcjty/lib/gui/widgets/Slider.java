@@ -6,7 +6,6 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 public class Slider extends AbstractWidget<Slider> {
@@ -25,10 +24,6 @@ public class Slider extends AbstractWidget<Slider> {
     private Scrollable scrollable;      // Old (used as cache in case scrollableName is used)
     private String scrollableName;      // New
 
-    public Slider(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
     public Scrollable getScrollable() {
         return scrollable;
     }
@@ -37,7 +32,7 @@ public class Slider extends AbstractWidget<Slider> {
         return scrollableName;
     }
 
-    public Slider setScrollableName(String scrollableName) {
+    public Slider scrollableName(String scrollableName) {
         this.scrollableName = scrollableName;
         return this;
     }
@@ -50,17 +45,17 @@ public class Slider extends AbstractWidget<Slider> {
         return !horizontal;
     }
 
-    public Slider setMinimumKnobSize(int m) {
+    public Slider minimumKnobSize(int m) {
         minimumKnobSize = m;
         return this;
     }
 
-    public Slider setHorizontal() {
+    public Slider horizontal() {
         this.horizontal = true;
         return this;
     }
 
-    public Slider setVertical() {
+    public Slider vertical() {
         this.horizontal = false;
         return this;
     }
@@ -75,11 +70,11 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(x, y);
+        super.draw(gui, x, y);
 
         findScrollable(window);
 

@@ -39,15 +39,11 @@ public class TextField extends AbstractWidget<TextField> {
     private List<TextSpecialKeyEvent> textSpecialKeyEvents = null;
     private boolean editable = DEFAULT_EDITABLE;
 
-    public TextField(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
     public boolean isEditable() {
         return editable;
     }
 
-    public TextField setEditable(boolean editable) {
+    public TextField editable(boolean editable) {
         this.editable = editable;
         return this;
     }
@@ -56,7 +52,7 @@ public class TextField extends AbstractWidget<TextField> {
         return text;
     }
 
-    public TextField setText(String text) {
+    public TextField text(String text) {
         this.text = text;
         cursor = text.length();
         if (startOffset >= cursor) {
@@ -73,7 +69,7 @@ public class TextField extends AbstractWidget<TextField> {
         if (isEnabledAndVisible() && editable) {
             window.setTextFocus(this);
             if (button == 1) {
-                setText("");
+                text("");
                 fireTextEvents("");
             }
             return this;
@@ -295,8 +291,8 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public void draw(int x, int y) {
-        super.draw(x, y);
+    public void draw(Screen gui, int x, int y) {
+        super.draw(gui, x, y);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -345,7 +341,7 @@ public class TextField extends AbstractWidget<TextField> {
         }
     }
 
-    public TextField addTextEvent(TextEvent event) {
+    public TextField event(TextEvent event) {
         if (textEvents == null) {
             textEvents = new ArrayList<>();
         }
@@ -366,12 +362,12 @@ public class TextField extends AbstractWidget<TextField> {
                 .build());
         if (textEvents != null) {
             for (TextEvent event : textEvents) {
-                event.textChanged(this, newText);
+                event.textChanged(newText);
             }
         }
     }
 
-    public TextField addSpecialKeyEvent(TextSpecialKeyEvent event) {
+    public TextField specialKeyEvent(TextSpecialKeyEvent event) {
         if (textSpecialKeyEvents == null) {
             textSpecialKeyEvents = new ArrayList<>();
         }
@@ -383,7 +379,7 @@ public class TextField extends AbstractWidget<TextField> {
         fireChannelEvents("arrowup");
         if (textSpecialKeyEvents != null) {
             for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
-                event.arrowUp(this);
+                event.arrowUp();
             }
         }
     }
@@ -392,7 +388,7 @@ public class TextField extends AbstractWidget<TextField> {
         fireChannelEvents("arrowdown");
         if (textSpecialKeyEvents != null) {
             for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
-                event.arrowDown(this);
+                event.arrowDown();
             }
         }
     }
@@ -401,7 +397,7 @@ public class TextField extends AbstractWidget<TextField> {
         fireChannelEvents("tab");
         if (textSpecialKeyEvents != null) {
             for (TextSpecialKeyEvent event : textSpecialKeyEvents) {
-                event.tab(this);
+                event.tab();
             }
         }
     }
@@ -427,7 +423,7 @@ public class TextField extends AbstractWidget<TextField> {
                 .build());
         if (textEnterEvents != null) {
             for (TextEnterEvent event : textEnterEvents) {
-                event.textEntered(this, newText);
+                event.textEntered(newText);
             }
         }
     }
@@ -452,9 +448,9 @@ public class TextField extends AbstractWidget<TextField> {
     @Override
     public <T> void setGenericValue(T value) {
         if (value == null) {
-            setText("");
+            text("");
         } else {
-            setText(value.toString());
+            text(value.toString());
         }
     }
 

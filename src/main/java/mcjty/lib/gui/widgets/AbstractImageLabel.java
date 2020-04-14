@@ -35,15 +35,11 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     private List<ImageEvent> imageEvents = null;
     private BufferedImage bufferedImage;
 
-    public AbstractImageLabel(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
     public ResourceLocation getImage() {
         return image;
     }
 
-    public P setImage(ResourceLocation image, int u, int v) {
+    public P image(ResourceLocation image, int u, int v) {
         this.image = image;
         this.u = u;
         this.v = v;
@@ -108,11 +104,11 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(x, y);
+        super.draw(gui, x, y);
 
         if (image != null) {
             GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
@@ -123,7 +119,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
         }
     }
 
-    public AbstractImageLabel<P> addImageEvent(ImageEvent event) {
+    public AbstractImageLabel<P> event(ImageEvent event) {
         if (imageEvents == null) {
             imageEvents = new ArrayList<>();
         }
@@ -148,7 +144,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
                 return;
             }
             for (ImageEvent event : imageEvents) {
-                event.imageClicked(this, u, v, color);
+                event.imageClicked(u, v, color);
             }
         }
     }

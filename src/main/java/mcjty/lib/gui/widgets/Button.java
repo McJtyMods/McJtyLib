@@ -2,7 +2,6 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.events.ButtonEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
@@ -15,12 +14,8 @@ public class Button extends AbstractLabel<Button> {
     private List<ButtonEvent> buttonEvents = null;
     private boolean pressed = false;
 
-    public Button(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
@@ -39,7 +34,7 @@ public class Button extends AbstractLabel<Button> {
             drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
         }
 
-        super.drawOffset(x, y, 0, 1);
+        super.drawOffset(gui, x, y, 0, 1);
     }
 
     @Override
@@ -62,7 +57,7 @@ public class Button extends AbstractLabel<Button> {
         }
     }
 
-    public Button addButtonEvent(ButtonEvent event) {
+    public Button event(ButtonEvent event) {
         if (buttonEvents == null) {
             buttonEvents = new ArrayList<>();
         }
@@ -80,7 +75,7 @@ public class Button extends AbstractLabel<Button> {
         fireChannelEvents();
         if (buttonEvents != null) {
             for (ButtonEvent event : buttonEvents) {
-                event.buttonClicked(this);
+                event.buttonClicked();
             }
         }
     }

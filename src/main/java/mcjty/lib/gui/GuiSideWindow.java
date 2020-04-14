@@ -2,16 +2,17 @@ package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
-import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.PacketSetGuiStyle;
+import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
-import java.awt.*;
+import static mcjty.lib.gui.widgets.Widgets.button;
+import static mcjty.lib.gui.widgets.Widgets.positional;
 
 public class GuiSideWindow {
     protected GuiStyle style;
@@ -31,18 +32,18 @@ public class GuiSideWindow {
     }
 
     public void initGui(final ModBase modBase, final Minecraft mc, Screen gui, int guiLeft, int guiTop, int xSize, int ySize) {
-        style = McJtyLib.getPreferencesProperties(mc.player).map(p -> p.getStyle()).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
+        style = McJtyLib.getPreferencesProperties(mc.player).map(PreferencesProperties::getStyle).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 
-        helpButton = new Button(mc, gui).setText("?").setLayoutHint(new PositionalLayout.PositionalHint(1, 1, 16, 16)).
-                setTooltips("Open manual").
-                addButtonEvent(parent -> help(modBase, mc));
-        guiButton = new Button(mc, gui).setText("s").setLayoutHint(new PositionalLayout.PositionalHint(1, 19, 16, 16)).
-                addButtonEvent(parent -> changeStyle(McJtyLib.networkHandler));
+        helpButton = button(1,1, 16, 16, "?")
+                .tooltips("Open manual")
+                .event(() -> help(modBase, mc));
+        guiButton = button(1, 19, 16, 16, "s")
+                .event(() -> changeStyle(McJtyLib.networkHandler));
         setStyleTooltip();
-        Panel sidePanel = new Panel(mc, gui).setLayout(new PositionalLayout()).addChild(guiButton).addChild(helpButton);
+        Panel sidePanel = positional().children(guiButton, helpButton);
         sideLeft = guiLeft + xSize;
         sideTop = guiTop + (ySize - 20) / 2 - 8;
-        sidePanel.setBounds(new Rectangle(sideLeft, sideTop, 20, 40));
+        sidePanel.bounds(sideLeft, sideTop, 20, 40);
         sideWindow = new Window(gui, sidePanel);
     }
 
@@ -52,7 +53,7 @@ public class GuiSideWindow {
     }
 
     private void setStyleTooltip() {
-        guiButton.setTooltips("Gui style:", style.getStyle());
+        guiButton.tooltips("Gui style:", style.getStyle());
     }
 
     private void changeStyle(SimpleChannel network) {

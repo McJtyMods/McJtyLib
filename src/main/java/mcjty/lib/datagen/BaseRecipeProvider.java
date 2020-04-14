@@ -60,12 +60,12 @@ public class BaseRecipeProvider extends RecipeProvider {
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, CopyNBTRecipeBuilder builder, String... lines) {
-        buildIntern(consumer, s -> builder.patternLine(s), (c, i) -> builder.key(c, i), lines);
+        buildIntern(consumer, builder::patternLine, builder::key, lines);
         builder.setGroup(group).build(consumer);
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ShapedRecipeBuilder builder, String... lines) {
-        buildIntern(consumer, s -> builder.patternLine(s), (c, i) -> builder.key(c, i), lines);
+        buildIntern(consumer, builder::patternLine, builder::key, lines);
         builder.setGroup(group).build(consumer);
     }
 
@@ -78,12 +78,12 @@ public class BaseRecipeProvider extends RecipeProvider {
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, CopyNBTRecipeBuilder builder, String... lines) {
-        buildIntern(consumer, s -> builder.patternLine(s), (c, i) -> builder.key(c, i), lines);
+        buildIntern(consumer, builder::patternLine, builder::key, lines);
         builder.setGroup(group).build(consumer, id);
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, ShapedRecipeBuilder builder, String... lines) {
-        buildIntern(consumer, s -> builder.patternLine(s), (c, i) -> builder.key(c, i), lines);
+        buildIntern(consumer, builder::patternLine, builder::key, lines);
         builder.setGroup(group).build(consumer, id);
     }
 

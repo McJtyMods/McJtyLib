@@ -8,7 +8,6 @@ import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.*;
@@ -25,31 +24,30 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
     private String currentChoice = null;
     private List<ChoiceEvent> choiceEvents = null;
 
-    public ChoiceLabel(Minecraft mc, Screen gui) {
-        super(mc, gui);
-        setText("");
+    public ChoiceLabel() {
+        text("");
     }
 
-    public ChoiceLabel addChoices(String ... choices) {
+    public ChoiceLabel choices(String ... choices) {
         for (String choice : choices) {
             choiceList.add(choice);
             if (currentChoice == null) {
                 currentChoice = choice;
-                setText(currentChoice);
+                text(currentChoice);
                 fireChoiceEvents(currentChoice);
             }
         }
         return this;
     }
 
-    public ChoiceLabel setChoiceTooltip(String choice, String... tooltips) {
+    public ChoiceLabel choiceTooltip(String choice, String... tooltips) {
         tooltipMap.put(choice, Arrays.asList(tooltips));
         return this;
     }
 
-    public ChoiceLabel setChoice(String choice) {
+    public ChoiceLabel choice(String choice) {
         currentChoice = choice;
-        setText(currentChoice);
+        text(currentChoice);
         return this;
     }
 
@@ -68,7 +66,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
@@ -89,7 +87,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
             RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleDisabled);
         }
 
-        super.drawOffset(x, y, -3, 1);
+        super.drawOffset(gui, x, y, -3, 1);
     }
 
     @Override
@@ -111,13 +109,13 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
                 }
             }
             currentChoice = choiceList.get(index);
-            setText(currentChoice);
+            text(currentChoice);
             fireChoiceEvents(currentChoice);
         }
         return null;
     }
 
-    public ChoiceLabel addChoiceEvent(ChoiceEvent event) {
+    public ChoiceLabel event(ChoiceEvent event) {
         if (choiceEvents == null) {
             choiceEvents = new ArrayList<>();
         }
@@ -140,7 +138,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
 
         if (choiceEvents != null) {
             for (ChoiceEvent event : choiceEvents) {
-                event.choiceChanged(this, choice);
+                event.choiceChanged(choice);
             }
         }
     }
@@ -188,9 +186,9 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
     @Override
     public <T> void setGenericValue(T value) {
         if (value instanceof Integer) {
-            setChoice(choiceList.get((Integer) value));
+            choice(choiceList.get((Integer) value));
         } else if (value instanceof Boolean) {
-            setChoice(choiceList.get(((Boolean) value) ? 1 : 0));
+            choice(choiceList.get(((Boolean) value) ? 1 : 0));
         } else {
             super.setGenericValue(value);
         }

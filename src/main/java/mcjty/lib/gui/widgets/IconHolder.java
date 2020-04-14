@@ -9,7 +9,6 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
@@ -39,10 +38,6 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     private Integer borderColor = null;
     private Integer selectedBorderColor = DEFAULT_SELECTED_BORDER_COLOR;
 
-    public IconHolder(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
     public IIcon getIcon() {
         return icon;
     }
@@ -59,7 +54,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return border;
     }
 
-    public IconHolder setBorder(int border) {
+    public IconHolder border(int border) {
         this.border = border;
         return this;
     }
@@ -68,7 +63,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return borderColor;
     }
 
-    public IconHolder setBorderColor(Integer borderColor) {
+    public IconHolder borderColor(Integer borderColor) {
         this.borderColor = borderColor;
         return this;
     }
@@ -77,7 +72,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return selectedBorderColor;
     }
 
-    public IconHolder setSelectedBorderColor(Integer selectedBorderColor) {
+    public IconHolder selectedBorderColor(Integer selectedBorderColor) {
         this.selectedBorderColor = selectedBorderColor;
         return this;
     }
@@ -86,7 +81,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return selectable;
     }
 
-    public IconHolder setSelectable(boolean selectable) {
+    public IconHolder selectable(boolean selectable) {
         this.selectable = selectable;
         return this;
     }
@@ -95,7 +90,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return makeCopy;
     }
 
-    public IconHolder setMakeCopy(boolean makeCopy) {
+    public IconHolder makeCopy(boolean makeCopy) {
         this.makeCopy = makeCopy;
         return this;
     }
@@ -142,11 +137,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(x, y);
+        super.draw(gui, x, y);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -165,11 +160,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
     @Override
-    public void drawPhase2(int x, int y) {
+    public void drawPhase2(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        super.drawPhase2(x, y);
+        super.drawPhase2(gui, x, y);
         if (border > 0 && selectable && selectedBorderColor != null && window.getTextFocus() == this) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;
@@ -177,7 +172,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         }
     }
 
-    public IconHolder addIconArrivesEvent(IconArrivesEvent event) {
+    public IconHolder arrivesEvent(IconArrivesEvent event) {
         if (iconArrivesEvents == null) {
             iconArrivesEvents = new ArrayList<>();
         }
@@ -189,7 +184,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         fireChannelEvents("arrived");
         if (iconArrivesEvents != null) {
             for (IconArrivesEvent event : iconArrivesEvents) {
-                boolean b = event.iconArrives(this, icon);
+                boolean b = event.iconArrives(icon);
                 if (!b) {
                     return false;
                 }
@@ -198,7 +193,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return true;
     }
 
-    public IconHolder addIconLeavesEvent(IconLeavesEvent event) {
+    public IconHolder leavesEvent(IconLeavesEvent event) {
         if (iconLeavesEvents == null) {
             iconLeavesEvents = new ArrayList<>();
         }
@@ -211,7 +206,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         fireChannelEvents("leaves");
         if (iconLeavesEvents != null) {
             for (IconLeavesEvent event : iconLeavesEvents) {
-                boolean b = event.iconLeaves(this, icon);
+                boolean b = event.iconLeaves(icon);
                 if (!b) {
                     return false;
                 }
@@ -220,7 +215,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return true;
     }
 
-    public IconHolder addIconClickedEvent(IconClickedEvent event) {
+    public IconHolder clickedEvent(IconClickedEvent event) {
         if (iconClickedEvents == null) {
             iconClickedEvents = new ArrayList<>();
         }
@@ -237,7 +232,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 .build());
         if (iconClickedEvents != null) {
             for (IconClickedEvent event : iconClickedEvents) {
-                boolean b = event.iconClicked(this, icon, dx, dy);
+                boolean b = event.iconClicked(icon, dx, dy);
                 if (!b) {
                     return false;
                 }
@@ -246,7 +241,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         return true;
     }
 
-    public IconHolder addIconHolderClickedEvent(IconHolderClickedEvent event) {
+    public IconHolder holderClickedEvent(IconHolderClickedEvent event) {
         if (iconHolderClickedEvents == null) {
             iconHolderClickedEvents = new ArrayList<>();
         }
@@ -263,12 +258,12 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 .build());
         if (iconHolderClickedEvents != null) {
             for (IconHolderClickedEvent event : iconHolderClickedEvents) {
-                event.holderClicked(this, icon, dx, dy);
+                event.holderClicked(icon, dx, dy);
             }
         }
     }
 
-    public IconHolder addIconHoverEvent(IconHoverEvent event) {
+    public IconHolder hoverEvent(IconHoverEvent event) {
         if (iconHoverEvents == null) {
             iconHoverEvents = new ArrayList<>();
         }
@@ -285,7 +280,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
                 .build());
         if (iconHoverEvents != null) {
             for (IconHoverEvent event : iconHoverEvents) {
-                event.hover(this, icon, dx, dy);
+                event.hover(icon, dx, dy);
             }
         }
     }

@@ -1,12 +1,13 @@
 package mcjty.lib.gui.widgets;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import mcjty.lib.gui.layout.HorizontalLayout;
+import mcjty.lib.gui.layout.PositionalLayout;
+import mcjty.lib.gui.layout.VerticalLayout;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import static mcjty.lib.gui.widgets.BlockRender.TYPE_BLOCKRENDER;
 import static mcjty.lib.gui.widgets.Button.TYPE_BUTTON;
@@ -28,11 +29,9 @@ import static mcjty.lib.gui.widgets.TextField.TYPE_TEXTFIELD;
 import static mcjty.lib.gui.widgets.ToggleButton.TYPE_TOGGLEBUTTON;
 import static mcjty.lib.gui.widgets.WidgetList.TYPE_WIDGETLIST;
 
-;
+public class Widgets {
 
-public class WidgetRepository {
-
-    private static final Map<String, BiFunction<Minecraft, Screen, Widget<?>>> FACTORIES = new HashMap<>();
+    private static final Map<String, Supplier<Widget<?>>> FACTORIES = new HashMap<>();
 
     static {
         FACTORIES.put(TYPE_BLOCKRENDER, BlockRender::new);
@@ -51,18 +50,69 @@ public class WidgetRepository {
         FACTORIES.put(TYPE_SLIDER, Slider::new);
         FACTORIES.put(TYPE_TABBEDPANEL, TabbedPanel::new);
         FACTORIES.put(TYPE_TEXTFIELD, TextField::new);
-//        FACTORIES.put(TYPE_TEXTPAGE, (minecraft, gui) -> new TextPage(minecraft, gui));
         FACTORIES.put(TYPE_TOGGLEBUTTON, ToggleButton::new);
         FACTORIES.put(TYPE_WIDGETLIST, WidgetList::new);
         FACTORIES.put(TYPE_TAGSELECTOR, TagSelector::new);
     }
 
     @Nullable
-    public static Widget<?> createWidget(String type, Minecraft minecraft, Screen gui) {
-        BiFunction<Minecraft, Screen, Widget<?>> function = FACTORIES.get(type);
+    public static Widget<?> createWidget(String type) {
+        Supplier<Widget<?>> function = FACTORIES.get(type);
         if (function == null) {
             return null;
         }
-        return function.apply(minecraft, gui);
+        return function.get();
+    }
+
+    public static Panel positional() {
+        return new Panel().layout(new PositionalLayout());
+    }
+
+    public static Panel horizontal() {
+        return new Panel().layout(new HorizontalLayout());
+    }
+
+    public static Panel horizontal(int margin, int spacing) {
+        return new Panel().layout(new HorizontalLayout().setHorizontalMargin(margin).setSpacing(spacing));
+    }
+
+    public static Panel vertical() {
+        return new Panel().layout(new VerticalLayout());
+    }
+
+    public static Panel vertical(int margin, int spacing) {
+        return new Panel().layout(new VerticalLayout().setVerticalMargin(margin).setSpacing(spacing));
+    }
+
+    public static Button button(int x, int y, int w, int h, String text) {
+        return new Button().hint(x, y, w, h).text(text);
+    }
+
+    public static Button button(String text) {
+        return new Button().text(text);
+    }
+
+    public static TextField textfield(int x, int y, int w, int h) {
+        return new TextField().hint(x, y, w, h);
+    }
+
+    public static Label label(int x, int y, int w, int h, String text) {
+        return new Label().hint(x, y, w, h).text(text);
+    }
+
+    public static Label label(String text) {
+        return new Label().text(text);
+    }
+
+    public static ImageChoiceLabel imageChoice(int x, int y, int w, int h) {
+        return new ImageChoiceLabel().hint(x, y, w, h);
+    }
+
+    public static WidgetList list(int x, int y, int w, int h) {
+        return new WidgetList().hint(x, y, w, h);
+    }
+
+    public static Slider slider(int x, int y, int w, int h) {
+        return new Slider().hint(x, y, w, h);
     }
 }

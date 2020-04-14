@@ -8,6 +8,7 @@ import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
@@ -22,11 +23,9 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.List;
 import java.util.*;
 
 /**
@@ -82,7 +81,7 @@ public class Window {
                                     ((GenericGuiContainer<?,?>) gui).sendServerCommandTyped(wrapper, teCommand, params));
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
-                    toplevel = new Panel(Minecraft.getInstance(), gui);
+                    toplevel = new Panel();
                     toplevel.readFromGuiCommand(cmd);
                 });
                 command.commands()
@@ -108,7 +107,7 @@ public class Window {
             }
             int guiLeft = (gui.width - dim[0]) / 2;
             int guiTop = (gui.height - dim[1]) / 2;
-            toplevel.setBounds(new Rectangle(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]));
+            toplevel.bounds(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]);
         }
         Minecraft.getInstance().keyboardListener.enableRepeatEvents(true);
     }
@@ -170,7 +169,7 @@ public class Window {
         Set<Integer> enabledFlags = widget.getEnabledFlags();
         if (!enabledFlags.isEmpty()) {
             boolean enable = activeFlags.containsAll(enabledFlags);
-            widget.setEnabled(enable);
+            widget.enabled(enable);
         }
         if (widget instanceof AbstractContainerWidget) {
             for (Widget<?> child : ((AbstractContainerWidget<?>) widget).getChildren()) {
@@ -273,11 +272,11 @@ public class Window {
         int y = getRelativeY();
 
         if (hover != null) {
-            hover.setHovering(false);
+            hover.hovering(false);
         }
         hover = toplevel.getWidgetAtPosition(x, y);
         if (hover != null) {
-            hover.setHovering(true);
+            hover.hovering(true);
         }
 
         int dwheel;
@@ -293,11 +292,11 @@ public class Window {
             toplevel.setWindow(this);
             toplevel.mouseScrolled(x, y, dwheel);
         }
-        currentStyle = McJtyLib.getPreferencesProperties(gui.getMinecraft().player).map(p -> p.getStyle()).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
+        currentStyle = McJtyLib.getPreferencesProperties(gui.getMinecraft().player).map(PreferencesProperties::getStyle).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 
         toplevel.setWindow(this);
-        toplevel.draw(0, 0);
-        toplevel.drawPhase2(0, 0);
+        toplevel.draw(gui, 0, 0);
+        toplevel.drawPhase2(gui, 0, 0);
     }
 
     public GuiStyle getCurrentStyle() {
@@ -360,7 +359,7 @@ public class Window {
     private void fireFocusEvents(Widget<?> widget) {
         if (focusEvents != null) {
             for (FocusEvent event : focusEvents) {
-                event.focus(this, widget);
+                event.focus(widget);
             }
         }
     }

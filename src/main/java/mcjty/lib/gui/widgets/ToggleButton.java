@@ -9,7 +9,6 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
@@ -28,15 +27,11 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
     private boolean pressed = false;
     private boolean checkMarker = DEFAULT_CHECKMARKER;
 
-    public ToggleButton(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
     public boolean isPressed() {
         return pressed;
     }
 
-    public ToggleButton setPressed(boolean pressed) {
+    public ToggleButton pressed(boolean pressed) {
         this.pressed = pressed;
         return this;
     }
@@ -57,13 +52,13 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
         return checkMarker;
     }
 
-    public ToggleButton setCheckMarker(boolean checkMarker) {
+    public ToggleButton checkMarker(boolean checkMarker) {
         this.checkMarker = checkMarker;
         return this;
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
@@ -94,7 +89,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
             }
         }
 
-        super.drawOffset(x, y, checkMarker ? 6 : 0, 1);
+        super.drawOffset(gui, x, y, checkMarker ? 6 : 0, 1);
     }
 
     @Override
@@ -107,7 +102,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
         return null;
     }
 
-    public ToggleButton addButtonEvent(ButtonEvent event) {
+    public ToggleButton event(ButtonEvent event) {
         if (buttonEvents == null) {
             buttonEvents = new ArrayList<>();
         }
@@ -128,7 +123,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
                 .build());
         if (buttonEvents != null) {
             for (ButtonEvent event : buttonEvents) {
-                event.buttonClicked(this);
+                event.buttonClicked();
             }
         }
     }
@@ -152,7 +147,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
 
     @Override
     public <T> void setGenericValue(T value) {
-        setPressed(TypeConvertors.toBoolean(value));
+        pressed(TypeConvertors.toBoolean(value));
     }
 
     @Override

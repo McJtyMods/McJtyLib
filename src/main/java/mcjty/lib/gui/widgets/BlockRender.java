@@ -8,7 +8,6 @@ import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.typed.Type;
 import mcjty.lib.varia.ItemStackTools;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -40,22 +39,21 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return renderItem;
     }
 
-    public BlockRender setRenderItem(Object renderItem) {
+    public BlockRender renderItem(Object renderItem) {
         this.renderItem = renderItem;
         return this;
     }
 
-    public BlockRender(Minecraft mc, Screen gui) {
-        super(mc, gui);
-        setDesiredHeight(16);
-        setDesiredWidth(16);
+    public BlockRender() {
+        desiredHeight(16);
+        desiredWidth(16);
     }
 
     public boolean isShowLabel() {
         return showLabel;
     }
 
-    public BlockRender setShowLabel(boolean showLabel) {
+    public BlockRender showLabel(boolean showLabel) {
         this.showLabel = showLabel;
         return this;
     }
@@ -64,7 +62,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return labelColor == null ? StyleConfig.colorTextNormal : labelColor;
     }
 
-    public BlockRender setLabelColor(int labelColor) {
+    public BlockRender labelColor(int labelColor) {
         this.labelColor = labelColor;
         return this;
     }
@@ -73,7 +71,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return offsetX;
     }
 
-    public BlockRender setOffsetX(int offsetX) {
+    public BlockRender offsetX(int offsetX) {
         this.offsetX = offsetX;
         return this;
     }
@@ -82,7 +80,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return offsetY;
     }
 
-    public BlockRender setOffsetY(int offsetY) {
+    public BlockRender offsetY(int offsetY) {
         this.offsetY = offsetY;
         return this;
     }
@@ -91,20 +89,20 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return hilightOnHover;
     }
 
-    public BlockRender setHilightOnHover(boolean hilightOnHover) {
+    public BlockRender hilightOnHover(boolean hilightOnHover) {
         this.hilightOnHover = hilightOnHover;
         return this;
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
         if (showLabel) {
-            drawBackground(x, y, bounds.height, bounds.height);
+            drawBackground(gui, x, y, bounds.height, bounds.height);
         } else {
-            super.draw(x, y);
+            super.draw(gui, x, y);
         }
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
@@ -158,7 +156,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return null;
     }
 
-    public BlockRender addSelectionEvent(BlockRenderEvent event) {
+    public BlockRender event(BlockRenderEvent event) {
         if (selectionEvents == null) {
             selectionEvents = new ArrayList<>();
         }
@@ -176,7 +174,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         fireChannelEvents("select");
         if (selectionEvents != null) {
             for (BlockRenderEvent event : selectionEvents) {
-                event.select(this);
+                event.select();
             }
         }
     }
@@ -185,7 +183,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         fireChannelEvents("doubleclick");
         if (selectionEvents != null) {
             for (BlockRenderEvent event : selectionEvents) {
-                event.doubleClick(this);
+                event.doubleClick();
             }
         }
     }
@@ -228,17 +226,17 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     @Override
     public <T> void setGenericValue(T value) {
         if (value == null) {
-            setRenderItem(null);
+            renderItem(null);
         } else {
             Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(value.toString()));
             if (item != null) {
-                setRenderItem(new ItemStack(item));
+                renderItem(new ItemStack(item));
             } else {
                 Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(value.toString()));
                 if (block != null) {
-                    setRenderItem(new ItemStack(block));
+                    renderItem(new ItemStack(block));
                 } else {
-                    setRenderItem(null);
+                    renderItem(null);
                 }
             }
         }

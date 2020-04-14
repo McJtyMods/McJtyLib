@@ -2,14 +2,10 @@ package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
-import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
-
-;
 
 public class TabbedPanel extends AbstractContainerWidget<Panel> {
 
@@ -18,12 +14,8 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     private Widget<?> current = null;
     private Map<String,Widget<?>> pages = new HashMap<>();
 
-    public TabbedPanel(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
-    public TabbedPanel addPage(String name, Widget<?> child) {
-        addChild(child);
+    public TabbedPanel page(String name, Widget<?> child) {
+        children(child);
         pages.put(name, child);
         return this;
     }
@@ -41,12 +33,12 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
         return null;
     }
 
-    public TabbedPanel setCurrent(Widget<?> current) {
+    public TabbedPanel current(Widget<?> current) {
         this.current = current;
         return this;
     }
 
-    public TabbedPanel setCurrent(String name) {
+    public TabbedPanel current(String name) {
         this.current = pages.get(name);
         return this;
     }
@@ -66,11 +58,11 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(x, y);
+        super.draw(gui, x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         drawBox(xx, yy, 0xffff0000);
@@ -79,14 +71,14 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
 
         if (current != null) {
             current.setWindow(window);
-            current.draw(xx, yy);
+            current.draw(gui, xx, yy);
         }
     }
 
     private void setChildBounds() {
         if (isDirty()) {
             for (Widget<?> child : getChildren()) {
-                child.setBounds(new Rectangle(0, 0, getBounds().width, getBounds().height));
+                child.bounds(0, 0, getBounds().width, getBounds().height);
             }
             markClean();
         }

@@ -9,10 +9,9 @@ import mcjty.lib.gui.events.SelectionEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
-import java.awt.Rectangle;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,10 +44,9 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     private int leftMargin = DEFAULT_LEFT_MARGIN;
     private int topMargin = DEFAULT_TOP_MARGIN;
 
-    public WidgetList(Minecraft mc, Screen gui) {
-        super(mc, gui);
-        setFilledRectThickness(-1);
-        setFilledBackground(StyleConfig.colorListBackground);
+    public WidgetList() {
+        filledRectThickness(-1);
+        filledBackground(StyleConfig.colorListBackground);
     }
 
     public int getRowheight() {
@@ -56,7 +54,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     // Setting rowheight to -1 will use variable height depending on the desired height of every row
-    public WidgetList setRowheight(int rowheight) {
+    public WidgetList rowheight(int rowheight) {
         this.rowheight = rowheight;
         return this;
     }
@@ -65,7 +63,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         return drawHorizontalLines;
     }
 
-    public WidgetList setDrawHorizontalLines(boolean drawHorizontalLines) {
+    public WidgetList drawHorizontalLines(boolean drawHorizontalLines) {
         this.drawHorizontalLines = drawHorizontalLines;
         return this;
     }
@@ -74,7 +72,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         return leftMargin;
     }
 
-    public WidgetList setLeftMargin(int leftMargin) {
+    public WidgetList leftMargin(int leftMargin) {
         this.leftMargin = leftMargin;
         return this;
     }
@@ -83,7 +81,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         return topMargin;
     }
 
-    public WidgetList setTopMargin(int topMargin) {
+    public WidgetList topMargin(int topMargin) {
         this.topMargin = topMargin;
         return this;
     }
@@ -95,7 +93,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         return selected;
     }
 
-    public WidgetList setSelected(int selected) {
+    public WidgetList selected(int selected) {
         this.selected = selected;
         return this;
     }
@@ -108,12 +106,12 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         return invisibleselection;
     }
 
-    public WidgetList setInvisibleSelection(boolean invisibleselection) {
+    public WidgetList invisibleSelection(boolean invisibleselection) {
         this.invisibleselection = invisibleselection;
         return this;
     }
 
-    public WidgetList setNoSelectionMode(boolean m) {
+    public WidgetList noSelectionMode(boolean m) {
         this.noselection = m;
         return this;
     }
@@ -122,7 +120,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         return noselection;
     }
 
-    public WidgetList setPropagateEventsToChildren(boolean propagateEventsToChildren) {
+    public WidgetList propagateEventsToChildren(boolean propagateEventsToChildren) {
         this.propagateEventsToChildren = propagateEventsToChildren;
         return this;
     }
@@ -156,13 +154,13 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
             Widget<?> child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
-            child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
+            child.bounds(0 /*@@@ margin?*/, top, bounds.width, rh);
             top += rh;
         }
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
@@ -170,7 +168,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         // Use the function above to force reset of the slider in case the contents changed so that it doesn't look weird.
         mouseScrolled(x, y, 0);
 
-        super.draw(x, y);
+        super.draw(gui, x, y);
         int xx = x + bounds.x + leftMargin;
         int yy = y + bounds.y + topMargin;
         int top = 0;        // Margin@@@?
@@ -179,7 +177,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         for (int i = first ; i < first+getCountSelected() && i < getChildren().size(); i++) {
             Widget<?> child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
-            child.setBounds(new Rectangle(0 /*@@@ margin?*/, top, bounds.width, rh));
+            child.bounds(0 /*@@@ margin?*/, top, bounds.width, rh);
             boolean hilighted = hilightedRows.contains(i);
             if ((top + rh-1 < bounds.height-3) && drawHorizontalLines) {
                 RenderHelper.drawHorizontalLine(xx + 2, yy + top + rh - 1, xx + bounds.width - 7, StyleConfig.colorListSeparatorLine);
@@ -195,25 +193,25 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             }
             if (isEnabledAndVisible()) {
                 child.setWindow(window);
-                child.draw(xx, yy);
+                child.draw(gui, xx, yy);
             } else {
                 boolean en = child.isEnabled();
-                child.setEnabled(false);
+                child.enabled(false);
                 child.setWindow(window);
-                child.draw(xx, yy);
-                child.setEnabled(en);
+                child.draw(gui, xx, yy);
+                child.enabled(en);
             }
             top += rh;
         }
     }
 
     @Override
-    public void drawPhase2(int x, int y) {
+    public void drawPhase2(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
 
-        super.drawPhase2(x, y);
+        super.drawPhase2(gui, x, y);
         int xx = x + bounds.x + leftMargin;
         int yy = y + bounds.y + topMargin;
         int top = 0;        // Margin@@@?
@@ -223,7 +221,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             Widget<?> child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             if (isEnabledAndVisible()) {
-                child.drawPhase2(xx, yy);
+                child.drawPhase2(gui, xx, yy);
             }
             top += rh;
         }}
@@ -393,7 +391,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         this.first = first;
     }
 
-    public WidgetList addSelectionEvent(SelectionEvent event) {
+    public WidgetList event(SelectionEvent event) {
         if (selectionEvents == null) {
             selectionEvents = new ArrayList<> ();
         }
@@ -414,7 +412,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
                 .build());
         if (selectionEvents != null) {
             for (SelectionEvent event : selectionEvents) {
-                event.select(this, index);
+                event.select(index);
             }
         }
     }
@@ -426,7 +424,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
                 .build());
         if (selectionEvents != null) {
             for (SelectionEvent event : selectionEvents) {
-                event.doubleClick(this, index);
+                event.doubleClick(index);
             }
         }
     }

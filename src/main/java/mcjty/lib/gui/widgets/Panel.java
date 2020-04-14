@@ -3,7 +3,6 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.*;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 public class Panel extends AbstractContainerWidget<Panel> {
@@ -14,13 +13,9 @@ public class Panel extends AbstractContainerWidget<Panel> {
 
     private Widget<?> focus = null;
 
-    public Panel(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
-    public Panel setLayout(Layout layout) {
+    public Panel layout(Layout layout) {
         this.layout = layout;
-        markDirty();
+        markLayoutDirty();
         return this;
     }
 
@@ -35,11 +30,11 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(x, y);
+        super.draw(gui, x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
 //        drawBox(xx, yy, 0xffff0000);
@@ -52,20 +47,20 @@ public class Panel extends AbstractContainerWidget<Panel> {
 
         for (Widget<?> child : getChildren()) {
             child.setWindow(window);
-            child.draw(xx, yy);
+            child.draw(gui, xx, yy);
         }
     }
 
     @Override
-    public void drawPhase2(int x, int y) {
+    public void drawPhase2(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        super.drawPhase2(x, y);
+        super.drawPhase2(gui, x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         for (Widget<?> child : getChildren()) {
-            child.drawPhase2(xx, yy);
+            child.drawPhase2(gui, xx, yy);
         }
     }
 

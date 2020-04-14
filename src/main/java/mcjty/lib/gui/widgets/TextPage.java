@@ -1,12 +1,11 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -50,19 +49,19 @@ public class TextPage extends AbstractWidget<TextPage> {
 
     private int tabCounter = 0;
 
-    public TextPage(ModBase modBase, Minecraft mc, Screen gui) {
-        super(mc, gui);
+    public TextPage(ModBase modBase) {
+        super();
         this.modBase = modBase;
     }
 
-    public TextPage setArrowImage(ResourceLocation image, int u, int v) {
+    public TextPage arrowImage(ResourceLocation image, int u, int v) {
         this.arrowImage = image;
         this.arrowU = u;
         this.arrowV = v;
         return this;
     }
 
-    public TextPage setCraftingGridImage(ResourceLocation image, int u, int v) {
+    public TextPage craftingGridImage(ResourceLocation image, int u, int v) {
         this.craftingGridImage = image;
         this.craftU = u;
         this.craftV = v;
@@ -227,8 +226,8 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public void draw(int x, int y) {
-        super.draw(x, y);
+    public void draw(Screen gui, int x, int y) {
+        super.draw(gui, x, y);
 
         tabCounter = 0;
         y += 3;
@@ -240,9 +239,9 @@ public class TextPage extends AbstractWidget<TextPage> {
                 tabCounter++;
             }
             else if (line.recipe != null) {
-                y = renderRecipe(x, y, line);
+                y = renderRecipe(gui, x, y, line);
             } else if (line.resourceLocation != null) {
-                renderImage(x, y, line);
+                renderImage(gui, x, y, line);
             } else if (line.line != null) {
                 renderLine(x, y, line);
             }
@@ -250,8 +249,8 @@ public class TextPage extends AbstractWidget<TextPage> {
         }
     }
 
-    private void renderImage(int x, int y, Line line) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+    private void renderImage(Screen gui, int x, int y, Line line) {
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(line.resourceLocation);
         gui.blit(x+4, y+1, line.u, line.v, 16, 16);
 
@@ -291,13 +290,13 @@ public class TextPage extends AbstractWidget<TextPage> {
         mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);
     }
 
-    private int renderRecipe(int x, int y, Line line) {
+    private int renderRecipe(Screen gui, int x, int y, Line line) {
         y += 4;
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         // @TODO: need support for shapeless and better error checking
 
         if (craftingGridImage != null) {
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
             gui.blit(25+x, y, craftU, craftV, 19*3, 19*3);
         }
@@ -339,12 +338,12 @@ public class TextPage extends AbstractWidget<TextPage> {
             }
         }
         if (arrowImage != null) {
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(arrowImage);
             gui.blit(x+25+67, y+18, arrowU, arrowV, 16, 16);
         }
         if (craftingGridImage != null) {
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
             gui.blit(x+25+92, y + 16, craftU, craftV, 18, 18);
         }

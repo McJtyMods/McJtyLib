@@ -1,10 +1,8 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.ClientEventHandler;
-import mcjty.lib.multipart.MultipartModelLoader;
 import mcjty.lib.tooltips.TooltipRender;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;

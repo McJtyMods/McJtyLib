@@ -6,7 +6,6 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
 
@@ -35,15 +34,11 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
     private int ih;
 
 
-    public AbstractLabel(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
     public ResourceLocation getImage() {
         return image;
     }
 
-    public P setImage(ResourceLocation image, int u, int v, int iw, int ih) {
+    public P image(ResourceLocation image, int u, int v, int iw, int ih) {
         this.image = image;
         this.u = u;
         this.v = v;
@@ -56,7 +51,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         return dynamic;
     }
 
-    public P setDynamic(boolean dynamic) {
+    public P dynamic(boolean dynamic) {
         this.dynamic = dynamic;
         return (P) this;
     }
@@ -89,12 +84,12 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         return text;
     }
 
-    public P setText(String text) {
+    public P text(String text) {
         this.text = text;
         return (P) this;
     }
 
-    public P setTextOffset(int ox, int oy) {
+    public P textOffset(int ox, int oy) {
         txtDx = ox;
         txtDy = oy;
         return (P) this;
@@ -104,7 +99,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         return color == null ? StyleConfig.colorTextNormal : color;
     }
 
-    public P setColor(int color) {
+    public P color(int color) {
         this.color = color;
         return (P) this;
     }
@@ -113,7 +108,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         return disabledColor == null ? StyleConfig.colorTextDisabled : disabledColor;
     }
 
-    public P setDisabledColor(int disabledColor) {
+    public P disabledColor(int disabledColor) {
         this.disabledColor = disabledColor;
         return (P) this;
     }
@@ -122,7 +117,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         return horizontalAlignment;
     }
 
-    public P setHorizontalAlignment(HorizontalAlignment horizontalAlignment) {
+    public P horizontalAlignment(HorizontalAlignment horizontalAlignment) {
         this.horizontalAlignment = horizontalAlignment;
         return (P) this;
     }
@@ -131,21 +126,21 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         return verticalAlignment;
     }
 
-    public P setVerticalAlignment(VerticalAlignment verticalAlignment) {
+    public P verticalAlignment(VerticalAlignment verticalAlignment) {
         this.verticalAlignment = verticalAlignment;
         return (P) this;
     }
 
     @Override
-    public void draw(int x, int y) {
-        drawOffset(x, y, 0, 0);
+    public void draw(Screen gui, int x, int y) {
+        drawOffset(gui, x, y, 0, 0);
     }
 
-    public void drawOffset(int x, int y, int offsetx, int offsety) {
+    public void drawOffset(Screen gui, int x, int y, int offsetx, int offsety) {
         if (!visible) {
             return;
         }
-        super.draw(x, y);
+        super.draw(gui, x, y);
 
         int dx = calculateHorizontalOffset() + offsetx + txtDx;
         int dy = calculateVerticalOffset() + offsety + txtDy;
@@ -227,9 +222,9 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
     @Override
     public <T> void setGenericValue(T value) {
         if (value == null) {
-            setText("");
+            text("");
         } else {
-            setText(value.toString());
+            text(value.toString());
         }
     }
 

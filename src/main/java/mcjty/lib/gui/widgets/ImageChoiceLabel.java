@@ -6,7 +6,6 @@ import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
@@ -16,8 +15,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-;
 
 public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
 
@@ -70,15 +67,11 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     private int currentChoice = -1;
     private List<ChoiceEvent> choiceEvents = null;
 
-    public ImageChoiceLabel(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
     public boolean isWithBorder() {
         return withBorder;
     }
 
-    public ImageChoiceLabel setWithBorder(boolean withBorder) {
+    public ImageChoiceLabel withBorder(boolean withBorder) {
         this.withBorder = withBorder;
         return this;
     }
@@ -87,7 +80,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         return highlightedChoice;
     }
 
-    public ImageChoiceLabel setHighlightedChoice(int highlightedChoice) {
+    public ImageChoiceLabel highlightedChoice(int highlightedChoice) {
         this.highlightedChoice = highlightedChoice;
         return this;
     }
@@ -101,7 +94,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         }
     }
 
-    public ImageChoiceLabel addChoice(String choice, String tooltips, ResourceLocation image, int u, int v) {
+    public ImageChoiceLabel choice(String choice, String tooltips, ResourceLocation image, int u, int v) {
         choiceList.add(new ChoiceEntry(choice, Arrays.asList(StringUtils.split(tooltips, "\n")), image, u, v));
         if (currentChoice == -1) {
             currentChoice = 0;
@@ -138,7 +131,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
 
     public void setCurrentChoice(int currentChoice) {
         this.currentChoice = currentChoice;
-        setImage(choiceList.get(currentChoice).getImage(), choiceList.get(currentChoice).getU(), choiceList.get(currentChoice).getV());
+        image(choiceList.get(currentChoice).getImage(), choiceList.get(currentChoice).getU(), choiceList.get(currentChoice).getV());
     }
 
     public int findChoice(String choice) {
@@ -173,7 +166,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         return choiceList.get(currentChoice).getChoice();
     }
 
-    public ImageChoiceLabel addChoiceEvent(ChoiceEvent event) {
+    public ImageChoiceLabel event(ChoiceEvent event) {
         if (choiceEvents == null) {
             choiceEvents = new ArrayList<>();
         }
@@ -195,13 +188,13 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
                 .build());
         if (choiceEvents != null) {
             for (ChoiceEvent event : choiceEvents) {
-                event.choiceChanged(this, choice);
+                event.choiceChanged(choice);
             }
         }
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (withBorder) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;
@@ -219,7 +212,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
             }
         }
 
-        super.draw(x, y);
+        super.draw(gui, x, y);
     }
 
 

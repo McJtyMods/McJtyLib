@@ -4,7 +4,6 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -31,11 +30,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     private boolean showRfPerTick = DEFAULT_SHOWRFPERTICK;
     private long rfPerTick = 0;
 
-    public EnergyBar(Minecraft mc, Screen gui) {
-        super(mc, gui);
-    }
-
-    public EnergyBar setHorizontal() {
+    public EnergyBar horizontal() {
         horizontal = true;
         return this;
     }
@@ -44,7 +39,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return horizontal;
     }
 
-    public EnergyBar setHandler(IEnergyStorage handler) {
+    public EnergyBar handler(IEnergyStorage handler) {
         this.handler = handler;
         return this;
     }
@@ -53,7 +48,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return handler;
     }
 
-    public EnergyBar setVertical() {
+    public EnergyBar vertical() {
         horizontal = false;
         return this;
     }
@@ -78,7 +73,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return showText;
     }
 
-    public EnergyBar setShowText(boolean showText) {
+    public EnergyBar showText(boolean showText) {
         this.showText = showText;
         return this;
     }
@@ -87,7 +82,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return showRfPerTick;
     }
 
-    public EnergyBar setShowRfPerTick(boolean showRfPerTick) {
+    public EnergyBar showRfPerTick(boolean showRfPerTick) {
         this.showRfPerTick = showRfPerTick;
         return this;
     }
@@ -96,7 +91,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return rfPerTick;
     }
 
-    public EnergyBar setRfPerTick(long rfPerTick) {
+    public EnergyBar rfPerTick(long rfPerTick) {
         this.rfPerTick = rfPerTick;
         return this;
     }
@@ -108,7 +103,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         return value;
     }
 
-    public EnergyBar setValue(long value) {
+    public EnergyBar value(long value) {
         this.value = value;
         return this;
     }
@@ -120,7 +115,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
        return maxValue;
     }
 
-    public EnergyBar setMaxValue(long maxValue) {
+    public EnergyBar maxValue(long maxValue) {
         this.maxValue = maxValue;
         return this;
     }
@@ -162,11 +157,11 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     @Override
-    public void draw(final int x, final int y) {
+    public void draw(Screen gui, final int x, final int y) {
         if (!visible) {
             return;
         }
-        super.draw(x, y);
+        super.draw(gui, x, y);
 
         int bx = x + bounds.x;
         int by = y + bounds.y;

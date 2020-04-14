@@ -1,5 +1,6 @@
 package mcjty.lib.gui.layout;
 
+import mcjty.lib.gui.widgets.AbstractWidget;
 import mcjty.lib.gui.widgets.Widget;
 
 import java.util.Collection;
@@ -16,7 +17,7 @@ public class HorizontalLayout extends AbstractLayout<HorizontalLayout> {
             if (w == Widget.SIZE_UNKNOWN) {
                 w = otherWidth;
             }
-            child.setBounds(align(left, getVerticalMargin(), w, height-getVerticalMargin()*2, child));
+            ((AbstractWidget)child).setBounds(align(left, getVerticalMargin(), w, height-getVerticalMargin()*2, child));
             left += w;
             left += getSpacing();
         }

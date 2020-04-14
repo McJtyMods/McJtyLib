@@ -5,6 +5,7 @@ import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.typed.Type;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -30,12 +31,12 @@ public interface Widget<P extends Widget<P>> {
 
     void setWindow(Window window);
 
-    P setName(String name);
+    P name(String name);
 
     /**
      * When this is set this widget will broadcast events on the given channel
      */
-    P setChannel(String channel);
+    P channel(String channel);
 
     /**
      * Return true if this widget is equal to the parameter widget or if the parameter
@@ -47,10 +48,8 @@ public interface Widget<P extends Widget<P>> {
      * Set the actual bounds for this widget. These coordinates are relative to the parents
      * coordinate system. This function is typically called by the parent of this widget
      * and should only be used by the application for the toplevel widget.
-     * @param bounds
-     * @return a reference to this widget
      */
-    void setBounds(Rectangle bounds);
+    void bounds(int x, int y, int w, int h);
 
     /**
      * Version of getDesiredWidth/getDesiredHeight that accepts a dimension parameter.
@@ -63,7 +62,7 @@ public interface Widget<P extends Widget<P>> {
      * Set the desired width for this widget. This property is used by layout instances
      * which may honor or ignore this. You can also use one of the SIZE_... constants.
      */
-    P setDesiredWidth(int width);
+    P desiredWidth(int width);
 
     int getDesiredWidth();
 
@@ -71,20 +70,20 @@ public interface Widget<P extends Widget<P>> {
      * Set the desired height for this widget. This property is used by layout instances
      * which may honor or ignore this. You can also use one of the SIZE_... constants.
      */
-    P setDesiredHeight(int height);
+    P desiredHeight(int height);
 
     int getDesiredHeight();
 
     /**
      * Set the tooltip for this widget.
      */
-    P setTooltips(String... tooltips);
+    P tooltips(String... tooltips);
 
     /**
      * Set itemstacks that the tooltips can use with @<index> notation
      * @return
      */
-    P setTooltipItems(ItemStack... items);
+    P tooltipItems(ItemStack... items);
 
     List<String> getTooltips();
 
@@ -93,12 +92,12 @@ public interface Widget<P extends Widget<P>> {
     /**
      * Enable or disable mouse interaction with this widget. This is true by default.
      */
-    P setEnabled(boolean enabled);
+    P enabled(boolean enabled);
 
     /**
      * Enable or disable based on a combination of 'flags'
      */
-    P setEnabledFlags(String... flags);
+    P enabledFlags(String... flags);
 
     @Nonnull
     Set<Integer> getEnabledFlags();
@@ -107,14 +106,14 @@ public interface Widget<P extends Widget<P>> {
 
     boolean isEnabledAndVisible();
 
-    P setHovering(boolean hovering);
+    P hovering(boolean hovering);
 
     boolean isHovering();
 
     /**
      * Make this widget visible/invisible.
      */
-    P setVisible(boolean visible);
+    P visible(boolean visible);
 
     boolean isVisible();
 
@@ -145,13 +144,13 @@ public interface Widget<P extends Widget<P>> {
      * The given coordinates are the absolute coordinates of the parent. This does *not* include
      * the top/left x,y of this widget itself.
      */
-    void draw(int x, int y);
+    void draw(Screen gui, int x, int y);
 
     /**
      * After the window has been drawn this is called again to give widgets a chance
      * to render additional stuff that has to be rendered on top of the rest
      */
-    void drawPhase2(int x, int y);
+    void drawPhase2(Screen gui, int x, int y);
 
     /**
      * Handle a mouse click for this widget. This widget does not have to check if the coordinate is
@@ -214,13 +213,13 @@ public interface Widget<P extends Widget<P>> {
      * @param hint
      * @return this widget
      */
-    P setLayoutHint(LayoutHint hint);
+    P hint(LayoutHint hint);
 
     /**
      * Conveniance for the positional layout
      */
-    default P setLayoutHint(int x, int y, int width, int height) {
-        return setLayoutHint(new PositionalLayout.PositionalHint(x, y, width, height));
+    default P hint(int x, int y, int width, int height) {
+        return hint(new PositionalLayout.PositionalHint(x, y, width, height));
     }
 
     LayoutHint getLayoutHint();
@@ -228,7 +227,7 @@ public interface Widget<P extends Widget<P>> {
     /**
      * Associate a user object with this widget.
      */
-    P setUserObject(Object obj);
+    P userObject(Object obj);
 
     Object getUserObject();
 
@@ -241,4 +240,7 @@ public interface Widget<P extends Widget<P>> {
     <T> void setGenericValue(T value);
 
     Object getGenericValue(Type<?> type);
+
+    // Mark the layout as dirty (mostly if it is a container)
+    void markLayoutDirty();
 }

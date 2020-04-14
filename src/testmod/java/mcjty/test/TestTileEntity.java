@@ -1,8 +1,8 @@
 package mcjty.test;
 
+import mcjty.lib.bindings.GenericTileEntity;
 import mcjty.lib.container.DefaultSidedInventory;
 import mcjty.lib.container.InventoryHelper;
-import mcjty.lib.bindings.GenericTileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class TestTileEntity extends GenericTileEntity implements DefaultSidedInventory {

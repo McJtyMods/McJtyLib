@@ -25,6 +25,7 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.dimension.DimensionType;
@@ -371,7 +372,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             list = new ArrayList<>();
         } else {
             ITooltipFlag flag = this.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-            list = stack.getTooltip(this.getMinecraft().player, flag).stream().map(s -> s.getFormattedText()).collect(Collectors.toList());
+            list = stack.getTooltip(this.getMinecraft().player, flag).stream().map(ITextComponent::getFormattedText).collect(Collectors.toList());
         }
 
         for (int i = 0; i < list.size(); ++i) {

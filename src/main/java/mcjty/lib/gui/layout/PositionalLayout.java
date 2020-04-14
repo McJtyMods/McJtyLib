@@ -2,7 +2,6 @@ package mcjty.lib.gui.layout;
 
 import mcjty.lib.gui.widgets.Widget;
 
-import java.awt.Rectangle;
 import java.util.Collection;
 
 public class PositionalLayout extends AbstractLayout<PositionalLayout> {
@@ -23,7 +22,7 @@ public class PositionalLayout extends AbstractLayout<PositionalLayout> {
                 } else {
                     h = hint.height;
                 }
-                child.setBounds(new Rectangle(hint.x, hint.y, w, h));
+                child.bounds(hint.x, hint.y, w, h);
             }
         }
     }

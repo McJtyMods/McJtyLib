@@ -3,11 +3,8 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-
-;
 
 public class IconRender extends AbstractWidget<IconRender> {
 
@@ -15,27 +12,26 @@ public class IconRender extends AbstractWidget<IconRender> {
 
     private TextureAtlasSprite icon = null;
 
-    public IconRender(Minecraft mc, Screen gui) {
-        super(mc, gui);
-        setDesiredHeight(16);
-        setDesiredWidth(16);
+    public IconRender() {
+        desiredHeight(16);
+        desiredWidth(16);
     }
 
     public TextureAtlasSprite getIcon() {
         return icon;
     }
 
-    public IconRender setIcon(TextureAtlasSprite icon) {
+    public IconRender icon(TextureAtlasSprite icon) {
         this.icon = icon;
         return this;
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(x, y);
+        super.draw(gui, x, y);
         if (icon != null) {
             RenderHelper.renderObject(mc, x + bounds.x, y + bounds.y, icon, false);
         }

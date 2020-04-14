@@ -7,8 +7,6 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +26,7 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
     private String suffix = DEFAULT_SUFFIX;
     private List<ValueEvent> valueEvents = null;
 
-    public ScrollableLabel(Minecraft mc, Screen gui) {
-        super(mc, gui);
+    public ScrollableLabel() {
         setFirstSelected(0);
     }
 
@@ -37,12 +34,12 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
         return suffix;
     }
 
-    public ScrollableLabel setSuffix(String suffix) {
+    public ScrollableLabel suffix(String suffix) {
         this.suffix = suffix;
         return this;
     }
 
-    public ScrollableLabel setRealMaximum(int realmax) {
+    public ScrollableLabel realMaximum(int realmax) {
         this.realmax = realmax;
 
         if (first > realmax-realmin) {
@@ -61,7 +58,7 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
         return first + realmin;
     }
 
-    public ScrollableLabel setRealValue(int value) {
+    public ScrollableLabel realValue(int value) {
         int f = value - realmin;
         if (f < 0) {
             f = 0;
@@ -70,7 +67,7 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
         return this;
     }
 
-    public ScrollableLabel setRealMinimum(int realmin) {
+    public ScrollableLabel realMinimum(int realmin) {
         this.realmin = realmin;
 
         if (first < 0) {
@@ -103,11 +100,11 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
     @Override
     public void setFirstSelected(int first) {
         this.first = first;
-        setText(getRealValue() + suffix);
+        text(getRealValue() + suffix);
         fireValueEvents(getRealValue());
     }
 
-    public ScrollableLabel addValueEvent(ValueEvent event) {
+    public ScrollableLabel event(ValueEvent event) {
         if (valueEvents == null) {
             valueEvents = new ArrayList<>();
         }
@@ -125,7 +122,7 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
         fireChannelEvents(TypedMap.builder().put(PARAM_VALUE, value).build());
         if (valueEvents != null) {
             for (ValueEvent event : valueEvents) {
-                event.valueChanged(this, value);
+                event.valueChanged(value);
             }
         }
     }
@@ -153,7 +150,7 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
 
     @Override
     public <T> void setGenericValue(T value) {
-        setRealValue(TypeConvertors.toInt(value));
+        realValue(TypeConvertors.toInt(value));
     }
 
     @Override

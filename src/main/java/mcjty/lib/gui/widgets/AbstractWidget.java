@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -17,7 +17,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
-import java.awt.Rectangle;
+import java.awt.*;
+import java.util.List;
 import java.util.*;
 
 public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Widget<P> {
@@ -32,7 +33,6 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     protected int desiredHeight = SIZE_UNKNOWN;
 
     protected Minecraft mc;
-    protected Screen gui;
     protected Window window;
 
     private LayoutHint layoutHint = null;
@@ -67,9 +67,8 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         return w == this;
     }
 
-    protected AbstractWidget(Minecraft mc, Screen gui) {
-        this.mc = mc;
-        this.gui = gui;
+    protected AbstractWidget() {
+        this.mc = Minecraft.getInstance();
     }
 
     @Override
@@ -88,7 +87,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setName(String name) {
+    public P name(String name) {
         this.name = name;
         if (channel == null) {
             channel = name;     // Automatic channel
@@ -97,7 +96,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setChannel(String channel) {
+    public P channel(String channel) {
         this.channel = channel;
         return (P) this;
     }
@@ -129,7 +128,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setTooltips(String... tooltips) {
+    public P tooltips(String... tooltips) {
         if (tooltips.length > 0) {
             this.tooltips = new ArrayList<>(tooltips.length);
             Collections.addAll(this.tooltips, tooltips);
@@ -140,7 +139,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setTooltipItems(ItemStack... items) {
+    public P tooltipItems(ItemStack... items) {
         if (items.length > 0) {
             this.items = new ArrayList<>(items.length);
             Collections.addAll(this.items, items);
@@ -166,19 +165,19 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setHovering(boolean hovering) {
+    public P hovering(boolean hovering) {
         this.hovering = hovering;
         return (P) this;
     }
 
     @Override
-    public P setEnabled(boolean enabled) {
+    public P enabled(boolean enabled) {
         this.enabled = enabled;
         return (P) this;
     }
 
     @Override
-    public P setEnabledFlags(String... flags) {
+    public P enabledFlags(String... flags) {
         for (String flag : flags) {
             enableFlags.add(StringRegister.STRINGS.get(flag));
         }
@@ -202,7 +201,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setVisible(boolean visible) {
+    public P visible(boolean visible) {
         this.visible = visible;
         return (P) this;
     }
@@ -227,7 +226,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setDesiredWidth(int desiredWidth) {
+    public P desiredWidth(int desiredWidth) {
         this.desiredWidth = desiredWidth;
         return (P) this;
     }
@@ -238,7 +237,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setDesiredHeight(int desiredHeight) {
+    public P desiredHeight(int desiredHeight) {
         this.desiredHeight = desiredHeight;
         return (P) this;
     }
@@ -248,7 +247,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
      * @param bg
      * @return
      */
-    public P setBackground(ResourceLocation bg) {
+    public P background(ResourceLocation bg) {
         return setBackgrounds(bg, null);
     }
 
@@ -271,7 +270,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
      * @param thickness use 0 to disable
      * @return
      */
-    public P setFilledRectThickness(int thickness) {
+    public P filledRectThickness(int thickness) {
         filledRectThickness = thickness;
         return (P) this;
     }
@@ -284,21 +283,25 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         return filledBackground2;
     }
 
-    public P setFilledBackground(int filledBackground) {
+    public P filledBackground(int filledBackground) {
         this.filledBackground = filledBackground;
         this.filledBackground2 = -1;
         return (P) this;
     }
 
-    public P setFilledBackground(int filledBackground, int filledBackground2) {
+    public P filledBackground(int filledBackground, int filledBackground2) {
         this.filledBackground = filledBackground;
         this.filledBackground2 = filledBackground2;
         return (P) this;
     }
 
-    @Override
     public void setBounds(Rectangle bounds) {
         this.bounds = bounds;
+    }
+
+    @Override
+    public void bounds(int x, int y, int w, int h) {
+        this.bounds = new Rectangle(x, y, w, h);
     }
 
     @Override
@@ -315,11 +318,11 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         }
     }
 
-    protected void drawBackground(int x, int y, int w, int h) {
+    protected void drawBackground(Screen gui, int x, int y, int w, int h) {
         if (!visible) {
             return;
         }
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -347,11 +350,11 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         }
     }
 
-    protected void drawBackground(int x, int y) {
+    protected void drawBackground(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
-        drawBackground(x, y, bounds.width, bounds.height);
+        drawBackground(gui, x, y, bounds.width, bounds.height);
     }
 
     protected void drawStyledBoxNormal(Window window, int x1, int y1, int x2, int y2) {
@@ -400,12 +403,12 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public void draw(int x, int y) {
-        drawBackground(x, y);
+    public void draw(Screen gui, int x, int y) {
+        drawBackground(gui, x, y);
     }
 
     @Override
-    public void drawPhase2(int x, int y) {
+    public void drawPhase2(Screen gui, int x, int y) {
 
     }
 
@@ -440,7 +443,8 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     /**
      * Mark this widget as dirty so that the system knows a new relayout is needed.
      */
-    void markDirty() {
+    @Override
+    public void markLayoutDirty() {
         layoutDirty = true;
     }
 
@@ -453,7 +457,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setLayoutHint(LayoutHint hint) {
+    public P hint(LayoutHint hint) {
         layoutHint = hint;
         layoutDirty = true;
         return (P) this;
@@ -470,7 +474,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public P setUserObject(Object obj) {
+    public P userObject(Object obj) {
         userObject = obj;
         return (P) this;
     }
@@ -505,12 +509,12 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
                 items.add(ItemStackTools.guiCommandToItemStack(itemCmd));
             }
         });
-        command.findCommand("hint").ifPresent(cmd -> setLayoutHint(new PositionalLayout.PositionalHint(
+        command.findCommand("hint").ifPresent(cmd -> hint(
                 cmd.getOptionalPar(0, 0),
                 cmd.getOptionalPar(1, 0),
                 cmd.getOptionalPar(2, 40),
                 cmd.getOptionalPar(3, 40)
-        )));
+        ));
         command.findCommand("bg1").ifPresent(cmd -> background1 = new ResourceLocation(cmd.getOptionalPar(0, "")));
         command.findCommand("bg2").ifPresent(cmd -> background2 = new ResourceLocation(cmd.getOptionalPar(0, "")));
         background2Horizontal = GuiParser.get(command, "bghoriz", DEFAULT_BACKGROUND_HORIZONTAL);

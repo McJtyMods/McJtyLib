@@ -1,8 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import mcjty.lib.gui.GuiParser;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,14 +10,16 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
 
     private final List<Widget<?>> children = new ArrayList<>();
 
-    public AbstractContainerWidget(Minecraft mc, Screen gui) {
-        super(mc, gui);
+    @Override
+    public void setBounds(Rectangle bounds) {
+        markLayoutDirty();
+        super.setBounds(bounds);
     }
 
     @Override
-    public void setBounds(Rectangle bounds) {
-        markDirty();
-        super.setBounds(bounds);
+    public void bounds(int x, int y, int w, int h) {
+        markLayoutDirty();
+        super.bounds(x, y, w, h);
     }
 
     @Override
@@ -65,31 +65,31 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         return false;
     }
 
-    public P addChildren(Widget<?>... children) {
+    public P children(Widget<?>... children) {
         for (Widget<?> child : children) {
             addChild(child);
         }
         return (P) this;
     }
 
-    public P addChild(Widget<?> child) {
+    private P addChild(Widget<?> child) {
         if (child == null) {
             throw new RuntimeException("THIS IS NOT POSSIBLE!");
         }
         children.add(child);
-        markDirty();
+        markLayoutDirty();
         return (P) this;
     }
 
     public P removeChild(Widget<?> child) {
         children.remove(child);
-        markDirty();
+        markLayoutDirty();
         return (P) this;
     }
 
     public void removeChildren() {
         children.clear();
-        markDirty();
+        markLayoutDirty();
     }
 
     public int getChildCount() {
@@ -131,7 +131,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         super.readFromGuiCommand(command);
         command.commands().forEach(cmd -> {
             String type = cmd.getId();
-            Widget<?> widget = WidgetRepository.createWidget(type, mc, gui);
+            Widget<?> widget = Widgets.createWidget(type);
             if (widget != null) {
                 widget.readFromGuiCommand(cmd);
                 children.add(widget);

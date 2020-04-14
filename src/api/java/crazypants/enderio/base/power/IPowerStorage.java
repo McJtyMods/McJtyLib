@@ -1,9 +1,9 @@
 package crazypants.enderio.base.power;
 
+import net.minecraft.util.Direction;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import net.minecraft.util.Direction;
 
 public interface IPowerStorage {
 

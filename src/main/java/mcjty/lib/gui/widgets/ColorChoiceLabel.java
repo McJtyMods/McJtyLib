@@ -9,13 +9,10 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-;
 
 public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
 
@@ -27,12 +24,11 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     private Integer currentColor = null;
     private List<ColorChoiceEvent> choiceEvents = null;
 
-    public ColorChoiceLabel(Minecraft mc, Screen gui) {
-        super(mc, gui);
-        setText("");
+    public ColorChoiceLabel() {
+        text("");
     }
 
-    public ColorChoiceLabel addColors(Integer ... colors) {
+    public ColorChoiceLabel colors(Integer ... colors) {
         for (Integer color : colors) {
             colorList.add(color);
             if (currentColor == null) {
@@ -43,12 +39,12 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
         return this;
     }
 
-    public ColorChoiceLabel setChoiceTooltip(Integer color, String... tooltips) {
+    public ColorChoiceLabel choiceTooltip(Integer color, String... tooltips) {
         tooltipMap.put(color, Arrays.asList(tooltips));
         return this;
     }
 
-    public ColorChoiceLabel setCurrentColor(Integer color) {
+    public ColorChoiceLabel currentColor(Integer color) {
         currentColor = color;
         return this;
     }
@@ -68,7 +64,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
@@ -85,7 +81,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
             RenderHelper.drawRightTriangle(xx + bounds.width - 4, yy + bounds.height / 2, StyleConfig.colorCycleButtonTriangleDisabled);
         }
 
-        super.drawOffset(x, y, 0, 1);
+        super.drawOffset(gui, x, y, 0, 1);
     }
 
     @Override
@@ -109,7 +105,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
         return null;
     }
 
-    public ColorChoiceLabel addChoiceEvent(ColorChoiceEvent event) {
+    public ColorChoiceLabel event(ColorChoiceEvent event) {
         if (choiceEvents == null) {
             choiceEvents = new ArrayList<>();
         }
@@ -130,7 +126,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
                 .build());
         if (choiceEvents != null) {
             for (ColorChoiceEvent event : choiceEvents) {
-                event.choiceChanged(this, color);
+                event.choiceChanged(color);
             }
         }
     }
@@ -177,7 +173,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
 
     @Override
     public <T> void setGenericValue(T value) {
-        setCurrentColor(TypeConvertors.toInt(value));
+        currentColor(TypeConvertors.toInt(value));
     }
 
     @Override

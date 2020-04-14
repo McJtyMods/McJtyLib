@@ -87,8 +87,8 @@ public class WindowManager {
 
     public void draw() {
         mouseWheel = 0;// @todo 1.14 Mouse.getDWheel();
-        windows.stream().forEach(w -> w.draw());
-        modalWindows.stream().forEach(w -> w.draw());
+        windows.stream().forEach(Window::draw);
+        modalWindows.stream().forEach(Window::draw);
         iconManager.draw(Minecraft.getInstance(), gui);
     }
 

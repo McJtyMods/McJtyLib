@@ -9,7 +9,6 @@ import mcjty.lib.gui.events.TagChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
@@ -26,12 +25,11 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     private final TagSelectorWindow selector = new TagSelectorWindow();
     private String type = "item";
 
-    public TagSelector(Minecraft mc, Screen gui) {
-        super(mc, gui);
-        setText("");
+    public TagSelector() {
+        text("");
     }
 
-    public TagSelector setCurrentTag(String tag) {
+    public TagSelector current(String tag) {
         currentTag = tag;
         return this;
     }
@@ -41,7 +39,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     }
 
     @Override
-    public void draw(int x, int y) {
+    public void draw(Screen gui, int x, int y) {
         if (!visible) {
             return;
         }
@@ -64,9 +62,9 @@ public class TagSelector extends AbstractLabel<TagSelector> {
 
         String tag = getCurrentTagSafe();
         String[] split = tag.split("[/:]");
-        setText(split[split.length - 1]); // @todo maybe not very clean like this? Better override getText()
+        text(split[split.length - 1]); // @todo maybe not very clean like this? Better override getText()
 
-        super.drawOffset(x, y, 0, 1);
+        super.drawOffset(gui, x, y, 0, 1);
     }
 
     private String getCurrentTagSafe() {
@@ -81,7 +79,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             selector.create(window, (int) x, (int) y, type, t -> {
-                setCurrentTag(t);
+                current(t);
                 fireChoiceEvents(t);
             }, this::getCurrentTag, false);
         }
@@ -89,7 +87,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     }
 
 
-    public TagSelector addChoiceEvent(TagChoiceEvent event) {
+    public TagSelector event(TagChoiceEvent event) {
         if (choiceEvents == null) {
             choiceEvents = new ArrayList<>();
         }
@@ -110,7 +108,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
                 .build());
         if (choiceEvents != null) {
             for (TagChoiceEvent event : choiceEvents) {
-                event.tagChanged(this, tag);
+                event.tagChanged(tag);
             }
         }
     }
@@ -134,7 +132,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
 
     @Override
     public <T> void setGenericValue(T value) {
-        setCurrentTag(value == null ? null : value.toString());
+        current(value == null ? null : value.toString());
     }
 
     @Override
