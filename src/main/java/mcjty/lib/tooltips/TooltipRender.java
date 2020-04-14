@@ -1,6 +1,7 @@
 package mcjty.lib.tooltips;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.BlockItem;
@@ -52,14 +53,10 @@ public class TooltipRender {
     @SubscribeEvent
     public void onTooltipPre(RenderTooltipEvent.Pre event) {
         Item item = event.getStack().getItem();
-        if (item instanceof ITooltipExtras) {
-
-        } else {
-            if (item instanceof ITooltipSettings) {
-                event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) item).getMaxWidth()));
-            } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof ITooltipSettings) {
-                event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) ((BlockItem) item).getBlock()).getMaxWidth()));
-            }
+        if (item instanceof ITooltipSettings) {
+            event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) item).getMaxWidth()));
+        } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof ITooltipSettings) {
+            event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) ((BlockItem) item).getBlock()).getMaxWidth()));
         }
     }
 
@@ -110,10 +107,10 @@ public class TooltipRender {
         ItemRenderer render = mc.getItemRenderer();
 
         net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translatef(0, 0, 400f);
+        RenderSystem.pushMatrix();
+        RenderSystem.translatef(0, 0, 400f);
         render.renderItemIntoGUI(itemStack, x, y);
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
 
         //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
         String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString((int) ((float) count));
@@ -122,12 +119,12 @@ public class TooltipRender {
 
         boolean hasReq = true;
 
-        if (errorAmount != -2) {
-            GlStateManager.pushMatrix();
-            GlStateManager.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
-            GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+        if (errorAmount != ITooltipExtras.NOAMOUNT) {
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
+            RenderSystem.scalef(0.5F, 0.5F, 0.5F);
             mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
         }
 
         int missingCount = 0;
@@ -138,11 +135,11 @@ public class TooltipRender {
             String s2 = "(" + fs + ")";
             int w2 = mc.fontRenderer.getStringWidth(s2);
 
-            GlStateManager.pushMatrix();
-            GlStateManager.translatef(x + 8 - w2 / 4, y + 17, 0);
-            GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 0);
+            RenderSystem.scalef(0.5F, 0.5F, 0.5F);
             mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
         }
         GlStateManager.enableDepthTest();
     }
