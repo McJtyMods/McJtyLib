@@ -5,8 +5,13 @@ import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
+import mcjty.lib.gui.events.ButtonEvent;
+import mcjty.lib.gui.events.SliderEvent;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.gui.screen.Screen;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Slider extends AbstractWidget<Slider> {
 
@@ -20,6 +25,8 @@ public class Slider extends AbstractWidget<Slider> {
     private int dy;
     private boolean horizontal = DEFAULT_HORIZONTAL;
     private int minimumKnobSize = DEFAULT_MINIMUM_KNOBSIZE;
+
+    private List<SliderEvent> sliderEvents = null;
 
     private Scrollable scrollable;      // Old (used as cache in case scrollableName is used)
     private String scrollableName;      // New
@@ -168,6 +175,29 @@ public class Slider extends AbstractWidget<Slider> {
         scrollable.setFirstSelected(first);
     }
 
+    public Slider event(SliderEvent event) {
+        if (sliderEvents == null) {
+            sliderEvents = new ArrayList<>();
+        }
+        sliderEvents.add(event);
+        return this;
+    }
+
+    public void removeSliderEvent(SliderEvent event) {
+        if (sliderEvents != null) {
+            sliderEvents.remove(event);
+        }
+    }
+
+    private void fireSliderEvents() {
+        fireChannelEvents();
+        if (sliderEvents != null) {
+            for (SliderEvent event : sliderEvents) {
+                event.sliderReleased();
+            }
+        }
+    }
+
     @Override
     public boolean mouseScrolled(double x, double y, double amount) {
         int first = scrollable.getFirstSelected();
@@ -223,6 +253,7 @@ public class Slider extends AbstractWidget<Slider> {
         if (dragging) {
             updateScrollable(x, y);
             dragging = false;
+            fireSliderEvents();
         }
     }
 

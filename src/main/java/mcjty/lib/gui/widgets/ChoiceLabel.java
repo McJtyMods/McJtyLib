@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -97,7 +98,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            if (button == 1) { // @todo 1.14 || McJtyLib.proxy.isShiftKeyDown()) {
+            if (button == 1 || McJtyLib.proxy.isShiftKeyDown()) {
                 index--;
                 if (index < 0) {
                     index = choiceList.size()-1;
