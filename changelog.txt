@@ -5,6 +5,7 @@ Upcoming:
 - Much better handling of modal windows and general window manager refactor
 - Working support for the mouse wheel in McJtyLib gui's
 - New 'tag' selector to be used by blocks/items that used to use the old oredictionary
+- JEI will now again properly avoid side windows and the help/style buttons on McJtyLib guis
 
 4.0.3-alpha:
 - Helpers for blockstate generation

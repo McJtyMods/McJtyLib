@@ -17,6 +17,7 @@ import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -72,12 +73,23 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         windowManager = null;
     }
 
-    public List<Rectangle> getSideWindowBounds() {
+    public List<Rectangle2d> getExtraWindowBounds() {
         if (sideWindow.getWindow() == null || sideWindow.getWindow().getToplevel() == null) {
-            Logging.getLogger().error(new RuntimeException("Internal error! getSideWindowBounds() called before initGui!"));
+            Logging.getLogger().error(new RuntimeException("Internal error! getExtraWindowBounds() called before initGui!"));
             return Collections.emptyList();
         }
-        return Collections.singletonList(sideWindow.getWindow().getToplevel().getBounds());
+        List<Rectangle2d> bounds = new ArrayList<>();
+        bounds.add(convert(sideWindow.getWindow().getToplevel().getBounds()));
+        if (windowManager != null) {
+            for (Window w : windowManager.getWindows()) {
+                bounds.add(convert(w.getToplevel().getBounds()));
+            }
+        }
+        return bounds;
+    }
+
+    private Rectangle2d convert(Rectangle r) {
+        return new Rectangle2d(r.x, r.y, r.width, r.height);
     }
 
 
