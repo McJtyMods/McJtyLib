@@ -3,9 +3,7 @@ package mcjty.lib.varia;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -30,32 +28,8 @@ import java.util.Optional;
 import java.util.Random;
 
 public class BlockTools {
+
     private static final Random random = new Random();
-
-    public static void emptyInventoryInWorld(World world, int x, int y, int z, Block block, IInventory inventory) {
-        for (int i = 0; i < inventory.getSizeInventory(); ++i) {
-            ItemStack itemstack = inventory.getStackInSlot(i);
-            spawnItemStack(world, x, y, z, itemstack);
-            inventory.setInventorySlotContents(i, ItemStack.EMPTY);
-        }
-        //TODO: What was this?
-        //world.func_147453_f(x, y, z, block);
-    }
-
-    public static void spawnItemStack(World world, int x, int y, int z, ItemStack itemstack) {
-        if (!itemstack.isEmpty()) {
-            ItemEntity entityItem = new ItemEntity(world, x, y, z, itemstack);
-            world.addEntity(entityItem);
-        }
-    }
-
-    public static Block getBlock(ItemStack stack) {
-        if (stack.getItem() instanceof BlockItem) {
-            return ((BlockItem) stack.getItem()).getBlock();
-        } else {
-            return null;
-        }
-    }
 
     public static String getModid(ItemStack stack) {
         if (!stack.isEmpty()) {

@@ -50,8 +50,8 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     public void initModel() {
-        McJtyLib.proxy.initStandardItemModel(this);
-        McJtyLib.proxy.initStateMapper(this, MultipartBakedModel.MODEL);
+//        McJtyLib.proxy.initStandardItemModel(this);
+//        McJtyLib.proxy.initStateMapper(this, MultipartBakedModel.MODEL);
     }
 
 

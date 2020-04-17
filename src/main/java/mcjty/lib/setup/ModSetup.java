@@ -11,7 +11,6 @@ import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.varia.WrenchChecker;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -65,8 +64,6 @@ public class ModSetup extends DefaultModSetup {
 
     @Override
     protected void setupModCompat() {
-        // @todo 1.14: check (right place?)
-        WrenchChecker.init();
     }
 
 

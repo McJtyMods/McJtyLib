@@ -1,7 +1,6 @@
-package mcjty.lib.gui;
+package mcjty.lib.varia;
 
 import mcjty.lib.api.container.CapabilityContainerProvider;
-import mcjty.lib.varia.WorldTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.screen.Screen;
@@ -49,17 +48,12 @@ public class GuiTools {
         return mouseY * gui.height / mainHeight;
     }
 
-    public static boolean openRemoteGui(@Nonnull PlayerEntity player, DimensionType dimensionType, @Nonnull BlockPos pos) {
+    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionType dimensionType, @Nonnull BlockPos pos) {
         if (dimensionType == null) {
             dimensionType = player.getEntityWorld().getDimension().getType();
         }
         World world = WorldTools.getWorld(player.getEntityWorld(), dimensionType);
-        if (world == null) {
-            // Not loaded
-            player.sendStatusMessage(new StringTextComponent("World is not loaded!"), false);
-            return false;
-        }
-        if (!world.isBlockLoaded(pos)) {
+        if (!WorldTools.isLoaded(world, pos)) {
             player.sendStatusMessage(new StringTextComponent("Position is not loaded!"), false);
             return false;
         }

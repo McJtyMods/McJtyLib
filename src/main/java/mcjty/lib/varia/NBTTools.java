@@ -4,9 +4,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
-import org.apache.commons.lang3.StringUtils;
+import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
+import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class NBTTools {
 
@@ -55,48 +60,33 @@ public class NBTTools {
         return tag.getString(name);
     }
 
-    public static StringBuffer appendIndent(StringBuffer buffer, int indent) {
-        return buffer.append(StringUtils.repeat(' ', indent));
+    @Nonnull
+    public static Optional<CompoundNBT> getTag(@Nonnull ItemStack stack) {
+        return Optional.ofNullable(stack.getTag());
     }
 
-    public static void convertNBTtoJson(StringBuffer buffer, ListNBT tagList, int indent) {
-        for (int i = 0 ; i < tagList.size() ; i++) {
-            CompoundNBT compound = tagList.getCompound(i);
-            appendIndent(buffer, indent).append("{\n");
-            convertNBTtoJson(buffer, compound, indent + 4);
-            appendIndent(buffer, indent).append("},\n");
+    @Nonnull
+    public static <R> R mapTag(@Nonnull ItemStack stack, Function<CompoundNBT,R> mapping, @Nonnull R def) {
+        if (stack.hasTag()) {
+            return mapping.apply(stack.getTag());
+        } else {
+            return def;
         }
     }
 
-    public static void convertNBTtoJson(StringBuffer buffer, CompoundNBT tagCompound, int indent) {
-        boolean first = true;
-        for (Object o : tagCompound.keySet()) {
-            if (!first) {
-                buffer.append(",\n");
-            }
-            first = false;
-
-            String key = (String) o;
-            INBT tag = tagCompound.get(key);
-            appendIndent(buffer, indent).append(key).append(':');
-            if (tag instanceof CompoundNBT) {
-                CompoundNBT compound = (CompoundNBT) tag;
-                buffer.append("{\n");
-                convertNBTtoJson(buffer, compound, indent + 4);
-                appendIndent(buffer, indent).append('}');
-            } else if (tag instanceof ListNBT) {
-                ListNBT list = (ListNBT) tag;
-                buffer.append("[\n");
-                convertNBTtoJson(buffer, list, indent + 4);
-                appendIndent(buffer, indent).append(']');
-            } else {
-                buffer.append(tag);
-            }
-        }
-        if (!first) {
-            buffer.append("\n");
-        }
+    @Nonnull
+    public static Function<ItemStack, String> intGetter(String tag, Integer def) {
+        return stack -> Integer.toString(mapTag(stack, nbt -> nbt.getInt(tag), def));
     }
 
+    @Nonnull
+    public static Function<ItemStack, String> strGetter(String tag, String def) {
+        return stack -> mapTag(stack, nbt -> nbt.getString(tag), def);
+    }
 
+    @Nonnull
+    public static Stream<INBT> getListStream(CompoundNBT compound, String tag) {
+        ListNBT list = compound.getList("Items", Constants.NBT.TAG_COMPOUND);
+        return StreamSupport.stream(list.spliterator(), false);
+    }
 }

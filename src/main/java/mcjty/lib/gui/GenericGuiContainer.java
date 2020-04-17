@@ -11,6 +11,7 @@ import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.GuiTools;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;

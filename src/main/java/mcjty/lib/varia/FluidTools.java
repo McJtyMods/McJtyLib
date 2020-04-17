@@ -19,7 +19,6 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
 public class FluidTools {
@@ -40,9 +39,8 @@ public class FluidTools {
         }).orElse(ItemStack.EMPTY);
     }
 
-    @Nullable
+    @Nonnull
     public static FluidStack convertBucketToFluid(@Nonnull ItemStack bucket) {
-        // @todo 1.14: return null in LazyOptional?
         return FluidUtil.getFluidHandler(bucket).map(handler -> {
             for (int i = 0; i < handler.getTanks(); i++) {
                 FluidStack contents = handler.getFluidInTank(i);
@@ -50,8 +48,8 @@ public class FluidTools {
                     return contents;
                 }
             }
-            return null;
-        }).orElse(null);
+            return FluidStack.EMPTY;
+        }).orElse(FluidStack.EMPTY);
     }
 
 
@@ -138,19 +136,4 @@ public class FluidTools {
         }
         return FluidStack.EMPTY;
     }
-    /**
-     * Get the capacity (in mb) of the given container for the given fluid
-     */
-    // @todo 1.14
-//    public static int getCapacity(@Nonnull FluidStack fluidStack, @Nonnull ItemStack itemStack) {
-//        return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-//            IFluidTankProperties[] tankProperties = handler.getTankProperties();
-//            for (IFluidTankProperties properties : tankProperties) {
-//                if (properties.canDrainFluidType(fluidStack)) {
-//                    return properties.getCapacity();
-//                }
-//            }
-//            return 0;
-//        }).orElse(0);
-//    }
 }

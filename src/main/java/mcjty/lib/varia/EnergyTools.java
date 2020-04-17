@@ -2,9 +2,6 @@ package mcjty.lib.varia;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.power.IBigPower;
-import mcjty.lib.compat.EnergySupportDraconic;
-import mcjty.lib.compat.EnergySupportEnderIO;
-import mcjty.lib.compat.EnergySupportMekanism;
 import mcjty.lib.compat.TeslaCompatibility;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,16 +13,6 @@ import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class EnergyTools {
-
-    // @todo 1.14
-//    @CapabilityInject(ITeslaHolder.class)
-//    public static Capability<ITeslaHolder> TESLA_HOLDER = null;
-//
-//    @CapabilityInject(ITeslaConsumer.class)
-//    public static Capability<ITeslaConsumer> TESLA_CONSUMER = null;
-//
-//    @CapabilityInject(ITeslaProducer.class)
-//    public static Capability<ITeslaProducer> TESLA_PRODUCER = null;
 
     public static class EnergyLevel {
         private final long energy;
@@ -66,42 +53,16 @@ public class EnergyTools {
         return stack.getCapability(CapabilityEnergy.ENERGY).isPresent();
     }
 
-    private static boolean draconic = false;
-    private static boolean mekanism = false;
-    private static boolean enderio = false;
-
-    private static boolean checkMods = true;
-
-    private static void doCheckMods() {
-        if (checkMods) {
-            // @todo 1.14
-//            draconic = Loader.isModLoaded("draconicevolution");
-//            mekanism = Loader.isModLoaded("mekanism");
-//            enderio = Loader.isModLoaded("enderio");
-            checkMods = false;
-        }
-    }
-
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
     public static EnergyLevel getEnergyLevelMulti(TileEntity tileEntity, @Nullable Direction side) {
         long maxEnergyStored;
         long energyStored;
-        doCheckMods();
         if (tileEntity instanceof IBigPower) {
             maxEnergyStored = ((IBigPower) tileEntity).getCapacity();
             energyStored = ((IBigPower) tileEntity).getStoredPower();
         } else if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(tileEntity, side)) {
             maxEnergyStored = TeslaCompatibility.getMaxEnergy(tileEntity, side);
             energyStored = TeslaCompatibility.getEnergy(tileEntity, side);
-        } else if (draconic && EnergySupportDraconic.isDraconicEnergyTile(tileEntity)) {
-            maxEnergyStored = EnergySupportDraconic.getMaxEnergy(tileEntity);
-            energyStored = EnergySupportDraconic.getCurrentEnergy(tileEntity);
-        } else if (mekanism && EnergySupportMekanism.isMekanismTileEntity(tileEntity)) {
-            maxEnergyStored = EnergySupportMekanism.getMaxEnergy(tileEntity);
-            energyStored = EnergySupportMekanism.getCurrentEnergy(tileEntity);
-        } else if (enderio && EnergySupportEnderIO.isEnderioTileEntity(tileEntity)) {
-            maxEnergyStored = EnergySupportEnderIO.getMaxEnergy(tileEntity);
-            energyStored = EnergySupportEnderIO.getCurrentEnergy(tileEntity);
         } else if (tileEntity != null) {
             return tileEntity.getCapability(CapabilityEnergy.ENERGY, side).map(h -> new EnergyLevel(h.getEnergyStored(), h.getMaxEnergyStored())).orElse(new EnergyLevel(0, 0));
         } else {

@@ -1,15 +1,9 @@
 package mcjty.lib.setup;
 
-import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import net.minecraftforge.common.animation.ITimeValue;
-import net.minecraftforge.common.model.animation.IAnimationStateMachine;
 
 public interface IProxy {
 
@@ -23,12 +17,6 @@ public interface IProxy {
     PlayerEntity getClientPlayer();
 
     RayTraceResult getClientMouseOver();
-
-    void enqueueWork(Runnable runnable);
-
-    void initStandardItemModel(Block block);
-
-    void initStateMapper(Block block, ModelResourceLocation model);
 
     boolean isJumpKeyDown();
 
@@ -46,6 +34,4 @@ public interface IProxy {
 
     // This version directly checks the actual key
     boolean isCtrlKeyDown();
-
-    IAnimationStateMachine load(ResourceLocation location, ImmutableMap<String, ITimeValue> parameters);
 }

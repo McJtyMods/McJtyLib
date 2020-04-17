@@ -13,17 +13,18 @@ import javax.annotation.Nullable;
 
 public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializable<CompoundNBT> {
 
-    public PreferencesDispatcher(){
-        properties = new PreferencesProperties();
-    }
+    private final PreferencesProperties properties = createProperties();
+    private final LazyOptional<PreferencesProperties> propertiesCap = LazyOptional.of(() -> properties);
 
-    private final PreferencesProperties properties;
+    private <T> PreferencesProperties createProperties() {
+        return new PreferencesProperties();
+    }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
         if (cap == ModSetup.PREFERENCES_CAPABILITY) {
-            return LazyOptional.of(() -> (T) properties);
+            return propertiesCap.cast();
         }
         return LazyOptional.empty();
     }

@@ -14,15 +14,15 @@ public class SoundTools {
         SPlaySoundEffectPacket soundEffect = new SPlaySoundEffectPacket(soundName, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
 
         for (int j = 0; j < worldObj.getPlayers().size(); ++j) {
-            ServerPlayerEntity PlayerEntitymp = (ServerPlayerEntity)worldObj.getPlayers().get(j);
-            BlockPos chunkcoordinates = PlayerEntitymp.getPosition();
+            ServerPlayerEntity player = (ServerPlayerEntity)worldObj.getPlayers().get(j);
+            BlockPos chunkcoordinates = player.getPosition();
             double d7 = x - chunkcoordinates.getX();
             double d8 = y - chunkcoordinates.getY();
             double d9 = z - chunkcoordinates.getZ();
             double d10 = d7 * d7 + d8 * d8 + d9 * d9;
 
             if (d10 <= 256.0D) {
-                PlayerEntitymp.connection.sendPacket(soundEffect);
+                player.connection.sendPacket(soundEffect);
             }
         }
     }

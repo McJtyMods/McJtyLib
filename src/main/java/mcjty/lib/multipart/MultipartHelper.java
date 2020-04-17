@@ -2,10 +2,10 @@ package mcjty.lib.multipart;
 
 import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
-import mcjty.lib.varia.BlockTools;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -68,7 +68,7 @@ public class MultipartHelper {
             ((GenericTileEntity) hitTile).onReplaced(multipartTE.getWorld(), multipartTE.getPos(), hitState, hitState); // @todo check?
             stack.setTag(tagCompound);
         }
-        BlockTools.spawnItemStack(multipartTE.getWorld(), pos.getX(), pos.getY(), pos.getZ(), stack);
+        InventoryHelper.spawnItemStack(multipartTE.getWorld(), pos.getX(), pos.getY(), pos.getZ(), stack);
 
         multipartTE.removePart(hitState);
 

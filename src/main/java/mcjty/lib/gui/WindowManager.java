@@ -3,6 +3,7 @@ package mcjty.lib.gui;
 import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.varia.GuiTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
