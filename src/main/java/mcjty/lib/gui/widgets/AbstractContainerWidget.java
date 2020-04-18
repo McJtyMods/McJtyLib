@@ -100,12 +100,12 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         return children;
     }
 
-    public Widget<?> getChild(int index) { return children.get(index); }
+    public <T extends Widget<?>> T getChild(int index) { return (T) children.get(index); }
 
-    public Widget<?> findChild(String name) {
+    public <T extends Widget<?>> T findChild(String name) {
         for (Widget<?> child : children) {
             if (name.equals(child.getName())) {
-                return child;
+                return (T) child;
             }
         }
         return null;
