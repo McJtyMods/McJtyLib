@@ -37,6 +37,7 @@ public class TeleportationTools {
         player.changeDimension(dimension, new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
+                entity = repositionEntity.apply(false);
                 entity.setPositionAndUpdate(x, y, z);
                 return entity;
             }
@@ -78,6 +79,7 @@ public class TeleportationTools {
             return entity.changeDimension(destWorld.getDimension().getType(), new ITeleporter() {
                 @Override
                 public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
+                    entity = repositionEntity.apply(false);
                     if (facing != null) {
                         fixOrientation(entity, newX, newY, newZ, facing);
                     }
