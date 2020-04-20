@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
@@ -84,7 +85,13 @@ public class GuiTools {
             return false;
         }
 
-        NetworkHooks.openGui((ServerPlayerEntity) player, provider.apply(te), pos);
+        CompoundNBT compound = new CompoundNBT();
+        CompoundNBT written = te.write(compound);
+
+        NetworkHooks.openGui((ServerPlayerEntity) player, provider.apply(te), buf -> {
+            buf.writeBlockPos(pos);
+            buf.writeCompoundTag(written);
+        });
         return true;
     }
 
