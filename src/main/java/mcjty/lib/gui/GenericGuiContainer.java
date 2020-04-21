@@ -490,7 +490,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public void sendServerCommandTyped(SimpleChannel network, String command, TypedMap params) {
-        network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), null, command, params));
+        network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), tileEntity.getDimensionType(), command, params));
     }
 
     public void sendServerCommandTyped(SimpleChannel network, DimensionType dimensionId, String command, TypedMap params) {

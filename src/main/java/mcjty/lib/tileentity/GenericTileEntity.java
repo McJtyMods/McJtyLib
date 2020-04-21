@@ -28,6 +28,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -508,9 +509,15 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return null;
     }
 
-    // Client side function to send a value to the server
+    /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
+    public DimensionType getDimensionType() {
+        return world.getDimension().getType();
+    }
+
+        // Client side function to send a value to the server
     public <T> void valueToServer(SimpleChannel network, Key<T> valueKey, T value) {
         network.sendToServer(new PacketServerCommandTyped(getPos(),
+                getDimensionType(),
                 COMMAND_SYNC_BINDING,
                 TypedMap.builder()
                         .put(valueKey, value)
@@ -521,7 +528,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * Call this client-side to this TE to request data from the server
      */
     public void requestDataFromServer(SimpleChannel channel, String command, @Nonnull TypedMap params) {
-        channel.sendToServer(new PacketRequestDataFromServer(pos, command, params));
+        channel.sendToServer(new PacketRequestDataFromServer(getDimensionType(), pos, command, params, false));
     }
 
 

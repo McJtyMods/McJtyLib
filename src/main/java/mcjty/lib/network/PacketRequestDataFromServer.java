@@ -2,9 +2,12 @@ package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.WorldTools;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -18,31 +21,40 @@ import java.util.function.Supplier;
  */
 public class PacketRequestDataFromServer {
     protected BlockPos pos;
+    private DimensionType type;
     protected String command;
     protected TypedMap params;
+    private boolean dummy;
 
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
+        type = DimensionType.getById(buf.readInt());
         command = buf.readString(32767);
         params = TypedMapTools.readArguments(buf);
+        dummy = buf.readBoolean();
     }
 
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
+        buf.writeInt(type.getId());
         buf.writeString(command);
         TypedMapTools.writeArguments(buf, params);
+        buf.writeBoolean(dummy);
     }
 
-    public PacketRequestDataFromServer(BlockPos pos, String command, TypedMap params) {
+    public PacketRequestDataFromServer(DimensionType type, BlockPos pos, String command, TypedMap params, boolean dummy) {
+        this.type = type;
         this.pos = pos;
         this.command = command;
         this.params = params;
+        this.dummy = dummy;
     }
 
     public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            TileEntity te = ctx.getSender().getEntityWorld().getTileEntity(pos);
+            World world = WorldTools.getWorld(ctx.getSender().getEntityWorld(), type);
+            TileEntity te = world.getTileEntity(pos);
             if(!(te instanceof ICommandHandler)) {
                 Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                 return;
@@ -54,7 +66,7 @@ public class PacketRequestDataFromServer {
                 return;
             }
 
-            PacketDataFromServer msg = new PacketDataFromServer(pos, command, result);
+            PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
             channel.sendTo(msg, ctx.getSender().connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
         });
         ctx.setPacketHandled(true);

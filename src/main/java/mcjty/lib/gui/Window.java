@@ -19,6 +19,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
@@ -411,7 +412,7 @@ public class Window {
         for (IValue<?> value : te.getValues()) {
             Key<?> key = value.getKey();
             if (keyName.equals(key.getName())) {
-                initializeBinding(network, componentName, value);
+                initializeBinding(network, te.getDimensionType(), componentName, value);
                 return this;
             }
         }
@@ -420,7 +421,7 @@ public class Window {
         return this;
     }
 
-    private <V> void initializeBinding(SimpleChannel network, String componentName, IValue<V> value) {
+    private <V> void initializeBinding(SimpleChannel network, @Nonnull DimensionType dimensionType, String componentName, IValue<V> value) {
         V v = value.getter().get();
         Widget<?> component = findChild(componentName);
 
@@ -432,7 +433,7 @@ public class Window {
 
         event(componentName, (source, params) -> {
             Type<V> type = value.getKey().getType();
-            ((GenericGuiContainer<?,?>)gui).sendServerCommandTyped(network, GenericTileEntity.COMMAND_SYNC_BINDING,
+            ((GenericGuiContainer<?,?>)gui).sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING,
                     TypedMap.builder()
                             // @todo this conversion can fail!
                             .put(value.getKey(), type.convert(component.getGenericValue(type)))

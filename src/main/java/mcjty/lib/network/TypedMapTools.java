@@ -6,6 +6,7 @@ import mcjty.lib.typed.TypedMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 
 import java.util.*;
 
@@ -20,6 +21,7 @@ public class TypedMapTools {
             registerMapping(Type.UUID, ArgumentType.TYPE_UUID);
             registerMapping(Type.INTEGER, ArgumentType.TYPE_INTEGER);
             registerMapping(Type.BLOCKPOS, ArgumentType.TYPE_BLOCKPOS);
+            registerMapping(Type.DIMENSION_TYPE, ArgumentType.TYPE_DIMENSION_TYPE);
             registerMapping(Type.BOOLEAN, ArgumentType.TYPE_BOOLEAN);
             registerMapping(Type.DOUBLE, ArgumentType.TYPE_DOUBLE);
             registerMapping(Type.ITEMSTACK, ArgumentType.TYPE_STACK);
@@ -64,6 +66,13 @@ public class TypedMapTools {
                         break;
                     case TYPE_DOUBLE:
                         args.put(new Key<>(key, Type.DOUBLE), buf.readDouble());
+                        break;
+                    case TYPE_DIMENSION_TYPE:
+                        if (buf.readBoolean()) {
+                            args.put(new Key<>(key, Type.DIMENSION_TYPE), DimensionType.getById(buf.readInt()));
+                        } else {
+                            args.put(new Key<>(key, Type.DIMENSION_TYPE), null);
+                        }
                         break;
                     case TYPE_BLOCKPOS:
                         if (buf.readBoolean()) {
@@ -142,6 +151,16 @@ public class TypedMapTools {
                 case TYPE_INTEGER:
                     buf.writeInt((Integer) args.get(key));
                     break;
+                case TYPE_DIMENSION_TYPE: {
+                    DimensionType type = (DimensionType) args.get(key);
+                    if (type != null) {
+                        buf.writeBoolean(true);
+                        buf.writeInt(type.getId());
+                    } else {
+                        buf.writeBoolean(false);
+                    }
+                    break;
+                }
                 case TYPE_BLOCKPOS: {
                     BlockPos pos = (BlockPos) args.get(key);
                     if (pos != null) {
@@ -223,7 +242,8 @@ public class TypedMapTools {
         TYPE_STRING_LIST(7),
         TYPE_ITEMSTACK_LIST(8),
         TYPE_POS_LIST(9),
-        TYPE_UUID(10);
+        TYPE_UUID(10),
+        TYPE_DIMENSION_TYPE(11);
 
         private final int index;
         private static final Map<Integer, ArgumentType> mapping = new HashMap<>();

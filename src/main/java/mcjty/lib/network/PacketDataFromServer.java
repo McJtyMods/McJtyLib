@@ -1,13 +1,16 @@
 package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 /**
@@ -21,7 +24,12 @@ public class PacketDataFromServer {
     String command;
 
     public void toBytes(PacketBuffer buf) {
-        buf.writeBlockPos(pos);
+        if (pos != null) {
+            buf.writeBoolean(true);
+            buf.writeBlockPos(pos);
+        } else {
+            buf.writeBoolean(false);
+        }
         buf.writeString(command);
 
         buf.writeBoolean(result != null);
@@ -31,7 +39,11 @@ public class PacketDataFromServer {
     }
 
     public PacketDataFromServer(PacketBuffer buf) {
-        pos = buf.readBlockPos();
+        if (buf.readBoolean()) {
+            pos = buf.readBlockPos();
+        } else {
+            pos = null;
+        }
         command = buf.readString(32767);
 
         if (buf.readBoolean()) {
@@ -41,7 +53,7 @@ public class PacketDataFromServer {
         }
     }
 
-    public PacketDataFromServer(BlockPos pos, String command, TypedMap result) {
+    public PacketDataFromServer(@Nullable BlockPos pos, String command, TypedMap result) {
         this.pos = pos;
         this.command = command;
         this.result = result;
@@ -50,16 +62,37 @@ public class PacketDataFromServer {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
-            if(!(te instanceof IClientCommandHandler)) {
-                Logging.log("createInventoryReadyPacket: TileEntity is not a ClientCommandHandler!");
-                return;
+            TileEntity te;
+            if (pos == null) {
+                // We are working from a tablet. Find the tile entity through the open container
+                GenericContainer container = getOpenContainer();
+                if (container == null) {
+                    Logging.log("Container is missing!");
+                    return;
+                }
+                te = container.getTe();
+            } else {
+                te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
+                if (!(te instanceof IClientCommandHandler)) {
+                    Logging.log("TileEntity is not a ClientCommandHandler!");
+                    return;
+                }
             }
+
             IClientCommandHandler clientCommandHandler = (IClientCommandHandler) te;
             if (!clientCommandHandler.receiveDataFromServer(command, result)) {
                 Logging.log("Command " + command + " was not handled!");
             }
         });
         ctx.setPacketHandled(true);
+    }
+
+    private static GenericContainer getOpenContainer() {
+        Container container = McJtyLib.proxy.getClientPlayer().openContainer;
+        if (container instanceof GenericContainer) {
+            return (GenericContainer) container;
+        } else {
+            return null;
+        }
     }
 }

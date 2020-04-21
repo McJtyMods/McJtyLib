@@ -90,6 +90,7 @@ public class GuiTools {
 
         NetworkHooks.openGui((ServerPlayerEntity) player, provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
+            buf.writeInt(world.getDimension().getType().getId());
             buf.writeCompoundTag(written);
         });
         return true;
