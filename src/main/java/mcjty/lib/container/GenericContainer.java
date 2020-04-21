@@ -6,6 +6,7 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.TriFunction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ClickType;
@@ -13,17 +14,21 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Generic container support.
@@ -423,5 +428,23 @@ public class GenericContainer extends Container implements IGenericContainer {
             return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> h.createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer())).orElseThrow(RuntimeException::new);
         });
         return (ContainerType<T>) containerType;
+    }
+
+    public static <T extends GenericContainer, E extends GenericTileEntity> ContainerType<T> createRemoteContainerType(
+            Function<DimensionType, E> dummyTEFactory,
+            TriFunction<Integer, BlockPos, E, T> containerFactory, int slots) {
+        return IForgeContainerType.create((windowId, inv, data) -> {
+            BlockPos pos = data.readBlockPos();
+            DimensionType type = DimensionType.getById(data.readInt());
+
+            E te = dummyTEFactory.apply(type);
+            te.setWorldAndPos(inv.player.getEntityWorld(), pos);    // Wrong world but doesn't really matter
+            CompoundNBT compound = data.readCompoundTag();
+            te.read(compound);
+
+            T container = containerFactory.apply(windowId, pos, te);
+            container.setupInventories(new ItemStackHandler(slots), inv);
+            return (T) container;
+        });
     }
 }
