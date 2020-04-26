@@ -8,6 +8,7 @@ Upcoming:
 - JEI will now again properly avoid side windows and the help/style buttons on McJtyLib guis
 - Greatly cleaned up the McJtyLib code. Removed all outdated code
 - Improved the wrench detector
+- All McJtyLib based GUI's will now properly check if the tile entity is near enough and not removed. Avoids potential dupes
 
 4.0.3-alpha:
 - Helpers for blockstate generation

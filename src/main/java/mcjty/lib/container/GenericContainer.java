@@ -126,13 +126,10 @@ public class GenericContainer extends Container implements IGenericContainer {
 
     @Override
     public boolean canInteractWith(PlayerEntity player) {
-        for (IItemHandler inventory : inventories.values()) {
-            // @todo
-//            if (!inventory.isUsableByPlayer(player)) {
-//                return false;
-//            }
+        if (te == null || te.canPlayerAccess(player)) {
+            return true;
         }
-        return true;
+        return false;
     }
 
     public SlotType getSlotType(int index) {
