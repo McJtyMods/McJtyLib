@@ -1,7 +1,7 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.base.ModBase;
-import mcjty.lib.varia.GuiTools;
+import mcjty.lib.client.GuiTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.util.text.StringTextComponent;
@@ -9,6 +9,10 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import java.util.List;
 
+/**
+ * This class can be used by items that want to show a GUI.
+ * It supports the side window, the window system in general as well as tooltips
+ */
 public class GuiItemScreen extends Screen {
     protected ModBase modBase;
     protected SimpleChannel network;

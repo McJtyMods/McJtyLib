@@ -7,6 +7,12 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 
+/**
+ * This item handler is meant for automation and is usually returned as the result
+ * of TE.getCapability(). Specific methods to override are 'canAutomationInsert'
+ * and 'canAutomationExtract'. Most TE's have another IItemHandler that is used
+ * for the container so that the player can interact with slots even if automation can't
+ */
 public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
 
     private final NoDirectionItemHander wrapped;

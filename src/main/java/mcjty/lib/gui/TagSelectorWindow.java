@@ -17,7 +17,15 @@ import java.util.stream.Collectors;
 
 import static mcjty.lib.gui.widgets.Widgets.*;
 
+/**
+ * This window is used by the TagSelector so that it's possible to select from a list of
+ * tags. It's also possible to use this in a standalone manner
+ */
 public class TagSelectorWindow {
+
+    public static final String TYPE_BOTH = "both";
+    public static final String TYPE_ITEM = "item";
+    public static final String TYPE_BLOCK = "block";
 
     private String filter = "";
     private String type;
@@ -25,17 +33,24 @@ public class TagSelectorWindow {
     private Consumer<String> tagSetter;
     private boolean onlyDoubleClick;
 
-    public void create(Window window, int x, int y, String type, Consumer<String> callback, Supplier<String> tagGetter,
+    /**
+     * @param parentWindow
+     * @param type one of TYPE_BOTH, TYPE_ITEM, or TYPE_BLOCK
+     * @param tagSetter this is fired by this class whenever a new tag is selected (or doubleclicked in case of 'onlyDoubleClick')
+     * @param tagGetter this is called to get the current selected tag
+     * @param onlyDoubleClick if true then only double click will select a tag
+     */
+    public void create(Window parentWindow, String type, Consumer<String> tagSetter, Supplier<String> tagGetter,
                        boolean onlyDoubleClick) {
         Minecraft mc = Minecraft.getInstance();
-        Screen gui = window.getWindowManager().getGui();
-        this.tagSetter = callback;
+        Screen gui = parentWindow.getWindowManager().getGui();
+        this.tagSetter = tagSetter;
         this.tagGetter = tagGetter;
         this.onlyDoubleClick = onlyDoubleClick;
 
         Panel modalDialog = positional().filledRectThickness(2);
-        int wx = (int) (window.getToplevel().getBounds().getX() + 20);
-        int wy = (int) (window.getToplevel().getBounds().getY() + 20);
+        int wx = (int) (parentWindow.getToplevel().getBounds().getX() + 20);
+        int wy = (int) (parentWindow.getToplevel().getBounds().getY() + 20);
         modalDialog.bounds(wx, wy, 200, 156);
 
         WidgetList list = list(5, 20, 180, 115).name("list");
@@ -55,7 +70,7 @@ public class TagSelectorWindow {
 
         modalDialog.children(close, clear, list, slider, filterField);
 
-        Window modalWindow = window.getWindowManager().createModalWindow(modalDialog);
+        Window modalWindow = parentWindow.getWindowManager().createModalWindow(modalDialog);
 
         list.event(new DefaultSelectionEvent() {
             @Override
@@ -68,14 +83,14 @@ public class TagSelectorWindow {
             @Override
             public void doubleClick(int index) {
                 selectTag(index, list);
-                window.getWindowManager().closeWindow(modalWindow);
+                parentWindow.getWindowManager().closeWindow(modalWindow);
             }
         });
 
-        close.event(() -> window.getWindowManager().closeWindow(modalWindow));
+        close.event(() -> parentWindow.getWindowManager().closeWindow(modalWindow));
         clear.event(() -> {
-            callback.accept(null);
-            window.getWindowManager().closeWindow(modalWindow);
+            tagSetter.accept(null);
+            parentWindow.getWindowManager().closeWindow(modalWindow);
         });
     }
 
@@ -88,11 +103,11 @@ public class TagSelectorWindow {
 
 
     private java.util.List<String> getTags() {
-        if ("both".equals(type)) {
+        if (TYPE_BOTH.equals(type)) {
             Set<ResourceLocation> tags = new HashSet<>(ItemTags.getCollection().getRegisteredTags());
             tags.addAll(BlockTags.getCollection().getRegisteredTags());
             return tags.stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
-        } else if ("item".equals(type)) {
+        } else if (TYPE_ITEM.equals(type)) {
             return ItemTags.getCollection().getRegisteredTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
         } else {
             return BlockTags.getCollection().getRegisteredTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());

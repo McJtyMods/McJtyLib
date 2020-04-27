@@ -11,6 +11,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.network.NetworkDirection;
 
+import javax.annotation.Nonnull;
+
 public class PreferencesProperties {
 
     private static final int DEFAULT_BUFFX = 2;
@@ -80,6 +82,7 @@ public class PreferencesProperties {
         return true;
     }
 
+    @Nonnull
     public GuiStyle getStyle() {
         return style;
     }

@@ -14,6 +14,10 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 import static mcjty.lib.gui.widgets.Widgets.button;
 import static mcjty.lib.gui.widgets.Widgets.positional;
 
+/**
+ * This side window manages both the online help button as well as the style button.
+ * Gui's that inherit from GenericGuiContainer will automatically have this
+ */
 public class GuiSideWindow {
     protected GuiStyle style;
 

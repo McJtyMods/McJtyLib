@@ -14,6 +14,7 @@ public class RenderGlowEffect {
      * Render a glow effect at the given position. The texture to use
      * for glowing should be bound before calling this.
      */
+    // @todo 1.15: needs porting
     public static void renderGlow(Tessellator tessellator, double x, double y, double z) {
         BufferBuilder buffer = tessellator.getBuffer();
         GlStateManager.pushMatrix();

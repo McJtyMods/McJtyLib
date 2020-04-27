@@ -11,7 +11,7 @@ import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.GuiTools;
+import mcjty.lib.client.GuiTools;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;
@@ -41,6 +41,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * The main parent for all container based gui's in McJtyLib based mods
+ */
 public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends Container> extends ContainerScreen<C> implements IKeyReceiver {
 
     protected ModBase modBase;
@@ -50,16 +53,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     protected final T tileEntity;
 
     private GuiSideWindow sideWindow;
-
-    @Override
-    public int getGuiLeft() {
-        return guiLeft;
-    }
-
-    @Override
-    public int getGuiTop() {
-        return guiTop;
-    }
 
     public void setWindowDimensions(int x, int y) {
         this.xSize = x;
@@ -74,23 +67,22 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         windowManager = null;
     }
 
+    // Mostly for JEI: get a list of all bounds additional to the main window. That includes modal windows, the side window, ...
     public List<Rectangle2d> getExtraWindowBounds() {
         if (sideWindow.getWindow() == null || sideWindow.getWindow().getToplevel() == null) {
             Logging.getLogger().error(new RuntimeException("Internal error! getExtraWindowBounds() called before initGui!"));
             return Collections.emptyList();
         }
         List<Rectangle2d> bounds = new ArrayList<>();
-        bounds.add(convert(sideWindow.getWindow().getToplevel().getBounds()));
+        Rectangle r1 = sideWindow.getWindow().getToplevel().getBounds();
+        bounds.add(new Rectangle2d(r1.x, r1.y, r1.width, r1.height));
         if (windowManager != null) {
             for (Window w : windowManager.getWindows()) {
-                bounds.add(convert(w.getToplevel().getBounds()));
+                Rectangle r = w.getToplevel().getBounds();
+                bounds.add(new Rectangle2d(r.x, r.y, r.width, r.height));
             }
         }
         return bounds;
-    }
-
-    private Rectangle2d convert(Rectangle r) {
-        return new Rectangle2d(r.x, r.y, r.width, r.height);
     }
 
 
@@ -103,8 +95,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     /**
      * Override this method to register your own windows to the window manager.
-     *
-     * @param mgr
      */
     protected void registerWindows(WindowManager mgr) {
     }
@@ -129,45 +119,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         getWindowManager().drawTooltips();
     }
 
-    public static String escapeString(String s) {
-        return s.replace("@", "@@");
-    }
-
-    private static List<Object> parseString(String s, List<ItemStack> items) {
-        List<Object> l = new ArrayList<>();
-        String current = "";
-        for (int i = 0; i < s.length(); ++i) {
-            String c = s.substring(i, i + 1);
-            if ("@".equals(c)) {
-                ++i;
-                int itemIdx = s.charAt(i) - '0';
-                if(itemIdx == '@' - '0') {
-                    // @@ becomes a literal @
-                    current += "@";
-                } else if(itemIdx < 0 || itemIdx > 9) {
-                    // probably forgot to escape something
-                    throw new IllegalArgumentException(s);
-                } else {
-                    // replace it with the corresponding item
-                    if (!current.isEmpty()) {
-                        l.add(current);
-                        current = "";
-                    }
-                    ItemStack e = items.get(itemIdx);
-                    if (!e.isEmpty()) {
-                        l.add(e);
-                    }
-                }
-            } else {
-                current += c;
-            }
-        }
-        if (!current.isEmpty()) {
-            l.add(current);
-        }
-        return l;
-    }
-
     public void drawHoveringText(List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
         if (!textLines.isEmpty()) {
             RenderSystem.pushMatrix();
@@ -181,7 +132,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             for (String s : textLines) {
                 int j;
                 if (s != null && items != null && s.contains("@") && !items.isEmpty()) {
-                    List<Object> list = parseString(s, items);
+                    List<Object> list = WindowTools.parseString(s, items);
                     boolean lineHasItemStacks = false;
                     j = 0;
                     for (Object o : list) {
@@ -245,38 +196,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
             RenderSystem.translated(0.0D, 0.0D, (double)this.itemRenderer.zLevel);
 
-            for (int k1 = 0; k1 < textLines.size(); ++k1) {
-                String s1 = textLines.get(k1);
-                if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
-                    List<Object> list = parseString(s1, items);
-                    int curx = xx;
-                    boolean lineHasItemStacks = false;
-                    for (Object o : list) {
-                        if (o instanceof String) {
-                            String s2 = (String)o;
-                            font.drawStringWithShadow(s2, curx, yy, -1);
-                            curx += font.getStringWidth(s2);
-                        } else {
-                            RenderHelper.renderObject(getMinecraft(), curx + 1, yy, o, false);
-                            curx += 20;
-                            lineHasItemStacks = true;
-                        }
-                    }
-                    if(lineHasItemStacks) {
-                        yy += 8;
-                    }
-                } else {
-                    font.drawStringWithShadow(s1, xx, yy, -1);
-                }
+            renderTextLines(textLines, items, font, xx, yy);
 
-                if (k1 == 0) {
-                    yy += 2;
-                }
-
-                yy += 10;
-            }
-
-//            this.zLevel = 0.0F;       // @todo 1.14
             setBlitOffset(0);
             this.itemRenderer.zLevel = 0.0F;
             RenderSystem.enableLighting();
@@ -284,6 +205,39 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
             RenderSystem.enableRescaleNormal();
             RenderSystem.popMatrix();
+        }
+    }
+
+    private void renderTextLines(List<String> textLines, List<ItemStack> items, FontRenderer font, int xx, int yy) {
+        for (int i = 0; i < textLines.size(); ++i) {
+            String s1 = textLines.get(i);
+            if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
+                List<Object> list = WindowTools.parseString(s1, items);
+                int curx = xx;
+                boolean lineHasItemStacks = false;
+                for (Object o : list) {
+                    if (o instanceof String) {
+                        String s2 = (String)o;
+                        font.drawStringWithShadow(s2, curx, yy, -1);
+                        curx += font.getStringWidth(s2);
+                    } else {
+                        RenderHelper.renderObject(getMinecraft(), curx + 1, yy, o, false);
+                        curx += 20;
+                        lineHasItemStacks = true;
+                    }
+                }
+                if(lineHasItemStacks) {
+                    yy += 8;
+                }
+            } else {
+                font.drawStringWithShadow(s1, xx, yy, -1);
+            }
+
+            if (i == 0) {
+                yy += 2;
+            }
+
+            yy += 10;
         }
     }
 
@@ -380,6 +334,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     protected void customRenderToolTip(BlockRender blockRender, ItemStack stack, int x, int y) {
         List<String> list;
+        //noinspection ConstantConditions
         if (stack.getItem() == null) {
             // Protection for bad itemstacks
             list = new ArrayList<>();

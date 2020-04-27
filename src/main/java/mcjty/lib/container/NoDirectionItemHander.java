@@ -13,28 +13,33 @@ import javax.annotation.Nonnull;
 
 public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
 
-    private final InventoryHelper helper;
-    private final GenericTileEntity te;
+    public final GenericTileEntity tileEntity;
+    private final ContainerFactory containerFactory;
+    private ItemStackList stacks;
 
     // Called when something changed
     protected void onUpdate(int index) {
-        te.markDirtyQuick();
+        tileEntity.markDirtyQuick();
     }
 
     public NoDirectionItemHander(GenericTileEntity te, ContainerFactory factory) {
-        this.helper = new InventoryHelper(te, factory, factory.getContainerSlots());
-        this.te = te;
+        this.tileEntity = te;
+        this.containerFactory = factory;
+        stacks = ItemStackList.create(containerFactory.getContainerSlots());
     }
 
     @Override
     public int getSlots() {
-        return helper.getCount();
+        return stacks.size();
     }
 
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
-        return helper.getStackInSlot(slot);
+        if (slot >= stacks.size()) {
+            return ItemStack.EMPTY;
+        }
+        return stacks.get(slot);
     }
 
     @Nonnull
@@ -47,7 +52,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
             return stack;
         }
 
-        ItemStack stackInSlot = helper.getStackInSlot(slot);
+        ItemStack stackInSlot = getStackInSlot(slot);
 
         int m;
         if (!stackInSlot.isEmpty()) {
@@ -69,7 +74,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                 if (!simulate) {
                     ItemStack copy = stack.copy();
                     copy.grow(stackInSlot.getCount());
-                    helper.setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
+                    setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
                     onUpdate(slot);
                 }
 
@@ -80,7 +85,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                 if (!simulate) {
                     ItemStack copy = stack.split(m);
                     copy.grow(stackInSlot.getCount());
-                    helper.setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
+                    setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
                     onUpdate(slot);
                     return stack;
                 } else {
@@ -98,7 +103,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    helper.setInventorySlotContents(stack.getMaxStackSize(), slot, stack.split(m));
+                    setInventorySlotContents(stack.getMaxStackSize(), slot, stack.split(m));
                     onUpdate(slot);
                     return stack;
                 } else {
@@ -107,7 +112,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                 }
             } else {
                 if (!simulate) {
-                    helper.setInventorySlotContents(stack.getMaxStackSize(), slot, stack);
+                    setInventorySlotContents(stack.getMaxStackSize(), slot, stack);
                     onUpdate(slot);
                 }
                 return ItemStack.EMPTY;
@@ -116,6 +121,41 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
 
     }
 
+    public void setInventorySlotContents(int stackLimit, int index, ItemStack stack) {
+        if (index >= stacks.size()) {
+            return;
+        }
+
+        if (containerFactory.isGhostSlot(index)) {
+            if (!stack.isEmpty()) {
+                ItemStack stack1 = stack.copy();
+                if (index < 9) {
+                    stack1.setCount(1);
+                }
+                stacks.set(index, stack1);
+            } else {
+                stacks.set(index, ItemStack.EMPTY);
+            }
+        } else if (containerFactory.isGhostOutputSlot(index)) {
+            if (!stack.isEmpty()) {
+                stacks.set(index, stack.copy());
+            } else {
+                stacks.set(index, ItemStack.EMPTY);
+            }
+        } else {
+            stacks.set(index, stack);
+            if (!stack.isEmpty() && stack.getCount() > stackLimit) {
+                if (stackLimit <= 0) {
+                    stack.setCount(0);
+                } else {
+                    stack.setCount(stackLimit);
+                }
+            }
+            tileEntity.markDirty();
+        }
+    }
+
+
     @Nonnull
     @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
@@ -123,7 +163,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
             return ItemStack.EMPTY;
         }
 
-        ItemStack stackInSlot = helper.getStackInSlot(slot);
+        ItemStack stackInSlot = getStackInSlot(slot);
 
         if (stackInSlot.isEmpty()) {
             return ItemStack.EMPTY;
@@ -144,15 +184,47 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
         } else {
             int m = Math.min(stackInSlot.getCount(), amount);
 
-            ItemStack decrStackSize = helper.decrStackSize(slot, m);
+            ItemStack decrStackSize = decrStackSize(slot, m);
             onUpdate(slot);
             return decrStackSize;
         }
     }
 
+    public ItemStack decrStackSize(int index, int amount) {
+        if (index >= stacks.size()) {
+            return ItemStack.EMPTY;
+        }
+
+        if (containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index)) {
+            ItemStack old = stacks.get(index);
+            stacks.set(index, ItemStack.EMPTY);
+            if (old.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            old.setCount(0);
+            return old;
+        } else {
+            if (!stacks.get(index).isEmpty()) {
+                if (stacks.get(index).getCount() <= amount) {
+                    ItemStack old = stacks.get(index);
+                    stacks.set(index, ItemStack.EMPTY);
+                    tileEntity.markDirty();
+                    return old;
+                }
+                ItemStack its = stacks.get(index).split(amount);
+                if (stacks.get(index).isEmpty()) {
+                    stacks.set(index, ItemStack.EMPTY);
+                }
+                tileEntity.markDirty();
+                return its;
+            }
+            return ItemStack.EMPTY;
+        }
+    }
+
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
-        helper.setStackInSlot(slot, stack);
+        stacks.set(slot, stack);
         onUpdate(slot);
     }
 
@@ -175,14 +247,13 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
     }
 
     public ContainerFactory getContainerFactory() {
-        return helper.getContainerFactory();
+        return containerFactory;
     }
 
     @Override
     public ListNBT serializeNBT() {
-        ItemStackList list = helper.getStacks();
         ListNBT bufferTagList = new ListNBT();
-        for (ItemStack stack : list) {
+        for (ItemStack stack : stacks) {
             CompoundNBT compoundNBT = new CompoundNBT();
             if (!stack.isEmpty()) {
                 stack.write(compoundNBT);
@@ -194,11 +265,10 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
 
     @Override
     public void deserializeNBT(ListNBT nbt) {
-        ItemStackList list = helper.getStacks();
         for (int i = 0; i < nbt.size(); i++) {
             CompoundNBT compoundNBT = nbt.getCompound(i);
-            if (i < list.size()) {
-                list.set(i, ItemStack.read(compoundNBT));
+            if (i < stacks.size()) {
+                stacks.set(i, ItemStack.read(compoundNBT));
             }
         }
     }

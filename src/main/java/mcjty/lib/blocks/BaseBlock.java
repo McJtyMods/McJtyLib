@@ -11,15 +11,11 @@ import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
-import mcjty.lib.container.InventoryHelper;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tooltips.ITooltipSettings;
-import mcjty.lib.varia.NBTTools;
-import mcjty.lib.varia.OrientationTools;
-import mcjty.lib.varia.WrenchChecker;
-import mcjty.lib.varia.WrenchUsage;
+import mcjty.lib.varia.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -191,7 +187,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             if (te != null) {
                 return te.getCapability(CapabilityModuleSupport.MODULE_CAPABILITY).map(h -> {
                     if (h.isModule(heldItem)) {
-                        if (InventoryHelper.installModule(player, heldItem, hand, pos, h.getFirstSlot(), h.getLastSlot())) {
+                        if (ModuleTools.installModule(player, heldItem, hand, pos, h.getFirstSlot(), h.getLastSlot())) {
                             return true;
                         }
                     }

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * Generic container support.
+ * Generic container support
  */
 public class GenericContainer extends Container implements IGenericContainer {
     protected Map<String,IItemHandler> inventories = new HashMap<>();
@@ -45,7 +45,6 @@ public class GenericContainer extends Container implements IGenericContainer {
         this.factory = factory;
         this.pos = pos;
         this.te = te;
-        factory.doSetup();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package mcjty.lib.gui;
 
 /**
- * Implement this interface if you want something to be controllable by a slider.
+ * Implement this interface if you want a widget to be controllable by a slider
  */
 public interface Scrollable {
     /**

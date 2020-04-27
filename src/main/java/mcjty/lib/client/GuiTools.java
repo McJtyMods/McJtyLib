@@ -1,6 +1,7 @@
-package mcjty.lib.varia;
+package mcjty.lib.client;
 
 import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.varia.WorldTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.screen.Screen;

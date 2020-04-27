@@ -14,6 +14,8 @@ import net.minecraft.client.gui.screen.Screen;
 import java.util.ArrayList;
 import java.util.List;
 
+import static mcjty.lib.gui.TagSelectorWindow.TYPE_ITEM;
+
 
 public class TagSelector extends AbstractLabel<TagSelector> {
 
@@ -23,7 +25,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     private String currentTag = null;
     private List<TagChoiceEvent> choiceEvents = null;
     private final TagSelectorWindow selector = new TagSelectorWindow();
-    private String type = "item";
+    private String type = TYPE_ITEM;
 
     public TagSelector() {
         text("");
@@ -78,7 +80,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     @Override
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
-            selector.create(window, (int) x, (int) y, type, t -> {
+            selector.create(window, type, t -> {
                 current(t);
                 fireChoiceEvents(t);
             }, this::getCurrentTag, false);
@@ -116,7 +118,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     @Override
     public void readFromGuiCommand(GuiParser.GuiCommand command) {
         super.readFromGuiCommand(command);
-        type = GuiParser.get(command, "type", "item");
+        type = GuiParser.get(command, "type", TYPE_ITEM);
     }
 
     @Override

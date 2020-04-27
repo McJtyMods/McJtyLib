@@ -63,7 +63,7 @@ public class Window {
         this.gui = gui;
         final int[] dim = {-1, -1};
         final int[] sidesize = {0, 0};
-        GuiParserClientTools.parseAndHandleClient(guiDescription, command -> {
+        WindowTools.parseAndHandleClient(guiDescription, command -> {
             if ("window".equals(command.getId())) {
                 command.findCommand("size").ifPresent(cmd -> {
                     dim[0] = cmd.getOptionalPar(0, -1);
