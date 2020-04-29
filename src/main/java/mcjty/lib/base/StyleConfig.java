@@ -94,7 +94,7 @@ public class StyleConfig {
 
     private static Map<String, ForgeConfigSpec.ConfigValue<String>> colorConfigValues = new HashMap<>();
 
-    public static void init(ForgeConfigSpec.Builder COMMON_BUILDER, ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ForgeConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("Style settings for all mods using mcjtylib").push(CATEGORY_STYLE);
 
         initSetting(CLIENT_BUILDER, "colorSliderTopLeft", colorSliderTopLeft, "Color: slider top left border");
