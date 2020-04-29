@@ -9,6 +9,7 @@ Upcoming:
 - Greatly cleaned up the McJtyLib code. Removed all outdated code
 - Improved the wrench detector
 - All McJtyLib based GUI's will now properly check if the tile entity is near enough and not removed. Avoids potential dupes
+- Moved most of the configs from common to server (so that they are saved with the world and synced to the client)
 
 4.0.3-alpha:
 - Helpers for blockstate generation

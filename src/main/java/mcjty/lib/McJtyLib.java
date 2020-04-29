@@ -47,7 +47,7 @@ public class McJtyLib implements ModBase {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientRegistration::init);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, GeneralConfig.COMMON_CONFIG);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
     }
 
     public static void registerMod(ModBase mod) {

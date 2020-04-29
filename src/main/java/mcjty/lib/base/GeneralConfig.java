@@ -13,11 +13,9 @@ import java.nio.file.Path;
 @Mod.EventBusSubscriber
 public class GeneralConfig {
 
-    private static final ForgeConfigSpec.Builder COMMON_BUILDER = new ForgeConfigSpec.Builder();
     private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
     private static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
 
-    public static final ForgeConfigSpec COMMON_CONFIG;
     public static final ForgeConfigSpec SERVER_CONFIG;
     public static final ForgeConfigSpec CLIENT_CONFIG;
 
@@ -25,7 +23,6 @@ public class GeneralConfig {
         StyleConfig.init(CLIENT_BUILDER);
         GeneralConfig.init(SERVER_BUILDER);
 
-        COMMON_CONFIG = COMMON_BUILDER.build();
         SERVER_CONFIG = SERVER_BUILDER.build();
         CLIENT_CONFIG = CLIENT_BUILDER.build();
     }
