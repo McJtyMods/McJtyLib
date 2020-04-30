@@ -104,6 +104,9 @@ dependencies {
 
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
+    compile fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}") {
+        transitive = false
+    }
     //deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"
     //deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
     //deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
