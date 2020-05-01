@@ -33,6 +33,8 @@ public class PacketHandler {
         channel.registerMessage(index1, PacketSendPreferencesToClient.class, PacketSendPreferencesToClient::toBytes, PacketSendPreferencesToClient::new, PacketSendPreferencesToClient::handle);
         int index = startIndex++;
         channel.registerMessage(index, PacketSetGuiStyle.class, PacketSetGuiStyle::toBytes, PacketSetGuiStyle::new, PacketSetGuiStyle::handle);
+        int index2 = startIndex++;
+        channel.registerMessage(index2, PacketOpenManual.class, PacketOpenManual::toBytes, PacketOpenManual::new, PacketOpenManual::handle);
 
         // Client side
 //        debugRegister(channel, );(startIndex++, PacketSendClientCommand.class, PacketSendClientCommand::toBytes, PacketSendClientCommand::new, PacketSendClientCommand::handle);

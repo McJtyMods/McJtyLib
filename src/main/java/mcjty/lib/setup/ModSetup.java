@@ -40,6 +40,8 @@ public class ModSetup extends DefaultModSetup {
 
     public static ResourceLocation PREFERENCES_CAPABILITY_KEY;
 
+    public static boolean patchouli = false;
+
     @CapabilityInject(PreferencesProperties.class)
     public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
 
@@ -64,6 +66,7 @@ public class ModSetup extends DefaultModSetup {
 
     @Override
     protected void setupModCompat() {
+        patchouli = ModList.get().isLoaded("patchouli");
     }
 
 

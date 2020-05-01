@@ -65,11 +65,6 @@ public class McJtyLib implements ModBase {
         return MODID;
     }
 
-    @Override
-    public void openManual(PlayerEntity player, int bookindex, String page) {
-
-    }
-
     public static void registerCommand(String modid, String id, IServerCommand command) {
         serverCommands.put(Pair.of(modid, id), command);
     }

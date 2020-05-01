@@ -1,18 +1,8 @@
 package mcjty.lib.base;
 
-import net.minecraft.entity.player.PlayerEntity;
-
 public interface ModBase {
 
     String getModId();
-
-    /**
-     * Open the manual at a specific page.
-     * @param player
-     * @param bookindex
-     * @param page
-     */
-    void openManual(PlayerEntity player, int bookindex, String page);
 
     /**
      * If your mod is registered with McJtyLib.registerMod() then this will be called after

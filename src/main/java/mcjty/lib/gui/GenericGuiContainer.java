@@ -59,11 +59,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         this.ySize = y;
     }
 
-    public GenericGuiContainer(ModBase mod, T tileEntity, C container, PlayerInventory inventory, int manual, String manualNode) {
+    public GenericGuiContainer(ModBase mod, T tileEntity, C container, PlayerInventory inventory, ManualEntry manualEntry) {
         super(container, inventory, new StringTextComponent("test"));   // @todo
         this.modBase = mod;
         this.tileEntity = tileEntity;
-        sideWindow = new GuiSideWindow(manual, manualNode);
+        sideWindow = new GuiSideWindow(manualEntry.getManual(), manualEntry.getEntry(), manualEntry.getPage());
         windowManager = null;
     }
 

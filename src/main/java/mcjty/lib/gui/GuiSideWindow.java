@@ -4,11 +4,12 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Panel;
+import mcjty.lib.network.PacketOpenManual;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import static mcjty.lib.gui.widgets.Widgets.button;
@@ -27,12 +28,14 @@ public class GuiSideWindow {
     private int sideLeft;
     private int sideTop;
 
-    private int manual;
-    private String manualNode;
+    private final ResourceLocation manual;
+    private final ResourceLocation manualNode;
+    private final int page;
 
-    public GuiSideWindow(int manual, String manualNode) {
+    public GuiSideWindow(ResourceLocation manual, ResourceLocation manualNode, int page) {
         this.manual = manual;
         this.manualNode = manualNode;
+        this.page = page;
     }
 
     public void initGui(final ModBase modBase, final Minecraft mc, Screen gui, int guiLeft, int guiTop, int xSize, int ySize) {
@@ -52,8 +55,9 @@ public class GuiSideWindow {
     }
 
     private void help(ModBase modBase, Minecraft mc) {
-        PlayerEntity player = mc.player;
-        modBase.openManual(player, manual, manualNode);
+        if (manual != null) {
+            McJtyLib.networkHandler.sendToServer(new PacketOpenManual(manual, manualNode, page));
+        }
     }
 
     private void setStyleTooltip() {

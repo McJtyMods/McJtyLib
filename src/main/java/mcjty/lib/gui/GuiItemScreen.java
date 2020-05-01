@@ -24,13 +24,13 @@ public class GuiItemScreen extends Screen {
 
     private GuiSideWindow sideWindow;
 
-    public GuiItemScreen(ModBase mod, SimpleChannel network, int xSize, int ySize, int manual, String manualNode) {
+    public GuiItemScreen(ModBase mod, SimpleChannel network, int xSize, int ySize, ManualEntry manualEntry) {
         super(new StringTextComponent("todo")); // @todo 1.14
         this.modBase = mod;
         this.network = network;
         this.xSize = xSize;
         this.ySize = ySize;
-        sideWindow = new GuiSideWindow(manual, manualNode);
+        sideWindow = new GuiSideWindow(manualEntry.getManual(), manualEntry.getEntry(), manualEntry.getPage());
     }
 
     @Override
