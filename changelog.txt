@@ -1,4 +1,4 @@
-Upcoming:
+4.1.0-beta:
 - Small fix for block placement (as used by the builder)
 - Support for better item tooltip system
 - Many cleanups and fixes for logic blocks
