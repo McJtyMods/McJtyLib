@@ -7,14 +7,14 @@ public enum SmartWrenchMode {
     MODE_WRENCH("w", "wrench"),
     MODE_SELECT("s", "focus");
 
-    private static Map<String,SmartWrenchMode> codeToMode = new HashMap<>();
+    private static final Map<String,SmartWrenchMode> CODE_TO_MODE = new HashMap<>();
 
     private final String code;
     private final String name;
 
     static {
         for (SmartWrenchMode mode : values()) {
-            codeToMode.put(mode.getCode(), mode);
+            CODE_TO_MODE.put(mode.getCode(), mode);
         }
     }
 
@@ -32,6 +32,6 @@ public enum SmartWrenchMode {
     }
 
     public static SmartWrenchMode getMode(String code) {
-        return codeToMode.get(code);
+        return CODE_TO_MODE.get(code);
     }
 }

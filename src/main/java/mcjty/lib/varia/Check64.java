@@ -108,11 +108,6 @@ public class Check64 {
         crc = CRC_TABLE[tab_index] ^ (crc << 8);
     }
 
-    public void update(final byte[] buffer, final int offset, int length) {
-        for (int i = offset; length > 0; length--)
-            update(buffer[i++]);
-    }
-
     public void update(final byte[] buffer) {
         for (int i = 0; i < buffer.length; i++)
             update(buffer[i]);

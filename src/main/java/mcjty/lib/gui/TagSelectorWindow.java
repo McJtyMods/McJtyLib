@@ -31,7 +31,6 @@ public class TagSelectorWindow {
     private String type;
     private Supplier<String> tagGetter;
     private Consumer<String> tagSetter;
-    private boolean onlyDoubleClick;
 
     /**
      * @param parentWindow
@@ -46,7 +45,6 @@ public class TagSelectorWindow {
         Screen gui = parentWindow.getWindowManager().getGui();
         this.tagSetter = tagSetter;
         this.tagGetter = tagGetter;
-        this.onlyDoubleClick = onlyDoubleClick;
 
         Panel modalDialog = positional().filledRectThickness(2);
         int wx = (int) (parentWindow.getToplevel().getBounds().getX() + 20);

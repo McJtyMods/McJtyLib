@@ -20,13 +20,10 @@ import static mcjty.lib.gui.widgets.Widgets.positional;
  * Gui's that inherit from GenericGuiContainer will automatically have this
  */
 public class GuiSideWindow {
-    protected GuiStyle style;
+    private GuiStyle style;
 
-    protected Window sideWindow;
+    private Window sideWindow;
     private Button guiButton;
-    private Button helpButton;
-    private int sideLeft;
-    private int sideTop;
 
     private final ResourceLocation manual;
     private final ResourceLocation manualNode;
@@ -41,15 +38,15 @@ public class GuiSideWindow {
     public void initGui(final ModBase modBase, final Minecraft mc, Screen gui, int guiLeft, int guiTop, int xSize, int ySize) {
         style = McJtyLib.getPreferencesProperties(mc.player).map(PreferencesProperties::getStyle).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 
-        helpButton = button(1,1, 16, 16, "?")
+        Button helpButton = button(1, 1, 16, 16, "?")
                 .tooltips("Open manual")
                 .event(() -> help(modBase, mc));
         guiButton = button(1, 19, 16, 16, "s")
                 .event(() -> changeStyle(McJtyLib.networkHandler));
         setStyleTooltip();
         Panel sidePanel = positional().children(guiButton, helpButton);
-        sideLeft = guiLeft + xSize;
-        sideTop = guiTop + (ySize - 20) / 2 - 8;
+        int sideLeft = guiLeft + xSize;
+        int sideTop = guiTop + (ySize - 20) / 2 - 8;
         sidePanel.bounds(sideLeft, sideTop, 20, 40);
         sideWindow = new Window(gui, sidePanel);
     }

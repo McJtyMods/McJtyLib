@@ -132,8 +132,7 @@ public class JSonTools {
                 CompoundNBT nbt = JsonToNBT.getTagFromJson(obj.get("nbt").getAsString());
                 stack.setTag(nbt);
             } catch (CommandSyntaxException e) {
-                e.printStackTrace();
-                // @todo
+                Logging.logError("Parsing error", e);
             }
         }
         return stack;

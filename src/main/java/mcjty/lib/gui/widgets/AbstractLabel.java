@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.HorizontalAlignment;
@@ -146,7 +146,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         int dy = calculateVerticalOffset() + offsety + txtDy;
 
         if (image != null) {
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(image);
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;

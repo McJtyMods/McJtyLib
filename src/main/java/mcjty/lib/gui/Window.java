@@ -251,7 +251,7 @@ public class Window {
                     writer.flush();
                 }
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                Logging.logError("Problem writing output.gui!", e);
             }
         }
         if (textFocus != null) {

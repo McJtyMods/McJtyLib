@@ -1,6 +1,7 @@
 package mcjty.lib.varia;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.GuiParser;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -75,7 +76,7 @@ public class ItemStackTools {
                 CompoundNBT nbt = JsonToNBT.getTagFromJson(cmd.getOptionalPar(0, ""));
                 stack.setTag(nbt);
             } catch (CommandSyntaxException e) {
-                e.printStackTrace();
+                Logging.logError("Error", e);
             }
         });
         return stack;

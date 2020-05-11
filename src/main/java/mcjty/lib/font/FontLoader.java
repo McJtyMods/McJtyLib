@@ -18,6 +18,7 @@ package mcjty.lib.font;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import mcjty.lib.varia.Logging;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 
@@ -39,7 +40,7 @@ public class FontLoader {
             font = font.deriveFont(defSize);
             out = new TrueTypeFont(font, antialias);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            Logging.logError("Error loading font!", e);
         }
         return out;
     }
@@ -60,7 +61,7 @@ public class FontLoader {
             font = font.deriveFont(defSize);
             out = new TrueTypeFont(font, antialias, additionalChars);
         } catch (RuntimeException | FontFormatException | IOException e) {
-            e.printStackTrace();
+            Logging.logError("Error loading font!", e);
         }
         return out;
     }

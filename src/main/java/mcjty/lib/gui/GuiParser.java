@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import mcjty.lib.varia.Logging;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.annotation.Nullable;
@@ -226,9 +227,9 @@ public class GuiParser {
         try {
             parse(reader).stream().forEach(command -> command.dump(1));
         } catch (IOException e) {
-            e.printStackTrace();
+            Logging.logError("Error parsing!", e);
         } catch (ParserException e) {
-            e.printStackTrace();
+            Logging.logError("Error parsing!", e);
         }
     }
 

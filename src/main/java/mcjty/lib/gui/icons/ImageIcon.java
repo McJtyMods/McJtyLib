@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ImageIcon implements IIcon {
+public class ImageIcon implements IIcon, Cloneable {
 
     private ResourceLocation image = null;
     private int u;

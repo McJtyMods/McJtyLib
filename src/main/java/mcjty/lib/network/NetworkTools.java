@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.varia.Logging;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -78,7 +79,7 @@ public class NetworkTools {
             buf.writeCompoundTag(nbt);
             buf.writeInt(itemStack.getCount());
         } catch (Exception e) {
-            e.printStackTrace();
+            Logging.logError("Error", e);
         }
     }
 

@@ -1,6 +1,7 @@
 package mcjty.lib.font;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import mcjty.lib.varia.Logging;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
@@ -248,8 +249,7 @@ public class TrueTypeFont {
             //.getTexture(font.toString(), imgTemp);
 
         } catch (RuntimeException e) {
-            System.err.println("Failed to create font.");
-            e.printStackTrace();
+            Logging.logError("Failed to create font!", e);
         }
     }
 
@@ -554,7 +554,7 @@ public class TrueTypeFont {
             return textureId.get(0);
 
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            Logging.logError("Failed to create font!", e);
         }
 
         return -1;

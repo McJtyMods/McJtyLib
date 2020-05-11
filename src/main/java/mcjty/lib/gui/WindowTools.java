@@ -32,7 +32,8 @@ public class WindowTools {
     public static List<Object> parseString(String s, List<ItemStack> items) {
         List<Object> l = new ArrayList<>();
         String current = "";
-        for (int i = 0; i < s.length(); ++i) {
+        int i = 0;
+        while (i < s.length()) {
             String c = s.substring(i, i + 1);
             if ("@".equals(c)) {
                 ++i;
@@ -57,6 +58,7 @@ public class WindowTools {
             } else {
                 current += c;
             }
+            i++;
         }
         if (!current.isEmpty()) {
             l.add(current);

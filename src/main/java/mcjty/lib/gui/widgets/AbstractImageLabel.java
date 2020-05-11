@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ImageEvent;
@@ -111,7 +111,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
         super.draw(gui, x, y);
 
         if (image != null) {
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
