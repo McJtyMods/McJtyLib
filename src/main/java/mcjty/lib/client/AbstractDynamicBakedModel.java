@@ -22,6 +22,7 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
     }
 
     public static TextureAtlasSprite getTexture(ResourceLocation resource) {
+        //noinspection deprecation
         return Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(resource);
     }
 
@@ -136,6 +137,7 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
         return ItemOverrideList.EMPTY;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public ItemCameraTransforms getItemCameraTransforms() {
         return ItemCameraTransforms.DEFAULT;

@@ -84,6 +84,11 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
 
     public P setSpacing(int spacing) {
         this.spacing = spacing;
+        return getThis();
+    }
+
+    private P getThis() {
+        //noinspection unchecked
         return (P) this;
     }
 
@@ -93,7 +98,7 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
 
     public P setHorizontalMargin(int horizontalMargin) {
         this.horizontalMargin = horizontalMargin;
-        return (P) this;
+        return getThis();
     }
 
     public int getVerticalMargin() {
@@ -102,7 +107,7 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
 
     public P setVerticalMargin(int verticalMargin) {
         this.verticalMargin = verticalMargin;
-        return (P) this;
+        return getThis();
     }
 
     public HorizontalAlignment getHorizontalAlignment() {
@@ -111,7 +116,7 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
 
     public P setHorizontalAlignment(HorizontalAlignment horizontalAlignment) {
         this.horizontalAlignment = horizontalAlignment;
-        return (P) this;
+        return getThis();
     }
 
     public VerticalAlignment getVerticalAlignment() {
@@ -120,6 +125,6 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
 
     public P setVerticalAlignment(VerticalAlignment verticalAlignment) {
         this.verticalAlignment = verticalAlignment;
-        return (P) this;
+        return getThis();
     }
 }

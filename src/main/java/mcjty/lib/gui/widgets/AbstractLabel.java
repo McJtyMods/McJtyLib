@@ -44,7 +44,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         this.v = v;
         this.iw = iw;
         this.ih = ih;
-        return (P) this;
+        return getThis();
     }
 
     public boolean isDynamic() {
@@ -53,7 +53,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
     public P dynamic(boolean dynamic) {
         this.dynamic = dynamic;
-        return (P) this;
+        return getThis();
     }
 
     @Override
@@ -86,13 +86,13 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
     public P text(String text) {
         this.text = text;
-        return (P) this;
+        return getThis();
     }
 
     public P textOffset(int ox, int oy) {
         txtDx = ox;
         txtDy = oy;
-        return (P) this;
+        return getThis();
     }
 
     public int getColor() {
@@ -101,7 +101,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
     public P color(int color) {
         this.color = color;
-        return (P) this;
+        return getThis();
     }
 
     public int getDisabledColor() {
@@ -110,7 +110,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
     public P disabledColor(int disabledColor) {
         this.disabledColor = disabledColor;
-        return (P) this;
+        return getThis();
     }
 
     public HorizontalAlignment getHorizontalAlignment() {
@@ -119,7 +119,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
     public P horizontalAlignment(HorizontalAlignment horizontalAlignment) {
         this.horizontalAlignment = horizontalAlignment;
-        return (P) this;
+        return getThis();
     }
 
     public VerticalAlignment getVerticalAlignment() {
@@ -128,7 +128,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
     public P verticalAlignment(VerticalAlignment verticalAlignment) {
         this.verticalAlignment = verticalAlignment;
-        return (P) this;
+        return getThis();
     }
 
     @Override

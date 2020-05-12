@@ -92,13 +92,18 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         if (channel == null) {
             channel = name;     // Automatic channel
         }
+        return getThis();
+    }
+
+    protected P getThis() {
+        //noinspection unchecked
         return (P) this;
     }
 
     @Override
     public P channel(String channel) {
         this.channel = channel;
-        return (P) this;
+        return getThis();
     }
 
     protected void fireChannelEvents() {
@@ -135,7 +140,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         } else {
             this.tooltips = null;
         }
-        return (P) this;
+        return getThis();
     }
 
     @Override
@@ -146,7 +151,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         } else {
             this.items = Collections.emptyList();
         }
-        return (P) this;
+        return getThis();
     }
 
     @Override
@@ -167,13 +172,13 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     @Override
     public P hovering(boolean hovering) {
         this.hovering = hovering;
-        return (P) this;
+        return getThis();
     }
 
     @Override
     public P enabled(boolean enabled) {
         this.enabled = enabled;
-        return (P) this;
+        return getThis();
     }
 
     @Override
@@ -181,7 +186,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         for (String flag : flags) {
             enableFlags.add(StringRegister.STRINGS.get(flag));
         }
-        return (P) this;
+        return getThis();
     }
 
     @Nonnull
@@ -203,7 +208,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     @Override
     public P visible(boolean visible) {
         this.visible = visible;
-        return (P) this;
+        return getThis();
     }
 
     @Override
@@ -228,7 +233,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     @Override
     public P desiredWidth(int desiredWidth) {
         this.desiredWidth = desiredWidth;
-        return (P) this;
+        return getThis();
     }
 
     @Override
@@ -239,7 +244,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     @Override
     public P desiredHeight(int desiredHeight) {
         this.desiredHeight = desiredHeight;
-        return (P) this;
+        return getThis();
     }
 
     /**
@@ -256,13 +261,13 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         this.background2 = bg2;
         this.background2Horizontal = true;
         this.backgroundOffset = 256;
-        return (P) this;
+        return getThis();
     }
 
     public P setBackgroundLayout(boolean horizontal, int offset) {
         this.background2Horizontal = horizontal;
         this.backgroundOffset = offset;
-        return (P) this;
+        return getThis();
     }
 
     /**
@@ -272,7 +277,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
      */
     public P filledRectThickness(int thickness) {
         filledRectThickness = thickness;
-        return (P) this;
+        return getThis();
     }
 
     public int getFilledBackground() {
@@ -286,13 +291,13 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     public P filledBackground(int filledBackground) {
         this.filledBackground = filledBackground;
         this.filledBackground2 = -1;
-        return (P) this;
+        return getThis();
     }
 
     public P filledBackground(int filledBackground, int filledBackground2) {
         this.filledBackground = filledBackground;
         this.filledBackground2 = filledBackground2;
-        return (P) this;
+        return getThis();
     }
 
     public void setBounds(Rectangle bounds) {
@@ -460,7 +465,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     public P hint(LayoutHint hint) {
         layoutHint = hint;
         layoutDirty = true;
-        return (P) this;
+        return getThis();
     }
 
     @Override
@@ -476,7 +481,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     @Override
     public P userObject(Object obj) {
         userObject = obj;
-        return (P) this;
+        return getThis();
     }
 
     @Override

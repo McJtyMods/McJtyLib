@@ -43,13 +43,13 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
         this.image = image;
         this.u = u;
         this.v = v;
-        return (P) this;
+        return getThis();
     }
 
     public P setTextureDimensions(int tw, int th) {
         this.txtWidth = tw;
         this.txtHeight = th;
-        return (P) this;
+        return getThis();
     }
 
     @Override

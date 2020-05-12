@@ -69,7 +69,7 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         for (Widget<?> child : children) {
             addChild(child);
         }
-        return (P) this;
+        return getThis();
     }
 
     private P addChild(Widget<?> child) {
@@ -78,13 +78,13 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         }
         children.add(child);
         markLayoutDirty();
-        return (P) this;
+        return getThis();
     }
 
     public P removeChild(Widget<?> child) {
         children.remove(child);
         markLayoutDirty();
-        return (P) this;
+        return getThis();
     }
 
     public void removeChildren() {
@@ -100,11 +100,15 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
         return children;
     }
 
-    public <T extends Widget<?>> T getChild(int index) { return (T) children.get(index); }
+    public <T extends Widget<?>> T getChild(int index) {
+        //noinspection unchecked
+        return (T) children.get(index);
+    }
 
     public <T extends Widget<?>> T findChild(String name) {
         for (Widget<?> child : children) {
             if (name.equals(child.getName())) {
+                //noinspection unchecked
                 return (T) child;
             }
         }
