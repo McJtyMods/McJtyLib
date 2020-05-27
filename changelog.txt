@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed potential crashes in key handling
+
 4.1.0-beta:
 - Small fix for block placement (as used by the builder)
 - Support for better item tooltip system
