@@ -16,8 +16,18 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class JSonTools {
+
+    public static Optional<JsonElement> getElement(JsonObject element, String name) {
+        JsonElement el = element.get(name);
+        if (el != null) {
+            return Optional.of(el);
+        } else {
+            return Optional.empty();
+        }
+    }
 
     public static int get(JsonObject object, String name, int def) {
         if (object.has(name)) {
