@@ -27,7 +27,7 @@ public interface IProxy {
     boolean isSneakKeyDown();
 
     // This version directly checks the actual key
-    boolean isShiftKeyDown();
+    boolean isSneaking();
 
     // This version directly checks the actual key
     boolean isAltKeyDown();

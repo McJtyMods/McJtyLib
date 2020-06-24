@@ -111,7 +111,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     @Override
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
-            if (button == 1) { // @todo 1.14 || McJtyLib.proxy.isShiftKeyDown()) {
+            if (button == 1) { // @todo 1.14 || McJtyLib.proxy.isSneaking()) {
                 currentChoice--;
                 if (currentChoice < 0) {
                     currentChoice = choiceList.size() - 1;

@@ -98,7 +98,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            if (button == 1 || McJtyLib.proxy.isShiftKeyDown()) {
+            if (button == 1 || McJtyLib.proxy.isSneaking()) {
                 index--;
                 if (index < 0) {
                     index = choiceList.size()-1;

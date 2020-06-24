@@ -58,7 +58,7 @@ public class DefaultServerProxy implements IProxy {
     }
 
     @Override
-    public boolean isShiftKeyDown() {
+    public boolean isSneaking() {
         throw new IllegalStateException("This should only be called from client side");
     }
 

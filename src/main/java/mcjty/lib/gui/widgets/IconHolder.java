@@ -107,7 +107,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     @Override
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
-//            if (McJtyLib.proxy.isShiftKeyDown()) {
+//            if (McJtyLib.proxy.isSneaking()) {
             // @todo 1.14
             if (false) {
             } else {

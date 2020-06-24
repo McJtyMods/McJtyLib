@@ -134,7 +134,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 wrenchUsed = getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
             }
         }
-        if (wrenchUsed == WrenchUsage.NORMAL && player.isShiftKeyDown /*isSneaking*/()) {
+        if (wrenchUsed == WrenchUsage.NORMAL && player.isSneaking()) {
             wrenchUsed = WrenchUsage.SNEAKING;
         }
         return wrenchUsed;
@@ -144,7 +144,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         if (item instanceof SmartWrench) {
             switch(((SmartWrench)item).getMode(itemStack)) {
                 case MODE_WRENCH: return WrenchUsage.NORMAL;
-                case MODE_SELECT: return player.isShiftKeyDown /*isSneaking*/() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
+                case MODE_SELECT: return player.isSneaking() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
                 default:          throw new RuntimeException("SmartWrench in unknown mode!");
             }
         } else if (McJtyLib.cofhapiitem && CofhApiItemCompatibility.isToolHammer(item)) {

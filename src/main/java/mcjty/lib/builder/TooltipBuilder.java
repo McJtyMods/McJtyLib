@@ -50,7 +50,7 @@ public class TooltipBuilder {
         String path = id.getPath();
         String prefix = "message." + namespace + "." + path + ".";
         InfoLine[] lines = infoLines;
-        if (infoLines == null || (McJtyLib.proxy.isShiftKeyDown() && shiftInfoLines != null)) {
+        if (infoLines == null || (McJtyLib.proxy.isSneaking() && shiftInfoLines != null)) {
             lines = shiftInfoLines;
         }
         addLines(stack, tooltip, prefix, lines);

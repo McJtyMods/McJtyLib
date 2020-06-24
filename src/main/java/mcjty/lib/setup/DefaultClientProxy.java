@@ -55,7 +55,7 @@ public class DefaultClientProxy implements IProxy {
     }
 
     @Override
-    public boolean isShiftKeyDown() {
+    public boolean isSneaking() {
         return Screen.hasShiftDown();
     }
 
