@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a bug when rendering empty fluids in the gui
+
 4.1.1-beta:
 - Fixed potential crashes in key handling
 
