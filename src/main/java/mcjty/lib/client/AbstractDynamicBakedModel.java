@@ -45,7 +45,8 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
                             builder.put(e, iu, iv);
                             break;
                         case 2:
-                            builder.put(e, 0f, 1f);
+                            builder.put(e, (short) 0, (short) 0);
+//                            builder.put(e, 0f, 1f);
                             break;
                         default:
                             builder.put(e);
