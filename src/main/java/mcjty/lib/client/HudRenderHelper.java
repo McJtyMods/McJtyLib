@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -130,11 +131,13 @@ public class HudRenderHelper {
                     String prefix = "";
                     if (!stack.isEmpty()) {
                         matrixStack.push();
-                        matrixStack.translate(0, 0, -150);
+                        matrixStack.translate((float)14f, (float)currenty+4f, 0);
+                        matrixStack.scale(10, -10, 16);
+//                        matrixStack.translate(0, 0, -150);
                         // @todo 1.15 this needs more work! we ignore 'currenty'!
                         ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
                         IBakedModel ibakedmodel = itemRender.getItemModelWithOverrides(stack, Minecraft.getInstance().world, (LivingEntity)null);
-                        itemRender.renderItem(stack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, buffer, 0, 0, ibakedmodel);
+                        itemRender.renderItem(stack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, buffer, 0xf000f0, OverlayTexture.NO_OVERLAY, ibakedmodel);
 
 //                        itemRender.renderItemAndEffectIntoGUI(stack, 0, currenty);
                         prefix = "    ";
