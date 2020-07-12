@@ -1,4 +1,4 @@
-Upcoming:
+4.1.2-beta:
 - Fixed a bug when rendering empty fluids in the gui (RFTools Control processor for example)
 - Better lighting for baked models for XNet and Ariente cables, RFTools Power PowerCell and RFTools Utility tank
 
