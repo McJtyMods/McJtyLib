@@ -1,13 +1,15 @@
 package mcjty.lib.datagen;
 
 import mcjty.lib.blocks.LogicSlabBlock;
-import mcjty.lib.varia.LogicFacing;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.*;
+
+import java.util.function.Function;
 
 import static net.minecraftforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
 
@@ -37,7 +39,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 new ResourceLocation("rftoolsbase", "block/base/machineside"));
     }
 
-    public ModelFile logicSlabModel(String modelName, ResourceLocation texture, ModelBuilder.FaceRotation faceRotation) {
+    private ModelFile logicSlabModel(String modelName, ResourceLocation texture, ModelBuilder.FaceRotation faceRotation) {
         BlockModelBuilder model = models().getBuilder(BLOCK_FOLDER + "/" + modelName)
                 .parent(models().getExistingFile(mcLoc("block")));
         model.element().from(0, 0, 0).to(16, 4, 16)
@@ -55,40 +57,58 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     }
 
     public void logicSlabBlock(LogicSlabBlock block, String modelPrefix, ResourceLocation topTexture) {
+        ModelFile[] models = getLogicSlabModels(modelPrefix, topTexture);
+        variantBlock(block,
+                state -> models[state.get(LogicSlabBlock.LOGIC_FACING).getRotationStep()],
+                state -> getXRotation(state.get(LogicSlabBlock.LOGIC_FACING).getSide()),
+                state -> getYRotation(state.get(LogicSlabBlock.LOGIC_FACING).getSide()));
+    }
+
+    // Get logic slab models indexed by the logic facing rotation step
+    public ModelFile[] getLogicSlabModels(String modelPrefix, ResourceLocation topTexture) {
         ModelFile models[] = new ModelFile[4];
         models[0] = logicSlabModel(modelPrefix + "_0", topTexture, ModelBuilder.FaceRotation.ZERO);
         models[1] = logicSlabModel(modelPrefix + "_1", topTexture, ModelBuilder.FaceRotation.UPSIDE_DOWN);
         models[2] = logicSlabModel(modelPrefix + "_2", topTexture, ModelBuilder.FaceRotation.COUNTERCLOCKWISE_90);
         models[3] = logicSlabModel(modelPrefix + "_3", topTexture, ModelBuilder.FaceRotation.CLOCKWISE_90);
-        VariantBlockStateBuilder builder = getVariantBuilder(block);
-        for (LogicFacing value : LogicFacing.VALUES) {
-            Direction direction = value.getSide();
-            applyLogicSlabRotation(builder.partialState().with(LogicSlabBlock.LOGIC_FACING, value)
-                    .modelForState().modelFile(models[value.getRotationStep()]), direction);
-        }
+        return models;
     }
 
-    public void applyLogicSlabRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
+    public void variantBlock(Block block,
+                             Function<BlockState, ModelFile> modelSelector,
+                             Function<BlockState, Integer> xRotation,
+                             Function<BlockState, Integer> yRotation) {
+        getVariantBuilder(block)
+                .forAllStates(state -> ConfiguredModel.builder()
+                        .modelFile(modelSelector.apply(state))
+                        .rotationX(xRotation.apply(state))
+                        .rotationY(yRotation.apply(state))
+                        .build()
+                );
+    }
+
+    public int getXRotation(Direction direction) {
         switch (direction) {
-            case UP:
-                builder.rotationX(180).addModel();
-                break;
-            case DOWN:
-                builder.addModel();
-                break;
-            case NORTH:
-                builder.rotationX(-90).addModel();
-                break;
-            case SOUTH:
-                builder.rotationX(90).addModel();
-                break;
-            case EAST:
-                builder.rotationX(90).rotationY(270).addModel();
-                break;
-            case WEST:
-                builder.rotationX(90).rotationY(90).addModel();
-                break;
+            case DOWN: return 0;
+            case UP: return 180;
+            case NORTH: return -90;
+            case SOUTH: return 90;
+            case WEST: return 90;
+            case EAST: return 90;
         }
+        return 0;
+    }
+
+    public int getYRotation(Direction direction) {
+        switch (direction) {
+            case DOWN: return 0;
+            case UP: return 0;
+            case NORTH: return 0;
+            case SOUTH: return 0;
+            case WEST: return 90;
+            case EAST: return 270;
+        }
+        return 0;
     }
 
     public void applyRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
