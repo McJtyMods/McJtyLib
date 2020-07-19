@@ -1,10 +1,18 @@
 package mcjty.lib.client;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
 
@@ -15,25 +23,22 @@ public class RenderGlowEffect {
      * for glowing should be bound before calling this.
      */
     // @todo 1.15: needs porting
-    public static void renderGlow(Tessellator tessellator, double x, double y, double z) {
-        BufferBuilder buffer = tessellator.getBuffer();
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(x, y, z);
+    public static void renderGlow(MatrixStack matrixStack, IRenderTypeBuffer buffer, double x, double y, double z, ResourceLocation texture) {
+        IVertexBuilder builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS);
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LIGHTMAP_COLOR);
+        matrixStack.push();
+        matrixStack.translate(x, y, z);
 
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(texture);
 
-        RenderGlowEffect.addSideFullTexture(buffer, Direction.UP.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, Direction.DOWN.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, Direction.NORTH.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, Direction.SOUTH.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, Direction.WEST.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(buffer, Direction.EAST.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(builder, sprite, Direction.UP.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(builder, sprite, Direction.DOWN.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(builder, sprite, Direction.NORTH.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(builder, sprite, Direction.SOUTH.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(builder, sprite, Direction.WEST.ordinal(), 1.1f, -0.05f);
+        RenderGlowEffect.addSideFullTexture(builder, sprite, Direction.EAST.ordinal(), 1.1f, -0.05f);
 
-        tessellator.draw();
-        GlStateManager.popMatrix();
+        matrixStack.pop();
     }
 
 
@@ -57,15 +62,15 @@ public class RenderGlowEffect {
         buffer.pos(offs.x + quad.v4.x * mult + offset, offs.y + quad.v4.y * mult + offset, offs.z + quad.v4.z * mult + offset).tex(1, 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
     }
 
-    public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset) {
+    public static void addSideFullTexture(IVertexBuilder buffer, TextureAtlasSprite sprite, int side, float mult, float offset) {
         int brightness = 240;
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;
         Quad quad = quads[side];
-        buffer.pos(quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).tex(0, 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).tex(0, 1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(quad.v3.x * mult + offset, quad.v3.y * mult + offset, quad.v3.z * mult + offset).tex(1, 1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(quad.v4.x * mult + offset, quad.v4.y * mult + offset, quad.v4.z * mult + offset).tex(1, 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.pos(quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).color(255, 255, 255, 128).tex(sprite.getMinU(), sprite.getMinV()).lightmap(b1, b2).normal(1,0,0).endVertex();
+        buffer.pos(quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).color(255, 255, 255, 128).tex(sprite.getMinU(), sprite.getMaxV()).lightmap(b1, b2).normal(1,0,0).endVertex();
+        buffer.pos(quad.v3.x * mult + offset, quad.v3.y * mult + offset, quad.v3.z * mult + offset).color(255, 255, 255, 128).tex(sprite.getMaxU(), sprite.getMaxV()).lightmap(b1, b2).normal(1,0,0).endVertex();
+        buffer.pos(quad.v4.x * mult + offset, quad.v4.y * mult + offset, quad.v4.z * mult + offset).color(255, 255, 255, 128).tex(sprite.getMaxU(), sprite.getMinV()).lightmap(b1, b2).normal(1,0,0).endVertex();
     }
 
     private static class Vt {
