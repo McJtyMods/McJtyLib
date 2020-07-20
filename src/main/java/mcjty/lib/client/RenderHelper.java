@@ -805,63 +805,29 @@ public class RenderHelper {
         builder.pos(positionMatrix, (x + 0), (y + 0), zLevel).tex(parentU + ((textureX + 0) * f), parentV + ((textureY + 0) * f1)).endVertex();
     }
 
-    public static void renderBillboardQuadBright(MatrixStack matrixStack, IRenderTypeBuffer buffer, double scale, ResourceLocation texture) {
+    public static void renderBillboardQuadBright(MatrixStack matrixStack, IRenderTypeBuffer buffer, float scale, ResourceLocation texture) {
         renderBillboardQuadBright(matrixStack, buffer, scale, texture, DEFAULT_SETTINGS);
     }
 
-    public static void renderBillboardQuadBright(MatrixStack matrixStack, IRenderTypeBuffer buffer, double scale, ResourceLocation texture, RenderSettings settings) {
+    public static void renderBillboardQuadBright(MatrixStack matrixStack, IRenderTypeBuffer buffer, float scale, ResourceLocation texture, RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
         TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(texture);
         matrixStack.push();
-        // @todo 1.15
-        RenderHelper.rotateToPlayer();
+        matrixStack.translate(0.5, 0.5, 0.5);
+        RenderHelper.rotateToPlayer(matrixStack);
         IVertexBuilder builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS);
-        builder.pos(-scale, -scale, 0.0D).tex(sprite.getMinU(), sprite.getMinV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        builder.pos(-scale, scale, 0.0D).tex(sprite.getMinU(), sprite.getMaxV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        builder.pos(scale, scale, 0.0D).tex(sprite.getMaxU(), sprite.getMaxV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
-        builder.pos(scale, -scale, 0.0D).tex(sprite.getMaxU(), sprite.getMinV()).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
+        Matrix4f matrix = matrixStack.getLast().getMatrix();
+        builder.pos(matrix, -scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).tex(sprite.getMinU(), sprite.getMinV()).lightmap(b1, b2).normal(1,0,0).endVertex();
+        builder.pos(matrix, -scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).tex(sprite.getMinU(), sprite.getMaxV()).lightmap(b1, b2).normal(1,0,0).endVertex();
+        builder.pos(matrix, scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).tex(sprite.getMaxU(), sprite.getMaxV()).lightmap(b1, b2).normal(1,0,0).endVertex();
+        builder.pos(matrix, scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).tex(sprite.getMaxU(), sprite.getMinV()).lightmap(b1, b2).normal(1,0,0).endVertex();
         matrixStack.pop();
     }
 
-    public static void renderBillboardQuad(double scale) {
-        GlStateManager.pushMatrix();
-
-        rotateToPlayer();
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        buffer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
-        buffer.pos(-scale, +scale, 0).tex(0, 1).endVertex();
-        buffer.pos(+scale, +scale, 0).tex(1, 1).endVertex();
-        buffer.pos(+scale, -scale, 0).tex(1, 0).endVertex();
-        tessellator.draw();
-        GlStateManager.popMatrix();
-    }
-
-    public static void renderBillboardQuadWithRotation(float rot, double scale) {
-        GlStateManager.pushMatrix();
-
-        rotateToPlayer();
-
-        GlStateManager.rotatef(rot, 0, 0, 1);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        buffer.pos(-scale, -scale, 0).tex(0, 0).endVertex();
-        buffer.pos(-scale, +scale, 0).tex(0, 1).endVertex();
-        buffer.pos(+scale, +scale, 0).tex(1, 1).endVertex();
-        buffer.pos(+scale, -scale, 0).tex(1, 0).endVertex();
-        tessellator.draw();
-        GlStateManager.popMatrix();
-    }
-
-    public static void rotateToPlayer() {
-        // @todo 1.15
-//        GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-//        GlStateManager.rotatef(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
+    public static void rotateToPlayer(MatrixStack matrixStack) {
+        Quaternion rotation = Minecraft.getInstance().gameRenderer.getActiveRenderInfo().getRotation();
+        matrixStack.rotate(rotation);
     }
 
     public static int renderText(Minecraft mc, int x, int y, String txt) {
