@@ -1,5 +1,7 @@
 package mcjty.lib.client;
 
+import net.minecraft.client.renderer.RenderType;
+
 public class RenderSettings {
 
     private final int brightness;
@@ -8,6 +10,7 @@ public class RenderSettings {
     private final int b;
     private final int a;
     private final float width;
+    private final RenderType renderType;
 
     private RenderSettings(Builder builder) {
         this.brightness = builder.brightness;
@@ -16,6 +19,7 @@ public class RenderSettings {
         this.b = builder.b;
         this.a = builder.a;
         this.width = builder.width;
+        this.renderType = builder.renderType;
     }
 
     public int getBrightness() {
@@ -42,6 +46,10 @@ public class RenderSettings {
         return width;
     }
 
+    public RenderType getRenderType() {
+        return renderType;
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -53,6 +61,7 @@ public class RenderSettings {
         private int b = 255;
         private int a = 255;
         private float width = 1.0f;
+        private RenderType renderType = CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS;
 
         public Builder brightness(int brightness) {
             this.brightness = brightness;
@@ -88,6 +97,11 @@ public class RenderSettings {
 
         public Builder width(float width) {
             this.width = width;
+            return this;
+        }
+
+        public Builder renderType(RenderType renderType) {
+            this.renderType = renderType;
             return this;
         }
 

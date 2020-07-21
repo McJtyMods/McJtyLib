@@ -34,11 +34,20 @@ public class CustomRenderTypes extends RenderType {
                     .writeMask(COLOR_WRITE)
                     .build(true));
 
-    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = makeType("translucent_add_noloightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = makeType("translucent_add_nolightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
             State.getBuilder().shadeModel(SHADE_ENABLED)
                     .lightmap(RenderState.LIGHTMAP_DISABLED)
                     .texture(BLOCK_SHEET_MIPPED)
                     .transparency(ADDITIVE_TRANSPARENCY)
+                    .writeMask(COLOR_WRITE)
+                    .build(true));
+
+
+    public static final RenderType TRANSLUCENT_LIGHTNING_NOLIGHTMAPS = makeType("translucent_lightning_nolightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+            State.getBuilder().shadeModel(SHADE_ENABLED)
+                    .lightmap(RenderState.LIGHTMAP_DISABLED)
+                    .texture(BLOCK_SHEET_MIPPED)
+                    .transparency(LIGHTNING_TRANSPARENCY)
                     .writeMask(COLOR_WRITE)
                     .build(true));
 
