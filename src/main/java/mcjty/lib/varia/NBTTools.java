@@ -49,7 +49,23 @@ public class NBTTools {
         if (tag == null) {
             return def;
         }
-        return tag.getInt(name);
+        if (tag.contains(name)) {
+            return tag.getInt(name);
+        } else {
+            return def;
+        }
+    }
+
+    public static float getFloat(ItemStack stack, String name, float def) {
+        CompoundNBT tag = stack.getTag();
+        if (tag == null) {
+            return def;
+        }
+        if (tag.contains(name)) {
+            return tag.getFloat(name);
+        } else {
+            return def;
+        }
     }
 
     public static String getString(ItemStack stack, String name, String def) {
@@ -57,7 +73,11 @@ public class NBTTools {
         if (tag == null) {
             return def;
         }
-        return tag.getString(name);
+        if (tag.contains(name)) {
+            return tag.getString(name);
+        } else {
+            return def;
+        }
     }
 
     @Nonnull
