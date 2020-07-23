@@ -4,6 +4,7 @@ import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
+import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.network.IClientCommandHandler;
 import mcjty.lib.network.ICommandHandler;
@@ -46,6 +47,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     public static final IValue<?>[] EMPTY_VALUES = new IValue[0];
     public static final IAction[] EMPTY_ACTIONS = new IAction[0];
+
+    public static final String CMD_RSMODE = "mcjtylib.setRsMode";
 
     public static final String COMMAND_SYNC_BINDING = "generic.syncBinding";
     public static final String COMMAND_SYNC_ACTION = "generic.syncAction";
@@ -217,7 +220,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * @param tagCompound
      */
     public void writeClientDataToNBT(CompoundNBT tagCompound) {
-        write(tagCompound);
+        write(tagCompound); // @todo TEST IF THIS IS REALLY NEEDED
     }
 
     /**
@@ -228,7 +231,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * @param tagCompound
      */
     public void readClientDataFromNBT(CompoundNBT tagCompound) {
-        read(tagCompound);
+        read(tagCompound);  // @TEST IF THIS IS REALLY NEEDED
     }
 
     /**
@@ -541,7 +544,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             String key = params.get(PARAM_KEY);
             findConsumer(key).run();
             return true;
+        } else if (CMD_RSMODE.equals(command)) {
+            setRSMode(RedstoneMode.values()[params.get(ImageChoiceLabel.PARAM_CHOICE_IDX)]);
+            return true;
         }
+
         return false;
     }
 
