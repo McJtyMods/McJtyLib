@@ -3,10 +3,13 @@ package mcjty.lib.varia;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.power.IBigPower;
 import mcjty.lib.compat.TeslaCompatibility;
+import mcjty.lib.tileentity.GenericEnergyStorage;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.energy.CapabilityEnergy;
 
 import javax.annotation.Nullable;
@@ -144,4 +147,26 @@ public class EnergyTools {
 //        // We can only fit one bit of useful information: whether or not it's half full
 //        return energyStored < remainingCapacity ? 0x3FFF_FFFF : 0x4000_0000;
     }
+
+    /**
+     * Send out energy to all adjacent devices that support receiving energy
+     */
+    public static void handleSendingEnergy(World world, BlockPos pos, long storedPower, long sendPerTick, GenericEnergyStorage storage) {
+        for (Direction facing : OrientationTools.DIRECTION_VALUES) {
+            BlockPos p = pos.offset(facing);
+            TileEntity te = world.getTileEntity(p);
+            Direction opposite = facing.getOpposite();
+            if (EnergyTools.isEnergyTE(te, opposite)) {
+                long rfToGive = Math.min(sendPerTick, storedPower);
+                long received = EnergyTools.receiveEnergy(te, opposite, rfToGive);
+                storage.consumeEnergy(received);
+                storedPower -= received;
+                if (storedPower <= 0) {
+                    break;
+                }
+            }
+        }
+    }
+
+
 }
