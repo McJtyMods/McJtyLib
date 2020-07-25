@@ -6,9 +6,11 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
+import mcjty.lib.gui.widgets.EnergyBar;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
+import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.client.GuiTools;
@@ -31,6 +33,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
@@ -474,5 +477,12 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     @FunctionalInterface
     public static interface GuiSupplier<C extends GenericContainer, S extends GenericGuiContainer, T extends GenericTileEntity> {
         S create(T tile, C container, PlayerInventory inventory);
+    }
+
+    protected void updateEnergyBar(EnergyBar energyBar) {
+        tileEntity.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> {
+            energyBar.maxValue(((GenericEnergyStorage)e).getCapacity());
+            energyBar.value(((GenericEnergyStorage)e).getEnergy());
+        });
     }
 }

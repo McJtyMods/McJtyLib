@@ -142,8 +142,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public void setRSModeInt(int i) {
-        this.rsMode = RedstoneMode.values()[i];
-        markDirtyClient();
+        setRSMode(RedstoneMode.values()[i]);
     }
 
     public int getRSModeInt() {
