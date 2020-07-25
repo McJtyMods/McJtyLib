@@ -1,5 +1,6 @@
-Upcoming:
-- Datagen stuff
+4.1.3-beta:
+- Datagen changes
+- Small updates
 
 4.1.2-beta:
 - Fixed a bug when rendering empty fluids in the gui (RFTools Control processor for example)
