@@ -87,6 +87,15 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 );
     }
 
+    public void variantBlock(Block block,
+                             Function<BlockState, ModelFile> modelSelector) {
+        getVariantBuilder(block)
+                .forAllStates(state -> ConfiguredModel.builder()
+                        .modelFile(modelSelector.apply(state))
+                        .build()
+                );
+    }
+
     public int getXRotation(Direction direction) {
         switch (direction) {
             case DOWN: return 0;
