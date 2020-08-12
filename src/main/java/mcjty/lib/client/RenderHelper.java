@@ -957,6 +957,25 @@ public class RenderHelper {
         buffer.pos(p4.getX(), p4.getY(), p4.getZ()).tex(0.0f, 1.0f).lightmap(b1, b2).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).endVertex();
     }
 
+    /**
+     * Draw a beam with some thickness.
+     */
+    public static void drawBeam(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector S, Vector E, Vector P, RenderSettings settings) {
+        Vector PS = Sub(S, P);
+        Vector SE = Sub(E, S);
+
+        Vector normal = Cross(PS, SE);
+        normal = normal.normalize();
+
+        Vector half = Mul(normal, settings.getWidth());
+        Vector p1 = Add(S, half);
+        Vector p2 = Sub(S, half);
+        Vector p3 = Add(E, half);
+        Vector p4 = Sub(E, half);
+
+        drawQuad(matrix, buffer, sprite, p1, p3, p4, p2, settings);
+    }
+
     private static void drawQuad(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector p1, Vector p2, Vector p3, Vector p4,
                                  RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
