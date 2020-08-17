@@ -45,6 +45,7 @@ public class TagSelectorWindow {
         Screen gui = parentWindow.getWindowManager().getGui();
         this.tagSetter = tagSetter;
         this.tagGetter = tagGetter;
+        this.type = type;
 
         Panel modalDialog = positional().filledRectThickness(2);
         int wx = (int) (parentWindow.getToplevel().getBounds().getX() + 20);
