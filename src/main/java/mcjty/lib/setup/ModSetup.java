@@ -21,7 +21,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -105,13 +105,13 @@ public class ModSetup extends DefaultModSetup {
 
                         // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
                         PlayerEntity player = event.getPlayer();
-                        Vec3d start = player.getEyePosition(1.0f);
-                        Vec3d vec31 = player.getLook(1.0f);
+                        Vector3d start = player.getEyePosition(1.0f);
+                        Vector3d vec31 = player.getLook(1.0f);
                         float dist = 20;
-                        Vec3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
+                        Vector3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
                         RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, player);
                         RayTraceResult result = player.getEntityWorld().rayTraceBlocks(context);
-                        Vec3d hitVec = result == null ? null : result.getHitVec();
+                        Vector3d hitVec = result == null ? null : result.getHitVec();
 
                         if (MultipartHelper.removePart((MultipartTE) tileEntity, state, player, hitVec/*@todo*/)) {
                             world.setBlockState(pos, Blocks.AIR.getDefaultState());

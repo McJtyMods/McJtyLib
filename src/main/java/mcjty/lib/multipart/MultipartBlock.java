@@ -20,6 +20,7 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.*;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
@@ -58,7 +59,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
         // @todo 1.14
-//        IProperty[] listedProperties = new IProperty[0]; // no listed properties
+//        Property[] listedProperties = new Property[0]; // no listed properties
 //        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { PARTS };
 //        return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
@@ -109,10 +110,10 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
-        Vec3d hit = result.getHitVec();
+        Vector3d hit = result.getHitVec();
         Direction facing = result.getFace();
-        Vec3d start = MultipartHelper.getPlayerEyes(player);
-        Vec3d end = new Vec3d(start.x + (pos.getX() + hit.x - start.x) * 3, start.y + (pos.getY() + hit.y - start.y) * 3, start.z + (pos.getZ() + hit.z - start.z) * 3);
+        Vector3d start = MultipartHelper.getPlayerEyes(player);
+        Vector3d end = new Vector3d(start.x + (pos.getX() + hit.x - start.x) * 3, start.y + (pos.getY() + hit.y - start.y) * 3, start.z + (pos.getZ() + hit.z - start.z) * 3);
         MultipartTE.Part part = getHitPart(state, world, pos, start, end);
         if (part != null) {
             if (part.getTileEntity() instanceof GenericTileEntity) {
@@ -125,7 +126,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Nullable
-    public BlockState getHitState(BlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+    public BlockState getHitState(BlockState blockState, World world, BlockPos pos, Vector3d start, Vector3d end) {
         MultipartTE.Part part = getHitPart(blockState, world, pos, start, end);
         if (part != null) {
             return part.getState();
@@ -137,7 +138,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     // @todo 1.14
 //    @Nullable
 //    @Override
-//    public RayTraceResult collisionRayTrace(BlockState blockState, World world, BlockPos pos, Vec3d start, Vec3d end) {
+//    public RayTraceResult collisionRayTrace(BlockState blockState, World world, BlockPos pos, Vector3d start, Vector3d end) {
 //        TileEntity te = world.getTileEntity(pos);
 //        if (te instanceof MultipartTE) {
 //            MultipartTE multipartTE = (MultipartTE) te;
@@ -157,7 +158,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 //    }
 
     @Nullable
-    public static MultipartTE.Part getHitPart(BlockState blockState, IBlockReader world, BlockPos pos, Vec3d start, Vec3d end) {
+    public static MultipartTE.Part getHitPart(BlockState blockState, IBlockReader world, BlockPos pos, Vector3d start, Vector3d end) {
         TileEntity te = world.getTileEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
@@ -177,7 +178,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
         }
     }
 
-    private RayTraceResult checkIntersect(BlockPos pos, Vec3d vec3d, Vec3d vec3d1, AxisAlignedBB boundingBox) {
+    private RayTraceResult checkIntersect(BlockPos pos, Vector3d vec3d, Vector3d vec3d1, AxisAlignedBB boundingBox) {
         // @todo 1.14
 //        RayTraceResult raytraceresult = boundingBox.calculateIntercept(vec3d, vec3d1);
 //        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX(), pos.getY(), pos.getZ()), raytraceresult.sideHit, pos);

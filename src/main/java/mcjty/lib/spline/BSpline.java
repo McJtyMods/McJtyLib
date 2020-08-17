@@ -69,7 +69,7 @@ public class BSpline<T> extends Spline<T> {
 //            z += base * pp.z;
         }
 
-//        return new Vec3d(x, y, z);
+//        return new Vector3d(x, y, z);
         return val;
     }
 }

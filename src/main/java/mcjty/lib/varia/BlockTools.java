@@ -8,7 +8,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.state.IStateHolder;
 import net.minecraft.state.StateContainer;
 import net.minecraft.util.ActionResultType;
@@ -17,7 +17,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
@@ -58,7 +58,7 @@ public class BlockTools {
 
     @Nullable
     public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
-        BlockRayTraceResult trace = new BlockRayTraceResult(new Vec3d(0, 0, 0), Direction.UP, pos, false);
+        BlockRayTraceResult trace = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, pos, false);
         BlockItemUseContext context = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, trace));
         if (blockStack.getItem() instanceof BlockItem) {
             BlockItem itemBlock = (BlockItem) blockStack.getItem();
@@ -84,12 +84,12 @@ public class BlockTools {
     // Write a blockstate to a string
     public static String writeBlockState(BlockState tag) {
         StringBuilder builder = new StringBuilder(ForgeRegistries.BLOCKS.getKey(tag.getBlock()).toString());
-        ImmutableMap<IProperty<?>, Comparable<?>> properties = tag.getValues();
+        ImmutableMap<Property<?>, Comparable<?>> properties = tag.getValues();
         if (!properties.isEmpty()) {
             char c = '@';
 
-            for(Map.Entry<IProperty<?>, Comparable<?>> entry : properties.entrySet()) {
-                IProperty<?> property = entry.getKey();
+            for(Map.Entry<Property<?>, Comparable<?>> entry : properties.entrySet()) {
+                Property<?> property = entry.getKey();
                 builder.append(c); c = ',';
                 builder.append(property.getName());
                 builder.append('=');
@@ -100,7 +100,7 @@ public class BlockTools {
         return builder.toString();
     }
 
-    private static <T extends Comparable<T>> String getName(IProperty<T> property, Comparable<?> cmp) {
+    private static <T extends Comparable<T>> String getName(Property<T> property, Comparable<?> cmp) {
         return property.getName((T)cmp);
     }
 
@@ -125,7 +125,7 @@ public class BlockTools {
             String[] split = StringUtils.split(properties, ',');
             for (String pv : split) {
                 String[] sp = StringUtils.split(pv, '=');
-                IProperty<?> property = statecontainer.getProperty(sp[0]);
+                Property<?> property = statecontainer.getProperty(sp[0]);
                 if (property != null) {
                     state = setValueHelper(state, property, sp[1]);
                 }
@@ -134,7 +134,7 @@ public class BlockTools {
         return state;
     }
 
-    private static <S extends IStateHolder<S>, T extends Comparable<T>> S setValueHelper(S state, IProperty<T> property, String value) {
+    private static <S extends IStateHolder<S>, T extends Comparable<T>> S setValueHelper(S state, Property<T> property, String value) {
         Optional<T> optional = property.parseValue(value);
         if (optional.isPresent()) {
             return state.with(property, (T)(optional.get()));

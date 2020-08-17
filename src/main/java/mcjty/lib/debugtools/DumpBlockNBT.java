@@ -59,10 +59,10 @@ public class DumpBlockNBT {
 
     // Use client-side
     public static void dumpFocusedBlock(@Nullable SimpleChannel network, @Nonnull PlayerEntity player, boolean liquids, boolean verbose) {
-        Vec3d start = player.getEyePosition(1.0f);
-        Vec3d vec31 = player.getLook(1.0f);
+        Vector3d start = player.getEyePosition(1.0f);
+        Vector3d vec31 = player.getLook(1.0f);
         float dist = 20;
-        Vec3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
+        Vector3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
         RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, liquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, player);
         RayTraceResult result = player.getEntityWorld().rayTraceBlocks(context);
         if (result == null || result.getType() != RayTraceResult.Type.BLOCK) {

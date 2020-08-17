@@ -27,7 +27,7 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -60,9 +60,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     private final int harvestLevel;
     private final TOPDriver topDriver;
 
-    public static final IProperty<?>[] HORIZ_PROPERTIES = new IProperty[]{BlockStateProperties.HORIZONTAL_FACING};
-    public static final IProperty<?>[] ROTATING_PROPERTIES = new IProperty[]{BlockStateProperties.FACING};
-    public static final IProperty<?>[] NONE_PROPERTIES = new IProperty[0];
+    public static final Property<?>[] HORIZ_PROPERTIES = new Property[]{BlockStateProperties.HORIZONTAL_FACING};
+    public static final Property<?>[] ROTATING_PROPERTIES = new Property[]{BlockStateProperties.FACING};
+    public static final Property<?>[] NONE_PROPERTIES = new Property[0];
 
     public BaseBlock(BlockBuilder builder) {
         super(builder.getProperties());
@@ -366,11 +366,11 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         super.onReplaced(state, world, pos, newstate, isMoving);
     }
 
-    protected IProperty<?>[] getProperties() {
+    protected Property<?>[] getProperties() {
         return getProperties(getRotationType());
     }
 
-    public static IProperty<?>[] getProperties(RotationType rotationType) {
+    public static Property<?>[] getProperties(RotationType rotationType) {
         switch (rotationType) {
             case HORIZROTATION:
                 return HORIZ_PROPERTIES;
@@ -384,7 +384,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        for (IProperty<?> property : getProperties()) {
+        for (Property<?> property : getProperties()) {
             builder.add(property);
         }
     }

@@ -50,7 +50,7 @@ public class MultipartHelper {
     }
 
     // Return true if there are no more parts left
-    public static boolean removePart(MultipartTE multipartTE, BlockState state, PlayerEntity player, Vec3d hitVec) {
+    public static boolean removePart(MultipartTE multipartTE, BlockState state, PlayerEntity player, Vector3d hitVec) {
         BlockPos pos = multipartTE.getPos();
         MultipartTE.Part hitPart = Registration.MULTIPART_BLOCK.getHitPart(state, multipartTE.getWorld(), pos, getPlayerEyes(player), hitVec);
         if (hitPart == null) {
@@ -78,7 +78,7 @@ public class MultipartHelper {
     private static RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, PlayerEntity playerIn, boolean useLiquids) {
         float pitch = playerIn.rotationPitch;
         float yaw = playerIn.rotationYaw;
-        Vec3d vec3 = getPlayerEyes(playerIn);
+        Vector3d vec3 = getPlayerEyes(playerIn);
         float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
         float f3 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
         float f4 = -MathHelper.cos(-pitch * 0.017453292F);
@@ -90,16 +90,16 @@ public class MultipartHelper {
             // @todo 1.14
 //            reach = ((ServerPlayerEntity)playerIn).interactionManager.getBlockReachDistance();
         }
-        Vec3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
+        Vector3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
         RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
         return worldIn.rayTraceBlocks(context);
     }
 
-    public static Vec3d getPlayerEyes(PlayerEntity playerIn) {
+    public static Vector3d getPlayerEyes(PlayerEntity playerIn) {
         double x = playerIn.getPosX();
         double y = playerIn.getPosY() + playerIn.getEyeHeight();
         double z = playerIn.getPosZ();
-        return new Vec3d(x, y, z);
+        return new Vector3d(x, y, z);
     }
 
 

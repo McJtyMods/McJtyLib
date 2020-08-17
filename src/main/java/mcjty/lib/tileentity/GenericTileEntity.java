@@ -26,7 +26,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
@@ -201,7 +201,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 //    }
 
     public boolean canPlayerAccess(PlayerEntity player) {
-        return !isRemoved() && player.getDistanceSq(new Vec3d(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
+        return !isRemoved() && player.getDistanceSq(new Vector3d(pos.getX(), pos.getY(), pos.getZ()).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Override
@@ -247,8 +247,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
+    public void read(BlockState state, CompoundNBT tagCompound) {
+        super.read(state, tagCompound);
+        read(tagCompound);
+    }
+
     public void read(CompoundNBT tagCompound) {
-        super.read(tagCompound);
         readCaps(tagCompound);
         readInfo(tagCompound);
     }
@@ -518,6 +522,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
         // Client side function to send a value to the server
     public <T> void valueToServer(SimpleChannel network, Key<T> valueKey, T value) {
+
         network.sendToServer(new PacketServerCommandTyped(getPos(),
                 getDimensionType(),
                 COMMAND_SYNC_BINDING,

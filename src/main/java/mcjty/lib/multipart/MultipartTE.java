@@ -7,7 +7,7 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -56,7 +56,7 @@ public class MultipartTE extends TileEntity {
             BlockState state = entry.getValue().state;
             System.out.println("    SLOT: " + entry.getKey().name() +
                     "    " + state.getBlock().getRegistryName().toString());
-            for (IProperty<?> property : state.getProperties()) {
+            for (Property<?> property : state.getProperties()) {
                 System.out.println("        PROP: " + property + " = " + state.get(property));
             }
 

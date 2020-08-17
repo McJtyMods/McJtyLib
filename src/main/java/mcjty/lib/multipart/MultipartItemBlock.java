@@ -207,7 +207,7 @@ public class MultipartItemBlock extends BlockItem {
         double x = playerIn.getPosX();
         double y = playerIn.getPosY() + playerIn.getEyeHeight();
         double z = playerIn.getPosZ();
-        Vec3d vec3 = new Vec3d(x, y, z);
+        Vector3d vec3 = new Vector3d(x, y, z);
         float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
         float f3 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
         float f4 = -MathHelper.cos(-pitch * 0.017453292F);
@@ -219,7 +219,7 @@ public class MultipartItemBlock extends BlockItem {
             // @todo 1.14
 //            reach = ((ServerPlayerEntity) playerIn).interactionManager.getBlockReachDistance();
         }
-        Vec3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
+        Vector3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
         RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
         return worldIn.rayTraceBlocks(context);
     }
