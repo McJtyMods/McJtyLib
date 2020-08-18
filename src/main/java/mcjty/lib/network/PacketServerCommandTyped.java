@@ -7,7 +7,6 @@ import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -31,7 +30,7 @@ public class PacketServerCommandTyped {
         command = buf.readString(32767);
         params = TypedMapTools.readArguments(buf);
         if (buf.readBoolean()) {
-            dimensionId = new DimensionId(buf);
+            dimensionId = DimensionId.fromPacket(buf);
         } else {
             dimensionId = null;
         }

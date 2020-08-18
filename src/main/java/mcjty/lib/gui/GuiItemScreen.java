@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.GuiTools;
 import net.minecraft.client.Minecraft;
@@ -86,8 +87,8 @@ public class GuiItemScreen extends Screen {
         return rc;
     }
 
-    public void drawWindow() {
-        this.renderBackground();
+    public void drawWindow(MatrixStack matrixStack) {
+        this.renderBackground(matrixStack);
         window.draw();
         sideWindow.getWindow().draw();
         List<String> tooltips = window.getTooltips();
@@ -95,13 +96,15 @@ public class GuiItemScreen extends Screen {
         if (tooltips != null) {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);
-            renderTooltip(tooltips, x-guiLeft, y-guiTop, mc.fontRenderer);
+            // @todo 1.16
+            //renderTooltip(matrixStack, tooltips, x-guiLeft, y-guiTop, mc.fontRenderer);
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);
-            renderTooltip(tooltips, x - guiLeft, y - guiTop, mc.fontRenderer);
+            // @todo 1.16
+//            renderTooltip(matrixStack, tooltips, x - guiLeft, y - guiTop, mc.fontRenderer);
         }
     }
 

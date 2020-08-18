@@ -50,9 +50,10 @@ public enum LogicFacing implements IStringSerializable {
     }
 
     @Override
-    public String getName() {
+    public String getString() {
         return name;
     }
+
 
     public Direction getInputSide() {
         return inputSide;

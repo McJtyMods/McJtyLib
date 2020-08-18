@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -76,7 +77,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
             if (checkMarker) {
                 RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
                 if (pressed) {
-                    mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal);
+                    mc.fontRenderer.drawString(new MatrixStack(), "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal);  // @todo 1.16
                 }
             }
         } else {
@@ -84,7 +85,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
             if (checkMarker) {
                 RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
                 if (pressed) {
-                    mc.fontRenderer.drawString("v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);
+                    mc.fontRenderer.drawString(new MatrixStack(), "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);    // @todo 1.16
                 }
             }
         }

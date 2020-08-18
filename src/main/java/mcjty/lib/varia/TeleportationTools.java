@@ -6,7 +6,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.ITeleporter;
 
@@ -15,8 +14,8 @@ import java.util.function.Function;
 
 public class TeleportationTools {
 
-    public static void teleport(PlayerEntity player, DimensionType dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
-        DimensionType oldId = player.getEntityWorld().getDimension().getType();
+    public static void teleport(PlayerEntity player, DimensionId dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
+        DimensionId oldId = DimensionId.fromWorld(player.getEntityWorld());
 
         float rotationYaw = player.rotationYaw;
         float rotationPitch = player.rotationPitch;
@@ -33,8 +32,8 @@ public class TeleportationTools {
         player.setPositionAndUpdate(destX, destY, destZ);
     }
 
-    public static void teleportToDimension(PlayerEntity player, DimensionType dimension, double x, double y, double z) {
-        player.changeDimension(dimension, new ITeleporter() {
+    public static void teleportToDimension(PlayerEntity player, DimensionId dimension, double x, double y, double z) {
+        player.changeDimension(dimension.getWorld(), new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
                 entity = repositionEntity.apply(false);
@@ -68,7 +67,7 @@ public class TeleportationTools {
      */
     public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, Direction facing) {
         World world = entity.getEntityWorld();
-        if (world.getDimension().getType().equals(destWorld.getDimension().getType())) {
+        if (DimensionId.fromWorld(world).equals(DimensionId.fromWorld(destWorld))) {
             if (facing != null) {
                 fixOrientation(entity, newX, newY, newZ, facing);
             }
@@ -76,7 +75,7 @@ public class TeleportationTools {
             ((ServerWorld) destWorld).updateEntity(entity);
             return entity;
         } else {
-            return entity.changeDimension(destWorld.getDimension().getType(), new ITeleporter() {
+            return entity.changeDimension((ServerWorld) destWorld, new ITeleporter() {
                 @Override
                 public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
                     entity = repositionEntity.apply(false);

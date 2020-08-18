@@ -11,7 +11,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -23,6 +26,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.fluids.FluidStack;
@@ -326,15 +332,15 @@ public class RenderHelper {
                 if (scaled >= 2) {
                     RenderSystem.pushMatrix();
                     RenderSystem.scalef(.5f, .5f, .5f);
-                    fr.drawStringWithShadow(s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215);
+                    fr.drawStringWithShadow(new MatrixStack(), s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215); // @todo 1.16
                     RenderSystem.popMatrix();
                 } else if (scaled == 1) {
                     RenderSystem.pushMatrix();
                     RenderSystem.scalef(.75f, .75f, .75f);
-                    fr.drawStringWithShadow(s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215);
+                    fr.drawStringWithShadow(new MatrixStack(), s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215); // @todo 1.16
                     RenderSystem.popMatrix();
                 } else {
-                    fr.drawStringWithShadow(s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (float)(yPosition + 6 + 3), 16777215);
+                    fr.drawStringWithShadow(new MatrixStack(), s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (float)(yPosition + 6 + 3), 16777215);   // @todo 1.16
                 }
 
                 buffer.finish();
@@ -394,15 +400,15 @@ public class RenderHelper {
                 if (scaled >= 2) {
                     RenderSystem.pushMatrix();
                     RenderSystem.scalef(.5f, .5f, .5f);
-                    fr.drawStringWithShadow(s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215);
+                    fr.drawStringWithShadow(new MatrixStack(), s, ((xPosition + 19 - 2) * 2 - 1 - fr.getStringWidth(s)), yPosition * 2 + 24, 16777215); // @todo 1.16
                     RenderSystem.popMatrix();
                 } else if (scaled == 1) {
                     RenderSystem.pushMatrix();
                     RenderSystem.scalef(.75f, .75f, .75f);
-                    fr.drawStringWithShadow(s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215);
+                    fr.drawStringWithShadow(new MatrixStack(), s, ((xPosition - 2) * 1.34f + 24 - fr.getStringWidth(s)), yPosition * 1.34f + 14, 16777215); // @todo 1.16
                     RenderSystem.popMatrix();
                 } else {
-                    fr.drawStringWithShadow(s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (yPosition + 6 + 3), 16777215);
+                    fr.drawStringWithShadow(new MatrixStack(), s, (xPosition + 19 - 2 - fr.getStringWidth(s)), (yPosition + 6 + 3), 16777215);  // @todo 1.16
                 }
                 RenderSystem.enableLighting();
                 RenderSystem.enableDepthTest();
@@ -586,11 +592,11 @@ public class RenderHelper {
     }
 
     public static void drawHorizontalLine(int x1, int y1, int x2, int color) {
-        Screen.fill(x1, y1, x2, y1 + 1, color);
+        Screen.fill(new MatrixStack(), x1, y1, x2, y1 + 1, color);  // @todo 1.16
     }
 
     public static void drawVerticalLine(int x1, int y1, int y2, int color) {
-        Screen.fill(x1, y1, x1 + 1, y2, color);
+        Screen.fill(new MatrixStack(), x1, y1, x1 + 1, y2, color);  // @todo 1.16
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
@@ -636,7 +642,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThickButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Screen.fill(x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
+        Screen.fill(new MatrixStack(), x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);    // @todo 1.16
         drawHorizontalLine(x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -657,7 +663,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThinButtonBox(int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
+        Screen.fill(new MatrixStack(), x1 + 1, y1 + 1, x2 - 1, y2 - 1, average); // @todo 1.16
         drawHorizontalLine(x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -717,7 +723,7 @@ public class RenderHelper {
      */
     public static void drawBeveledBox(int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            Screen.fill(new MatrixStack(), x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);  // @todo 1.16
         }
         drawHorizontalLine(x1, y1, x2 - 1, topleftcolor);
         drawVerticalLine(x1, y1, y2 - 1, topleftcolor);
@@ -743,12 +749,12 @@ public class RenderHelper {
      */
     public static void drawThickBeveledBox(int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            Screen.fill(new MatrixStack(), x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);  // @todo 1.16
         }
-        Screen.fill(x1, y1, x2 - 1, y1 + thickness, topleftcolor);
-        Screen.fill(x1, y1, x1 + thickness, y2 - 1, topleftcolor);
-        Screen.fill(x2 - thickness, y1, x2, y2 - 1, botrightcolor);
-        Screen.fill(x1, y2 - thickness, x2, y2, botrightcolor);
+        Screen.fill(new MatrixStack(), x1, y1, x2 - 1, y1 + thickness, topleftcolor);   // @todo 1.16
+        Screen.fill(new MatrixStack(), x1, y1, x1 + thickness, y2 - 1, topleftcolor);   // @todo 1.16
+        Screen.fill(new MatrixStack(), x2 - thickness, y1, x2, y2 - 1, botrightcolor);  // @todo 1.16
+        Screen.fill(new MatrixStack(), x1, y2 - thickness, x2, y2, botrightcolor);  // @todo 1.16
     }
 
     /**
@@ -756,7 +762,7 @@ public class RenderHelper {
      */
     public static void drawFlatBox(int x1, int y1, int x2, int y2, int border, int fill) {
         if (fill != -1) {
-            Screen.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
+            Screen.fill(new MatrixStack(), x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);   // @todo 1.16
         }
         drawHorizontalLine(x1, y1, x2 - 1, border);
         drawVerticalLine(x1, y1, y2 - 1, border);
@@ -844,7 +850,7 @@ public class RenderHelper {
         GlStateManager.disableDepthTest();
         GlStateManager.disableBlend();
         int width = mc.fontRenderer.getStringWidth(txt);
-        mc.fontRenderer.drawStringWithShadow(txt, x, y, 16777215);
+        mc.fontRenderer.drawStringWithShadow(new MatrixStack(), txt, x, y, 16777215);   // @todo 1.16
         GlStateManager.enableLighting();
         GlStateManager.enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower
@@ -873,7 +879,7 @@ public class RenderHelper {
         GlStateManager.disableDepthTest();
         GlStateManager.disableBlend();
         int width = mc.fontRenderer.getStringWidth(txt);
-        mc.fontRenderer.drawString(txt, x, y, color);
+        mc.fontRenderer.drawString(new MatrixStack(), txt, x, y, color);    // @todo 1.16
         GlStateManager.enableLighting();
         GlStateManager.enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower

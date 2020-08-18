@@ -431,7 +431,7 @@ public class GenericContainer extends Container implements IGenericContainer {
             TriFunction<Integer, BlockPos, E, T> containerFactory, int slots) {
         return IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            DimensionType type = DimensionType.getById(data.readInt());
+            DimensionId type = DimensionId.fromPacket(data);
 
             E te = dummyTEFactory.apply(type);
             te.setWorldAndPos(inv.player.getEntityWorld(), pos);    // Wrong world but doesn't really matter

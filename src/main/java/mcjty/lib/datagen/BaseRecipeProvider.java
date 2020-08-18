@@ -6,6 +6,7 @@ import net.minecraft.data.*;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.util.IItemProvider;
@@ -29,7 +30,7 @@ public class BaseRecipeProvider extends RecipeProvider {
         return this;
     }
 
-    protected BaseRecipeProvider add(char c, Tag<Item> itemTag) {
+    protected BaseRecipeProvider add(char c, ITag<Item> itemTag) {
         defaultIngredients.put(c, Ingredient.fromTag(itemTag));
         return this;
     }

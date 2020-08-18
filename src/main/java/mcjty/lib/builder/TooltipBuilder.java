@@ -4,10 +4,7 @@ import mcjty.lib.McJtyLib;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -39,7 +36,7 @@ public class TooltipBuilder {
     private static TranslationTextComponent stylize(String translationKey, TextFormatting... formattings) {
         TranslationTextComponent component = new TranslationTextComponent(translationKey);
         for (TextFormatting format : formattings) {
-            component.applyTextStyle(format);
+            component.mergeStyle(format);
         }
         return component;
     }
@@ -71,7 +68,7 @@ public class TooltipBuilder {
                         } else {
                             component = stylize(prefix + line.getSuffix(), line.getStyles());
                         }
-                        component.appendSibling(new StringTextComponent(TextFormatting.WHITE + s));
+                        ((IFormattableTextComponent)component).append(new StringTextComponent(TextFormatting.WHITE + s));
                         tooltip.add(component);
                     });
                 } else {
@@ -84,7 +81,7 @@ public class TooltipBuilder {
                     if (line.getInformationGetter() != null) {
                         String extra = line.getInformationGetter().apply(stack);
                         if (extra != null) {
-                            component.appendSibling(new StringTextComponent(TextFormatting.WHITE + extra));
+                            ((IFormattableTextComponent)component).append(new StringTextComponent(TextFormatting.WHITE + extra));
                             tooltip.add(component);
                         } // Else we don't add the entire component
                     } else {

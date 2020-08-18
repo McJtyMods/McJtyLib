@@ -8,7 +8,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -29,7 +28,7 @@ public class PacketRequestDataFromServer {
 
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        type = DimensionType.getById(buf.readInt());
+        type = DimensionId.fromPacket(buf);
         command = buf.readString(32767);
         params = TypedMapTools.readArguments(buf);
         dummy = buf.readBoolean();
@@ -37,7 +36,7 @@ public class PacketRequestDataFromServer {
 
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
-        buf.writeInt(type.getId());
+        type.toBytes(buf);
         buf.writeString(command);
         TypedMapTools.writeArguments(buf, params);
         buf.writeBoolean(dummy);

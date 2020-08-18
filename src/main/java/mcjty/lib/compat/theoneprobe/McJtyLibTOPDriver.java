@@ -14,6 +14,7 @@ import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
@@ -49,18 +50,18 @@ public class McJtyLibTOPDriver implements TOPDriver {
                 te.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> {
                     int infused = h.getInfused();
                     int pct = infused * 100 / GeneralConfig.maxInfuse.get();
-                    probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
+                    probeInfo.text(new StringTextComponent(TextFormatting.YELLOW + "Infused: " + pct + "%"));   // @todo 1.16
                 });
                 if (GeneralConfig.manageOwnership.get()) {
                     if (generic.getOwnerName() != null && !generic.getOwnerName().isEmpty()) {
                         int securityChannel = generic.getSecurityChannel();
                         if (securityChannel == -1) {
-                            probeInfo.text(TextFormatting.YELLOW + "Owned by: " + generic.getOwnerName());
+                            probeInfo.text(new StringTextComponent(TextFormatting.YELLOW + "Owned by: " + generic.getOwnerName())); // @todo 1.16
                         } else {
-                            probeInfo.text(TextFormatting.YELLOW + "Owned by: " + generic.getOwnerName() + " (channel " + securityChannel + ")");
+                            probeInfo.text(new StringTextComponent(TextFormatting.YELLOW + "Owned by: " + generic.getOwnerName() + " (channel " + securityChannel + ")"));  // @todo 1.16
                         }
                         if (generic.getOwnerUUID() == null) {
-                            probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                            probeInfo.text(new StringTextComponent(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!"));    // @todo 1.16
                         }
                     }
                 }

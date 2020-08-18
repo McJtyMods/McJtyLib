@@ -74,6 +74,6 @@ public class Logging {
     }
 
     public static void warn(@Nonnull PlayerEntity player, String message) {
-        player.sendStatusMessage(new StringTextComponent(message).setStyle(new Style().setColor(TextFormatting.RED)), false);
+        player.sendStatusMessage(new StringTextComponent(message).setStyle(Style.EMPTY.setFormatting(TextFormatting.RED)), false);
     }
 }

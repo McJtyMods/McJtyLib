@@ -7,7 +7,7 @@ import net.minecraft.block.IBucketPickupHandler;
 import net.minecraft.block.material.Material;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.tileentity.TileEntity;
@@ -109,7 +109,7 @@ public class FluidTools {
     @Nonnull
     public static FluidStack pickupFluidBlock(World world, BlockPos pos, @Nonnull Predicate<FluidStack> action, @Nonnull Runnable clearBlock) {
         BlockState blockstate = world.getBlockState(pos);
-        IFluidState fluidstate = world.getFluidState(pos);
+        FluidState fluidstate = world.getFluidState(pos);
         Material material = blockstate.getMaterial();
         Fluid fluid = fluidstate.getFluid();
 

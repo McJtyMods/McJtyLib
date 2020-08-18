@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
@@ -150,7 +151,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
             mc.getTextureManager().bindTexture(image);
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;
-            gui.blit(xx, yy, u, v, iw, ih);
+            gui.blit(new MatrixStack(), xx, yy, u, v, iw, ih);  // @todo 1.16
         }
 
         int col = getColor();
@@ -159,9 +160,9 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         }
 
         if (text == null) {
-            mc.fontRenderer.drawString("", x+dx+bounds.x, y+dy+bounds.y, col);
+            mc.fontRenderer.drawString(new MatrixStack(), "", x+dx+bounds.x, y+dy+bounds.y, col);   // @todo 1.16
         } else {
-            mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
+            mc.fontRenderer.drawString(new MatrixStack(), mc.fontRenderer.func_238412_a_(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);    // @todo 1.16
         }
     }
 

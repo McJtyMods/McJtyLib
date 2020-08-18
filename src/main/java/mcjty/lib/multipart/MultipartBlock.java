@@ -237,8 +237,9 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 //    }
 
 
-    @Override
-    public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
+    // @todo 1.16
+//    @Override
+//    public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
 //        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
 //
 //        TileEntity te = world.getTileEntity(pos);
@@ -248,6 +249,6 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 //        }
 //        return extendedBlockState;
         // @todo 1.14
-        return state;
-    }
+//        return state;
+//    }
 }

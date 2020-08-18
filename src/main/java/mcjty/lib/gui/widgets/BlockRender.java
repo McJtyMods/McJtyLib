@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
@@ -137,7 +138,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 }
                 int h = mc.fontRenderer.FONT_HEIGHT;
                 int dy = (bounds.height - h)/2;
-                mc.fontRenderer.drawString(name, xx+20, yy + dy, getLabelColor());
+                mc.fontRenderer.drawString(new MatrixStack(), name, xx+20, yy + dy, getLabelColor());   // @todo 1.16
             }
         }
     }

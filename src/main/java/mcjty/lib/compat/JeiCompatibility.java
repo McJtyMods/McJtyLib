@@ -21,11 +21,12 @@ public class JeiCompatibility implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addGuiContainerHandler(GenericGuiContainer.class, new IGuiContainerHandler<GenericGuiContainer>() {
-            @Override
-            public List<Rectangle2d> getGuiExtraAreas(GenericGuiContainer containerScreen) {
-                return containerScreen.getExtraWindowBounds();
-            }
-        });
+        // @todo 1.16
+//        registration.addGuiContainerHandler(GenericGuiContainer.class, new IGuiContainerHandler<GenericGuiContainer>() {
+//            @Override
+//            public List<Rectangle2d> getGuiExtraAreas(GenericGuiContainer containerScreen) {
+//                return containerScreen.getExtraWindowBounds();
+//            }
+//        });
     }
 }

@@ -99,7 +99,7 @@ public class MultipartTE extends TileEntity {
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         int oldVersion = version;
-        read(packet.getNbtCompound());
+        read(getBlockState(), packet.getNbtCompound());
         if (world.isRemote && version != oldVersion) {
 //            dumpParts("onData");
             world.markBlockRangeForRenderUpdate(pos, null, null);
@@ -144,8 +144,8 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public void read(CompoundNBT compound) {
-        super.read(compound);
+    public void read(BlockState st, CompoundNBT compound) {
+        super.read(st, compound);
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
         version = compound.getInt("version");
@@ -166,11 +166,11 @@ public class MultipartTE extends TileEntity {
                             te = state.getBlock().createTileEntity(state, world);// @todo
                             if (te != null) {
                                 te.setWorldAndPos(world, pos);
-                                te.read(tc);
+                                te.read(state, tc);
                                 te.setWorldAndPos(world, pos);
                             }
                         } else {
-                            te.read(tc);
+                            te.read(state, tc);
                             te.setPos(pos);
                         }
                     }
@@ -182,7 +182,7 @@ public class MultipartTE extends TileEntity {
                         te = state.getBlock().createTileEntity(state, world);// @todo
                         if (te != null) {
                             te.setWorldAndPos(world, pos);
-                            te.read(tc);
+                            te.read(state, tc);
                             te.setWorldAndPos(world, pos);
                         }
                     }

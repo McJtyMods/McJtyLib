@@ -1,5 +1,6 @@
 package mcjty.lib.tooltips;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -8,6 +9,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -72,13 +74,14 @@ public class TooltipRender {
             int bx = event.getX();
             int by = event.getY()+3;
 
-            List<String> tooltip = event.getLines();
+            List<? extends ITextProperties> tooltip = event.getLines();
             int lines = (((count - 1) / STACKS_PER_LINE) + 1);
             int width = Math.min(STACKS_PER_LINE, count) * 18;
             int height = lines * 20 + 1;
 
-            for (String s : tooltip) {
-                if (s.startsWith("    ")) {
+            for (ITextProperties s : tooltip) {
+                // @todo 1.16 is this right?
+                if (s.getString().startsWith("    ")) {
 //                if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r")) {
                     break;
                 } else {
@@ -123,7 +126,7 @@ public class TooltipRender {
             RenderSystem.pushMatrix();
             RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
             RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
+            mc.fontRenderer.drawStringWithShadow(new MatrixStack(), s1, 0, 0, color);   // @todo 1.16
             RenderSystem.popMatrix();
         }
 
@@ -138,7 +141,7 @@ public class TooltipRender {
             RenderSystem.pushMatrix();
             RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 0);
             RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
+            mc.fontRenderer.drawStringWithShadow(new MatrixStack(), s2, 0, 0, 0xFF0000);    // @todo 1.16
             RenderSystem.popMatrix();
         }
         GlStateManager.enableDepthTest();

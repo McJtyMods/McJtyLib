@@ -1,5 +1,6 @@
 package mcjty.lib.gui.icons;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -116,7 +117,7 @@ public class ImageIcon implements IIcon, Cloneable {
     public void draw(Minecraft mc, Screen gui, int x, int y) {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(image);
-        gui.blit(x, y, u, v, width, height);
+        gui.blit(new MatrixStack(), x, y, u, v, width, height); // @todo 1.16
         if (overlays != null) {
             for (IIcon icon : overlays) {
                 icon.draw(mc, gui, x, y);

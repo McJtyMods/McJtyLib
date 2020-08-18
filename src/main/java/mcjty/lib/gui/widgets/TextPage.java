@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.ModBase;
 import mcjty.lib.client.RenderHelper;
@@ -252,7 +253,7 @@ public class TextPage extends AbstractWidget<TextPage> {
     private void renderImage(Screen gui, int x, int y, Line line) {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(line.resourceLocation);
-        gui.blit(x+4, y+1, line.u, line.v, 16, 16);
+        gui.blit(new MatrixStack(), x+4, y+1, line.u, line.v, 16, 16);  // @todo 1.16
 
         int dx = 22;
         String s = "";
@@ -268,7 +269,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);
+        mc.fontRenderer.drawString(new MatrixStack(), mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);    // @todo 1.16
     }
 
     private void renderLine(int x, int y, Line line) {
@@ -287,7 +288,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRenderer.drawString(mc.fontRenderer.trimStringToWidth(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);
+        mc.fontRenderer.drawString(new MatrixStack(), mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);    // @todo 1.16
     }
 
     private int renderRecipe(Screen gui, int x, int y, Line line) {
@@ -298,7 +299,7 @@ public class TextPage extends AbstractWidget<TextPage> {
         if (craftingGridImage != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
-            gui.blit(25+x, y, craftU, craftV, 19*3, 19*3);
+            gui.blit(new MatrixStack(), 25+x, y, craftU, craftV, 19*3, 19*3);   // @todo 1.16
         }
         int w;
         int h;
@@ -340,12 +341,12 @@ public class TextPage extends AbstractWidget<TextPage> {
         if (arrowImage != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(arrowImage);
-            gui.blit(x+25+67, y+18, arrowU, arrowV, 16, 16);
+            gui.blit(new MatrixStack(), x+25+67, y+18, arrowU, arrowV, 16, 16); // @todo 1.16
         }
         if (craftingGridImage != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
-            gui.blit(x+25+92, y + 16, craftU, craftV, 18, 18);
+            gui.blit(new MatrixStack(), x+25+92, y + 16, craftU, craftV, 18, 18);   // @todo 1.16
         }
         RenderHelper.renderObject(mc, x+25+93, y + 17, line.recipe.getRecipeOutput(), false);
         y -= 4;

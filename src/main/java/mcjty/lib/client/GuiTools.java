@@ -1,6 +1,7 @@
 package mcjty.lib.client;
 
 import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
@@ -17,7 +18,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
@@ -52,7 +52,7 @@ public class GuiTools {
         return mouseY * gui.height / mainHeight;
     }
 
-    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionType dimensionType, @Nonnull BlockPos pos) {
+    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos) {
         return openRemoteGui(player, dimensionType, pos,
                 te -> new INamedContainerProvider() {
                     @Override
@@ -70,10 +70,10 @@ public class GuiTools {
                 });
     }
 
-    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionType dimensionType, @Nonnull BlockPos pos,
+    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos,
                                         Function<TileEntity, INamedContainerProvider> provider) {
         if (dimensionType == null) {
-            dimensionType = player.getEntityWorld().getDimension().getType();
+            dimensionType = DimensionId.fromWorld(player.getEntityWorld());
         }
         World world = WorldTools.getWorld(player.getEntityWorld(), dimensionType);
         if (!WorldTools.isLoaded(world, pos)) {
@@ -91,7 +91,7 @@ public class GuiTools {
 
         NetworkHooks.openGui((ServerPlayerEntity) player, provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
-            buf.writeInt(world.getDimension().getType().getId());
+            DimensionId.fromWorld(world).toBytes(buf);
             buf.writeCompoundTag(written);
         });
         return true;

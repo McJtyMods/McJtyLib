@@ -76,7 +76,7 @@ public class QuadTransformer {
         int[] data = input.getVertexData();
         processVertices(transform, fmt, positionIndex, data, data);
 
-        return new BakedQuad(data, input.getTintIndex(), input.getFace(), input.func_187508_a(), input.shouldApplyDiffuseLighting());
+        return new BakedQuad(data, input.getTintIndex(), input.getFace(), input.func_187508_a(), input.func_239287_f_());
     }
 
     /**
@@ -100,7 +100,7 @@ public class QuadTransformer {
             int[] outData = Arrays.copyOf(inData, inData.length);
             processVertices(transform, fmt, positionIndex, inData, outData);
 
-            outputs.add(new BakedQuad(outData, input.getTintIndex(), input.getFace(), input.func_187508_a(), input.shouldApplyDiffuseLighting()));
+            outputs.add(new BakedQuad(outData, input.getTintIndex(), input.getFace(), input.func_187508_a(), input.func_239287_f_()));
         }
         return outputs;
     }

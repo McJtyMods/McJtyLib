@@ -15,16 +15,38 @@ public class DimensionId {
 
     private final RegistryKey<World> id;
 
-    public DimensionId(RegistryKey<World> id) {
+    private DimensionId(RegistryKey<World> id) {
         this.id = id;
     }
 
-    public DimensionId(PacketBuffer buf) {
-        id = RegistryKey.func_240903_a_(Registry.WORLD_KEY, buf.readResourceLocation());
+    public static DimensionId overworld() {
+        return new DimensionId(World.field_234918_g_);
+    }
+
+    public static DimensionId fromId(RegistryKey<World> id) {
+        return new DimensionId(id);
+    }
+
+    public static DimensionId fromPacket(PacketBuffer buf) {
+        RegistryKey<World> key = RegistryKey.func_240903_a_(Registry.WORLD_KEY, buf.readResourceLocation());
+        return new DimensionId(key);
+    }
+
+    public static DimensionId fromWorld(World world) {
+        return new DimensionId(world.func_234923_W_());
+    }
+
+    public static DimensionId fromResourceLocation(ResourceLocation location) {
+        RegistryKey<World> key = RegistryKey.func_240903_a_(Registry.WORLD_KEY, location);
+        return new DimensionId(key);
     }
 
     public ResourceLocation getRegistryName() {
         return id.getRegistryName();
+    }
+
+    public boolean isOverworld() {
+        return id.equals(World.field_234918_g_);
     }
 
     public void toBytes(PacketBuffer buf) {
@@ -35,6 +57,10 @@ public class DimensionId {
     public ServerWorld getWorld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return server.getWorld(id);
+    }
+
+    public static boolean sameDimension(World world1, World world2) {
+        return world1.func_234923_W_().equals(world2.func_234923_W_());
     }
 
     @Override
