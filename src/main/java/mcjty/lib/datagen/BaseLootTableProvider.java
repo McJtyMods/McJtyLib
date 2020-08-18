@@ -12,11 +12,11 @@ import net.minecraft.data.IDataProvider;
 import net.minecraft.data.LootTableProvider;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
+import net.minecraft.loot.*;
+import net.minecraft.loot.conditions.MatchTool;
+import net.minecraft.loot.functions.*;
 import net.minecraft.state.Property;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.*;
-import net.minecraft.world.storage.loot.conditions.MatchTool;
-import net.minecraft.world.storage.loot.functions.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -85,7 +85,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
                                 .addOperation("Info", "BlockEntityTag.Info", CopyNbt.Action.REPLACE)
                                 .addOperation("Items", "BlockEntityTag.Items", CopyNbt.Action.REPLACE)
                                 .addOperation("Energy", "BlockEntityTag.Energy", CopyNbt.Action.REPLACE))
-                        .acceptFunction(SetContents.builder()
+                        .acceptFunction(SetContents.builderIn()
                                 .addLootEntry(DynamicLootEntry.func_216162_a(new ResourceLocation("minecraft", "contents"))))
                 );
         return LootTable.builder().addLootPool(builder);

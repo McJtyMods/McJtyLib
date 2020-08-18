@@ -125,13 +125,13 @@ public class BlockRender extends AbstractWidget<BlockRender> {
             if (showLabel) {
                 String name;
                 if (renderItem instanceof ItemStack) {
-                    name = ((ItemStack) renderItem).getDisplayName().getFormattedText();
+                    name = ((ItemStack) renderItem).getDisplayName().getString() /* was getFormattedText() */;
                 } else if (renderItem instanceof FluidStack) {
-                    name = ((FluidStack) renderItem).getDisplayName().getFormattedText();   // @todo 1.14 better lang support
+                    name = ((FluidStack) renderItem).getDisplayName().getString() /* was getFormattedText() */;   // @todo 1.14 better lang support
                 } else if (renderItem instanceof Item) {
-                    name = new ItemStack((Item) renderItem).getDisplayName().getFormattedText();
+                    name = new ItemStack((Item) renderItem).getDisplayName().getString() /* was getFormattedText() */;
                 } else if (renderItem instanceof Block) {
-                    name = new ItemStack((Block) renderItem).getDisplayName().getFormattedText();
+                    name = new ItemStack((Block) renderItem).getDisplayName().getString() /* was getFormattedText() */;
                 } else {
                     name = "";
                 }

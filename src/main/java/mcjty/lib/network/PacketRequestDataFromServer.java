@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.network.PacketBuffer;
@@ -21,7 +22,7 @@ import java.util.function.Supplier;
  */
 public class PacketRequestDataFromServer {
     protected BlockPos pos;
-    private DimensionType type;
+    private DimensionId type;
     protected String command;
     protected TypedMap params;
     private boolean dummy;
@@ -42,7 +43,7 @@ public class PacketRequestDataFromServer {
         buf.writeBoolean(dummy);
     }
 
-    public PacketRequestDataFromServer(DimensionType type, BlockPos pos, String command, TypedMap params, boolean dummy) {
+    public PacketRequestDataFromServer(DimensionId type, BlockPos pos, String command, TypedMap params, boolean dummy) {
         this.type = type;
         this.pos = pos;
         this.command = command;

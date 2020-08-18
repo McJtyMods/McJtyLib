@@ -11,6 +11,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.InterModComms;
 import org.apache.commons.lang3.text.WordUtils;
@@ -84,11 +85,11 @@ public class TOPCompatibility {
                                 .item(pickBlock)
                                 .vertical()
                                 .itemLabel(pickBlock)
-                                .text(MODNAME + modid);
+                                .text(new StringTextComponent(MODNAME + modid));    // @todo 1.16 better fix!
                     } else {
                         probeInfo.vertical()
-                                .text(NAME + STARTLOC + block.getTranslationKey() + ".name" + ENDLOC)
-                                .text(MODNAME + modid);
+                                .text(new StringTextComponent(NAME + STARTLOC + block.getTranslationKey() + ".name" + ENDLOC))    // @todo 1.16 better fix!
+                                .text(new StringTextComponent(MODNAME + modid));    // @todo 1.16 better fix!
                     }
 
                     return true;

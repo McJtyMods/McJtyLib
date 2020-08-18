@@ -9,8 +9,8 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.state.Property;
-import net.minecraft.state.IStateHolder;
 import net.minecraft.state.StateContainer;
+import net.minecraft.state.StateHolder;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -53,7 +53,7 @@ public class BlockTools {
     }
 
     public static String getReadableName(ItemStack stack) {
-        return stack.getDisplayName().getFormattedText();
+        return stack.getDisplayName().getString() /* was getFormattedText() */;
     }
 
     @Nullable
@@ -134,7 +134,7 @@ public class BlockTools {
         return state;
     }
 
-    private static <S extends IStateHolder<S>, T extends Comparable<T>> S setValueHelper(S state, Property<T> property, String value) {
+    private static <S extends StateHolder<S>, T extends Comparable<T>> S setValueHelper(S state, Property<T> property, String value) {
         Optional<T> optional = property.parseValue(value);
         if (optional.isPresent()) {
             return state.with(property, (T)(optional.get()));

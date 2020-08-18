@@ -1,8 +1,10 @@
 package mcjty.lib.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.client.GuiTools;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
@@ -13,7 +15,7 @@ import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.client.GuiTools;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;
@@ -32,7 +34,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -118,7 +119,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(int i, int i2) {
+    protected void drawGuiContainerForegroundLayer(MatrixStack stack, int p_230451_2_, int p_230451_3_) {
+        super.drawGuiContainerForegroundLayer(stack, p_230451_2_, p_230451_3_);
         getWindowManager().drawTooltips();
     }
 
@@ -185,17 +187,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             setBlitOffset(300);
             this.itemRenderer.zLevel = 300.0F;
             int l = -267386864;
-            this.fillGradient(xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
-            this.fillGradient(xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
-            this.fillGradient(xx - 3, yy - 3, xx + i + 3, yy + k + 3, l, l);
-            this.fillGradient(xx - 4, yy - 3, xx - 3, yy + k + 3, l, l);
-            this.fillGradient(xx + i + 3, yy - 3, xx + i + 4, yy + k + 3, l, l);
+            MatrixStack matrixStack = null; // @todo 1.16
+            this.fillGradient(matrixStack, xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
+            this.fillGradient(matrixStack, xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
+            this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy + k + 3, l, l);
+            this.fillGradient(matrixStack, xx - 4, yy - 3, xx - 3, yy + k + 3, l, l);
+            this.fillGradient(matrixStack, xx + i + 3, yy - 3, xx + i + 4, yy + k + 3, l, l);
             int i1 = 1347420415;
             int j1 = (i1 & 16711422) >> 1 | i1 & -16777216;
-            this.fillGradient(xx - 3, yy - 3 + 1, xx - 3 + 1, yy + k + 3 - 1, i1, j1);
-            this.fillGradient(xx + i + 2, yy - 3 + 1, xx + i + 3, yy + k + 3 - 1, i1, j1);
-            this.fillGradient(xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
-            this.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
+            this.fillGradient(matrixStack, xx - 3, yy - 3 + 1, xx - 3 + 1, yy + k + 3 - 1, i1, j1);
+            this.fillGradient(matrixStack, xx + i + 2, yy - 3 + 1, xx + i + 3, yy + k + 3 - 1, i1, j1);
+            this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
+            this.fillGradient(matrixStack, xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
             RenderSystem.translated(0.0D, 0.0D, (double)this.itemRenderer.zLevel);
 
@@ -221,7 +224,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 for (Object o : list) {
                     if (o instanceof String) {
                         String s2 = (String)o;
-                        font.drawStringWithShadow(s2, curx, yy, -1);
+                        font.drawStringWithShadow(new MatrixStack(), s2, curx, yy, -1); // @todo 1.16
                         curx += font.getStringWidth(s2);
                     } else {
                         RenderHelper.renderObject(getMinecraft(), curx + 1, yy, o, false);
@@ -233,7 +236,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                     yy += 8;
                 }
             } else {
-                font.drawStringWithShadow(s1, xx, yy, -1);
+                font.drawStringWithShadow(new MatrixStack(), s1, xx, yy, -1);   // @todo 1.16
             }
 
             if (i == 0) {
@@ -245,36 +248,37 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        drawWindow();
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {
+        drawWindow(matrixStack);
     }
 
-    protected void drawWindow() {
+    protected void drawWindow(MatrixStack matrixStack) {
         if (window == null) {
             return;
         }
-        renderBackground();
+        renderBackground(matrixStack);
         getWindowManager().draw();
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         if (window == null) {
             return;
         }
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
+        // @todo 1.16
+//        this.renderHoveredToolTip(mouseX, mouseY);
         drawStackTooltips(mouseX, mouseY);
     }
 
-
-    @Override
-    public void drawSlot(Slot slotIn) {
-        // Prevent slots from being rendered if they are (partially) covered by a modal window
-        if (!isPartiallyCoveredByModalWindow(slotIn)) {
-            super.drawSlot(slotIn);
-        }
-    }
+//@todo 1.16
+//    @Override
+//    public void drawSlot(Slot slotIn) {
+//        // Prevent slots from being rendered if they are (partially) covered by a modal window
+//        if (!isPartiallyCoveredByModalWindow(slotIn)) {
+//            super.drawSlot(slotIn);
+//        }
+//    }
 
     @Nullable
     @Override
@@ -343,7 +347,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             list = new ArrayList<>();
         } else {
             ITooltipFlag flag = this.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-            list = stack.getTooltip(this.getMinecraft().player, flag).stream().map(ITextComponent::getFormattedText).collect(Collectors.toList());
+            list = stack.getTooltip(this.getMinecraft().player, flag).stream().map(ITextComponent::getString /* @todo was getFormattedText*/).collect(Collectors.toList());
         }
 
         for (int i = 0; i < list.size(); ++i) {
@@ -360,7 +364,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         if (stack.getItem() != null) {
             font = stack.getItem().getFontRenderer(stack);
         }
-        this.renderTooltip(list, x, y, (font == null ? getMinecraft().fontRenderer : font));
+//        this.renderTooltip(new MatrixStack(), list, x, y, (font == null ? getMinecraft().fontRenderer : font)); // @todo 1.16
     }
 
     @Override
@@ -448,10 +452,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public void sendServerCommandTyped(SimpleChannel network, String command, TypedMap params) {
-        network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), tileEntity.getDimensionType(), command, params));
+        network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), tileEntity.getDimension(), command, params));
     }
 
-    public void sendServerCommandTyped(SimpleChannel network, DimensionType dimensionId, String command, TypedMap params) {
+    public void sendServerCommandTyped(SimpleChannel network, DimensionId dimensionId, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), dimensionId, command, params));
     }
 

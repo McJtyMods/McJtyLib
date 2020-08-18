@@ -1,13 +1,10 @@
 package mcjty.lib.setup;
 
+import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class DefaultServerProxy implements IProxy {
 
@@ -18,8 +15,7 @@ public class DefaultServerProxy implements IProxy {
 
     @Override
     public World getWorld() {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
+        return WorldTools.getOverworld();
     }
 
     @Override

@@ -13,6 +13,7 @@ import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -29,7 +30,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -169,8 +169,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public void handleUpdateTag(CompoundNBT tag) {
-        super.handleUpdateTag(tag);
+    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+        super.handleUpdateTag(state, tag);
         readClientDataFromNBT(tag);
     }
 
@@ -370,7 +370,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             return false;
         }
         ownerUUID = player.getGameProfile().getId();
-        ownerName = player.getName().getFormattedText();
+        ownerName = player.getName().getString() /* was getFormattedText() */;
         markDirtyClient();
 
         return true;
@@ -516,15 +516,15 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
-    public DimensionType getDimensionType() {
-        return world.getDimension().getType();
+    public DimensionId getDimension() {
+        return new DimensionId(world.func_234923_W_());
     }
 
         // Client side function to send a value to the server
     public <T> void valueToServer(SimpleChannel network, Key<T> valueKey, T value) {
 
         network.sendToServer(new PacketServerCommandTyped(getPos(),
-                getDimensionType(),
+                getDimension(),
                 COMMAND_SYNC_BINDING,
                 TypedMap.builder()
                         .put(valueKey, value)
@@ -535,7 +535,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * Call this client-side to this TE to request data from the server
      */
     public void requestDataFromServer(SimpleChannel channel, String command, @Nonnull TypedMap params) {
-        channel.sendToServer(new PacketRequestDataFromServer(getDimensionType(), pos, command, params, false));
+        channel.sendToServer(new PacketRequestDataFromServer(getDimension(), pos, command, params, false));
     }
 
 
