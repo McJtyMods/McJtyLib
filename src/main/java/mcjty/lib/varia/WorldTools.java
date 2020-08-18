@@ -17,10 +17,6 @@ public class WorldTools {
         return world.isBlockLoaded(pos);
     }
 
-    public static String getDimensionName(World world) {
-        return getDimensionName(world.getDimension().getType());
-    }
-
     public static String getDimensionName(DimensionType type) {
         return type.getRegistryName().toString();
     }
