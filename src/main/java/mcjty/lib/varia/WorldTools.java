@@ -30,18 +30,18 @@ public class WorldTools {
         if (world == null) {
 //            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
             // @todo 1.16 somehow load the world?
-            return type.getWorld();
+            return type.loadWorld();
         }
         return world;
     }
 
     public static ServerWorld getWorld(DimensionId type) {
-        return type.getWorld();
+        return type.loadWorld();
     }
 
     public static ServerWorld getWorld(World world, DimensionId type) {
         // @todo 1.16 load?
-        return type.getWorld(world);
+        return type.loadWorld(world);
 //        MinecraftServer server = world.getServer();
 //        return DimensionManager.getWorld(server, type, false, false);
     }

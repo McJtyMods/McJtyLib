@@ -33,7 +33,7 @@ public class TeleportationTools {
     }
 
     public static void teleportToDimension(PlayerEntity player, DimensionId dimension, double x, double y, double z) {
-        player.changeDimension(dimension.getWorld(player.getEntityWorld()), new ITeleporter() {
+        player.changeDimension(dimension.loadWorld(player.getEntityWorld()), new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
                 entity = repositionEntity.apply(false);

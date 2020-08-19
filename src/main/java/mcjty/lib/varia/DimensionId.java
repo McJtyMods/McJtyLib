@@ -57,13 +57,14 @@ public class DimensionId {
         buf.writeResourceLocation(id.getRegistryName());
     }
 
-    public ServerWorld getWorld() {
+    public ServerWorld loadWorld() {
+        // @todo 1.16: actually load the world
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return server.getWorld(id);
     }
 
-    public ServerWorld getWorld(World otherWorld) {
-//        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+    public ServerWorld loadWorld(World otherWorld) {
+        // @todo 1.16: actually load the world
         return otherWorld.getServer().getWorld(id);
     }
 
