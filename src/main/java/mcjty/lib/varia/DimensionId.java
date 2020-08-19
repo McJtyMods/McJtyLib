@@ -62,6 +62,11 @@ public class DimensionId {
         return server.getWorld(id);
     }
 
+    public ServerWorld getWorld(World otherWorld) {
+//        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return otherWorld.getServer().getWorld(id);
+    }
+
     public static boolean sameDimension(World world1, World world2) {
         return world1.func_234923_W_().equals(world2.func_234923_W_());
     }

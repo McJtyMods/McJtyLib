@@ -41,7 +41,7 @@ public class WorldTools {
 
     public static ServerWorld getWorld(World world, DimensionId type) {
         // @todo 1.16 load?
-        return type.getWorld();
+        return type.getWorld(world);
 //        MinecraftServer server = world.getServer();
 //        return DimensionManager.getWorld(server, type, false, false);
     }

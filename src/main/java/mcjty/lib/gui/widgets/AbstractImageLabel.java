@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
@@ -115,7 +116,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
             mc.getTextureManager().bindTexture(image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            gui.blit(xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
+            gui.blit(new MatrixStack(), xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);    // @todo 1.16
         }
     }
 
