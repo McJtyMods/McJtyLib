@@ -47,7 +47,7 @@ public class GlobalCoordinate {
 
     @Override
     public String toString() {
-        return BlockPosTools.toString(coordinate) + " (" + WorldTools.getDimensionName(dimension) + ")";
+        return BlockPosTools.toString(coordinate) + " (" + dimension.getName() + ")";
     }
 }
 

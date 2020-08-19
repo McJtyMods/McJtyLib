@@ -15,10 +15,6 @@ public class WorldTools {
         return world.isBlockLoaded(pos);
     }
 
-    public static String getDimensionName(DimensionId type) {
-        return type.getName();
-    }
-
     public static ServerWorld getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return server.getWorld(World.field_234918_g_);
