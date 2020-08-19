@@ -109,7 +109,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
             int yy = y + bounds.y + offsetY;
             mc.getItemRenderer().zLevel = 100;
             this.window.getGui().setBlitOffset(100);
-            RenderHelper.renderObject(mc, xx, yy, renderItem, false);
+            RenderHelper.renderObject(xx, yy, renderItem, false);
             mc.getItemRenderer().zLevel = 0;
             this.window.getGui().setBlitOffset(0);
             if (hilightOnHover && isHovering()) {

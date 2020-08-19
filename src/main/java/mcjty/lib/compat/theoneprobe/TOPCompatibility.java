@@ -18,10 +18,7 @@ import org.apache.commons.lang3.text.WordUtils;
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
-import static mcjty.theoneprobe.api.IProbeInfo.ENDLOC;
-import static mcjty.theoneprobe.api.IProbeInfo.STARTLOC;
 import static mcjty.theoneprobe.api.TextStyleClass.MODNAME;
-import static mcjty.theoneprobe.api.TextStyleClass.NAME;
 
 public class TOPCompatibility {
 
@@ -84,11 +81,11 @@ public class TOPCompatibility {
                                 .item(pickBlock)
                                 .vertical()
                                 .itemLabel(pickBlock)
-                                .text(MODNAME + modid);
+                                .text(CompoundText.create().style(MODNAME).text(modid));
                     } else {
                         probeInfo.vertical()
-                                .text(NAME + STARTLOC + block.getTranslationKey() + ".name" + ENDLOC)
-                                .text(MODNAME + modid);
+                                .text(CompoundText.create().name(block.getTranslationKey()))
+                                .text(CompoundText.create().style(MODNAME).text(modid));
                     }
 
                     return true;

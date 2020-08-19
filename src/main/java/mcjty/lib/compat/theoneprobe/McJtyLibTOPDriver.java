@@ -8,14 +8,17 @@ import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.theoneprobe.api.CompoundText;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+
+import static mcjty.theoneprobe.api.TextStyleClass.ERROR;
+import static mcjty.theoneprobe.api.TextStyleClass.HIGHLIGHTED;
 
 public class McJtyLibTOPDriver implements TOPDriver {
 
@@ -49,18 +52,18 @@ public class McJtyLibTOPDriver implements TOPDriver {
                 te.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> {
                     int infused = h.getInfused();
                     int pct = infused * 100 / GeneralConfig.maxInfuse.get();
-                    probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
+                    probeInfo.text(CompoundText.create().style(HIGHLIGHTED).text("Infused: " + pct + "%"));
                 });
                 if (GeneralConfig.manageOwnership.get()) {
                     if (generic.getOwnerName() != null && !generic.getOwnerName().isEmpty()) {
                         int securityChannel = generic.getSecurityChannel();
                         if (securityChannel == -1) {
-                            probeInfo.text(TextFormatting.YELLOW + "Owned by: " + generic.getOwnerName());
+                            probeInfo.text(CompoundText.create().style(HIGHLIGHTED).text("Owned by: " + generic.getOwnerName()));
                         } else {
-                            probeInfo.text(TextFormatting.YELLOW + "Owned by: " + generic.getOwnerName() + " (channel " + securityChannel + ")");
+                            probeInfo.text(CompoundText.create().style(HIGHLIGHTED).text("Owned by: " + generic.getOwnerName() + " (channel " + securityChannel + ")"));
                         }
                         if (generic.getOwnerUUID() == null) {
-                            probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
+                            probeInfo.text(CompoundText.create().style(ERROR).text( "Warning! Ownership not correctly set! Please place block again!"));
                         }
                     }
                 }
