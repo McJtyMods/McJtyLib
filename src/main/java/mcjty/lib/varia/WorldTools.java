@@ -16,7 +16,7 @@ public class WorldTools {
     }
 
     public static String getDimensionName(DimensionId type) {
-        return type.getRegistryName().toString();
+        return type.getName();
     }
 
     public static ServerWorld getOverworld() {
