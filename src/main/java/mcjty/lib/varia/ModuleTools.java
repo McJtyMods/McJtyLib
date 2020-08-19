@@ -9,7 +9,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -22,7 +21,7 @@ public class ModuleTools {
         return stack.getTag().contains("monitorx");
     }
 
-    public static void setPositionInModule(ItemStack stack, DimensionType dimension, BlockPos pos, String name) {
+    public static void setPositionInModule(ItemStack stack, DimensionId dimension, BlockPos pos, String name) {
         CompoundNBT tag = stack.getOrCreateTag();
         if (dimension != null) {
             tag.putString("monitordim", dimension.getRegistryName().toString());
@@ -52,11 +51,11 @@ public class ModuleTools {
         return new BlockPos(monitorx, monitory, monitorz);
     }
 
-    public static DimensionType getDimensionFromModule(ItemStack stack) {
+    public static DimensionId getDimensionFromModule(ItemStack stack) {
         CompoundNBT tag = stack.getOrCreateTag();
         if (tag.contains("monitordim")) {
             String monitordim = tag.getString("monitordim");
-            return DimensionType.byName(new ResourceLocation(monitordim));
+            return DimensionId.fromResourceLocation(new ResourceLocation(monitordim));
         } else {
             return null;
         }

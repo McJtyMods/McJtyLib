@@ -224,7 +224,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                         font.drawStringWithShadow(s2, curx, yy, -1);
                         curx += font.getStringWidth(s2);
                     } else {
-                        RenderHelper.renderObject(getMinecraft(), curx + 1, yy, o, false);
+                        RenderHelper.renderObject(curx + 1, yy, o, false);
                         curx += 20;
                         lineHasItemStacks = true;
                     }

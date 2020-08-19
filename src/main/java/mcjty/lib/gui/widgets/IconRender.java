@@ -33,7 +33,7 @@ public class IconRender extends AbstractWidget<IconRender> {
         }
         super.draw(gui, x, y);
         if (icon != null) {
-            RenderHelper.renderObject(mc, x + bounds.x, y + bounds.y, icon, false);
+            RenderHelper.renderObject(x + bounds.x, y + bounds.y, icon, false);
         }
     }
 

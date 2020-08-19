@@ -6,7 +6,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.ITeleporter;
 
@@ -16,7 +15,7 @@ import java.util.function.Function;
 public class TeleportationTools {
 
     public static void teleport(PlayerEntity player, DimensionId dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
-        DimensionType oldId = player.getEntityWorld().getDimension().getType();
+        DimensionId oldId = DimensionId.fromWorld(player.getEntityWorld());
 
         float rotationYaw = player.rotationYaw;
         float rotationPitch = player.rotationPitch;

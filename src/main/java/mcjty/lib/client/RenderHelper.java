@@ -144,54 +144,55 @@ public class RenderHelper {
         GlStateManager.popMatrix();
     }
 
-    public static boolean renderObject(Minecraft mc, int x, int y, Object itm, boolean highlight) {
+    public static boolean renderObject(int x, int y, Object itm, boolean highlight) {
         if (itm instanceof Entity) {
             renderEntity((Entity) itm, x, y);
             return true;
         }
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        return renderObject(mc, itemRenderer, x, y, itm, highlight, 100);
+        return renderObject(itemRenderer, x, y, itm, highlight, 100);
     }
 
-    public static boolean renderObject(Minecraft mc, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
+    public static boolean renderObject(ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
         itemRender.zLevel = lvl;
 
         if (itm == null) {
-            return renderItemStack(mc, itemRender, ItemStack.EMPTY, x, y, "", highlight);
+            return renderItemStack(itemRender, ItemStack.EMPTY, x, y, "", highlight);
         }
         if (itm instanceof Item) {
-            return renderItemStack(mc, itemRender, new ItemStack((Item) itm, 1), x, y, "", highlight);
+            return renderItemStack(itemRender, new ItemStack((Item) itm, 1), x, y, "", highlight);
         }
         if (itm instanceof Block) {
-            return renderItemStack(mc, itemRender, new ItemStack((Block) itm, 1), x, y, "", highlight);
+            return renderItemStack(itemRender, new ItemStack((Block) itm, 1), x, y, "", highlight);
         }
         if (itm instanceof ItemStack) {
-            return renderItemStackWithCount(mc, itemRender, (ItemStack) itm, x, y, highlight);
+            return renderItemStackWithCount(itemRender, (ItemStack) itm, x, y, highlight);
         }
         if (itm instanceof FluidStack) {
-            return renderFluidStack(mc, (FluidStack) itm, x, y, highlight);
+            return renderFluidStack((FluidStack) itm, x, y, highlight);
         }
         if (itm instanceof TextureAtlasSprite) {
-            return renderIcon(mc, itemRender, (TextureAtlasSprite) itm, x, y, highlight);
+            return renderIcon(itemRender, (TextureAtlasSprite) itm, x, y, highlight);
         }
-        return renderItemStack(mc, itemRender, ItemStack.EMPTY, x, y, "", highlight);
+        return renderItemStack(itemRender, ItemStack.EMPTY, x, y, "", highlight);
     }
 
-    public static boolean renderIcon(Minecraft mc, ItemRenderer itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
+    public static boolean renderIcon(ItemRenderer itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
         //itemRender.draw(xo, yo, itm, 16, 16); //TODO: Make
         return true;
     }
 
-    public static boolean renderFluidStack(Minecraft mc, FluidStack fluidStack, int x, int y, boolean highlight) {
+    public static boolean renderFluidStack(FluidStack fluidStack, int x, int y, boolean highlight) {
         Fluid fluid = fluidStack.getFluid();
         if (fluid == null) {
             return false;
         }
 
+        Minecraft mc = Minecraft.getInstance();
         ResourceLocation fluidStill = fluid.getAttributes().getStillTexture();
         TextureAtlasSprite fluidStillSprite = null;
         if (fluidStill != null) {
-            fluidStillSprite = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidStill);
+            fluidStillSprite = mc.getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(fluidStill);
         }
         if (fluidStillSprite == null) {
             return false;
@@ -231,7 +232,7 @@ public class RenderHelper {
     }
 
 
-    public static boolean renderItemStackWithCount(Minecraft mc, ItemRenderer itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
+    public static boolean renderItemStackWithCount(ItemRenderer itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
         int size = itm.getCount();
         String amount;
         if (size <= 1) {
@@ -246,7 +247,7 @@ public class RenderHelper {
             amount = String.valueOf(size / 1000000000) + "g";
         }
 
-        return renderItemStack(mc, itemRender, itm, xo, yo, amount, highlight);
+        return renderItemStack(itemRender, itm, xo, yo, amount, highlight);
 //        if (itm.stackSize==1 || itm.stackSize==0) {
 //            return renderItemStack(mc, itemRender, itm, xo, yo, "", highlight);
 //        } else {
@@ -283,7 +284,7 @@ public class RenderHelper {
 
     }
 
-    public static boolean renderItemStack(Minecraft mc, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
+    public static boolean renderItemStack(ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
         RenderSystem.color4f(1F, 1F, 1F, 1f);
 
         boolean rc = false;
@@ -304,7 +305,7 @@ public class RenderHelper {
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             itemRender.renderItemAndEffectIntoGUI(itm, x, y);
-            renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt, txt.length() - 2);
+            renderItemOverlayIntoGUI(Minecraft.getInstance().fontRenderer, itm, x, y, txt, txt.length() - 2);
 //            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
             RenderSystem.popMatrix();
             RenderSystem.disableRescaleNormal();
@@ -830,7 +831,7 @@ public class RenderHelper {
         matrixStack.rotate(rotation);
     }
 
-    public static int renderText(Minecraft mc, int x, int y, String txt) {
+    public static int renderText(int x, int y, String txt) {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1f);
 
         GlStateManager.pushMatrix();
@@ -843,6 +844,7 @@ public class RenderHelper {
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
         GlStateManager.disableBlend();
+        Minecraft mc = Minecraft.getInstance();
         int width = mc.fontRenderer.getStringWidth(txt);
         mc.fontRenderer.drawStringWithShadow(txt, x, y, 16777215);
         GlStateManager.enableLighting();
@@ -859,7 +861,7 @@ public class RenderHelper {
         return width;
     }
 
-    public static int renderText(Minecraft mc, int x, int y, String txt, int color) {
+    public static int renderText(int x, int y, String txt, int color) {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0f);
 
         GlStateManager.pushMatrix();
@@ -872,6 +874,7 @@ public class RenderHelper {
         GlStateManager.disableLighting();
         GlStateManager.disableDepthTest();
         GlStateManager.disableBlend();
+        Minecraft mc = Minecraft.getInstance();
         int width = mc.fontRenderer.getStringWidth(txt);
         mc.fontRenderer.drawString(txt, x, y, color);
         GlStateManager.enableLighting();

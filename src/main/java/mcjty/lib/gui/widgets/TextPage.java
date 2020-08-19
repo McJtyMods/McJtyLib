@@ -332,7 +332,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                                 stack.setTag(tc.copy());
                             }
                         }
-                        RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
+                        RenderHelper.renderObject(26 + x + i * 18, 1 + y + j * 18, stack, false);
                     }
                 }
             }
@@ -347,7 +347,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             mc.getTextureManager().bindTexture(craftingGridImage);
             gui.blit(x+25+92, y + 16, craftU, craftV, 18, 18);
         }
-        RenderHelper.renderObject(mc, x+25+93, y + 17, line.recipe.getRecipeOutput(), false);
+        RenderHelper.renderObject(x+25+93, y + 17, line.recipe.getRecipeOutput(), false);
         y -= 4;
         return y;
     }
