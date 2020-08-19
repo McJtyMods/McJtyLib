@@ -44,6 +44,9 @@ public class DimensionId {
         return id.getRegistryName();
     }
 
+    // Is this a good way to get the dimension name?
+    public String getName() { return id.getRegistryName().getPath(); }
+
     public boolean isOverworld() {
         return id.equals(DimensionType.OVERWORLD);
     }
