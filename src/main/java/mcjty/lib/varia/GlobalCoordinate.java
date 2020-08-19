@@ -2,6 +2,7 @@ package mcjty.lib.varia;
 
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 
 public class GlobalCoordinate {
@@ -12,6 +13,12 @@ public class GlobalCoordinate {
         this.coordinate = coordinate;
         this.dimension = dimension;
     }
+
+    public GlobalCoordinate(BlockPos coordinate, World world) {
+        this.coordinate = coordinate;
+        this.dimension = world.getDimension().getType();
+    }
+
 
     public BlockPos getCoordinate() {
         return coordinate;
