@@ -7,6 +7,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.util.Objects;
@@ -15,12 +16,14 @@ public class DimensionId {
 
     private final RegistryKey<World> id;
 
+    private final static Lazy<DimensionId> OVERWORLD = Lazy.of(() -> new DimensionId(World.field_234918_g_));
+
     private DimensionId(RegistryKey<World> id) {
         this.id = id;
     }
 
     public static DimensionId overworld() {
-        return new DimensionId(World.field_234918_g_);
+        return OVERWORLD.get();
     }
 
     public static DimensionId fromId(RegistryKey<World> id) {
@@ -63,6 +66,12 @@ public class DimensionId {
         return server.getWorld(id);
     }
 
+    // Do not load the world if it is not there
+    public ServerWorld getWorld() {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return server.getWorld(id);
+    }
+
     public ServerWorld loadWorld(World otherWorld) {
         // @todo 1.16: actually load the world
         return otherWorld.getServer().getWorld(id);
@@ -71,6 +80,11 @@ public class DimensionId {
     public static boolean sameDimension(World world1, World world2) {
         return world1.func_234923_W_().equals(world2.func_234923_W_());
     }
+
+    public boolean sameDimension(World world) {
+        return id.equals(world.func_234923_W_());
+    }
+
 
     @Override
     public boolean equals(Object o) {

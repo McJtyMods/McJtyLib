@@ -36,7 +36,7 @@ public class WorldTools {
     }
 
     public static ServerWorld getWorld(DimensionId type) {
-        return type.loadWorld();
+        return type.getWorld();
     }
 
     public static ServerWorld getWorld(World world, DimensionId type) {
