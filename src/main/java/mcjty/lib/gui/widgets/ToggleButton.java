@@ -59,7 +59,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
     }
 
     @Override
-    public void draw(Screen gui, int x, int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
@@ -68,29 +68,29 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
 
         if (isEnabled()) {
             if (pressed) {
-                drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                drawStyledBoxSelected(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             } else if (isHovering()) {
-                drawStyledBoxHovering(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                drawStyledBoxHovering(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             } else {
-                drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                drawStyledBoxNormal(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             }
             if (checkMarker) {
-                RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
+                RenderHelper.drawBeveledBox(matrixStack, xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
                 if (pressed) {
-                    mc.fontRenderer.drawString(new MatrixStack(), "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal);  // @todo 1.16
+                    mc.fontRenderer.drawString(matrixStack, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal);
                 }
             }
         } else {
-            drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+            drawStyledBoxDisabled(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             if (checkMarker) {
-                RenderHelper.drawBeveledBox(xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
+                RenderHelper.drawBeveledBox(matrixStack, xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
                 if (pressed) {
-                    mc.fontRenderer.drawString(new MatrixStack(), "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);    // @todo 1.16
+                    mc.fontRenderer.drawString(matrixStack, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);
                 }
             }
         }
 
-        super.drawOffset(gui, x, y, checkMarker ? 6 : 0, 1);
+        super.drawOffset(gui, matrixStack, x, y, checkMarker ? 6 : 0, 1);
     }
 
     @Override

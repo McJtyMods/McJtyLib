@@ -89,8 +89,8 @@ public class GuiItemScreen extends Screen {
 
     public void drawWindow(MatrixStack matrixStack) {
         this.renderBackground(matrixStack);
-        window.draw();
-        sideWindow.getWindow().draw();
+        window.draw(matrixStack);
+        sideWindow.getWindow().draw(matrixStack);
         List<String> tooltips = window.getTooltips();
         Minecraft mc = getMinecraft();
         if (tooltips != null) {

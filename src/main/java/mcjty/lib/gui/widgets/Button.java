@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.events.ButtonEvent;
 import net.minecraft.client.gui.screen.Screen;
@@ -15,7 +16,7 @@ public class Button extends AbstractLabel<Button> {
     private boolean pressed = false;
 
     @Override
-    public void draw(Screen gui, int x, int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
@@ -24,17 +25,17 @@ public class Button extends AbstractLabel<Button> {
 
         if (isEnabledAndVisible()) {
             if (pressed) {
-                drawStyledBoxSelected(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                drawStyledBoxSelected(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             } else if (isHovering()) {
-                drawStyledBoxHovering(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                drawStyledBoxHovering(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             } else {
-                drawStyledBoxNormal(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                drawStyledBoxNormal(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             }
         } else {
-            drawStyledBoxDisabled(window, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+            drawStyledBoxDisabled(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
         }
 
-        super.drawOffset(gui, x, y, 0, 1);
+        super.drawOffset(gui, matrixStack, x, y, 0, 1);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
@@ -268,7 +269,7 @@ public class Window {
         return windowCmd;
     }
 
-    public void draw() {
+    public void draw(MatrixStack matrixStack) {
         int x = getRelativeX();
         int y = getRelativeY();
 
@@ -296,8 +297,8 @@ public class Window {
         currentStyle = McJtyLib.getPreferencesProperties(gui.getMinecraft().player).map(PreferencesProperties::getStyle).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 
         toplevel.setWindow(this);
-        toplevel.draw(gui, 0, 0);
-        toplevel.drawPhase2(gui, 0, 0);
+        toplevel.draw(gui, matrixStack, 0, 0);
+        toplevel.drawPhase2(gui, matrixStack, 0, 0);
     }
 
     public GuiStyle getCurrentStyle() {

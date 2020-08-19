@@ -1,5 +1,6 @@
 package mcjty.lib.gui.icons;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.IconHolder;
 import mcjty.lib.gui.widgets.Widget;
@@ -92,9 +93,9 @@ public class IconManager {
         return draggingIcon != null;
     }
 
-    public void draw(Minecraft mc, Screen gui) {
+    public void draw(Screen gui, MatrixStack matrixStack) {
         if (draggingIcon != null) {
-            draggingIcon.draw(mc, gui, getRelativeX() - dx, getRelativeY() - dy);
+            draggingIcon.draw(gui, matrixStack, getRelativeX() - dx, getRelativeY() - dy);
         }
     }
 

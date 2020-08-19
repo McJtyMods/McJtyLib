@@ -158,15 +158,15 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     @Override
-    public void draw(Screen gui, final int x, final int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, final int x, final int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, x, y);
+        super.draw(gui, matrixStack, x, y);
 
         int bx = x + bounds.x;
         int by = y + bounds.y;
-        RenderHelper.drawThickBeveledBox(bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, StyleConfig.colorEnergyBarTopLeft, StyleConfig.colorEnergyBarBottomRight, 0xff636363);
+        RenderHelper.drawThickBeveledBox(matrixStack, bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, StyleConfig.colorEnergyBarTopLeft, StyleConfig.colorEnergyBarBottomRight, 0xff636363);
 
         long currentValue = getValue();
         long maximum = getMaxValue();
@@ -177,14 +177,14 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
                 int w = (int) ((bounds.width-2) * (double) currentValue / maximum);
                 for (int xx = bx+1 ; xx < bx + bounds.width-2 ; xx++) {
                     color = getColor(bx, w, on, xx);
-                    RenderHelper.drawVerticalLine(xx, by+1, by + bounds.height - 2, color);
+                    RenderHelper.drawVerticalLine(matrixStack, xx, by+1, by + bounds.height - 2, color);
                     on = !on;
                 }
             } else {
                 int h = (int) ((bounds.height-2) * (double) currentValue / maximum);
                 for (int yy = y+1 ; yy < y + bounds.height-2 ; yy++) {
                     color = getColorReversed(y, h, on, yy);
-                    RenderHelper.drawHorizontalLine(bx+1, y + by + bounds.height - yy -2, bx + bounds.width - 2, color);
+                    RenderHelper.drawHorizontalLine(matrixStack, bx+1, y + by + bounds.height - yy -2, bx + bounds.width - 2, color);
                     on = !on;
                 }
             }
@@ -196,7 +196,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             } else {
                 s = currentValue + "/" + maximum;
             }
-            mc.fontRenderer.drawString(new MatrixStack(), mc.fontRenderer.func_238412_a_(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, getTextColor());  // @todo 1.16
+            mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.fontRenderer.FONT_HEIGHT)/2, getTextColor());
         }
     }
 

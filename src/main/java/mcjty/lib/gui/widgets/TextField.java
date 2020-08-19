@@ -292,8 +292,8 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public void draw(Screen gui, int x, int y) {
-        super.draw(gui, x, y);
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+        super.draw(gui, matrixStack, x, y);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -307,16 +307,16 @@ public class TextField extends AbstractWidget<TextField> {
             col = StyleConfig.colorTextFieldHoveringFiller;
         }
 
-        RenderHelper.drawThickBeveledBox(xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
+        RenderHelper.drawThickBeveledBox(matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
 
         String renderedText = mc.fontRenderer.func_238412_a_(this.text.substring(startOffset), bounds.width - 10);
         int textX = x + 5 + bounds.x;
         int textY = y + calculateVerticalOffset() + bounds.y;
         if (isEnabled()) {
             if (isEditable()) {
-                mc.fontRenderer.drawString(new MatrixStack(), renderedText, textX, textY, 0xff000000);  // @todo 1.16
+                mc.fontRenderer.drawString(matrixStack, renderedText, textX, textY, 0xff000000);
             } else {
-                mc.fontRenderer.drawString(new MatrixStack(), renderedText, textX, textY, 0xff333333);  // @todo 1.16
+                mc.fontRenderer.drawString(matrixStack, renderedText, textX, textY, 0xff333333);
             }
 
             if (isRegionSelected()) {
@@ -333,12 +333,12 @@ public class TextField extends AbstractWidget<TextField> {
                 RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.fontRenderer.FONT_HEIGHT, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
             }
         } else {
-            mc.fontRenderer.drawString(new MatrixStack(), renderedText, textX, textY, 0xffa0a0a0);  // @todo 1.16
+            mc.fontRenderer.drawString(matrixStack, renderedText, textX, textY, 0xffa0a0a0);
         }
 
         if (window.getTextFocus() == this) {
             int w = mc.fontRenderer.getStringWidth(this.text.substring(startOffset, cursor));
-            Screen.fill(new MatrixStack(), xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);   // @todo 1.16
+            Screen.fill(matrixStack, xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }
 

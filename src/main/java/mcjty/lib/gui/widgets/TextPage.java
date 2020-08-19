@@ -227,8 +227,8 @@ public class TextPage extends AbstractWidget<TextPage> {
     }
 
     @Override
-    public void draw(Screen gui, int x, int y) {
-        super.draw(gui, x, y);
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+        super.draw(gui, matrixStack, x, y);
 
         tabCounter = 0;
         y += 3;
@@ -240,20 +240,20 @@ public class TextPage extends AbstractWidget<TextPage> {
                 tabCounter++;
             }
             else if (line.recipe != null) {
-                y = renderRecipe(gui, x, y, line);
+                y = renderRecipe(gui, matrixStack, x, y, line);
             } else if (line.resourceLocation != null) {
-                renderImage(gui, x, y, line);
+                renderImage(gui, matrixStack, x, y, line);
             } else if (line.line != null) {
-                renderLine(x, y, line);
+                renderLine(matrixStack, x, y, line);
             }
             y += line.height;
         }
     }
 
-    private void renderImage(Screen gui, int x, int y, Line line) {
+    private void renderImage(Screen gui, MatrixStack matrixStack, int x, int y, Line line) {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         mc.getTextureManager().bindTexture(line.resourceLocation);
-        gui.blit(new MatrixStack(), x+4, y+1, line.u, line.v, 16, 16);  // @todo 1.16
+        gui.blit(matrixStack, x+4, y+1, line.u, line.v, 16, 16);
 
         int dx = 22;
         String s = "";
@@ -269,10 +269,10 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRenderer.drawString(new MatrixStack(), mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);    // @todo 1.16
+        mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);    // @todo 1.16
     }
 
-    private void renderLine(int x, int y, Line line) {
+    private void renderLine(MatrixStack matrixStack, int x, int y, Line line) {
         int dx;
         String s = "";
         int col = 0xFF000000;
@@ -288,10 +288,10 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRenderer.drawString(new MatrixStack(), mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);    // @todo 1.16
+        mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);    // @todo 1.16
     }
 
-    private int renderRecipe(Screen gui, int x, int y, Line line) {
+    private int renderRecipe(Screen gui, MatrixStack matrixStack, int x, int y, Line line) {
         y += 4;
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         // @TODO: need support for shapeless and better error checking
@@ -299,7 +299,7 @@ public class TextPage extends AbstractWidget<TextPage> {
         if (craftingGridImage != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
-            gui.blit(new MatrixStack(), 25+x, y, craftU, craftV, 19*3, 19*3);   // @todo 1.16
+            gui.blit(matrixStack, 25+x, y, craftU, craftV, 19*3, 19*3);
         }
         int w;
         int h;
@@ -333,7 +333,7 @@ public class TextPage extends AbstractWidget<TextPage> {
                                 stack.setTag(tc.copy());
                             }
                         }
-                        RenderHelper.renderObject(mc, 26 + x + i * 18, 1 + y + j * 18, stack, false);
+                        RenderHelper.renderObject(matrixStack, 26 + x + i * 18, 1 + y + j * 18, stack, false);
                     }
                 }
             }
@@ -341,14 +341,14 @@ public class TextPage extends AbstractWidget<TextPage> {
         if (arrowImage != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(arrowImage);
-            gui.blit(new MatrixStack(), x+25+67, y+18, arrowU, arrowV, 16, 16); // @todo 1.16
+            gui.blit(matrixStack, x+25+67, y+18, arrowU, arrowV, 16, 16);
         }
         if (craftingGridImage != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(craftingGridImage);
-            gui.blit(new MatrixStack(), x+25+92, y + 16, craftU, craftV, 18, 18);   // @todo 1.16
+            gui.blit(matrixStack, x+25+92, y + 16, craftU, craftV, 18, 18);
         }
-        RenderHelper.renderObject(mc, x+25+93, y + 17, line.recipe.getRecipeOutput(), false);
+        RenderHelper.renderObject(matrixStack, x+25+93, y + 17, line.recipe.getRecipeOutput(), false);
         y -= 4;
         return y;
     }

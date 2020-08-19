@@ -133,15 +133,15 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
     }
 
     @Override
-    public void draw(Screen gui, int x, int y) {
-        drawOffset(gui, x, y, 0, 0);
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+        drawOffset(gui, matrixStack, x, y, 0, 0);
     }
 
-    public void drawOffset(Screen gui, int x, int y, int offsetx, int offsety) {
+    public void drawOffset(Screen gui, MatrixStack matrixStack, int x, int y, int offsetx, int offsety) {
         if (!visible) {
             return;
         }
-        super.draw(gui, x, y);
+        super.draw(gui, matrixStack, x, y);
 
         int dx = calculateHorizontalOffset() + offsetx + txtDx;
         int dy = calculateVerticalOffset() + offsety + txtDy;
@@ -151,7 +151,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
             mc.getTextureManager().bindTexture(image);
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;
-            gui.blit(new MatrixStack(), xx, yy, u, v, iw, ih);  // @todo 1.16
+            gui.blit(matrixStack, xx, yy, u, v, iw, ih);
         }
 
         int col = getColor();
@@ -160,9 +160,9 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         }
 
         if (text == null) {
-            mc.fontRenderer.drawString(new MatrixStack(), "", x+dx+bounds.x, y+dy+bounds.y, col);   // @todo 1.16
+            mc.fontRenderer.drawString(matrixStack, "", x+dx+bounds.x, y+dy+bounds.y, col);
         } else {
-            mc.fontRenderer.drawString(new MatrixStack(), mc.fontRenderer.func_238412_a_(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);    // @todo 1.16
+            mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
         }
     }
 

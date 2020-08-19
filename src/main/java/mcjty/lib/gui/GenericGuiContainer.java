@@ -119,14 +119,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack stack, int p_230451_2_, int p_230451_3_) {
-        super.drawGuiContainerForegroundLayer(stack, p_230451_2_, p_230451_3_);
-        getWindowManager().drawTooltips();
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int p_230451_2_, int p_230451_3_) {
+        super.drawGuiContainerForegroundLayer(matrixStack, p_230451_2_, p_230451_3_);
+        getWindowManager().drawTooltips(matrixStack);
     }
 
-    public void drawHoveringText(List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
+    public void drawHoveringText(MatrixStack matrixStack, List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
         if (!textLines.isEmpty()) {
-            RenderSystem.pushMatrix();
+            matrixStack.push();
             RenderSystem.disableRescaleNormal();
             net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
             RenderSystem.disableLighting();
@@ -187,7 +187,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             setBlitOffset(300);
             this.itemRenderer.zLevel = 300.0F;
             int l = -267386864;
-            MatrixStack matrixStack = null; // @todo 1.16
             this.fillGradient(matrixStack, xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
             this.fillGradient(matrixStack, xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
             this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy + k + 3, l, l);
@@ -202,7 +201,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
             RenderSystem.translated(0.0D, 0.0D, (double)this.itemRenderer.zLevel);
 
-            renderTextLines(textLines, items, font, xx, yy);
+            renderTextLines(matrixStack, textLines, items, font, xx, yy);
 
             setBlitOffset(0);
             this.itemRenderer.zLevel = 0.0F;
@@ -210,11 +209,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             RenderSystem.enableDepthTest();
             net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
             RenderSystem.enableRescaleNormal();
-            RenderSystem.popMatrix();
+            matrixStack.pop();
         }
     }
 
-    private void renderTextLines(List<String> textLines, List<ItemStack> items, FontRenderer font, int xx, int yy) {
+    private void renderTextLines(MatrixStack matrixStack, List<String> textLines, List<ItemStack> items, FontRenderer font, int xx, int yy) {
         for (int i = 0; i < textLines.size(); ++i) {
             String s1 = textLines.get(i);
             if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
@@ -224,10 +223,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 for (Object o : list) {
                     if (o instanceof String) {
                         String s2 = (String)o;
-                        font.drawStringWithShadow(new MatrixStack(), s2, curx, yy, -1); // @todo 1.16
+                        font.drawStringWithShadow(matrixStack, s2, curx, yy, -1);
                         curx += font.getStringWidth(s2);
                     } else {
-                        RenderHelper.renderObject(getMinecraft(), curx + 1, yy, o, false);
+                        RenderHelper.renderObject(matrixStack, curx + 1, yy, o, false);
                         curx += 20;
                         lineHasItemStacks = true;
                     }
@@ -236,7 +235,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                     yy += 8;
                 }
             } else {
-                font.drawStringWithShadow(new MatrixStack(), s1, xx, yy, -1);   // @todo 1.16
+                font.drawStringWithShadow(matrixStack, s1, xx, yy, -1);
             }
 
             if (i == 0) {
@@ -257,7 +256,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             return;
         }
         renderBackground(matrixStack);
-        getWindowManager().draw();
+        getWindowManager().draw(matrixStack);
     }
 
     @Override
@@ -266,19 +265,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             return;
         }
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        // @todo 1.16
-//        this.renderHoveredToolTip(mouseX, mouseY);
-        drawStackTooltips(mouseX, mouseY);
+        this.func_230459_a_(matrixStack, mouseX, mouseY);    // renderHoveredTooltip
+        drawStackTooltips(matrixStack, mouseX, mouseY);
     }
 
-//@todo 1.16
-//    @Override
-//    public void drawSlot(Slot slotIn) {
-//        // Prevent slots from being rendered if they are (partially) covered by a modal window
-//        if (!isPartiallyCoveredByModalWindow(slotIn)) {
-//            super.drawSlot(slotIn);
-//        }
-//    }
+    @Override
+    public void moveItems(MatrixStack matrixStack, Slot slot) {
+        super.moveItems(matrixStack, slot);
+        // Prevent slots from being rendered if they are (partially) covered by a modal window
+        if (!isPartiallyCoveredByModalWindow(slot)) {
+            super.moveItems(matrixStack, slot);
+        }
+    }
 
     @Nullable
     @Override
@@ -312,7 +310,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     /**
      * Draw tooltips for itemstacks that are in BlockRender widgets
      */
-    protected void drawStackTooltips(int mouseX, int mouseY) {
+    protected void drawStackTooltips(MatrixStack matrixStack, int mouseX, int mouseY) {
         int x = GuiTools.getRelativeX(window.getGui());
         int y = GuiTools.getRelativeY(window.getGui());
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
@@ -330,7 +328,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 itemStack = ItemStack.EMPTY;
             }
             if (!itemStack.isEmpty()) {
-                customRenderToolTip(blockRender, itemStack, mouseX, mouseY);
+                customRenderToolTip(matrixStack, blockRender, itemStack, mouseX, mouseY);
             }
         }
     }
@@ -339,7 +337,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         return oldList;
     }
 
-    protected void customRenderToolTip(BlockRender blockRender, ItemStack stack, int x, int y) {
+    protected void customRenderToolTip(MatrixStack matrixStack, BlockRender blockRender, ItemStack stack, int x, int y) {
         List<String> list;
         //noinspection ConstantConditions
         if (stack.getItem() == null) {
@@ -364,7 +362,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         if (stack.getItem() != null) {
             font = stack.getItem().getFontRenderer(stack);
         }
-//        this.renderTooltip(new MatrixStack(), list, x, y, (font == null ? getMinecraft().fontRenderer : font)); // @todo 1.16
+//        this.renderTooltip(matrixStack, list, x, y, (font == null ? getMinecraft().fontRenderer : font)); // @todo 1.16
     }
 
     @Override

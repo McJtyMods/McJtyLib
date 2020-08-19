@@ -96,21 +96,21 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public void draw(Screen gui, int x, int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
         if (showLabel) {
-            drawBackground(gui, x, y, bounds.height, bounds.height);
+            drawBackground(gui, matrixStack, x, y, bounds.height, bounds.height);
         } else {
-            super.draw(gui, x, y);
+            super.draw(gui, matrixStack, x, y);
         }
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
             int yy = y + bounds.y + offsetY;
             mc.getItemRenderer().zLevel = 100;
             this.window.getGui().setBlitOffset(100);
-            RenderHelper.renderObject(mc, xx, yy, renderItem, false);
+            RenderHelper.renderObject(matrixStack, xx, yy, renderItem, false);
             mc.getItemRenderer().zLevel = 0;
             this.window.getGui().setBlitOffset(0);
             if (hilightOnHover && isHovering()) {
@@ -138,7 +138,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 }
                 int h = mc.fontRenderer.FONT_HEIGHT;
                 int dy = (bounds.height - h)/2;
-                mc.fontRenderer.drawString(new MatrixStack(), name, xx+20, yy + dy, getLabelColor());   // @todo 1.16
+                mc.fontRenderer.drawString(matrixStack, name, xx+20, yy + dy, getLabelColor());
             }
         }
     }

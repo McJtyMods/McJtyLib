@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.gui.screen.Screen;
@@ -58,20 +59,20 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void draw(Screen gui, int x, int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, x, y);
+        super.draw(gui, matrixStack, x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
-        drawBox(xx, yy, 0xffff0000);
+        drawBox(matrixStack, xx, yy, 0xffff0000);
 
         setChildBounds();
 
         if (current != null) {
             current.setWindow(window);
-            current.draw(gui, xx, yy);
+            current.draw(gui, matrixStack, xx, yy);
         }
     }
 

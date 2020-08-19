@@ -2,11 +2,13 @@ package mcjty.lib.compat;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.GenericGuiContainer;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
@@ -22,7 +24,7 @@ public class JeiCompatibility implements IModPlugin {
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         // @todo 1.16
-//        registration.addGuiContainerHandler(GenericGuiContainer.class, new IGuiContainerHandler<GenericGuiContainer>() {
+//        registration.addGuiContainerHandler(GenericGuiContainer.class, new IGuiContainerHandler<GenericGuiContainer<GenericTileEntity, Container>>() {
 //            @Override
 //            public List<Rectangle2d> getGuiExtraAreas(GenericGuiContainer containerScreen) {
 //                return containerScreen.getExtraWindowBounds();

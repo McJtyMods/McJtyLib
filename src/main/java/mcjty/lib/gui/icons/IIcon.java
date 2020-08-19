@@ -1,5 +1,6 @@
 package mcjty.lib.gui.icons;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 
@@ -10,7 +11,7 @@ public interface IIcon {
     /**
      * Draw this icon on the GUI at the specific position
      */
-    void draw(Minecraft mc, Screen gui, int x, int y);
+    void draw(Screen gui, MatrixStack matrixStack, int x, int y);
 
     void addOverlay(IIcon icon);
 

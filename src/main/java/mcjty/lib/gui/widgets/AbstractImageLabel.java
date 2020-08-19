@@ -105,18 +105,18 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
 
     @Override
-    public void draw(Screen gui, int x, int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, x, y);
+        super.draw(gui, matrixStack, x, y);
 
         if (image != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
             mc.getTextureManager().bindTexture(image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            gui.blit(new MatrixStack(), xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);    // @todo 1.16
+            gui.blit(matrixStack, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
         }
     }
 

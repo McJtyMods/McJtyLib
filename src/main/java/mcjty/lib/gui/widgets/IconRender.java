@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
@@ -27,13 +28,13 @@ public class IconRender extends AbstractWidget<IconRender> {
     }
 
     @Override
-    public void draw(Screen gui, int x, int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, x, y);
+        super.draw(gui, matrixStack, x, y);
         if (icon != null) {
-            RenderHelper.renderObject(mc, x + bounds.x, y + bounds.y, icon, false);
+            RenderHelper.renderObject(matrixStack, x + bounds.x, y + bounds.y, icon, false);
         }
     }
 

@@ -2,7 +2,6 @@ package mcjty.lib.tooltips;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.BlockItem;
@@ -98,22 +97,22 @@ public class TooltipRender {
             for (Pair<ItemStack, Integer> item : items) {
                 int x = bx + (j % STACKS_PER_LINE) * 18;
                 int y = by + (j / STACKS_PER_LINE) * 20;
-                renderBlocks(item.getLeft(), x, y, item.getLeft().getCount(), item.getRight());
+                renderBlocks(event.getMatrixStack(), item.getLeft(), x, y, item.getLeft().getCount(), item.getRight());
                 j++;
             }
         }
     }
 
-    private static void renderBlocks(ItemStack itemStack, int x, int y, int count, int errorAmount) {
+    private static void renderBlocks(MatrixStack matrixStack, ItemStack itemStack, int x, int y, int count, int errorAmount) {
         Minecraft mc = Minecraft.getInstance();
         GlStateManager.disableDepthTest();
         ItemRenderer render = mc.getItemRenderer();
 
         net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
-        RenderSystem.pushMatrix();
-        RenderSystem.translatef(0, 0, 400f);
-        render.renderItemIntoGUI(itemStack, x, y);
-        RenderSystem.popMatrix();
+        matrixStack.push();
+        matrixStack.translate(0, 0, 400f);
+        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
+        matrixStack.pop();
 
         //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
         String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString((int) ((float) count));
@@ -123,11 +122,11 @@ public class TooltipRender {
         boolean hasReq = true;
 
         if (errorAmount != ITooltipExtras.NOAMOUNT) {
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
-            RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawStringWithShadow(new MatrixStack(), s1, 0, 0, color);   // @todo 1.16
-            RenderSystem.popMatrix();
+            matrixStack.push();
+            matrixStack.translate(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
+            matrixStack.scale(0.5F, 0.5F, 0.5F);
+            mc.fontRenderer.drawStringWithShadow(matrixStack, s1, 0, 0, color);
+            matrixStack.pop();
         }
 
         int missingCount = 0;
@@ -138,11 +137,11 @@ public class TooltipRender {
             String s2 = "(" + fs + ")";
             int w2 = mc.fontRenderer.getStringWidth(s2);
 
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 0);
-            RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawStringWithShadow(new MatrixStack(), s2, 0, 0, 0xFF0000);    // @todo 1.16
-            RenderSystem.popMatrix();
+            matrixStack.push();
+            matrixStack.translate(x + 8 - w2 / 4, y + 17, 0);
+            matrixStack.scale(0.5F, 0.5F, 0.5F);
+            mc.fontRenderer.drawStringWithShadow(matrixStack, s2, 0, 0, 0xFF0000);
+            matrixStack.pop();
         }
         GlStateManager.enableDepthTest();
     }

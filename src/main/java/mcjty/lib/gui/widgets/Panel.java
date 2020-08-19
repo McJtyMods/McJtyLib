@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.*;
 import mcjty.lib.typed.Type;
@@ -30,11 +31,11 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void draw(Screen gui, int x, int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, x, y);
+        super.draw(gui, matrixStack, x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
 //        drawBox(xx, yy, 0xffff0000);
@@ -47,20 +48,20 @@ public class Panel extends AbstractContainerWidget<Panel> {
 
         for (Widget<?> child : getChildren()) {
             child.setWindow(window);
-            child.draw(gui, xx, yy);
+            child.draw(gui, matrixStack, xx, yy);
         }
     }
 
     @Override
-    public void drawPhase2(Screen gui, int x, int y) {
+    public void drawPhase2(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
-        super.drawPhase2(gui, x, y);
+        super.drawPhase2(gui, matrixStack, x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         for (Widget<?> child : getChildren()) {
-            child.drawPhase2(gui, xx, yy);
+            child.drawPhase2(gui, matrixStack, xx, yy);
         }
     }
 

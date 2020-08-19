@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
@@ -144,13 +145,13 @@ public interface Widget<P extends Widget<P>> {
      * The given coordinates are the absolute coordinates of the parent. This does *not* include
      * the top/left x,y of this widget itself.
      */
-    void draw(Screen gui, int x, int y);
+    void draw(Screen gui, MatrixStack matrixStack, int x, int y);
 
     /**
      * After the window has been drawn this is called again to give widgets a chance
      * to render additional stuff that has to be rendered on top of the rest
      */
-    void drawPhase2(Screen gui, int x, int y);
+    void drawPhase2(Screen gui, MatrixStack matrixStack, int x, int y);
 
     /**
      * Handle a mouse click for this widget. This widget does not have to check if the coordinate is

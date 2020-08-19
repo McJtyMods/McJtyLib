@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
@@ -137,11 +138,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     @Override
-    public void draw(Screen gui, int x, int y) {
+    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, x, y);
+        super.draw(gui, matrixStack, x, y);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -149,26 +150,26 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         if (border > 0) {
             if (borderColor != null) {
                 if ((!selectable) || window.getTextFocus() != this) {
-                    RenderHelper.drawFlatBox(xx, yy, xx + bounds.width, yy + bounds.height, borderColor, -1);
+                    RenderHelper.drawFlatBox(matrixStack, xx, yy, xx + bounds.width, yy + bounds.height, borderColor, -1);
                 }
             }
         }
 
         if (icon != null) {
-            icon.draw(mc, gui, xx + border, yy + border);
+            icon.draw(gui, matrixStack, xx + border, yy + border);
         }
     }
 
     @Override
-    public void drawPhase2(Screen gui, int x, int y) {
+    public void drawPhase2(Screen gui, MatrixStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
-        super.drawPhase2(gui, x, y);
+        super.drawPhase2(gui, matrixStack, x, y);
         if (border > 0 && selectable && selectedBorderColor != null && window.getTextFocus() == this) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            RenderHelper.drawFlatBox(xx, yy, xx + bounds.width, yy + bounds.height, selectedBorderColor, -1);
+            RenderHelper.drawFlatBox(matrixStack, xx, yy, xx + bounds.width, yy + bounds.height, selectedBorderColor, -1);
         }
     }
 
