@@ -6,6 +6,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.util.Objects;
@@ -14,12 +16,14 @@ public class DimensionId {
 
     private final DimensionType id;
 
+    private final static Lazy<DimensionId> OVERWORLD = Lazy.of(() -> new DimensionId(DimensionType.OVERWORLD));
+
     private DimensionId(DimensionType id) {
         this.id = id;
     }
 
     public static DimensionId overworld() {
-        return new DimensionId(DimensionType.OVERWORLD);
+        return OVERWORLD.get();
     }
 
     public static DimensionId fromId(DimensionType id) {
@@ -44,6 +48,16 @@ public class DimensionId {
         return id.getRegistryName();
     }
 
+    // Only use when needed. Only on 1.15
+    public int getInternalId() {
+        return id.getId();
+    }
+
+    // Only use when needed. Only on 1.15
+    public DimensionType getInternalType() {
+        return id;
+    }
+
     // Is this a good way to get the dimension name?
     public String getName() { return id.getRegistryName().getPath(); }
 
@@ -55,13 +69,27 @@ public class DimensionId {
         buf.writeInt(id.getId());
     }
 
-    public ServerWorld getWorld() {
+    public ServerWorld loadWorld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return server.getWorld(id);
     }
 
+    // Do not load the world if it is not there
+    public ServerWorld getWorld() {
+        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        return DimensionManager.getWorld(server, id, false, false);
+    }
+
+    public ServerWorld loadWorld(World otherWorld) {
+        return otherWorld.getServer().getWorld(id);
+    }
+
     public static boolean sameDimension(World world1, World world2) {
         return world1.getDimension().getType().equals(world2.getDimension().getType());
+    }
+
+    public boolean sameDimension(World world) {
+        return id.equals(world.getDimension().getType());
     }
 
     @Override

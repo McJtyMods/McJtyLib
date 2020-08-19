@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 public class TeleportationTools {
 
-    public static void teleport(PlayerEntity player, DimensionType dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
+    public static void teleport(PlayerEntity player, DimensionId dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
         DimensionType oldId = player.getEntityWorld().getDimension().getType();
 
         float rotationYaw = player.rotationYaw;
@@ -33,8 +33,8 @@ public class TeleportationTools {
         player.setPositionAndUpdate(destX, destY, destZ);
     }
 
-    public static void teleportToDimension(PlayerEntity player, DimensionType dimension, double x, double y, double z) {
-        player.changeDimension(dimension, new ITeleporter() {
+    public static void teleportToDimension(PlayerEntity player, DimensionId dimension, double x, double y, double z) {
+        player.changeDimension(dimension.getInternalType(), new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
                 entity = repositionEntity.apply(false);

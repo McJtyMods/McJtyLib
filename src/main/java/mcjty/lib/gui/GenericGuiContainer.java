@@ -3,6 +3,7 @@ package mcjty.lib.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.base.ModBase;
+import mcjty.lib.client.GuiTools;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
@@ -13,7 +14,7 @@ import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.client.GuiTools;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;
@@ -32,7 +33,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -451,7 +451,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), tileEntity.getDimensionType(), command, params));
     }
 
-    public void sendServerCommandTyped(SimpleChannel network, DimensionType dimensionId, String command, TypedMap params) {
+    public void sendServerCommandTyped(SimpleChannel network, DimensionId dimensionId, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), dimensionId, command, params));
     }
 

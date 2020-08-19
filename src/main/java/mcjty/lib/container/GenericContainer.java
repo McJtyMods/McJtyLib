@@ -5,6 +5,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.TriFunction;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,7 +19,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -427,11 +427,11 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     public static <T extends GenericContainer, E extends GenericTileEntity> ContainerType<T> createRemoteContainerType(
-            Function<DimensionType, E> dummyTEFactory,
+            Function<DimensionId, E> dummyTEFactory,
             TriFunction<Integer, BlockPos, E, T> containerFactory, int slots) {
         return IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            DimensionType type = DimensionType.getById(data.readInt());
+            DimensionId type = DimensionId.fromPacket(data);
 
             E te = dummyTEFactory.apply(type);
             te.setWorldAndPos(inv.player.getEntityWorld(), pos);    // Wrong world but doesn't really matter

@@ -17,10 +17,6 @@ public class WorldTools {
         return world.isBlockLoaded(pos);
     }
 
-    public static String getDimensionName(DimensionType type) {
-        return type.getRegistryName().toString();
-    }
-
     public static ServerWorld getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return DimensionManager.getWorld(server, DimensionType.OVERWORLD, false, false);
@@ -40,13 +36,26 @@ public class WorldTools {
         return world;
     }
 
+    public static ServerWorld loadWorld(DimensionId type) {
+        return type.loadWorld();
+    }
+
     public static ServerWorld getWorld(DimensionType type) {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return DimensionManager.getWorld(server, type, false, false);
+    }
+
+    public static ServerWorld getWorld(DimensionId type) {
+        return type.loadWorld();
     }
 
     public static ServerWorld getWorld(World world, DimensionType type) {
         MinecraftServer server = world.getServer();
         return DimensionManager.getWorld(server, type, false, false);
     }
+
+    public static ServerWorld getWorld(World world, DimensionId type) {
+        return type.loadWorld(world);
+    }
+
 }

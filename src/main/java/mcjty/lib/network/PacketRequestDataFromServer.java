@@ -1,13 +1,13 @@
 package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -21,14 +21,14 @@ import java.util.function.Supplier;
  */
 public class PacketRequestDataFromServer {
     protected BlockPos pos;
-    private DimensionType type;
+    private DimensionId type;
     protected String command;
     protected TypedMap params;
     private boolean dummy;
 
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        type = DimensionType.getById(buf.readInt());
+        type = DimensionId.fromPacket(buf);
         command = buf.readString(32767);
         params = TypedMapTools.readArguments(buf);
         dummy = buf.readBoolean();
@@ -36,13 +36,13 @@ public class PacketRequestDataFromServer {
 
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
-        buf.writeInt(type.getId());
+        type.toBytes(buf);
         buf.writeString(command);
         TypedMapTools.writeArguments(buf, params);
         buf.writeBoolean(dummy);
     }
 
-    public PacketRequestDataFromServer(DimensionType type, BlockPos pos, String command, TypedMap params, boolean dummy) {
+    public PacketRequestDataFromServer(DimensionId type, BlockPos pos, String command, TypedMap params, boolean dummy) {
         this.type = type;
         this.pos = pos;
         this.command = command;

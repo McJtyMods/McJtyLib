@@ -13,13 +13,13 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
@@ -421,7 +421,7 @@ public class Window {
         return this;
     }
 
-    private <V> void initializeBinding(SimpleChannel network, @Nonnull DimensionType dimensionType, String componentName, IValue<V> value) {
+    private <V> void initializeBinding(SimpleChannel network, @Nonnull DimensionId dimensionType, String componentName, IValue<V> value) {
         V v = value.getter().get();
         Widget<?> component = findChild(componentName);
 

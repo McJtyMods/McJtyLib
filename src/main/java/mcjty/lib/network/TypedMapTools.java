@@ -3,10 +3,10 @@ package mcjty.lib.network;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.DimensionId;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
 
 import java.util.*;
 
@@ -69,7 +69,7 @@ public class TypedMapTools {
                         break;
                     case TYPE_DIMENSION_TYPE:
                         if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.DIMENSION_TYPE), DimensionType.getById(buf.readInt()));
+                            args.put(new Key<>(key, Type.DIMENSION_TYPE), DimensionId.fromPacket(buf));
                         } else {
                             args.put(new Key<>(key, Type.DIMENSION_TYPE), null);
                         }
@@ -152,10 +152,10 @@ public class TypedMapTools {
                     buf.writeInt((Integer) args.get(key));
                     break;
                 case TYPE_DIMENSION_TYPE: {
-                    DimensionType type = (DimensionType) args.get(key);
+                    DimensionId type = (DimensionId) args.get(key);
                     if (type != null) {
                         buf.writeBoolean(true);
-                        buf.writeInt(type.getId());
+                        type.toBytes(buf);
                     } else {
                         buf.writeBoolean(false);
                     }

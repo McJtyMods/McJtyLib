@@ -3,20 +3,19 @@ package mcjty.lib.varia;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 
 public class GlobalCoordinate {
     private final BlockPos coordinate;
-    private final DimensionType dimension;
+    private final DimensionId dimension;
 
-    public GlobalCoordinate(BlockPos coordinate, DimensionType dimension) {
+    public GlobalCoordinate(BlockPos coordinate, DimensionId dimension) {
         this.coordinate = coordinate;
         this.dimension = dimension;
     }
 
     public GlobalCoordinate(BlockPos coordinate, World world) {
         this.coordinate = coordinate;
-        this.dimension = world.getDimension().getType();
+        this.dimension = DimensionId.fromWorld(world);
     }
 
 
@@ -24,7 +23,7 @@ public class GlobalCoordinate {
         return coordinate;
     }
 
-    public DimensionType getDimension() {
+    public DimensionId getDimension() {
         return dimension;
     }
 
@@ -43,13 +42,13 @@ public class GlobalCoordinate {
     @Override
     public int hashCode() {
         int result = coordinate != null ? coordinate.hashCode() : 0;
-        result = 31 * result + dimension.getId();
+        result = 31 * result + dimension.hashCode();
         return result;
     }
 
     @Override
     public String toString() {
-        return BlockPosTools.toString(coordinate) + " (" + WorldTools.getDimensionName(dimension) + ")";
+        return BlockPosTools.toString(coordinate) + " (" + dimension.getName() + ")";
     }
 }
 

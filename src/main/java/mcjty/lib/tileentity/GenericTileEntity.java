@@ -13,6 +13,7 @@ import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -29,7 +30,6 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -512,8 +512,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
-    public DimensionType getDimensionType() {
-        return world.getDimension().getType();
+    public DimensionId getDimensionType() {
+        return DimensionId.fromWorld(world);
     }
 
         // Client side function to send a value to the server
