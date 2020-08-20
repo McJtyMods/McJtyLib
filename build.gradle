@@ -3,22 +3,21 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url 'https://plugins.gradle.org/m2/' }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath 'gradle.plugin.com.matthewprenger:CurseGradle:1.4.0'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
-
-//plugins {
-    //id 'com.matthewprenger.cursegradle' version '1.1.0'
-//}
-
+apply plugin: 'com.matthewprenger.cursegradle'
 apply plugin: 'maven-publish'
+
 
 repositories {
     maven { // JEI
