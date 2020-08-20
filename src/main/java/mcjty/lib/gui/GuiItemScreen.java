@@ -5,10 +5,14 @@ import mcjty.lib.base.ModBase;
 import mcjty.lib.client.GuiTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.util.IReorderingProcessor;
+import net.minecraft.util.text.ITextProperties;
+import net.minecraft.util.text.LanguageMap;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class can be used by items that want to show a GUI.
@@ -96,15 +100,19 @@ public class GuiItemScreen extends Screen {
         if (tooltips != null) {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);
-            // @todo 1.16
-            //renderTooltip(matrixStack, tooltips, x-guiLeft, y-guiTop, mc.fontRenderer);
+            // @todo check on 1.16
+            List<ITextProperties> properties = tooltips.stream().map(StringTextComponent::new).collect(Collectors.toList());
+            List<IReorderingProcessor> processors = LanguageMap.getInstance().func_244260_a(properties);
+            renderTooltip(matrixStack, processors, x-guiLeft, y-guiTop);
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);
-            // @todo 1.16
-//            renderTooltip(matrixStack, tooltips, x - guiLeft, y - guiTop, mc.fontRenderer);
+            // @todo check on 1.16
+            List<ITextProperties> properties = tooltips.stream().map(StringTextComponent::new).collect(Collectors.toList());
+            List<IReorderingProcessor> processors = LanguageMap.getInstance().func_244260_a(properties);
+            renderTooltip(matrixStack, processors, x - guiLeft, y - guiTop);
         }
     }
 

@@ -31,9 +31,8 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.IReorderingProcessor;
+import net.minecraft.util.text.*;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -362,7 +361,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         if (stack.getItem() != null) {
             font = stack.getItem().getFontRenderer(stack);
         }
-//        this.renderTooltip(matrixStack, list, x, y, (font == null ? getMinecraft().fontRenderer : font)); // @todo 1.16
+        // @todo check on 1.16
+        List<ITextProperties> properties = list.stream().map(StringTextComponent::new).collect(Collectors.toList());
+        List<IReorderingProcessor> processors = LanguageMap.getInstance().func_244260_a(properties);
+        renderToolTip(matrixStack, processors, x, y, (font == null ? getMinecraft().fontRenderer : font));
     }
 
     @Override

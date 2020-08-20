@@ -61,7 +61,7 @@ public class DimensionId {
     }
 
     public ServerWorld loadWorld() {
-        // @todo 1.16: actually load the world
+        // Worlds in 1.16 are always loaded
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         return server.getWorld(id);
     }
@@ -73,7 +73,7 @@ public class DimensionId {
     }
 
     public ServerWorld loadWorld(World otherWorld) {
-        // @todo 1.16: actually load the world
+        // Worlds in 1.16 are always loaded
         return otherWorld.getServer().getWorld(id);
     }
 

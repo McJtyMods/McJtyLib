@@ -269,7 +269,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);    // @todo 1.16
+        mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y + 3, col);
     }
 
     private void renderLine(MatrixStack matrixStack, int x, int y, Line line) {
@@ -288,7 +288,7 @@ public class TextPage extends AbstractWidget<TextPage> {
             dx = 25;
         }
         s += line.line;
-        mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);    // @todo 1.16
+        mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(s, bounds.width-dx), x + dx + bounds.x, y + bounds.y, col);
     }
 
     private int renderRecipe(Screen gui, MatrixStack matrixStack, int x, int y, Line line) {

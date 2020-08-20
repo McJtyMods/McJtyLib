@@ -28,8 +28,7 @@ public class WorldTools {
     public static ServerWorld loadWorld(DimensionId type) {
         ServerWorld world = getWorld(type);
         if (world == null) {
-//            MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-            // @todo 1.16 somehow load the world?
+            // Worlds in 1.16 are always loaded
             return type.loadWorld();
         }
         return world;
@@ -40,9 +39,7 @@ public class WorldTools {
     }
 
     public static ServerWorld getWorld(World world, DimensionId type) {
-        // @todo 1.16 load?
+        // Worlds in 1.16 are always loaded
         return type.loadWorld(world);
-//        MinecraftServer server = world.getServer();
-//        return DimensionManager.getWorld(server, type, false, false);
     }
 }
