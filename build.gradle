@@ -265,8 +265,10 @@ curseforge {
             displayName = "${modname} - ${version}"
         }
         relations {
-            optionalLibrary 'the-one-probe'
+            optionalLibrary 'baubles'
+            optionalLibrary 'tesla'
             optionalLibrary 'redstone-flux'
         }
     }
 }
+
