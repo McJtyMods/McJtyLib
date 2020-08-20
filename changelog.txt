@@ -1,3 +1,6 @@
+5.0.0:
+- First port to 1.16.2
+
 4.1.4:
 - Tag selector windows were ignoring the type. As a consequence they only showed block tags and not items tags
 
