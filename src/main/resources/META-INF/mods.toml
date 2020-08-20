@@ -1,5 +1,6 @@
-modLoader="javafml" #mandatory
-loaderVersion="[31,)" #mandatory (25 is current forge version)
+modLoader="javafml"
+loaderVersion="[33,)"
+license="MIT License https://github.com/McJtyMods/McJtyLib/blob/1.16/LICENCE"
 issueTrackerURL="http://github.com/McJtyMods/McJtyLib/issues"
 displayURL="http://github.com/McJtyMods/McJtyLib/"
 # A file name (in the root of the mod JAR) containing a logo for display
