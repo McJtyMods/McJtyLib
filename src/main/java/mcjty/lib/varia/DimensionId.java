@@ -45,11 +45,11 @@ public class DimensionId {
     }
 
     public ResourceLocation getRegistryName() {
-        return id.getRegistryName();
+        return id.func_240901_a_();
     }
 
     // Is this a good way to get the dimension name?
-    public String getName() { return id.getRegistryName().getPath(); }
+    public String getName() { return id.func_240901_a_().getPath(); }
 
     public boolean isOverworld() {
         return id.equals(World.field_234918_g_);
@@ -57,7 +57,7 @@ public class DimensionId {
 
     public void toBytes(PacketBuffer buf) {
         // @todo use numerical ID
-        buf.writeResourceLocation(id.getRegistryName());
+        buf.writeResourceLocation(id.func_240901_a_());
     }
 
     public ServerWorld loadWorld() {

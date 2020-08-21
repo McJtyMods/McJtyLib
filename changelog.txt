@@ -1,3 +1,7 @@
+5.0.1:
+- Fixed a problem with gui's showing some random text
+- Fixed handling of dimensions. Fixing this fixes lots of things throughout the game
+
 5.0.0:
 - First port to 1.16.2
 
