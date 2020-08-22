@@ -23,7 +23,7 @@ public class JeiCompatibility implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-//        registration.addGuiContainerHandler(GenericGuiContainer.class, new Handler<GenericContainer>());
+        registration.addGenericGuiContainerHandler(GenericGuiContainer.class, new Handler<GenericContainer>());
     }
 
     static class Handler<T extends Container> implements IGuiContainerHandler<GenericGuiContainer<?,T>> {
