@@ -17,12 +17,12 @@ public class WorldTools {
 
     public static ServerWorld getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getWorld(World.field_234918_g_);
+        return server.getWorld(World.OVERWORLD);
     }
 
     public static ServerWorld getOverworld(World world) {
         MinecraftServer server = world.getServer();
-        return server.getWorld(World.field_234918_g_);
+        return server.getWorld(World.OVERWORLD);
     }
 
     public static ServerWorld loadWorld(DimensionId type) {

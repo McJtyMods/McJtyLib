@@ -263,7 +263,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             return;
         }
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.func_230459_a_(matrixStack, mouseX, mouseY);    // renderHoveredTooltip
+        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
         drawStackTooltips(matrixStack, mouseX, mouseY);
     }
 

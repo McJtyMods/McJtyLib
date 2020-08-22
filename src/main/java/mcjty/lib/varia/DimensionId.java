@@ -16,7 +16,7 @@ public class DimensionId {
 
     private final RegistryKey<World> id;
 
-    private final static Lazy<DimensionId> OVERWORLD = Lazy.of(() -> new DimensionId(World.field_234918_g_));
+    private final static Lazy<DimensionId> OVERWORLD = Lazy.of(() -> new DimensionId(World.OVERWORLD));
 
     private DimensionId(RegistryKey<World> id) {
         this.id = id;
@@ -36,7 +36,7 @@ public class DimensionId {
     }
 
     public static DimensionId fromWorld(World world) {
-        return new DimensionId(world.func_234923_W_());
+        return new DimensionId(world.getDimensionKey());
     }
 
     public static DimensionId fromResourceLocation(ResourceLocation location) {
@@ -52,7 +52,7 @@ public class DimensionId {
     public String getName() { return id.func_240901_a_().getPath(); }
 
     public boolean isOverworld() {
-        return id.equals(World.field_234918_g_);
+        return id.equals(World.OVERWORLD);
     }
 
     public void toBytes(PacketBuffer buf) {
@@ -78,11 +78,11 @@ public class DimensionId {
     }
 
     public static boolean sameDimension(World world1, World world2) {
-        return world1.func_234923_W_().equals(world2.func_234923_W_());
+        return world1.getDimensionKey().equals(world2.getDimensionKey());
     }
 
     public boolean sameDimension(World world) {
-        return id.equals(world.func_234923_W_());
+        return id.equals(world.getDimensionKey());
     }
 
 
