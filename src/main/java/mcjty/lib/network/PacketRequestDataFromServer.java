@@ -54,20 +54,22 @@ public class PacketRequestDataFromServer {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             World world = WorldTools.getWorld(ctx.getSender().getEntityWorld(), type);
-            TileEntity te = world.getTileEntity(pos);
-            if(!(te instanceof ICommandHandler)) {
-                Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
-                return;
-            }
-            ICommandHandler commandHandler = (ICommandHandler) te;
-            TypedMap result = commandHandler.executeWithResult(command, params);
-            if (result == null) {
-                Logging.log("Command " + command + " was not handled!");
-                return;
-            }
+            if (world.isBlockLoaded(pos)) {
+                TileEntity te = world.getTileEntity(pos);
+                if (!(te instanceof ICommandHandler)) {
+                    Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
+                    return;
+                }
+                ICommandHandler commandHandler = (ICommandHandler) te;
+                TypedMap result = commandHandler.executeWithResult(command, params);
+                if (result == null) {
+                    Logging.log("Command " + command + " was not handled!");
+                    return;
+                }
 
-            PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
-            channel.sendTo(msg, ctx.getSender().connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+                PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
+                channel.sendTo(msg, ctx.getSender().connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+            }
         });
         ctx.setPacketHandled(true);
     }

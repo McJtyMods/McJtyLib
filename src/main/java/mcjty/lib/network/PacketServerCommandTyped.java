@@ -75,14 +75,16 @@ public class PacketServerCommandTyped {
             if (world == null) {
                 return;
             }
-            TileEntity te = world.getTileEntity(pos);
-            if(!(te instanceof ICommandHandler)) {
-                Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
-                return;
-            }
-            ICommandHandler commandHandler = (ICommandHandler) te;
-            if (!commandHandler.execute(playerEntity, command, params)) {
-                Logging.log("Command " + command + " was not handled!");
+            if (world.isBlockLoaded(pos)) {
+                TileEntity te = world.getTileEntity(pos);
+                if (!(te instanceof ICommandHandler)) {
+                    Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
+                    return;
+                }
+                ICommandHandler commandHandler = (ICommandHandler) te;
+                if (!commandHandler.execute(playerEntity, command, params)) {
+                    Logging.log("Command " + command + " was not handled!");
+                }
             }
         });
         ctx.setPacketHandled(true);
