@@ -11,7 +11,6 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,8 +38,8 @@ public class McJtyLib {
     public McJtyLib() {
         instance = this;
         // Register the setup method for modloading
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> setup.init(event));
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientRegistration::init);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::init);
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
