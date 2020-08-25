@@ -1,7 +1,6 @@
 package mcjty.lib;
 
 import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.base.ModBase;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.*;
@@ -19,11 +18,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 @Mod(McJtyLib.MODID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class McJtyLib implements ModBase {
+public class McJtyLib {
 
     public static final String MODID = "mcjtylib";
 
@@ -38,8 +36,6 @@ public class McJtyLib implements ModBase {
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
 
-    private static final Map<String, ModBase> mods = new HashMap<>();
-
     public McJtyLib() {
         instance = this;
         // Register the setup method for modloading
@@ -48,21 +44,6 @@ public class McJtyLib implements ModBase {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
-    }
-
-    public static void registerMod(ModBase mod) {
-        mods.put(mod.getModId(), mod);
-    }
-
-    public static void forEachMod(Consumer<ModBase> consumer) {
-        for (ModBase mod : mods.values()) {
-            consumer.accept(mod);
-        }
-    }
-
-    @Override
-    public String getModId() {
-        return MODID;
     }
 
     public static void registerCommand(String modid, String id, IServerCommand command) {
