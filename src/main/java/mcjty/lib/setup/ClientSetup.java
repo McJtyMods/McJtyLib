@@ -7,7 +7,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-public class ClientRegistration {
+public class ClientSetup {
 
     public static void init(FMLClientSetupEvent e) {
         MinecraftForge.EVENT_BUS.register(new TooltipRender());
