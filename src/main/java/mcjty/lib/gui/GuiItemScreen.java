@@ -1,7 +1,6 @@
 package mcjty.lib.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import mcjty.lib.base.ModBase;
 import mcjty.lib.client.GuiTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
