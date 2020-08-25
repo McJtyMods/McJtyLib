@@ -1,3 +1,6 @@
+Upcoming:
+- Safer client-side registrations (thread-safety)
+
 5.0.2:
 - Fixed a potential exploit which could be used to attack a server
 
