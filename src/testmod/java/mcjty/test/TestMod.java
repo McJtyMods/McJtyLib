@@ -1,7 +1,6 @@
 package mcjty.test;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.base.ModBase;
 import mcjty.lib.compat.MainCompatHandler;
 import mcjty.lib.network.PacketHandler;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,16 +16,11 @@ import org.apache.logging.log4j.Logger;
 import static mcjty.test.TestMod.MODID;
 
 @Mod(modid = MODID, name="testmod")
-public class TestMod implements ModBase {
+public class TestMod {
 
     public static final String MODID = "testmod";
 
     public static final int TESTGUI = 1;
-
-    @Override
-    public String getModId() {
-        return MODID;
-    }
 
     @Override
     public void openManual(PlayerEntity player, int bookindex, String page) {

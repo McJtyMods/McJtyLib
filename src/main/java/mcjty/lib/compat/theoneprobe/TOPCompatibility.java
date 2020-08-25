@@ -1,7 +1,6 @@
 package mcjty.lib.compat.theoneprobe;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.base.ModBase;
 import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.setup.Registration;
@@ -93,8 +92,6 @@ public class TOPCompatibility {
                 }
                 return false;
             });
-
-            McJtyLib.forEachMod(ModBase::handleTopExtras);
 
             return null;
         }

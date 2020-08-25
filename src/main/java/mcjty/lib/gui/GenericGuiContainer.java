@@ -3,7 +3,6 @@ package mcjty.lib.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.McJtyLib;
-import mcjty.lib.base.ModBase;
 import mcjty.lib.client.GuiTools;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
@@ -49,8 +48,6 @@ import java.util.stream.Collectors;
  */
 public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends Container> extends ContainerScreen<C> implements IKeyReceiver {
 
-    protected ModBase modBase;
-
     protected Window window;
     private WindowManager windowManager;
     protected final T tileEntity;
@@ -62,9 +59,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         this.ySize = y;
     }
 
-    public GenericGuiContainer(ModBase mod, T tileEntity, C container, PlayerInventory inventory, ManualEntry manualEntry) {
+    public GenericGuiContainer(T tileEntity, C container, PlayerInventory inventory, ManualEntry manualEntry) {
         super(container, inventory, new StringTextComponent("test"));   // @todo
-        this.modBase = mod;
         this.tileEntity = tileEntity;
         sideWindow = new GuiSideWindow(manualEntry.getManual(), manualEntry.getEntry(), manualEntry.getPage());
         windowManager = null;
@@ -93,7 +89,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public void init() {
         windowManager = null;
         super.init();
-        sideWindow.initGui(modBase, minecraft, this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(minecraft, this, guiLeft, guiTop, xSize, ySize);
     }
 
     /**

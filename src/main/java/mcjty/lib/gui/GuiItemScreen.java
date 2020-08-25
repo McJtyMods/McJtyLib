@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
  * It supports the side window, the window system in general as well as tooltips
  */
 public class GuiItemScreen extends Screen {
-    protected ModBase modBase;
     protected SimpleChannel network;
     protected Window window;
     protected int xSize;
@@ -29,9 +28,8 @@ public class GuiItemScreen extends Screen {
 
     private GuiSideWindow sideWindow;
 
-    public GuiItemScreen(ModBase mod, SimpleChannel network, int xSize, int ySize, ManualEntry manualEntry) {
+    public GuiItemScreen(SimpleChannel network, int xSize, int ySize, ManualEntry manualEntry) {
         super(new StringTextComponent("todo")); // @todo 1.14
-        this.modBase = mod;
         this.network = network;
         this.xSize = xSize;
         this.ySize = ySize;
@@ -48,7 +46,7 @@ public class GuiItemScreen extends Screen {
         super.init();
         guiLeft = (this.width - xSize) / 2;
         guiTop = (this.height - ySize) / 2;
-        sideWindow.initGui(modBase, getMinecraft(), this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(getMinecraft(), this, guiLeft, guiTop, xSize, ySize);
     }
 
     @Override

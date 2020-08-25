@@ -1,7 +1,6 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
-import mcjty.lib.base.ModBase;
 import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.PacketOpenManual;
@@ -35,12 +34,12 @@ public class GuiSideWindow {
         this.page = page;
     }
 
-    public void initGui(final ModBase modBase, final Minecraft mc, Screen gui, int guiLeft, int guiTop, int xSize, int ySize) {
+    public void initGui(final Minecraft mc, Screen gui, int guiLeft, int guiTop, int xSize, int ySize) {
         style = McJtyLib.getPreferencesProperties(mc.player).map(PreferencesProperties::getStyle).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 
         Button helpButton = button(1, 1, 16, 16, "?")
                 .tooltips("Open manual")
-                .event(() -> help(modBase, mc));
+                .event(() -> help(mc));
         guiButton = button(1, 19, 16, 16, "s")
                 .event(() -> changeStyle(McJtyLib.networkHandler));
         setStyleTooltip();
@@ -51,7 +50,7 @@ public class GuiSideWindow {
         sideWindow = new Window(gui, sidePanel);
     }
 
-    private void help(ModBase modBase, Minecraft mc) {
+    private void help(Minecraft mc) {
         if (manual != null) {
             McJtyLib.networkHandler.sendToServer(new PacketOpenManual(manual, manualNode, page));
         }
