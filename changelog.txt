@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem on servers
+
 4.1.6:
 - Safer client-side registrations (thread-safety)
 - Various cleanups and fixes
