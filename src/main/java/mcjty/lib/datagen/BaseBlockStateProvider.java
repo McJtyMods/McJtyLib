@@ -26,7 +26,8 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 texture,
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
-                new ResourceLocation("rftoolsbase", "block/base/machineside"));
+                new ResourceLocation("rftoolsbase", "block/base/machineside"))
+                .texture("particle", texture);
     }
 
     public ModelFile topBasedModel(String modelName, ResourceLocation texture) {
@@ -36,7 +37,8 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
                 new ResourceLocation("rftoolsbase", "block/base/machineside"),
-                new ResourceLocation("rftoolsbase", "block/base/machineside"));
+                new ResourceLocation("rftoolsbase", "block/base/machineside"))
+                .texture("particle", texture);
     }
 
     private ModelFile logicSlabModel(String modelName, ResourceLocation texture, ModelBuilder.FaceRotation faceRotation) {
@@ -52,7 +54,8 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 .end()
                 .texture("side", new ResourceLocation("rftoolsbase", "block/base/machineside"))
                 .texture("down", new ResourceLocation("rftoolsbase", "block/base/machinebottom"))
-                .texture("up", texture);
+                .texture("up", texture)
+                .texture("particle", texture);
         return model;
     }
 
