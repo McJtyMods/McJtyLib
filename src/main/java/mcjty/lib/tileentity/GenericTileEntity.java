@@ -294,7 +294,11 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             }
 
             ownerName = infoTag.getString("owner");
-            ownerUUID = infoTag.getUniqueId("ownerId");
+            if (infoTag.hasUniqueId("ownerId")) {
+                ownerUUID = infoTag.getUniqueId("ownerId");
+            } else {
+                ownerUUID = null;
+            }
             if (infoTag.contains("secChannel")) {
                 securityChannel = infoTag.getInt("secChannel");
             } else {

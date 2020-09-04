@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a potential issue when reading owner UUID
+
 5.0.4:
 - Fixed a problem on servers
 
