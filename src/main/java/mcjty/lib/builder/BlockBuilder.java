@@ -2,6 +2,7 @@ package mcjty.lib.builder;
 
 import mcjty.lib.compat.theoneprobe.McJtyLibTOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
+import mcjty.lib.gui.ManualEntry;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -23,9 +24,14 @@ public class BlockBuilder {
     private ToolType toolType = ToolType.PICKAXE;
     private int harvestLevel = 0;
     private TOPDriver topDriver = McJtyLibTOPDriver.DRIVER;
+    private ManualEntry manualEntry = ManualEntry.EMPTY;
 
     public Block.Properties getProperties() {
         return properties;
+    }
+
+    public ManualEntry getManualEntry() {
+        return manualEntry;
     }
 
     public boolean isInfusable() {
@@ -66,6 +72,11 @@ public class BlockBuilder {
 
     public BlockBuilder infusable() {
         this.infusable = true;
+        return this;
+    }
+
+    public BlockBuilder manualEntry(ManualEntry manualEntry) {
+        this.manualEntry = manualEntry;
         return this;
     }
 

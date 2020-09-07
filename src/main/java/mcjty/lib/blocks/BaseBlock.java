@@ -11,6 +11,7 @@ import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
+import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -59,6 +60,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     private final ToolType toolType;
     private final int harvestLevel;
     private final TOPDriver topDriver;
+    private final ManualEntry manualEntry;
 
     public static final Property<?>[] HORIZ_PROPERTIES = new Property[]{BlockStateProperties.HORIZONTAL_FACING};
     public static final Property<?>[] ROTATING_PROPERTIES = new Property[]{BlockStateProperties.FACING};
@@ -72,6 +74,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         this.toolType = builder.getToolType();
         this.harvestLevel = builder.getHarvestLevel();
         this.topDriver = builder.getTopDriver();
+        this.manualEntry = builder.getManualEntry();
+    }
+
+    @Override
+    public ManualEntry getManualEntry() {
+        return manualEntry;
     }
 
     public static void setInfused(ItemStack stack, int infused) {
