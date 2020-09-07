@@ -1,3 +1,6 @@
+Upcoming:
+- New online help system. Use F1 key (default) when hovering over item tooltip
+
 1.16-5.0.5:
 - Fixed a potential issue when reading owner UUID
 
