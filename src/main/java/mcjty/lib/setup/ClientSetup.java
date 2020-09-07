@@ -1,6 +1,8 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.ClientEventHandler;
+import mcjty.lib.keys.KeyBindings;
+import mcjty.lib.keys.KeyInputHandler;
 import mcjty.lib.tooltips.TooltipRender;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -16,6 +18,8 @@ public class ClientSetup {
 
         // @todo 1.15
 //        ModelLoaderRegistry.registerLoader(new MultipartModelLoader());
+        KeyBindings.init();
+        MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
     }
 
     private static class McJtyLibBlockRegister {

@@ -2,6 +2,9 @@ package mcjty.lib.tooltips;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import mcjty.lib.McJtyLib;
+import mcjty.lib.gui.ManualEntry;
+import mcjty.lib.keys.KeyBindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.BlockItem;
@@ -9,6 +12,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,6 +29,8 @@ import java.util.List;
 public class TooltipRender {
 
     private static final int STACKS_PER_LINE = 8;
+
+    public static ITooltipSettings lastUsedTooltipItem = null;
 
     @SubscribeEvent
     public void onMakeTooltip(ItemTooltipEvent event) {
@@ -50,13 +57,43 @@ public class TooltipRender {
         }
     }
 
+    private static ITooltipSettings getSettings(Item item) {
+        if (item instanceof ITooltipSettings) {
+            return (ITooltipSettings) item;
+        } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof ITooltipSettings) {
+            return (ITooltipSettings) ((BlockItem) item).getBlock();
+        } else {
+            return null;
+        }
+    }
+
+    @SubscribeEvent
+    public void onItemTooltipEvent(ItemTooltipEvent event) {
+        Item item = event.getItemStack().getItem();
+        ITooltipSettings settings = getSettings(item);
+        lastUsedTooltipItem = settings;
+        if (settings != null) {
+            ManualEntry entry = settings.getManualEntry();
+            if (entry.getManual() != null) {
+                if (KeyBindings.openManual != null) {
+                    if (!McJtyLib.proxy.isSneaking()) {
+                        String translationKey = KeyBindings.openManual.getTranslationKey();
+                        event.getToolTip().add(new StringTextComponent("<Press ").applyTextStyle(TextFormatting.YELLOW)
+                                .appendSibling(new TranslationTextComponent(translationKey).applyTextStyle(TextFormatting.GREEN))
+                                .appendSibling(new StringTextComponent(" for help>").applyTextStyle(TextFormatting.YELLOW)));
+                    }
+                }
+            }
+        }
+    }
+
     @SubscribeEvent
     public void onTooltipPre(RenderTooltipEvent.Pre event) {
         Item item = event.getStack().getItem();
-        if (item instanceof ITooltipSettings) {
-            event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) item).getMaxWidth()));
-        } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof ITooltipSettings) {
-            event.setMaxWidth(Math.max(event.getMaxWidth(), ((ITooltipSettings) ((BlockItem) item).getBlock()).getMaxWidth()));
+        ITooltipSettings settings = getSettings(item);
+        lastUsedTooltipItem = settings;
+        if (settings != null) {
+            event.setMaxWidth(Math.max(event.getMaxWidth(), settings.getMaxWidth()));
         }
     }
 
