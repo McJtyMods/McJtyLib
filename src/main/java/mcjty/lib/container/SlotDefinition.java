@@ -1,13 +1,18 @@
 package mcjty.lib.container;
 
+import mcjty.lib.varia.TriConsumer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public class SlotDefinition {
     private final SlotType type;
     private final Predicate<ItemStack> validItems;
+    private TriConsumer<TileEntity, PlayerEntity, ItemStack> onCraft = (te, playerEntity, stack) -> {};
 
     SlotDefinition(SlotType type, ItemStack... itemStacks) {
         this.type = type;
@@ -19,6 +24,15 @@ public class SlotDefinition {
             }
             return false;
         };
+    }
+
+    public SlotDefinition onCraft(TriConsumer<TileEntity, PlayerEntity, ItemStack> onCraft) {
+        this.onCraft = onCraft;
+        return this;
+    }
+
+    public TriConsumer<TileEntity, PlayerEntity, ItemStack> getOnCraft() {
+        return onCraft;
     }
 
     SlotDefinition(SlotType type, Class<?> itemClass) {
@@ -66,6 +80,10 @@ public class SlotDefinition {
     }
 
     public static SlotDefinition craftResult() {
+        return new SlotDefinition(SlotType.SLOT_CRAFTRESULT);
+    }
+
+    public static SlotDefinition craftResult(BiConsumer<PlayerEntity, ItemStack> onCraft) {
         return new SlotDefinition(SlotType.SLOT_CRAFTRESULT);
     }
 

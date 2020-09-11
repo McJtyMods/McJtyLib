@@ -36,7 +36,6 @@ import java.util.function.Function;
 public class GenericContainer extends Container implements IGenericContainer {
     protected Map<String,IItemHandler> inventories = new HashMap<>();
     private ContainerFactory factory;
-    private GenericCrafter crafter = null;
     protected final BlockPos pos;
     protected final GenericTileEntity te;
 
@@ -135,34 +134,26 @@ public class GenericContainer extends Container implements IGenericContainer {
         return factory.getSlotType(index);
     }
 
-    public GenericCrafter getCrafter() {
-        return crafter;
-    }
-
-    public void setCrafter(GenericCrafter crafter) {
-        this.crafter = crafter;
-    }
-
     @Override
     public void setupInventories(IItemHandler itemHandler, PlayerInventory inventory) {
         addInventory(ContainerFactory.CONTAINER_CONTAINER, itemHandler);
         addInventory(ContainerFactory.CONTAINER_PLAYER, new InvWrapper(inventory));
-        generateSlots();
+        generateSlots(inventory.player);
     }
 
-    public void generateSlots() {
+    public void generateSlots(PlayerEntity player) {
         for (SlotFactory slotFactory : factory.getSlots()) {
             IItemHandler inventory = inventories.get(slotFactory.getInventoryName());
             int index = slotFactory.getIndex();
             int x = slotFactory.getX();
             int y = slotFactory.getY();
             SlotType slotType = slotFactory.getSlotType();
-            Slot slot = createSlot(slotFactory, inventory, index, x, y, slotType);
+            Slot slot = createSlot(slotFactory, player, inventory, index, x, y, slotType);
             addSlot(slot);
         }
     }
 
-    protected Slot createSlot(SlotFactory slotFactory, final IItemHandler inventory, final int index, final int x, final int y, SlotType slotType) {
+    protected Slot createSlot(SlotFactory slotFactory, PlayerEntity playerEntity, final IItemHandler inventory, final int index, final int x, final int y, SlotType slotType) {
         Slot slot;
         if (slotType == SlotType.SLOT_GHOST) {
             slot = new GhostSlot(inventory, index, x, y);
@@ -177,7 +168,8 @@ public class GenericContainer extends Container implements IGenericContainer {
                 }
             };
         } else if (slotType == SlotType.SLOT_CRAFTRESULT) {
-            slot = new CraftingSlot(inventory, te, index, x, y, crafter);
+            slot = new CraftingSlot(playerEntity, inventory, te, index, x, y)
+                    .onCraft(slotFactory.getSlotDefinition().getOnCraft());
         } else {
             slot = new BaseSlot(inventory, te, index, x, y);
         }
