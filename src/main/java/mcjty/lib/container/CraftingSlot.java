@@ -4,7 +4,6 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.TriConsumer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.AbstractFurnaceTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -71,10 +70,6 @@ public class CraftingSlot extends SlotItemHandler {
     protected void onCrafting(ItemStack stack) {
         stack.onCrafting(player.world, player, this.removeCount);
         onCraft.accept(te, player, stack);
-        // @todo
-        if (!this.player.world.isRemote && this.inventory instanceof AbstractFurnaceTileEntity) {
-            ((AbstractFurnaceTileEntity)this.inventory).func_213995_d(this.player);
-        }
 
         this.removeCount = 0;
         net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerSmeltedEvent(this.player, stack);
