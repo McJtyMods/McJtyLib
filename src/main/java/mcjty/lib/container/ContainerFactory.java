@@ -1,17 +1,24 @@
 package mcjty.lib.container;
 
+import net.minecraftforge.common.util.Lazy;
+
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * This class can be used to help build containers. It's used in combination with GenericContainer which
  * will take instances of this class to help setup the slots in the container
  */
 public class ContainerFactory {
+
+    public static final Lazy<ContainerFactory> EMPTY = Lazy.of(() -> new ContainerFactory(0));
+
     private Map<Integer,SlotDefinition> indexToType = new HashMap<>();
-    private Map<SlotDefinition,SlotRanges> slotRangesMap = new HashMap<>();
+//    private Map<SlotDefinition,SlotRanges> slotRangesMap = new HashMap<>();
     private List<SlotFactory> slots = new ArrayList<>();
 
     public static final String CONTAINER_CONTAINER = "container";
@@ -27,9 +34,10 @@ public class ContainerFactory {
         return containerSlots;
     }
 
-    public Map<SlotDefinition, SlotRanges> getSlotRangesMap() {
-        return slotRangesMap;
-    }
+    // @todo
+//    public Map<SlotDefinition, SlotRanges> getSlotRangesMap() {
+//        return slotRangesMap;
+//    }
 
     public Iterable<SlotFactory> getSlots() {
         return slots;
@@ -46,15 +54,27 @@ public class ContainerFactory {
         return slotDefinition.getType();
     }
 
+    /**
+     * Return the type of this slot for the given index.
+     */
+    @Nonnull
+    public SlotDefinition getSlotDefinition(int index) {
+        SlotDefinition slotDefinition = indexToType.get(index);
+        if (slotDefinition == null) {
+            throw new IllegalStateException("Bad slot specified!");
+        }
+        return slotDefinition;
+    }
+
     public boolean isContainerSlot(int index) {
         return getSlotType(index) == SlotType.SLOT_CONTAINER;
     }
     public boolean isOutputSlot(int index) {
-        return getSlotType(index) == SlotType.SLOT_OUTPUT;
+        return getSlotDefinition(index).isOutput();
     }
 
     public boolean isInputSlot(int index) {
-        return getSlotType(index) == SlotType.SLOT_INPUT;
+        return getSlotDefinition(index).isInput();
     }
 
     public boolean isGhostSlot(int index) {
@@ -74,11 +94,21 @@ public class ContainerFactory {
     }
 
     public boolean isSpecificItemSlot(int index) {
-        return getSlotType(index) == SlotType.SLOT_SPECIFICITEM;
+        return getSlotDefinition(index).isSpecific();
     }
 
     public boolean isPlayerHotbarSlot(int index) {
         return getSlotType(index) == SlotType.SLOT_PLAYERHOTBAR;
+    }
+
+    public SlotRanges getRanges(Predicate<SlotDefinition> matcher) {
+        SlotRanges ranges = new SlotRanges();
+        for (SlotFactory slot : slots) {
+            if (matcher.test(slot.getSlotDefinition())) {
+                ranges.addSingle(slot.getIndex());
+            }
+        }
+        return ranges;
     }
 
     public ContainerFactory slot(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y) {
@@ -86,12 +116,12 @@ public class ContainerFactory {
         int slotIndex = slots.size();
         slots.add(slotFactory);
 
-        SlotRanges slotRanges = slotRangesMap.get(slotDefinition);
-        if (slotRanges == null) {
-            slotRanges = new SlotRanges(slotDefinition);
-            slotRangesMap.put(slotDefinition, slotRanges);
-        }
-        slotRanges.addSingle(slotIndex);
+//        SlotRanges slotRanges = slotRangesMap.get(slotDefinition);
+//        if (slotRanges == null) {
+//            slotRanges = new SlotRanges();
+//            slotRangesMap.put(slotDefinition, slotRanges);
+//        }
+//        slotRanges.addSingle(slotIndex);
         indexToType.put(slotIndex, slotDefinition);
         return this;
     }
