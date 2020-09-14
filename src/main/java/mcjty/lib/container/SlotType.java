@@ -7,14 +7,7 @@ public enum SlotType {
     SLOT_UNKNOWN("unknown"),
     SLOT_GHOST("ghost"),               // Ghost slot as used by crafting grids
     SLOT_GHOSTOUT("ghostout"),         // Ghost slot for crafting output
-
-// @todo one SLOT type with input/output flags
     SLOT_GENERIC("generic"),           // Generic input slot, use in()/out() to specify input/output
-
-    SLOT_INPUT("input"),               // Inventory slot that can accept items in sided inventories
-    SLOT_OUTPUT("output"),             // Inventory slot that can output items in sided inventories
-    SLOT_INPUTOUTPUT("inputoutput"),   // Slot for input and output
-    SLOT_CONTAINER("container"),       // Inventory slot that cannot accept nor output items in sided inventories
     SLOT_SPECIFICITEM("specificitem"), // Only a specific item fits in this slot
     SLOT_PLAYERINV("playerinv"),       // Player inventory slot
     SLOT_PLAYERHOTBAR("playerhotbar"), // Player hotbar slot

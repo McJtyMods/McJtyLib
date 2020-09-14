@@ -17,9 +17,6 @@ public class SlotDefinition {
 
     SlotDefinition(SlotType type, ItemStack... itemStacks) {
         this.type = type;
-        // @todo temporary for compatibility
-        input = type == SlotType.SLOT_INPUT || type == SlotType.SLOT_INPUTOUTPUT;
-        output = type == SlotType.SLOT_OUTPUT || type == SlotType.SLOT_INPUTOUTPUT;
         this.validItems = stack -> {
             for (ItemStack itemStack : itemStacks) {
                 if (itemStack.getItem() == stack.getItem()) {
@@ -65,22 +62,6 @@ public class SlotDefinition {
 
     public static SlotDefinition generic() {
         return new SlotDefinition(SlotType.SLOT_GENERIC);
-    }
-
-    public static SlotDefinition output() {
-        return new SlotDefinition(SlotType.SLOT_OUTPUT);
-    }
-
-    public static SlotDefinition input() {
-        return new SlotDefinition(SlotType.SLOT_INPUT);
-    }
-
-    public static SlotDefinition inputOutput() {
-        return new SlotDefinition(SlotType.SLOT_INPUTOUTPUT);
-    }
-
-    public static SlotDefinition container() {
-        return new SlotDefinition(SlotType.SLOT_CONTAINER);
     }
 
     public static SlotDefinition ghost() {

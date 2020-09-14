@@ -40,18 +40,8 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         return this;
     }
 
-    public DefaultContainerProvider<C> itemHandler(LazyOptional<? extends IItemHandler> itemHandler) {
-        this.itemHandler = () -> itemHandler.map(h -> h).orElseThrow(RuntimeException::new);
-        return this;
-    }
-
     public DefaultContainerProvider<C> itemHandler(Supplier<? extends IItemHandler> itemHandler) {
         this.itemHandler = itemHandler;
-        return this;
-    }
-
-    public DefaultContainerProvider<C> energyHandler(LazyOptional<? extends GenericEnergyStorage> energyHandler) {
-        this.energyHandler = () -> energyHandler.map(h -> h).orElseThrow(RuntimeException::new);
         return this;
     }
 
