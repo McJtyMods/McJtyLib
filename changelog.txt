@@ -1,5 +1,7 @@
-Upcoming:
+1.15-4.1.8:
 - New module system for mods
+- New online help system on item/block tooltips (press F1)
+- Refactored lots of internal code to make containers more consistent and work better
 
 1.15-4.1.7:
 - Fixed a problem on servers
