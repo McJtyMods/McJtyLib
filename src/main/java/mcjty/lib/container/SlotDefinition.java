@@ -6,16 +6,20 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 public class SlotDefinition {
     private final SlotType type;
+    private boolean input = false;
+    private boolean output = false;
     private final Predicate<ItemStack> validItems;
     private TriConsumer<TileEntity, PlayerEntity, ItemStack> onCraft = (te, playerEntity, stack) -> {};
 
     SlotDefinition(SlotType type, ItemStack... itemStacks) {
         this.type = type;
+        // @todo temporary for compatibility
+        input = type == SlotType.SLOT_INPUT || type == SlotType.SLOT_INPUTOUTPUT;
+        output = type == SlotType.SLOT_OUTPUT || type == SlotType.SLOT_INPUTOUTPUT;
         this.validItems = stack -> {
             for (ItemStack itemStack : itemStacks) {
                 if (itemStack.getItem() == stack.getItem()) {
@@ -31,21 +35,21 @@ public class SlotDefinition {
         return this;
     }
 
+    public SlotDefinition in() {
+        input = true;
+        return this;
+    }
+
+    public SlotDefinition out() {
+        output = true;
+        return this;
+    }
+
     public TriConsumer<TileEntity, PlayerEntity, ItemStack> getOnCraft() {
         return onCraft;
     }
 
-    SlotDefinition(SlotType type, Class<?> itemClass) {
-        this.type = type;
-        this.validItems = stack -> {
-            if (itemClass != null && itemClass.isInstance(stack.getItem())) {
-                return true;
-            }
-            return false;
-        };
-    }
-
-    SlotDefinition(SlotType type, Predicate<ItemStack> validItems) {
+    private SlotDefinition(SlotType type, Predicate<ItemStack> validItems) {
         this.type = type;
         this.validItems = validItems;
     }
@@ -59,12 +63,20 @@ public class SlotDefinition {
         return new SlotDefinition(SlotType.SLOT_SPECIFICITEM, validItems);
     }
 
+    public static SlotDefinition generic() {
+        return new SlotDefinition(SlotType.SLOT_GENERIC);
+    }
+
     public static SlotDefinition output() {
         return new SlotDefinition(SlotType.SLOT_OUTPUT);
     }
 
     public static SlotDefinition input() {
         return new SlotDefinition(SlotType.SLOT_INPUT);
+    }
+
+    public static SlotDefinition inputOutput() {
+        return new SlotDefinition(SlotType.SLOT_INPUTOUTPUT);
     }
 
     public static SlotDefinition container() {
@@ -83,16 +95,24 @@ public class SlotDefinition {
         return new SlotDefinition(SlotType.SLOT_CRAFTRESULT);
     }
 
-    public static SlotDefinition craftResult(BiConsumer<PlayerEntity, ItemStack> onCraft) {
-        return new SlotDefinition(SlotType.SLOT_CRAFTRESULT);
-    }
-
     public SlotType getType() {
         return type;
     }
 
     public boolean itemStackMatches(ItemStack stack) {
         return validItems.test(stack);
+    }
+
+    public boolean isSpecific() {
+        return type == SlotType.SLOT_SPECIFICITEM;
+    }
+
+    public boolean isInput() {
+        return input;
+    }
+
+    public boolean isOutput() {
+        return output;
     }
 
     @Override

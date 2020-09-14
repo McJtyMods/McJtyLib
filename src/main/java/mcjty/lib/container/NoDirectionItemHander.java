@@ -18,7 +18,6 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
     private ItemStackList stacks;
 
     // Called when something changed
-    // @todo would be better if onUpdate had an ItemStack parameter
     protected void onUpdate(int index) {
         tileEntity.markDirtyQuick();
     }
