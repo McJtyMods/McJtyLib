@@ -1,7 +1,6 @@
 package mcjty.lib.container;
 
 import com.google.common.collect.Range;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -28,6 +27,7 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -239,7 +239,7 @@ public class GenericContainer extends Container implements IGenericContainer {
                     }
                 }
                 slot.onSlotChange(origStack, itemstack);
-            } else if (factory.isOutputSlot(index) || factory.isInputSlot(index) || factory.isContainerSlot(index)) {
+            } else if (factory.isOutputSlot(index) || factory.isInputSlot(index) || factory.isGenericSlot(index)) {
                 if (!mergeItemStacks(origStack, SlotType.SLOT_SPECIFICITEM, false)) {
                     if (!mergeItemStacks(origStack, SlotType.SLOT_PLAYERINV, true)) {
                         if (!mergeItemStacks(origStack, SlotType.SLOT_PLAYERHOTBAR, false)) {
@@ -252,21 +252,17 @@ public class GenericContainer extends Container implements IGenericContainer {
                 return ItemStack.EMPTY;
             } else if (factory.isPlayerInventorySlot(index)) {
                 if (!mergeItemStacks(origStack, SlotType.SLOT_SPECIFICITEM, false)) {
-                    if (!mergeItemStacks(origStack, SlotType.SLOT_INPUT, false)) {
-                        if (!mergeItemStacks(origStack, SlotType.SLOT_INPUTOUTPUT, false)) {
-                            if (!mergeItemStacks(origStack, SlotType.SLOT_PLAYERHOTBAR, false)) {
-                                return ItemStack.EMPTY;
-                            }
+                    if (!mergeItemStacks(origStack, SlotDefinition::isInput, false)) {
+                        if (!mergeItemStacks(origStack, SlotType.SLOT_PLAYERHOTBAR, false)) {
+                            return ItemStack.EMPTY;
                         }
                     }
                 }
             } else if (factory.isPlayerHotbarSlot(index)) {
                 if (!mergeItemStacks(origStack, SlotType.SLOT_SPECIFICITEM, false)) {
-                    if (!mergeItemStacks(origStack, SlotType.SLOT_INPUT, false)) {
-                        if (!mergeItemStacks(origStack, SlotType.SLOT_INPUTOUTPUT, false)) {
-                            if (!mergeItemStacks(origStack, SlotType.SLOT_PLAYERINV, false)) {
-                                return ItemStack.EMPTY;
-                            }
+                    if (!mergeItemStacks(origStack, SlotDefinition::isInput, false)) {
+                        if (!mergeItemStacks(origStack, SlotType.SLOT_PLAYERINV, false)) {
+                            return ItemStack.EMPTY;
                         }
                     }
                 }
@@ -411,11 +407,11 @@ public class GenericContainer extends Container implements IGenericContainer {
     public static ContainerType<Container> createContainerType(String registryName) {
         ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
+            TileEntity te = inv.player.getEntityWorld().getTileEntity(pos);
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
-            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> h.createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer())).orElseThrow(RuntimeException::new);
+            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> Objects.requireNonNull(h.createMenu(windowId, inv, inv.player))).orElseThrow(RuntimeException::new);
         });
         containerType.setRegistryName(registryName);
         return containerType;
@@ -424,11 +420,11 @@ public class GenericContainer extends Container implements IGenericContainer {
     public static <T extends Container> ContainerType<T> createContainerType() {
         ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
+            TileEntity te = inv.player.getEntityWorld().getTileEntity(pos);
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
-            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> h.createMenu(windowId, inv, McJtyLib.proxy.getClientPlayer())).orElseThrow(RuntimeException::new);
+            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> Objects.requireNonNull(h.createMenu(windowId, inv, inv.player))).orElseThrow(RuntimeException::new);
         });
         return (ContainerType<T>) containerType;
     }

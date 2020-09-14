@@ -66,11 +66,11 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTS
     }
 
     public boolean canAutomationInsert(int slot) {
-        return wrapped.getContainerFactory().isInputSlot(slot) || wrapped.getContainerFactory().isSpecificItemSlot(slot);
+        return wrapped.getContainerFactory().isInputSlot(slot);
     }
 
     public boolean canAutomationExtract(int slot) {
-        return wrapped.getContainerFactory().isOutputSlot(slot) || wrapped.getContainerFactory().isSpecificItemSlot(slot);
+        return wrapped.getContainerFactory().isOutputSlot(slot);
     }
 
     @Override
