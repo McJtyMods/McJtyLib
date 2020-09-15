@@ -8,7 +8,6 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
@@ -23,8 +22,9 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     private BiFunction<Integer, PlayerEntity, C> containerSupplier;
     private Supplier<? extends IItemHandler> itemHandler = () -> null;
     private Supplier<? extends GenericEnergyStorage> energyHandler = () -> null;
-    private List<IntReferenceHolder> integerListeners = new ArrayList<>();
-    private List<IntReferenceHolder> shortListeners = new ArrayList<>();
+    private final List<IntReferenceHolder> integerListeners = new ArrayList<>();
+    private final List<IntReferenceHolder> shortListeners = new ArrayList<>();
+    private final List<IContainerDataListener> containerDataListeners = new ArrayList<>();
 
     public DefaultContainerProvider(String name) {
         this.name = name;
@@ -47,6 +47,11 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
 
     public DefaultContainerProvider<C> energyHandler(Supplier<? extends GenericEnergyStorage> energyHandler) {
         this.energyHandler = energyHandler;
+        return this;
+    }
+
+    public DefaultContainerProvider<C> dataListener(IContainerDataListener dataListener) {
+        this.containerDataListeners.add(dataListener);
         return this;
     }
 
@@ -75,6 +80,9 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         }
         for (IntReferenceHolder listener : shortListeners) {
             container.addShortListener(listener);
+        }
+        for (IContainerDataListener dataListener : containerDataListeners) {
+            container.addContainerDataListener(dataListener);
         }
 
         return container.getAsContainer();
