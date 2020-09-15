@@ -1,34 +1,38 @@
 package mcjty.lib.container;
 
 import com.google.common.collect.Range;
+import io.netty.buffer.ByteBuf;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.api.container.IGenericContainer;
+import mcjty.lib.network.PacketContainerDataToClient;
+import mcjty.lib.network.PacketHandler;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.TriFunction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntReferenceHolder;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -36,8 +40,9 @@ import java.util.function.Predicate;
  * Generic container support
  */
 public class GenericContainer extends Container implements IGenericContainer {
-    protected Map<String,IItemHandler> inventories = new HashMap<>();
-    private ContainerFactory factory;
+    protected final Map<String,IItemHandler> inventories = new HashMap<>();
+    private final Map<ResourceLocation, IContainerDataListener> containerData = new HashMap<>();
+    private final ContainerFactory factory;
     protected final BlockPos pos;
     protected final GenericTileEntity te;
 
@@ -108,6 +113,11 @@ public class GenericContainer extends Container implements IGenericContainer {
                 return flag;
             }
         });
+    }
+
+    @Override
+    public void addContainerDataListener(IContainerDataListener data) {
+        this.containerData.put(data.getId(), data);
     }
 
     public void addInventory(String name, @Nullable IItemHandler inventory) {
@@ -401,6 +411,26 @@ public class GenericContainer extends Container implements IGenericContainer {
             return ItemStack.EMPTY;
         } else {
             return super.slotClick(index, button, mode, player);
+        }
+    }
+
+    public IContainerDataListener getListener(ResourceLocation id) {
+        return containerData.get(id);
+    }
+
+    @Override
+    public void detectAndSendChanges() {
+        super.detectAndSendChanges();
+
+        for (IContainerDataListener data : containerData.values()) {
+            if (data.isDirtyAndClear()) {
+                PacketContainerDataToClient packet = new PacketContainerDataToClient(data::toBytes);
+                for (IContainerListener listener : this.listeners) {
+                    if (listener instanceof ServerPlayerEntity) {
+                        McJtyLib.networkHandler.sendTo(packet, ((ServerPlayerEntity) listener).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+                    }
+                }
+            }
         }
     }
 

@@ -13,6 +13,8 @@ public interface IGenericContainer {
 
     void addIntegerListener(IntReferenceHolder holder);
 
+    void addContainerDataListener(IContainerDataListener dataListener);
+
     void setupInventories(@Nullable IItemHandler itemHandler, PlayerInventory inventory);
 
     Container getAsContainer();
