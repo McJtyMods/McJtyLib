@@ -103,10 +103,12 @@ public class ContainerFactory {
 
     public SlotRanges getRanges(Predicate<SlotDefinition> matcher) {
         SlotRanges ranges = new SlotRanges();
+        int idx = 0;
         for (SlotFactory slot : slots) {
             if (matcher.test(slot.getSlotDefinition())) {
-                ranges.addSingle(slot.getIndex());
+                ranges.addSingle(idx);
             }
+            idx++;
         }
         return ranges;
     }

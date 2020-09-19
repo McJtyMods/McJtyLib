@@ -1,3 +1,6 @@
+1.16-5.0.8:
+- Fixed a serious dupe glitch in many inventories throughout the RFTools and XNet mods!
+
 1.16-5.0.7:
 - New module system for mods
 - Refactored lots of internal code to make containers more consistent and work better
