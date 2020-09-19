@@ -1,3 +1,6 @@
+1.15-4.1.9:
+- Fixed a serious dupe glitch in many inventories throughout the RFTools and XNet mods!
+
 1.15-4.1.8:
 - New module system for mods
 - New online help system on item/block tooltips (press F1)
