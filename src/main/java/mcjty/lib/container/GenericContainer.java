@@ -2,12 +2,12 @@ package mcjty.lib.container;
 
 import com.google.common.collect.Range;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.network.PacketContainerDataToClient;
-import mcjty.lib.network.PacketHandler;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
@@ -25,14 +25,16 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -424,7 +426,10 @@ public class GenericContainer extends Container implements IGenericContainer {
 
         for (IContainerDataListener data : containerData.values()) {
             if (data.isDirtyAndClear()) {
-                PacketContainerDataToClient packet = new PacketContainerDataToClient(data::toBytes);
+                ByteBuf newbuf = Unpooled.buffer();
+                PacketBuffer buffer = new PacketBuffer(newbuf);
+                data.toBytes(buffer);
+                PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
                 for (IContainerListener listener : this.listeners) {
                     if (listener instanceof ServerPlayerEntity) {
                         McJtyLib.networkHandler.sendTo(packet, ((ServerPlayerEntity) listener).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
