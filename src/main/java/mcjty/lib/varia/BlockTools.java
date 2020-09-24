@@ -11,7 +11,6 @@ import net.minecraft.item.ItemUseContext;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.IStateHolder;
 import net.minecraft.state.StateContainer;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
@@ -69,7 +68,7 @@ public class BlockTools {
                     return null;
                 }
             }
-            if (itemBlock.tryPlace(context) == ActionResultType.SUCCESS) {
+            if (itemBlock.tryPlace(context).isSuccessOrConsume()) {
                 blockStack.shrink(1);
             }
             return origState;
