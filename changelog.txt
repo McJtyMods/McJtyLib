@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem with picking up blocks that would cause the Builder to duplicate blocks
+
 1.16-5.0.8:
 - Fixed a serious dupe glitch in many inventories throughout the RFTools and XNet mods!
 
