@@ -17,7 +17,7 @@ import net.minecraftforge.client.model.pipeline.BakedQuadBuilder;
 public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
 
     @Override
-    public boolean func_230044_c_() {
+    public boolean isSideLit() {
         return false;
     }
 

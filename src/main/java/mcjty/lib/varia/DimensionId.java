@@ -31,7 +31,7 @@ public class DimensionId {
     }
 
     public static DimensionId fromPacket(PacketBuffer buf) {
-        RegistryKey<World> key = RegistryKey.func_240903_a_(Registry.WORLD_KEY, buf.readResourceLocation());
+        RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, buf.readResourceLocation());
         return new DimensionId(key);
     }
 
@@ -40,16 +40,16 @@ public class DimensionId {
     }
 
     public static DimensionId fromResourceLocation(ResourceLocation location) {
-        RegistryKey<World> key = RegistryKey.func_240903_a_(Registry.WORLD_KEY, location);
+        RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, location);
         return new DimensionId(key);
     }
 
     public ResourceLocation getRegistryName() {
-        return id.func_240901_a_();
+        return id.getLocation();
     }
 
     // Is this a good way to get the dimension name?
-    public String getName() { return id.func_240901_a_().getPath(); }
+    public String getName() { return id.getLocation().getPath(); }
 
     public boolean isOverworld() {
         return id.equals(World.OVERWORLD);
@@ -57,7 +57,7 @@ public class DimensionId {
 
     public void toBytes(PacketBuffer buf) {
         // @todo use numerical ID
-        buf.writeResourceLocation(id.func_240901_a_());
+        buf.writeResourceLocation(id.getLocation());
     }
 
     public ServerWorld loadWorld() {
