@@ -1,3 +1,6 @@
+1.15-4.1.10:
+- New server->client container communication system
+
 1.15-4.1.9:
 - Fixed a serious dupe glitch in many inventories throughout the RFTools and XNet mods!
 
