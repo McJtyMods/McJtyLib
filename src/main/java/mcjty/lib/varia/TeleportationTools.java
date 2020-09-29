@@ -36,7 +36,8 @@ public class TeleportationTools {
         player.changeDimension(dimension.loadWorld(player.getEntityWorld()), new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                entity = repositionEntity.apply(false);
+                // @todo this crashes on 1.16.3?
+//                    entity = repositionEntity.apply(false);
                 entity.setPositionAndUpdate(x, y, z);
                 return entity;
             }
