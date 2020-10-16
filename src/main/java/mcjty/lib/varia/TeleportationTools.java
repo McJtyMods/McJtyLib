@@ -2,6 +2,7 @@ package mcjty.lib.varia;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -33,11 +34,13 @@ public class TeleportationTools {
     }
 
     public static void teleportToDimension(PlayerEntity player, DimensionId dimension, double x, double y, double z) {
-        player.changeDimension(dimension.loadWorld(player.getEntityWorld()), new ITeleporter() {
+        ServerWorld world = dimension.loadWorld(player.getEntityWorld());
+        player.changeDimension(world, new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                // @todo this crashes on 1.16.3?
-//                    entity = repositionEntity.apply(false);
+                entity.setWorld(world);
+                world.addDuringPortalTeleport((ServerPlayerEntity) entity);
+                entity.moveForced(x, y, z);
                 entity.setPositionAndUpdate(x, y, z);
                 return entity;
             }
