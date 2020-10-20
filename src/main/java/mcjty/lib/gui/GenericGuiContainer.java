@@ -265,7 +265,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     @Override
     public void moveItems(MatrixStack matrixStack, Slot slot) {
-        super.moveItems(matrixStack, slot);
         // Prevent slots from being rendered if they are (partially) covered by a modal window
         if (!isPartiallyCoveredByModalWindow(slot)) {
             super.moveItems(matrixStack, slot);

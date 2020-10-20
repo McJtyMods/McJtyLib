@@ -7,15 +7,19 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.keys.KeyBindings;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -149,7 +153,8 @@ public class TooltipRender {
         net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
         matrixStack.push();
         matrixStack.translate(0, 0, 400f);
-        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
+        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getItemModelWithOverrides(itemStack, (World)null, (LivingEntity)null));
+//        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
         matrixStack.pop();
 
         //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
@@ -183,4 +188,37 @@ public class TooltipRender {
         }
         GlStateManager.enableDepthTest();
     }
+
+    private static void renderItemModelIntoGUI(ItemRenderer render, MatrixStack matrixStack, ItemStack itemStack, int x, int y, IBakedModel bakedmodel) {
+        matrixStack.push();
+        Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+        Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmapDirect(false, false);
+        RenderSystem.enableRescaleNormal();
+        RenderSystem.enableAlphaTest();
+        RenderSystem.defaultAlphaFunc();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        matrixStack.translate((float)x, (float)y, 100.0F + render.zLevel);
+        matrixStack.translate(8.0F, 8.0F, 0.0F);
+        matrixStack.scale(1.0F, -1.0F, 1.0F);
+        matrixStack.scale(16.0F, 16.0F, 16.0F);
+        IRenderTypeBuffer.Impl irendertypebuffer$impl = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        boolean flag = !bakedmodel.isSideLit();
+        if (flag) {
+            RenderHelper.setupGuiFlatDiffuseLighting();
+        }
+
+        render.renderItem(itemStack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+        irendertypebuffer$impl.finish();
+        RenderSystem.enableDepthTest();
+        if (flag) {
+            RenderHelper.setupGui3DDiffuseLighting();
+        }
+
+        RenderSystem.disableAlphaTest();
+        RenderSystem.disableRescaleNormal();
+        matrixStack.pop();
+    }
+
 }
