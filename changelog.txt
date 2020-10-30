@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a potential problem with RFTools/XNet blocks placed by automatic placers that don't supply a fake player
+
 1.16-5.0.11:
 - Fixed a problem with item icon rendering in tooltips
 - Fixed a problem with icons rendering under modal windows
