@@ -9,6 +9,8 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
+import javax.annotation.Nullable;
+
 import static net.minecraft.util.Direction.*;
 
 public class OrientationTools {
@@ -135,7 +137,10 @@ public class OrientationTools {
         }
     }
 
-    public static Direction getFacingFromEntity(BlockPos clickedBlock, Entity entityIn) {
+    public static Direction getFacingFromEntity(BlockPos clickedBlock, @Nullable Entity entityIn) {
+        if (entityIn == null) {
+            return UP;
+        }
         if (MathHelper.abs((float) entityIn.getPosX() - clickedBlock.getX()) < 2.0F && MathHelper.abs((float) entityIn.getPosZ() - clickedBlock.getZ()) < 2.0F) {
             double d0 = entityIn.getPosY() + entityIn.getEyeHeight();
 

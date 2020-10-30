@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a potential problem with RFTools/XNet blocks placed by automatic placers that don't supply a fake player
+
 1.15-4.1.10:
 - New server->client container communication system
 
