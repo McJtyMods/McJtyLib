@@ -811,6 +811,24 @@ public class RenderHelper {
         builder.pos(positionMatrix, (x + 0), (y + 0), zLevel).tex(parentU + ((textureX + 0) * f), parentV + ((textureY + 0) * f1)).endVertex();
     }
 
+
+    /**
+     * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height
+     */
+    public static void drawTexturedModalRect(Matrix4f matrix, int x, int y, int u, int v, int width, int height) {
+        float zLevel = 0.01f;
+        float f = (1 / 256.0f);
+        float f1 = (1 / 256.0f);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos(matrix, (x + 0), (y + height), zLevel).tex(((u + 0) * f), ((v + height) * f1)).endVertex();
+        buffer.pos(matrix, (x + width), (y + height), zLevel).tex(((u + width) * f), ((v + height) * f1)).endVertex();
+        buffer.pos(matrix, (x + width), (y + 0), zLevel).tex(((u + width) * f), ((v + 0) * f1)).endVertex();
+        buffer.pos(matrix, (x + 0), (y + 0), zLevel).tex(((u + 0) * f), ((v + 0) * f1)).endVertex();
+        tessellator.draw();
+    }
+
     public static void renderBillboardQuadBright(MatrixStack matrixStack, IRenderTypeBuffer buffer, float scale, ResourceLocation texture) {
         renderBillboardQuadBright(matrixStack, buffer, scale, texture, DEFAULT_SETTINGS);
     }

@@ -1,3 +1,6 @@
+Upcoming:
+- New method for rendering
+
 1.16-5.0.12:
 - Fixed a potential problem with RFTools/XNet blocks placed by automatic placers that don't supply a fake player
 
