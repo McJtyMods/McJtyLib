@@ -11,8 +11,13 @@ import net.minecraft.state.Property;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelDataManager;
+import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +25,8 @@ import java.util.Map;
 import static mcjty.lib.setup.Registration.TYPE_MULTIPART;
 
 public class MultipartTE extends TileEntity {
+
+    public static final ModelProperty<Map<PartSlot, MultipartTE.Part>> PARTS = new ModelProperty<>();
 
     public static class Part {
         private final BlockState state;
@@ -95,6 +102,13 @@ public class MultipartTE extends TileEntity {
         return parts;
     }
 
+    @Nonnull
+    @Override
+    public IModelData getModelData() {
+        return new ModelDataMap.Builder()
+                .withInitial(PARTS, parts)
+                .build();
+    }
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
@@ -102,6 +116,7 @@ public class MultipartTE extends TileEntity {
         read(getBlockState(), packet.getNbtCompound());
         if (world.isRemote && version != oldVersion) {
 //            dumpParts("onData");
+            ModelDataManager.requestModelDataRefresh(this);
             world.markBlockRangeForRenderUpdate(pos, null, null);
 //            world.markForRerender(pos);
         }

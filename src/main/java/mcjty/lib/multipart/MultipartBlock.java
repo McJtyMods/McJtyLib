@@ -14,7 +14,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
@@ -32,8 +31,6 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     public static final AxisAlignedBB AABB_EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     public static final AxisAlignedBB AABB_CENTER = new AxisAlignedBB(.4, .4, .4, .6, .6, .6);
 
-    public static final PartsProperty PARTS = null;// @todo 1.14 new PartsProperty("parts");
-
     public MultipartBlock() {
         super(Block.Properties.create(Material.IRON)
             .hardnessAndResistance(2.0f)
@@ -48,20 +45,6 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     @Override
     public TileEntity createNewTileEntity(IBlockReader worldIn) {
         return new MultipartTE();
-    }
-
-    public void initModel() {
-//        McJtyLib.proxy.initStandardItemModel(this);
-//        McJtyLib.proxy.initStateMapper(this, MultipartBakedModel.MODEL);
-    }
-
-
-    @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        // @todo 1.14
-//        Property[] listedProperties = new Property[0]; // no listed properties
-//        IUnlistedProperty[] unlistedProperties = new IUnlistedProperty[] { PARTS };
-//        return new ExtendedBlockState(this, listedProperties, unlistedProperties);
     }
 
     @Override
@@ -79,12 +62,6 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
         return ItemStack.EMPTY;
     }
 
-
-    // @todo 1.15
-//    @Override
-//    public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
-//        return true; // delegated to GenericCableBakedModel#getQuads
-//    }
 
     // @todo 1.14
 //    @Override
