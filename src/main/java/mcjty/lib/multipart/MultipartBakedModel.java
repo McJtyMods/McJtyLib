@@ -1,21 +1,25 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.client.AbstractDynamicBakedModel;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.MinecraftForgeClient;
+import net.minecraftforge.client.model.data.IModelData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-public class MultipartBakedModel implements IBakedModel {
+public class MultipartBakedModel extends AbstractDynamicBakedModel {
 
     public static final ModelResourceLocation MODEL = new ModelResourceLocation(McJtyLib.MODID + ":multipart");
-
-    private TextureAtlasSprite particleTexture;
 
 //    private static void initTextures() {
 //        if (cableTextures == null) {
@@ -38,45 +42,41 @@ public class MultipartBakedModel implements IBakedModel {
 //        }
 //    }
 //
-    public MultipartBakedModel(TextureAtlasSprite particleTexture) {
-        this.particleTexture = particleTexture;
-    }
 
     @Override
     public boolean func_230044_c_() {
         return false;
     }
 
+    @Nonnull
     @Override
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @Nonnull Random rand, @Nonnull IModelData extraData) {
         if (state == null) {
             return Collections.emptyList();
         }
 
-        // @todo 1.14
-//        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
-//
-//        Map<PartSlot, MultipartTE.Part> parts = extendedBlockState.getValue(MultipartBlock.PARTS);
-//        if (parts != null) {
-//            List<BakedQuad> quads = new ArrayList<>();
-//            BlockRenderLayer layer = MinecraftForgeClient.getRenderLayer();
-//
-//            for (Map.Entry<PartSlot, MultipartTE.Part> entry : parts.entrySet()) {
-//                MultipartTE.Part part = entry.getValue();
-//                BlockState blockState = part.getState();
-//                if (layer == null || blockState.getBlock().canRenderInLayer(blockState, layer)) {
-//                    IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModelForState(blockState);
-//                    try {
-//                        if (!(model instanceof MultipartBakedModel)) {  // @todo safety
-//                            quads.addAll(model.getQuads(state, side, rand++));
-//                        }
-//                    } catch (Exception ignore) {
-//                        System.out.println("MultipartBakedModel.getQuads");
-//                    }
-//                }
-//            }
-//            return quads;
-//        }
+        Map<PartSlot, MultipartTE.Part> parts = extraData.getData(MultipartTE.PARTS);
+
+        if (parts != null) {
+            List<BakedQuad> quads = new ArrayList<>();
+            RenderType layer = MinecraftForgeClient.getRenderLayer();
+
+            for (Map.Entry<PartSlot, MultipartTE.Part> entry : parts.entrySet()) {
+                MultipartTE.Part part = entry.getValue();
+                BlockState blockState = part.getState();
+                if (layer == null || RenderTypeLookup.canRenderInLayer(blockState, layer)) {
+                    IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(blockState);
+                    try {
+                        if (!(model instanceof MultipartBakedModel)) {  // @todo safety
+                            quads.addAll(model.getQuads(state, side, rand));
+                        }
+                    } catch (Exception ignore) {
+                        System.out.println("MultipartBakedModel.getQuads");
+                    }
+                }
+            }
+            return quads;
+        }
         return Collections.emptyList();
     }
 
@@ -98,7 +98,7 @@ public class MultipartBakedModel implements IBakedModel {
 
     @Override
     public TextureAtlasSprite getParticleTexture() {
-        return particleTexture;
+        return getTexture(new ResourceLocation("minecraft", "missingno"));  // @todo 1.15
     }
 
     @Override
