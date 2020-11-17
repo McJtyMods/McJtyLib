@@ -102,6 +102,4 @@ public class MultipartHelper {
         double z = playerIn.getPosZ();
         return new Vector3d(x, y, z);
     }
-
-
 }

@@ -25,7 +25,11 @@ public class MultipartItemBlock extends BlockItem {
 
     public MultipartItemBlock(Block block) {
         super(block, new Properties());
-    }   // @todo 1.14
+    }
+
+    public MultipartItemBlock(Block block, Properties properties) {
+        super(block, properties);
+    }
 
     @Override
     protected boolean canPlace(BlockItemUseContext context, BlockState state) {
@@ -54,7 +58,7 @@ public class MultipartItemBlock extends BlockItem {
             slot = ((IPartBlock) this.getBlock()).getSlotFromState(world, pos, toPlace);
         }
 
-        if (!block.isReplaceable(toPlace, context) && !canFitInside(block, world, pos, slot)) {
+        if (!block.isReplaceable(state, context) && !canFitInside(block, world, pos, slot)) {
             pos = pos.offset(context.getFace());
             state = world.getBlockState(pos);
             block = state.getBlock();

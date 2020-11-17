@@ -18,13 +18,22 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.shapes.IBooleanFunction;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.util.Map;
+import java.util.function.Function;
 
 public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoProvider, ITileEntityProvider {
 
@@ -33,12 +42,12 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     public MultipartBlock() {
         super(Block.Properties.create(Material.IRON)
-            .hardnessAndResistance(2.0f)
-            .sound(SoundType.METAL));
+                .hardnessAndResistance(2.0f)
+                .notSolid()
+                .harvestLevel(0)
+                .harvestTool(ToolType.PICKAXE)
+                .sound(SoundType.METAL));
         setRegistryName(McJtyLib.MODID, "multipart");
-//        setHarvestLevel("pickaxe", 0);    // @todo 1.14
-        // @todo TEMPORARY!
-//        setCreativeTab(CreativeTabs.MISC);
     }
 
     @Nullable
@@ -62,28 +71,43 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
         return ItemStack.EMPTY;
     }
 
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+        return VoxelShapes.empty();
+    }
 
-    // @todo 1.14
-//    @Override
-//    public void addCollisionBoxToList(BlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entityIn, boolean isActualState) {
-//        TileEntity te = world.getTileEntity(pos);
-//        if (te instanceof MultipartTE) {
-//            MultipartTE multipartTE = (MultipartTE) te;
-//            for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
-//                MultipartTE.Part part = entry.getValue();
-//                addCollisionBoxToList(pos, entityBox, collidingBoxes, part.getState().getCollisionBoundingBox(world, pos));
-//            }
-//        }
-//    }
-//    @Override
-//    public AxisAlignedBB getSelectedBoundingBox(BlockState state, World worldIn, BlockPos pos) {
-//        return AABB_EMPTY;
-//    }
-//    @Override
-//    public boolean shouldSideBeRendered(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-//        return true;
-//    }
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+        return combinePartShapes(world, pos, s -> s.getCollisionShape(world, pos, context));
+    }
 
+    @Override
+    public VoxelShape getRaytraceShape(BlockState state, IBlockReader world, BlockPos pos) {
+        return combinePartShapes(world, pos, s -> s.getRaytraceShape(world, pos, ISelectionContext.dummy()));
+    }
+
+    @Override
+    public VoxelShape getRenderShape(BlockState state, IBlockReader world, BlockPos pos) {
+        return combinePartShapes(world, pos, s -> s.getRenderShape(world, pos));
+    }
+
+    private VoxelShape combinePartShapes(IBlockReader world, BlockPos pos, Function<BlockState, VoxelShape> shapeGetter) {
+        VoxelShape combined = VoxelShapes.empty();
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof MultipartTE) {
+            MultipartTE multipartTE = (MultipartTE) te;
+            for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
+                MultipartTE.Part part = entry.getValue();
+                VoxelShape shape = shapeGetter.apply(part.getState());
+                if (combined.isEmpty()) {
+                    combined = shape;
+                } else {
+                    combined = VoxelShapes.combineAndSimplify(combined, shape, IBooleanFunction.OR);
+                }
+            }
+        }
+        return combined;
+    }
 
     @Override
     public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
@@ -112,28 +136,6 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
         }
     }
 
-    // @todo 1.14
-//    @Nullable
-//    @Override
-//    public RayTraceResult collisionRayTrace(BlockState blockState, World world, BlockPos pos, Vector3d start, Vector3d end) {
-//        TileEntity te = world.getTileEntity(pos);
-//        if (te instanceof MultipartTE) {
-//            MultipartTE multipartTE = (MultipartTE) te;
-//            for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
-//                MultipartTE.Part part = entry.getValue();
-//                if (!(part.getState().getBlock() instanceof MultipartBlock)) {     // @todo safety
-//                    RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
-//                    if (result != null) {
-//                        return result;
-//                    }
-//                }
-//            }
-//            return null;
-//        } else {
-//            return super.collisionRayTrace(blockState, world, pos, start, end);
-//        }
-//    }
-
     @Nullable
     public static MultipartTE.Part getHitPart(BlockState blockState, IBlockReader world, BlockPos pos, Vector3d start, Vector3d end) {
         TileEntity te = world.getTileEntity(pos);
@@ -143,10 +145,10 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
                 MultipartTE.Part part = entry.getValue();
                 if (!(part.getState().getBlock() instanceof MultipartBlock)) {     // @todo safety
                     // @todo 1.14
-//                    RayTraceResult result = part.getState().collisionRayTrace(world, pos, start, end);
-//                    if (result != null) {
-//                        return part;
-//                    }
+                    BlockRayTraceResult result = part.getState().getRaytraceShape(world, pos, ISelectionContext.dummy()).rayTrace(start, end, pos);
+                    if (result != null) {
+                        return part;
+                    }
                 }
             }
             return null;
@@ -154,29 +156,6 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
             return null;
         }
     }
-
-    private RayTraceResult checkIntersect(BlockPos pos, Vector3d vec3d, Vector3d vec3d1, AxisAlignedBB boundingBox) {
-        // @todo 1.14
-//        RayTraceResult raytraceresult = boundingBox.calculateIntercept(vec3d, vec3d1);
-//        return raytraceresult == null ? null : new RayTraceResult(raytraceresult.hitVec.addVector(pos.getX(), pos.getY(), pos.getZ()), raytraceresult.sideHit, pos);
-        return null;
-    }
-
-    // @todo 1.14
-//    @Override
-//    public boolean isBlockNormalCube(BlockState blockState) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isOpaqueCube(BlockState blockState) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean isFullCube(BlockState state) {
-//        return false;
-//    }
 
     @Override
     public TOPDriver getProbeDriver() {
