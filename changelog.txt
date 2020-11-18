@@ -1,3 +1,6 @@
+Upcoming:
+- Fixes for truetype rendering
+
 1.16-5.0.13:
 - New method for rendering
 

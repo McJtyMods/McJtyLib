@@ -18,7 +18,6 @@ public class ClientSetup {
 
         KeyBindings.init();
         MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(MultipartModelLoader::register);
 
         RenderTypeLookup.setRenderLayer(Registration.MULTIPART_BLOCK, (RenderType) -> true);
     }

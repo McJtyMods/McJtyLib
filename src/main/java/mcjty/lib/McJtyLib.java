@@ -1,6 +1,7 @@
 package mcjty.lib;
 
 import mcjty.lib.base.GeneralConfig;
+import mcjty.lib.multipart.MultipartModelLoader;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.*;
@@ -42,6 +43,7 @@ public class McJtyLib {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::init);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(MultipartModelLoader::register);
         });
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
