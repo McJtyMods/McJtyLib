@@ -1,4 +1,4 @@
-Upcoming:
+1.16-5.0.14:
 - Fixes for truetype rendering
 
 1.16-5.0.13:
