@@ -63,7 +63,7 @@ public class MultipartItemBlock extends BlockItem {
             block = state.getBlock();
         }
 
-        context = BlockItemUseContext.func_221536_a(context, pos, context.getFace());
+//        context = BlockItemUseContext.func_221536_a(context, pos, context.getFace());
 
         if (player.canPlayerEdit(pos, context.getFace(), itemstack)) {
             // We have to call getStateForPlacement again to be sure it is ok for this position as well

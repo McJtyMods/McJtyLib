@@ -68,8 +68,8 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return VoxelShapes.empty();
+    public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+        return combinePartShapes(world, pos, s -> s.getShape(world, pos, context));
     }
 
     @Override
@@ -119,7 +119,11 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
                 return part.getState().getBlock().onBlockActivated(part.getState(), world, pos, player, hand, result);
             }
         }
-        return ActionResultType.PASS;
+        TileEntity te = world.getTileEntity(pos);
+        if (te instanceof MultipartTE) {
+            ((MultipartTE) te).dump();
+        }
+        return ActionResultType.CONSUME;
     }
 
     @Nullable
