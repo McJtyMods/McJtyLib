@@ -1,6 +1,7 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.tileentity.GenericTileEntity;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -19,6 +20,7 @@ import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,6 +96,25 @@ public class MultipartTE extends TileEntity {
                 }
 //                dumpParts("remove");
                 return;
+            }
+        }
+    }
+
+    public void dump() {
+        if (world.isRemote) {
+            System.out.println("CLIENT: " + pos);
+        } else {
+            System.out.println("SERVER: " + pos);
+        }
+        for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
+            System.out.println("    SLOT: " + entry.getKey());
+            Part part = entry.getValue();
+            BlockState state = part.getState();
+            Block block = state.getBlock();
+            Collection<Property<?>> properties = state.getProperties();
+            System.out.println("        block: " + block.getRegistryName().toString());
+            for (Property<?> property : properties) {
+                System.out.println("        property: " + property.getName() + " = " + state.get(property).toString());
             }
         }
     }
