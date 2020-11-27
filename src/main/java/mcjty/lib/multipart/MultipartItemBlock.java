@@ -18,6 +18,8 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.common.util.Constants.BlockFlags;
 
 import javax.annotation.Nonnull;
 
@@ -150,7 +152,7 @@ public class MultipartItemBlock extends BlockItem {
         }
 
         BlockState multiState = Registration.MULTIPART_BLOCK.getDefaultState();
-        if (!world.setBlockState(pos, multiState, 11)) {
+        if (!world.setBlockState(pos, multiState, BlockFlags.BLOCK_UPDATE + BlockFlags.NOTIFY_NEIGHBORS + BlockFlags.UPDATE_NEIGHBORS)) {
             return false;
         }
 
