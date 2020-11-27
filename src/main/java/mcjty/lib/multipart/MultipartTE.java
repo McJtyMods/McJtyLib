@@ -73,6 +73,7 @@ public class MultipartTE extends TileEntity {
     }
 
     public void addPart(PartSlot slot, BlockState state, TileEntity te) {
+        System.out.println("MultipartTE.addPart: " + world.isRemote);
         parts.put(slot, new Part(state, te));
 
         if (te instanceof GenericTileEntity) {
@@ -82,6 +83,10 @@ public class MultipartTE extends TileEntity {
         if (!world.isRemote) {
             version++;
             markDirtyClient();
+        } else {
+            // @todo may not be needed. It doesn't seem to help anyway
+//            ModelDataManager.requestModelDataRefresh(this);
+//            world.markBlockRangeForRenderUpdate(pos, null, null);
         }
 //        dumpParts("add");
     }
@@ -136,10 +141,8 @@ public class MultipartTE extends TileEntity {
         int oldVersion = version;
         read(packet.getNbtCompound());
         if (world.isRemote && version != oldVersion) {
-//            dumpParts("onData");
             ModelDataManager.requestModelDataRefresh(this);
-            world.markBlockRangeForRenderUpdate(pos, null, null);
-//            world.markForRerender(pos);
+            world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         }
     }
 
@@ -157,6 +160,7 @@ public class MultipartTE extends TileEntity {
         write(nbtTag);
         return new SUpdateTileEntityPacket(pos, 1, nbtTag);
     }
+
 
     public void markDirtyClient() {
         markDirty();
