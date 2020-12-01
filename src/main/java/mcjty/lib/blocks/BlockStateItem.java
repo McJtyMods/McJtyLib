@@ -3,6 +3,9 @@ package mcjty.lib.blocks;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 
 import javax.annotation.Nullable;
 
@@ -25,5 +28,10 @@ public class BlockStateItem extends BlockItem {
         return null;
     }
 
-
+    @Override
+    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+        if (this.isInGroup(group)) {
+            items.add(new ItemStack(this));
+        }
+    }
 }
