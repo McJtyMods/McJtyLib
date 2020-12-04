@@ -16,7 +16,9 @@ public class DimensionId {
 
     private final DimensionType id;
 
-    private final static Lazy<DimensionId> OVERWORLD = Lazy.of(() -> new DimensionId(DimensionType.OVERWORLD));
+    private static final Lazy<DimensionId> OVERWORLD = Lazy.of(() -> new DimensionId(DimensionType.OVERWORLD));
+    private static final Lazy<DimensionId> NETHER = Lazy.of(() -> new DimensionId(DimensionType.THE_NETHER));
+    private static final Lazy<DimensionId> END = Lazy.of(() -> new DimensionId(DimensionType.THE_END));
 
     private DimensionId(DimensionType id) {
         this.id = id;
@@ -24,6 +26,14 @@ public class DimensionId {
 
     public static DimensionId overworld() {
         return OVERWORLD.get();
+    }
+
+    public static DimensionId nether() {
+        return NETHER.get();
+    }
+
+    public static DimensionId end() {
+        return END.get();
     }
 
     public static DimensionId fromId(DimensionType id) {
