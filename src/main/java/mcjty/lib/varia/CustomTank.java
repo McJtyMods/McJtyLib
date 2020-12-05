@@ -131,6 +131,9 @@ public class CustomTank implements IFluidHandler, IFluidTank {
             onContentsChanged();
             fluid.shrink(drained);
         }
+        if (fluid.getAmount() <= 0) {
+            fluid = FluidStack.EMPTY;
+        }
         return stack;
     }
 

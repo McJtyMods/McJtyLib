@@ -1,5 +1,6 @@
 Upcoming:
 - Small DimensionId update
+- Small fix in the custom tank code
 
 1.15-4.1.12:
 - Fixes for truetype rendering
