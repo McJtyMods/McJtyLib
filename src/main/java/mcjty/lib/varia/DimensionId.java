@@ -54,6 +54,10 @@ public class DimensionId {
         return new DimensionId(key);
     }
 
+    public RegistryKey<World> getId() {
+        return id;
+    }
+
     public ResourceLocation getRegistryName() {
         return id.getLocation();
     }
