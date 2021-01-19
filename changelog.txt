@@ -1,5 +1,6 @@
 Upcoming:
 - Small changes for RFTools Dimensions
+- Fixes for tooltip rendering
 
 1.16-5.0.15:
 - Small DimensionId update

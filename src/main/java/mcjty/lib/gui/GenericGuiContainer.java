@@ -30,9 +30,10 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.text.*;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
@@ -41,7 +42,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * The main parent for all container based gui's in McJtyLib based mods
@@ -326,27 +326,19 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
-    protected List<String> addCustomLines(List<String> oldList, BlockRender blockRender, ItemStack stack) {
+    protected List<ITextComponent> addCustomLines(List<ITextComponent> oldList, BlockRender blockRender, ItemStack stack) {
         return oldList;
     }
 
     protected void customRenderToolTip(MatrixStack matrixStack, BlockRender blockRender, ItemStack stack, int x, int y) {
-        List<String> list;
+        List<ITextComponent> list;
         //noinspection ConstantConditions
         if (stack.getItem() == null) {
             // Protection for bad itemstacks
             list = new ArrayList<>();
         } else {
             ITooltipFlag flag = this.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-            list = stack.getTooltip(this.getMinecraft().player, flag).stream().map(ITextComponent::getString /* @todo was getFormattedText*/).collect(Collectors.toList());
-        }
-
-        for (int i = 0; i < list.size(); ++i) {
-            if (i == 0) {
-                list.set(i, stack.getRarity().color + list.get(i));
-            } else {
-                list.set(i,  TextFormatting.GRAY + list.get(i));
-            }
+            list = stack.getTooltip(this.getMinecraft().player, flag);
         }
 
         list = addCustomLines(list, blockRender, stack);
@@ -355,10 +347,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         if (stack.getItem() != null) {
             font = stack.getItem().getFontRenderer(stack);
         }
-        // @todo check on 1.16
-        List<ITextProperties> properties = list.stream().map(StringTextComponent::new).collect(Collectors.toList());
-        List<IReorderingProcessor> processors = LanguageMap.getInstance().func_244260_a(properties);
-        renderToolTip(matrixStack, processors, x, y, (font == null ? getMinecraft().fontRenderer : font));
+        GuiUtils.preItemToolTip(stack);
+        GuiUtils.drawHoveringText(matrixStack, list, x, y, xSize, ySize, -1, (font == null ? getMinecraft().fontRenderer : font));
     }
 
     @Override
