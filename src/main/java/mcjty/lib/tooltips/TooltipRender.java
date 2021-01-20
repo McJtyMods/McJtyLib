@@ -166,9 +166,10 @@ public class TooltipRender {
 
         if (errorAmount != ITooltipExtras.NOAMOUNT) {
             matrixStack.push();
-            matrixStack.translate(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
-            matrixStack.scale(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawStringWithShadow(matrixStack, s1, 0, 0, color);
+            matrixStack.translate(16 - w1, (hasReq ? 8 : 10), 550f);
+//            matrixStack.scale(0.5F, 0.5F, 0.5F);
+//            matrixStack.translate(8 - w1/5, 0, 400f);
+            mc.fontRenderer.drawStringWithShadow(matrixStack, s1, x, y, color);
             matrixStack.pop();
         }
 
@@ -181,9 +182,10 @@ public class TooltipRender {
             int w2 = mc.fontRenderer.getStringWidth(s2);
 
             matrixStack.push();
-            matrixStack.translate(x + 8 - w2 / 4, y + 17, 0);
-            matrixStack.scale(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawStringWithShadow(matrixStack, s2, 0, 0, 0xFF0000);
+            matrixStack.translate(x + 8 - w2 / 4, y + 17, 550f);
+
+//            matrixStack.scale(0.5F, 0.5F, 0.5F);
+            mc.fontRenderer.drawStringWithShadow(matrixStack, s2, 0, 0, 0xFFFF0000);
             matrixStack.pop();
         }
         GlStateManager.enableDepthTest();
