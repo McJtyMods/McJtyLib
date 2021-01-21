@@ -11,11 +11,14 @@ import net.minecraft.data.DirectoryCache;
 import net.minecraft.data.IDataProvider;
 import net.minecraft.data.LootTableProvider;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.loot.*;
 import net.minecraft.loot.conditions.MatchTool;
 import net.minecraft.loot.functions.*;
 import net.minecraft.state.Property;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +34,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     protected final Map<Block, LootTable.Builder> lootTables = new HashMap<>();
+    protected final Map<EntityType<?>, LootTable.Builder> entityLootTables = new HashMap<>();
     private final DataGenerator generator;
 
     public BaseLootTableProvider(DataGenerator dataGeneratorIn) {
@@ -39,6 +43,18 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     protected abstract void addTables();
+
+    protected void addItemDropTable(EntityType<?> entityType, IItemProvider item) {
+        entityLootTables.put(entityType, createItemDropTable(entityType.getRegistryName().getPath(), item));
+    }
+
+    protected LootTable.Builder createItemDropTable(String name, IItemProvider item) {
+        LootPool.Builder builder = LootPool.builder()
+                .name(name)
+                .rolls(ConstantRange.of(1))
+                .addEntry(ItemLootEntry.builder(item));
+        return LootTable.builder().addLootPool(builder);
+    }
 
     protected LootTable.Builder createSilkTouchTable(String name, Block block, Item lootItem, float min, float max) {
         LootPool.Builder builder = LootPool.builder()
@@ -119,6 +135,10 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
             tables.put(entry.getKey().getLootTable(), entry.getValue().setParameterSet(LootParameterSets.BLOCK).build());
         }
+        for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
+            tables.put(entry.getKey().getLootTable(), entry.getValue().setParameterSet(LootParameterSets.ENTITY).build());
+        }
+
         writeTables(cache, tables);
     }
 
