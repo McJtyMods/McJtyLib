@@ -1,6 +1,6 @@
 package mcjty.lib.datagen;
 
-import mcjty.lib.crafting.CopyNBTRecipeBuilder;
+import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.block.Blocks;
 import net.minecraft.data.*;
 import net.minecraft.item.Item;
@@ -8,7 +8,6 @@ import net.minecraft.item.Items;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
@@ -60,7 +59,7 @@ public class BaseRecipeProvider extends RecipeProvider {
         }
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, CopyNBTRecipeBuilder builder, String... lines) {
+    protected void build(Consumer<IFinishedRecipe> consumer, IRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::key, lines);
         builder.setGroup(group).build(consumer);
     }
@@ -78,7 +77,7 @@ public class BaseRecipeProvider extends RecipeProvider {
         builder.setGroup(group).build(consumer, id);
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, CopyNBTRecipeBuilder builder, String... lines) {
+    protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, IRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::key, lines);
         builder.setGroup(group).build(consumer, id);
     }

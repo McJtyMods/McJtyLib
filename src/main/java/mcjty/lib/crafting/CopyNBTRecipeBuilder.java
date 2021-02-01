@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 
 import static mcjty.lib.setup.Registration.COPYNBT_SERIALIZER;
 
-public class CopyNBTRecipeBuilder {
+public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder> {
     private static final Logger LOGGER = LogManager.getLogger();
     private final Item result;
     private final int count;
@@ -53,14 +53,17 @@ public class CopyNBTRecipeBuilder {
         return new CopyNBTRecipeBuilder(resultIn, countIn);
     }
 
+    @Override
     public CopyNBTRecipeBuilder key(Character symbol, ITag<Item> tagIn) {
         return this.key(symbol, Ingredient.fromTag(tagIn));
     }
 
+    @Override
     public CopyNBTRecipeBuilder key(Character symbol, IItemProvider itemIn) {
         return this.key(symbol, Ingredient.fromItems(itemIn));
     }
 
+    @Override
     public CopyNBTRecipeBuilder key(Character symbol, Ingredient ingredientIn) {
         if (this.key.containsKey(symbol)) {
             throw new IllegalArgumentException("Symbol '" + symbol + "' is already defined!");
@@ -72,6 +75,7 @@ public class CopyNBTRecipeBuilder {
         }
     }
 
+    @Override
     public CopyNBTRecipeBuilder patternLine(String patternIn) {
         if (!this.pattern.isEmpty() && patternIn.length() != this.pattern.get(0).length()) {
             throw new IllegalArgumentException("Pattern must be the same width on every line!");
@@ -86,15 +90,18 @@ public class CopyNBTRecipeBuilder {
         return this;
     }
 
+    @Override
     public CopyNBTRecipeBuilder setGroup(String groupIn) {
         this.group = groupIn;
         return this;
     }
 
+    @Override
     public void build(Consumer<IFinishedRecipe> consumerIn) {
         this.build(consumerIn, Registry.ITEM.getKey(this.result));
     }
 
+    @Override
     public void build(Consumer<IFinishedRecipe> consumerIn, String save) {
         ResourceLocation resourcelocation = Registry.ITEM.getKey(this.result);
         if ((new ResourceLocation(save)).equals(resourcelocation)) {
@@ -104,6 +111,7 @@ public class CopyNBTRecipeBuilder {
         }
     }
 
+    @Override
     public void build(Consumer<IFinishedRecipe> consumerIn, ResourceLocation id) {
         this.validate(id);
         this.advancementBuilder.withParentId(new ResourceLocation("recipes/root")).withCriterion("has_the_recipe",
