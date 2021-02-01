@@ -48,11 +48,32 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         entityLootTables.put(entityType, createItemDropTable(entityType.getRegistryName().getPath(), item));
     }
 
+    protected void addItemDropTable(EntityType<?> entityType, IItemProvider item,
+                                    float min, float max,
+                                    float lmin, float lmax) {
+        entityLootTables.put(entityType, createItemDropTable(
+                entityType.getRegistryName().getPath(), item, min, max, lmin, lmax));
+    }
+
     protected LootTable.Builder createItemDropTable(String name, IItemProvider item) {
         LootPool.Builder builder = LootPool.builder()
                 .name(name)
                 .rolls(ConstantRange.of(1))
                 .addEntry(ItemLootEntry.builder(item));
+        return LootTable.builder().addLootPool(builder);
+    }
+
+    protected LootTable.Builder createItemDropTable(String name, IItemProvider item,
+                                                    float min, float max,
+                                                    float lmin, float lmax) {
+        LootPool.Builder builder = LootPool.builder()
+                .name(name)
+                .rolls(ConstantRange.of(1))
+                .addEntry(ItemLootEntry.builder(item)
+                        .acceptFunction(SetCount
+                                .builder(RandomValueRange.of(min, max)))
+                        .acceptFunction(LootingEnchantBonus
+                                .builder(RandomValueRange.of(lmin, lmax))));
         return LootTable.builder().addLootPool(builder);
     }
 
