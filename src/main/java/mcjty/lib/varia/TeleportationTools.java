@@ -1,5 +1,6 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.McJtyLib;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -35,6 +36,10 @@ public class TeleportationTools {
 
     public static void teleportToDimension(PlayerEntity player, DimensionId dimension, double x, double y, double z) {
         ServerWorld world = dimension.loadWorld(player.getEntityWorld());
+        if (world == null) {
+            McJtyLib.setup.getLogger().error("Something went wrong teleporting to dimension " + dimension.getName());
+            return;
+        }
         player.changeDimension(world, new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {

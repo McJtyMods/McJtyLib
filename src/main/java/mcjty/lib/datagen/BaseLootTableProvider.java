@@ -13,7 +13,6 @@ import net.minecraft.data.LootTableProvider;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.loot.*;
 import net.minecraft.loot.conditions.MatchTool;
 import net.minecraft.loot.functions.*;
@@ -35,6 +34,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
 
     protected final Map<Block, LootTable.Builder> lootTables = new HashMap<>();
     protected final Map<EntityType<?>, LootTable.Builder> entityLootTables = new HashMap<>();
+    protected final Map<ResourceLocation, LootTable.Builder> chestLootTables = new HashMap<>();
     private final DataGenerator generator;
 
     public BaseLootTableProvider(DataGenerator dataGeneratorIn) {
@@ -46,6 +46,10 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
 
     protected void addItemDropTable(EntityType<?> entityType, IItemProvider item) {
         entityLootTables.put(entityType, createItemDropTable(entityType.getRegistryName().getPath(), item));
+    }
+
+    protected void addChestLootTable(ResourceLocation id, LootTable.Builder builder) {
+        chestLootTables.put(id, builder);
     }
 
     protected void addItemDropTable(EntityType<?> entityType, IItemProvider item,
@@ -159,6 +163,11 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
             tables.put(entry.getKey().getLootTable(), entry.getValue().setParameterSet(LootParameterSets.ENTITY).build());
         }
+        for (Map.Entry<ResourceLocation, LootTable.Builder> entry : chestLootTables.entrySet()) {
+            ResourceLocation id = entry.getKey();
+            ResourceLocation location = new ResourceLocation(id.getNamespace(), "chests/" + id.getPath());
+            tables.put(location, entry.getValue().setParameterSet(LootParameterSets.CHEST).build());
+        }
 
         writeTables(cache, tables);
     }
@@ -171,6 +180,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
                 IDataProvider.save(GSON, cache, LootTableManager.toJson(lootTable), path);
             } catch (IOException e) {
                 LOGGER.error("Couldn't write loot table {}", path, e);
+                throw new RuntimeException(e);
             }
         });
     }
