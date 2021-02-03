@@ -165,8 +165,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         }
         for (Map.Entry<ResourceLocation, LootTable.Builder> entry : chestLootTables.entrySet()) {
             ResourceLocation id = entry.getKey();
-            ResourceLocation location = new ResourceLocation(id.getNamespace(), "chests/" + id.getPath());
-            tables.put(location, entry.getValue().setParameterSet(LootParameterSets.CHEST).build());
+            tables.put(id, entry.getValue().setParameterSet(LootParameterSets.CHEST).build());
         }
 
         writeTables(cache, tables);
