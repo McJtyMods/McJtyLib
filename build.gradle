@@ -253,6 +253,7 @@ curseforge {
         releaseType = project.curse_type
         addGameVersion '1.16.3'
         addGameVersion '1.16.4'
+        addGameVersion '1.16.5'
         mainArtifact(jar) {
             displayName = "${modname} - ${version}"
         }
