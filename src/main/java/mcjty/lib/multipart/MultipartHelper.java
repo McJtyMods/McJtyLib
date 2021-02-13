@@ -61,7 +61,7 @@ public class MultipartHelper {
         BlockState hitState = hitPart.getState();
         TileEntity hitTile = hitPart.getTileEntity();
 
-        ItemStack stack = new ItemStack(Item.getItemFromBlock(hitState.getBlock()));
+        ItemStack stack = new ItemStack(hitState.getBlock().asItem());
         if (hitTile instanceof GenericTileEntity) {
             CompoundNBT tagCompound = new CompoundNBT();
             // @todo how to fix the restorable parts from NBT?

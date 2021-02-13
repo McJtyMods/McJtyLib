@@ -60,7 +60,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
         MultipartTE.Part part = getHitPart(state, world, pos, player.getEyePosition(0), target.getHitVec());
         if (part != null) {
-            return new ItemStack(Item.getItemFromBlock(part.getState().getBlock()));
+            return new ItemStack(part.getState().getBlock().asItem());
         } else {
             return ItemStack.EMPTY;
         }
