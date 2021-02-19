@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Mod(McJtyLib.MODID)
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class McJtyLib {
 
     public static final String MODID = "mcjtylib";

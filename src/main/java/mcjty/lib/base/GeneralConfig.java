@@ -2,6 +2,7 @@ package mcjty.lib.base;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.varia.Logging;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -10,7 +11,7 @@ import net.minecraftforge.fml.config.ModConfig;
 
 import java.nio.file.Path;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = McJtyLib.MODID)
 public class GeneralConfig {
 
     private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
