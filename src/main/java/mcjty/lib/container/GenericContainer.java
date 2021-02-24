@@ -12,6 +12,7 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.TriFunction;
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -146,6 +147,23 @@ public class GenericContainer extends Container implements IGenericContainer {
 
     public SlotType getSlotType(int index) {
         return factory.getSlotType(index);
+    }
+
+    @Nullable
+    public Slot getSlotByInventoryAndIndex(String name, int index) {
+        IItemHandler inv = inventories.get(name);
+        if (inv == null) {
+            return null;
+        }
+        for (Slot slot : inventorySlots) {
+            if (slot instanceof SlotItemHandler) {
+                IItemHandler itemHandler = ((SlotItemHandler) slot).getItemHandler();
+                if (itemHandler == inv && slot.getSlotIndex() == index) {
+                    return slot;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
