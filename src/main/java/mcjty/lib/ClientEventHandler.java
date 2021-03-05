@@ -38,8 +38,9 @@ public class ClientEventHandler {
                 if (manager != null) {
                     if (manager.getModalWindows().findFirst().isPresent()) {
                         // There is a modal window. Eat this event and send it directly to the window
-                        manager.mouseScrolled(event.getMouseX(), event.getMouseY(), event.getScrollDelta());
-                        event.setCanceled(true);
+                        if (container.mouseScrolledFromEvent(event.getMouseX(), event.getMouseY(), event.getScrollDelta())) {
+                            event.setCanceled(true);
+                        }
                     }
                 }
             }
@@ -55,8 +56,9 @@ public class ClientEventHandler {
                 if (manager != null) {
                     if (manager.getModalWindows().findFirst().isPresent()) {
                         // There is a modal window. Eat this event and send it directly to the window
-                        manager.mouseClicked(event.getMouseX(), event.getMouseY(), event.getButton());
-                        event.setCanceled(true);
+                        if (container.mouseClickedFromEvent(event.getMouseX(), event.getMouseY(), event.getButton())) {
+                            event.setCanceled(true);
+                        }
                     }
                 }
             }
@@ -72,8 +74,9 @@ public class ClientEventHandler {
                 if (manager != null) {
                     if (manager.getModalWindows().findFirst().isPresent()) {
                         // There is a modal window. Eat this event and send it directly to the window
-                        manager.mouseReleased(event.getMouseX(), event.getMouseY(), event.getButton());
-                        event.setCanceled(true);
+                        if (container.mouseReleasedFromEvent(event.getMouseX(), event.getMouseY(), event.getButton())) {
+                            event.setCanceled(true);
+                        }
                     }
                 }
             }

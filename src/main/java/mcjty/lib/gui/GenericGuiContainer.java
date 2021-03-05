@@ -417,6 +417,27 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
+    public boolean mouseClickedFromEvent(double x, double y, int button) {
+        WindowManager manager = getWindow().getWindowManager();
+        manager.mouseClicked(x, y, button);
+        return true;
+    }
+
+    @Override
+    public boolean mouseReleasedFromEvent(double x, double y, int button) {
+        WindowManager manager = getWindow().getWindowManager();
+        manager.mouseReleased(x, y, button);
+        return true;
+    }
+
+    @Override
+    public boolean mouseScrolledFromEvent(double x, double y, double amount) {
+        WindowManager manager = getWindow().getWindowManager();
+        manager.mouseScrolled(x, y, amount);
+        return true;
+    }
+
+    @Override
     public void keyTypedFromEvent(int keyCode, int scanCode) {
         if (window != null) {
             if (getWindowManager().keyTyped(keyCode, scanCode)) {

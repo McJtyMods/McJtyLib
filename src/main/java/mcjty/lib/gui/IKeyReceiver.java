@@ -10,5 +10,11 @@ public interface IKeyReceiver {
 
     void keyTypedFromEvent(int keyCode, int scanCode);
 
+    // Return true if event is handled and should be canceled
+    // This is called only if there is a global window open
+    boolean mouseClickedFromEvent(double x, double y, int button);
+    boolean mouseReleasedFromEvent(double x, double y, int button);
+    boolean mouseScrolledFromEvent(double x, double y, double amount);
+
     void charTypedFromEvent(char codePoint);
 }
