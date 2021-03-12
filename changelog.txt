@@ -1,3 +1,6 @@
+Upcoming:
+- New tool for getting modname
+
 1.16-5.0.18:
 - Fix for RFTools Control
 
