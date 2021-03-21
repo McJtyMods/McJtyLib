@@ -320,7 +320,7 @@ public class TrueTypeFont {
         return fontHeight;
     }
 
-    public String func_238412_a_(String text, int width) {
+    public String trimStringToWidth(String text, int width) {
         StringBuilder stringbuilder = new StringBuilder();
         int i = 0;
         int j = 0;

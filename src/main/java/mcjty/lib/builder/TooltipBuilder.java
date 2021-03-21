@@ -68,7 +68,7 @@ public class TooltipBuilder {
                         } else {
                             component = stylize(prefix + line.getSuffix(), line.getStyles());
                         }
-                        ((IFormattableTextComponent)component).append(new StringTextComponent(TextFormatting.WHITE + s));
+                        ((IFormattableTextComponent)component).appendSibling(new StringTextComponent(TextFormatting.WHITE + s));
                         tooltip.add(component);
                     });
                 } else {
@@ -81,7 +81,7 @@ public class TooltipBuilder {
                     if (line.getInformationGetter() != null) {
                         String extra = line.getInformationGetter().apply(stack);
                         if (extra != null) {
-                            ((IFormattableTextComponent)component).append(new StringTextComponent(TextFormatting.WHITE + extra));
+                            ((IFormattableTextComponent)component).appendSibling(new StringTextComponent(TextFormatting.WHITE + extra));
                             tooltip.add(component);
                         } // Else we don't add the entire component
                     } else {

@@ -57,7 +57,7 @@ public class CustomRenderTypes extends RenderType {
     public static final RenderType OVERLAY_LINES = makeType("overlay_lines",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINES, 256,
             State.getBuilder().line(THICK_LINES)
-                    .layer(field_239235_M_) // @todo 1.16 PROJECTION_LAYERING
+                    .layer(VIEW_OFFSET_Z_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .texture(NO_TEXTURE)
                     .depthTest(DEPTH_ALWAYS)

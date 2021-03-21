@@ -309,7 +309,7 @@ public class TextField extends AbstractWidget<TextField> {
 
         RenderHelper.drawThickBeveledBox(matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
 
-        String renderedText = mc.fontRenderer.func_238412_a_(this.text.substring(startOffset), bounds.width - 10);
+        String renderedText = mc.fontRenderer.trimStringToWidth(this.text.substring(startOffset), bounds.width - 10);
         int textX = x + 5 + bounds.x;
         int textY = y + calculateVerticalOffset() + bounds.y;
         if (isEnabled()) {

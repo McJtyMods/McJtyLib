@@ -85,8 +85,8 @@ public class TooltipRender {
                     if (!McJtyLib.proxy.isSneaking()) {
                         String translationKey = KeyBindings.openManual.getTranslationKey();
                         event.getToolTip().add(new StringTextComponent("<Press ").mergeStyle(TextFormatting.YELLOW)
-                                .append(new TranslationTextComponent(translationKey).mergeStyle(TextFormatting.GREEN))
-                                .append(new StringTextComponent(" for help>").mergeStyle(TextFormatting.YELLOW)));
+                                .appendSibling(new TranslationTextComponent(translationKey).mergeStyle(TextFormatting.GREEN))
+                                .appendSibling(new StringTextComponent(" for help>").mergeStyle(TextFormatting.YELLOW)));
                     }
                 }
             }
