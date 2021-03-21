@@ -162,7 +162,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         if (text == null) {
             mc.fontRenderer.drawString(matrixStack, "", x+dx+bounds.x, y+dy+bounds.y, col);
         } else {
-            mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.func_238412_a_(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
+            mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.trimStringToWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
         }
     }
 
