@@ -14,6 +14,9 @@ public class CapabilityTools {
 
     @Nonnull
     public static LazyOptional<IItemHandler> getItemCapabilitySafe(TileEntity tileEntity) {
+        if (tileEntity == null) {
+            return LazyOptional.empty();
+        }
         try {
             return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
         } catch (RuntimeException e) {
@@ -24,6 +27,9 @@ public class CapabilityTools {
 
     @Nonnull
     public static LazyOptional<IFluidHandler> getFluidCapabilitySafe(TileEntity tileEntity) {
+        if (tileEntity == null) {
+            return LazyOptional.empty();
+        }
         try {
             return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
         } catch (RuntimeException e) {
