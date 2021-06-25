@@ -7,11 +7,11 @@ public class SecurityTools {
 
     // @todo
 //    public static boolean isAdmin(PlayerEntity player) {
-//        return player.capabilities.isCreativeMode || MinecraftServer.getServer().getConfigurationManager().getOppedPlayers().func_183026_b(player.getGameProfile());
+//        return player.capabilities.isCreativeMode || MinecraftServer.getServer().getConfigurationManager().getOppedPlayers().canBypassPlayerLimit(player.getGameProfile());
 //    }
 
     public static boolean isPrivileged(PlayerEntity player, World world) {
-        return player.abilities.isCreativeMode || world.getServer().getPlayerList().canSendCommands(player.getGameProfile());
+        return player.abilities.instabuild || world.getServer().getPlayerList().isOp(player.getGameProfile());
     }
 
 }

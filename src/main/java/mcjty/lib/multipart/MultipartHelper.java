@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 public class MultipartHelper {
 
     public static TileEntity getTileEntity(IBlockReader access, BlockPos pos, PartSlot slot) {
-        TileEntity te = access.getTileEntity(pos);
+        TileEntity te = access.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
             if (part != null) {
@@ -29,7 +29,7 @@ public class MultipartHelper {
     }
 
     public static TileEntity getTileEntity(IBlockReader access, PartPos pos) {
-        TileEntity te = access.getTileEntity(pos.getPos());
+        TileEntity te = access.getBlockEntity(pos.getPos());
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(pos.getSlot());
             if (part != null) {
@@ -40,7 +40,7 @@ public class MultipartHelper {
     }
 
     public static BlockState getBlockState(IBlockReader access, BlockPos pos, PartSlot slot) {
-        TileEntity te = access.getTileEntity(pos);
+        TileEntity te = access.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
             if (part != null) {
@@ -52,8 +52,8 @@ public class MultipartHelper {
 
     // Return true if there are no more parts left
     public static boolean removePart(MultipartTE multipartTE, BlockState state, PlayerEntity player, Vector3d hitVec) {
-        BlockPos pos = multipartTE.getPos();
-        MultipartTE.Part hitPart = Registration.MULTIPART_BLOCK.getHitPart(state, multipartTE.getWorld(), pos, getPlayerEyes(player), hitVec);
+        BlockPos pos = multipartTE.getBlockPos();
+        MultipartTE.Part hitPart = Registration.MULTIPART_BLOCK.getHitPart(state, multipartTE.getLevel(), pos, getPlayerEyes(player), hitVec);
         if (hitPart == null) {
             return false;
         }
@@ -66,10 +66,10 @@ public class MultipartHelper {
             CompoundNBT tagCompound = new CompoundNBT();
             // @todo how to fix the restorable parts from NBT?
 //            ((GenericTileEntity) hitTile).writeRestorableToNBT(tagCompound);
-            ((GenericTileEntity) hitTile).onReplaced(multipartTE.getWorld(), multipartTE.getPos(), hitState, hitState); // @todo check?
+            ((GenericTileEntity) hitTile).onReplaced(multipartTE.getLevel(), multipartTE.getBlockPos(), hitState, hitState); // @todo check?
             stack.setTag(tagCompound);
         }
-        InventoryHelper.spawnItemStack(multipartTE.getWorld(), pos.getX(), pos.getY(), pos.getZ(), stack);
+        InventoryHelper.dropItemStack(multipartTE.getLevel(), pos.getX(), pos.getY(), pos.getZ(), stack);
 
         multipartTE.removePart(hitState);
 
@@ -77,8 +77,8 @@ public class MultipartHelper {
     }
 
     private static RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, PlayerEntity playerIn, boolean useLiquids) {
-        float pitch = playerIn.rotationPitch;
-        float yaw = playerIn.rotationYaw;
+        float pitch = playerIn.xRot;
+        float yaw = playerIn.yRot;
         Vector3d vec3 = getPlayerEyes(playerIn);
         float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
         float f3 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
@@ -93,13 +93,13 @@ public class MultipartHelper {
         }
         Vector3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
         RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
-        return worldIn.rayTraceBlocks(context);
+        return worldIn.clip(context);
     }
 
     public static Vector3d getPlayerEyes(PlayerEntity playerIn) {
-        double x = playerIn.getPosX();
-        double y = playerIn.getPosY() + playerIn.getEyeHeight();
-        double z = playerIn.getPosZ();
+        double x = playerIn.getX();
+        double y = playerIn.getY() + playerIn.getEyeHeight();
+        double z = playerIn.getZ();
         return new Vector3d(x, y, z);
     }
 }

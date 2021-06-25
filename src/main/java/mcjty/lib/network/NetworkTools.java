@@ -17,7 +17,7 @@ public class NetworkTools {
 
     public static FluidStack readFluidStack(ByteBuf dataIn) {
         PacketBuffer buf = new PacketBuffer(dataIn);
-        CompoundNBT nbt = buf.readCompoundTag();
+        CompoundNBT nbt = buf.readNbt();
         return FluidStack.loadFluidStackFromNBT(nbt);
     }
 
@@ -26,7 +26,7 @@ public class NetworkTools {
         CompoundNBT nbt = new CompoundNBT();
         fluidStack.writeToNBT(nbt);
         try {
-            buf.writeCompoundTag(nbt);
+            buf.writeNbt(nbt);
         } catch (RuntimeException e) {
             Logging.logError("Error writing fluid stack", e);
         }
@@ -36,7 +36,7 @@ public class NetworkTools {
         if (!dataIn.readBoolean()) {
             return null;
         }
-        return dataIn.readString(32767);
+        return dataIn.readUtf(32767);
     }
 
     public static void writeStringUTF8(PacketBuffer dataOut, String str) {
@@ -45,7 +45,7 @@ public class NetworkTools {
             return;
         }
         dataOut.writeBoolean(true);
-        dataOut.writeString(str);
+        dataOut.writeUtf(str);
     }
 
     public static void writeStringList(PacketBuffer dataOut, @Nonnull List<String> list) {
@@ -65,8 +65,8 @@ public class NetworkTools {
 
     /// This function supports itemstacks with more then 64 items.
     public static ItemStack readItemStack(PacketBuffer buf) {
-        CompoundNBT nbt = buf.readCompoundTag();
-        ItemStack stack = ItemStack.read(nbt);
+        CompoundNBT nbt = buf.readNbt();
+        ItemStack stack = ItemStack.of(nbt);
         stack.setCount(buf.readInt());
         return stack;
     }
@@ -74,9 +74,9 @@ public class NetworkTools {
     /// This function supports itemstacks with more then 64 items.
     public static void writeItemStack(PacketBuffer buf, ItemStack itemStack) {
         CompoundNBT nbt = new CompoundNBT();
-        itemStack.write(nbt);
+        itemStack.save(nbt);
         try {
-            buf.writeCompoundTag(nbt);
+            buf.writeNbt(nbt);
             buf.writeInt(itemStack.getCount());
         } catch (Exception e) {
             Logging.logError("Error", e);
@@ -116,7 +116,7 @@ public class NetworkTools {
         int size = buf.readInt();
         List<ItemStack> outputs = new ArrayList<>(size);
         for (int i = 0 ; i < size ; i++) {
-            outputs.add(buf.readItemStack());
+            outputs.add(buf.readItem());
         }
         return outputs;
     }
@@ -124,7 +124,7 @@ public class NetworkTools {
     public static void writeItemStackList(PacketBuffer buf, @Nonnull List<ItemStack> outputs) {
         buf.writeInt(outputs.size());
         for (ItemStack output : outputs) {
-            buf.writeItemStack(output);
+            buf.writeItem(output);
         }
     }
 }

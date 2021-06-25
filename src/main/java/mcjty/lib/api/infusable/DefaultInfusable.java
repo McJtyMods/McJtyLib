@@ -19,6 +19,6 @@ public class DefaultInfusable implements IInfusable {
     @Override
     public void setInfused(int i) {
         infused = i;
-        owner.markDirty();
+        owner.setChanged();
     }
 }

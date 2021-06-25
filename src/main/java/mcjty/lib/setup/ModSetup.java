@@ -77,7 +77,7 @@ public class ModSetup extends DefaultModSetup {
 
         @SubscribeEvent
         public void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
-            if (event.phase == TickEvent.Phase.START && !event.player.getEntityWorld().isRemote) {
+            if (event.phase == TickEvent.Phase.START && !event.player.getCommandSenderWorld().isClientSide) {
                 McJtyLib.getPreferencesProperties(event.player).ifPresent(handler -> handler.tick((ServerPlayerEntity) event.player));
             }
         }
@@ -99,22 +99,22 @@ public class ModSetup extends DefaultModSetup {
             BlockPos pos = event.getPos();
             BlockState state = world.getBlockState(pos);
             if (state.getBlock() instanceof MultipartBlock) {
-                TileEntity tileEntity = world.getTileEntity(pos);
+                TileEntity tileEntity = world.getBlockEntity(pos);
                 if (tileEntity instanceof MultipartTE) {
-                    if (!world.isRemote) {
+                    if (!world.isClientSide) {
 
                         // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
                         PlayerEntity player = event.getPlayer();
                         Vector3d start = player.getEyePosition(1.0f);
-                        Vector3d vec31 = player.getLook(1.0f);
+                        Vector3d vec31 = player.getViewVector(1.0f);
                         float dist = 20;
                         Vector3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
                         RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, player);
-                        RayTraceResult result = player.getEntityWorld().rayTraceBlocks(context);
-                        Vector3d hitVec = result == null ? null : result.getHitVec();
+                        RayTraceResult result = player.getCommandSenderWorld().clip(context);
+                        Vector3d hitVec = result == null ? null : result.getLocation();
 
                         if (MultipartHelper.removePart((MultipartTE) tileEntity, state, player, hitVec/*@todo*/)) {
-                            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                            world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                         }
                     }
                 }

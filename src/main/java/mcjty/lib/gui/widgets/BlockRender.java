@@ -108,10 +108,10 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
             int yy = y + bounds.y + offsetY;
-            mc.getItemRenderer().zLevel = 100;
+            mc.getItemRenderer().blitOffset = 100;
             this.window.getGui().setBlitOffset(100);
             RenderHelper.renderObject(matrixStack, xx, yy, renderItem, false);
-            mc.getItemRenderer().zLevel = 0;
+            mc.getItemRenderer().blitOffset = 0;
             this.window.getGui().setBlitOffset(0);
             if (hilightOnHover && isHovering()) {
                 RenderSystem.disableLighting();
@@ -126,19 +126,19 @@ public class BlockRender extends AbstractWidget<BlockRender> {
             if (showLabel) {
                 String name;
                 if (renderItem instanceof ItemStack) {
-                    name = ((ItemStack) renderItem).getDisplayName().getString() /* was getFormattedText() */;
+                    name = ((ItemStack) renderItem).getHoverName().getString() /* was getFormattedText() */;
                 } else if (renderItem instanceof FluidStack) {
                     name = ((FluidStack) renderItem).getDisplayName().getString() /* was getFormattedText() */;   // @todo 1.14 better lang support
                 } else if (renderItem instanceof Item) {
-                    name = new ItemStack((Item) renderItem).getDisplayName().getString() /* was getFormattedText() */;
+                    name = new ItemStack((Item) renderItem).getHoverName().getString() /* was getFormattedText() */;
                 } else if (renderItem instanceof Block) {
-                    name = new ItemStack((Block) renderItem).getDisplayName().getString() /* was getFormattedText() */;
+                    name = new ItemStack((Block) renderItem).getHoverName().getString() /* was getFormattedText() */;
                 } else {
                     name = "";
                 }
-                int h = mc.fontRenderer.FONT_HEIGHT;
+                int h = mc.font.lineHeight;
                 int dy = (bounds.height - h)/2;
-                mc.fontRenderer.drawString(matrixStack, name, xx+20, yy + dy, getLabelColor());
+                mc.font.draw(matrixStack, name, xx+20, yy + dy, getLabelColor());
             }
         }
     }

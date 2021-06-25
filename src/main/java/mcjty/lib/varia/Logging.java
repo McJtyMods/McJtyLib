@@ -46,7 +46,7 @@ public class Logging {
                 prevTicks = ticks;
                 getInstance().logger.log(Level.INFO, "=== Time " + ticks + " ===");
             }
-            String id = te.getPos().getX() + "," + te.getPos().getY() + "," + te.getPos().getZ() + ": ";
+            String id = te.getBlockPos().getX() + "," + te.getBlockPos().getY() + "," + te.getBlockPos().getZ() + ": ";
             getInstance().logger.log(Level.INFO, id + message);
         }
     }
@@ -70,10 +70,10 @@ public class Logging {
     }
 
     public static void message(@Nonnull PlayerEntity player, String message) {
-        player.sendStatusMessage(new StringTextComponent(message), false);
+        player.displayClientMessage(new StringTextComponent(message), false);
     }
 
     public static void warn(@Nonnull PlayerEntity player, String message) {
-        player.sendStatusMessage(new StringTextComponent(message).setStyle(Style.EMPTY.setFormatting(TextFormatting.RED)), false);
+        player.displayClientMessage(new StringTextComponent(message).setStyle(Style.EMPTY.withColor(TextFormatting.RED)), false);
     }
 }

@@ -30,12 +30,12 @@ public class BaseRecipeProvider extends RecipeProvider {
     }
 
     protected BaseRecipeProvider add(char c, ITag<Item> itemTag) {
-        defaultIngredients.put(c, Ingredient.fromTag(itemTag));
+        defaultIngredients.put(c, Ingredient.of(itemTag));
         return this;
     }
 
     protected BaseRecipeProvider add(char c, IItemProvider itemProvider) {
-        defaultIngredients.put(c, Ingredient.fromItems(itemProvider));
+        defaultIngredients.put(c, Ingredient.of(itemProvider));
         return this;
     }
 
@@ -65,16 +65,16 @@ public class BaseRecipeProvider extends RecipeProvider {
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ShapedRecipeBuilder builder, String... lines) {
-        buildIntern(consumer, builder::patternLine, builder::key, lines);
-        builder.setGroup(group).build(consumer);
+        buildIntern(consumer, builder::pattern, builder::define, lines);
+        builder.group(group).save(consumer);
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ShapelessRecipeBuilder builder) {
-        builder.setGroup(group).build(consumer);
+        builder.group(group).save(consumer);
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, ShapelessRecipeBuilder builder) {
-        builder.setGroup(group).build(consumer, id);
+        builder.group(group).save(consumer, id);
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, IRecipeBuilder builder, String... lines) {
@@ -83,8 +83,8 @@ public class BaseRecipeProvider extends RecipeProvider {
     }
 
     protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, ShapedRecipeBuilder builder, String... lines) {
-        buildIntern(consumer, builder::patternLine, builder::key, lines);
-        builder.setGroup(group).build(consumer, id);
+        buildIntern(consumer, builder::pattern, builder::define, lines);
+        builder.group(group).save(consumer, id);
     }
 
     public BaseRecipeProvider(DataGenerator datagen) {

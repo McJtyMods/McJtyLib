@@ -115,8 +115,8 @@ public class ImageIcon implements IIcon, Cloneable {
 
     @Override
     public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        Minecraft.getInstance().getTextureManager().bindTexture(image);
+        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        Minecraft.getInstance().getTextureManager().bind(image);
         gui.blit(matrixStack, x, y, u, v, width, height);
         if (overlays != null) {
             for (IIcon icon : overlays) {

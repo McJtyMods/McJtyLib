@@ -29,7 +29,7 @@ public class PacketRequestDataFromServer {
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
         type = DimensionId.fromPacket(buf);
-        command = buf.readString(32767);
+        command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
         dummy = buf.readBoolean();
     }
@@ -37,7 +37,7 @@ public class PacketRequestDataFromServer {
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
         type.toBytes(buf);
-        buf.writeString(command);
+        buf.writeUtf(command);
         TypedMapTools.writeArguments(buf, params);
         buf.writeBoolean(dummy);
     }
@@ -53,9 +53,9 @@ public class PacketRequestDataFromServer {
     public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            World world = WorldTools.getWorld(ctx.getSender().getEntityWorld(), type);
-            if (world.isBlockLoaded(pos)) {
-                TileEntity te = world.getTileEntity(pos);
+            World world = WorldTools.getWorld(ctx.getSender().getCommandSenderWorld(), type);
+            if (world.hasChunkAt(pos)) {
+                TileEntity te = world.getBlockEntity(pos);
                 if (!(te instanceof ICommandHandler)) {
                     Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                     return;
@@ -68,7 +68,7 @@ public class PacketRequestDataFromServer {
                 }
 
                 PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
-                channel.sendTo(msg, ctx.getSender().connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+                channel.sendTo(msg, ctx.getSender().connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             }
         });
         ctx.setPacketHandled(true);

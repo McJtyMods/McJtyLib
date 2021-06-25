@@ -13,16 +13,16 @@ public class SoundTools {
     public static void playSound(World worldObj, SoundEvent soundName, double x, double y, double z, double volume, double pitch) {
         SPlaySoundEffectPacket soundEffect = new SPlaySoundEffectPacket(soundName, SoundCategory.BLOCKS, x, y, z, (float) volume, (float) pitch);
 
-        for (int j = 0; j < worldObj.getPlayers().size(); ++j) {
-            ServerPlayerEntity player = (ServerPlayerEntity)worldObj.getPlayers().get(j);
-            BlockPos chunkcoordinates = player.getPosition();
+        for (int j = 0; j < worldObj.players().size(); ++j) {
+            ServerPlayerEntity player = (ServerPlayerEntity)worldObj.players().get(j);
+            BlockPos chunkcoordinates = player.blockPosition();
             double d7 = x - chunkcoordinates.getX();
             double d8 = y - chunkcoordinates.getY();
             double d9 = z - chunkcoordinates.getZ();
             double d10 = d7 * d7 + d8 * d8 + d9 * d9;
 
             if (d10 <= 256.0D) {
-                player.connection.sendPacket(soundEffect);
+                player.connection.send(soundEffect);
             }
         }
     }

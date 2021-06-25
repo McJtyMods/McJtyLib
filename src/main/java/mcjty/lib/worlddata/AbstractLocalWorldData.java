@@ -18,16 +18,16 @@ public abstract class AbstractLocalWorldData<T extends AbstractLocalWorldData<T>
     }
 
     public void save() {
-        markDirty();
+        setDirty();
     }
 
     @Nonnull
     public static <T extends AbstractLocalWorldData<T>> T getData(World world, Supplier<? extends T> supplier, String name) {
-        if (world.isRemote) {
+        if (world.isClientSide) {
             throw new RuntimeException("Don't access this client-side!");
         }
-        DimensionSavedDataManager storage = ((ServerWorld)world).getSavedData();
-        return storage.getOrCreate(supplier, name);
+        DimensionSavedDataManager storage = ((ServerWorld)world).getDataStorage();
+        return storage.computeIfAbsent(supplier, name);
     }
 
 }

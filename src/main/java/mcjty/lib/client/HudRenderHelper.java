@@ -25,7 +25,7 @@ public class HudRenderHelper {
                                       HudOrientation hudOrientation,
                                       Direction orientation,
                                       double x, double y, double z, float scale) {
-        matrixStack.push();
+        matrixStack.pushPose();
 
         if (hudPlacement == HudPlacement.HUD_FRONT) {
             matrixStack.translate((float) x + 0.5F, (float) y + 0.75F, (float) z + 0.5F);
@@ -35,19 +35,19 @@ public class HudRenderHelper {
             matrixStack.translate((float) x + 0.5F, (float) y + 1.75F, (float) z + 0.5F);
         }
 
-        Quaternion quaternion = Minecraft.getInstance().getRenderManager().getCameraOrientation();
+        Quaternion quaternion = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         switch (hudOrientation) {
             case HUD_SOUTH:
-                matrixStack.rotate(new Quaternion(new Vector3f(0, 1, 0), -getHudAngle(orientation), true));
+                matrixStack.mulPose(new Quaternion(new Vector3f(0, 1, 0), -getHudAngle(orientation), true));
                 break;
             case HUD_TOPLAYER_HORIZ:
                 // @todo 1.15 change to correct quaternion? This is most likely not correct?
-                matrixStack.rotate(quaternion);   // @todo 1.15 test
+                matrixStack.mulPose(quaternion);   // @todo 1.15 test
 //                GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
 //                GlStateManager.rotatef(180, 0.0F, 1.0F, 0.0F);
                 break;
             case HUD_TOPLAYER:
-                matrixStack.rotate(quaternion);   // @todo 1.15 test
+                matrixStack.mulPose(quaternion);   // @todo 1.15 test
 //                GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
 //                GlStateManager.rotatef(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
 //                GlStateManager.rotatef(180, 0.0F, 1.0F, 0.0F);
@@ -60,7 +60,7 @@ public class HudRenderHelper {
             matrixStack.translate(0.0F, -0.2500F, -0.4375F + .4f);
         }
 
-        renderText(matrixStack, buffer, Minecraft.getInstance().fontRenderer, messages, 11, scale);
+        renderText(matrixStack, buffer, Minecraft.getInstance().font, messages, 11, scale);
 
 //        net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
 //        Minecraft.getInstance().gameRenderer.getLightTexture().disableLightmap();
@@ -74,7 +74,7 @@ public class HudRenderHelper {
 //        GlStateManager.enableBlend();
 //        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
     public static void renderHud(MatrixStack stack, IRenderTypeBuffer buffer, List<String> messages,
@@ -130,21 +130,21 @@ public class HudRenderHelper {
                 if (currenty + height <= 124) {
                     String prefix = "";
                     if (!stack.isEmpty()) {
-                        matrixStack.push();
+                        matrixStack.pushPose();
                         matrixStack.translate((float)14f, (float)currenty+4f, 0);
                         matrixStack.scale(10, -10, 16);
 //                        matrixStack.translate(0, 0, -150);
                         // @todo 1.15 this needs more work! we ignore 'currenty'!
                         ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
-                        IBakedModel ibakedmodel = itemRender.getItemModelWithOverrides(stack, Minecraft.getInstance().world, (LivingEntity)null);
-                        itemRender.renderItem(stack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, buffer, 0xf000f0, OverlayTexture.NO_OVERLAY, ibakedmodel);
+                        IBakedModel ibakedmodel = itemRender.getModel(stack, Minecraft.getInstance().level, (LivingEntity)null);
+                        itemRender.render(stack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, buffer, 0xf000f0, OverlayTexture.NO_OVERLAY, ibakedmodel);
 
 //                        itemRender.renderItemAndEffectIntoGUI(stack, 0, currenty);
                         prefix = "    ";
-                        matrixStack.pop();
+                        matrixStack.popPose();
                     }
 
-                    fontrenderer.renderString(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff, false, matrixStack.getLast().getMatrix(), buffer, false, 0, 140);
+                    fontrenderer.drawInBatch(fontrenderer.plainSubstrByWidth(prefix + s, 115), 7, currenty, 0xffffff, false, matrixStack.last().pose(), buffer, false, 0, 140);
 //                    fontrenderer.drawString(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff);
                     currenty += height;
                 }

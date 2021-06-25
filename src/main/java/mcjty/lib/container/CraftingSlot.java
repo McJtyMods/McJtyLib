@@ -31,45 +31,45 @@ public class CraftingSlot extends SlotItemHandler {
     }
 
     @Override
-    public ItemStack decrStackSize(int amount) {
-        if (this.getHasStack()) {
-            this.removeCount += Math.min(amount, this.getStack().getCount());
+    public ItemStack remove(int amount) {
+        if (this.hasItem()) {
+            this.removeCount += Math.min(amount, this.getItem().getCount());
         }
-        return super.decrStackSize(amount);
+        return super.remove(amount);
     }
 
     @Override
-    public void putStack(ItemStack stack) {
+    public void set(ItemStack stack) {
         if (te != null) {
             te.onSlotChanged(getSlotIndex(), stack);
         }
-        super.putStack(stack);
+        super.set(stack);
     }
 
     @Override
-    public boolean isItemValid(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return false;
     }
 
     @Override
     public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack) {
-        this.onCrafting(stack);
+        this.checkTakeAchievements(stack);
         super.onTake(thePlayer, stack);
         return stack;
     }
 
     @Override
-    protected void onCrafting(ItemStack stack, int amount) {
+    protected void onQuickCraft(ItemStack stack, int amount) {
         this.removeCount += amount;
-        this.onCrafting(stack);
+        this.checkTakeAchievements(stack);
     }
 
     /**
      * the itemStack passed in is the output - ie, iron ingots, and pickaxes, not ore and wood.
      */
     @Override
-    protected void onCrafting(ItemStack stack) {
-        stack.onCrafting(player.world, player, this.removeCount);
+    protected void checkTakeAchievements(ItemStack stack) {
+        stack.onCraftedBy(player.level, player, this.removeCount);
         onCraft.accept(te, player, stack);
 
         this.removeCount = 0;

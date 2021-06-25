@@ -11,7 +11,7 @@ public class KeyBindings {
     public static KeyBinding openManual;
 
     public static void init() {
-        openManual = new KeyBinding("key.openManual", KeyConflictContext.GUI, InputMappings.getInputByName("key.keyboard.f1"), "key.categories.mcjtylib");
+        openManual = new KeyBinding("key.openManual", KeyConflictContext.GUI, InputMappings.getKey("key.keyboard.f1"), "key.categories.mcjtylib");
         ClientRegistry.registerKeyBinding(openManual);
     }
 }

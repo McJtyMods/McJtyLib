@@ -17,8 +17,8 @@ public class DimensionId {
     private final RegistryKey<World> id;
 
     private static final Lazy<DimensionId> OVERWORLD = Lazy.of(() -> new DimensionId(World.OVERWORLD));
-    private static final Lazy<DimensionId> NETHER = Lazy.of(() -> new DimensionId(World.THE_NETHER));
-    private static final Lazy<DimensionId> END = Lazy.of(() -> new DimensionId(World.THE_END));
+    private static final Lazy<DimensionId> NETHER = Lazy.of(() -> new DimensionId(World.NETHER));
+    private static final Lazy<DimensionId> END = Lazy.of(() -> new DimensionId(World.END));
 
     private DimensionId(RegistryKey<World> id) {
         this.id = id;
@@ -41,16 +41,16 @@ public class DimensionId {
     }
 
     public static DimensionId fromPacket(PacketBuffer buf) {
-        RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, buf.readResourceLocation());
+        RegistryKey<World> key = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
         return new DimensionId(key);
     }
 
     public static DimensionId fromWorld(World world) {
-        return new DimensionId(world.getDimensionKey());
+        return new DimensionId(world.dimension());
     }
 
     public static DimensionId fromResourceLocation(ResourceLocation location) {
-        RegistryKey<World> key = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, location);
+        RegistryKey<World> key = RegistryKey.create(Registry.DIMENSION_REGISTRY, location);
         return new DimensionId(key);
     }
 
@@ -59,11 +59,11 @@ public class DimensionId {
     }
 
     public ResourceLocation getRegistryName() {
-        return id.getLocation();
+        return id.location();
     }
 
     // Is this a good way to get the dimension name?
-    public String getName() { return id.getLocation().getPath(); }
+    public String getName() { return id.location().getPath(); }
 
     public boolean isOverworld() {
         return id.equals(World.OVERWORLD);
@@ -71,32 +71,32 @@ public class DimensionId {
 
     public void toBytes(PacketBuffer buf) {
         // @todo use numerical ID
-        buf.writeResourceLocation(id.getLocation());
+        buf.writeResourceLocation(id.location());
     }
 
     public ServerWorld loadWorld() {
         // Worlds in 1.16 are always loaded
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getWorld(id);
+        return server.getLevel(id);
     }
 
     // Do not load the world if it is not there
     public ServerWorld getWorld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getWorld(id);
+        return server.getLevel(id);
     }
 
     public ServerWorld loadWorld(World otherWorld) {
         // Worlds in 1.16 are always loaded
-        return otherWorld.getServer().getWorld(id);
+        return otherWorld.getServer().getLevel(id);
     }
 
     public static boolean sameDimension(World world1, World world2) {
-        return world1.getDimensionKey().equals(world2.getDimensionKey());
+        return world1.dimension().equals(world2.dimension());
     }
 
     public boolean sameDimension(World world) {
-        return id.equals(world.getDimensionKey());
+        return id.equals(world.dimension());
     }
 
 

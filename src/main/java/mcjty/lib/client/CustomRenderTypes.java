@@ -10,6 +10,9 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
 
+import net.minecraft.client.renderer.RenderState.LineState;
+import net.minecraft.client.renderer.RenderType.State;
+
 public class CustomRenderTypes extends RenderType {
 
     // Dummy
@@ -26,75 +29,75 @@ public class CustomRenderTypes extends RenderType {
 //    }
 
 
-    public static final RenderType TRANSLUCENT_ADD = makeType("translucent_add", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
-            State.getBuilder().shadeModel(SHADE_ENABLED)
-                    .lightmap(LIGHTMAP_ENABLED)
-                    .texture(BLOCK_SHEET_MIPPED)
-                    .transparency(ADDITIVE_TRANSPARENCY)
-                    .writeMask(COLOR_WRITE)
-                    .build(true));
+    public static final RenderType TRANSLUCENT_ADD = create("translucent_add", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+            State.builder().setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(LIGHTMAP)
+                    .setTextureState(BLOCK_SHEET_MIPPED)
+                    .setTransparencyState(ADDITIVE_TRANSPARENCY)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(true));
 
-    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = makeType("translucent_add_nolightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
-            State.getBuilder().shadeModel(SHADE_ENABLED)
-                    .lightmap(RenderState.LIGHTMAP_DISABLED)
-                    .texture(BLOCK_SHEET_MIPPED)
-                    .transparency(ADDITIVE_TRANSPARENCY)
-                    .writeMask(COLOR_WRITE)
-                    .build(true));
+    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = create("translucent_add_nolightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+            State.builder().setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(RenderState.NO_LIGHTMAP)
+                    .setTextureState(BLOCK_SHEET_MIPPED)
+                    .setTransparencyState(ADDITIVE_TRANSPARENCY)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(true));
 
 
-    public static final RenderType TRANSLUCENT_LIGHTNING_NOLIGHTMAPS = makeType("translucent_lightning_nolightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
-            State.getBuilder().shadeModel(SHADE_ENABLED)
-                    .lightmap(RenderState.LIGHTMAP_DISABLED)
-                    .texture(BLOCK_SHEET_MIPPED)
-                    .transparency(LIGHTNING_TRANSPARENCY)
-                    .writeMask(COLOR_WRITE)
-                    .build(true));
+    public static final RenderType TRANSLUCENT_LIGHTNING_NOLIGHTMAPS = create("translucent_lightning_nolightmaps", DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 262144, true, false,
+            State.builder().setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(RenderState.NO_LIGHTMAP)
+                    .setTextureState(BLOCK_SHEET_MIPPED)
+                    .setTransparencyState(LIGHTNING_TRANSPARENCY)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(true));
 
 
     private static final LineState THICK_LINES = new LineState(OptionalDouble.of(2.0D));
 
-    public static final RenderType OVERLAY_LINES = makeType("overlay_lines",
+    public static final RenderType OVERLAY_LINES = create("overlay_lines",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINES, 256,
-            State.getBuilder().line(THICK_LINES)
-                    .layer(VIEW_OFFSET_Z_LAYERING)
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_ALWAYS)
-                    .cull(CULL_DISABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_WRITE)
-                    .build(false));
+            State.builder().setLineState(THICK_LINES)
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTextureState(NO_TEXTURE)
+                    .setDepthTestState(NO_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setLightmapState(NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType QUADS_NOTEXTURE = makeType("quads_notexture",
+    public static final RenderType QUADS_NOTEXTURE = create("quads_notexture",
             DefaultVertexFormats.POSITION_COLOR_LIGHTMAP, GL11.GL_QUADS, 2097152, true, false,
-            State.getBuilder()
-                    .texture(NO_TEXTURE)
-                    .shadeModel(SHADE_ENABLED).lightmap(LIGHTMAP_ENABLED)
-                    .build(false));
+            State.builder()
+                    .setTextureState(NO_TEXTURE)
+                    .setShadeModelState(SMOOTH_SHADE).setLightmapState(LIGHTMAP)
+                    .createCompositeState(false));
 
-    public static final RenderType LINES_LIGHTMAP = makeType("lines_lightmap",
+    public static final RenderType LINES_LIGHTMAP = create("lines_lightmap",
             DefaultVertexFormats.POSITION_COLOR_LIGHTMAP, GL11.GL_LINES, 256, true, false,
-            State.getBuilder()
-                    .line(new LineState(OptionalDouble.of(1.0)))
-                    .texture(NO_TEXTURE)
-                    .shadeModel(SHADE_ENABLED).lightmap(LIGHTMAP_ENABLED)
-                    .build(false));
+            State.builder()
+                    .setLineState(new LineState(OptionalDouble.of(1.0)))
+                    .setTextureState(NO_TEXTURE)
+                    .setShadeModelState(SMOOTH_SHADE).setLightmapState(LIGHTMAP)
+                    .createCompositeState(false));
 
     public static final RenderState.TransparencyState LINESTRIP_TRANSP = new RenderState.TransparencyState("linestrip_transp", () -> {
         RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
     }, () -> {
         RenderSystem.disableBlend();
         RenderSystem.defaultBlendFunc();
     });
 
-    public static final RenderType LINESTRIP = makeType("linestrip",
+    public static final RenderType LINESTRIP = create("linestrip",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINE_STRIP, 256, true, false,
-            State.getBuilder()
-                    .line(new LineState(OptionalDouble.of(2.0)))
-                    .transparency(LINESTRIP_TRANSP)
-                    .texture(NO_TEXTURE)
-                    .shadeModel(SHADE_ENABLED).lightmap(RenderState.LIGHTMAP_DISABLED)
-                    .build(false));
+            State.builder()
+                    .setLineState(new LineState(OptionalDouble.of(2.0)))
+                    .setTransparencyState(LINESTRIP_TRANSP)
+                    .setTextureState(NO_TEXTURE)
+                    .setShadeModelState(SMOOTH_SHADE).setLightmapState(RenderState.NO_LIGHTMAP)
+                    .createCompositeState(false));
 }

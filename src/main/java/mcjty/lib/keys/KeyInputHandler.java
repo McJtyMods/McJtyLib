@@ -8,7 +8,7 @@ public class KeyInputHandler {
 
     @SubscribeEvent
     public void onKeyInput(InputEvent.KeyInputEvent event) {
-        if (KeyBindings.openManual.isPressed()) {
+        if (KeyBindings.openManual.consumeClick()) {
             ClientManualHelper.openManualFromGui();
         }
     }

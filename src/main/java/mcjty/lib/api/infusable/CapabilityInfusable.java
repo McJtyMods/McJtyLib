@@ -21,7 +21,7 @@ public class CapabilityInfusable {
 
             @Override
             public void readNBT(Capability<IInfusable> capability, IInfusable instance, Direction side, INBT nbt) {
-                instance.setInfused(((IntNBT)nbt).getInt());
+                instance.setInfused(((IntNBT)nbt).getAsInt());
             }
         }, () -> { throw new UnsupportedOperationException(); });
     }

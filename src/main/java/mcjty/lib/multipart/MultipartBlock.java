@@ -35,15 +35,17 @@ import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Function;
 
+import net.minecraft.block.AbstractBlock;
+
 public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoProvider, ITileEntityProvider {
 
     public static final AxisAlignedBB AABB_EMPTY = new AxisAlignedBB(0, 0, 0, 0, 0, 0);
     public static final AxisAlignedBB AABB_CENTER = new AxisAlignedBB(.4, .4, .4, .6, .6, .6);
 
     public MultipartBlock() {
-        super(Block.Properties.create(Material.IRON)
-                .hardnessAndResistance(2.0f)
-                .notSolid()
+        super(AbstractBlock.Properties.of(Material.METAL)
+                .strength(2.0f)
+                .noOcclusion()
                 .harvestLevel(0)
                 .harvestTool(ToolType.PICKAXE)
                 .sound(SoundType.METAL));
@@ -52,13 +54,13 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     @Nullable
     @Override
-    public TileEntity createNewTileEntity(IBlockReader worldIn) {
+    public TileEntity newBlockEntity(IBlockReader worldIn) {
         return new MultipartTE();
     }
 
     @Override
     public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-        MultipartTE.Part part = getHitPart(state, world, pos, player.getEyePosition(0), target.getHitVec());
+        MultipartTE.Part part = getHitPart(state, world, pos, player.getEyePosition(0), target.getLocation());
         if (part != null) {
             return new ItemStack(part.getState().getBlock().asItem());
         } else {
@@ -67,7 +69,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public ItemStack getItem(IBlockReader worldIn, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(IBlockReader worldIn, BlockPos pos, BlockState state) {
         return ItemStack.EMPTY;
     }
 
@@ -82,18 +84,18 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public VoxelShape getRaytraceShape(BlockState state, IBlockReader world, BlockPos pos) {
-        return combinePartShapes(world, pos, s -> s.getRaytraceShape(world, pos, ISelectionContext.dummy()));
+    public VoxelShape getInteractionShape(BlockState state, IBlockReader world, BlockPos pos) {
+        return combinePartShapes(world, pos, s -> s.getVisualShape(world, pos, ISelectionContext.empty()));
     }
 
     @Override
-    public VoxelShape getRenderShape(BlockState state, IBlockReader world, BlockPos pos) {
-        return combinePartShapes(world, pos, s -> s.getRenderShape(world, pos));
+    public VoxelShape getOcclusionShape(BlockState state, IBlockReader world, BlockPos pos) {
+        return combinePartShapes(world, pos, s -> s.getOcclusionShape(world, pos));
     }
 
     private VoxelShape combinePartShapes(IBlockReader world, BlockPos pos, Function<BlockState, VoxelShape> shapeGetter) {
         VoxelShape combined = VoxelShapes.empty();
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
             for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
@@ -102,7 +104,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
                 if (combined.isEmpty()) {
                     combined = shape;
                 } else {
-                    combined = VoxelShapes.combineAndSimplify(combined, shape, IBooleanFunction.OR);
+                    combined = VoxelShapes.join(combined, shape, IBooleanFunction.OR);
                 }
             }
         }
@@ -110,9 +112,9 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
-        Vector3d hit = result.getHitVec();
-        Direction facing = result.getFace();
+    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+        Vector3d hit = result.getLocation();
+        Direction facing = result.getDirection();
         Vector3d start = MultipartHelper.getPlayerEyes(player);
         Vector3d end = new Vector3d(start.x + (pos.getX() + hit.x - start.x) * 3, start.y + (pos.getY() + hit.y - start.y) * 3, start.z + (pos.getZ() + hit.z - start.z) * 3);
         MultipartTE.Part part = getHitPart(state, world, pos, start, end);
@@ -120,10 +122,10 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
             if (part.getTileEntity() instanceof GenericTileEntity) {
                 return ((GenericTileEntity) part.getTileEntity()).onBlockActivated(part.getState(), player, hand, result);
             } else {
-                return part.getState().getBlock().onBlockActivated(part.getState(), world, pos, player, hand, result);
+                return part.getState().getBlock().use(part.getState(), world, pos, player, hand, result);
             }
         }
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             ((MultipartTE) te).dump();
         }
@@ -142,14 +144,14 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     @Nullable
     public static MultipartTE.Part getHitPart(BlockState blockState, IBlockReader world, BlockPos pos, Vector3d start, Vector3d end) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE multipartTE = (MultipartTE) te;
             for (Map.Entry<PartSlot, MultipartTE.Part> entry : multipartTE.getParts().entrySet()) {
                 MultipartTE.Part part = entry.getValue();
                 if (!(part.getState().getBlock() instanceof MultipartBlock)) {     // @todo safety
                     // @todo 1.14
-                    BlockRayTraceResult result = part.getState().getRaytraceShape(world, pos, ISelectionContext.dummy()).rayTrace(start, end, pos);
+                    BlockRayTraceResult result = part.getState().getVisualShape(world, pos, ISelectionContext.empty()).clip(start, end, pos);
                     if (result != null) {
                         return part;
                     }

@@ -29,7 +29,7 @@ public class NBTTools {
     }
 
     public static <T> void setInfoNBT(ItemStack stack, TriConsumer<CompoundNBT, String, T> setter, String name, T value) {
-        CompoundNBT entityTag = stack.getOrCreateChildTag("BlockEntityTag");
+        CompoundNBT entityTag = stack.getOrCreateTagElement("BlockEntityTag");
         CompoundNBT info = entityTag.getCompound("Info");
         setter.accept(info, name, value);
         entityTag.put("Info", info);

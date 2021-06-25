@@ -12,22 +12,22 @@ public class GhostOutputSlot extends SlotItemHandler {
     }
 
     @Override
-    public boolean canTakeStack(PlayerEntity player) {
+    public boolean mayPickup(PlayerEntity player) {
         return false;
     }
 
     @Override
-    public ItemStack decrStackSize(int amount) {
+    public ItemStack remove(int amount) {
         return ItemStack.EMPTY;
     }
 
     @Override
-    public int getSlotStackLimit() {
+    public int getMaxStackSize() {
         return 64;
     }
 
     @Override
-    public boolean isItemValid(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return false;
     }
 }

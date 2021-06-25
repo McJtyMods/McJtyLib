@@ -103,13 +103,13 @@ public class TagSelectorWindow {
 
     private java.util.List<String> getTags() {
         if (TYPE_BOTH.equals(type)) {
-            Set<ResourceLocation> tags = new HashSet<>(ItemTags.getCollection().getRegisteredTags());
-            tags.addAll(BlockTags.getCollection().getRegisteredTags());
+            Set<ResourceLocation> tags = new HashSet<>(ItemTags.getAllTags().getAvailableTags());
+            tags.addAll(BlockTags.getAllTags().getAvailableTags());
             return tags.stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
         } else if (TYPE_ITEM.equals(type)) {
-            return ItemTags.getCollection().getRegisteredTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
+            return ItemTags.getAllTags().getAvailableTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
         } else {
-            return BlockTags.getCollection().getRegisteredTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
+            return BlockTags.getAllTags().getAvailableTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
         }
     }
 

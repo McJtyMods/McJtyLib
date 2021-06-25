@@ -16,11 +16,11 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory inv) {
-        ItemStack result = recipe.getCraftingResult(inv);
+    public ItemStack assemble(CraftingInventory inv) {
+        ItemStack result = recipe.assemble(inv);
         CompoundNBT nbt = null;
-        for (int i = 0 ; i < inv.getSizeInventory() ; i++) {
-            ItemStack stack = inv.getStackInSlot(i);
+        for (int i = 0 ; i < inv.getContainerSize() ; i++) {
+            ItemStack stack = inv.getItem(i);
 
             INBTPreservingIngredient inbt = null;
             if (stack.getItem() instanceof INBTPreservingIngredient) {

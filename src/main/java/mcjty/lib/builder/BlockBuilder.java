@@ -11,13 +11,15 @@ import net.minecraftforge.common.ToolType;
 
 import java.util.function.Supplier;
 
+import net.minecraft.block.AbstractBlock;
+
 public class BlockBuilder {
 
-    public static final Block.Properties STANDARD_IRON = Block.Properties.create(Material.IRON)
-            .hardnessAndResistance(2.0f)
+    public static final AbstractBlock.Properties STANDARD_IRON = AbstractBlock.Properties.of(Material.METAL)
+            .strength(2.0f)
             .sound(SoundType.METAL);
 
-    private Block.Properties properties = STANDARD_IRON;
+    private AbstractBlock.Properties properties = STANDARD_IRON;
     private boolean infusable = false;
     private TooltipBuilder tooltipBuilder = new TooltipBuilder();
     private Supplier<TileEntity> tileEntitySupplier;
@@ -26,7 +28,7 @@ public class BlockBuilder {
     private TOPDriver topDriver = McJtyLibTOPDriver.DRIVER;
     private ManualEntry manualEntry = ManualEntry.EMPTY;
 
-    public Block.Properties getProperties() {
+    public AbstractBlock.Properties getProperties() {
         return properties;
     }
 
@@ -60,7 +62,7 @@ public class BlockBuilder {
 
     // ----------------------------------------------------------------------
 
-    public BlockBuilder properties(Block.Properties properties) {
+    public BlockBuilder properties(AbstractBlock.Properties properties) {
         this.properties = properties;
         return this;
     }

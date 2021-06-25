@@ -73,7 +73,7 @@ public class ItemStackTools {
         ItemStack stack = new ItemStack(item, amount);
         obj.findCommand("tag").ifPresent(cmd -> {
             try {
-                CompoundNBT nbt = JsonToNBT.getTagFromJson(cmd.getOptionalPar(0, ""));
+                CompoundNBT nbt = JsonToNBT.parseTag(cmd.getOptionalPar(0, ""));
                 stack.setTag(nbt);
             } catch (CommandSyntaxException e) {
                 Logging.logError("Error", e);

@@ -47,12 +47,12 @@ public class PacketDumpBlockInfo {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             ServerPlayerEntity player = ctx.getSender();
-            MinecraftServer server = player.getEntityWorld().getServer();
-            OpList oppedPlayers = server.getPlayerList().getOppedPlayers();
-            OpEntry entry = oppedPlayers.getEntry(player.getGameProfile());
-            int perm = entry == null ? server.getOpPermissionLevel() : entry.getPermissionLevel();
+            MinecraftServer server = player.getCommandSenderWorld().getServer();
+            OpList oppedPlayers = server.getPlayerList().getOps();
+            OpEntry entry = oppedPlayers.get(player.getGameProfile());
+            int perm = entry == null ? server.getOperatorUserPermissionLevel() : entry.getLevel();
             if (perm >= 1) {
-                World world = WorldTools.getWorld(player.world, dimid);
+                World world = WorldTools.getWorld(player.level, dimid);
                 String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
                 Logging.getLogger().log(Level.INFO, "### Server side ###");
                 Logging.getLogger().log(Level.INFO, output);

@@ -43,7 +43,7 @@ public class PacketContainerDataToClient {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            Container container = McJtyLib.proxy.getClientPlayer().openContainer;
+            Container container = McJtyLib.proxy.getClientPlayer().containerMenu;
             if (container instanceof GenericContainer) {
                 GenericContainer gc = (GenericContainer) container;
                 IContainerDataListener listener = gc.getListener(id);

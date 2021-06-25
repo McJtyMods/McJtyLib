@@ -11,12 +11,12 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public World getClientWorld() {
-        return Minecraft.getInstance().world;
+        return Minecraft.getInstance().level;
     }
 
     @Override
     public World getWorld() {
-        return Minecraft.getInstance().world;
+        return Minecraft.getInstance().level;
     }
 
     @Override
@@ -31,27 +31,27 @@ public class DefaultClientProxy implements IProxy {
 
     @Override
     public RayTraceResult getClientMouseOver() {
-        return Minecraft.getInstance().objectMouseOver;
+        return Minecraft.getInstance().hitResult;
     }
 
     @Override
     public boolean isJumpKeyDown() {
-        return Minecraft.getInstance().gameSettings.keyBindJump.isKeyDown();
+        return Minecraft.getInstance().options.keyJump.isDown();
     }
 
     @Override
     public boolean isForwardKeyDown() {
-        return Minecraft.getInstance().gameSettings.keyBindForward.isKeyDown();
+        return Minecraft.getInstance().options.keyUp.isDown();
     }
 
     @Override
     public boolean isBackKeyDown() {
-        return Minecraft.getInstance().gameSettings.keyBindBack.isKeyDown();
+        return Minecraft.getInstance().options.keyDown.isDown();
     }
 
     @Override
     public boolean isSneakKeyDown() {
-        return Minecraft.getInstance().gameSettings.keyBindSneak.isKeyDown();
+        return Minecraft.getInstance().options.keyShift.isDown();
     }
 
     @Override

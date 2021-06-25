@@ -28,7 +28,7 @@ public class OrientationTools {
                 return input;
             case Y:
                 if (input != UP && input != DOWN) {
-                    return input.rotateY();
+                    return input.getClockWise();
                 }
 
                 return input;
@@ -81,7 +81,7 @@ public class OrientationTools {
 
 
     public static Direction getOrientationHoriz(BlockState state) {
-        return state.get(BlockStateProperties.HORIZONTAL_FACING);
+        return state.getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     public static Direction getOrientation(BlockState state) {
@@ -93,8 +93,8 @@ public class OrientationTools {
     }
 
     public static Direction determineOrientation(int x, int y, int z, LivingEntity entity) {
-        if (MathHelper.abs((float) entity.getPosX() - x) < 2.0F && MathHelper.abs((float) entity.getPosZ() - z) < 2.0F) {
-            double d0 = entity.getPosY() + 1.82D - entity.getYOffset();
+        if (MathHelper.abs((float) entity.getX() - x) < 2.0F && MathHelper.abs((float) entity.getZ() - z) < 2.0F) {
+            double d0 = entity.getY() + 1.82D - entity.getMyRidingOffset();
 
             if (d0 - y > 2.0D) {
                 return Direction.UP;
@@ -104,14 +104,14 @@ public class OrientationTools {
                 return DOWN;
             }
         }
-        int i = (int) ((entity.rotationYaw * 4.0F / 360.0F) + 0.5D);
-        int l = ((entity.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        int i = (int) ((entity.yRot * 4.0F / 360.0F) + 0.5D);
+        int l = ((entity.yRot * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
         return l == 0 ? Direction.NORTH : (l == 1 ? Direction.EAST : (l == 2 ? SOUTH : (l == 3 ? Direction.WEST : DOWN)));
     }
 
     public static Direction determineOrientationHoriz(LivingEntity MobEntity) {
-        int i = (int) ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D);
-        int l = ((MobEntity.rotationYaw * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        int i = (int) ((MobEntity.yRot * 4.0F / 360.0F) + 0.5D);
+        int l = ((MobEntity.yRot * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
         return l == 0 ? Direction.NORTH : (l == 1 ? Direction.EAST : (l == 2 ? SOUTH : (l == 3 ? Direction.WEST : DOWN)));
     }
 
@@ -141,8 +141,8 @@ public class OrientationTools {
         if (entityIn == null) {
             return UP;
         }
-        if (MathHelper.abs((float) entityIn.getPosX() - clickedBlock.getX()) < 2.0F && MathHelper.abs((float) entityIn.getPosZ() - clickedBlock.getZ()) < 2.0F) {
-            double d0 = entityIn.getPosY() + entityIn.getEyeHeight();
+        if (MathHelper.abs((float) entityIn.getX() - clickedBlock.getX()) < 2.0F && MathHelper.abs((float) entityIn.getZ() - clickedBlock.getZ()) < 2.0F) {
+            double d0 = entityIn.getY() + entityIn.getEyeHeight();
 
             if (d0 - clickedBlock.getY() > 2.0D) {
                 return UP;
@@ -153,6 +153,6 @@ public class OrientationTools {
             }
         }
 
-        return entityIn.getHorizontalFacing().getOpposite();
+        return entityIn.getDirection().getOpposite();
     }
 }

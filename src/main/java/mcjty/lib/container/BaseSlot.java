@@ -15,11 +15,11 @@ public class BaseSlot extends SlotItemHandler {
     }
 
     @Override
-    public void putStack(ItemStack stack) {
+    public void set(ItemStack stack) {
         if (te != null) {
             te.onSlotChanged(getSlotIndex(), stack);
         }
-        super.putStack(stack);
+        super.set(stack);
     }
 
     public GenericTileEntity getTe() {

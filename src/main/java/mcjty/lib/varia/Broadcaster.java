@@ -21,9 +21,9 @@ public class Broadcaster {
             }
         }
         messages.put(message, time);
-        for (Object p : worldObj.getPlayers()) {
+        for (Object p : worldObj.players()) {
             PlayerEntity player = (PlayerEntity) p;
-            double sqdist = player.getDistanceSq(x + .5, y + .5, z + .5);
+            double sqdist = player.distanceToSqr(x + .5, y + .5, z + .5);
             if (sqdist < radius) {
                 Logging.warn(player, message);
             }

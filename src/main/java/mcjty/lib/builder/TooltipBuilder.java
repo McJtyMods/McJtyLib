@@ -36,7 +36,7 @@ public class TooltipBuilder {
     private static TranslationTextComponent stylize(String translationKey, TextFormatting... formattings) {
         TranslationTextComponent component = new TranslationTextComponent(translationKey);
         for (TextFormatting format : formattings) {
-            component.mergeStyle(format);
+            component.withStyle(format);
         }
         return component;
     }
@@ -68,7 +68,7 @@ public class TooltipBuilder {
                         } else {
                             component = stylize(prefix + line.getSuffix(), line.getStyles());
                         }
-                        ((IFormattableTextComponent)component).appendSibling(new StringTextComponent(TextFormatting.WHITE + s));
+                        ((IFormattableTextComponent)component).append(new StringTextComponent(TextFormatting.WHITE + s));
                         tooltip.add(component);
                     });
                 } else {
@@ -81,7 +81,7 @@ public class TooltipBuilder {
                     if (line.getInformationGetter() != null) {
                         String extra = line.getInformationGetter().apply(stack);
                         if (extra != null) {
-                            ((IFormattableTextComponent)component).appendSibling(new StringTextComponent(TextFormatting.WHITE + extra));
+                            ((IFormattableTextComponent)component).append(new StringTextComponent(TextFormatting.WHITE + extra));
                             tooltip.add(component);
                         } // Else we don't add the entire component
                     } else {

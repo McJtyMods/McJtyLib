@@ -71,7 +71,7 @@ public class TOPCompatibility {
                     ItemStack pickBlock = data.getPickBlock();
                     MultipartTE.Part part = Registration.MULTIPART_BLOCK.getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
                     if (part != null) {
-                        pickBlock = part.getState().getBlock().getItem(world, data.getPos(), part.getState());
+                        pickBlock = part.getState().getBlock().getCloneItemStack(world, data.getPos(), part.getState());
                         modid = part.getState().getBlock().getRegistryName().getNamespace();
                     }
                     modid = WordUtils.capitalize(modid);
@@ -84,7 +84,7 @@ public class TOPCompatibility {
                                 .text(CompoundText.create().style(MODNAME).text(modid));
                     } else {
                         probeInfo.vertical()
-                                .text(CompoundText.create().name(block.getTranslationKey()))
+                                .text(CompoundText.create().name(block.getDescriptionId()))
                                 .text(CompoundText.create().style(MODNAME).text(modid));
                     }
 

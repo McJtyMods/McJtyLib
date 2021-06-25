@@ -28,6 +28,8 @@ import javax.annotation.Nullable;
 import static mcjty.lib.varia.LogicFacing.*;
 import static net.minecraft.util.Direction.*;
 
+import net.minecraft.util.Direction.Axis;
+
 /**
  * The superclass for logic slabs.
  */
@@ -42,9 +44,9 @@ public class LogicSlabBlock extends BaseBlock {
     public static Direction rotateLeft(Direction downSide, Direction inputSide) {
         switch (downSide) {
             case DOWN:
-                return inputSide.rotateY();
+                return inputSide.getClockWise();
             case UP:
-                return inputSide.rotateYCCW();
+                return inputSide.getCounterClockWise();
             case NORTH:
                 return OrientationTools.rotateAround(inputSide, Axis.Z);
             case SOUTH:
@@ -69,8 +71,8 @@ public class LogicSlabBlock extends BaseBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        Vector3d hit = context.getHitVec();
-        BlockPos pos = context.getPos();
+        Vector3d hit = context.getClickLocation();
+        BlockPos pos = context.getClickedPos();
         double hx = hit.x - pos.getX();
         double hy = hit.y - pos.getY();
         double hz = hit.z - pos.getZ();
@@ -78,7 +80,7 @@ public class LogicSlabBlock extends BaseBlock {
         double dy = Math.abs(0.5 - hy);
         double dz = Math.abs(0.5 - hz);
 
-        Direction side = context.getFace().getOpposite();
+        Direction side = context.getClickedFace().getOpposite();
         LogicFacing facing;
         switch (side) {
             case DOWN:
@@ -127,19 +129,19 @@ public class LogicSlabBlock extends BaseBlock {
                 facing = DOWN_TOWEST;
                 break;
         }
-        return super.getStateForPlacement(context).with(LOGIC_FACING, facing);
+        return super.getStateForPlacement(context).setValue(LOGIC_FACING, facing);
     }
 
-    public static final VoxelShape BLOCK_DOWN = VoxelShapes.create(0.0F, 0.0F, 0.0F, 1.0F, 0.25F, 1.0F);
-    public static final VoxelShape BLOCK_UP = VoxelShapes.create(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F);
-    public static final VoxelShape BLOCK_NORTH = VoxelShapes.create(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.25F);
-    public static final VoxelShape BLOCK_SOUTH = VoxelShapes.create(0.0F, 0.0F, 0.75F, 1.0F, 1.0F, 1.0F);
-    public static final VoxelShape BLOCK_WEST = VoxelShapes.create(0.0F, 0.0F, 0.0F, 0.25F, 1.0F, 1.0F);
-    public static final VoxelShape BLOCK_EAST = VoxelShapes.create(0.75F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_DOWN = VoxelShapes.box(0.0F, 0.0F, 0.0F, 1.0F, 0.25F, 1.0F);
+    public static final VoxelShape BLOCK_UP = VoxelShapes.box(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_NORTH = VoxelShapes.box(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.25F);
+    public static final VoxelShape BLOCK_SOUTH = VoxelShapes.box(0.0F, 0.0F, 0.75F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_WEST = VoxelShapes.box(0.0F, 0.0F, 0.0F, 0.25F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_EAST = VoxelShapes.box(0.75F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        switch (state.get(LOGIC_FACING).getSide()) {
+        switch (state.getValue(LOGIC_FACING).getSide()) {
             case DOWN:
                 return BLOCK_DOWN;
             case UP:
@@ -160,15 +162,15 @@ public class LogicSlabBlock extends BaseBlock {
      * Returns the signal strength at one input of the block
      */
     protected int getInputStrength(World world, BlockPos pos, Direction side) {
-        int power = world.getRedstonePower(pos.offset(side), side);
+        int power = world.getSignal(pos.relative(side), side);
         if (power < 15) {
             // Check if there is no redstone wire there. If there is a 'bend' in the redstone wire it is
             // not detected with world.getRedstonePower().
             // Not exactly pretty, but it's how vanilla redstone repeaters do it.
-            BlockState blockState = world.getBlockState(pos.offset(side));
+            BlockState blockState = world.getBlockState(pos.relative(side));
             Block b = blockState.getBlock();
             if (b == Blocks.REDSTONE_WIRE) {
-                power = Math.max(power, blockState.get(RedstoneWireBlock.POWER));
+                power = Math.max(power, blockState.getValue(RedstoneWireBlock.POWER));
             }
         }
 
@@ -181,7 +183,7 @@ public class LogicSlabBlock extends BaseBlock {
         super.checkRedstone(world, pos);
         // Old behaviour
         // @todo remove once all implementations do this in the TE.checkRedstone
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity)te;
             Direction inputSide = logicTileEntity.getFacing(world.getBlockState(pos)).getInputSide();
@@ -192,7 +194,7 @@ public class LogicSlabBlock extends BaseBlock {
 
     @Override
     public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity)te;
             Direction direction = logicTileEntity.getFacing(state).getInputSide();
@@ -212,7 +214,7 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     protected int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity) te;
             return logicTileEntity.getRedstoneOutput(state, world, pos, side);
@@ -223,11 +225,11 @@ public class LogicSlabBlock extends BaseBlock {
     @Override
     public BlockState rotate(BlockState state, IWorld world, BlockPos pos, Rotation rot) {
         if (state.getBlock() instanceof LogicSlabBlock) {
-            LogicFacing facing = state.get(LOGIC_FACING);
+            LogicFacing facing = state.getValue(LOGIC_FACING);
             LogicFacing newfacing = LogicFacing.rotate(facing);
-            BlockState newstate = state.getBlock().getDefaultState().with(LOGIC_FACING, newfacing);
-            world.setBlockState(pos, newstate, 3);
-            TileEntity te = world.getTileEntity(pos);
+            BlockState newstate = state.getBlock().defaultBlockState().setValue(LOGIC_FACING, newfacing);
+            world.setBlock(pos, newstate, 3);
+            TileEntity te = world.getBlockEntity(pos);
             if (te instanceof LogicTileEntity) {
                 ((LogicTileEntity) te).rotateBlock(rot);
             }
@@ -237,18 +239,18 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     @Override
-    public boolean canProvidePower(BlockState state) {
+    public boolean isSignalSource(BlockState state) {
         return true;
     }
 
     @Override
-    public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+    public int getSignal(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
         return getRedstoneOutput(blockState, blockAccess, pos, side);
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(LOGIC_FACING);
     }
 

@@ -55,8 +55,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     private GuiSideWindow sideWindow;
 
     public void setWindowDimensions(int x, int y) {
-        this.xSize = x;
-        this.ySize = y;
+        this.imageWidth = x;
+        this.imageHeight = y;
     }
 
     public GenericGuiContainer(T tileEntity, C container, PlayerInventory inventory, ManualEntry manualEntry) {
@@ -89,7 +89,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public void init() {
         windowManager = null;
         super.init();
-        sideWindow.initGui(minecraft, this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(minecraft, this, leftPos, topPos, imageWidth, imageHeight);
     }
 
     /**
@@ -114,15 +114,15 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int p_230451_2_, int p_230451_3_) {
+    protected void renderLabels(MatrixStack matrixStack, int p_230451_2_, int p_230451_3_) {
         getWindowManager().drawTooltips(matrixStack);
     }
 
     public void drawHoveringText(MatrixStack matrixStack, List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
         if (!textLines.isEmpty()) {
-            matrixStack.push();
+            matrixStack.pushPose();
             RenderSystem.disableRescaleNormal();
-            net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
+            net.minecraft.client.renderer.RenderHelper.turnOff();
             RenderSystem.disableLighting();
             RenderSystem.disableDepthTest();
             int i = 0;
@@ -136,7 +136,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                     j = 0;
                     for (Object o : list) {
                         if (o instanceof String) {
-                            j += font.getStringWidth((String) o);
+                            j += font.width((String) o);
                         } else {
                             j += 20;    // ItemStack
                             lineHasItemStacks = true;
@@ -147,7 +147,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                     }
 
                 } else {
-                    j = font.getStringWidth(s);
+                    j = font.width(s);
                 }
 
                 if (j > i) {
@@ -163,23 +163,23 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 k += 2 + (textLines.size() - 1) * 10 + linesWithItemStacks * 8;
             }
 
-            if (xx > this.width - guiLeft - i - 5) {
+            if (xx > this.width - leftPos - i - 5) {
                 xx -= 28 + i;
             }
 
-            if (xx < 4 - guiLeft) {
-                xx = 4 - guiLeft;
+            if (xx < 4 - leftPos) {
+                xx = 4 - leftPos;
             }
 
-            if (yy > this.height - guiTop - k - 4) {
-                yy = this.height - guiTop - k - 4;
-            } else if (yy < 4 - guiTop) {
-                yy = 4 - guiTop;
+            if (yy > this.height - topPos - k - 4) {
+                yy = this.height - topPos - k - 4;
+            } else if (yy < 4 - topPos) {
+                yy = 4 - topPos;
             }
 
 //            this.zLevel = 300.0F;     // @todo 1.14
             setBlitOffset(300);
-            this.itemRenderer.zLevel = 300.0F;
+            this.itemRenderer.blitOffset = 300.0F;
             int l = -267386864;
             this.fillGradient(matrixStack, xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
             this.fillGradient(matrixStack, xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
@@ -193,17 +193,17 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
             this.fillGradient(matrixStack, xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
-            RenderSystem.translated(0.0D, 0.0D, (double)this.itemRenderer.zLevel);
+            RenderSystem.translated(0.0D, 0.0D, (double)this.itemRenderer.blitOffset);
 
             renderTextLines(matrixStack, textLines, items, font, xx, yy);
 
             setBlitOffset(0);
-            this.itemRenderer.zLevel = 0.0F;
+            this.itemRenderer.blitOffset = 0.0F;
             RenderSystem.enableLighting();
             RenderSystem.enableDepthTest();
-            net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
+            net.minecraft.client.renderer.RenderHelper.turnBackOn();
             RenderSystem.enableRescaleNormal();
-            matrixStack.pop();
+            matrixStack.popPose();
         }
     }
 
@@ -217,8 +217,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 for (Object o : list) {
                     if (o instanceof String) {
                         String s2 = (String)o;
-                        font.drawStringWithShadow(matrixStack, s2, curx, yy, -1);
-                        curx += font.getStringWidth(s2);
+                        font.drawShadow(matrixStack, s2, curx, yy, -1);
+                        curx += font.width(s2);
                     } else {
                         RenderHelper.renderObject(matrixStack, curx + 1, yy, o, false);
                         curx += 20;
@@ -229,7 +229,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                     yy += 8;
                 }
             } else {
-                font.drawStringWithShadow(matrixStack, s1, xx, yy, -1);
+                font.drawShadow(matrixStack, s1, xx, yy, -1);
             }
 
             if (i == 0) {
@@ -241,7 +241,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int x, int y) {
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int x, int y) {
         drawWindow(matrixStack);
     }
 
@@ -259,15 +259,15 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             return;
         }
         super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
         drawStackTooltips(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    public void moveItems(MatrixStack matrixStack, Slot slot) {
+    public void renderSlot(MatrixStack matrixStack, Slot slot) {
         // Prevent slots from being rendered if they are (partially) covered by a modal window
         if (!isPartiallyCoveredByModalWindow(slot)) {
-            super.moveItems(matrixStack, slot);
+            super.renderSlot(matrixStack, slot);
         }
     }
 
@@ -285,16 +285,16 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public boolean isSlotSelected(Slot slotIn, double mouseX, double mouseY) {
+    public boolean isHovering(Slot slotIn, double mouseX, double mouseY) {
         if (isPartiallyCoveredByModalWindow(slotIn)) {
             return false;
         }
-        return super.isSlotSelected(slotIn, mouseX, mouseY);
+        return super.isHovering(slotIn, mouseX, mouseY);
     }
 
     private boolean isPartiallyCoveredByModalWindow(Slot slotIn) {
-        int xPos = slotIn.xPos + window.getToplevel().getBounds().x;
-        int yPos = slotIn.yPos + window.getToplevel().getBounds().y;
+        int xPos = slotIn.x + window.getToplevel().getBounds().x;
+        int yPos = slotIn.y + window.getToplevel().getBounds().y;
 
         return getWindowManager().getModalWindows()
                 .anyMatch(window -> window.getToplevel().getBounds().intersects(new Rectangle(xPos, yPos, 18, 18)));
@@ -337,8 +337,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             // Protection for bad itemstacks
             list = new ArrayList<>();
         } else {
-            ITooltipFlag flag = this.getMinecraft().gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
-            list = stack.getTooltip(this.getMinecraft().player, flag);
+            ITooltipFlag flag = this.getMinecraft().options.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
+            list = stack.getTooltipLines(this.getMinecraft().player, flag);
         }
 
         list = addCustomLines(list, blockRender, stack);
@@ -348,7 +348,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             font = stack.getItem().getFontRenderer(stack);
         }
         GuiUtils.preItemToolTip(stack);
-        GuiUtils.drawHoveringText(matrixStack, list, x, y, xSize, ySize, -1, (font == null ? getMinecraft().fontRenderer : font));
+        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, (font == null ? getMinecraft().font : font));
     }
 
     @Override
@@ -357,9 +357,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
-        getMinecraft().keyboardListener.enableRepeatEvents(false);
+    public void removed() {
+        super.removed();
+        getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
     }
 
     @Override
@@ -457,11 +457,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public void sendServerCommandTyped(SimpleChannel network, String command, TypedMap params) {
-        network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), tileEntity.getDimension(), command, params));
+        network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
     }
 
     public void sendServerCommandTyped(SimpleChannel network, DimensionId dimensionId, String command, TypedMap params) {
-        network.sendToServer(new PacketServerCommandTyped(tileEntity.getPos(), dimensionId, command, params));
+        network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), dimensionId, command, params));
     }
 
     public void sendServerCommand(SimpleChannel network, String modid, String command, @Nonnull TypedMap arguments) {
@@ -477,10 +477,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             ContainerType<C> type,
             GuiSupplier<C, S, T> guiSupplier) {
         ScreenManager.IScreenFactory<C, S> factory = (container, inventory, title) -> {
-            TileEntity te = McJtyLib.proxy.getClientWorld().getTileEntity(container.getPos());
+            TileEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(container.getPos());
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid tile entity!");
         };
-        ScreenManager.registerFactory(type, factory);
+        ScreenManager.register(type, factory);
     }
 
     @FunctionalInterface

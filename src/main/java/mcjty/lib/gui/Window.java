@@ -111,7 +111,7 @@ public class Window {
             int guiTop = (gui.height - dim[1]) / 2;
             toplevel.bounds(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]);
         }
-        Minecraft.getInstance().keyboardListener.enableRepeatEvents(true);
+        Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
     }
 
     public <T extends Widget<T>> T findChild(String name) {
@@ -332,20 +332,20 @@ public class Window {
     }
 
     private int getRelativeX() {
-        int windowWidth = gui.getMinecraft().getMainWindow().getWidth();
+        int windowWidth = gui.getMinecraft().getWindow().getScreenWidth();
         if (windowWidth == 0) {
             return 0;
         } else {
-            return (int) gui.getMinecraft().mouseHelper.getMouseX() * gui.width / windowWidth;
+            return (int) gui.getMinecraft().mouseHandler.xpos() * gui.width / windowWidth;
         }
     }
 
     private int getRelativeY() {
-        int windowHeight = gui.getMinecraft().getMainWindow().getHeight();
+        int windowHeight = gui.getMinecraft().getWindow().getScreenHeight();
         if (windowHeight == 0) {
             return 0;
         } else {
-            return (int) gui.getMinecraft().mouseHelper.getMouseY() * gui.height / windowHeight;
+            return (int) gui.getMinecraft().mouseHandler.ypos() * gui.height / windowHeight;
         }
     }
 

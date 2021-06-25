@@ -30,7 +30,7 @@ public class PacketDataFromServer {
         } else {
             buf.writeBoolean(false);
         }
-        buf.writeString(command);
+        buf.writeUtf(command);
 
         buf.writeBoolean(result != null);
         if (result != null) {
@@ -44,7 +44,7 @@ public class PacketDataFromServer {
         } else {
             pos = null;
         }
-        command = buf.readString(32767);
+        command = buf.readUtf(32767);
 
         if (buf.readBoolean()) {
             result = TypedMapTools.readArguments(buf);
@@ -72,7 +72,7 @@ public class PacketDataFromServer {
                 }
                 te = container.getTe();
             } else {
-                te = McJtyLib.proxy.getClientWorld().getTileEntity(pos);
+                te = McJtyLib.proxy.getClientWorld().getBlockEntity(pos);
                 if (!(te instanceof IClientCommandHandler)) {
                     Logging.log("TileEntity is not a ClientCommandHandler!");
                     return;
@@ -88,7 +88,7 @@ public class PacketDataFromServer {
     }
 
     private static GenericContainer getOpenContainer() {
-        Container container = McJtyLib.proxy.getClientPlayer().openContainer;
+        Container container = McJtyLib.proxy.getClientPlayer().containerMenu;
         if (container instanceof GenericContainer) {
             return (GenericContainer) container;
         } else {

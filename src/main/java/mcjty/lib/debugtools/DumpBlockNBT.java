@@ -21,7 +21,7 @@ public class DumpBlockNBT {
 
     public static String dumpBlockNBT(@Nonnull World world, @Nonnull BlockPos pos, boolean verbose) {
         BlockState state = world.getBlockState(pos);
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         Block block = state.getBlock();
 
         JsonObject jsonObject = new JsonObject();
@@ -29,7 +29,7 @@ public class DumpBlockNBT {
         if (te != null) {
             jsonObject.add("teClass", new JsonPrimitive(te.getClass().getCanonicalName()));
             CompoundNBT tag = new CompoundNBT();
-            te.write(tag);
+            te.save(tag);
             if (verbose) {
                 String nbtJson = tag.toString();
                 JsonParser parser = new JsonParser();
@@ -37,7 +37,7 @@ public class DumpBlockNBT {
                 jsonObject.add("nbt", element);
             } else {
                 JsonArray array = new JsonArray();
-                for (String key : tag.keySet()) {
+                for (String key : tag.getAllKeys()) {
                     array.add(new JsonPrimitive(key));
                 }
                 jsonObject.add("nbt", array);
@@ -61,20 +61,20 @@ public class DumpBlockNBT {
     // Use client-side
     public static void dumpFocusedBlock(@Nullable SimpleChannel network, @Nonnull PlayerEntity player, boolean liquids, boolean verbose) {
         Vector3d start = player.getEyePosition(1.0f);
-        Vector3d vec31 = player.getLook(1.0f);
+        Vector3d vec31 = player.getViewVector(1.0f);
         float dist = 20;
         Vector3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
         RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, liquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, player);
-        RayTraceResult result = player.getEntityWorld().rayTraceBlocks(context);
+        RayTraceResult result = player.getCommandSenderWorld().clip(context);
         if (result == null || result.getType() != RayTraceResult.Type.BLOCK) {
             return;
         }
 
-        String output = DumpBlockNBT.dumpBlockNBT(player.getEntityWorld(), ((BlockRayTraceResult) result).getPos(), verbose);
+        String output = DumpBlockNBT.dumpBlockNBT(player.getCommandSenderWorld(), ((BlockRayTraceResult) result).getBlockPos(), verbose);
         Logging.getLogger().log(Level.INFO, "### Client side ###");
         Logging.getLogger().log(Level.INFO, output);
         if (network != null) {
-            network.sendToServer(new PacketDumpBlockInfo(player.getEntityWorld(), ((BlockRayTraceResult) result).getPos(), verbose));
+            network.sendToServer(new PacketDumpBlockInfo(player.getCommandSenderWorld(), ((BlockRayTraceResult) result).getBlockPos(), verbose));
         }
     }
 }

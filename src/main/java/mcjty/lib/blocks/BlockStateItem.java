@@ -9,6 +9,8 @@ import net.minecraft.util.NonNullList;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.item.Item.Properties;
+
 public class BlockStateItem extends BlockItem {
 
     private final BlockState state;
@@ -20,8 +22,8 @@ public class BlockStateItem extends BlockItem {
 
     @Nullable
     @Override
-    protected BlockState getStateForPlacement(BlockItemUseContext context) {
-        BlockState stateForPlacement = super.getStateForPlacement(context);
+    protected BlockState getPlacementState(BlockItemUseContext context) {
+        BlockState stateForPlacement = super.getPlacementState(context);
         if (stateForPlacement != null) {
             return state;
         }
@@ -29,8 +31,8 @@ public class BlockStateItem extends BlockItem {
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        if (this.isInGroup(group)) {
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+        if (this.allowdedIn(group)) {
             items.add(new ItemStack(this));
         }
     }

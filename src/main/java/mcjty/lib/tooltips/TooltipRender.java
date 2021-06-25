@@ -52,7 +52,7 @@ public class TooltipRender {
                 int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
                 int width = Math.min(STACKS_PER_LINE, count) * 18;
                 String spaces = "";//"\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
-                while (mc.fontRenderer.getStringWidth(spaces) < width) {
+                while (mc.font.width(spaces) < width) {
                     spaces += " ";
                 }
 
@@ -83,10 +83,10 @@ public class TooltipRender {
             if (entry.getManual() != null) {
                 if (KeyBindings.openManual != null) {
                     if (!McJtyLib.proxy.isSneaking()) {
-                        String translationKey = KeyBindings.openManual.getTranslationKey();
-                        event.getToolTip().add(new StringTextComponent("<Press ").mergeStyle(TextFormatting.YELLOW)
-                                .appendSibling(new TranslationTextComponent(translationKey).mergeStyle(TextFormatting.GREEN))
-                                .appendSibling(new StringTextComponent(" for help>").mergeStyle(TextFormatting.YELLOW)));
+                        String translationKey = KeyBindings.openManual.saveString();
+                        event.getToolTip().add(new StringTextComponent("<Press ").withStyle(TextFormatting.YELLOW)
+                                .append(new TranslationTextComponent(translationKey).withStyle(TextFormatting.GREEN))
+                                .append(new StringTextComponent(" for help>").withStyle(TextFormatting.YELLOW)));
                     }
                 }
             }
@@ -130,8 +130,8 @@ public class TooltipRender {
                 }
             }
 
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager._enableBlend();
+            GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             //Gui.drawRect(bx, by, bx + width, by + height, 0x55000000);
 
             int j = 0;
@@ -147,30 +147,30 @@ public class TooltipRender {
 
     private static void renderBlocks(MatrixStack matrixStack, ItemStack itemStack, int x, int y, int count, int errorAmount) {
         Minecraft mc = Minecraft.getInstance();
-        GlStateManager.disableDepthTest();
+        GlStateManager._disableDepthTest();
         ItemRenderer render = mc.getItemRenderer();
 
-        net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
-        matrixStack.push();
+        net.minecraft.client.renderer.RenderHelper.setupForFlatItems();
+        matrixStack.pushPose();
         matrixStack.translate(0, 0, 400f);
-        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getItemModelWithOverrides(itemStack, (World)null, (LivingEntity)null));
+        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, (World)null, (LivingEntity)null));
 //        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
-        matrixStack.pop();
+        matrixStack.popPose();
 
         //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
         String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString((int) ((float) count));
-        int w1 = mc.fontRenderer.getStringWidth(s1);
+        int w1 = mc.font.width(s1);
         int color = 0xFFFFFF;
 
         boolean hasReq = true;
 
         if (errorAmount != ITooltipExtras.NOAMOUNT) {
-            matrixStack.push();
+            matrixStack.pushPose();
             matrixStack.translate(16 - w1, (hasReq ? 8 : 10), 550f);
 //            matrixStack.scale(0.5F, 0.5F, 0.5F);
 //            matrixStack.translate(8 - w1/5, 0, 400f);
-            mc.fontRenderer.drawStringWithShadow(matrixStack, s1, x, y, color);
-            matrixStack.pop();
+            mc.font.drawShadow(matrixStack, s1, x, y, color);
+            matrixStack.popPose();
         }
 
         int missingCount = 0;
@@ -179,48 +179,48 @@ public class TooltipRender {
             String fs = Integer.toString(errorAmount);
             //String s2 = TextFormatting.BOLD + "(" + fs + ")";
             String s2 = "(" + fs + ")";
-            int w2 = mc.fontRenderer.getStringWidth(s2);
+            int w2 = mc.font.width(s2);
 
-            matrixStack.push();
+            matrixStack.pushPose();
             matrixStack.translate(x + 8 - w2 / 4, y + 17, 550f);
 
 //            matrixStack.scale(0.5F, 0.5F, 0.5F);
-            mc.fontRenderer.drawStringWithShadow(matrixStack, s2, 0, 0, 0xFFFF0000);
-            matrixStack.pop();
+            mc.font.drawShadow(matrixStack, s2, 0, 0, 0xFFFF0000);
+            matrixStack.popPose();
         }
-        GlStateManager.enableDepthTest();
+        GlStateManager._enableDepthTest();
     }
 
     private static void renderItemModelIntoGUI(ItemRenderer render, MatrixStack matrixStack, ItemStack itemStack, int x, int y, IBakedModel bakedmodel) {
-        matrixStack.push();
-        Minecraft.getInstance().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-        Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE).setBlurMipmapDirect(false, false);
+        matrixStack.pushPose();
+        Minecraft.getInstance().getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
+        Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS).setFilter(false, false);
         RenderSystem.enableRescaleNormal();
         RenderSystem.enableAlphaTest();
         RenderSystem.defaultAlphaFunc();
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        matrixStack.translate((float)x, (float)y, 100.0F + render.zLevel);
+        matrixStack.translate((float)x, (float)y, 100.0F + render.blitOffset);
         matrixStack.translate(8.0F, 8.0F, 0.0F);
         matrixStack.scale(1.0F, -1.0F, 1.0F);
         matrixStack.scale(16.0F, 16.0F, 16.0F);
-        IRenderTypeBuffer.Impl irendertypebuffer$impl = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-        boolean flag = !bakedmodel.isSideLit();
+        IRenderTypeBuffer.Impl irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
+        boolean flag = !bakedmodel.usesBlockLight();
         if (flag) {
-            RenderHelper.setupGuiFlatDiffuseLighting();
+            RenderHelper.setupForFlatItems();
         }
 
-        render.renderItem(itemStack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
-        irendertypebuffer$impl.finish();
+        render.render(itemStack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+        irendertypebuffer$impl.endBatch();
         RenderSystem.enableDepthTest();
         if (flag) {
-            RenderHelper.setupGui3DDiffuseLighting();
+            RenderHelper.setupFor3DItems();
         }
 
         RenderSystem.disableAlphaTest();
         RenderSystem.disableRescaleNormal();
-        matrixStack.pop();
+        matrixStack.popPose();
     }
 
 }

@@ -63,9 +63,9 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     public void logicSlabBlock(LogicSlabBlock block, String modelPrefix, ResourceLocation topTexture) {
         ModelFile[] models = getLogicSlabModels(modelPrefix, topTexture);
         variantBlock(block,
-                state -> models[state.get(LogicSlabBlock.LOGIC_FACING).getRotationStep()],
-                state -> getXRotation(state.get(LogicSlabBlock.LOGIC_FACING).getSide()),
-                state -> getYRotation(state.get(LogicSlabBlock.LOGIC_FACING).getSide()));
+                state -> models[state.getValue(LogicSlabBlock.LOGIC_FACING).getRotationStep()],
+                state -> getXRotation(state.getValue(LogicSlabBlock.LOGIC_FACING).getSide()),
+                state -> getYRotation(state.getValue(LogicSlabBlock.LOGIC_FACING).getSide()));
     }
 
     // Get logic slab models indexed by the logic facing rotation step

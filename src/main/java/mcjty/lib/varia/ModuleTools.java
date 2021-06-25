@@ -86,8 +86,8 @@ public class ModuleTools {
      * @return true if successful
      */
     public static boolean installModule(PlayerEntity player, ItemStack heldItem, Hand hand, BlockPos pos, int start, int stop) {
-        World world = player.getEntityWorld();
-        TileEntity te = world.getTileEntity(pos);
+        World world = player.getCommandSenderWorld();
+        TileEntity te = world.getBlockEntity(pos);
         if (te == null) {
             return false;
         }
@@ -103,10 +103,10 @@ public class ModuleTools {
                     }
                     heldItem.shrink(1);
                     if (heldItem.isEmpty()) {
-                        player.setHeldItem(hand, ItemStack.EMPTY);
+                        player.setItemInHand(hand, ItemStack.EMPTY);
                     }
-                    if (world.isRemote) {
-                        player.sendStatusMessage(new StringTextComponent("Installed module"), false);
+                    if (world.isClientSide) {
+                        player.displayClientMessage(new StringTextComponent("Installed module"), false);
                     }
                     return true;
                 }

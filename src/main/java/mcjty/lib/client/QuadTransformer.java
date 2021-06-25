@@ -18,7 +18,7 @@ import java.util.List;
 public class QuadTransformer {
     private static void processVertices(Matrix4f transform, VertexFormat fmt, int positionIndex, int[] inData, int[] outData) {
         int positionOffset = fmt.getOffset(positionIndex);
-        int stride = fmt.getSize() / 4;
+        int stride = fmt.getVertexSize() / 4;
         for (int i = 0; i < 4; i++) {
             int offset = positionOffset + i * stride;
             float x = Float.intBitsToFloat(inData[offset]);
@@ -27,7 +27,7 @@ public class QuadTransformer {
 
             // @todo 1.15
 //            Vector4f pos = new Vector4f(x, y, z, 1);
-//            transform.func_226597_a_(pos);
+//            transform.translate(pos);
 //            if (pos.getW() != 1.0f) {
 //                float v = 1 / pos.getW();
 //                pos.scale(new Vector3f(v, v, v));
@@ -56,7 +56,7 @@ public class QuadTransformer {
         if (positionElement.getType() != VertexFormatElement.Type.FLOAT) {
             throw new RuntimeException("WAT? Position not FLOAT");
         }
-        if (positionElement.getSize() < 3) {
+        if (positionElement.getByteSize() < 3) {
             throw new RuntimeException("WAT? Position not 3D");
         }
         return positionIndex;
@@ -73,10 +73,10 @@ public class QuadTransformer {
         VertexFormat fmt = null; // @todo 1.15 input.getFormat();
         int positionIndex = findPositionIndex(fmt);
 
-        int[] data = input.getVertexData();
+        int[] data = input.getVertices();
         processVertices(transform, fmt, positionIndex, data, data);
 
-        return new BakedQuad(data, input.getTintIndex(), input.getFace(), input.getSprite(), input.applyDiffuseLighting());
+        return new BakedQuad(data, input.getTintIndex(), input.getDirection(), input.getSprite(), input.isShade());
     }
 
     /**
@@ -96,11 +96,11 @@ public class QuadTransformer {
 
         List<BakedQuad> outputs = Lists.newArrayList();
         for (BakedQuad input : inputs) {
-            int[] inData = input.getVertexData();
+            int[] inData = input.getVertices();
             int[] outData = Arrays.copyOf(inData, inData.length);
             processVertices(transform, fmt, positionIndex, inData, outData);
 
-            outputs.add(new BakedQuad(outData, input.getTintIndex(), input.getFace(), input.getSprite(), input.applyDiffuseLighting()));
+            outputs.add(new BakedQuad(outData, input.getTintIndex(), input.getDirection(), input.getSprite(), input.isShade()));
         }
         return outputs;
     }
@@ -121,7 +121,7 @@ public class QuadTransformer {
         int positionIndex = findPositionIndex(fmt);
 
         for (BakedQuad input : inputs) {
-            int[] data = input.getVertexData();
+            int[] data = input.getVertices();
             processVertices(transform, fmt, positionIndex, data, data);
         }
     }

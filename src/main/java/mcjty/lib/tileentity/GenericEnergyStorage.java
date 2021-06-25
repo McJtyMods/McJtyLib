@@ -91,7 +91,7 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
 
     @Override
     public void deserializeNBT(LongNBT nbt) {
-        energy = nbt.getLong();
+        energy = nbt.getAsLong();
     }
 
     @Override

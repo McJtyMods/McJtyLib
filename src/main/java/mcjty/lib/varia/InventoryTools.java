@@ -82,7 +82,7 @@ public class InventoryTools {
      */
     @Nonnull
     public static ItemStack insertItem(World world, BlockPos pos, Direction direction, @Nonnull ItemStack s) {
-        TileEntity te = world.getTileEntity(direction == null ? pos : pos.offset(direction));
+        TileEntity te = world.getBlockEntity(direction == null ? pos : pos.relative(direction));
         if (te != null) {
             Direction opposite = direction == null ? null : direction.getOpposite();
             return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite)
@@ -95,7 +95,7 @@ public class InventoryTools {
     public static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
         // @todo 1.14
 //        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (!result.getHasSubtypes() || result.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
-        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (result.getDamage() == itemstack1.getDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
+        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (result.getDamageValue() == itemstack1.getDamageValue()) && ItemStack.tagMatches(result, itemstack1);
     }
 
     @Nonnull

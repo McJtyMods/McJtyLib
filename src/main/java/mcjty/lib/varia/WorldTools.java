@@ -12,17 +12,17 @@ public class WorldTools {
         if (world == null || pos == null) {
             return false;
         }
-        return world.isBlockLoaded(pos);
+        return world.hasChunkAt(pos);
     }
 
     public static ServerWorld getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getWorld(World.OVERWORLD);
+        return server.getLevel(World.OVERWORLD);
     }
 
     public static ServerWorld getOverworld(World world) {
         MinecraftServer server = world.getServer();
-        return server.getWorld(World.OVERWORLD);
+        return server.getLevel(World.OVERWORLD);
     }
 
     public static ServerWorld loadWorld(DimensionId type) {

@@ -21,9 +21,9 @@ public class RenderGlowEffect {
     public static void renderGlow(MatrixStack matrixStack, IRenderTypeBuffer buffer, ResourceLocation texture) {
         IVertexBuilder builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS);
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getAtlasSpriteGetter(AtlasTexture.LOCATION_BLOCKS_TEXTURE).apply(texture);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(AtlasTexture.LOCATION_BLOCKS).apply(texture);
 
-        Matrix4f matrix = matrixStack.getLast().getMatrix();
+        Matrix4f matrix = matrixStack.last().pose();
         RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.UP.ordinal(), 1.1f, -0.05f);
         RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.DOWN.ordinal(), 1.1f, -0.05f);
         RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.NORTH.ordinal(), 1.1f, -0.05f);
@@ -47,10 +47,10 @@ public class RenderGlowEffect {
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;
         Quad quad = quads[side];
-        buffer.pos(offs.x + quad.v1.x * mult + offset, offs.y + quad.v1.y * mult + offset, offs.z + quad.v1.z * mult + offset).tex(0, 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(offs.x + quad.v2.x * mult + offset, offs.y + quad.v2.y * mult + offset, offs.z + quad.v2.z * mult + offset).tex(0, 1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(offs.x + quad.v3.x * mult + offset, offs.y + quad.v3.y * mult + offset, offs.z + quad.v3.z * mult + offset).tex(1, 1).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.pos(offs.x + quad.v4.x * mult + offset, offs.y + quad.v4.y * mult + offset, offs.z + quad.v4.z * mult + offset).tex(1, 0).lightmap(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.vertex(offs.x + quad.v1.x * mult + offset, offs.y + quad.v1.y * mult + offset, offs.z + quad.v1.z * mult + offset).uv(0, 0).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.vertex(offs.x + quad.v2.x * mult + offset, offs.y + quad.v2.y * mult + offset, offs.z + quad.v2.z * mult + offset).uv(0, 1).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.vertex(offs.x + quad.v3.x * mult + offset, offs.y + quad.v3.y * mult + offset, offs.z + quad.v3.z * mult + offset).uv(1, 1).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.vertex(offs.x + quad.v4.x * mult + offset, offs.y + quad.v4.y * mult + offset, offs.z + quad.v4.z * mult + offset).uv(1, 0).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
     }
 
     public static void addSideFullTexture(Matrix4f positionMatrix, IVertexBuilder buffer, TextureAtlasSprite sprite, int side, float mult, float offset) {
@@ -58,10 +58,10 @@ public class RenderGlowEffect {
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;
         Quad quad = quads[side];
-        buffer.pos(positionMatrix, quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).color(255, 255, 255, 128).tex(sprite.getMinU(), sprite.getMinV()).lightmap(b1, b2).normal(1,0,0).endVertex();
-        buffer.pos(positionMatrix, quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).color(255, 255, 255, 128).tex(sprite.getMinU(), sprite.getMaxV()).lightmap(b1, b2).normal(1,0,0).endVertex();
-        buffer.pos(positionMatrix, quad.v3.x * mult + offset, quad.v3.y * mult + offset, quad.v3.z * mult + offset).color(255, 255, 255, 128).tex(sprite.getMaxU(), sprite.getMaxV()).lightmap(b1, b2).normal(1,0,0).endVertex();
-        buffer.pos(positionMatrix, quad.v4.x * mult + offset, quad.v4.y * mult + offset, quad.v4.z * mult + offset).color(255, 255, 255, 128).tex(sprite.getMaxU(), sprite.getMinV()).lightmap(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(positionMatrix, quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(positionMatrix, quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(positionMatrix, quad.v3.x * mult + offset, quad.v3.y * mult + offset, quad.v3.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU1(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(positionMatrix, quad.v4.x * mult + offset, quad.v4.y * mult + offset, quad.v4.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU1(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
     }
 
     private static class Vt {

@@ -30,13 +30,13 @@ public class InventoryLocator {
             }
             return LazyOptional.empty();
         }
-        TileEntity te = worldObj.getTileEntity(thisCoordinate);
+        TileEntity te = worldObj.getBlockEntity(thisCoordinate);
         if (te == null) {
             return LazyOptional.empty();
         }
         return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).map(handler -> {
             // Remember in inventoryCoordinate (acts as a cache)
-            inventoryCoordinate = thisCoordinate.offset(direction);
+            inventoryCoordinate = thisCoordinate.relative(direction);
             inventorySide = direction.getOpposite();
             return getItemHandlerAtCoordinate(worldObj, inventoryCoordinate, inventorySide);
         }).orElse(LazyOptional.empty());
@@ -44,7 +44,7 @@ public class InventoryLocator {
 
     @Nonnull
     private LazyOptional<IItemHandler> getItemHandlerAtCoordinate(World worldObj, BlockPos c, Direction direction) {
-        TileEntity te = worldObj.getTileEntity(c);
+        TileEntity te = worldObj.getBlockEntity(c);
         if (te == null) {
             return LazyOptional.empty();
         }
@@ -65,7 +65,7 @@ public class InventoryLocator {
 
         if (!stack.isEmpty()) {
             ItemEntity entityItem = new ItemEntity(worldObj, pos.getX(), pos.getY(), pos.getZ(), stack);
-            worldObj.addEntity(entityItem);
+            worldObj.addFreshEntity(entityItem);
         }
     }
 

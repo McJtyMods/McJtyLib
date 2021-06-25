@@ -25,7 +25,7 @@ public abstract class DefaultModSetup {
     protected void createTab(String name, Supplier<ItemStack> stack) {
         creativeTab = new ItemGroup(name) {
             @Override
-            public ItemStack createIcon() {
+            public ItemStack makeIcon() {
                 return stack.get();
             }
         };

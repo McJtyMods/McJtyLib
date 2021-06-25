@@ -99,7 +99,7 @@ public class GuiItemScreen extends Screen {
             int y = GuiTools.getRelativeY(this);
             // @todo check on 1.16
             List<ITextProperties> properties = tooltips.stream().map(StringTextComponent::new).collect(Collectors.toList());
-            List<IReorderingProcessor> processors = LanguageMap.getInstance().func_244260_a(properties);
+            List<IReorderingProcessor> processors = LanguageMap.getInstance().getVisualOrder(properties);
             renderTooltip(matrixStack, processors, x-guiLeft, y-guiTop);
         }
         tooltips = sideWindow.getWindow().getTooltips();
@@ -108,7 +108,7 @@ public class GuiItemScreen extends Screen {
             int y = GuiTools.getRelativeY(this);
             // @todo check on 1.16
             List<ITextProperties> properties = tooltips.stream().map(StringTextComponent::new).collect(Collectors.toList());
-            List<IReorderingProcessor> processors = LanguageMap.getInstance().func_244260_a(properties);
+            List<IReorderingProcessor> processors = LanguageMap.getInstance().getVisualOrder(properties);
             renderTooltip(matrixStack, processors, x - guiLeft, y - guiTop);
         }
     }

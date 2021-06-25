@@ -153,8 +153,8 @@ public class EnergyTools {
      */
     public static void handleSendingEnergy(World world, BlockPos pos, long storedPower, long sendPerTick, GenericEnergyStorage storage) {
         for (Direction facing : OrientationTools.DIRECTION_VALUES) {
-            BlockPos p = pos.offset(facing);
-            TileEntity te = world.getTileEntity(p);
+            BlockPos p = pos.relative(facing);
+            TileEntity te = world.getBlockEntity(p);
             Direction opposite = facing.getOpposite();
             if (EnergyTools.isEnergyTE(te, opposite)) {
                 long rfToGive = Math.min(sendPerTick, storedPower);

@@ -22,6 +22,8 @@ import java.awt.*;
 import java.util.List;
 import java.util.*;
 
+import mcjty.lib.gui.widgets.Widget.Dimension;
+
 public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Widget<P> {
 
     public static final int DEFAULT_BACKGROUND_OFFSET = 256;
@@ -333,17 +335,17 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         if (background1 != null) {
-            mc.getTextureManager().bindTexture(background1);
+            mc.getTextureManager().bind(background1);
             if (background2 == null) {
                 gui.blit(matrixStack, xx, yy, 0, 0, w, h);
             } else {
                 if (background2Horizontal) {
                     gui.blit(matrixStack, xx, yy, 0, 0, backgroundOffset, h);
-                    mc.getTextureManager().bindTexture(background2);
+                    mc.getTextureManager().bind(background2);
                     gui.blit(matrixStack, xx + backgroundOffset, yy, 0, 0, w - backgroundOffset, h);
                 } else {
                     gui.blit(matrixStack, xx, yy, 0, 0, w, backgroundOffset);
-                    mc.getTextureManager().bindTexture(background2);
+                    mc.getTextureManager().bind(background2);
                     gui.blit(matrixStack, xx, yy + backgroundOffset, 0, 0, w, h - backgroundOffset);
                 }
             }

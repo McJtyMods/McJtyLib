@@ -28,27 +28,27 @@ public class GuiTools {
 
     public static int getRelativeX(Screen gui) {
         Minecraft mc = Minecraft.getInstance();
-        int mainWidth = mc.getMainWindow().getWidth();
+        int mainWidth = mc.getWindow().getScreenWidth();
         if (mainWidth <= 0) {
             // Safety
             return 0;
         }
 
-        MouseHelper mouse = mc.mouseHelper;
-        int mouseX = (int) (mouse.getMouseX());
+        MouseHelper mouse = mc.mouseHandler;
+        int mouseX = (int) (mouse.xpos());
         return mouseX * gui.width / mainWidth;
     }
 
     public static int getRelativeY(Screen gui) {
         Minecraft mc = Minecraft.getInstance();
-        int mainHeight = mc.getMainWindow().getHeight();
+        int mainHeight = mc.getWindow().getScreenHeight();
         if (mainHeight <= 0) {
             // Safety
             return 0;
         }
 
-        MouseHelper mouse = mc.mouseHelper;
-        int mouseY = (int) (mouse.getMouseY());
+        MouseHelper mouse = mc.mouseHandler;
+        int mouseY = (int) (mouse.ypos());
         return mouseY * gui.height / mainHeight;
     }
 
@@ -73,26 +73,26 @@ public class GuiTools {
     public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos,
                                         Function<TileEntity, INamedContainerProvider> provider) {
         if (dimensionType == null) {
-            dimensionType = DimensionId.fromWorld(player.getEntityWorld());
+            dimensionType = DimensionId.fromWorld(player.getCommandSenderWorld());
         }
-        World world = WorldTools.getWorld(player.getEntityWorld(), dimensionType);
+        World world = WorldTools.getWorld(player.getCommandSenderWorld(), dimensionType);
         if (!WorldTools.isLoaded(world, pos)) {
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + "Position is not loaded!"), false);
+            player.displayClientMessage(new StringTextComponent(TextFormatting.RED + "Position is not loaded!"), false);
             return false;
         }
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te == null) {
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.RED + "Tile entity is missing!"), false);
+            player.displayClientMessage(new StringTextComponent(TextFormatting.RED + "Tile entity is missing!"), false);
             return false;
         }
 
         CompoundNBT compound = new CompoundNBT();
-        CompoundNBT written = te.write(compound);
+        CompoundNBT written = te.save(compound);
 
         NetworkHooks.openGui((ServerPlayerEntity) player, provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
             DimensionId.fromWorld(world).toBytes(buf);
-            buf.writeCompoundTag(written);
+            buf.writeNbt(written);
         });
         return true;
     }

@@ -79,7 +79,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private static boolean isControlDown() {
-        long handle = Minecraft.getInstance().getMainWindow().getHandle();
+        long handle = Minecraft.getInstance().getWindow().getWindow();
         return InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 
@@ -90,7 +90,7 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            long handle = Minecraft.getInstance().getMainWindow().getHandle();
+            long handle = Minecraft.getInstance().getWindow().getWindow();
             if (isControlDown()) {
                 if(keyCode == GLFW.GLFW_KEY_V) {
                     String data = GLFW.glfwGetClipboardString(handle);
@@ -193,7 +193,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private int calculateVerticalOffset() {
-        int h = mc.fontRenderer.FONT_HEIGHT;
+        int h = mc.font.lineHeight;
         return (bounds.height - h) / 2;
     }
 
@@ -201,10 +201,10 @@ public class TextField extends AbstractWidget<TextField> {
         if (cursor < startOffset) {
             startOffset = cursor;
         } else {
-            int w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
+            int w = mc.font.width(text.substring(startOffset, cursor));
             while (w > bounds.width - 12) {
                 startOffset++;
-                w = mc.fontRenderer.getStringWidth(text.substring(startOffset, cursor));
+                w = mc.font.width(text.substring(startOffset, cursor));
             }
         }
     }
@@ -309,14 +309,14 @@ public class TextField extends AbstractWidget<TextField> {
 
         RenderHelper.drawThickBeveledBox(matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
 
-        String renderedText = mc.fontRenderer.trimStringToWidth(this.text.substring(startOffset), bounds.width - 10);
+        String renderedText = mc.font.plainSubstrByWidth(this.text.substring(startOffset), bounds.width - 10);
         int textX = x + 5 + bounds.x;
         int textY = y + calculateVerticalOffset() + bounds.y;
         if (isEnabled()) {
             if (isEditable()) {
-                mc.fontRenderer.drawString(matrixStack, renderedText, textX, textY, 0xff000000);
+                mc.font.draw(matrixStack, renderedText, textX, textY, 0xff000000);
             } else {
-                mc.fontRenderer.drawString(matrixStack, renderedText, textX, textY, 0xff333333);
+                mc.font.draw(matrixStack, renderedText, textX, textY, 0xff333333);
             }
 
             if (isRegionSelected()) {
@@ -328,16 +328,16 @@ public class TextField extends AbstractWidget<TextField> {
 
                 String renderedSelection = renderedText.substring(renderedStart, renderedEnd);
                 String renderedPreSelection = renderedText.substring(0, renderedStart);
-                int selectionX = textX + mc.fontRenderer.getStringWidth(renderedPreSelection);
-                int selectionWidth = mc.fontRenderer.getStringWidth(renderedSelection);
-                RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.fontRenderer.FONT_HEIGHT, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
+                int selectionX = textX + mc.font.width(renderedPreSelection);
+                int selectionWidth = mc.font.width(renderedSelection);
+                RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.font.lineHeight, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
             }
         } else {
-            mc.fontRenderer.drawString(matrixStack, renderedText, textX, textY, 0xffa0a0a0);
+            mc.font.draw(matrixStack, renderedText, textX, textY, 0xffa0a0a0);
         }
 
         if (window.getTextFocus() == this) {
-            int w = mc.fontRenderer.getStringWidth(this.text.substring(startOffset, cursor));
+            int w = mc.font.width(this.text.substring(startOffset, cursor));
             Screen.fill(matrixStack, xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }

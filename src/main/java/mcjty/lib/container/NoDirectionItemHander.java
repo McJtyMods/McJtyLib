@@ -151,7 +151,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                     stack.setCount(stackLimit);
                 }
             }
-            tileEntity.markDirty();
+            tileEntity.setChanged();
         }
     }
 
@@ -208,14 +208,14 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
                 if (stacks.get(index).getCount() <= amount) {
                     ItemStack old = stacks.get(index);
                     stacks.set(index, ItemStack.EMPTY);
-                    tileEntity.markDirty();
+                    tileEntity.setChanged();
                     return old;
                 }
                 ItemStack its = stacks.get(index).split(amount);
                 if (stacks.get(index).isEmpty()) {
                     stacks.set(index, ItemStack.EMPTY);
                 }
-                tileEntity.markDirty();
+                tileEntity.setChanged();
                 return its;
             }
             return ItemStack.EMPTY;
@@ -256,7 +256,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
         for (ItemStack stack : stacks) {
             CompoundNBT compoundNBT = new CompoundNBT();
             if (!stack.isEmpty()) {
-                stack.write(compoundNBT);
+                stack.save(compoundNBT);
             }
             bufferTagList.add(compoundNBT);
         }
@@ -268,7 +268,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
         for (int i = 0; i < nbt.size(); i++) {
             CompoundNBT compoundNBT = nbt.getCompound(i);
             if (i < stacks.size()) {
-                stacks.set(i, ItemStack.read(compoundNBT));
+                stacks.set(i, ItemStack.of(compoundNBT));
             }
         }
     }

@@ -34,7 +34,7 @@ public class Registration {
 
     @SubscribeEvent
     public static void registerTiles(final RegistryEvent.Register<TileEntityType<?>> registry) {
-        registry.getRegistry().register(TYPE_MULTIPART = TileEntityType.Builder.create(MultipartTE::new).build(null).setRegistryName(new ResourceLocation(McJtyLib.MODID, "multipart")));
+        registry.getRegistry().register(TYPE_MULTIPART = TileEntityType.Builder.of(MultipartTE::new).build(null).setRegistryName(new ResourceLocation(McJtyLib.MODID, "multipart")));
     }
 
     @SubscribeEvent

@@ -40,8 +40,8 @@ public class CapabilityTools {
 
     private static void reportWrongBlock(TileEntity tileEntity, Exception e) {
         if (tileEntity != null) {
-            ResourceLocation name = tileEntity.getWorld().getBlockState(tileEntity.getPos()).getBlock().getRegistryName();
-            Logging.logError("Block " + name.toString() + " at " + BlockPosTools.toString(tileEntity.getPos()) + " does not respect the capability API and crashes on null side.");
+            ResourceLocation name = tileEntity.getLevel().getBlockState(tileEntity.getBlockPos()).getBlock().getRegistryName();
+            Logging.logError("Block " + name.toString() + " at " + BlockPosTools.toString(tileEntity.getBlockPos()) + " does not respect the capability API and crashes on null side.");
             Logging.logError("Please report to the corresponding mod. This is not a bug in RFTools!");
         }
         if (e != null) {

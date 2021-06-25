@@ -60,42 +60,42 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     protected LootTable.Builder createItemDropTable(String name, IItemProvider item) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .rolls(ConstantRange.of(1))
-                .addEntry(ItemLootEntry.builder(item));
-        return LootTable.builder().addLootPool(builder);
+                .setRolls(ConstantRange.exactly(1))
+                .add(ItemLootEntry.lootTableItem(item));
+        return LootTable.lootTable().withPool(builder);
     }
 
     protected LootTable.Builder createItemDropTable(String name, IItemProvider item,
                                                     float min, float max,
                                                     float lmin, float lmax) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .rolls(ConstantRange.of(1))
-                .addEntry(ItemLootEntry.builder(item)
-                        .acceptFunction(SetCount
-                                .builder(RandomValueRange.of(min, max)))
-                        .acceptFunction(LootingEnchantBonus
-                                .builder(RandomValueRange.of(lmin, lmax))));
-        return LootTable.builder().addLootPool(builder);
+                .setRolls(ConstantRange.exactly(1))
+                .add(ItemLootEntry.lootTableItem(item)
+                        .apply(SetCount
+                                .setCount(RandomValueRange.between(min, max)))
+                        .apply(LootingEnchantBonus
+                                .lootingMultiplier(RandomValueRange.between(lmin, lmax))));
+        return LootTable.lootTable().withPool(builder);
     }
 
     protected LootTable.Builder createSilkTouchTable(String name, Block block, Item lootItem, float min, float max) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .rolls(ConstantRange.of(1))
-                .addEntry(AlternativesLootEntry.builder(
-                        ItemLootEntry.builder(block)
-                                .acceptCondition(MatchTool.builder(ItemPredicate.Builder.create()
-                                        .enchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.IntBound.atLeast(1))))),
-                        ItemLootEntry.builder(lootItem)
-                                .acceptFunction(SetCount.builder(new RandomValueRange(min, max)))
-                                .acceptFunction(ApplyBonus.uniformBonusCount(Enchantments.FORTUNE, 1))
-                                .acceptFunction(ExplosionDecay.builder())
+                .setRolls(ConstantRange.exactly(1))
+                .add(AlternativesLootEntry.alternatives(
+                        ItemLootEntry.lootTableItem(block)
+                                .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
+                                        .hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.IntBound.atLeast(1))))),
+                        ItemLootEntry.lootTableItem(lootItem)
+                                .apply(SetCount.setCount(new RandomValueRange(min, max)))
+                                .apply(ApplyBonus.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 1))
+                                .apply(ExplosionDecay.explosionDecay())
                         )
                 );
-        return LootTable.builder().addLootPool(builder);
+        return LootTable.lootTable().withPool(builder);
     }
 
     protected void addBlockStateTable(Block block, Property property) {
@@ -103,13 +103,13 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     protected LootTable.Builder createBlockStateTable(String name, Block block, Property property) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(block.getRegistryName().getPath())
-                .rolls(ConstantRange.of(1))
-                .addEntry(ItemLootEntry.builder(block)
-                        .acceptFunction(CopyBlockState.func_227545_a_(block).func_227552_a_(property))
+                .setRolls(ConstantRange.exactly(1))
+                .add(ItemLootEntry.lootTableItem(block)
+                        .apply(CopyBlockState.copyState(block).copy(property))
                 );
-        return LootTable.builder().addLootPool(builder);
+        return LootTable.lootTable().withPool(builder);
     }
 
     protected void addStandardTable(Block block) {
@@ -117,19 +117,19 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     protected LootTable.Builder createStandardTable(String name, Block block) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .rolls(ConstantRange.of(1))
-                .addEntry(ItemLootEntry.builder(block)
-                        .acceptFunction(CopyName.builder(CopyName.Source.BLOCK_ENTITY))
-                        .acceptFunction(CopyNbt.builder(CopyNbt.Source.BLOCK_ENTITY)
-                                .addOperation("Info", "BlockEntityTag.Info", CopyNbt.Action.REPLACE)
-                                .addOperation("Items", "BlockEntityTag.Items", CopyNbt.Action.REPLACE)
-                                .addOperation("Energy", "BlockEntityTag.Energy", CopyNbt.Action.REPLACE))
-                        .acceptFunction(SetContents.builderIn()
-                                .addLootEntry(DynamicLootEntry.func_216162_a(new ResourceLocation("minecraft", "contents"))))
+                .setRolls(ConstantRange.exactly(1))
+                .add(ItemLootEntry.lootTableItem(block)
+                        .apply(CopyName.copyName(CopyName.Source.BLOCK_ENTITY))
+                        .apply(CopyNbt.copyData(CopyNbt.Source.BLOCK_ENTITY)
+                                .copy("Info", "BlockEntityTag.Info", CopyNbt.Action.REPLACE)
+                                .copy("Items", "BlockEntityTag.Items", CopyNbt.Action.REPLACE)
+                                .copy("Energy", "BlockEntityTag.Energy", CopyNbt.Action.REPLACE))
+                        .apply(SetContents.setContents()
+                                .withEntry(DynamicLootEntry.dynamicEntry(new ResourceLocation("minecraft", "contents"))))
                 );
-        return LootTable.builder().addLootPool(builder);
+        return LootTable.lootTable().withPool(builder);
     }
 
     protected void addSimpleTable(Block block) {
@@ -137,35 +137,35 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     protected LootTable.Builder createSimpleTable(String name, Block block) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .rolls(ConstantRange.of(1))
-                .addEntry(ItemLootEntry.builder(block));
-        return LootTable.builder().addLootPool(builder);
+                .setRolls(ConstantRange.exactly(1))
+                .add(ItemLootEntry.lootTableItem(block));
+        return LootTable.lootTable().withPool(builder);
     }
 
     protected LootTable.Builder createSimpleTable(String name, Item item) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .rolls(ConstantRange.of(1))
-                .addEntry(ItemLootEntry.builder(item));
-        return LootTable.builder().addLootPool(builder);
+                .setRolls(ConstantRange.exactly(1))
+                .add(ItemLootEntry.lootTableItem(item));
+        return LootTable.lootTable().withPool(builder);
     }
 
     @Override
-    public void act(DirectoryCache cache) {
+    public void run(DirectoryCache cache) {
         addTables();
 
         Map<ResourceLocation, LootTable> tables = new HashMap<>();
         for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
-            tables.put(entry.getKey().getLootTable(), entry.getValue().setParameterSet(LootParameterSets.BLOCK).build());
+            tables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootParameterSets.BLOCK).build());
         }
         for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
-            tables.put(entry.getKey().getLootTable(), entry.getValue().setParameterSet(LootParameterSets.ENTITY).build());
+            tables.put(entry.getKey().getDefaultLootTable(), entry.getValue().setParamSet(LootParameterSets.ENTITY).build());
         }
         for (Map.Entry<ResourceLocation, LootTable.Builder> entry : chestLootTables.entrySet()) {
             ResourceLocation id = entry.getKey();
-            tables.put(id, entry.getValue().setParameterSet(LootParameterSets.CHEST).build());
+            tables.put(id, entry.getValue().setParamSet(LootParameterSets.CHEST).build());
         }
 
         writeTables(cache, tables);
@@ -176,7 +176,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         tables.forEach((key, lootTable) -> {
             Path path = outputFolder.resolve("data/" + key.getNamespace() + "/loot_tables/" + key.getPath() + ".json");
             try {
-                IDataProvider.save(GSON, cache, LootTableManager.toJson(lootTable), path);
+                IDataProvider.save(GSON, cache, LootTableManager.serialize(lootTable), path);
             } catch (IOException e) {
                 LOGGER.error("Couldn't write loot table {}", path, e);
                 throw new RuntimeException(e);

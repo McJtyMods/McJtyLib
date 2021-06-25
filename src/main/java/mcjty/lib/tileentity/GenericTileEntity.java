@@ -68,16 +68,16 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public void markDirtyClient() {
-        markDirty();
-        if (getWorld() != null) {
-            BlockState state = getWorld().getBlockState(getPos());
-            getWorld().notifyBlockUpdate(getPos(), state, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+        setChanged();
+        if (getLevel() != null) {
+            BlockState state = getLevel().getBlockState(getBlockPos());
+            getLevel().sendBlockUpdated(getBlockPos(), state, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         }
     }
 
     public void markDirtyQuick() {
-        if (getWorld() != null) {
-            getWorld().markChunkDirty(this.pos, this);
+        if (getLevel() != null) {
+            getLevel().blockEntityChanged(this.worldPosition, this);
         }
     }
 
@@ -116,7 +116,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     public void checkRedstone(World world, BlockPos pos) {
-        int powered = world.getRedstonePowerFromNeighbors(pos); // @todo check
+        int powered = world.getBestNeighborSignal(pos); // @todo check
         setPowerInput(powered);
     }
 
@@ -124,7 +124,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public void setPowerInput(int powered) {
         if (powerLevel != powered) {
             powerLevel = powered;
-            markDirty();
+            setChanged();
         }
     }
 
@@ -179,12 +179,12 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTag = new CompoundNBT();
         this.writeClientDataToNBT(nbtTag);
-        return new SUpdateTileEntityPacket(pos, 1, nbtTag);
+        return new SUpdateTileEntityPacket(worldPosition, 1, nbtTag);
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
-        readClientDataFromNBT(packet.getNbtCompound());
+        readClientDataFromNBT(packet.getTag());
     }
 
     //    public void setInfused(int infused) {
@@ -201,7 +201,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 //    }
 
     public boolean canPlayerAccess(PlayerEntity player) {
-        return !isRemoved() && player.getDistanceSq(new Vector3d(pos.getX(), pos.getY(), pos.getZ()).add(0.5D, 0.5D, 0.5D)) <= 64D;
+        return !isRemoved() && player.distanceToSqr(new Vector3d(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Override
@@ -219,7 +219,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * @param tagCompound
      */
     public void writeClientDataToNBT(CompoundNBT tagCompound) {
-        write(tagCompound); // @todo TEST IF THIS IS REALLY NEEDED
+        save(tagCompound); // @todo TEST IF THIS IS REALLY NEEDED
     }
 
     /**
@@ -247,8 +247,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT tagCompound) {
-        super.read(state, tagCompound);
+    public void load(BlockState state, CompoundNBT tagCompound) {
+        super.load(state, tagCompound);
         read(tagCompound);
     }
 
@@ -294,8 +294,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             }
 
             ownerName = infoTag.getString("owner");
-            if (infoTag.hasUniqueId("ownerId")) {
-                ownerUUID = infoTag.getUniqueId("ownerId");
+            if (infoTag.hasUUID("ownerId")) {
+                ownerUUID = infoTag.getUUID("ownerId");
             } else {
                 ownerUUID = null;
             }
@@ -319,8 +319,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT tagCompound) {
-        super.write(tagCompound);
+    public CompoundNBT save(CompoundNBT tagCompound) {
+        super.save(tagCompound);
         writeCaps(tagCompound);
         writeInfo(tagCompound);
         return tagCompound;
@@ -357,7 +357,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
         infoTag.putString("owner", ownerName);
         if (ownerUUID != null) {
-            infoTag.putUniqueId("ownerId", ownerUUID);
+            infoTag.putUUID("ownerId", ownerUUID);
         }
         if (securityChannel != -1) {
             infoTag.putInt("secChannel", securityChannel);
@@ -521,13 +521,13 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
     public DimensionId getDimension() {
-        return DimensionId.fromWorld(world);
+        return DimensionId.fromWorld(level);
     }
 
         // Client side function to send a value to the server
     public <T> void valueToServer(SimpleChannel network, Key<T> valueKey, T value) {
 
-        network.sendToServer(new PacketServerCommandTyped(getPos(),
+        network.sendToServer(new PacketServerCommandTyped(getBlockPos(),
                 getDimension(),
                 COMMAND_SYNC_BINDING,
                 TypedMap.builder()
@@ -539,7 +539,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * Call this client-side to this TE to request data from the server
      */
     public void requestDataFromServer(SimpleChannel channel, String command, @Nonnull TypedMap params) {
-        channel.sendToServer(new PacketRequestDataFromServer(getDimension(), pos, command, params, false));
+        channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command, params, false));
     }
 
 

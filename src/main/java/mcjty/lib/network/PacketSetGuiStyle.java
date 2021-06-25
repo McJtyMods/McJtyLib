@@ -16,11 +16,11 @@ public class PacketSetGuiStyle {
     String style;
 
     public PacketSetGuiStyle(PacketBuffer buf) {
-        style = buf.readString(32767);
+        style = buf.readUtf(32767);
     }
 
     public void toBytes(PacketBuffer buf) {
-        buf.writeString(style);
+        buf.writeUtf(style);
     }
 
     public PacketSetGuiStyle(String style) {

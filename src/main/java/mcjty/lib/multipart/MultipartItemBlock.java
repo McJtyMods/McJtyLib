@@ -23,6 +23,8 @@ import net.minecraftforge.common.util.Constants.BlockFlags;
 
 import javax.annotation.Nonnull;
 
+import net.minecraft.item.Item.Properties;
+
 public class MultipartItemBlock extends BlockItem {
 
     public MultipartItemBlock(Block block) {
@@ -41,15 +43,15 @@ public class MultipartItemBlock extends BlockItem {
 
 
     @Override
-    public ActionResultType tryPlace(BlockItemUseContext context) {
-        World world = context.getWorld();
-        BlockPos pos = context.getPos();
+    public ActionResultType place(BlockItemUseContext context) {
+        World world = context.getLevel();
+        BlockPos pos = context.getClickedPos();
         PlayerEntity player = context.getPlayer();
 
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
 
-        ItemStack itemstack = context.getItem();
+        ItemStack itemstack = context.getItemInHand();
         if (itemstack.isEmpty()) {
             return ActionResultType.FAIL;
         }
@@ -60,15 +62,15 @@ public class MultipartItemBlock extends BlockItem {
             slot = ((IPartBlock) this.getBlock()).getSlotFromState(world, pos, toPlace);
         }
 
-        if (!block.isReplaceable(state, context) && !canFitInside(block, world, pos, slot)) {
-            pos = pos.offset(context.getFace());
+        if (!block.canBeReplaced(state, context) && !canFitInside(block, world, pos, slot)) {
+            pos = pos.relative(context.getClickedFace());
             state = world.getBlockState(pos);
             block = state.getBlock();
         }
 
-//        context = BlockItemUseContext.func_221536_a(context, pos, context.getFace());
+//        context = BlockItemUseContext.at(context, pos, context.getFace());
 
-        if (player.canPlayerEdit(pos, context.getFace(), itemstack)) {
+        if (player.mayUseItemAt(pos, context.getClickedFace(), itemstack)) {
             // We have to call getStateForPlacement again to be sure it is ok for this position as well
             toPlace = this.getBlock().getStateForPlacement(context);
             if (this.getBlock() instanceof IPartBlock) {
@@ -102,7 +104,7 @@ public class MultipartItemBlock extends BlockItem {
         if (block != Registration.MULTIPART_BLOCK) {
             return false;
         }
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
             return part == null;
@@ -140,7 +142,7 @@ public class MultipartItemBlock extends BlockItem {
 
     private boolean placeBlockAtInternal(ItemStack stack, PlayerEntity player, World world, BlockPos pos, BlockState newState,
                                          @Nonnull PartSlot slot) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             TileEntity tileEntity = createTileEntity(world, newState);
             if (tileEntity instanceof GenericTileEntity && stack.getTag() != null) {
@@ -151,16 +153,16 @@ public class MultipartItemBlock extends BlockItem {
             return true;
         }
 
-        BlockState multiState = Registration.MULTIPART_BLOCK.getDefaultState();
-        if (!world.setBlockState(pos, multiState, BlockFlags.BLOCK_UPDATE + BlockFlags.NOTIFY_NEIGHBORS + BlockFlags.UPDATE_NEIGHBORS)) {
+        BlockState multiState = Registration.MULTIPART_BLOCK.defaultBlockState();
+        if (!world.setBlock(pos, multiState, BlockFlags.BLOCK_UPDATE + BlockFlags.NOTIFY_NEIGHBORS + BlockFlags.UPDATE_NEIGHBORS)) {
             return false;
         }
 
         BlockState state = world.getBlockState(pos);
         if (state.getBlock() == Registration.MULTIPART_BLOCK) {
-            setTileEntityNBT(world, player, pos, stack);
+            updateCustomBlockEntityTag(world, player, pos, stack);
 
-            te = world.getTileEntity(pos);
+            te = world.getBlockEntity(pos);
             if (te instanceof MultipartTE) {
                 TileEntity tileEntity = createTileEntity(world, newState);
                 if (tileEntity instanceof GenericTileEntity && stack.hasTag()) {
@@ -171,7 +173,7 @@ public class MultipartItemBlock extends BlockItem {
                 return true;
             }
 
-            newState.getBlock().onBlockPlacedBy(world, pos, newState, player, stack);
+            newState.getBlock().setPlacedBy(world, pos, newState, player, stack);
 
             if (player instanceof ServerPlayerEntity) {
                 CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayerEntity) player, pos, stack);
@@ -209,11 +211,11 @@ public class MultipartItemBlock extends BlockItem {
 
 
     private RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, PlayerEntity playerIn, boolean useLiquids) {
-        float pitch = playerIn.rotationPitch;
-        float yaw = playerIn.rotationYaw;
-        double x = playerIn.getPosX();
-        double y = playerIn.getPosY() + playerIn.getEyeHeight();
-        double z = playerIn.getPosZ();
+        float pitch = playerIn.xRot;
+        float yaw = playerIn.yRot;
+        double x = playerIn.getX();
+        double y = playerIn.getY() + playerIn.getEyeHeight();
+        double z = playerIn.getZ();
         Vector3d vec3 = new Vector3d(x, y, z);
         float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
         float f3 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
@@ -228,7 +230,7 @@ public class MultipartItemBlock extends BlockItem {
         }
         Vector3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
         RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
-        return worldIn.rayTraceBlocks(context);
+        return worldIn.clip(context);
     }
 
 }

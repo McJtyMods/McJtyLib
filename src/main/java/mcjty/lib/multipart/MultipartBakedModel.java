@@ -22,7 +22,7 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
     public static final ModelResourceLocation MODEL = new ModelResourceLocation(McJtyLib.MODID + ":multipart");
 
     @Override
-    public boolean isSideLit() {
+    public boolean usesBlockLight() {
         return false;
     }
 
@@ -43,7 +43,7 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
                 MultipartTE.Part part = entry.getValue();
                 BlockState blockState = part.getState();
                 if (layer == null || RenderTypeLookup.canRenderInLayer(blockState, layer)) {
-                    IBakedModel model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(blockState);
+                    IBakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(blockState);
                     try {
                         if (!(model instanceof MultipartBakedModel)) {  // @todo safety
                             quads.addAll(model.getQuads(state, side, rand));
@@ -60,7 +60,7 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
 
 
     @Override
-    public boolean isAmbientOcclusion() {
+    public boolean useAmbientOcclusion() {
         return true;
     }
 
@@ -70,18 +70,18 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
     }
 
     @Override
-    public boolean isBuiltInRenderer() {
+    public boolean isCustomRenderer() {
         return false;
     }
 
     @Override
-    public TextureAtlasSprite getParticleTexture() {
+    public TextureAtlasSprite getParticleIcon() {
         return getTexture(new ResourceLocation("minecraft", "missingno"));  // @todo 1.15
     }
 
     @Override
-    public ItemCameraTransforms getItemCameraTransforms() {
-        return ItemCameraTransforms.DEFAULT;
+    public ItemCameraTransforms getTransforms() {
+        return ItemCameraTransforms.NO_TRANSFORMS;
     }
 
     @Override

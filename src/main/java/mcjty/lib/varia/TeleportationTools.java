@@ -17,10 +17,10 @@ import java.util.function.Function;
 public class TeleportationTools {
 
     public static void teleport(PlayerEntity player, DimensionId dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
-        DimensionId oldId = DimensionId.fromWorld(player.getEntityWorld());
+        DimensionId oldId = DimensionId.fromWorld(player.getCommandSenderWorld());
 
-        float rotationYaw = player.rotationYaw;
-        float rotationPitch = player.rotationPitch;
+        float rotationYaw = player.yRot;
+        float rotationPitch = player.xRot;
 
         if (!oldId.equals(dimension)) {
             teleportToDimension(player, dimension, destX, destY, destZ);
@@ -28,14 +28,14 @@ public class TeleportationTools {
         if (direction != null) {
             fixOrientation(player, destX, destY, destZ, direction);
         } else {
-            player.rotationYaw = rotationYaw;
-            player.rotationPitch = rotationPitch;
+            player.yRot = rotationYaw;
+            player.xRot = rotationPitch;
         }
-        player.setPositionAndUpdate(destX, destY, destZ);
+        player.teleportTo(destX, destY, destZ);
     }
 
     public static void teleportToDimension(PlayerEntity player, DimensionId dimension, double x, double y, double z) {
-        ServerWorld world = dimension.loadWorld(player.getEntityWorld());
+        ServerWorld world = dimension.loadWorld(player.getCommandSenderWorld());
         if (world == null) {
             McJtyLib.setup.getLogger().error("Something went wrong teleporting to dimension " + dimension.getName());
             return;
@@ -43,10 +43,10 @@ public class TeleportationTools {
         player.changeDimension(world, new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerWorld currentWorld, ServerWorld destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                entity.setWorld(world);
+                entity.setLevel(world);
                 world.addDuringPortalTeleport((ServerPlayerEntity) entity);
-                entity.moveForced(x, y, z);
-                entity.setPositionAndUpdate(x, y, z);
+                entity.moveTo(x, y, z);
+                entity.teleportTo(x, y, z);
                 return entity;
             }
         });
@@ -60,8 +60,8 @@ public class TeleportationTools {
         double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
         float f = (float) (MathHelper.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
         float f1 = (float) (-(MathHelper.atan2(d1, d3) * (180D / Math.PI)));
-        entity.rotationPitch = updateRotation(entity.rotationPitch, f1);
-        entity.rotationYaw = updateRotation(entity.rotationYaw, f);
+        entity.xRot = updateRotation(entity.xRot, f1);
+        entity.yRot = updateRotation(entity.yRot, f);
     }
 
     private static float updateRotation(float angle, float targetAngle) {
@@ -75,13 +75,13 @@ public class TeleportationTools {
      * entities to be killed and recreated)
      */
     public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, Direction facing) {
-        World world = entity.getEntityWorld();
+        World world = entity.getCommandSenderWorld();
         if (DimensionId.fromWorld(world).equals(DimensionId.fromWorld(destWorld))) {
             if (facing != null) {
                 fixOrientation(entity, newX, newY, newZ, facing);
             }
-            entity.setLocationAndAngles(newX, newY, newZ, entity.rotationYaw, entity.rotationPitch);
-            ((ServerWorld) destWorld).updateEntity(entity);
+            entity.moveTo(newX, newY, newZ, entity.yRot, entity.xRot);
+            ((ServerWorld) destWorld).tickNonPassenger(entity);
             return entity;
         } else {
             return entity.changeDimension((ServerWorld) destWorld, new ITeleporter() {
@@ -91,7 +91,7 @@ public class TeleportationTools {
                     if (facing != null) {
                         fixOrientation(entity, newX, newY, newZ, facing);
                     }
-                    entity.setPositionAndUpdate(newX, newY, newZ);
+                    entity.teleportTo(newX, newY, newZ);
                     return entity;
                 }
             });
@@ -100,7 +100,7 @@ public class TeleportationTools {
 
     private static void fixOrientation(Entity entity, double newX, double newY, double newZ, Direction facing) {
         if (facing != Direction.DOWN && facing != Direction.UP) {
-            facePosition(entity, newX, newY, newZ, new BlockPos(newX, newY, newZ).offset(facing, 4));
+            facePosition(entity, newX, newY, newZ, new BlockPos(newX, newY, newZ).relative(facing, 4));
         }
     }
 

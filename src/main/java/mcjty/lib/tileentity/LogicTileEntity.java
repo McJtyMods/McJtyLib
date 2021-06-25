@@ -22,7 +22,7 @@ public class LogicTileEntity extends GenericTileEntity {
     }
 
     public LogicFacing getFacing(BlockState state) {
-        return state.get(LOGIC_FACING);
+        return state.getValue(LOGIC_FACING);
     }
 
     public int getPowerOutput() {
@@ -34,10 +34,10 @@ public class LogicTileEntity extends GenericTileEntity {
             return;
         }
         powerOutput = newout;
-        markDirty();
+        setChanged();
         BlockState state = getBlockState();
         Direction outputSide = getFacing(state).getInputSide().getOpposite();
-        getWorld().neighborChanged(this.pos.offset(outputSide), state.getBlock(), this.pos);
+        getLevel().neighborChanged(this.worldPosition.relative(outputSide), state.getBlock(), this.worldPosition);
         //        getWorld().notifyNeighborsOfStateChange(this.pos, this.getBlockType());
     }
 
@@ -52,15 +52,15 @@ public class LogicTileEntity extends GenericTileEntity {
      * Returns the signal strength at one input of the block
      */
     public int getInputStrength(World world, BlockPos pos, Direction side) {
-        int power = world.getRedstonePower(pos.offset(side), side);
+        int power = world.getSignal(pos.relative(side), side);
         if (power < 15) {
             // Check if there is no redstone wire there. If there is a 'bend' in the redstone wire it is
             // not detected with world.getRedstonePower().
             // Not exactly pretty, but it's how vanilla redstone repeaters do it.
-            BlockState blockState = world.getBlockState(pos.offset(side));
+            BlockState blockState = world.getBlockState(pos.relative(side));
             Block b = blockState.getBlock();
             if (b == Blocks.REDSTONE_WIRE) {
-                power = Math.max(power, blockState.get(RedstoneWireBlock.POWER));
+                power = Math.max(power, blockState.getValue(RedstoneWireBlock.POWER));
             }
         }
 

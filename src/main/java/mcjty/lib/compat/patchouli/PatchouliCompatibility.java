@@ -14,7 +14,7 @@ public class PatchouliCompatibility {
         if (ModSetup.patchouli) {
             PatchouliAPI.instance.openBookGUI(player, id);
         } else {
-            player.sendMessage(new StringTextComponent(TextFormatting.RED + "Patchouli is missing! No manual present"), Util.DUMMY_UUID);
+            player.sendMessage(new StringTextComponent(TextFormatting.RED + "Patchouli is missing! No manual present"), Util.NIL_UUID);
         }
     }
 
@@ -22,7 +22,7 @@ public class PatchouliCompatibility {
         if (ModSetup.patchouli) {
             PatchouliAPI.instance.openBookEntry(player, id, entry, page);
         } else {
-            player.sendMessage(new StringTextComponent(TextFormatting.RED + "Patchouli is missing! No manual present"), Util.DUMMY_UUID);
+            player.sendMessage(new StringTextComponent(TextFormatting.RED + "Patchouli is missing! No manual present"), Util.NIL_UUID);
         }
     }
 }

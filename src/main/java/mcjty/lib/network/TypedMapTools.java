@@ -46,14 +46,14 @@ public class TypedMapTools {
         int size = buf.readInt();
         if (size != 0) {
             for (int i = 0 ; i < size ; i++) {
-                String key = buf.readString(32767);
+                String key = buf.readUtf(32767);
                 ArgumentType type = ArgumentType.getType(buf.readByte());
                 switch (type) {
                     case TYPE_STRING:
                         args.put(new Key<>(key, Type.STRING), NetworkTools.readStringUTF8(buf));
                         break;
                     case TYPE_UUID:
-                        args.put(new Key<>(key, Type.UUID), buf.readUniqueId());
+                        args.put(new Key<>(key, Type.UUID), buf.readUUID());
                         break;
                     case TYPE_INTEGER:
                         args.put(new Key<>(key, Type.INTEGER), buf.readInt());
@@ -138,7 +138,7 @@ public class TypedMapTools {
     public static void writeArguments(PacketBuffer buf, TypedMap args) {
         buf.writeInt(args.size());
         for (Key<?> key : args.getKeys()) {
-            buf.writeString(key.getName());
+            buf.writeUtf(key.getName());
             ArgumentType argumentType = getArgumentType(key.getType());
             buf.writeByte(argumentType.ordinal());
             switch (argumentType) {
@@ -146,7 +146,7 @@ public class TypedMapTools {
                     NetworkTools.writeStringUTF8(buf, (String)args.get(key));
                     break;
                 case TYPE_UUID:
-                    buf.writeUniqueId((UUID) args.get(key));
+                    buf.writeUUID((UUID) args.get(key));
                     break;
                 case TYPE_INTEGER:
                     buf.writeInt((Integer) args.get(key));

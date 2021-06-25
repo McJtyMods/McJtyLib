@@ -64,7 +64,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
             return w;
         }
         if (w == -1) {
-            w = mc.fontRenderer.getStringWidth(text)+6;
+            w = mc.font.width(text)+6;
         }
         return w;
     }
@@ -76,7 +76,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
             return h;
         }
         if (h == -1) {
-            h = mc.fontRenderer.FONT_HEIGHT+2;
+            h = mc.font.lineHeight+2;
         }
         return h;
     }
@@ -148,7 +148,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
         if (image != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.getTextureManager().bindTexture(image);
+            mc.getTextureManager().bind(image);
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;
             gui.blit(matrixStack, xx, yy, u, v, iw, ih);
@@ -160,15 +160,15 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         }
 
         if (text == null) {
-            mc.fontRenderer.drawString(matrixStack, "", x+dx+bounds.x, y+dy+bounds.y, col);
+            mc.font.draw(matrixStack, "", x+dx+bounds.x, y+dy+bounds.y, col);
         } else {
-            mc.fontRenderer.drawString(matrixStack, mc.fontRenderer.trimStringToWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
+            mc.font.draw(matrixStack, mc.font.plainSubstrByWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
         }
     }
 
     private int calculateVerticalOffset() {
         if (verticalAlignment != VerticalAlignment.ALIGN_TOP) {
-            int h = mc.fontRenderer.FONT_HEIGHT;
+            int h = mc.font.lineHeight;
             if (verticalAlignment == VerticalAlignment.ALIGN_BOTTOM) {
                 return bounds.height - h;
             } else {
@@ -181,7 +181,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
     private int calculateHorizontalOffset() {
         if (horizontalAlignment != HorizontalAlignment.ALIGN_LEFT) {
-            int w = mc.fontRenderer.getStringWidth(text);
+            int w = mc.font.width(text);
             if (horizontalAlignment == HorizontalAlignment.ALIGN_RIGHT) {
                 return bounds.width - w;
             } else {

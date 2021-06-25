@@ -67,12 +67,12 @@ public class GenericContainer extends Container implements IGenericContainer {
 
     @Override
     public void addShortListener(IntReferenceHolder holder) {
-        trackInt(holder);
+        addDataSlot(holder);
     }
 
     @Override
     public void addIntegerListener(IntReferenceHolder holder) {
-        trackInt(new IntReferenceHolder() {
+        addDataSlot(new IntReferenceHolder() {
             private int lastKnown;
 
             @Override
@@ -87,14 +87,14 @@ public class GenericContainer extends Container implements IGenericContainer {
             }
 
             @Override
-            public boolean isDirty() {
+            public boolean checkAndClearUpdateFlag() {
                 int i = this.get();
                 boolean flag = i != this.lastKnown;
                 this.lastKnown = i;
                 return flag;
             }
         });
-        trackInt(new IntReferenceHolder() {
+        addDataSlot(new IntReferenceHolder() {
             private int lastKnown;
 
             @Override
@@ -109,7 +109,7 @@ public class GenericContainer extends Container implements IGenericContainer {
             }
 
             @Override
-            public boolean isDirty() {
+            public boolean checkAndClearUpdateFlag() {
                 int i = this.get();
                 boolean flag = i != this.lastKnown;
                 this.lastKnown = i;
@@ -138,7 +138,7 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity player) {
+    public boolean stillValid(PlayerEntity player) {
         if (te == null || te.canPlayerAccess(player)) {
             return true;
         }
@@ -155,7 +155,7 @@ public class GenericContainer extends Container implements IGenericContainer {
         if (inv == null) {
             return null;
         }
-        for (Slot slot : inventorySlots) {
+        for (Slot slot : slots) {
             if (slot instanceof SlotItemHandler) {
                 IItemHandler itemHandler = ((SlotItemHandler) slot).getItemHandler();
                 if (itemHandler == inv && slot.getSlotIndex() == index) {
@@ -195,7 +195,7 @@ public class GenericContainer extends Container implements IGenericContainer {
             final SlotDefinition slotDefinition = slotFactory.getSlotDefinition();
             slot = new SlotItemHandler(inventory, index, x, y) {
                 @Override
-                public boolean isItemValid(ItemStack stack) {
+                public boolean mayPlace(ItemStack stack) {
                     return slotDefinition.itemStackMatches(stack);
                 }
             };
@@ -225,7 +225,7 @@ public class GenericContainer extends Container implements IGenericContainer {
         for (Range<Integer> r : ranges.asRanges()) {
             Integer start = r.lowerEndpoint();
             int end = r.upperEndpoint();
-            if (mergeItemStack(itemStack, start, end, reverse)) {
+            if (moveItemStackTo(itemStack, start, end, reverse)) {
                 return true;
             }
         }
@@ -254,12 +254,12 @@ public class GenericContainer extends Container implements IGenericContainer {
 //    }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity player, int index) {
+    public ItemStack quickMoveStack(PlayerEntity player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.getHasStack()) {
-            ItemStack origStack = slot.getStack();
+        if (slot != null && slot.hasItem()) {
+            ItemStack origStack = slot.getItem();
             itemstack = origStack.copy();
 
             if (factory.isSpecificItemSlot(index)) {
@@ -268,7 +268,7 @@ public class GenericContainer extends Container implements IGenericContainer {
                         return ItemStack.EMPTY;
                     }
                 }
-                slot.onSlotChange(origStack, itemstack);
+                slot.onQuickCraft(origStack, itemstack);
             } else if (factory.isOutputSlot(index) || factory.isInputSlot(index) || factory.isGenericSlot(index)) {
                 if (!mergeItemStacks(origStack, SlotType.SLOT_SPECIFICITEM, false)) {
                     if (!mergeItemStacks(origStack, SlotType.SLOT_PLAYERINV, true)) {
@@ -277,7 +277,7 @@ public class GenericContainer extends Container implements IGenericContainer {
                         }
                     }
                 }
-                slot.onSlotChange(origStack, itemstack);
+                slot.onQuickCraft(origStack, itemstack);
             } else if (factory.isGhostSlot(index) || factory.isGhostOutputSlot(index)) {
                 return ItemStack.EMPTY;
             } else if (factory.isPlayerInventorySlot(index)) {
@@ -301,9 +301,9 @@ public class GenericContainer extends Container implements IGenericContainer {
             }
 
             if (origStack.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
 
             if (origStack.getCount() == itemstack.getCount()) {
@@ -318,7 +318,7 @@ public class GenericContainer extends Container implements IGenericContainer {
 
 
     @Override
-    protected boolean mergeItemStack(ItemStack par1ItemStack, int fromIndex, int toIndex, boolean reverseOrder) {
+    protected boolean moveItemStackTo(ItemStack par1ItemStack, int fromIndex, int toIndex, boolean reverseOrder) {
         boolean result = false;
         int checkIndex = fromIndex;
 
@@ -332,14 +332,14 @@ public class GenericContainer extends Container implements IGenericContainer {
         if (par1ItemStack.isStackable()) {
 
             while (!par1ItemStack.isEmpty() && (!reverseOrder && checkIndex < toIndex || reverseOrder && checkIndex >= fromIndex)) {
-                slot = this.inventorySlots.get(checkIndex);
-                itemstack1 = slot.getStack();
+                slot = this.slots.get(checkIndex);
+                itemstack1 = slot.getItem();
 
-                if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem() && (par1ItemStack.getDamage() == itemstack1.getDamage())
-                        && ItemStack.areItemStackTagsEqual(par1ItemStack, itemstack1) && slot.isItemValid(par1ItemStack)) {
+                if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem() && (par1ItemStack.getDamageValue() == itemstack1.getDamageValue())
+                        && ItemStack.tagMatches(par1ItemStack, itemstack1) && slot.mayPlace(par1ItemStack)) {
 
                     int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();
-                    int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getSlotStackLimit());
+                    int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getMaxStackSize());
                     if (mergedSize <= maxStackSize) {
                         par1ItemStack.setCount(0);
                         if (mergedSize <= 0) {
@@ -347,7 +347,7 @@ public class GenericContainer extends Container implements IGenericContainer {
                         } else {
                             itemstack1.setCount(mergedSize);
                         }
-                        slot.onSlotChanged();
+                        slot.setChanged();
                         result = true;
                     } else if (itemstack1.getCount() < maxStackSize) {
                         int amount = -(maxStackSize - itemstack1.getCount());
@@ -357,7 +357,7 @@ public class GenericContainer extends Container implements IGenericContainer {
                         } else {
                             itemstack1.setCount(maxStackSize);
                         }
-                        slot.onSlotChanged();
+                        slot.setChanged();
                         result = true;
                     }
                 }
@@ -378,20 +378,20 @@ public class GenericContainer extends Container implements IGenericContainer {
             }
 
             while (!reverseOrder && checkIndex < toIndex || reverseOrder && checkIndex >= fromIndex) {
-                slot = this.inventorySlots.get(checkIndex);
-                itemstack1 = slot.getStack();
+                slot = this.slots.get(checkIndex);
+                itemstack1 = slot.getItem();
 
-                if (itemstack1.isEmpty() && slot.isItemValid(par1ItemStack)) {
+                if (itemstack1.isEmpty() && slot.mayPlace(par1ItemStack)) {
                     ItemStack in = par1ItemStack.copy();
-                    int amount1 = Math.min(in.getCount(), slot.getSlotStackLimit());
+                    int amount1 = Math.min(in.getCount(), slot.getMaxStackSize());
                     if (amount1 <= 0) {
                         in.setCount(0);
                     } else {
                         in.setCount(amount1);
                     }
 
-                    slot.putStack(in);
-                    slot.onSlotChanged();
+                    slot.set(in);
+                    slot.setChanged();
                     if (in.getCount() >= par1ItemStack.getCount()) {
                         par1ItemStack.setCount(0);
                     } else {
@@ -414,23 +414,23 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
-    public ItemStack slotClick(int index, int button, ClickType mode, PlayerEntity player) {
+    public ItemStack clicked(int index, int button, ClickType mode, PlayerEntity player) {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
-            if (slot.getHasStack()) {
-                slot.putStack(ItemStack.EMPTY);
+            if (slot.hasItem()) {
+                slot.set(ItemStack.EMPTY);
             }
 
-            ItemStack clickedWith = player.inventory.getItemStack();
+            ItemStack clickedWith = player.inventory.getCarried();
             if (!clickedWith.isEmpty()) {
                 ItemStack copy = clickedWith.copy();
                 copy.setCount(1);
-                slot.putStack(copy);
+                slot.set(copy);
             }
-            detectAndSendChanges();
+            broadcastChanges();
             return ItemStack.EMPTY;
         } else {
-            return super.slotClick(index, button, mode, player);
+            return super.clicked(index, button, mode, player);
         }
     }
 
@@ -439,8 +439,8 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
-    public void detectAndSendChanges() {
-        super.detectAndSendChanges();
+    public void broadcastChanges() {
+        super.broadcastChanges();
 
         for (IContainerDataListener data : containerData.values()) {
             if (data.isDirtyAndClear()) {
@@ -448,9 +448,9 @@ public class GenericContainer extends Container implements IGenericContainer {
                 PacketBuffer buffer = new PacketBuffer(newbuf);
                 data.toBytes(buffer);
                 PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
-                for (IContainerListener listener : this.listeners) {
+                for (IContainerListener listener : this.containerListeners) {
                     if (listener instanceof ServerPlayerEntity) {
-                        McJtyLib.networkHandler.sendTo(packet, ((ServerPlayerEntity) listener).connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+                        McJtyLib.networkHandler.sendTo(packet, ((ServerPlayerEntity) listener).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                     }
                 }
             }
@@ -460,7 +460,7 @@ public class GenericContainer extends Container implements IGenericContainer {
     public static ContainerType<Container> createContainerType(String registryName) {
         ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            TileEntity te = inv.player.getEntityWorld().getTileEntity(pos);
+            TileEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
@@ -473,7 +473,7 @@ public class GenericContainer extends Container implements IGenericContainer {
     public static <T extends Container> ContainerType<T> createContainerType() {
         ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            TileEntity te = inv.player.getEntityWorld().getTileEntity(pos);
+            TileEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
@@ -490,8 +490,8 @@ public class GenericContainer extends Container implements IGenericContainer {
             DimensionId type = DimensionId.fromPacket(data);
 
             E te = dummyTEFactory.apply(type);
-            te.setWorldAndPos(inv.player.getEntityWorld(), pos);    // Wrong world but doesn't really matter
-            CompoundNBT compound = data.readCompoundTag();
+            te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter
+            CompoundNBT compound = data.readNbt();
             te.read(compound);
 
             T container = containerFactory.apply(windowId, pos, te);

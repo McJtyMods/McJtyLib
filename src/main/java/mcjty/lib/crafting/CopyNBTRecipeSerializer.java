@@ -11,19 +11,19 @@ public class CopyNBTRecipeSerializer extends net.minecraftforge.registries.Forge
     private final ShapedRecipe.Serializer serializer = new ShapedRecipe.Serializer();
 
     @Override
-    public CopyNBTRecipe read(ResourceLocation recipeId, JsonObject json) {
-        ShapedRecipe recipe = serializer.read(recipeId, json);
+    public CopyNBTRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+        ShapedRecipe recipe = serializer.fromJson(recipeId, json);
         return new CopyNBTRecipe(recipe);
     }
 
     @Override
-    public CopyNBTRecipe read(ResourceLocation recipeId, PacketBuffer buffer) {
-        ShapedRecipe recipe = serializer.read(recipeId, buffer);
+    public CopyNBTRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+        ShapedRecipe recipe = serializer.fromNetwork(recipeId, buffer);
         return new CopyNBTRecipe(recipe);
     }
 
     @Override
-    public void write(PacketBuffer buffer, CopyNBTRecipe recipe) {
-        serializer.write(buffer, recipe.getRecipe());
+    public void toNetwork(PacketBuffer buffer, CopyNBTRecipe recipe) {
+        serializer.toNetwork(buffer, recipe.getRecipe());
     }
 }

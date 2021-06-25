@@ -160,7 +160,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
             int yy = i / 4;
             Button colorLabel = button(5 + xx * 20, 23 + yy * 20, 18, 18, null)
                     .color(color.getTextColor())
-                    .tooltips(color.getString())
+                    .tooltips(color.getSerializedName())
                     .filledBackground(0xff000000 | color.getTextColor())
                     .event(() -> {
                         currentColor = color.getTextColor() & 0xffffff;

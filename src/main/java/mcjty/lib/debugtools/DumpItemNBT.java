@@ -30,7 +30,7 @@ public class DumpItemNBT {
                 jsonObject.add("nbt", element);
             } else {
                 JsonArray array = new JsonArray();
-                for (String key : tag.keySet()) {
+                for (String key : tag.getAllKeys()) {
                     array.add(new JsonPrimitive(key));
                 }
                 jsonObject.add("nbt", array);
@@ -43,7 +43,7 @@ public class DumpItemNBT {
 
     // Use client-side
     public static void dumpHeldItem(@Nullable SimpleChannel network, @Nonnull PlayerEntity player, boolean verbose) {
-        ItemStack item = player.getHeldItemMainhand();
+        ItemStack item = player.getMainHandItem();
         if (item.isEmpty()) {
             return;
         }

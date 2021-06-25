@@ -139,7 +139,7 @@ public class JSonTools {
         ItemStack stack = new ItemStack(item, amount);
         if (obj.has("nbt")) {
             try {
-                CompoundNBT nbt = JsonToNBT.getTagFromJson(obj.get("nbt").getAsString());
+                CompoundNBT nbt = JsonToNBT.parseTag(obj.get("nbt").getAsString());
                 stack.setTag(nbt);
             } catch (CommandSyntaxException e) {
                 Logging.logError("Parsing error", e);

@@ -48,7 +48,7 @@ public class McJtyLibTOPDriver implements TOPDriver {
 
     public void addStandardProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
         if (mode == ProbeMode.EXTENDED) {
-        TileEntity te = world.getTileEntity(data.getPos());
+        TileEntity te = world.getBlockEntity(data.getPos());
         if (te instanceof GenericTileEntity) {
             GenericTileEntity generic = (GenericTileEntity) te;
                 te.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> {

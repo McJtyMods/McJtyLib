@@ -113,7 +113,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
         if (image != null) {
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.getTextureManager().bindTexture(image);
+            mc.getTextureManager().bind(image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
             gui.blit(matrixStack, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);

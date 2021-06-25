@@ -27,7 +27,7 @@ public class PacketServerCommandTyped {
 
     public PacketServerCommandTyped(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        command = buf.readString(32767);
+        command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
         if (buf.readBoolean()) {
             dimensionId = DimensionId.fromPacket(buf);
@@ -52,7 +52,7 @@ public class PacketServerCommandTyped {
 
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
-        buf.writeString(command);
+        buf.writeUtf(command);
         TypedMapTools.writeArguments(buf, params);
         if (dimensionId != null) {
             buf.writeBoolean(true);
@@ -68,15 +68,15 @@ public class PacketServerCommandTyped {
             PlayerEntity playerEntity = ctx.getSender();
             World world;
             if (dimensionId == null) {
-                world = playerEntity.getEntityWorld();
+                world = playerEntity.getCommandSenderWorld();
             } else {
-                world = WorldTools.getWorld(playerEntity.world, dimensionId);
+                world = WorldTools.getWorld(playerEntity.level, dimensionId);
             }
             if (world == null) {
                 return;
             }
-            if (world.isBlockLoaded(pos)) {
-                TileEntity te = world.getTileEntity(pos);
+            if (world.hasChunkAt(pos)) {
+                TileEntity te = world.getBlockEntity(pos);
                 if (!(te instanceof ICommandHandler)) {
                     Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                     return;

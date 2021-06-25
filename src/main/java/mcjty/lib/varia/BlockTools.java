@@ -47,11 +47,11 @@ public class BlockTools {
 
     public static String getReadableName(World world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
-        return getReadableName(state.getBlock().getItem(world, pos, state));
+        return getReadableName(state.getBlock().getCloneItemStack(world, pos, state));
     }
 
     public static String getReadableName(ItemStack stack) {
-        return stack.getDisplayName().getString() /* was getFormattedText() */;
+        return stack.getHoverName().getString() /* was getFormattedText() */;
     }
 
     @Nullable
@@ -67,14 +67,14 @@ public class BlockTools {
                     return null;
                 }
             }
-            if (itemBlock.tryPlace(context).isSuccessOrConsume()) {
+            if (itemBlock.place(context).consumesAction()) {
                 blockStack.shrink(1);
             }
             return origState;
         } else {
-            player.setHeldItem(Hand.MAIN_HAND, blockStack);
-            player.setPosition(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            blockStack.getItem().onItemUse(context);
+            player.setItemInHand(Hand.MAIN_HAND, blockStack);
+            player.setPos(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
+            blockStack.getItem().useOn(context);
             return world.getBlockState(pos);
         }
     }
@@ -117,9 +117,9 @@ public class BlockTools {
         if (block == null) {
             throw new RuntimeException("Cannot find block '" + blockName + "'!");
         }
-        BlockState state = block.getDefaultState();
+        BlockState state = block.defaultBlockState();
         if (properties != null) {
-            StateContainer<Block, BlockState> statecontainer = state.getBlock().getStateContainer();
+            StateContainer<Block, BlockState> statecontainer = state.getBlock().getStateDefinition();
             String[] split = StringUtils.split(properties, ',');
             for (String pv : split) {
                 String[] sp = StringUtils.split(pv, '=');
@@ -133,9 +133,9 @@ public class BlockTools {
     }
 
     private static <T extends Comparable<T>> BlockState setValueHelper(BlockState state, Property<T> property, String value) {
-        Optional<T> optional = property.parseValue(value);
+        Optional<T> optional = property.getValue(value);
         if (optional.isPresent()) {
-            return state.with(property, (T) optional.get());
+            return state.setValue(property, (T) optional.get());
         } else {
             return state;
         }

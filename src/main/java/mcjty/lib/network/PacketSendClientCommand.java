@@ -29,14 +29,14 @@ public class PacketSendClientCommand {
     }
 
     public void toBytes(PacketBuffer buf) {
-        buf.writeString(modid);
-        buf.writeString(command);
+        buf.writeUtf(modid);
+        buf.writeUtf(command);
         TypedMapTools.writeArguments(buf, arguments);
     }
 
     public PacketSendClientCommand(PacketBuffer buf) {
-        modid = buf.readString(32767);
-        command = buf.readString(32767);
+        modid = buf.readUtf(32767);
+        command = buf.readUtf(32767);
         arguments = TypedMapTools.readArguments(buf);
     }
 

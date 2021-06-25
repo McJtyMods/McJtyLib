@@ -120,10 +120,10 @@ public class WindowManager {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 GenericGuiContainer<?,?> gui = (GenericGuiContainer<?,?>) this.gui;
-                gui.drawHoveringText(matrixStack, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().fontRenderer);
+                gui.drawHoveringText(matrixStack, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().font);
             }
         });
-        net.minecraft.client.renderer.RenderHelper.setupGuiFlatDiffuseLighting();
+        net.minecraft.client.renderer.RenderHelper.setupForFlatItems();
     }
 
     public Optional<Widget<?>> findWidgetAtPosition(double x, double y) {

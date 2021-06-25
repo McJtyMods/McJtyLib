@@ -56,31 +56,31 @@ public class MultipartTE extends TileEntity {
     }
 
     private void dumpParts(String prefix) {
-        if (world.isRemote) {
-            System.out.println("====== CLIENT(" + prefix + ") " + pos.toString() + " ======");
+        if (level.isClientSide) {
+            System.out.println("====== CLIENT(" + prefix + ") " + worldPosition.toString() + " ======");
         } else {
-            System.out.println("====== SERVER(" + prefix + ") " + pos.toString() + " ======");
+            System.out.println("====== SERVER(" + prefix + ") " + worldPosition.toString() + " ======");
         }
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             BlockState state = entry.getValue().state;
             System.out.println("    SLOT: " + entry.getKey().name() +
                     "    " + state.getBlock().getRegistryName().toString());
             for (Property<?> property : state.getProperties()) {
-                System.out.println("        PROP: " + property + " = " + state.get(property));
+                System.out.println("        PROP: " + property + " = " + state.getValue(property));
             }
 
         }
     }
 
     public void addPart(PartSlot slot, BlockState state, TileEntity te) {
-        System.out.println("MultipartTE.addPart: " + world.isRemote);
+        System.out.println("MultipartTE.addPart: " + level.isClientSide);
         parts.put(slot, new Part(state, te));
 
         if (te instanceof GenericTileEntity) {
             ((GenericTileEntity) te).onPartAdded(slot, state, this);
         }
 
-        if (!world.isRemote) {
+        if (!level.isClientSide) {
             version++;
             markDirtyClient();
         } else {
@@ -95,7 +95,7 @@ public class MultipartTE extends TileEntity {
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             if (entry.getValue().getState() == partState) {
                 parts.remove(entry.getKey());
-                if (!world.isRemote) {
+                if (!level.isClientSide) {
                     version++;
                     markDirtyClient();
                 }
@@ -106,10 +106,10 @@ public class MultipartTE extends TileEntity {
     }
 
     public void dump() {
-        if (world.isRemote) {
-            System.out.println("CLIENT: " + pos);
+        if (level.isClientSide) {
+            System.out.println("CLIENT: " + worldPosition);
         } else {
-            System.out.println("SERVER: " + pos);
+            System.out.println("SERVER: " + worldPosition);
         }
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             System.out.println("    SLOT: " + entry.getKey());
@@ -119,7 +119,7 @@ public class MultipartTE extends TileEntity {
             Collection<Property<?>> properties = state.getProperties();
             System.out.println("        block: " + block.getRegistryName().toString());
             for (Property<?> property : properties) {
-                System.out.println("        property: " + property.getName() + " = " + state.get(property).toString());
+                System.out.println("        property: " + property.getName() + " = " + state.getValue(property).toString());
             }
         }
     }
@@ -139,17 +139,17 @@ public class MultipartTE extends TileEntity {
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         int oldVersion = version;
-        read(getBlockState(), packet.getNbtCompound());
-        if (world.isRemote && version != oldVersion) {
+        load(getBlockState(), packet.getTag());
+        if (level.isClientSide && version != oldVersion) {
             ModelDataManager.requestModelDataRefresh(this);
-            world.notifyBlockUpdate(pos, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
         }
     }
 
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT updateTag = super.getUpdateTag();
-        write(updateTag);
+        save(updateTag);
         return updateTag;
     }
 
@@ -157,16 +157,16 @@ public class MultipartTE extends TileEntity {
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTag = new CompoundNBT();
-        write(nbtTag);
-        return new SUpdateTileEntityPacket(pos, 1, nbtTag);
+        save(nbtTag);
+        return new SUpdateTileEntityPacket(worldPosition, 1, nbtTag);
     }
 
 
     public void markDirtyClient() {
-        markDirty();
-        if (world != null) {
-            BlockState state = world.getBlockState(pos);
-            world.notifyBlockUpdate(pos, state, state, 3);
+        setChanged();
+        if (level != null) {
+            BlockState state = level.getBlockState(worldPosition);
+            level.sendBlockUpdated(worldPosition, state, state, 3);
         }
     }
 
@@ -178,14 +178,14 @@ public class MultipartTE extends TileEntity {
     }
 
     public void markDirtyQuick() {
-        if (world != null) {
-            world.markChunkDirty(this.pos, this);
+        if (level != null) {
+            level.blockEntityChanged(this.worldPosition, this);
         }
     }
 
     @Override
-    public void read(BlockState st, CompoundNBT compound) {
-        super.read(st, compound);
+    public void load(BlockState st, CompoundNBT compound) {
+        super.load(st, compound);
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
         version = compound.getInt("version");
@@ -203,15 +203,15 @@ public class MultipartTE extends TileEntity {
                         CompoundNBT tc = tag.getCompound("te");
                         TileEntity te = part.tileEntity;
                         if (te == null) {
-                            te = state.getBlock().createTileEntity(state, world);// @todo
+                            te = state.getBlock().createTileEntity(state, level);// @todo
                             if (te != null) {
-                                te.setWorldAndPos(world, pos);
-                                te.read(state, tc);
-                                te.setWorldAndPos(world, pos);
+                                te.setLevelAndPosition(level, worldPosition);
+                                te.load(state, tc);
+                                te.setLevelAndPosition(level, worldPosition);
                             }
                         } else {
-                            te.read(state, tc);
-                            te.setPos(pos);
+                            te.load(state, tc);
+                            te.setPosition(worldPosition);
                         }
                     }
                     newparts.put(slot, part);
@@ -219,11 +219,11 @@ public class MultipartTE extends TileEntity {
                     TileEntity te = null;
                     if (tag.contains("te")) {
                         CompoundNBT tc = tag.getCompound("te");
-                        te = state.getBlock().createTileEntity(state, world);// @todo
+                        te = state.getBlock().createTileEntity(state, level);// @todo
                         if (te != null) {
-                            te.setWorldAndPos(world, pos);
-                            te.read(state, tc);
-                            te.setWorldAndPos(world, pos);
+                            te.setLevelAndPosition(level, worldPosition);
+                            te.load(state, tc);
+                            te.setLevelAndPosition(level, worldPosition);
                         }
                     }
                     Part part = new Part(state, te);
@@ -243,17 +243,17 @@ public class MultipartTE extends TileEntity {
 
 
     @Override
-    public void setWorldAndPos(World worldIn, BlockPos pos) {
-        super.setWorldAndPos(worldIn, pos);
+    public void setLevelAndPosition(World worldIn, BlockPos pos) {
+        super.setLevelAndPosition(worldIn, pos);
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             if (entry.getValue().getTileEntity() != null) {
-                entry.getValue().getTileEntity().setWorldAndPos(worldIn, pos);
+                entry.getValue().getTileEntity().setLevelAndPosition(worldIn, pos);
             }
         }
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundNBT save(CompoundNBT compound) {
         ListNBT list = new ListNBT();
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             PartSlot slot = entry.getKey();
@@ -267,7 +267,7 @@ public class MultipartTE extends TileEntity {
             TileEntity te = part.getTileEntity();
             if (te != null) {
                 CompoundNBT tc = new CompoundNBT();
-                tc = te.write(tc);
+                tc = te.save(tc);
                 tag.put("te", tc);
             }
 
@@ -276,7 +276,7 @@ public class MultipartTE extends TileEntity {
         compound.put("parts", list);
         compound.putInt("version", version);
 
-        return super.write(compound);
+        return super.save(compound);
     }
 
     // @todo 1.14
