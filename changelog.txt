@@ -1,4 +1,4 @@
-Upcoming:
+1.16-5.0.20:
 - Safety for getting item or fluid handler from a tile entity. Avoids log spam with fluid module for removed block
 - Updates for custom crafting recipes
 
