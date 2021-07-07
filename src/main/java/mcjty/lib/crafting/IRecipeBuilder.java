@@ -10,11 +10,11 @@ import net.minecraft.util.ResourceLocation;
 import java.util.function.Consumer;
 
 public interface IRecipeBuilder<T extends IRecipeBuilder<T>> {
-    T key(Character symbol, ITag<Item> tagIn);
+    T define(Character symbol, ITag<Item> tagIn);
 
-    T key(Character symbol, IItemProvider itemIn);
+    T define(Character symbol, IItemProvider itemIn);
 
-    T key(Character symbol, Ingredient ingredientIn);
+    T define(Character symbol, Ingredient ingredientIn);
 
     T patternLine(String patternIn);
 

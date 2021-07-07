@@ -1,32 +1,41 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class PacketSendPreferencesToClient {
+    private BuffStyle buffStyle;
     private int buffX;
     private int buffY;
     private GuiStyle style;
 
     public PacketSendPreferencesToClient(ByteBuf buf) {
+        buffStyle = BuffStyle.values()[buf.readInt()];
         buffX = buf.readInt();
         buffY = buf.readInt();
         style = GuiStyle.values()[buf.readInt()];
     }
 
     public void toBytes(ByteBuf buf) {
+        buf.writeInt(buffStyle.ordinal());
         buf.writeInt(buffX);
         buf.writeInt(buffY);
         buf.writeInt(style.ordinal());
     }
 
-    public PacketSendPreferencesToClient(int buffX, int buffY, GuiStyle style) {
+    public PacketSendPreferencesToClient(BuffStyle buffStyle, int buffX, int buffY, GuiStyle style) {
+        this.buffStyle = buffStyle;
         this.buffX = buffX;
         this.buffY = buffY;
         this.style = style;
+    }
+
+    public BuffStyle getBuffStyle() {
+        return buffStyle;
     }
 
     public int getBuffX() {

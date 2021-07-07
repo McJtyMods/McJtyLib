@@ -16,7 +16,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tags.ITag;
-import net.minecraft.tags.Tag;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
@@ -54,17 +53,17 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
     }
 
     @Override
-    public CopyNBTRecipeBuilder key(Character symbol, ITag<Item> tagIn) {
-        return this.key(symbol, Ingredient.of(tagIn));
+    public CopyNBTRecipeBuilder define(Character symbol, ITag<Item> tagIn) {
+        return this.define(symbol, Ingredient.of(tagIn));
     }
 
     @Override
-    public CopyNBTRecipeBuilder key(Character symbol, IItemProvider itemIn) {
-        return this.key(symbol, Ingredient.of(itemIn));
+    public CopyNBTRecipeBuilder define(Character symbol, IItemProvider itemIn) {
+        return this.define(symbol, Ingredient.of(itemIn));
     }
 
     @Override
-    public CopyNBTRecipeBuilder key(Character symbol, Ingredient ingredientIn) {
+    public CopyNBTRecipeBuilder define(Character symbol, Ingredient ingredientIn) {
         if (this.key.containsKey(symbol)) {
             throw new IllegalArgumentException("Symbol '" + symbol + "' is already defined!");
         } else if (symbol == ' ') {
@@ -85,7 +84,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
         }
     }
 
-    public CopyNBTRecipeBuilder addCriterion(String name, ICriterionInstance criterionIn) {
+    public CopyNBTRecipeBuilder unlockedBy(String name, ICriterionInstance criterionIn) {
         this.advancementBuilder.addCriterion(name, criterionIn);
         return this;
     }

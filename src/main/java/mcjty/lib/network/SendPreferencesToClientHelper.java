@@ -9,7 +9,7 @@ public class SendPreferencesToClientHelper {
     public static void setPreferences(PacketSendPreferencesToClient prefs) {
         PlayerEntity player = Minecraft.getInstance().player;
         McJtyLib.getPreferencesProperties(player).ifPresent(properties -> {
-            properties.setBuffXY(prefs.getBuffX(), prefs.getBuffY());
+            properties.setBuffXY(prefs.getBuffStyle(), prefs.getBuffX(), prefs.getBuffY());
             properties.setStyle(prefs.getStyle().getStyle());
         });
     }
