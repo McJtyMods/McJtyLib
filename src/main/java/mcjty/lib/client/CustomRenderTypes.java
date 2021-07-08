@@ -10,9 +10,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
 
-import net.minecraft.client.renderer.RenderState.LineState;
-import net.minecraft.client.renderer.RenderType.State;
-
 public class CustomRenderTypes extends RenderType {
 
     // Dummy
@@ -84,13 +81,22 @@ public class CustomRenderTypes extends RenderType {
                     .setShadeModelState(SMOOTH_SHADE).setLightmapState(LIGHTMAP)
                     .createCompositeState(false));
 
-    public static final RenderState.TransparencyState LINESTRIP_TRANSP = new RenderState.TransparencyState("linestrip_transp", () -> {
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
-    }, () -> {
-        RenderSystem.disableBlend();
-        RenderSystem.defaultBlendFunc();
-    });
+    // Workaround for a weird bug with lambda's
+    public static final Runnable TRANSP_ENABLE = new Runnable() {
+        @Override
+        public void run() {
+            RenderSystem.enableBlend();
+            RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
+        }
+    };
+    public static final Runnable TRANSP_DISABLE = new Runnable() {
+        @Override
+        public void run() {
+            RenderSystem.disableBlend();
+            RenderSystem.defaultBlendFunc();
+        }
+    };
+    public static final RenderState.TransparencyState LINESTRIP_TRANSP = new RenderState.TransparencyState("linestrip_transp", TRANSP_ENABLE, TRANSP_DISABLE);
 
     public static final RenderType LINESTRIP = create("linestrip",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINE_STRIP, 256, true, false,
