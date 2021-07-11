@@ -1,3 +1,6 @@
+Upcoming:
+- Support for better fake player system
+
 1.16-5.0.21:
 - Weird fix for a weird missing method error
 
