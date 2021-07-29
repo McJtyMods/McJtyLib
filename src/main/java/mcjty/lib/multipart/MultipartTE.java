@@ -1,17 +1,17 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.state.Property;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
@@ -26,15 +26,15 @@ import java.util.Map;
 
 import static mcjty.lib.setup.Registration.TYPE_MULTIPART;
 
-public class MultipartTE extends TileEntity {
+public class MultipartTE extends BlockEntity {
 
     public static final ModelProperty<Map<PartSlot, MultipartTE.Part>> PARTS = new ModelProperty<>();
 
     public static class Part {
         private final BlockState state;
-        private final TileEntity tileEntity;
+        private final BlockEntity tileEntity;
 
-        public Part(BlockState state, TileEntity tileEntity) {
+        public Part(BlockState state, BlockEntity tileEntity) {
             this.state = state;
             this.tileEntity = tileEntity;
         }
@@ -43,7 +43,7 @@ public class MultipartTE extends TileEntity {
             return state;
         }
 
-        public TileEntity getTileEntity() {
+        public BlockEntity getTileEntity() {
             return tileEntity;
         }
     }
@@ -72,7 +72,7 @@ public class MultipartTE extends TileEntity {
         }
     }
 
-    public void addPart(PartSlot slot, BlockState state, TileEntity te) {
+    public void addPart(PartSlot slot, BlockState state, BlockEntity te) {
         System.out.println("MultipartTE.addPart: " + level.isClientSide);
         parts.put(slot, new Part(state, te));
 
@@ -137,7 +137,7 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
         int oldVersion = version;
         load(getBlockState(), packet.getTag());
         if (level.isClientSide && version != oldVersion) {
@@ -147,18 +147,18 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public CompoundNBT getUpdateTag() {
-        CompoundNBT updateTag = super.getUpdateTag();
+    public CompoundTag getUpdateTag() {
+        CompoundTag updateTag = super.getUpdateTag();
         save(updateTag);
         return updateTag;
     }
 
     @Nullable
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        CompoundNBT nbtTag = new CompoundNBT();
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        CompoundTag nbtTag = new CompoundTag();
         save(nbtTag);
-        return new SUpdateTileEntityPacket(worldPosition, 1, nbtTag);
+        return new ClientboundBlockEntityDataPacket(worldPosition, 1, nbtTag);
     }
 
 
@@ -184,24 +184,24 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public void load(BlockState st, CompoundNBT compound) {
+    public void load(BlockState st, CompoundTag compound) {
         super.load(st, compound);
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
         version = compound.getInt("version");
-        ListNBT list = compound.getList("parts", Constants.NBT.TAG_COMPOUND);
+        ListTag list = compound.getList("parts", Constants.NBT.TAG_COMPOUND);
         for (int i = 0 ; i < list.size() ; i++) {
-            CompoundNBT tag = list.getCompound(i);
+            CompoundTag tag = list.getCompound(i);
 
             PartSlot slot = PartSlot.byName(tag.getString("slot"));
             if (slot != null) {
-                BlockState state = NBTUtil.readBlockState(tag);
+                BlockState state = NbtUtils.readBlockState(tag);
                 if (partExists(slot, state)) {
                     // Part is already there. Just update it
                     Part part = this.parts.get(slot);
                     if (tag.contains("te")) {
-                        CompoundNBT tc = tag.getCompound("te");
-                        TileEntity te = part.tileEntity;
+                        CompoundTag tc = tag.getCompound("te");
+                        BlockEntity te = part.tileEntity;
                         if (te == null) {
                             te = state.getBlock().createTileEntity(state, level);// @todo
                             if (te != null) {
@@ -216,9 +216,9 @@ public class MultipartTE extends TileEntity {
                     }
                     newparts.put(slot, part);
                 } else {
-                    TileEntity te = null;
+                    BlockEntity te = null;
                     if (tag.contains("te")) {
-                        CompoundNBT tc = tag.getCompound("te");
+                        CompoundTag tc = tag.getCompound("te");
                         te = state.getBlock().createTileEntity(state, level);// @todo
                         if (te != null) {
                             te.setLevelAndPosition(level, worldPosition);
@@ -243,7 +243,7 @@ public class MultipartTE extends TileEntity {
 
 
     @Override
-    public void setLevelAndPosition(World worldIn, BlockPos pos) {
+    public void setLevelAndPosition(Level worldIn, BlockPos pos) {
         super.setLevelAndPosition(worldIn, pos);
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             if (entry.getValue().getTileEntity() != null) {
@@ -253,20 +253,20 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
-        ListNBT list = new ListNBT();
+    public CompoundTag save(CompoundTag compound) {
+        ListTag list = new ListTag();
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             PartSlot slot = entry.getKey();
             Part part = entry.getValue();
 
             BlockState state = part.getState();
-            CompoundNBT tag = NBTUtil.writeBlockState(state);
+            CompoundTag tag = NbtUtils.writeBlockState(state);
 
             tag.putString("slot", slot.name());
 
-            TileEntity te = part.getTileEntity();
+            BlockEntity te = part.getTileEntity();
             if (te != null) {
-                CompoundNBT tc = new CompoundNBT();
+                CompoundTag tc = new CompoundTag();
                 tc = te.save(tc);
                 tag.put("te", tc);
             }

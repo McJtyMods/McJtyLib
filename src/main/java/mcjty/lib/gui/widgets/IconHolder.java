@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
@@ -10,7 +10,7 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,7 +138,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     @Override
-    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
@@ -161,7 +161,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
     @Override
-    public void drawPhase2(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void drawPhase2(Screen gui, PoseStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }

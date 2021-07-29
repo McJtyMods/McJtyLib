@@ -4,11 +4,11 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -25,7 +25,7 @@ public class PacketServerCommandTyped {
     protected String command;
     protected TypedMap params;
 
-    public PacketServerCommandTyped(PacketBuffer buf) {
+    public PacketServerCommandTyped(FriendlyByteBuf buf) {
         pos = buf.readBlockPos();
         command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
@@ -50,7 +50,7 @@ public class PacketServerCommandTyped {
         this.dimensionId = dimensionId;
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
         buf.writeUtf(command);
         TypedMapTools.writeArguments(buf, params);
@@ -65,8 +65,8 @@ public class PacketServerCommandTyped {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            PlayerEntity playerEntity = ctx.getSender();
-            World world;
+            Player playerEntity = ctx.getSender();
+            Level world;
             if (dimensionId == null) {
                 world = playerEntity.getCommandSenderWorld();
             } else {
@@ -76,7 +76,7 @@ public class PacketServerCommandTyped {
                 return;
             }
             if (world.hasChunkAt(pos)) {
-                TileEntity te = world.getBlockEntity(pos);
+                BlockEntity te = world.getBlockEntity(pos);
                 if (!(te instanceof ICommandHandler)) {
                     Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                     return;

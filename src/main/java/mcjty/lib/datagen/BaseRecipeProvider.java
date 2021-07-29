@@ -1,15 +1,15 @@
 package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.IRecipeBuilder;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.data.*;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.tags.Tag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.Tags;
 
 import java.util.HashMap;
@@ -18,6 +18,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 
 public class BaseRecipeProvider extends RecipeProvider {
 
@@ -29,12 +34,12 @@ public class BaseRecipeProvider extends RecipeProvider {
         return this;
     }
 
-    protected BaseRecipeProvider add(char c, ITag<Item> itemTag) {
+    protected BaseRecipeProvider add(char c, Tag<Item> itemTag) {
         defaultIngredients.put(c, Ingredient.of(itemTag));
         return this;
     }
 
-    protected BaseRecipeProvider add(char c, IItemProvider itemProvider) {
+    protected BaseRecipeProvider add(char c, ItemLike itemProvider) {
         defaultIngredients.put(c, Ingredient.of(itemProvider));
         return this;
     }
@@ -44,7 +49,7 @@ public class BaseRecipeProvider extends RecipeProvider {
         return this;
     }
 
-    private void buildIntern(Consumer<IFinishedRecipe> consumer,
+    private void buildIntern(Consumer<FinishedRecipe> consumer,
                              Consumer<String> lineConsumer, BiConsumer<Character, Ingredient> ingredientConsumer, String... lines) {
         Set<Character> characters = new HashSet<>();
         for (String line : lines) {
@@ -59,30 +64,30 @@ public class BaseRecipeProvider extends RecipeProvider {
         }
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, IRecipeBuilder builder, String... lines) {
+    protected void build(Consumer<FinishedRecipe> consumer, IRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::define, lines);
         builder.setGroup(group).build(consumer);
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, ShapedRecipeBuilder builder, String... lines) {
+    protected void build(Consumer<FinishedRecipe> consumer, ShapedRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::pattern, builder::define, lines);
         builder.group(group).save(consumer);
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, ShapelessRecipeBuilder builder) {
+    protected void build(Consumer<FinishedRecipe> consumer, ShapelessRecipeBuilder builder) {
         builder.group(group).save(consumer);
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, ShapelessRecipeBuilder builder) {
+    protected void build(Consumer<FinishedRecipe> consumer, ResourceLocation id, ShapelessRecipeBuilder builder) {
         builder.group(group).save(consumer, id);
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, IRecipeBuilder builder, String... lines) {
+    protected void build(Consumer<FinishedRecipe> consumer, ResourceLocation id, IRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::define, lines);
         builder.setGroup(group).build(consumer, id);
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, ShapedRecipeBuilder builder, String... lines) {
+    protected void build(Consumer<FinishedRecipe> consumer, ResourceLocation id, ShapedRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::pattern, builder::define, lines);
         builder.group(group).save(consumer, id);
     }

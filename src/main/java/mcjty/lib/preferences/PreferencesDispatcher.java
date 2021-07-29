@@ -1,8 +1,8 @@
 package mcjty.lib.preferences;
 
 import mcjty.lib.setup.ModSetup;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
@@ -11,7 +11,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializable<CompoundNBT> {
+public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
     private final PreferencesProperties properties = createProperties();
     private final LazyOptional<PreferencesProperties> propertiesCap = LazyOptional.of(() -> properties);
@@ -36,14 +36,14 @@ public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializa
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         properties.saveNBTData(nbt);
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         properties.loadNBTData(nbt);
     }
 

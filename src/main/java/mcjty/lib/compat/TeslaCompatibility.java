@@ -1,30 +1,30 @@
 package mcjty.lib.compat;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
 
 import javax.annotation.Nullable;
 
 public class TeslaCompatibility {
 
-    public static boolean isEnergyHandler(TileEntity te, @Nullable Direction side) {
+    public static boolean isEnergyHandler(BlockEntity te, @Nullable Direction side) {
         return false;   // @todo 1.14 return te != null && te.hasCapability(TeslaCapabilities.CAPABILITY_HOLDER, side);
     }
 
-    public static boolean isEnergyReceiver(TileEntity te, @Nullable Direction side) {
+    public static boolean isEnergyReceiver(BlockEntity te, @Nullable Direction side) {
         return false;   // @todo 1.14 return te != null && te.hasCapability(TeslaCapabilities.CAPABILITY_CONSUMER, side);
     }
 
-    public static long getEnergy(TileEntity te, @Nullable Direction side) {
+    public static long getEnergy(BlockEntity te, @Nullable Direction side) {
         return 0;   // @todo 1.14 return te.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getStoredPower();
     }
 
-    public static long getMaxEnergy(TileEntity te, @Nullable Direction side) {
+    public static long getMaxEnergy(BlockEntity te, @Nullable Direction side) {
         return 0;   // @todo 1.14 return te.getCapability(TeslaCapabilities.CAPABILITY_HOLDER, side).getCapacity();
     }
 
-    public static long receiveEnergy(TileEntity te, @Nullable Direction from, long maxReceive) {
+    public static long receiveEnergy(BlockEntity te, @Nullable Direction from, long maxReceive) {
         return 0;   // @todo 1.14 return te.getCapability(TeslaCapabilities.CAPABILITY_CONSUMER, from).givePower(maxReceive, false);
     }
 

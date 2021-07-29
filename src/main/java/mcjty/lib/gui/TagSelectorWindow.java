@@ -3,10 +3,10 @@ package mcjty.lib.gui;
 import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.widgets.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashSet;
 import java.util.List;

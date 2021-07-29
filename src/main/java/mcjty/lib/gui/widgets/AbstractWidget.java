@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
@@ -13,9 +13,9 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -123,7 +123,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         }
     }
 
-    protected void drawBox(MatrixStack matrixStack, int xx, int yy, int color) {
+    protected void drawBox(PoseStack matrixStack, int xx, int yy, int color) {
         Screen.fill(matrixStack, xx, yy, xx, yy + bounds.height, color);
         Screen.fill(matrixStack, xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
         Screen.fill(matrixStack, xx, yy, xx + bounds.width, yy, color);
@@ -326,7 +326,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         }
     }
 
-    protected void drawBackground(Screen gui, MatrixStack matrixStack, int x, int y, int w, int h) {
+    protected void drawBackground(Screen gui, PoseStack matrixStack, int x, int y, int w, int h) {
         if (!visible) {
             return;
         }
@@ -358,39 +358,39 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         }
     }
 
-    protected void drawBackground(Screen gui, MatrixStack matrixStack, int x, int y) {
+    protected void drawBackground(Screen gui, PoseStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
         drawBackground(gui, matrixStack, x, y, bounds.width, bounds.height);
     }
 
-    protected void drawStyledBoxNormal(Window window, MatrixStack matrixStack, int x1, int y1, int x2, int y2) {
+    protected void drawStyledBoxNormal(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2) {
         drawStyledBox(window, matrixStack, x1, y1, x2, y2,
                 StyleConfig.colorButtonBorderTopLeft, StyleConfig.colorButtonFiller, StyleConfig.colorButtonFillerGradient1, StyleConfig.colorButtonFillerGradient2, StyleConfig.colorButtonBorderBottomRight);
     }
 
-    protected void drawStyledBoxNormal(Window window, MatrixStack matrixStack, int x1, int y1, int x2, int y2, int averageOverride) {
+    protected void drawStyledBoxNormal(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2, int averageOverride) {
         drawStyledBox(window, matrixStack, x1, y1, x2, y2,
                 StyleConfig.colorButtonBorderTopLeft, averageOverride, averageOverride, averageOverride, StyleConfig.colorButtonBorderBottomRight);
     }
 
-    protected void drawStyledBoxSelected(Window window, MatrixStack matrixStack, int x1, int y1, int x2, int y2) {
+    protected void drawStyledBoxSelected(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2) {
         drawStyledBox(window, matrixStack, x1, y1, x2, y2,
                 StyleConfig.colorButtonSelectedBorderTopLeft, StyleConfig.colorButtonSelectedFiller, StyleConfig.colorButtonSelectedFillerGradient1, StyleConfig.colorButtonSelectedFillerGradient2, StyleConfig.colorButtonSelectedBorderBottomRight);
     }
 
-    protected void drawStyledBoxHovering(Window window, MatrixStack matrixStack, int x1, int y1, int x2, int y2) {
+    protected void drawStyledBoxHovering(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2) {
         drawStyledBox(window, matrixStack, x1, y1, x2, y2,
                 StyleConfig.colorButtonHoveringBorderTopLeft, StyleConfig.colorButtonHoveringFiller, StyleConfig.colorButtonHoveringFillerGradient1, StyleConfig.colorButtonHoveringFillerGradient2, StyleConfig.colorButtonHoveringBorderBottomRight);
     }
 
-    protected void drawStyledBoxDisabled(Window window, MatrixStack matrixStack, int x1, int y1, int x2, int y2) {
+    protected void drawStyledBoxDisabled(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2) {
         drawStyledBox(window, matrixStack, x1, y1, x2, y2,
                 StyleConfig.colorButtonDisabledBorderTopLeft, StyleConfig.colorButtonDisabledFiller, StyleConfig.colorButtonDisabledFillerGradient1, StyleConfig.colorButtonDisabledFillerGradient2, StyleConfig.colorButtonDisabledBorderBottomRight);
     }
 
-    private void drawStyledBox(Window window, MatrixStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int average1, int average2, int dark) {
+    private void drawStyledBox(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int average1, int average2, int dark) {
         switch (window.getCurrentStyle()) {
             case STYLE_BEVEL:
                 RenderHelper.drawThinButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
@@ -411,12 +411,12 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
         drawBackground(gui, matrixStack, x, y);
     }
 
     @Override
-    public void drawPhase2(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void drawPhase2(Screen gui, PoseStack matrixStack, int x, int y) {
 
     }
 

@@ -1,6 +1,6 @@
 package mcjty.lib.varia;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -45,13 +45,13 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         return fluid.getAmount();
     }
 
-    public CustomTank readFromNBT(CompoundNBT nbt) {
+    public CustomTank readFromNBT(CompoundTag nbt) {
         FluidStack fluid = FluidStack.loadFluidStackFromNBT(nbt);
         setFluid(fluid);
         return this;
     }
 
-    public CompoundNBT writeToNBT(CompoundNBT nbt) {
+    public CompoundTag writeToNBT(CompoundTag nbt) {
         fluid.writeToNBT(nbt);
         return nbt;
     }

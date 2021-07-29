@@ -2,20 +2,26 @@ package mcjty.lib.multipart;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.client.AbstractDynamicBakedModel;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.model.data.IModelData;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 
 public class MultipartBakedModel extends AbstractDynamicBakedModel {
 
@@ -42,8 +48,8 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
             for (Map.Entry<PartSlot, MultipartTE.Part> entry : parts.entrySet()) {
                 MultipartTE.Part part = entry.getValue();
                 BlockState blockState = part.getState();
-                if (layer == null || RenderTypeLookup.canRenderInLayer(blockState, layer)) {
-                    IBakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(blockState);
+                if (layer == null || ItemBlockRenderTypes.canRenderInLayer(blockState, layer)) {
+                    BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(blockState);
                     try {
                         if (!(model instanceof MultipartBakedModel)) {  // @todo safety
                             quads.addAll(model.getQuads(state, side, rand));
@@ -80,13 +86,13 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
     }
 
     @Override
-    public ItemCameraTransforms getTransforms() {
-        return ItemCameraTransforms.NO_TRANSFORMS;
+    public ItemTransforms getTransforms() {
+        return ItemTransforms.NO_TRANSFORMS;
     }
 
     @Override
-    public ItemOverrideList getOverrides() {
-        return ItemOverrideList.EMPTY;
+    public ItemOverrides getOverrides() {
+        return ItemOverrides.EMPTY;
     }
 
 }

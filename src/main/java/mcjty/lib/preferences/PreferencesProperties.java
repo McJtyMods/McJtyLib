@@ -4,10 +4,10 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -30,25 +30,25 @@ public class PreferencesProperties {
     public PreferencesProperties() {
     }
 
-    public void tick(ServerPlayerEntity player) {
+    public void tick(ServerPlayer player) {
         if (dirty) {
             syncToClient(player);
         }
     }
 
-    private void syncToClient(ServerPlayerEntity player) {
+    private void syncToClient(ServerPlayer player) {
         McJtyLib.networkHandler.sendTo(new PacketSendPreferencesToClient(buffStyle, buffX, buffY, style), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         dirty = false;
     }
 
-    public void saveNBTData(CompoundNBT compound) {
+    public void saveNBTData(CompoundTag compound) {
         compound.putString("buffStyle", buffStyle.getName());
         compound.putInt("buffX", buffX);
         compound.putInt("buffY", buffY);
         compound.putString("style", style.getStyle());
     }
 
-    public void loadNBTData(CompoundNBT compound) {
+    public void loadNBTData(CompoundTag compound) {
         buffStyle = BuffStyle.getStyle(compound.getString("buffStyle"));
         if (buffStyle == null) {
             buffStyle = BuffStyle.BOTRIGHT;
@@ -121,12 +121,12 @@ public class PreferencesProperties {
         CapabilityManager.INSTANCE.register(PreferencesProperties.class, new Capability.IStorage<PreferencesProperties>() {
 
             @Override
-            public INBT writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
+            public Tag writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, INBT nbt) {
+            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, Tag nbt) {
                 throw new UnsupportedOperationException();
             }
 

@@ -1,12 +1,12 @@
 package mcjty.lib.crafting;
 
 import com.google.gson.JsonObject;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
-public class CopyNBTRecipeSerializer extends net.minecraftforge.registries.ForgeRegistryEntry<IRecipeSerializer<?>> implements IRecipeSerializer<CopyNBTRecipe> {
+public class CopyNBTRecipeSerializer extends net.minecraftforge.registries.ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<CopyNBTRecipe> {
 
     private final ShapedRecipe.Serializer serializer = new ShapedRecipe.Serializer();
 
@@ -17,13 +17,13 @@ public class CopyNBTRecipeSerializer extends net.minecraftforge.registries.Forge
     }
 
     @Override
-    public CopyNBTRecipe fromNetwork(ResourceLocation recipeId, PacketBuffer buffer) {
+    public CopyNBTRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
         ShapedRecipe recipe = serializer.fromNetwork(recipeId, buffer);
         return new CopyNBTRecipe(recipe);
     }
 
     @Override
-    public void toNetwork(PacketBuffer buffer, CopyNBTRecipe recipe) {
+    public void toNetwork(FriendlyByteBuf buffer, CopyNBTRecipe recipe) {
         serializer.toNetwork(buffer, recipe.getRecipe());
     }
 }

@@ -1,6 +1,6 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
@@ -18,10 +18,10 @@ import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
@@ -269,7 +269,7 @@ public class Window {
         return windowCmd;
     }
 
-    public void draw(MatrixStack matrixStack) {
+    public void draw(PoseStack matrixStack) {
         int x = getRelativeX();
         int y = getRelativeY();
 

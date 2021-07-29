@@ -1,26 +1,26 @@
 package mcjty.lib.api.container;
 
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
 public class CapabilityContainerProvider {
 
-    @CapabilityInject(INamedContainerProvider.class)
-    public static Capability<INamedContainerProvider> CONTAINER_PROVIDER_CAPABILITY = null;
+    @CapabilityInject(MenuProvider.class)
+    public static Capability<MenuProvider> CONTAINER_PROVIDER_CAPABILITY = null;
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(INamedContainerProvider.class, new Capability.IStorage<INamedContainerProvider>() {
+        CapabilityManager.INSTANCE.register(MenuProvider.class, new Capability.IStorage<MenuProvider>() {
             @Override
-            public INBT writeNBT(Capability<INamedContainerProvider> capability, INamedContainerProvider instance, Direction side) {
+            public Tag writeNBT(Capability<MenuProvider> capability, MenuProvider instance, Direction side) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void readNBT(Capability<INamedContainerProvider> capability, INamedContainerProvider instance, Direction side, INBT base) {
+            public void readNBT(Capability<MenuProvider> capability, MenuProvider instance, Direction side, Tag base) {
                 throw new UnsupportedOperationException();
             }
         }, () -> { throw new UnsupportedOperationException(); });

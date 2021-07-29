@@ -1,14 +1,14 @@
 package mcjty.lib.varia;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
 
 public class BlockPosTools {
 
     public static final BlockPos INVALID = new BlockPos(-1, -1, -1);
 
-    public static BlockPos read(CompoundNBT tagCompound, String tagName) {
+    public static BlockPos read(CompoundTag tagCompound, String tagName) {
         int[] array = tagCompound.getIntArray(tagName);
         if (array.length == 0) {
             return null;
@@ -17,7 +17,7 @@ public class BlockPosTools {
         }
     }
 
-    public static void write(CompoundNBT tagCompound, String tagName, BlockPos coordinate) {
+    public static void write(CompoundTag tagCompound, String tagName, BlockPos coordinate) {
         if (coordinate == null) {
             tagCompound.putIntArray(tagName, new int[] { });
         } else {
@@ -25,8 +25,8 @@ public class BlockPosTools {
         }
     }
 
-    public static CompoundNBT write(BlockPos coordinate) {
-        CompoundNBT tagCompound = new CompoundNBT();
+    public static CompoundTag write(BlockPos coordinate) {
+        CompoundTag tagCompound = new CompoundTag();
         write(tagCompound, "c", coordinate);
         return tagCompound;
     }

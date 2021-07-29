@@ -17,45 +17,43 @@ import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tooltips.ITooltipSettings;
 import mcjty.lib.varia.*;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.state.Property;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolType;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings {
 
     private final boolean infusable;
-    private final Supplier<TileEntity> tileEntitySupplier;
     private final TooltipBuilder tooltipBuilder;
     private final ToolType toolType;
     private final int harvestLevel;
@@ -69,7 +67,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public BaseBlock(BlockBuilder builder) {
         super(builder.getProperties());
         this.infusable = builder.isInfusable();
-        this.tileEntitySupplier = builder.getTileEntitySupplier();
         this.tooltipBuilder = builder.getTooltipBuilder();
         this.toolType = builder.getToolType();
         this.harvestLevel = builder.getHarvestLevel();
@@ -83,11 +80,11 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public static void setInfused(ItemStack stack, int infused) {
-        NBTTools.setInfoNBT(stack, CompoundNBT::putInt, "infused", infused);
+        NBTTools.setInfoNBT(stack, CompoundTag::putInt, "infused", infused);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable IBlockReader world, List<ITextComponent> tooltip, ITooltipFlag advanced) {
+    public void appendHoverText(ItemStack stack, @Nullable BlockGetter world, List<Component> tooltip, TooltipFlag advanced) {
         intAddInformation(stack, tooltip);
 
         if (tooltipBuilder.isActive()) {
@@ -95,17 +92,17 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
     }
 
-    private void intAddInformation(ItemStack itemStack, List<ITextComponent> list) {
-        CompoundNBT tagCompound = itemStack.getTag();
+    private void intAddInformation(ItemStack itemStack, List<Component> list) {
+        CompoundTag tagCompound = itemStack.getTag();
         if (tagCompound != null) {
             if (tagCompound.contains("Energy")) {
                 long energy = tagCompound.getLong("Energy");
-                list.add(new StringTextComponent(TextFormatting.GREEN + "Energy: " + energy + " rf"));
+                list.add(new TextComponent(ChatFormatting.GREEN + "Energy: " + energy + " rf"));
             }
             if (isInfusable()) {
                 int infused = getInfused(itemStack);
                 int pct = infused * 100 / GeneralConfig.maxInfuse.get();
-                list.add(new StringTextComponent(TextFormatting.YELLOW + "Infused: " + pct + "%"));
+                list.add(new TextComponent(ChatFormatting.YELLOW + "Infused: " + pct + "%"));
             }
 
             if (GeneralConfig.manageOwnership.get() && tagCompound.contains("owner")) {
@@ -116,25 +113,25 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 }
 
                 if (securityChannel == -1) {
-                    list.add(new StringTextComponent(TextFormatting.YELLOW + "Owned by: " + owner));
+                    list.add(new TextComponent(ChatFormatting.YELLOW + "Owned by: " + owner));
                 } else {
-                    list.add(new StringTextComponent(TextFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")"));
+                    list.add(new TextComponent(ChatFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")"));
                 }
 
                 if (!tagCompound.contains("idM")) {
-                    list.add(new StringTextComponent(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!"));
+                    list.add(new TextComponent(ChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!"));
                 }
             }
         }
     }
 
     public static int getInfused(ItemStack itemStack) {
-        return NBTTools.getInfoNBT(itemStack, CompoundNBT::getInt, "infused", 0);
+        return NBTTools.getInfoNBT(itemStack, CompoundTag::getInt, "infused", 0);
     }
 
     // This if this block was activated with a wrench
-    private WrenchUsage testWrenchUsage(BlockPos pos, PlayerEntity player) {
-        ItemStack itemStack = player.getItemInHand(Hand.MAIN_HAND);
+    private WrenchUsage testWrenchUsage(BlockPos pos, Player player) {
+        ItemStack itemStack = player.getItemInHand(InteractionHand.MAIN_HAND);
         WrenchUsage wrenchUsed = WrenchUsage.NOT;
         if (!itemStack.isEmpty()) {
             Item item = itemStack.getItem();
@@ -148,7 +145,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return wrenchUsed;
     }
 
-    protected WrenchUsage getWrenchUsage(BlockPos pos, PlayerEntity player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
+    protected WrenchUsage getWrenchUsage(BlockPos pos, Player player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
         if (item instanceof SmartWrench) {
             switch(((SmartWrench)item).getMode(itemStack)) {
                 case MODE_WRENCH: return WrenchUsage.NORMAL;
@@ -165,33 +162,33 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @SuppressWarnings("deprecation")
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
-        TileEntity te = world.getBlockEntity(pos);
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
+        BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof GenericTileEntity) {
-            ActionResultType resultType = ((GenericTileEntity) te).onBlockActivated(state, player, hand, result);
-            if (resultType != ActionResultType.PASS) {
+            InteractionResult resultType = ((GenericTileEntity) te).onBlockActivated(state, player, hand, result);
+            if (resultType != InteractionResult.PASS) {
                 return resultType;
             }
         }
         ItemStack heldItem = player.getItemInHand(hand);
         if (handleModule(world, pos, state, player, hand, heldItem, result)) {
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
         WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
         switch (wrenchUsed) {
-            case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
-            case NORMAL:       return wrenchUse(world, pos, result.getDirection(), player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
-            case SNEAKING:     return wrenchSneak(world, pos, player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
-            case DISABLED:     return wrenchDisabled(world, pos, player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
-            case SELECT:       return wrenchSelect(world, pos, player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
-            case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player) ? ActionResultType.SUCCESS : ActionResultType.PASS;
+            case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case NORMAL:       return wrenchUse(world, pos, result.getDirection(), player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case SNEAKING:     return wrenchSneak(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case DISABLED:     return wrenchDisabled(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case SELECT:       return wrenchSelect(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
         }
-        return ActionResultType.PASS;
+        return InteractionResult.PASS;
     }
 
-    public boolean handleModule(World world, BlockPos pos, BlockState state, PlayerEntity player, Hand hand, ItemStack heldItem, BlockRayTraceResult result) {
+    public boolean handleModule(Level world, BlockPos pos, BlockState state, Player player, InteractionHand hand, ItemStack heldItem, BlockHitResult result) {
         if (!heldItem.isEmpty()) {
-            TileEntity te = world.getBlockEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             if (te != null) {
                 return te.getCapability(CapabilityModuleSupport.MODULE_CAPABILITY).map(h -> {
                     if (h.isModule(heldItem)) {
@@ -206,8 +203,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return false;
     }
 
-    protected boolean wrenchUse(World world, BlockPos pos, Direction side, PlayerEntity player) {
-        TileEntity tileEntity = world.getBlockEntity(pos);
+    protected boolean wrenchUse(Level world, BlockPos pos, Direction side, Player player) {
+        BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof GenericTileEntity) {
             if (!((GenericTileEntity) tileEntity).wrenchUse(world, pos, side, player)) {
                 rotate(world.getBlockState(pos), world, pos, Rotation.CLOCKWISE_90);
@@ -218,13 +215,13 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return true;
     }
 
-    protected boolean wrenchSneak(World world, BlockPos pos, PlayerEntity player) {
+    protected boolean wrenchSneak(Level world, BlockPos pos, Player player) {
         // @todo
         breakAndRemember(world, player, pos);
         return true;
     }
 
-    protected void breakAndRemember(World world, PlayerEntity player, BlockPos pos) {
+    protected void breakAndRemember(Level world, Player player, BlockPos pos) {
         if (!world.isClientSide) {
             playerDestroy(world, player, pos, world.getBlockState(pos), world.getBlockEntity(pos), ItemStack.EMPTY);
             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -232,20 +229,20 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
 
-    protected boolean wrenchDisabled(World world, BlockPos pos, PlayerEntity player) {
+    protected boolean wrenchDisabled(Level world, BlockPos pos, Player player) {
         return false;
     }
 
-    protected boolean wrenchSelect(World world, BlockPos pos, PlayerEntity player) {
+    protected boolean wrenchSelect(Level world, BlockPos pos, Player player) {
         return false;
     }
 
-    protected boolean wrenchSneakSelect(World world, BlockPos pos, PlayerEntity player) {
+    protected boolean wrenchSneakSelect(Level world, BlockPos pos, Player player) {
         return false;
     }
 
-    protected boolean openGui(World world, int x, int y, int z, PlayerEntity player) {
-        TileEntity te = world.getBlockEntity(new BlockPos(x, y, z));
+    protected boolean openGui(Level world, int x, int y, int z, Player player) {
+        BlockEntity te = world.getBlockEntity(new BlockPos(x, y, z));
         if (te == null) {
             return false;
         }
@@ -256,20 +253,20 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             if (checkAccess(world, player, te)) {
                 return true;
             }
-            NetworkHooks.openGui((ServerPlayerEntity) player, h, te.getBlockPos());
+            NetworkHooks.openGui((ServerPlayer) player, h, te.getBlockPos());
             return true;
         }).orElse(false);
     }
 
 
     @Override
-    public void setPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
         if (!world.isClientSide && GeneralConfig.manageOwnership.get()) {
             setOwner(world, pos, placer);
         }
 
-        TileEntity te = world.getBlockEntity(pos);
+        BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof GenericTileEntity) {
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
             genericTileEntity.onBlockPlacedBy(world, pos, state, placer, stack);
@@ -280,41 +277,41 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @SuppressWarnings("deprecation")
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
         super.neighborChanged(state, world, pos, blockIn, fromPos, p_220069_6_);
         checkRedstone(world, pos);
     }
 
-    protected void checkRedstone(World world, BlockPos pos) {
-        TileEntity te = world.getBlockEntity(pos);
+    protected void checkRedstone(Level world, BlockPos pos) {
+        BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof GenericTileEntity) {
             ((GenericTileEntity) te).checkRedstone(world, pos);
         }
     }
 
 
-    protected void setOwner(World world, BlockPos pos, LivingEntity entity) {
-        TileEntity te = world.getBlockEntity(pos);
-        if (te instanceof GenericTileEntity && entity instanceof PlayerEntity) {
+    protected void setOwner(Level world, BlockPos pos, LivingEntity entity) {
+        BlockEntity te = world.getBlockEntity(pos);
+        if (te instanceof GenericTileEntity && entity instanceof Player) {
             GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-            PlayerEntity player = (PlayerEntity) entity;
+            Player player = (Player) entity;
             genericTileEntity.setOwner(player);
         }
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+    public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
         if (hasTileEntity(state)) {
             super.triggerEvent(state, worldIn, pos, id, param);
-            TileEntity tileentity = worldIn.getBlockEntity(pos);
+            BlockEntity tileentity = worldIn.getBlockEntity(pos);
             return tileentity == null ? false : tileentity.triggerEvent(id, param);
         } else {
             return super.triggerEvent(state, worldIn, pos, id, param);
         }
     }
 
-    protected boolean checkAccess(World world, PlayerEntity player, TileEntity te) {
+    protected boolean checkAccess(Level world, Player player, BlockEntity te) {
         if (te instanceof GenericTileEntity) {
             ((GenericTileEntity) te).checkAccess(player);
         }
@@ -332,11 +329,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return harvestLevel;
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return tileEntitySupplier != null;
-    }
-
     public RotationType getRotationType() {
         return RotationType.ROTATION;
     }
@@ -345,27 +337,17 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return infusable;
     }
 
-    @Nullable
-    @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        if (tileEntitySupplier == null) {
-            return null;
-        } else {
-            return tileEntitySupplier.get();
-        }
-    }
-
     @Nonnull
     @Override
-    public PartSlot getSlotFromState(World world, BlockPos pos, BlockState newState) {
+    public PartSlot getSlotFromState(Level world, BlockPos pos, BlockState newState) {
         return PartSlot.NONE;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public void onRemove(BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState newstate, boolean isMoving) {
+    public void onRemove(BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull BlockState newstate, boolean isMoving) {
         if (!world.isClientSide) {
-            TileEntity te = world.getBlockEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             if (te instanceof GenericTileEntity) {
                 GenericTileEntity genericTileEntity = (GenericTileEntity) te;
                 genericTileEntity.onReplaced(world, pos, state, newstate);
@@ -391,7 +373,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         for (Property<?> property : getProperties()) {
             builder.add(property);
         }
@@ -400,8 +382,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        PlayerEntity placer = context.getPlayer();
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Player placer = context.getPlayer();
         BlockPos pos = context.getClickedPos();
         BlockState state = super.getStateForPlacement(context);
         switch (getRotationType()) {
@@ -437,7 +419,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     @Override
-    public BlockState rotate(BlockState state, IWorld world, BlockPos pos, Rotation rot) {
+    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rot) {
         switch (getRotationType()) {
             case HORIZROTATION:
                 state = state.setValue(BlockStateProperties.HORIZONTAL_FACING, rot.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
@@ -448,7 +430,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             case NONE:
                 break;
         }
-        TileEntity tileEntity = world.getBlockEntity(pos);
+        BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof GenericTileEntity) {
             ((GenericTileEntity) tileEntity).rotateBlock(rot);
         }

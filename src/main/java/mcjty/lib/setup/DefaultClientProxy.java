@@ -1,36 +1,36 @@
 package mcjty.lib.setup;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.Level;
 
 public class DefaultClientProxy implements IProxy {
 
     @Override
-    public World getClientWorld() {
+    public Level getClientWorld() {
         return Minecraft.getInstance().level;
     }
 
     @Override
-    public World getWorld() {
+    public Level getWorld() {
         return Minecraft.getInstance().level;
     }
 
     @Override
-    public PlayerEntity getClientPlayer() {
+    public Player getClientPlayer() {
         return Minecraft.getInstance().player;
     }
 
     @Override
-    public RecipeManager getRecipeManager(World world) {
+    public RecipeManager getRecipeManager(Level world) {
         return world.getRecipeManager();
     }
 
     @Override
-    public RayTraceResult getClientMouseOver() {
+    public HitResult getClientMouseOver() {
         return Minecraft.getInstance().hitResult;
     }
 

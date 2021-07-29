@@ -1,13 +1,13 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.client.GuiTools;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.IReorderingProcessor;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.LanguageMap;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import java.util.List;
@@ -28,7 +28,7 @@ public class GuiItemScreen extends Screen {
     private GuiSideWindow sideWindow;
 
     public GuiItemScreen(SimpleChannel network, int xSize, int ySize, ManualEntry manualEntry) {
-        super(new StringTextComponent("todo")); // @todo 1.14
+        super(new TextComponent("todo")); // @todo 1.14
         this.network = network;
         this.xSize = xSize;
         this.ySize = ySize;
@@ -88,7 +88,7 @@ public class GuiItemScreen extends Screen {
         return rc;
     }
 
-    public void drawWindow(MatrixStack matrixStack) {
+    public void drawWindow(PoseStack matrixStack) {
         this.renderBackground(matrixStack);
         window.draw(matrixStack);
         sideWindow.getWindow().draw(matrixStack);
@@ -98,8 +98,8 @@ public class GuiItemScreen extends Screen {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);
             // @todo check on 1.16
-            List<ITextProperties> properties = tooltips.stream().map(StringTextComponent::new).collect(Collectors.toList());
-            List<IReorderingProcessor> processors = LanguageMap.getInstance().getVisualOrder(properties);
+            List<FormattedText> properties = tooltips.stream().map(TextComponent::new).collect(Collectors.toList());
+            List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
             renderTooltip(matrixStack, processors, x-guiLeft, y-guiTop);
         }
         tooltips = sideWindow.getWindow().getTooltips();
@@ -107,8 +107,8 @@ public class GuiItemScreen extends Screen {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);
             // @todo check on 1.16
-            List<ITextProperties> properties = tooltips.stream().map(StringTextComponent::new).collect(Collectors.toList());
-            List<IReorderingProcessor> processors = LanguageMap.getInstance().getVisualOrder(properties);
+            List<FormattedText> properties = tooltips.stream().map(TextComponent::new).collect(Collectors.toList());
+            List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
             renderTooltip(matrixStack, processors, x - guiLeft, y - guiTop);
         }
     }

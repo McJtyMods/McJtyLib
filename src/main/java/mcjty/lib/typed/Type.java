@@ -1,8 +1,8 @@
 package mcjty.lib.typed;
 
 import mcjty.lib.varia.DimensionId;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 
 import javax.annotation.Nonnull;
 import java.util.List;

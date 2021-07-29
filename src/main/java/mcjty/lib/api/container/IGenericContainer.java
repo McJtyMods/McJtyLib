@@ -1,21 +1,21 @@
 package mcjty.lib.api.container;
 
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.IntReferenceHolder;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 
 public interface IGenericContainer {
 
-    void addShortListener(IntReferenceHolder holder);
+    void addShortListener(DataSlot holder);
 
-    void addIntegerListener(IntReferenceHolder holder);
+    void addIntegerListener(DataSlot holder);
 
     void addContainerDataListener(IContainerDataListener dataListener);
 
-    void setupInventories(@Nullable IItemHandler itemHandler, PlayerInventory inventory);
+    void setupInventories(@Nullable IItemHandler itemHandler, Inventory inventory);
 
-    Container getAsContainer();
+    AbstractContainerMenu getAsContainer();
 }

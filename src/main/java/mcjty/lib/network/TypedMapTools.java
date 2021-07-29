@@ -4,9 +4,9 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.DimensionId;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 
 import java.util.*;
 
@@ -41,7 +41,7 @@ public class TypedMapTools {
         return typeToIndex.get(type);
     }
 
-    public static TypedMap readArguments(PacketBuffer buf) {
+    public static TypedMap readArguments(FriendlyByteBuf buf) {
         TypedMap.Builder args = TypedMap.builder();
         int size = buf.readInt();
         if (size != 0) {
@@ -135,7 +135,7 @@ public class TypedMapTools {
         return args.build();
     }
 
-    public static void writeArguments(PacketBuffer buf, TypedMap args) {
+    public static void writeArguments(FriendlyByteBuf buf, TypedMap args) {
         buf.writeInt(args.size());
         for (Key<?> key : args.getKeys()) {
             buf.writeUtf(key.getName());

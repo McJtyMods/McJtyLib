@@ -4,21 +4,21 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MouseHelper;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.client.MouseHandler;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,7 +34,7 @@ public class GuiTools {
             return 0;
         }
 
-        MouseHelper mouse = mc.mouseHandler;
+        MouseHandler mouse = mc.mouseHandler;
         int mouseX = (int) (mouse.xpos());
         return mouseX * gui.width / mainWidth;
     }
@@ -47,22 +47,22 @@ public class GuiTools {
             return 0;
         }
 
-        MouseHelper mouse = mc.mouseHandler;
+        MouseHandler mouse = mc.mouseHandler;
         int mouseY = (int) (mouse.ypos());
         return mouseY * gui.height / mainHeight;
     }
 
-    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos) {
+    public static boolean openRemoteGui(@Nonnull Player player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos) {
         return openRemoteGui(player, dimensionType, pos,
-                te -> new INamedContainerProvider() {
+                te -> new MenuProvider() {
                     @Override
-                    public ITextComponent getDisplayName() {
-                        return new StringTextComponent("Remote Gui");
+                    public Component getDisplayName() {
+                        return new TextComponent("Remote Gui");
                     }
 
                     @Nullable
                     @Override
-                    public Container createMenu(int id, PlayerInventory inventory, PlayerEntity player) {
+                    public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
                         return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY)
                                 .map(h -> h.createMenu(id, inventory, player))
                                 .orElse(null);
@@ -70,26 +70,26 @@ public class GuiTools {
                 });
     }
 
-    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos,
-                                        Function<TileEntity, INamedContainerProvider> provider) {
+    public static boolean openRemoteGui(@Nonnull Player player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos,
+                                        Function<BlockEntity, MenuProvider> provider) {
         if (dimensionType == null) {
             dimensionType = DimensionId.fromWorld(player.getCommandSenderWorld());
         }
-        World world = WorldTools.getWorld(player.getCommandSenderWorld(), dimensionType);
+        Level world = WorldTools.getWorld(player.getCommandSenderWorld(), dimensionType);
         if (!WorldTools.isLoaded(world, pos)) {
-            player.displayClientMessage(new StringTextComponent(TextFormatting.RED + "Position is not loaded!"), false);
+            player.displayClientMessage(new TextComponent(ChatFormatting.RED + "Position is not loaded!"), false);
             return false;
         }
-        TileEntity te = world.getBlockEntity(pos);
+        BlockEntity te = world.getBlockEntity(pos);
         if (te == null) {
-            player.displayClientMessage(new StringTextComponent(TextFormatting.RED + "Tile entity is missing!"), false);
+            player.displayClientMessage(new TextComponent(ChatFormatting.RED + "Tile entity is missing!"), false);
             return false;
         }
 
-        CompoundNBT compound = new CompoundNBT();
-        CompoundNBT written = te.save(compound);
+        CompoundTag compound = new CompoundTag();
+        CompoundTag written = te.save(compound);
 
-        NetworkHooks.openGui((ServerPlayerEntity) player, provider.apply(te), buf -> {
+        NetworkHooks.openGui((ServerPlayer) player, provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
             DimensionId.fromWorld(world).toBytes(buf);
             buf.writeNbt(written);

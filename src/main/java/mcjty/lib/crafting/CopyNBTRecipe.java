@@ -1,13 +1,13 @@
 package mcjty.lib.crafting;
 
 import mcjty.lib.setup.Registration;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 
 public class CopyNBTRecipe extends AbstractRecipeAdaptor {
 
@@ -16,9 +16,9 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory inv) {
+    public ItemStack assemble(CraftingContainer inv) {
         ItemStack result = recipe.assemble(inv);
-        CompoundNBT nbt = null;
+        CompoundTag nbt = null;
         for (int i = 0 ; i < inv.getContainerSize() ; i++) {
             ItemStack stack = inv.getItem(i);
 
@@ -32,9 +32,9 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
             }
 
             if (inbt != null && stack.getTag() != null) {
-                nbt = new CompoundNBT();
+                nbt = new CompoundTag();
                 for (String tag : inbt.getTagsToPreserve()) {
-                    INBT value = stack.getTag().get(tag);
+                    Tag value = stack.getTag().get(tag);
                     if (value != null) {
                         nbt.put(tag, value);
                     }
@@ -48,7 +48,7 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return Registration.COPYNBT_SERIALIZER;
     }
 }

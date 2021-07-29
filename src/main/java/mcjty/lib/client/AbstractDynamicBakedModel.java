@@ -2,15 +2,15 @@ package mcjty.lib.client;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3d;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.pipeline.BakedQuadBuilder;
 
@@ -23,10 +23,10 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
 
     public static TextureAtlasSprite getTexture(ResourceLocation resource) {
         //noinspection deprecation
-        return Minecraft.getInstance().getTextureAtlas(AtlasTexture.LOCATION_BLOCKS).apply(resource);
+        return Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(resource);
     }
 
-    protected void putVertex(BakedQuadBuilder builder, Vector3d normal,
+    protected void putVertex(BakedQuadBuilder builder, Vec3 normal,
                            double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
         ImmutableList<VertexFormatElement> elements = builder.getVertexFormat().getElements().asList();
         for (int e = 0; e < elements.size(); e++) {
@@ -63,13 +63,13 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
         }
     }
 
-    protected static Vector3d v(double x, double y, double z) {
-        return new Vector3d(x, y, z);
+    protected static Vec3 v(double x, double y, double z) {
+        return new Vec3(x, y, z);
     }
 
-    protected BakedQuad createQuad(Vector3d v1, Vector3d v2, Vector3d v3, Vector3d v4, TextureAtlasSprite sprite,
+    protected BakedQuad createQuad(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4, TextureAtlasSprite sprite,
                                    float r, float g, float b, float a) {
-        Vector3d normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
+        Vec3 normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
         BakedQuadBuilder builder = new BakedQuadBuilder(sprite);
         builder.setQuadOrientation(Direction.getNearest(normal.x, normal.y, normal.z));
@@ -81,8 +81,8 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
     }
 
 
-    protected BakedQuad createQuad(Vector3d v1, Vector3d v2, Vector3d v3, Vector3d v4, TextureAtlasSprite sprite) {
-        Vector3d normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
+    protected BakedQuad createQuad(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4, TextureAtlasSprite sprite) {
+        Vec3 normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
         BakedQuadBuilder builder = new BakedQuadBuilder(sprite);
         builder.setQuadOrientation(Direction.getNearest(normal.x, normal.y, normal.z));
@@ -93,8 +93,8 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
         return builder.build();
     }
 
-    protected BakedQuad createQuad(Vector3d v1, Vector3d v2, Vector3d v3, Vector3d v4, TextureAtlasSprite sprite, float hilight) {
-        Vector3d normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
+    protected BakedQuad createQuad(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4, TextureAtlasSprite sprite, float hilight) {
+        Vec3 normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
         BakedQuadBuilder builder = new BakedQuadBuilder(sprite);
         builder.setQuadOrientation(Direction.getNearest(normal.x, normal.y, normal.z));
@@ -106,8 +106,8 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
     }
 
 
-    protected BakedQuad createQuadReversed(Vector3d v1, Vector3d v2, Vector3d v3, Vector3d v4, TextureAtlasSprite sprite) {
-        Vector3d normal = v3.subtract(v1).cross(v2.subtract(v1)).normalize();
+    protected BakedQuad createQuadReversed(Vec3 v1, Vec3 v2, Vec3 v3, Vec3 v4, TextureAtlasSprite sprite) {
+        Vec3 normal = v3.subtract(v1).cross(v2.subtract(v1)).normalize();
 
         BakedQuadBuilder builder = new BakedQuadBuilder(sprite);
         builder.setQuadOrientation(Direction.getNearest(normal.x, normal.y, normal.z));
@@ -134,14 +134,14 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
     }
 
     @Override
-    public ItemOverrideList getOverrides() {
-        return ItemOverrideList.EMPTY;
+    public ItemOverrides getOverrides() {
+        return ItemOverrides.EMPTY;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public ItemCameraTransforms getTransforms() {
-        return ItemCameraTransforms.NO_TRANSFORMS;
+    public ItemTransforms getTransforms() {
+        return ItemTransforms.NO_TRANSFORMS;
     }
 
 

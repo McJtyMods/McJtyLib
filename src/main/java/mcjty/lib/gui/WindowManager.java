@@ -1,11 +1,11 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.client.GuiTools;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +86,7 @@ public class WindowManager {
         return mouseWheel;
     }
 
-    public void draw(MatrixStack matrixStack) {
+    public void draw(PoseStack matrixStack) {
         mouseWheel = 0;// @todo 1.14 Mouse.getDWheel();
         windows.stream().forEach(window -> window.draw(matrixStack));
         modalWindows.stream().forEach(window -> window.draw(matrixStack));
@@ -112,7 +112,7 @@ public class WindowManager {
         return modalWindows.stream();
     }
 
-    public void drawTooltips(MatrixStack matrixStack) {
+    public void drawTooltips(PoseStack matrixStack) {
         int x = GuiTools.getRelativeX(gui);
         int y = GuiTools.getRelativeY(gui);
 
@@ -123,7 +123,7 @@ public class WindowManager {
                 gui.drawHoveringText(matrixStack, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().font);
             }
         });
-        net.minecraft.client.renderer.RenderHelper.setupForFlatItems();
+        com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
     }
 
     public Optional<Widget<?>> findWidgetAtPosition(double x, double y) {

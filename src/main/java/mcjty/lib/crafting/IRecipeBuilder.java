@@ -1,18 +1,18 @@
 package mcjty.lib.crafting;
 
-import net.minecraft.data.IFinishedRecipe;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.IItemProvider;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 
 public interface IRecipeBuilder<T extends IRecipeBuilder<T>> {
-    T define(Character symbol, ITag<Item> tagIn);
+    T define(Character symbol, Tag<Item> tagIn);
 
-    T define(Character symbol, IItemProvider itemIn);
+    T define(Character symbol, ItemLike itemIn);
 
     T define(Character symbol, Ingredient ingredientIn);
 
@@ -20,9 +20,9 @@ public interface IRecipeBuilder<T extends IRecipeBuilder<T>> {
 
     T setGroup(String groupIn);
 
-    void build(Consumer<IFinishedRecipe> consumerIn);
+    void build(Consumer<FinishedRecipe> consumerIn);
 
-    void build(Consumer<IFinishedRecipe> consumerIn, String save);
+    void build(Consumer<FinishedRecipe> consumerIn, String save);
 
-    void build(Consumer<IFinishedRecipe> consumerIn, ResourceLocation id);
+    void build(Consumer<FinishedRecipe> consumerIn, ResourceLocation id);
 }

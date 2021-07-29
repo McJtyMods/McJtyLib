@@ -2,31 +2,31 @@ package mcjty.lib.container;
 
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.TriConsumer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.AbstractFurnaceTileEntity;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.fmllegacy.hooks.BasicEventHooks;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
 public class CraftingSlot extends SlotItemHandler {
     private final GenericTileEntity te;
-    private final PlayerEntity player;
-    private TriConsumer<TileEntity, PlayerEntity, ItemStack> onCraft = (container, playerEntity, stack) -> {};
+    private final Player player;
+    private TriConsumer<BlockEntity, Player, ItemStack> onCraft = (container, playerEntity, stack) -> {};
     private int removeCount;
 
-    public CraftingSlot(PlayerEntity playerEntity, IItemHandler inventory, GenericTileEntity te, int index, int x, int y) {
+    public CraftingSlot(Player playerEntity, IItemHandler inventory, GenericTileEntity te, int index, int x, int y) {
         super(inventory, index, x, y);
         this.te = te;
         this.player = playerEntity;
     }
 
-    public CraftingSlot onCraft(TriConsumer<TileEntity, PlayerEntity, ItemStack> onCraft) {
+    public CraftingSlot onCraft(TriConsumer<BlockEntity, Player, ItemStack> onCraft) {
         this.onCraft = onCraft;
         return this;
     }
 
-    public TriConsumer<TileEntity, PlayerEntity, ItemStack> getOnCraft() {
+    public TriConsumer<BlockEntity, Player, ItemStack> getOnCraft() {
         return onCraft;
     }
 
@@ -52,7 +52,7 @@ public class CraftingSlot extends SlotItemHandler {
     }
 
     @Override
-    public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack) {
+    public ItemStack onTake(Player thePlayer, ItemStack stack) {
         this.checkTakeAchievements(stack);
         super.onTake(thePlayer, stack);
         return stack;
@@ -73,6 +73,6 @@ public class CraftingSlot extends SlotItemHandler {
         onCraft.accept(te, player, stack);
 
         this.removeCount = 0;
-        net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerSmeltedEvent(this.player, stack);
+        BasicEventHooks.firePlayerSmeltedEvent(this.player, stack);
     }
 }

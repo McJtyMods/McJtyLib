@@ -12,20 +12,17 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.TriFunction;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.*;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -36,20 +33,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
  * Generic container support
  */
-public class GenericContainer extends Container implements IGenericContainer {
+public class GenericContainer extends AbstractContainerMenu implements IGenericContainer {
     protected final Map<String,IItemHandler> inventories = new HashMap<>();
     private final Map<ResourceLocation, IContainerDataListener> containerData = new HashMap<>();
     private final ContainerFactory factory;
     protected final BlockPos pos;
     protected final GenericTileEntity te;
 
-    public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity te) {
+    public GenericContainer(@Nullable MenuType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity te) {
         super(type, id);
         this.factory = factory;
         this.pos = pos;
@@ -57,7 +54,7 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
-    public Container getAsContainer() {
+    public AbstractContainerMenu getAsContainer() {
         return this;
     }
 
@@ -66,13 +63,13 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
-    public void addShortListener(IntReferenceHolder holder) {
+    public void addShortListener(DataSlot holder) {
         addDataSlot(holder);
     }
 
     @Override
-    public void addIntegerListener(IntReferenceHolder holder) {
-        addDataSlot(new IntReferenceHolder() {
+    public void addIntegerListener(DataSlot holder) {
+        addDataSlot(new DataSlot() {
             private int lastKnown;
 
             @Override
@@ -94,7 +91,7 @@ public class GenericContainer extends Container implements IGenericContainer {
                 return flag;
             }
         });
-        addDataSlot(new IntReferenceHolder() {
+        addDataSlot(new DataSlot() {
             private int lastKnown;
 
             @Override
@@ -138,7 +135,7 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
-    public boolean stillValid(PlayerEntity player) {
+    public boolean stillValid(Player player) {
         if (te == null || te.canPlayerAccess(player)) {
             return true;
         }
@@ -167,13 +164,13 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
-    public void setupInventories(IItemHandler itemHandler, PlayerInventory inventory) {
+    public void setupInventories(IItemHandler itemHandler, Inventory inventory) {
         addInventory(ContainerFactory.CONTAINER_CONTAINER, itemHandler);
         addInventory(ContainerFactory.CONTAINER_PLAYER, new InvWrapper(inventory));
         generateSlots(inventory.player);
     }
 
-    public void generateSlots(PlayerEntity player) {
+    public void generateSlots(Player player) {
         for (SlotFactory slotFactory : factory.getSlots()) {
             IItemHandler inventory = inventories.get(slotFactory.getInventoryName());
             int index = slotFactory.getIndex();
@@ -185,7 +182,7 @@ public class GenericContainer extends Container implements IGenericContainer {
         }
     }
 
-    protected Slot createSlot(SlotFactory slotFactory, PlayerEntity playerEntity, final IItemHandler inventory, final int index, final int x, final int y, SlotType slotType) {
+    protected Slot createSlot(SlotFactory slotFactory, Player playerEntity, final IItemHandler inventory, final int index, final int x, final int y, SlotType slotType) {
         Slot slot;
         if (slotType == SlotType.SLOT_GHOST) {
             slot = new GhostSlot(inventory, index, x, y);
@@ -254,7 +251,7 @@ public class GenericContainer extends Container implements IGenericContainer {
 //    }
 
     @Override
-    public ItemStack quickMoveStack(PlayerEntity player, int index) {
+    public ItemStack quickMoveStack(Player player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 
@@ -413,24 +410,24 @@ public class GenericContainer extends Container implements IGenericContainer {
         return result;
     }
 
+
     @Override
-    public ItemStack clicked(int index, int button, ClickType mode, PlayerEntity player) {
+    public void clicked(int index, int button, ClickType mode, Player player) {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.hasItem()) {
                 slot.set(ItemStack.EMPTY);
             }
 
-            ItemStack clickedWith = player.inventory.getCarried();
+            ItemStack clickedWith = player.inventoryMenu.getCarried();
             if (!clickedWith.isEmpty()) {
                 ItemStack copy = clickedWith.copy();
                 copy.setCount(1);
                 slot.set(copy);
             }
             broadcastChanges();
-            return ItemStack.EMPTY;
         } else {
-            return super.clicked(index, button, mode, player);
+            super.clicked(index, button, mode, player);
         }
     }
 
@@ -445,22 +442,22 @@ public class GenericContainer extends Container implements IGenericContainer {
         for (IContainerDataListener data : containerData.values()) {
             if (data.isDirtyAndClear()) {
                 ByteBuf newbuf = Unpooled.buffer();
-                PacketBuffer buffer = new PacketBuffer(newbuf);
+                FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
                 data.toBytes(buffer);
                 PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
-                for (IContainerListener listener : this.containerListeners) {
-                    if (listener instanceof ServerPlayerEntity) {
-                        McJtyLib.networkHandler.sendTo(packet, ((ServerPlayerEntity) listener).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                for (ContainerListener listener : this.containerListeners) {
+                    if (listener instanceof ServerPlayer) {
+                        McJtyLib.networkHandler.sendTo(packet, ((ServerPlayer) listener).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                     }
                 }
             }
         }
     }
 
-    public static ContainerType<Container> createContainerType(String registryName) {
-        ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
+    public static MenuType<AbstractContainerMenu> createContainerType(String registryName) {
+        MenuType<AbstractContainerMenu> containerType = IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            TileEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
+            BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
@@ -470,28 +467,28 @@ public class GenericContainer extends Container implements IGenericContainer {
         return containerType;
     }
 
-    public static <T extends Container> ContainerType<T> createContainerType() {
-        ContainerType<Container> containerType = IForgeContainerType.create((windowId, inv, data) -> {
+    public static <T extends AbstractContainerMenu> MenuType<T> createContainerType() {
+        MenuType<AbstractContainerMenu> containerType = IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            TileEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
+            BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
             return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> Objects.requireNonNull(h.createMenu(windowId, inv, inv.player))).orElseThrow(RuntimeException::new);
         });
-        return (ContainerType<T>) containerType;
+        return (MenuType<T>) containerType;
     }
 
-    public static <T extends GenericContainer, E extends GenericTileEntity> ContainerType<T> createRemoteContainerType(
-            Function<DimensionId, E> dummyTEFactory,
+    public static <T extends GenericContainer, E extends GenericTileEntity> MenuType<T> createRemoteContainerType(
+            BiFunction<DimensionId, BlockPos, E> dummyTEFactory,
             TriFunction<Integer, BlockPos, E, T> containerFactory, int slots) {
         return IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
             DimensionId type = DimensionId.fromPacket(data);
 
-            E te = dummyTEFactory.apply(type);
-            te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter
-            CompoundNBT compound = data.readNbt();
+            E te = dummyTEFactory.apply(type, pos);
+            te.setLevel(inv.player.getCommandSenderWorld());    // Wrong world but doesn't really matter
+            CompoundTag compound = data.readNbt();
             te.read(compound);
 
             T container = containerFactory.apply(windowId, pos, te);

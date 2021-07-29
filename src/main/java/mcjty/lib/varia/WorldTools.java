@@ -1,32 +1,32 @@
 package mcjty.lib.varia;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 public class WorldTools {
 
-    public static boolean isLoaded(World world, BlockPos pos) {
+    public static boolean isLoaded(Level world, BlockPos pos) {
         if (world == null || pos == null) {
             return false;
         }
         return world.hasChunkAt(pos);
     }
 
-    public static ServerWorld getOverworld() {
+    public static ServerLevel getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getLevel(World.OVERWORLD);
+        return server.getLevel(Level.OVERWORLD);
     }
 
-    public static ServerWorld getOverworld(World world) {
+    public static ServerLevel getOverworld(Level world) {
         MinecraftServer server = world.getServer();
-        return server.getLevel(World.OVERWORLD);
+        return server.getLevel(Level.OVERWORLD);
     }
 
-    public static ServerWorld loadWorld(DimensionId type) {
-        ServerWorld world = getWorld(type);
+    public static ServerLevel loadWorld(DimensionId type) {
+        ServerLevel world = getWorld(type);
         if (world == null) {
             // Worlds in 1.16 are always loaded
             return type.loadWorld();
@@ -34,11 +34,11 @@ public class WorldTools {
         return world;
     }
 
-    public static ServerWorld getWorld(DimensionId type) {
+    public static ServerLevel getWorld(DimensionId type) {
         return type.getWorld();
     }
 
-    public static ServerWorld getWorld(World world, DimensionId type) {
+    public static ServerLevel getWorld(Level world, DimensionId type) {
         // Worlds in 1.16 are always loaded
         return type.loadWorld(world);
     }

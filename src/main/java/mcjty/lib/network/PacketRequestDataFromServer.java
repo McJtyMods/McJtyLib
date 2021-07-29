@@ -4,10 +4,10 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -26,7 +26,7 @@ public class PacketRequestDataFromServer {
     protected TypedMap params;
     private boolean dummy;
 
-    public PacketRequestDataFromServer(PacketBuffer buf) {
+    public PacketRequestDataFromServer(FriendlyByteBuf buf) {
         pos = buf.readBlockPos();
         type = DimensionId.fromPacket(buf);
         command = buf.readUtf(32767);
@@ -34,7 +34,7 @@ public class PacketRequestDataFromServer {
         dummy = buf.readBoolean();
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
         type.toBytes(buf);
         buf.writeUtf(command);
@@ -53,9 +53,9 @@ public class PacketRequestDataFromServer {
     public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            World world = WorldTools.getWorld(ctx.getSender().getCommandSenderWorld(), type);
+            Level world = WorldTools.getWorld(ctx.getSender().getCommandSenderWorld(), type);
             if (world.hasChunkAt(pos)) {
-                TileEntity te = world.getBlockEntity(pos);
+                BlockEntity te = world.getBlockEntity(pos);
                 if (!(te instanceof ICommandHandler)) {
                     Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                     return;

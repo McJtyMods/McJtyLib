@@ -1,6 +1,6 @@
 package mcjty.lib.api.smartwrench;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface SmartWrench {
     SmartWrenchMode getMode(ItemStack itemStack);

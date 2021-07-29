@@ -1,13 +1,13 @@
 package mcjty.lib.api.container;
 
 import mcjty.lib.tileentity.GenericEnergyStorage;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-public class DefaultContainerProvider<C extends IGenericContainer> implements INamedContainerProvider {
+public class DefaultContainerProvider<C extends IGenericContainer> implements MenuProvider {
 
     private final String name;
-    private BiFunction<Integer, PlayerEntity, C> containerSupplier;
+    private BiFunction<Integer, Player, C> containerSupplier;
     private Supplier<? extends IItemHandler> itemHandler = () -> null;
     private Supplier<? extends GenericEnergyStorage> energyHandler = () -> null;
-    private final List<IntReferenceHolder> integerListeners = new ArrayList<>();
-    private final List<IntReferenceHolder> shortListeners = new ArrayList<>();
+    private final List<DataSlot> integerListeners = new ArrayList<>();
+    private final List<DataSlot> shortListeners = new ArrayList<>();
     private final List<IContainerDataListener> containerDataListeners = new ArrayList<>();
 
     public DefaultContainerProvider(String name) {
@@ -31,11 +31,11 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     }
 
     @Override
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent(name);
+    public Component getDisplayName() {
+        return new TextComponent(name);
     }
 
-    public DefaultContainerProvider<C> containerSupplier(BiFunction<Integer, PlayerEntity, C> containerSupplier) {
+    public DefaultContainerProvider<C> containerSupplier(BiFunction<Integer, Player, C> containerSupplier) {
         this.containerSupplier = containerSupplier;
         return this;
     }
@@ -55,19 +55,19 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         return this;
     }
 
-    public DefaultContainerProvider<C> integerListener(IntReferenceHolder holder) {
+    public DefaultContainerProvider<C> integerListener(DataSlot holder) {
         integerListeners.add(holder);
         return this;
     }
 
-    public DefaultContainerProvider<C> shortListener(IntReferenceHolder holder) {
+    public DefaultContainerProvider<C> shortListener(DataSlot holder) {
         shortListeners.add(holder);
         return this;
     }
 
     @Nullable
     @Override
-    public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player playerEntity) {
         C container = containerSupplier.apply(windowId, playerEntity);
         IItemHandler itemHandler = this.itemHandler.get();
         container.setupInventories(itemHandler, playerInventory);
@@ -75,10 +75,10 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         if (energyHandler != null) {
             energyHandler.addIntegerListeners(container);
         }
-        for (IntReferenceHolder listener : integerListeners) {
+        for (DataSlot listener : integerListeners) {
             container.addIntegerListener(listener);
         }
-        for (IntReferenceHolder listener : shortListeners) {
+        for (DataSlot listener : shortListeners) {
             container.addShortListener(listener);
         }
         for (IContainerDataListener dataListener : containerDataListeners) {

@@ -7,9 +7,9 @@ import mcjty.lib.network.PacketOpenManual;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import static mcjty.lib.gui.widgets.Widgets.button;
 import static mcjty.lib.gui.widgets.Widgets.positional;

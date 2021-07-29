@@ -5,11 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
@@ -139,7 +139,7 @@ public class JSonTools {
         ItemStack stack = new ItemStack(item, amount);
         if (obj.has("nbt")) {
             try {
-                CompoundNBT nbt = JsonToNBT.parseTag(obj.get("nbt").getAsString());
+                CompoundTag nbt = TagParser.parseTag(obj.get("nbt").getAsString());
                 stack.setTag(nbt);
             } catch (CommandSyntaxException e) {
                 Logging.logError("Parsing error", e);

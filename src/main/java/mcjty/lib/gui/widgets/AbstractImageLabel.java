@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
@@ -9,9 +9,9 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.resources.IResource;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -90,7 +90,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     private int pickColor(int u, int v) {
         if (bufferedImage == null) {
             try {
-                IResource resource = Minecraft.getInstance().getResourceManager().getResource(image);
+                Resource resource = Minecraft.getInstance().getResourceManager().getResource(image);
                 bufferedImage = ImageIO.read(resource.getInputStream());
             } catch (IOException e) {
             }
@@ -105,7 +105,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
 
     @Override
-    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }

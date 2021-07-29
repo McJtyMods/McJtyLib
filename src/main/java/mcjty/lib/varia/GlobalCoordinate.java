@@ -1,8 +1,8 @@
 package mcjty.lib.varia;
 
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class GlobalCoordinate {
     private final BlockPos coordinate;
@@ -13,7 +13,7 @@ public class GlobalCoordinate {
         this.dimension = dimension;
     }
 
-    public GlobalCoordinate(BlockPos coordinate, World world) {
+    public GlobalCoordinate(BlockPos coordinate, Level world) {
         this.coordinate = coordinate;
         this.dimension = DimensionId.fromWorld(world);
     }

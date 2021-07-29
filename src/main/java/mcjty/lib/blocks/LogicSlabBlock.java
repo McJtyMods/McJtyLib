@@ -4,31 +4,31 @@ import mcjty.lib.builder.BlockBuilder;
 import mcjty.lib.tileentity.LogicTileEntity;
 import mcjty.lib.varia.LogicFacing;
 import mcjty.lib.varia.OrientationTools;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 
 import static mcjty.lib.varia.LogicFacing.*;
-import static net.minecraft.util.Direction.*;
+import static net.minecraft.core.Direction.*;
 
-import net.minecraft.util.Direction.Axis;
+import net.minecraft.core.Direction.Axis;
 
 /**
  * The superclass for logic slabs.
@@ -70,8 +70,8 @@ public class LogicSlabBlock extends BaseBlock {
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        Vector3d hit = context.getClickLocation();
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Vec3 hit = context.getClickLocation();
         BlockPos pos = context.getClickedPos();
         double hx = hit.x - pos.getX();
         double hy = hit.y - pos.getY();
@@ -132,15 +132,15 @@ public class LogicSlabBlock extends BaseBlock {
         return super.getStateForPlacement(context).setValue(LOGIC_FACING, facing);
     }
 
-    public static final VoxelShape BLOCK_DOWN = VoxelShapes.box(0.0F, 0.0F, 0.0F, 1.0F, 0.25F, 1.0F);
-    public static final VoxelShape BLOCK_UP = VoxelShapes.box(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F);
-    public static final VoxelShape BLOCK_NORTH = VoxelShapes.box(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.25F);
-    public static final VoxelShape BLOCK_SOUTH = VoxelShapes.box(0.0F, 0.0F, 0.75F, 1.0F, 1.0F, 1.0F);
-    public static final VoxelShape BLOCK_WEST = VoxelShapes.box(0.0F, 0.0F, 0.0F, 0.25F, 1.0F, 1.0F);
-    public static final VoxelShape BLOCK_EAST = VoxelShapes.box(0.75F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_DOWN = Shapes.box(0.0F, 0.0F, 0.0F, 1.0F, 0.25F, 1.0F);
+    public static final VoxelShape BLOCK_UP = Shapes.box(0.0F, 0.75F, 0.0F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_NORTH = Shapes.box(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 0.25F);
+    public static final VoxelShape BLOCK_SOUTH = Shapes.box(0.0F, 0.0F, 0.75F, 1.0F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_WEST = Shapes.box(0.0F, 0.0F, 0.0F, 0.25F, 1.0F, 1.0F);
+    public static final VoxelShape BLOCK_EAST = Shapes.box(0.75F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
         switch (state.getValue(LOGIC_FACING).getSide()) {
             case DOWN:
                 return BLOCK_DOWN;
@@ -161,7 +161,7 @@ public class LogicSlabBlock extends BaseBlock {
     /**
      * Returns the signal strength at one input of the block
      */
-    protected int getInputStrength(World world, BlockPos pos, Direction side) {
+    protected int getInputStrength(Level world, BlockPos pos, Direction side) {
         int power = world.getSignal(pos.relative(side), side);
         if (power < 15) {
             // Check if there is no redstone wire there. If there is a 'bend' in the redstone wire it is
@@ -170,7 +170,7 @@ public class LogicSlabBlock extends BaseBlock {
             BlockState blockState = world.getBlockState(pos.relative(side));
             Block b = blockState.getBlock();
             if (b == Blocks.REDSTONE_WIRE) {
-                power = Math.max(power, blockState.getValue(RedstoneWireBlock.POWER));
+                power = Math.max(power, blockState.getValue(RedStoneWireBlock.POWER));
             }
         }
 
@@ -179,11 +179,11 @@ public class LogicSlabBlock extends BaseBlock {
 
     @Override
     @Deprecated
-    protected void checkRedstone(World world, BlockPos pos) {
+    protected void checkRedstone(Level world, BlockPos pos) {
         super.checkRedstone(world, pos);
         // Old behaviour
         // @todo remove once all implementations do this in the TE.checkRedstone
-        TileEntity te = world.getBlockEntity(pos);
+        BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity)te;
             Direction inputSide = logicTileEntity.getFacing(world.getBlockState(pos)).getInputSide();
@@ -193,8 +193,8 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
-        TileEntity te = world.getBlockEntity(pos);
+    public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
+        BlockEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity)te;
             Direction direction = logicTileEntity.getFacing(state).getInputSide();
@@ -213,8 +213,8 @@ public class LogicSlabBlock extends BaseBlock {
         return false;
     }
 
-    protected int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
-        TileEntity te = world.getBlockEntity(pos);
+    protected int getRedstoneOutput(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
+        BlockEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
             LogicTileEntity logicTileEntity = (LogicTileEntity) te;
             return logicTileEntity.getRedstoneOutput(state, world, pos, side);
@@ -223,13 +223,13 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     @Override
-    public BlockState rotate(BlockState state, IWorld world, BlockPos pos, Rotation rot) {
+    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rot) {
         if (state.getBlock() instanceof LogicSlabBlock) {
             LogicFacing facing = state.getValue(LOGIC_FACING);
             LogicFacing newfacing = LogicFacing.rotate(facing);
             BlockState newstate = state.getBlock().defaultBlockState().setValue(LOGIC_FACING, newfacing);
             world.setBlock(pos, newstate, 3);
-            TileEntity te = world.getBlockEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             if (te instanceof LogicTileEntity) {
                 ((LogicTileEntity) te).rotateBlock(rot);
             }
@@ -244,12 +244,12 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     @Override
-    public int getSignal(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+    public int getSignal(BlockState blockState, BlockGetter blockAccess, BlockPos pos, Direction side) {
         return getRedstoneOutput(blockState, blockAccess, pos, side);
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(LOGIC_FACING);
     }

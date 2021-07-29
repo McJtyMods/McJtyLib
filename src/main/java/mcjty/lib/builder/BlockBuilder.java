@@ -3,32 +3,32 @@ package mcjty.lib.builder;
 import mcjty.lib.compat.theoneprobe.McJtyLibTOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.gui.ManualEntry;
-import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.ToolType;
 
-import java.util.function.Supplier;
-
-import net.minecraft.block.AbstractBlock;
+import java.util.function.BiFunction;
 
 public class BlockBuilder {
 
-    public static final AbstractBlock.Properties STANDARD_IRON = AbstractBlock.Properties.of(Material.METAL)
+    public static final BlockBehaviour.Properties STANDARD_IRON = BlockBehaviour.Properties.of(Material.METAL)
             .strength(2.0f)
             .sound(SoundType.METAL);
 
-    private AbstractBlock.Properties properties = STANDARD_IRON;
+    private BlockBehaviour.Properties properties = STANDARD_IRON;
     private boolean infusable = false;
     private TooltipBuilder tooltipBuilder = new TooltipBuilder();
-    private Supplier<TileEntity> tileEntitySupplier;
+    private BiFunction<BlockPos, BlockState, BlockEntity> tileEntitySupplier;
     private ToolType toolType = ToolType.PICKAXE;
     private int harvestLevel = 0;
     private TOPDriver topDriver = McJtyLibTOPDriver.DRIVER;
     private ManualEntry manualEntry = ManualEntry.EMPTY;
 
-    public AbstractBlock.Properties getProperties() {
+    public BlockBehaviour.Properties getProperties() {
         return properties;
     }
 
@@ -44,7 +44,7 @@ public class BlockBuilder {
         return tooltipBuilder;
     }
 
-    public Supplier<TileEntity> getTileEntitySupplier() {
+    public BiFunction<BlockPos, BlockState, BlockEntity> getTileEntitySupplier() {
         return tileEntitySupplier;
     }
 
@@ -62,7 +62,7 @@ public class BlockBuilder {
 
     // ----------------------------------------------------------------------
 
-    public BlockBuilder properties(AbstractBlock.Properties properties) {
+    public BlockBuilder properties(BlockBehaviour.Properties properties) {
         this.properties = properties;
         return this;
     }
@@ -97,7 +97,7 @@ public class BlockBuilder {
         return this;
     }
 
-    public BlockBuilder tileEntitySupplier(Supplier<TileEntity> supplier) {
+    public BlockBuilder tileEntitySupplier(BiFunction<BlockPos, BlockState, BlockEntity> supplier) {
         this.tileEntitySupplier = supplier;
         return this;
     }

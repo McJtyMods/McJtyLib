@@ -6,7 +6,7 @@ import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.*;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
@@ -14,7 +14,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -57,7 +57,7 @@ public class McJtyLib {
         clientCommands.put(Pair.of(modid, id), command);
     }
 
-    public static boolean handleCommand(String modid, String id, PlayerEntity player, TypedMap arguments) {
+    public static boolean handleCommand(String modid, String id, Player player, TypedMap arguments) {
         IServerCommand command = serverCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;
@@ -65,7 +65,7 @@ public class McJtyLib {
         return command.execute(player, arguments);
     }
 
-    public static boolean handleClientCommand(String modid, String id, PlayerEntity player, TypedMap arguments) {
+    public static boolean handleClientCommand(String modid, String id, Player player, TypedMap arguments) {
         IServerCommand command = clientCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;
@@ -73,7 +73,7 @@ public class McJtyLib {
         return command.execute(player, arguments);
     }
 
-    public static LazyOptional<PreferencesProperties> getPreferencesProperties(PlayerEntity player) {
+    public static LazyOptional<PreferencesProperties> getPreferencesProperties(Player player) {
         return player.getCapability(ModSetup.PREFERENCES_CAPABILITY);
     }
 }
