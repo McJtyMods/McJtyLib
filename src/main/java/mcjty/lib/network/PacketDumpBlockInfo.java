@@ -4,15 +4,14 @@ import mcjty.lib.debugtools.DumpBlockNBT;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.players.ServerOpListEntry;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.ServerOpList;
-import net.minecraft.core.BlockPos;
+import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkEvent;
-import org.apache.logging.log4j.Level;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -54,8 +53,8 @@ public class PacketDumpBlockInfo {
             if (perm >= 1) {
                 Level world = WorldTools.getWorld(player.level, dimid);
                 String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
-                Logging.getLogger().log(Level.INFO, "### Server side ###");
-                Logging.getLogger().log(Level.INFO, output);
+                Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, "### Server side ###");
+                Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, output);
             }
         });
         ctx.setPacketHandled(true);

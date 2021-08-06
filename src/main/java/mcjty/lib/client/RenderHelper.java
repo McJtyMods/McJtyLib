@@ -1,39 +1,32 @@
 package mcjty.lib.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import mcjty.lib.base.StyleConfig;
-import mcjty.lib.varia.MathTools;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import com.mojang.blaze3d.vertex.Tesselator;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import mcjty.lib.base.StyleConfig;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.fluids.FluidStack;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 
 import javax.annotation.Nullable;
 
@@ -108,46 +101,45 @@ public class RenderHelper {
     }
 
     public static void renderEntity(PoseStack matrixStack, Entity entity, int xPos, int yPos, float scale) {
-        matrixStack.pushPose();
-        GlStateManager._color4f(1f, 1f, 1f, 1f);
-        GlStateManager._enableRescaleNormal();
-        GlStateManager._enableColorMaterial();
-        matrixStack.pushPose();
-        matrixStack.translate(xPos + 8, yPos + 16, 50F);
-        matrixStack.scale(-scale, scale, scale);
-        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180F));
-        matrixStack.mulPose(Vector3f.YP.rotationDegrees(135F));
-        com.mojang.blaze3d.platform.Lighting.turnBackOn();
-        matrixStack.mulPose(Vector3f.YN.rotationDegrees(135F));
-        matrixStack.mulPose(Vector3f.YP.rotationDegrees(rot));
-//        GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
-//        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
-        entity.xRot = 0.0F;
-        matrixStack.translate(0.0F, (float) entity.getMyRidingOffset(), 0.0F);
-        // @todo 1.15
-//        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
-//        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
-        matrixStack.popPose();
-        com.mojang.blaze3d.platform.Lighting.turnOff();
-
-        GlStateManager._disableRescaleNormal();
-        matrixStack.translate(0F, 0F, 0.0F);
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager._enableRescaleNormal();
-        int i1 = 240;
-        int k1 = 240;
-
-        // @todo 1.14 check if right?
-        // @todo 1.15
-//        GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
-//        OpenGlHelper.setLightmapTextureCoords(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
-
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager._disableRescaleNormal();
-        com.mojang.blaze3d.platform.Lighting.turnOff();
-        GlStateManager._disableLighting();
-        GlStateManager._disableDepthTest();
-        matrixStack.popPose();
+        // @todo 1.17 port rendering
+//        matrixStack.pushPose();
+//        GlStateManager._color4f(1f, 1f, 1f, 1f);
+//        GlStateManager._enableRescaleNormal();
+//        GlStateManager._enableColorMaterial();
+//        matrixStack.pushPose();
+//        matrixStack.translate(xPos + 8, yPos + 16, 50F);
+//        matrixStack.scale(-scale, scale, scale);
+//        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180F));
+//        matrixStack.mulPose(Vector3f.YP.rotationDegrees(135F));
+//        com.mojang.blaze3d.platform.Lighting.turnBackOn();
+//        matrixStack.mulPose(Vector3f.YN.rotationDegrees(135F));
+//        matrixStack.mulPose(Vector3f.YP.rotationDegrees(rot));
+//        entity.xRot = 0.0F;
+//        matrixStack.translate(0.0F, (float) entity.getMyRidingOffset(), 0.0F);
+//        // @todo 1.15
+////        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
+////        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
+//        matrixStack.popPose();
+//        com.mojang.blaze3d.platform.Lighting.turnOff();
+//
+//        GlStateManager._disableRescaleNormal();
+//        matrixStack.translate(0F, 0F, 0.0F);
+//        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
+//        GlStateManager._enableRescaleNormal();
+//        int i1 = 240;
+//        int k1 = 240;
+//
+//        // @todo 1.14 check if right?
+//        // @todo 1.15
+////        GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
+////        OpenGlHelper.setLightmapTextureCoords(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
+//
+//        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
+//        GlStateManager._disableRescaleNormal();
+//        com.mojang.blaze3d.platform.Lighting.turnOff();
+//        GlStateManager._disableLighting();
+//        GlStateManager._disableDepthTest();
+//        matrixStack.popPose();
     }
 
     public static boolean renderObject(PoseStack matrixStack, int x, int y, Object itm, boolean highlight) {
@@ -204,7 +196,7 @@ public class RenderHelper {
         }
 
         int fluidColor = fluid.getAttributes().getColor(fluidStack);
-        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bind(TextureAtlas.LOCATION_BLOCKS);
+//        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bind(TextureAtlas.LOCATION_BLOCKS);    // @todo 1.17 rendering
         setGLColorFromInt(fluidColor);
         drawFluidTexture(x, y, fluidStillSprite, 100);
 
@@ -219,7 +211,7 @@ public class RenderHelper {
 
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder vertexBuffer = tessellator.getBuilder();
-        vertexBuffer.begin(7, DefaultVertexFormat.POSITION_TEX);
+        vertexBuffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         vertexBuffer.vertex(xCoord, yCoord + 16, zLevel).uv(uMin, vMax).endVertex();
         vertexBuffer.vertex(xCoord + 16, yCoord + 16, zLevel).uv(uMax, vMax).endVertex();
         vertexBuffer.vertex(xCoord + 16, yCoord, zLevel).uv(uMax, vMin).endVertex();
@@ -233,7 +225,8 @@ public class RenderHelper {
         float green = (color >> 8 & 0xFF) / 255.0F;
         float blue = (color & 0xFF) / 255.0F;
 
-        GlStateManager._color4f(red, green, blue, 1.0F);
+        // @todo 1.17
+//        GlStateManager._color4f(red, green, blue, 1.0F);
     }
 
 
@@ -262,60 +255,60 @@ public class RenderHelper {
 
     public static void renderStackOnGround(PoseStack matrixStack, ItemStack stack, double alpha) {
         if (!stack.isEmpty()) {
-            BakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getModel(stack, null, null);
+            BakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getModel(stack, null, null, 0);  // @todo 1.17 check integer
             if (!stack.isEmpty()) {
-                Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
-                Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
-                GlStateManager._color4f(1.0F, 1.0F, 1.0F, (float) alpha);
-                GlStateManager._enableRescaleNormal();
-                GlStateManager._alphaFunc(GL11.GL_GREATER, 0.1F);
-                GlStateManager._enableBlend();
-                GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
-                matrixStack.pushPose();
-
-                // @todo 1.15
-//                ibakedmodel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
-//                Minecraft.getInstance().getItemRenderer().renderItem(stack, ibakedmodel);
-
-                // @todo 1.15
-//                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
-                matrixStack.popPose();
-                GlStateManager._disableRescaleNormal();
-                GlStateManager._disableBlend();
-                Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
-                Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).restoreLastBlurMipmap();
+                // @todo 1.17 port rendering
+//                Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+//                Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
+//                GlStateManager._color4f(1.0F, 1.0F, 1.0F, (float) alpha);
+//                GlStateManager._enableRescaleNormal();
+//                GlStateManager._alphaFunc(GL11.GL_GREATER, 0.1F);
+//                GlStateManager._enableBlend();
+//                GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
+//                matrixStack.pushPose();
+//
+//                // @todo 1.15
+////                ibakedmodel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
+////                Minecraft.getInstance().getItemRenderer().renderItem(stack, ibakedmodel);
+//
+//                // @todo 1.15
+////                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
+//                matrixStack.popPose();
+//                GlStateManager._disableRescaleNormal();
+//                GlStateManager._disableBlend();
+//                Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+//                Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).restoreLastBlurMipmap();
             }
         }
 
     }
 
     public static boolean renderItemStack(PoseStack matrixStack, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
-        RenderSystem.color4f(1F, 1F, 1F, 1f);
-
         boolean rc = false;
-        if (highlight) {
-            RenderSystem.disableLighting();
-            drawVerticalGradientRect(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
-        }
-        if (!itm.isEmpty() && itm.getItem() != null) {
-            rc = true;
-            matrixStack.pushPose();
-            RenderSystem.color4f(1F, 1F, 1F, 1F);
-            RenderSystem.enableRescaleNormal();
-            RenderSystem.enableLighting();
-            com.mojang.blaze3d.platform.Lighting.turnBackOn();
-            // @todo 1.14 check if right?
-            // @todo 1.15
-            RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, (float) 240, (float) 240);
-//            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
-
-            itemRender.renderAndDecorateItem(itm, x, y);
-            renderItemOverlayIntoGUI(matrixStack, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
-//            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
-            matrixStack.popPose();
-            RenderSystem.disableRescaleNormal();
-            RenderSystem.disableLighting();
-        }
+        // @todo 1.17 port rendering
+//        RenderSystem.color4f(1F, 1F, 1F, 1f);
+//
+//        if (highlight) {
+//            RenderSystem.disableLighting();
+//            drawVerticalGradientRect(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
+//        }
+//        if (!itm.isEmpty() && itm.getItem() != null) {
+//            rc = true;
+//            matrixStack.pushPose();
+//            RenderSystem.color4f(1F, 1F, 1F, 1F);
+//            RenderSystem.enableRescaleNormal();
+//            RenderSystem.enableLighting();
+//            com.mojang.blaze3d.platform.Lighting.turnBackOn();
+//            // @todo 1.14 check if right?
+//            // @todo 1.15
+//            RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, (float) 240, (float) 240);
+//
+//            itemRender.renderAndDecorateItem(itm, x, y);
+//            renderItemOverlayIntoGUI(matrixStack, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
+//            matrixStack.popPose();
+//            RenderSystem.disableRescaleNormal();
+//            RenderSystem.disableLighting();
+//        }
 
         return rc;
     }
@@ -349,7 +342,7 @@ public class RenderHelper {
             if (stack.getItem().showDurabilityBar(stack)) {
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableTexture();
-                RenderSystem.disableAlphaTest();
+//                RenderSystem.disableAlphaTest();  // @todo 1.17
                 RenderSystem.disableBlend();
                 Tesselator tessellator = Tesselator.getInstance();
                 BufferBuilder bufferbuilder = tessellator.getBuilder();
@@ -359,7 +352,7 @@ public class RenderHelper {
                 draw(bufferbuilder, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
                 draw(bufferbuilder, xPosition + 2, yPosition + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
                 RenderSystem.enableBlend();
-                RenderSystem.enableAlphaTest();
+//                RenderSystem.enableAlphaTest();   // @todo 1.17
                 RenderSystem.enableTexture();
                 RenderSystem.enableDepthTest();
             }
@@ -394,7 +387,7 @@ public class RenderHelper {
                     s = ChatFormatting.RED + String.valueOf(stackSize);
                 }
 
-                RenderSystem.disableLighting();
+//                RenderSystem.disableLighting();   // @todo 1.17
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableBlend();
                 if (scaled >= 2) {
@@ -410,7 +403,7 @@ public class RenderHelper {
                 } else {
                     fr.drawShadow(matrixStack, s, (xPosition + 19 - 2 - fr.width(s)), (yPosition + 6 + 3), 16777215);
                 }
-                RenderSystem.enableLighting();
+//                RenderSystem.enableLighting();        // @todo 1.17
                 RenderSystem.enableDepthTest();
                 // Fixes opaque cooldown overlay a bit lower
                 // TODO: check if enabled blending still screws things up down the line.
@@ -421,36 +414,38 @@ public class RenderHelper {
                 double health = stack.getItem().getDurabilityForDisplay(stack);
                 int j = (int) Math.round(13.0D - health * 13.0D);
                 int i = (int) Math.round(255.0D - health * 255.0D);
-                RenderSystem.disableLighting();
-                RenderSystem.disableDepthTest();
-                RenderSystem.disableTexture();
-                RenderSystem.disableAlphaTest();
-                RenderSystem.disableBlend();
-                Tesselator tessellator = Tesselator.getInstance();
-                BufferBuilder vertexbuffer = tessellator.getBuilder();
-                draw(vertexbuffer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-                draw(vertexbuffer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
-                draw(vertexbuffer, xPosition + 2, yPosition + 13, j, 1, 255 - i, i, 0, 255);
-                RenderSystem.enableBlend();
-                RenderSystem.enableAlphaTest();
-                RenderSystem.enableTexture();
-                RenderSystem.enableLighting();
-                RenderSystem.enableDepthTest();
+                // @todo 1.17 port rendering
+//                RenderSystem.disableLighting();
+//                RenderSystem.disableDepthTest();
+//                RenderSystem.disableTexture();
+//                RenderSystem.disableAlphaTest();
+//                RenderSystem.disableBlend();
+//                Tesselator tessellator = Tesselator.getInstance();
+//                BufferBuilder vertexbuffer = tessellator.getBuilder();
+//                draw(vertexbuffer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
+//                draw(vertexbuffer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
+//                draw(vertexbuffer, xPosition + 2, yPosition + 13, j, 1, 255 - i, i, 0, 255);
+//                RenderSystem.enableBlend();
+//                RenderSystem.enableAlphaTest();
+//                RenderSystem.enableTexture();
+//                RenderSystem.enableLighting();
+//                RenderSystem.enableDepthTest();
             }
 
             LocalPlayer PlayerEntitysp = Minecraft.getInstance().player;
             float f = PlayerEntitysp == null ? 0.0F : PlayerEntitysp.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getFrameTime());
 
             if (f > 0.0F) {
-                RenderSystem.disableLighting();
-                RenderSystem.disableDepthTest();
-                RenderSystem.disableTexture();
-                Tesselator tessellator1 = Tesselator.getInstance();
-                BufferBuilder vertexbuffer1 = tessellator1.getBuilder();
-                draw(vertexbuffer1, xPosition, yPosition + MathTools.floor(16.0F * (1.0F - f)), 16, MathTools.ceiling(16.0F * f), 255, 255, 255, 127);
-                RenderSystem.enableTexture();
-                RenderSystem.enableLighting();
-                RenderSystem.enableDepthTest();
+                // @todo 1.17 port rendering
+//                RenderSystem.disableLighting();
+//                RenderSystem.disableDepthTest();
+//                RenderSystem.disableTexture();
+//                Tesselator tessellator1 = Tesselator.getInstance();
+//                BufferBuilder vertexbuffer1 = tessellator1.getBuilder();
+//                draw(vertexbuffer1, xPosition, yPosition + MathTools.floor(16.0F * (1.0F - f)), 16, MathTools.ceiling(16.0F * f), 255, 255, 255, 127);
+//                RenderSystem.enableTexture();
+//                RenderSystem.enableLighting();
+//                RenderSystem.enableDepthTest();
             }
         }
     }
@@ -459,7 +454,7 @@ public class RenderHelper {
      * Draw with the WorldRenderer
      */
     private static void draw(BufferBuilder renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+        renderer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         renderer.vertex((x + 0), (y + 0), 0.0D).color(red, green, blue, alpha).endVertex();
         renderer.vertex((x + 0), (y + height), 0.0D).color(red, green, blue, alpha).endVertex();
         renderer.vertex((x + width), (y + height), 0.0D).color(red, green, blue, alpha).endVertex();
@@ -486,25 +481,25 @@ public class RenderHelper {
         float f7 = (color2 & 255) / 255.0F;
         GlStateManager._disableTexture();
         GlStateManager._enableBlend();
-        GlStateManager._disableAlphaTest();
+//        GlStateManager._disableAlphaTest();       // @todo 1.17
 
         // @todo 1.14 check
 //        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
 
-        GlStateManager._shadeModel(GL11.GL_SMOOTH);
+//        GlStateManager._shadeModel(GL11.GL_SMOOTH);   // @todo 1.17
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         buffer.vertex(x2, y1, zLevel).color(f1, f2, f3, f).endVertex();
         buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
         buffer.vertex(x1, y2, zLevel).color(f5, f6, f7, f4).endVertex();
         buffer.vertex(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.end();
 
-        GlStateManager._shadeModel(GL11.GL_FLAT);
+//        GlStateManager._shadeModel(GL11.GL_FLAT); // @todo 1.17
         GlStateManager._disableBlend();
-        GlStateManager._enableAlphaTest();
+//        GlStateManager._enableAlphaTest();        // @todo 1.17
         GlStateManager._enableTexture();
     }
 
@@ -526,25 +521,26 @@ public class RenderHelper {
         float f7 = (color2 & 255) / 255.0F;
         GlStateManager._disableTexture();
         GlStateManager._enableBlend();
-        GlStateManager._disableAlphaTest();
+//        GlStateManager._disableAlphaTest();       // @todo 1.17
 
         // @todo 1.14 check
 //        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
 
-        GlStateManager._shadeModel(GL11.GL_SMOOTH);
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
-        buffer.vertex(x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
-        buffer.vertex(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
-        buffer.vertex(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
-        tessellator.end();
-        GlStateManager._shadeModel(GL11.GL_FLAT);
-        GlStateManager._disableBlend();
-        GlStateManager._enableAlphaTest();
-        GlStateManager._enableTexture();
+        // @todo 1.17 port rendering
+//        GlStateManager._shadeModel(GL11.GL_SMOOTH);
+//        Tesselator tessellator = Tesselator.getInstance();
+//        BufferBuilder buffer = tessellator.getBuilder();
+//        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+//        buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
+//        buffer.vertex(x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
+//        buffer.vertex(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
+//        buffer.vertex(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
+//        tessellator.end();
+//        GlStateManager._shadeModel(GL11.GL_FLAT);
+//        GlStateManager._disableBlend();
+//        GlStateManager._enableAlphaTest();
+//        GlStateManager._enableTexture();
     }
 
     /**
@@ -779,7 +775,7 @@ public class RenderHelper {
         float f1 = (1 / 256.0f);
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         buffer.vertex((x + 0), (y + height), zLevel).uv(((u + 0) * f), ((v + height) * f1)).endVertex();
         buffer.vertex((x + width), (y + height), zLevel).uv(((u + width) * f), ((v + height) * f1)).endVertex();
         buffer.vertex((x + width), (y + 0), zLevel).uv(((u + width) * f), ((v + 0) * f1)).endVertex();
@@ -793,7 +789,7 @@ public class RenderHelper {
         double zLevel = 50;
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder vertexbuffer = tessellator.getBuilder();
-        vertexbuffer.begin(7, DefaultVertexFormat.POSITION_TEX);
+        vertexbuffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         vertexbuffer.vertex((x + 0), (y + height), zLevel).uv(((textureX + 0) * f), ((textureY + height) * f1)).endVertex();
         vertexbuffer.vertex((x + width), (y + height), zLevel).uv(((textureX + width) * f), ((textureY + height) * f1)).endVertex();
         vertexbuffer.vertex((x + width), (y + 0), zLevel).uv(((textureX + width) * f), ((textureY + 0) * f1)).endVertex();
@@ -821,7 +817,7 @@ public class RenderHelper {
         float f1 = (1 / 256.0f);
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         buffer.vertex(matrix, (x + 0), (y + height), zLevel).uv(((u + 0) * f), ((v + height) * f1)).endVertex();
         buffer.vertex(matrix, (x + width), (y + height), zLevel).uv(((u + width) * f), ((v + height) * f1)).endVertex();
         buffer.vertex(matrix, (x + width), (y + 0), zLevel).uv(((u + width) * f), ((v + 0) * f1)).endVertex();
@@ -855,63 +851,67 @@ public class RenderHelper {
     }
 
     public static int renderText(PoseStack matrixStack, int x, int y, String txt) {
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1f);
-
-        matrixStack.pushPose();
-        matrixStack.translate(0.0F, 0.0F, 32.0F);
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager._enableRescaleNormal();
-        GlStateManager._enableLighting();
-        com.mojang.blaze3d.platform.Lighting.turnBackOn();
-
-        GlStateManager._disableLighting();
-        GlStateManager._disableDepthTest();
-        GlStateManager._disableBlend();
-        Minecraft mc = Minecraft.getInstance();
-        int width = mc.font.width(txt);
-        mc.font.drawShadow(matrixStack, txt, x, y, 16777215);
-        GlStateManager._enableLighting();
-        GlStateManager._enableDepthTest();
-        // Fixes opaque cooldown overlay a bit lower
-        // TODO: check if enabled blending still screws things up down the line.
-        GlStateManager._enableBlend();
-
-
-        matrixStack.popPose();
-        GlStateManager._disableRescaleNormal();
-        GlStateManager._disableLighting();
-
-        return width;
+        // @todo 1.17 port rendering
+//        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1f);
+//
+//        matrixStack.pushPose();
+//        matrixStack.translate(0.0F, 0.0F, 32.0F);
+//        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
+//        GlStateManager._enableRescaleNormal();
+//        GlStateManager._enableLighting();
+//        com.mojang.blaze3d.platform.Lighting.turnBackOn();
+//
+//        GlStateManager._disableLighting();
+//        GlStateManager._disableDepthTest();
+//        GlStateManager._disableBlend();
+//        Minecraft mc = Minecraft.getInstance();
+//        int width = mc.font.width(txt);
+//        mc.font.drawShadow(matrixStack, txt, x, y, 16777215);
+//        GlStateManager._enableLighting();
+//        GlStateManager._enableDepthTest();
+//        // Fixes opaque cooldown overlay a bit lower
+//        // TODO: check if enabled blending still screws things up down the line.
+//        GlStateManager._enableBlend();
+//
+//
+//        matrixStack.popPose();
+//        GlStateManager._disableRescaleNormal();
+//        GlStateManager._disableLighting();
+//
+//        return width;
+        return 0;
     }
 
     public static int renderText(PoseStack matrixStack, int x, int y, String txt, int color) {
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0f);
-
-        matrixStack.pushPose();
-        matrixStack.translate(0.0F, 0.0F, 32.0F);
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager._enableRescaleNormal();
-        GlStateManager._enableLighting();
-        com.mojang.blaze3d.platform.Lighting.turnBackOn();
-
-        GlStateManager._disableLighting();
-        GlStateManager._disableDepthTest();
-        GlStateManager._disableBlend();
-        Minecraft mc = Minecraft.getInstance();
-        int width = mc.font.width(txt);
-        mc.font.draw(matrixStack, txt, x, y, color);
-        GlStateManager._enableLighting();
-        GlStateManager._enableDepthTest();
-        // Fixes opaque cooldown overlay a bit lower
-        // TODO: check if enabled blending still screws things up down the line.
-        GlStateManager._enableBlend();
-
-
-        matrixStack.popPose();
-        GlStateManager._disableRescaleNormal();
-        GlStateManager._disableLighting();
-
-        return width;
+        // @todo 1.17 port rendering
+//        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0f);
+//
+//        matrixStack.pushPose();
+//        matrixStack.translate(0.0F, 0.0F, 32.0F);
+//        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
+//        GlStateManager._enableRescaleNormal();
+//        GlStateManager._enableLighting();
+//        com.mojang.blaze3d.platform.Lighting.turnBackOn();
+//
+//        GlStateManager._disableLighting();
+//        GlStateManager._disableDepthTest();
+//        GlStateManager._disableBlend();
+//        Minecraft mc = Minecraft.getInstance();
+//        int width = mc.font.width(txt);
+//        mc.font.draw(matrixStack, txt, x, y, color);
+//        GlStateManager._enableLighting();
+//        GlStateManager._enableDepthTest();
+//        // Fixes opaque cooldown overlay a bit lower
+//        // TODO: check if enabled blending still screws things up down the line.
+//        GlStateManager._enableBlend();
+//
+//
+//        matrixStack.popPose();
+//        GlStateManager._disableRescaleNormal();
+//        GlStateManager._disableLighting();
+//
+//        return width;
+        return 0;
     }
 
     /**

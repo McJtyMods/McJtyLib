@@ -112,8 +112,9 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
         super.draw(gui, matrixStack, x, y);
 
         if (image != null) {
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.getTextureManager().bind(image);
+            // @todo 1.17
+//            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+//            mc.getTextureManager().bind(image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
             gui.blit(matrixStack, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);

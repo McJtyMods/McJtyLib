@@ -52,10 +52,9 @@ public class CraftingSlot extends SlotItemHandler {
     }
 
     @Override
-    public ItemStack onTake(Player thePlayer, ItemStack stack) {
+    public void onTake(Player thePlayer, ItemStack stack) {
         this.checkTakeAchievements(stack);
         super.onTake(thePlayer, stack);
-        return stack;
     }
 
     @Override

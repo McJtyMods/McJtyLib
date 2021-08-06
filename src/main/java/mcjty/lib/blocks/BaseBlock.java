@@ -299,18 +299,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public boolean triggerEvent(BlockState state, Level worldIn, BlockPos pos, int id, int param) {
-        if (hasTileEntity(state)) {
-            super.triggerEvent(state, worldIn, pos, id, param);
-            BlockEntity tileentity = worldIn.getBlockEntity(pos);
-            return tileentity == null ? false : tileentity.triggerEvent(id, param);
-        } else {
-            return super.triggerEvent(state, worldIn, pos, id, param);
-        }
-    }
-
     protected boolean checkAccess(Level world, Player player, BlockEntity te) {
         if (te instanceof GenericTileEntity) {
             ((GenericTileEntity) te).checkAccess(player);

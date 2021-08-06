@@ -370,10 +370,11 @@ public class TrueTypeFont {
 
     public void drawString(float x, float y, String text, float scaleX, float scaleY, int format, float yoffset, float... rgba) {
         if (rgba.length == 0) rgba = new float[]{1f, 1f, 1f, 1f};
-        GlStateManager._pushMatrix();
-        GlStateManager._scalef(-scaleX, -scaleY, 1.0f);
-        GlStateManager._rotatef(180, 0, 1, 0);
-        GlStateManager._translatef(0, yoffset, 0);
+        // @todo 1.17 renderer
+//        GlStateManager._pushMatrix();
+//        GlStateManager._scalef(-scaleX, -scaleY, 1.0f);
+//        GlStateManager._rotatef(180, 0, 1, 0);
+//        GlStateManager._translatef(0, yoffset, 0);
 
         GlStateManager._bindTexture(fontTextureID);
         // @todo 1.15 needs rework
@@ -401,7 +402,8 @@ public class TrueTypeFont {
         // @todo 1.15
 //        GlStateManager.end();
 
-        GlStateManager._popMatrix();
+        // @todo 1.17
+//        GlStateManager._popMatrix();
     }
 
     private void drawTextInternal(float x, float y, String whatchars, float scaleX, float scaleY, int format, float[] rgba) {
@@ -447,7 +449,8 @@ public class TrueTypeFont {
         }
         if (rgba.length == 4)
             //worldRenderer.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-            GlStateManager._color4f(rgba[0], rgba[1], rgba[2], rgba[3]);
+            // @todo 1.17
+//            GlStateManager._color4f(rgba[0], rgba[1], rgba[2], rgba[3]);
         while (i >= 0 && i <= endIndex) {
 
             charCurrent = whatchars.charAt(i);

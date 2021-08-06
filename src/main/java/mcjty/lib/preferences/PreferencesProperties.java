@@ -4,13 +4,10 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
 
@@ -118,20 +115,6 @@ public class PreferencesProperties {
     }
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(PreferencesProperties.class, new Capability.IStorage<PreferencesProperties>() {
-
-            @Override
-            public Tag writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, Tag nbt) {
-                throw new UnsupportedOperationException();
-            }
-
-        }, () -> {
-            throw new UnsupportedOperationException();
-        });
+        CapabilityManager.INSTANCE.register(PreferencesProperties.class);
     }
 }

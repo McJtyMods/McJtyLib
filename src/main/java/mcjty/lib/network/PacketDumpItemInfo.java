@@ -3,12 +3,12 @@ package mcjty.lib.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.debugtools.DumpItemNBT;
 import mcjty.lib.varia.Logging;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.players.ServerOpListEntry;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.ServerOpList;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.server.players.ServerOpListEntry;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import org.apache.logging.log4j.Level;
 
 import java.util.function.Supplier;

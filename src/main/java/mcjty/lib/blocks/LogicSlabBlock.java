@@ -192,7 +192,8 @@ public class LogicSlabBlock extends BaseBlock {
         }
     }
 
-    @Override
+    // @todo 1.17 @@@@@@@@@@@@ FIX ME!!!
+//    @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
         BlockEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {

@@ -1,14 +1,13 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.ForgeConfigSpec;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,7 +35,7 @@ public class Logging {
     }
 
     public static void logError(String msg) {
-        getLogger().log(Level.ERROR, msg);
+        getLogger().log(org.apache.logging.log4j.Level.ERROR, msg);
     }
 
     public static void log(Level world, BlockEntity te, String message) {
@@ -44,10 +43,10 @@ public class Logging {
             long ticks = world.getGameTime();
             if (ticks != prevTicks) {
                 prevTicks = ticks;
-                getInstance().logger.log(Level.INFO, "=== Time " + ticks + " ===");
+                getInstance().logger.log(org.apache.logging.log4j.Level.INFO, "=== Time " + ticks + " ===");
             }
             String id = te.getBlockPos().getX() + "," + te.getBlockPos().getY() + "," + te.getBlockPos().getZ() + ": ";
-            getInstance().logger.log(Level.INFO, id + message);
+            getInstance().logger.log(org.apache.logging.log4j.Level.INFO, id + message);
         }
     }
 
@@ -60,12 +59,12 @@ public class Logging {
     }
 
     public static void log(String message) {
-        getInstance().logger.log(Level.INFO, message);
+        getInstance().logger.log(org.apache.logging.log4j.Level.INFO, message);
     }
 
     public static void logDebug(String message) {
         if (debugMode) {
-            getInstance().logger.log(Level.INFO, message);
+            getInstance().logger.log(org.apache.logging.log4j.Level.INFO, message);
         }
     }
 

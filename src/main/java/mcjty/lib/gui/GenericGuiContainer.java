@@ -1,7 +1,7 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.client.GuiTools;
 import mcjty.lib.client.RenderHelper;
@@ -17,22 +17,24 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.Tools;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fmlclient.gui.GuiUtils;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -345,12 +347,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
         list = addCustomLines(list, blockRender, stack);
 
-        Font font = null;
-        if (stack.getItem() != null) {
-            font = stack.getItem().getFontRenderer(stack);
-        }
+        Font font = getMinecraft().font;
+//        Font font = null;
+//        if (stack.getItem() != null) {
+//            font = stack.getItem().getFontRenderer(stack);
+//        }
         GuiUtils.preItemToolTip(stack);
-        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, (font == null ? getMinecraft().font : font));
+        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, font);
     }
 
     @Override

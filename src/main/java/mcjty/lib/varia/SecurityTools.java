@@ -11,7 +11,7 @@ public class SecurityTools {
 //    }
 
     public static boolean isPrivileged(Player player, Level world) {
-        return player.abilities.instabuild || world.getServer().getPlayerList().isOp(player.getGameProfile());
+        return player.getAbilities().instabuild || world.getServer().getPlayerList().isOp(player.getGameProfile());
     }
 
 }

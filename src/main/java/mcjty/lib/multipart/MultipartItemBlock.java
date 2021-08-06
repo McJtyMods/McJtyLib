@@ -16,6 +16,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -130,8 +131,11 @@ public class MultipartItemBlock extends BlockItem {
 //        }
 //    }
 
-    private BlockEntity createTileEntity(Level world, BlockState state) {
-        return state.getBlock().createTileEntity(state, world);
+    private BlockEntity createTileEntity(BlockPos pos, BlockState state) {
+        if (state.getBlock() instanceof EntityBlock entityBlock) {
+            return entityBlock.newBlockEntity(pos, state);
+        }
+        return null;
     }
 
     @Override
@@ -144,7 +148,7 @@ public class MultipartItemBlock extends BlockItem {
                                          @Nonnull PartSlot slot) {
         BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
-            BlockEntity tileEntity = createTileEntity(world, newState);
+            BlockEntity tileEntity = createTileEntity(pos, newState);
             if (tileEntity instanceof GenericTileEntity && stack.getTag() != null) {
                 // @todo how to do this?
 //                ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
@@ -164,7 +168,7 @@ public class MultipartItemBlock extends BlockItem {
 
             te = world.getBlockEntity(pos);
             if (te instanceof MultipartTE) {
-                BlockEntity tileEntity = createTileEntity(world, newState);
+                BlockEntity tileEntity = createTileEntity(pos, newState);
                 if (tileEntity instanceof GenericTileEntity && stack.hasTag()) {
                     // @todo how to do this?
 //                    ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
@@ -211,8 +215,8 @@ public class MultipartItemBlock extends BlockItem {
 
 
     private HitResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn, boolean useLiquids) {
-        float pitch = playerIn.xRot;
-        float yaw = playerIn.yRot;
+        float pitch = playerIn.getXRot();
+        float yaw = playerIn.getYRot();
         double x = playerIn.getX();
         double y = playerIn.getY() + playerIn.getEyeHeight();
         double z = playerIn.getZ();

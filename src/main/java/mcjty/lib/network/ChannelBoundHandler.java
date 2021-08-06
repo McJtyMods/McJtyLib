@@ -1,8 +1,9 @@
 package mcjty.lib.network;
 
+
 import mcjty.lib.varia.TriConsumer;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;

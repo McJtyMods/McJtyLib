@@ -114,7 +114,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
             mc.getItemRenderer().blitOffset = 0;
             this.window.getGui().setBlitOffset(0);
             if (hilightOnHover && isHovering()) {
-                RenderSystem.disableLighting();
+//                RenderSystem.disableLighting();   // @todo 1.17
                 RenderSystem.disableDepthTest();
                 RenderSystem.colorMask(true, true, true, false);
                 RenderHelper.drawVerticalGradientRect(xx, yy, xx + 16, yy + 16, -2130706433, -2130706433);

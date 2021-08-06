@@ -18,7 +18,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.util.text.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
@@ -159,7 +158,7 @@ public class TooltipRender {
         com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
         matrixStack.pushPose();
         matrixStack.translate(0, 0, 400f);
-        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, (Level)null, (LivingEntity)null));
+        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, (Level)null, (LivingEntity)null, 0));   // @todo 1.17 what is this integer?
 //        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
         matrixStack.popPose();
 
@@ -198,35 +197,37 @@ public class TooltipRender {
     }
 
     private static void renderItemModelIntoGUI(ItemRenderer render, PoseStack matrixStack, ItemStack itemStack, int x, int y, BakedModel bakedmodel) {
-        matrixStack.pushPose();
-        Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
-        Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
-        RenderSystem.enableRescaleNormal();
-        RenderSystem.enableAlphaTest();
-        RenderSystem.defaultAlphaFunc();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        matrixStack.translate((float)x, (float)y, 100.0F + render.blitOffset);
-        matrixStack.translate(8.0F, 8.0F, 0.0F);
-        matrixStack.scale(1.0F, -1.0F, 1.0F);
-        matrixStack.scale(16.0F, 16.0F, 16.0F);
-        MultiBufferSource.BufferSource irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
-        boolean flag = !bakedmodel.usesBlockLight();
-        if (flag) {
-            Lighting.setupForFlatItems();
-        }
+        // @todo 1.17 port me
 
-        render.render(itemStack, ItemTransforms.TransformType.GUI, false, matrixStack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
-        irendertypebuffer$impl.endBatch();
-        RenderSystem.enableDepthTest();
-        if (flag) {
-            Lighting.setupFor3DItems();
-        }
-
-        RenderSystem.disableAlphaTest();
-        RenderSystem.disableRescaleNormal();
-        matrixStack.popPose();
+//        matrixStack.pushPose();
+//        Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+//        Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
+//        RenderSystem.enableRescaleNormal();
+//        RenderSystem.enableAlphaTest();
+//        RenderSystem.defaultAlphaFunc();
+//        RenderSystem.enableBlend();
+//        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+//        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+//        matrixStack.translate((float)x, (float)y, 100.0F + render.blitOffset);
+//        matrixStack.translate(8.0F, 8.0F, 0.0F);
+//        matrixStack.scale(1.0F, -1.0F, 1.0F);
+//        matrixStack.scale(16.0F, 16.0F, 16.0F);
+//        MultiBufferSource.BufferSource irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
+//        boolean flag = !bakedmodel.usesBlockLight();
+//        if (flag) {
+//            Lighting.setupForFlatItems();
+//        }
+//
+//        render.render(itemStack, ItemTransforms.TransformType.GUI, false, matrixStack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+//        irendertypebuffer$impl.endBatch();
+//        RenderSystem.enableDepthTest();
+//        if (flag) {
+//            Lighting.setupFor3DItems();
+//        }
+//
+//        RenderSystem.disableAlphaTest();
+//        RenderSystem.disableRescaleNormal();
+//        matrixStack.popPose();
     }
 
 }

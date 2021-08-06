@@ -53,7 +53,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return new MultipartTE();
+        return new MultipartTE(blockPos, blockState);
     }
 
     @Override

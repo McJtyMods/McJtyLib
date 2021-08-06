@@ -1,17 +1,18 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
@@ -51,8 +52,8 @@ public class MultipartTE extends BlockEntity {
     private Map<PartSlot, Part> parts = new HashMap<>();
     private int version = 0;    // To update rendering client-side
 
-    public MultipartTE() {
-        super(TYPE_MULTIPART);
+    public MultipartTE(BlockPos pos, BlockState state) {
+        super(TYPE_MULTIPART, pos, state);
     }
 
     private void dumpParts(String prefix) {
@@ -139,7 +140,7 @@ public class MultipartTE extends BlockEntity {
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
         int oldVersion = version;
-        load(getBlockState(), packet.getTag());
+        load(packet.getTag());
         if (level.isClientSide && version != oldVersion) {
             ModelDataManager.requestModelDataRefresh(this);
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
@@ -179,13 +180,13 @@ public class MultipartTE extends BlockEntity {
 
     public void markDirtyQuick() {
         if (level != null) {
-            level.blockEntityChanged(this.worldPosition, this);
+            level.blockEntityChanged(this.worldPosition);
         }
     }
 
     @Override
-    public void load(BlockState st, CompoundTag compound) {
-        super.load(st, compound);
+    public void load(CompoundTag compound) {
+        super.load(compound);
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
         version = compound.getInt("version");
@@ -203,15 +204,17 @@ public class MultipartTE extends BlockEntity {
                         CompoundTag tc = tag.getCompound("te");
                         BlockEntity te = part.tileEntity;
                         if (te == null) {
-                            te = state.getBlock().createTileEntity(state, level);// @todo
-                            if (te != null) {
-                                te.setLevelAndPosition(level, worldPosition);
-                                te.load(state, tc);
-                                te.setLevelAndPosition(level, worldPosition);
+                            if (state.getBlock() instanceof EntityBlock entityBlock) {
+                                te = entityBlock.newBlockEntity(worldPosition, state);
+                                if (te != null) {
+                                    te.setLevel(level);
+                                    te.load(tc);
+                                    te.setLevel(level);
+                                }
                             }
                         } else {
-                            te.load(state, tc);
-                            te.setPosition(worldPosition);
+                            te.load(tc);
+//                            te.setPosition(worldPosition);    // @todo 1.17
                         }
                     }
                     newparts.put(slot, part);
@@ -219,11 +222,13 @@ public class MultipartTE extends BlockEntity {
                     BlockEntity te = null;
                     if (tag.contains("te")) {
                         CompoundTag tc = tag.getCompound("te");
-                        te = state.getBlock().createTileEntity(state, level);// @todo
-                        if (te != null) {
-                            te.setLevelAndPosition(level, worldPosition);
-                            te.load(state, tc);
-                            te.setLevelAndPosition(level, worldPosition);
+                        if (state.getBlock() instanceof EntityBlock entityBlock) {
+                            te = entityBlock.newBlockEntity(worldPosition, state);
+                            if (te != null) {
+                                te.setLevel(level);
+                                te.load(tc);
+                                te.setLevel(level);
+                            }
                         }
                     }
                     Part part = new Part(state, te);
@@ -243,11 +248,11 @@ public class MultipartTE extends BlockEntity {
 
 
     @Override
-    public void setLevelAndPosition(Level worldIn, BlockPos pos) {
-        super.setLevelAndPosition(worldIn, pos);
+    public void setLevel(Level level) {
+        super.setLevel(level);
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             if (entry.getValue().getTileEntity() != null) {
-                entry.getValue().getTileEntity().setLevelAndPosition(worldIn, pos);
+                entry.getValue().getTileEntity().setLevel(level);
             }
         }
     }

@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 

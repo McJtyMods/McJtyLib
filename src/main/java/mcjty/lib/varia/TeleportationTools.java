@@ -1,14 +1,14 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.McJtyLib;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.ITeleporter;
 
 import javax.annotation.Nullable;
@@ -19,8 +19,8 @@ public class TeleportationTools {
     public static void teleport(Player player, DimensionId dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
         DimensionId oldId = DimensionId.fromWorld(player.getCommandSenderWorld());
 
-        float rotationYaw = player.yRot;
-        float rotationPitch = player.xRot;
+        float rotationYaw = player.getYRot();
+        float rotationPitch = player.getXRot();
 
         if (!oldId.equals(dimension)) {
             teleportToDimension(player, dimension, destX, destY, destZ);
@@ -28,8 +28,8 @@ public class TeleportationTools {
         if (direction != null) {
             fixOrientation(player, destX, destY, destZ, direction);
         } else {
-            player.yRot = rotationYaw;
-            player.xRot = rotationPitch;
+            player.setYRot(rotationYaw);
+            player.setXRot(rotationPitch);
         }
         player.teleportTo(destX, destY, destZ);
     }
@@ -43,7 +43,7 @@ public class TeleportationTools {
         player.changeDimension(world, new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                entity.setLevel(world);
+                entity.level = world;
                 world.addDuringPortalTeleport((ServerPlayer) entity);
                 entity.moveTo(x, y, z);
                 entity.teleportTo(x, y, z);
@@ -57,11 +57,11 @@ public class TeleportationTools {
         double d1 = dest.getY() - (newY + entity.getEyeHeight());
         double d2 = dest.getZ() - newZ;
 
-        double d3 = Mth.sqrt(d0 * d0 + d2 * d2);
+        double d3 = Mth.sqrt((float) (d0 * d0 + d2 * d2));
         float f = (float) (Mth.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
         float f1 = (float) (-(Mth.atan2(d1, d3) * (180D / Math.PI)));
-        entity.xRot = updateRotation(entity.xRot, f1);
-        entity.yRot = updateRotation(entity.yRot, f);
+        entity.setXRot( updateRotation(entity.getXRot(), f1));
+        entity.setYRot(updateRotation(entity.getYRot(), f));
     }
 
     private static float updateRotation(float angle, float targetAngle) {
@@ -80,7 +80,7 @@ public class TeleportationTools {
             if (facing != null) {
                 fixOrientation(entity, newX, newY, newZ, facing);
             }
-            entity.moveTo(newX, newY, newZ, entity.yRot, entity.xRot);
+            entity.moveTo(newX, newY, newZ, entity.getYRot(), entity.getXRot());
             ((ServerLevel) destWorld).tickNonPassenger(entity);
             return entity;
         } else {

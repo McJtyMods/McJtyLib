@@ -17,8 +17,8 @@ public class LogicTileEntity extends GenericTileEntity {
 
     protected int powerOutput = 0;
 
-    public LogicTileEntity(BlockEntityType<?> type) {
-        super(type);
+    public LogicTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
     public LogicFacing getFacing(BlockState state) {

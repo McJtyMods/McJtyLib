@@ -67,8 +67,8 @@ public class GenericTileEntity extends BlockEntity implements ICommandHandler, I
     protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     protected int powerLevel = 0;
 
-    public GenericTileEntity(BlockEntityType<?> type) {
-        super(type);
+    public GenericTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
     public void markDirtyClient() {

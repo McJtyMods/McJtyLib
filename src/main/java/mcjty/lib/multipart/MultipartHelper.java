@@ -2,23 +2,20 @@ package mcjty.lib.multipart;
 
 import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Containers;
-import net.minecraft.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.util.math.*;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class MultipartHelper {
 
@@ -82,8 +79,8 @@ public class MultipartHelper {
     }
 
     private static HitResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn, boolean useLiquids) {
-        float pitch = playerIn.xRot;
-        float yaw = playerIn.yRot;
+        float pitch = playerIn.getXRot();
+        float yaw = playerIn.getYRot();
         Vec3 vec3 = getPlayerEyes(playerIn);
         float f2 = Mth.cos(-yaw * 0.017453292F - (float) Math.PI);
         float f3 = Mth.sin(-yaw * 0.017453292F - (float)Math.PI);
