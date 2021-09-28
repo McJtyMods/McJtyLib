@@ -40,6 +40,8 @@ import javax.annotation.Nullable;
 public class RenderHelper {
     public static float rot = 0.0f;
 
+    public static final int MAX_BRIGHTNESS = 0xf000f0;
+
     public static final RenderSettings DEFAULT_SETTINGS = RenderSettings.builder()
             .color(255, 255, 255)
             .alpha(128)
@@ -1018,7 +1020,7 @@ public class RenderHelper {
                 .vertex(matrix, x, y, z)
                 .color(1.0f, 1.0f, 1.0f, 1.0f)
                 .uv(u, v)
-                .uv2(0xf000f0)
+                .uv2(MAX_BRIGHTNESS)
                 .normal(1, 0, 0)
                 .endVertex();
     }

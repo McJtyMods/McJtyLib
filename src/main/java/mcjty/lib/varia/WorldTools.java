@@ -1,10 +1,15 @@
 package mcjty.lib.varia;
 
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ChunkHolder;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+
+import java.util.stream.Stream;
 
 public class WorldTools {
 
@@ -41,5 +46,16 @@ public class WorldTools {
     public static ServerWorld getWorld(World world, DimensionId type) {
         // Worlds in 1.16 are always loaded
         return type.loadWorld(world);
+    }
+
+    /**
+     * Gets all players who have the chunk in which the provided (x,z) coordinates are located loaded
+     */
+    public static Stream<ServerPlayerEntity> getAllPlayersWatchingBlock(World world, BlockPos pos) {
+        if (world instanceof ServerWorld) {
+            ChunkHolder.IPlayerProvider playerManager = ((ServerWorld)world).getChunkSource().chunkMap;
+            return playerManager.getPlayers(new ChunkPos(pos), false);
+        }
+        return Stream.empty();
     }
 }
