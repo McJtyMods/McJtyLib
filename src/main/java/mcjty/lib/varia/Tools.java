@@ -1,5 +1,6 @@
 package mcjty.lib.varia;
 
+import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -7,8 +8,23 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Tools {
+
+    public static IntReferenceHolder holder(Supplier<Integer> getter, Consumer<Integer> setter) {
+        return new IntReferenceHolder() {
+            @Override
+            public int get() {
+                return getter.get();
+            }
+
+            @Override
+            public void set(int v) {
+                setter.accept(v);
+            }
+        };
+    }
 
     public static String getModName(IForgeRegistryEntry<?> entry) {
         ResourceLocation registryName = entry.getRegistryName();
