@@ -9,8 +9,17 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public abstract class BaseItemModelProvider extends ItemModelProvider {
 
+    protected String name(Item item) {
+        return item.getRegistryName().getPath();
+    }
+
+
     public BaseItemModelProvider(DataGenerator generator, String modid, ExistingFileHelper existingFileHelper) {
         super(generator, modid, existingFileHelper);
+    }
+
+    public void parentedBlock(Block block) {
+        parentedBlock(block, "block/" + block.getRegistryName().getPath());
     }
 
     public void parentedBlock(Block block, String model) {

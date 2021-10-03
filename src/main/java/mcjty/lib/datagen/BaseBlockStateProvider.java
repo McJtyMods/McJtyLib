@@ -193,9 +193,10 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     private VariantBlockStateBuilder directionBlock(Block block, Function<BlockState, ModelFile> model, DirectionProperty directionProperty) {
         VariantBlockStateBuilder builder = getVariantBuilder(block);
         builder.forAllStates(state -> {
-            ConfiguredModel.Builder<VariantBlockStateBuilder> modelBuilder = builder.partialState().modelForState();
+            ConfiguredModel.Builder<VariantBlockStateBuilder> modelBuilder = builder.partialState().modelForState()
+                    .modelFile(model.apply(state));
             applyRotation(modelBuilder, state.getValue(directionProperty));
-            return modelBuilder.modelFile(model.apply(state)).build();
+            return modelBuilder.build();
         });
         return builder;
     }
