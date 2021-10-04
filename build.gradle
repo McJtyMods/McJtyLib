@@ -77,6 +77,10 @@ minecraft {
     }
 }
 
+jar {
+  duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     if (findProject(':TheOneProbe') != null) {

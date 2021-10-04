@@ -11,6 +11,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import static net.minecraftforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
@@ -129,42 +130,48 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         return 0;
     }
 
-    public void applyRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
+    public void applyRotation(ConfiguredModel.Builder<?> builder, Direction direction) {
+        applyRotationBld(builder, direction);
+        builder.addModel();
+    }
+
+    private void applyRotationBld(ConfiguredModel.Builder<?> builder, Direction direction) {
         switch (direction) {
             case DOWN:
-                builder.rotationX(90).addModel();
+                builder.rotationX(90);
                 break;
             case UP:
-                builder.rotationX(-90).addModel();
+                builder.rotationX(-90);
                 break;
             case NORTH:
-                builder.addModel();
                 break;
             case SOUTH:
-                builder.rotationY(180).addModel();
+                builder.rotationY(180);
                 break;
             case WEST:
-                builder.rotationY(270).addModel();
+                builder.rotationY(270);
                 break;
             case EAST:
-                builder.rotationY(90).addModel();
+                builder.rotationY(90);
                 break;
         }
     }
 
     public void applyHorizRotation(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
+        applyHorizRotationBld(builder, direction);
+        builder.addModel();
+    }
+
+    private void applyHorizRotationBld(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
         switch (direction) {
-            case NORTH:
-                builder.addModel();
-                break;
             case SOUTH:
-                builder.rotationY(180).addModel();
+                builder.rotationY(180);
                 break;
             case WEST:
-                builder.rotationY(270).addModel();
+                builder.rotationY(270);
                 break;
             case EAST:
-                builder.rotationY(90).addModel();
+                builder.rotationY(90);
                 break;
         }
     }
@@ -175,28 +182,28 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     }
 
     protected VariantBlockStateBuilder horizontalOrientedBlock(Block block, ModelFile model) {
-        return horizontalOrientedBlock(block, state -> model);
+        return horizontalOrientedBlock(block, (blockState, builder) -> builder.modelFile(model));
     }
 
-    protected VariantBlockStateBuilder horizontalOrientedBlock(Block block, Function<BlockState, ModelFile> model) {
+    protected VariantBlockStateBuilder horizontalOrientedBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model) {
         return directionBlock(block, model, BlockStateProperties.HORIZONTAL_FACING);
     }
 
     protected VariantBlockStateBuilder orientedBlock(Block block, ModelFile model) {
-        return orientedBlock(block, state -> model);
+        return orientedBlock(block, (blockState, builder) -> builder.modelFile(model));
     }
 
-    protected VariantBlockStateBuilder orientedBlock(Block block, Function<BlockState, ModelFile> model) {
+    protected VariantBlockStateBuilder orientedBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model) {
         return directionBlock(block, model, BlockStateProperties.FACING);
     }
 
-    private VariantBlockStateBuilder directionBlock(Block block, Function<BlockState, ModelFile> model, DirectionProperty directionProperty) {
+    private VariantBlockStateBuilder directionBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model, DirectionProperty directionProperty) {
         VariantBlockStateBuilder builder = getVariantBuilder(block);
         builder.forAllStates(state -> {
-            ConfiguredModel.Builder<VariantBlockStateBuilder> modelBuilder = builder.partialState().modelForState()
-                    .modelFile(model.apply(state));
-            applyRotation(modelBuilder, state.getValue(directionProperty));
-            return modelBuilder.build();
+            ConfiguredModel.Builder<?> bld = ConfiguredModel.builder();
+            model.accept(state, bld);
+            applyRotationBld(bld, state.getValue(directionProperty));
+            return bld.build();
         });
         return builder;
     }
