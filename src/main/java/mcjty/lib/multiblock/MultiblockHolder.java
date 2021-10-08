@@ -1,19 +1,11 @@
 package mcjty.lib.multiblock;
 
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.LongNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.Constants;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class MultiblockHolder<T extends IMultiblock> {
 
     private final T mb;
-    private final Set<BlockPos> positions = new HashSet<>();
+//    private final Set<BlockPos> positions = new HashSet<>();
 
     public MultiblockHolder(T mb) {
         this.mb = mb;
@@ -23,24 +15,23 @@ public class MultiblockHolder<T extends IMultiblock> {
         return mb;
     }
 
-    public Set<BlockPos> getPositions() {
-        return positions;
-    }
+//    public Set<BlockPos> getPositions() {
+//        return positions;
+//    }
 
     public void load(CompoundNBT tagCompound) {
-        mb.load(tagCompound);
-        positions.clear();
-        ListNBT lst = tagCompound.getList("pos", Constants.NBT.TAG_LONG);
-        for (INBT nbt : lst) {
-            positions.add(BlockPos.of(((LongNBT)nbt).getAsLong()));
-        }
+//        positions.clear();
+//        ListNBT lst = tagCompound.getList("pos", Constants.NBT.TAG_LONG);
+//        for (INBT nbt : lst) {
+//            positions.add(BlockPos.of(((LongNBT)nbt).getAsLong()));
+//        }
     }
 
     public CompoundNBT save(CompoundNBT tagCompound) {
         mb.save(tagCompound);
-        ListNBT list = new ListNBT();
-        positions.forEach(p -> list.add(LongNBT.valueOf(p.asLong())));
-        tagCompound.put("pos", list);
+//        ListNBT list = new ListNBT();
+//        positions.forEach(p -> list.add(LongNBT.valueOf(p.asLong())));
+//        tagCompound.put("pos", list);
         return tagCompound;
     }
 }

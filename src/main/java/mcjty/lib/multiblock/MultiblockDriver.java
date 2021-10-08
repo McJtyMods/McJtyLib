@@ -2,11 +2,16 @@ package mcjty.lib.multiblock;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class MultiblockDriver<T extends IMultiblock> {
@@ -14,12 +19,16 @@ public class MultiblockDriver<T extends IMultiblock> {
     private final Map<Integer,MultiblockHolder<T>> multiblocks = new HashMap<>();
     private int lastId = 0;
 
-    private final Supplier<T> blockSupplier;
+    private final Function<CompoundNBT, T> blockSupplier;
     private final Consumer<MultiblockDriver<T>> dirtySetter;
+    private final IMultiblockFixer<T> fixer;
+    private final BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
 
-    public MultiblockDriver(Supplier<T> blockSupplier, Consumer<MultiblockDriver<T>> dirtySetter) {
-        this.blockSupplier = blockSupplier;
-        this.dirtySetter = dirtySetter;
+    private MultiblockDriver(Builder<T> builder) {
+        this.blockSupplier = builder.blockSupplier;
+        this.dirtySetter = builder.dirtySetter;
+        this.fixer = builder.fixer;
+        this.holderGetter = builder.holderGetter;
     }
 
     public void clear() {
@@ -27,27 +36,41 @@ public class MultiblockDriver<T extends IMultiblock> {
         lastId = 0;
     }
 
-    public T getOrCreate(int id) {
-        MultiblockHolder<T> holder = multiblocks.get(id);
-        T mb = holder.getMb();
-        if (mb == null) {
-            mb = blockSupplier.get();
-            multiblocks.put(id, new MultiblockHolder<>(mb));
-            dirtySetter.accept(this);
-        }
-        return mb;
+    public IMultiblockFixer<T> getFixer() {
+        return fixer;
     }
 
+    public BiFunction<World, BlockPos, IMultiblockConnector> getHolderGetter() {
+        return holderGetter;
+    }
+
+    /**
+     * Create (or replace) a multiblock with a given id and initialize it
+     */
+    public void createOrUpdate(int id, T mb) {
+        multiblocks.put(id, new MultiblockHolder<>(mb));
+    }
+
+    /**
+     * Get a multiblock with a given id. Returns null if the multiblock doesn't exist
+     */
+    @Nullable
     public T get(int id) {
         MultiblockHolder<T> holder = multiblocks.get(id);
         return holder == null ? null : holder.getMb();
     }
 
+    /**
+     * Delete a multiblock
+     */
     public void delete(int id) {
         multiblocks.remove(id);
         dirtySetter.accept(this);
     }
 
+    /**
+     * Modify a multiblock (holder) and make sure the data gets saved afterwards
+     */
     public void modify(int id, Consumer<MultiblockHolder<T>> consumer) {
         MultiblockHolder<T> holder = multiblocks.get(id);
         if (holder != null) {
@@ -56,7 +79,10 @@ public class MultiblockDriver<T extends IMultiblock> {
         }
     }
 
-    public int create() {
+    /**
+     * Create a new multiblock ID
+     */
+    public int createId() {
         lastId++;
         dirtySetter.accept(this);
         return lastId;
@@ -68,7 +94,7 @@ public class MultiblockDriver<T extends IMultiblock> {
         for (int i = 0 ; i < lst.size() ; i++) {
             CompoundNBT tc = lst.getCompound(i);
             int id = tc.getInt("id");
-            T value = blockSupplier.get();
+            T value = blockSupplier.apply(tc);
             MultiblockHolder<T> holder = new MultiblockHolder<>(value);
             holder.load(tc);
             multiblocks.put(id, holder);
@@ -87,6 +113,42 @@ public class MultiblockDriver<T extends IMultiblock> {
         tagCompound.put("mb", lst);
         tagCompound.putInt("lastId", lastId);
         return tagCompound;
+    }
+
+    public static <T extends IMultiblock> Builder<T> builder() {
+        return new Builder<>();
+    }
+
+    public static class Builder<T extends IMultiblock> {
+
+        private Function<CompoundNBT, T> blockSupplier;
+        private Consumer<MultiblockDriver<T>> dirtySetter;
+        private IMultiblockFixer<T> fixer;
+        private BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
+
+        public Builder<T> blockSupplier(Function<CompoundNBT, T> blockSupplier) {
+            this.blockSupplier = blockSupplier;
+            return this;
+        }
+
+        public Builder<T> dirtySetter(Consumer<MultiblockDriver<T>> dirtySetter) {
+            this.dirtySetter = dirtySetter;
+            return this;
+        }
+
+        public Builder<T> fixer(IMultiblockFixer<T> fixer) {
+            this.fixer = fixer;
+            return this;
+        }
+
+        public Builder<T> holderGetter(BiFunction<World, BlockPos, IMultiblockConnector> holderGetter) {
+            this.holderGetter = holderGetter;
+            return this;
+        }
+
+        public MultiblockDriver<T> build() {
+            return new MultiblockDriver<>(this);
+        }
     }
 
 }

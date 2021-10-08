@@ -1,9 +1,29 @@
 package mcjty.lib.multiblock;
 
-public class MultiblockSupport {}/*{
+import com.google.common.collect.Sets;
+import mcjty.lib.varia.OrientationTools;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import org.apache.commons.lang3.tuple.Pair;
 
-    public static <T extends IMultiblock> void addBlockToNetwork(World level, BlockPos thisPos,
-                                                                 MultiblockDriver<T> driver, BiFunction<World, BlockPos, IMultiblockConnector> holderGetter) {
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+public class MultiblockSupport {
+
+    /**
+     * Add a new block to the adjacent multiblocks (possibly merging adjacent multiblocks)
+     * The new block should not have a network id yet (set to -1!)
+     */
+    public static <T extends IMultiblock> void addBlock(World level, BlockPos thisPos, MultiblockDriver<T> driver, T newMb) {
+        BiFunction<World, BlockPos, IMultiblockConnector> holderGetter = driver.getHolderGetter();
+        IMultiblockFixer<T> fixer = driver.getFixer();
+
         Set<Integer> adjacentGeneratorIds = new HashSet<>();
         for (Direction direction : OrientationTools.DIRECTION_VALUES) {
             BlockPos pos = thisPos.relative(direction);
@@ -14,66 +34,107 @@ public class MultiblockSupport {}/*{
         }
 
         IMultiblockConnector thisHolder = holderGetter.apply(level, thisPos);
-        int mbId = thisHolder.getMultiblockId();
 
         if (adjacentGeneratorIds.isEmpty()) {
             // New network
-            mbId = driver.create();
-            T mb = driver.getOrCreate(mbId);
-            mb.setGeneratorBlocks(1);
+            int mbId = driver.createId();
+            driver.createOrUpdate(mbId, newMb);
+            fixer.initialize(driver, level, newMb, mbId);
         } else if (adjacentGeneratorIds.size() == 1) {
             // Only one network adjacent. So we can simply join this new block to that network
-            mbId = adjacentGeneratorIds.iterator().next();
-            T mb = driver.getOrCreate(mbId);
-            mb.setActive(false);       // Deactivate to make sure it properly restarts
-            mb.incGeneratorBlocks();
+            int mbId = adjacentGeneratorIds.iterator().next();
+            fixer.blockAdded(driver, level, thisPos, mbId, newMb);
         } else {
-            // We need to merge networks. The first network will be the master. First we
-            // calculate the total amount of energy in all the networks that are merged this way
-            int energy = 0;
-            for (Integer netId : adjacentGeneratorIds) {
-                T mb = driver.getOrCreate(netId);
-                mb.setActive(false);       // Deactivate to make sure it properly restarts
-                energy += mb.getEnergy();
-            }
+            // We need to merge networks
+            Set<T> mbs = adjacentGeneratorIds.stream().map(driver::get).collect(Collectors.toSet());
 
-            int id = adjacentGeneratorIds.iterator().next();
+            int masterId = adjacentGeneratorIds.iterator().next();
             Set<BlockPos> done = Sets.newHashSet();
-            setBlocksToNetwork(thisPos, done, id, driver, holderGetter);
+            setBlocksToNetwork(level, thisPos, done, masterId, driver);
 
-            T mb = driver.getOrCreate(mbId);
-            mb.setEnergy(energy);
+            fixer.merge(driver, level, mbs, masterId, newMb);
         }
     }
 
-    private static <T extends IMultiblock> void setBlocksToNetwork(BlockPos c, Set<BlockPos> done, int newId,
-                                           MultiblockDriver<T> driver, BiFunction<World, BlockPos, IMultiblockConnector> holderGetter) {
-        done.add(c);
-
-        DRGeneratorNetwork generatorNetwork = DRGeneratorNetwork.getChannels(level);
-        TileEntityGeneratorPart generatorTileEntity = (TileEntityGeneratorPart) level.getBlockEntity(c);
-        int oldNetworkId = generatorTileEntity.getNetworkId();
-        if (oldNetworkId != newId) {
-            if (oldNetworkId != -1) {
-                generatorNetwork.getOrCreateNetwork(oldNetworkId).decGeneratorBlocks();
-            }
-            generatorTileEntity.setNetworkId(newId);
-            if (newId != -1) {
-                generatorNetwork.getOrCreateNetwork(newId).incGeneratorBlocks();
-            }
+    /// After this routine the 'done' set will be all the blocks for this network
+    private static <T extends IMultiblock> void setBlocksToNetwork(World level, BlockPos c, Set<BlockPos> done, int newId, MultiblockDriver<T> driver) {
+        IMultiblockConnector connector = driver.getHolderGetter().apply(level, c);
+        if (connector == null) {
+            return;
         }
+
+        done.add(c);
+        connector.setMultiblockId(newId);
 
         for (Direction direction : OrientationTools.DIRECTION_VALUES) {
             BlockPos newC = c.relative(direction);
             if (!done.contains(newC)) {
-                Block block = level.getBlockState(newC).getBlock();
-                if (block == GeneratorModule.GENERATOR_PART_BLOCK.get()) {
-                    setBlocksToNetwork(newC, done, newId);
+                if (driver.getHolderGetter().apply(level, newC) != null) {
+                    setBlocksToNetwork(level, newC, done, newId, driver);
                 }
             }
         }
     }
 
+    public static <T extends IMultiblock> void removeBlock(World level, BlockPos thisPos, MultiblockDriver<T> driver) {
+
+        BiFunction<World, BlockPos, IMultiblockConnector> holderGetter = driver.getHolderGetter();
+        IMultiblockConnector thisHolder = holderGetter.apply(level, thisPos);
+        T thisData = driver.get(thisHolder.getMultiblockId());
+
+        // Clear all networks adjacent to this one.
+        for (Direction direction : OrientationTools.DIRECTION_VALUES) {
+            BlockPos newC = thisPos.relative(direction);
+            IMultiblockConnector holder = holderGetter.apply(level, newC);
+            if (holder != null) {
+                Set<BlockPos> done = Sets.newHashSet();
+                done.add(thisPos);
+                setBlocksToNetwork(level, newC, done, -1, driver);
+            }
+        }
+
+        // Now assign new ones.
+        List<Pair<T, Set<BlockPos>>> todo = new ArrayList<>();  // A list of networks we have to fix
+        int idToUse = thisHolder.getMultiblockId();
+        for (Direction direction : OrientationTools.DIRECTION_VALUES) {
+            BlockPos newC = thisPos.relative(direction);
+            IMultiblockConnector holder = holderGetter.apply(level, newC);
+            if (holder != null) {
+                if (holder.getMultiblockId() == -1) {
+                    if (idToUse == -1) {
+                        idToUse = driver.createId();
+                    }
+                    Set<BlockPos> done = Sets.newHashSet();
+                    done.add(thisPos);
+                    setBlocksToNetwork(level, newC, done, idToUse, driver);
+                    T mb = driver.get(idToUse);
+                    todo.add(Pair.of(mb, done));
+
+                    idToUse = -1;
+                }
+            }
+        }
+
+        // We now have a list of multiblocks with associated positions (in todo)
+        driver.getFixer().distribute(driver, level, thisData, todo);
+
+        // Now we need to redistribute the total energy based on the size of the adjacent networks.
+//        int energy = totalEnergy / totalBlocks;
+//        int remainder = totalEnergy % totalBlocks;
+//        for (Direction direction : OrientationTools.DIRECTION_VALUES) {
+//            BlockPos newC = thisPos.relative(direction);
+//            Block block = level.getBlockState(newC).getBlock();
+//            if (block == GeneratorModule.GENERATOR_PART_BLOCK.get()) {
+//                TileEntityGeneratorPart generatorTileEntity = (TileEntityGeneratorPart) level.getBlockEntity(newC);
+//                DRGeneratorNetwork.Network network = generatorTileEntity.getNetwork();
+//                if (network.getEnergy() == -1) {
+//                    network.setEnergy(energy * network.getGeneratorBlocks() + remainder);
+//                    remainder = 0;  // Only the first network gets the remainder.
+//                }
+//            }
+//        }
+//        generatorNetwork.save();
+    }
+
 
 }
-*/
