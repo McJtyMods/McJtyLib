@@ -9,23 +9,25 @@ import net.minecraftforge.common.util.Constants;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class MultiblockDriver<T extends IMultiblock> {
 
     private final Map<Integer,MultiblockHolder<T>> multiblocks = new HashMap<>();
     private int lastId = 0;
 
-    private final Function<CompoundNBT, T> blockSupplier;
+    private final Function<CompoundNBT, T> loader;
+    private final BiConsumer<CompoundNBT, T> saver;
     private final Consumer<MultiblockDriver<T>> dirtySetter;
     private final IMultiblockFixer<T> fixer;
     private final BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
 
     private MultiblockDriver(Builder<T> builder) {
-        this.blockSupplier = builder.blockSupplier;
+        this.loader = builder.loader;
+        this.saver = builder.saver;
         this.dirtySetter = builder.dirtySetter;
         this.fixer = builder.fixer;
         this.holderGetter = builder.holderGetter;
@@ -94,7 +96,7 @@ public class MultiblockDriver<T extends IMultiblock> {
         for (int i = 0 ; i < lst.size() ; i++) {
             CompoundNBT tc = lst.getCompound(i);
             int id = tc.getInt("id");
-            T value = blockSupplier.apply(tc);
+            T value = loader.apply(tc);
             MultiblockHolder<T> holder = new MultiblockHolder<>(value);
             holder.load(tc);
             multiblocks.put(id, holder);
@@ -107,6 +109,7 @@ public class MultiblockDriver<T extends IMultiblock> {
         for (Map.Entry<Integer, MultiblockHolder<T>> entry : multiblocks.entrySet()) {
             CompoundNBT tc = new CompoundNBT();
             tc.putInt("id", entry.getKey());
+            saver.accept(tc, entry.getValue().getMb());
             entry.getValue().save(tc);
             lst.add(tc);
         }
@@ -121,13 +124,19 @@ public class MultiblockDriver<T extends IMultiblock> {
 
     public static class Builder<T extends IMultiblock> {
 
-        private Function<CompoundNBT, T> blockSupplier;
+        private Function<CompoundNBT, T> loader;
+        private BiConsumer<CompoundNBT, T> saver;
         private Consumer<MultiblockDriver<T>> dirtySetter;
         private IMultiblockFixer<T> fixer;
         private BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
 
-        public Builder<T> blockSupplier(Function<CompoundNBT, T> blockSupplier) {
-            this.blockSupplier = blockSupplier;
+        public Builder<T> loader(Function<CompoundNBT, T> loader) {
+            this.loader = loader;
+            return this;
+        }
+
+        public Builder<T> saver(BiConsumer<CompoundNBT, T> saver) {
+            this.saver = saver;
             return this;
         }
 

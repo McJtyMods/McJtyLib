@@ -28,7 +28,6 @@ public class MultiblockHolder<T extends IMultiblock> {
     }
 
     public CompoundNBT save(CompoundNBT tagCompound) {
-        mb.save(tagCompound);
 //        ListNBT list = new ListNBT();
 //        positions.forEach(p -> list.add(LongNBT.valueOf(p.asLong())));
 //        tagCompound.put("pos", list);

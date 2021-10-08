@@ -52,7 +52,8 @@ public class MultiblockSupport {
             Set<BlockPos> done = Sets.newHashSet();
             setBlocksToNetwork(level, thisPos, done, masterId, driver);
 
-            fixer.merge(driver, level, mbs, masterId, newMb);
+            mbs.add(newMb);
+            fixer.merge(driver, level, mbs, masterId);
         }
     }
 
@@ -94,7 +95,7 @@ public class MultiblockSupport {
         }
 
         // Now assign new ones.
-        List<Pair<T, Set<BlockPos>>> todo = new ArrayList<>();  // A list of networks we have to fix
+        List<Pair<Integer, Set<BlockPos>>> todo = new ArrayList<>();  // A list of networks we have to fix
         int idToUse = thisHolder.getMultiblockId();
         for (Direction direction : OrientationTools.DIRECTION_VALUES) {
             BlockPos newC = thisPos.relative(direction);
@@ -108,7 +109,7 @@ public class MultiblockSupport {
                     done.add(thisPos);
                     setBlocksToNetwork(level, newC, done, idToUse, driver);
                     T mb = driver.get(idToUse);
-                    todo.add(Pair.of(mb, done));
+                    todo.add(Pair.of(idToUse, done));
 
                     idToUse = -1;
                 }
