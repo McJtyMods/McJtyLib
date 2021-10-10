@@ -165,52 +165,98 @@ publishing {
     }
 }
 
-
-task("uploadJars", dependsOn: "reobf") {
-    description = "uploads JARs"
-    if (System.getenv("local_maven") != null) {
-        apply plugin: 'maven'
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    repository(url: "file://" + System.getenv("local_maven"))
-                    pom {
-                        groupId = project.group
-                        version = project.version
-                        artifactId = project.archivesBaseName
-                        project {
-                            name project.archivesBaseName
-                            packaging 'jar'
-                            description 'McJtyLib'
-                            scm {
-                                url 'https://github.com/McJtyMods/McJtyLib'
-                                connection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
-                                developerConnection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
-                            }
-                            issueManagement {
-                                system 'github'
-                                url 'https://github.com/McJtyMods/McJtyLib/issues'
-                            }
-                            licenses {
-                                license {
-                                    name 'MIT'
-                                    distribution 'repo'
-                                }
-                            }
-                            developers {
-                                developer {
-                                    id 'McJty'
-                                    name 'McJty'
-                                    roles { role 'developer' }
-                                }
-                            }
-                        }
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = project.archivesBaseName
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'McJtyLib'
+                description = 'Base mod for all McJty tech mods'
+                url = 'https://github.com/McJtyMods/McJtyLib'
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://github.com/McJtyMods/McJtyLib/LICENSE'
                     }
+                }
+                developers {
+                    developer {
+                        id = 'McJty'
+                    }
+                }
+                scm {
+                    url 'https://github.com/McJtyMods/McJtyLib'
+                    connection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
+                    developerConnection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
                 }
             }
         }
     }
+    repositories {
+        maven {
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = layout.buildDirectory.dir('repos/releases')
+            def snapshotsRepoUrl = layout.buildDirectory.dir('repos/snapshots')
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
 }
+
+
+//task("uploadJars", dependsOn: "reobf") {
+//    description = "uploads JARs"
+//    if (System.getenv("local_maven") != null) {
+//        apply plugin: 'maven'
+//        uploadArchives {
+//            repositories {
+//                mavenDeployer {
+//                    repository(url: "file://" + System.getenv("local_maven"))
+//                    pom {
+//                        groupId = project.group
+//                        version = project.version
+//                        artifactId = project.archivesBaseName
+//                        project {
+//                            name project.archivesBaseName
+//                            packaging 'jar'
+//                            description 'McJtyLib'
+//                            scm {
+//                                url 'https://github.com/McJtyMods/McJtyLib'
+//                                connection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
+//                                developerConnection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
+//                            }
+//                            issueManagement {
+//                                system 'github'
+//                                url 'https://github.com/McJtyMods/McJtyLib/issues'
+//                            }
+//                            licenses {
+//                                license {
+//                                    name 'MIT'
+//                                    distribution 'repo'
+//                                }
+//                            }
+//                            developers {
+//                                developer {
+//                                    id 'McJty'
+//                                    name 'McJty'
+//                                    roles { role 'developer' }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 String getChangelogText() {
     def changelogFile = file('changelog.txt')
