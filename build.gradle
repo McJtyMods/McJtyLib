@@ -157,25 +157,25 @@ publishing {
             name = 'McJtyLib'
             description = 'Base mod for all McJty tech mods'
             scm {
-                url 'https://github.com/McJtyMods/McJtyLib'
-                connection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
-                developerConnection 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
+                url = 'https://github.com/McJtyMods/McJtyLib'
+                connection = 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
+                developerConnection = 'scm:git:git@github.com:McJtyMods/McJtyLib.git'
             }
             issueManagement {
-                system 'github'
-                url 'https://github.com/McJtyMods/McJtyLib/issues'
+                system = 'github'
+                url = 'https://github.com/McJtyMods/McJtyLib/issues'
             }
             licenses {
                 license {
-                    name 'MIT'
-                    distribution 'repo'
+                    name = 'MIT'
+                    distribution = 'repo'
                 }
             }
             developers {
                 developer {
-                    id 'McJty'
-                    name 'McJty'
-                    roles { role 'developer' }
+                    id = 'McJty'
+                    name = 'McJty'
+                    roles = ['developer']
                 }
             }
         }
