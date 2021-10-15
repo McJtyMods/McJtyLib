@@ -1,7 +1,6 @@
 package mcjty.lib.client;
 
 import mcjty.lib.api.container.CapabilityContainerProvider;
-import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
@@ -92,7 +91,7 @@ public class GuiTools {
 
         NetworkHooks.openGui((ServerPlayerEntity) player, provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
-            DimensionId.fromWorld(world).toBytes(buf);
+            buf.writeResourceLocation(world.dimension().location());
             buf.writeNbt(written);
         });
         return true;
