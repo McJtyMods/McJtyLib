@@ -14,7 +14,6 @@ import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;
@@ -30,8 +29,10 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -460,7 +461,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
     }
 
-    public void sendServerCommandTyped(SimpleChannel network, DimensionId dimensionId, String command, TypedMap params) {
+    public void sendServerCommandTyped(SimpleChannel network, RegistryKey<World> dimensionId, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), dimensionId, command, params));
     }
 

@@ -13,6 +13,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -52,7 +53,7 @@ public class GuiTools {
         return mouseY * gui.height / mainHeight;
     }
 
-    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos) {
+    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable RegistryKey<World> dimensionType, @Nonnull BlockPos pos) {
         return openRemoteGui(player, dimensionType, pos,
                 te -> new INamedContainerProvider() {
                     @Override
@@ -70,10 +71,10 @@ public class GuiTools {
                 });
     }
 
-    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable DimensionId dimensionType, @Nonnull BlockPos pos,
+    public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable RegistryKey<World> dimensionType, @Nonnull BlockPos pos,
                                         Function<TileEntity, INamedContainerProvider> provider) {
         if (dimensionType == null) {
-            dimensionType = DimensionId.fromWorld(player.getCommandSenderWorld());
+            dimensionType = player.getCommandSenderWorld().dimension();
         }
         World world = WorldTools.getWorld(player.getCommandSenderWorld(), dimensionType);
         if (!WorldTools.isLoaded(world, pos)) {

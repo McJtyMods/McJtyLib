@@ -2,6 +2,7 @@ package mcjty.lib.varia;
 
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
@@ -30,22 +31,22 @@ public class WorldTools {
         return server.getLevel(World.OVERWORLD);
     }
 
-    public static ServerWorld loadWorld(DimensionId type) {
+    public static ServerWorld loadWorld(RegistryKey<World> type) {
         ServerWorld world = getWorld(type);
         if (world == null) {
             // Worlds in 1.16 are always loaded
-            return type.loadWorld();
+            return ServerLifecycleHooks.getCurrentServer().getLevel(type);
         }
         return world;
     }
 
-    public static ServerWorld getWorld(DimensionId type) {
-        return type.getWorld();
+    public static ServerWorld getWorld(RegistryKey<World> type) {
+        return ServerLifecycleHooks.getCurrentServer().getLevel(type);
     }
 
-    public static ServerWorld getWorld(World world, DimensionId type) {
+    public static ServerWorld getWorld(World world, RegistryKey<World> type) {
         // Worlds in 1.16 are always loaded
-        return type.loadWorld(world);
+        return world.getServer().getLevel(type);
     }
 
     /**

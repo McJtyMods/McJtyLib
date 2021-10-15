@@ -9,10 +9,8 @@ import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.network.PacketContainerDataToClient;
 import mcjty.lib.tileentity.GenericTileEntity;
-import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.TriFunction;
-import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -22,8 +20,11 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IntReferenceHolder;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.items.IItemHandler;
@@ -483,11 +484,11 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     public static <T extends GenericContainer, E extends GenericTileEntity> ContainerType<T> createRemoteContainerType(
-            Function<DimensionId, E> dummyTEFactory,
+            Function<RegistryKey<World>, E> dummyTEFactory,
             TriFunction<Integer, BlockPos, E, T> containerFactory, int slots) {
         return IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            DimensionId type = DimensionId.fromPacket(data);
+            RegistryKey<World> type = RegistryKey.create(Registry.DIMENSION_REGISTRY, data.readResourceLocation());
 
             E te = dummyTEFactory.apply(type);
             te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter

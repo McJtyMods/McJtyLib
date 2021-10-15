@@ -2,7 +2,9 @@ package mcjty.lib.typed;
 
 import mcjty.lib.varia.DimensionId;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -25,7 +27,7 @@ public final class Type<V> {
     public static final Type<Boolean> BOOLEAN = create(Boolean.class);
     public static final Type<BlockPos> BLOCKPOS = create(BlockPos.class);
     public static final Type<ItemStack> ITEMSTACK = create(ItemStack.class);
-    public static final Type<DimensionId> DIMENSION_TYPE = create(DimensionId.class);
+    public static final Type<RegistryKey<World>> DIMENSION_TYPE = create(RegistryKey.class);
 
     public static final Type<List<String>> STRING_LIST = create(List.class);
     public static final Type<List<ItemStack>> ITEMSTACK_LIST = create(List.class);

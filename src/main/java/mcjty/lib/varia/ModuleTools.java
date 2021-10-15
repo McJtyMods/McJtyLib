@@ -5,8 +5,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -51,11 +53,11 @@ public class ModuleTools {
         return new BlockPos(monitorx, monitory, monitorz);
     }
 
-    public static DimensionId getDimensionFromModule(ItemStack stack) {
+    public static RegistryKey<World> getDimensionFromModule(ItemStack stack) {
         CompoundNBT tag = stack.getOrCreateTag();
         if (tag.contains("monitordim")) {
             String monitordim = tag.getString("monitordim");
-            return DimensionId.fromResourceLocation(new ResourceLocation(monitordim));
+            return RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(monitordim));
         } else {
             return null;
         }

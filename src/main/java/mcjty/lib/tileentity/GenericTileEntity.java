@@ -520,8 +520,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
-    public DimensionId getDimension() {
-        return DimensionId.fromWorld(level);
+    public RegistryKey<World> getDimension() {
+        return level.dimension();
     }
 
         // Client side function to send a value to the server

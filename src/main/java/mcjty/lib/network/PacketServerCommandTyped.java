@@ -1,13 +1,14 @@
 package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -21,7 +22,7 @@ import java.util.function.Supplier;
 public class PacketServerCommandTyped {
 
     protected BlockPos pos;
-    protected DimensionId dimensionId;
+    protected RegistryKey<World> dimensionId;
     protected String command;
     protected TypedMap params;
 
@@ -30,7 +31,7 @@ public class PacketServerCommandTyped {
         command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
         if (buf.readBoolean()) {
-            dimensionId = DimensionId.fromPacket(buf);
+            dimensionId = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
         } else {
             dimensionId = null;
         }
@@ -43,7 +44,7 @@ public class PacketServerCommandTyped {
         this.dimensionId = null;
     }
 
-    public PacketServerCommandTyped(BlockPos pos, DimensionId dimensionId, String command, TypedMap params) {
+    public PacketServerCommandTyped(BlockPos pos, RegistryKey<World> dimensionId, String command, TypedMap params) {
         this.pos = pos;
         this.command = command;
         this.params = params;
@@ -56,7 +57,7 @@ public class PacketServerCommandTyped {
         TypedMapTools.writeArguments(buf, params);
         if (dimensionId != null) {
             buf.writeBoolean(true);
-            dimensionId.toBytes(buf);
+            buf.writeResourceLocation(dimensionId.location());
         } else {
             buf.writeBoolean(false);
         }

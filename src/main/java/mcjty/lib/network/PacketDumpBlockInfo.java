@@ -1,7 +1,6 @@
 package mcjty.lib.network;
 
 import mcjty.lib.debugtools.DumpBlockNBT;
-import mcjty.lib.varia.DimensionId;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -9,7 +8,9 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.OpEntry;
 import net.minecraft.server.management.OpList;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.Level;
@@ -21,24 +22,24 @@ import java.util.function.Supplier;
  */
 public class PacketDumpBlockInfo {
 
-    private DimensionId dimid;
+    private RegistryKey<World> dimid;
     private BlockPos pos;
     private boolean verbose;
 
     public void toBytes(PacketBuffer buf) {
-        dimid.toBytes(buf);
+        buf.writeResourceLocation(dimid.location());
         buf.writeBlockPos(pos);
         buf.writeBoolean(verbose);
     }
 
     public PacketDumpBlockInfo(PacketBuffer buf) {
-        dimid = DimensionId.fromPacket(buf);
+        dimid = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
         pos = buf.readBlockPos();
         verbose = buf.readBoolean();
     }
 
     public PacketDumpBlockInfo(World world, BlockPos pos, boolean verbose) {
-        this.dimid = DimensionId.fromWorld(world);
+        this.dimid = world.dimension();
         this.pos = pos;
         this.verbose = verbose;
     }

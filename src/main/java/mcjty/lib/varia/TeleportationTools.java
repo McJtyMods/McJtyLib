@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -16,8 +17,8 @@ import java.util.function.Function;
 
 public class TeleportationTools {
 
-    public static void teleport(PlayerEntity player, DimensionId dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
-        DimensionId oldId = DimensionId.fromWorld(player.getCommandSenderWorld());
+    public static void teleport(PlayerEntity player, RegistryKey<World> dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
+        RegistryKey<World> oldId = player.getCommandSenderWorld().dimension();
 
         float rotationYaw = player.yRot;
         float rotationPitch = player.xRot;
@@ -34,10 +35,10 @@ public class TeleportationTools {
         player.teleportTo(destX, destY, destZ);
     }
 
-    public static void teleportToDimension(PlayerEntity player, DimensionId dimension, double x, double y, double z) {
-        ServerWorld world = dimension.loadWorld(player.getCommandSenderWorld());
+    public static void teleportToDimension(PlayerEntity player, RegistryKey<World> dimension, double x, double y, double z) {
+        ServerWorld world = player.getCommandSenderWorld().getServer().getLevel(dimension);
         if (world == null) {
-            McJtyLib.setup.getLogger().error("Something went wrong teleporting to dimension " + dimension.getName());
+            McJtyLib.setup.getLogger().error("Something went wrong teleporting to dimension " + dimension.location().getPath());
             return;
         }
         player.changeDimension(world, new ITeleporter() {
