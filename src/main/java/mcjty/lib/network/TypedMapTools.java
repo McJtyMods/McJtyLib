@@ -3,12 +3,12 @@ package mcjty.lib.network;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.DimensionId;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 import java.util.*;
 
@@ -154,10 +154,10 @@ public class TypedMapTools {
                     buf.writeInt((Integer) args.get(key));
                     break;
                 case TYPE_DIMENSION_TYPE: {
-                    DimensionId type = (DimensionId) args.get(key);
+                    RegistryKey<World> type = (RegistryKey<World>) args.get(key);
                     if (type != null) {
                         buf.writeBoolean(true);
-                        type.toBytes(buf);
+                        buf.writeResourceLocation(type.location());
                     } else {
                         buf.writeBoolean(false);
                     }
