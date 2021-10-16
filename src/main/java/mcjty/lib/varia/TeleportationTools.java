@@ -13,6 +13,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.util.ITeleporter;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class TeleportationTools {
@@ -77,7 +78,7 @@ public class TeleportationTools {
      */
     public static Entity teleportEntity(Entity entity, World destWorld, double newX, double newY, double newZ, Direction facing) {
         World world = entity.getCommandSenderWorld();
-        if (DimensionId.fromWorld(world).equals(DimensionId.fromWorld(destWorld))) {
+        if (Objects.equals(world.dimension(), destWorld.dimension())) {
             if (facing != null) {
                 fixOrientation(entity, newX, newY, newZ, facing);
             }

@@ -23,10 +23,10 @@ public class ModuleTools {
         return stack.getTag().contains("monitorx");
     }
 
-    public static void setPositionInModule(ItemStack stack, DimensionId dimension, BlockPos pos, String name) {
+    public static void setPositionInModule(ItemStack stack, RegistryKey<World> dimension, BlockPos pos, String name) {
         CompoundNBT tag = stack.getOrCreateTag();
         if (dimension != null) {
-            tag.putString("monitordim", dimension.getRegistryName().toString());
+            tag.putString("monitordim", dimension.location().toString());
         }
         if (name != null) {
             tag.putString("monitorname", name);

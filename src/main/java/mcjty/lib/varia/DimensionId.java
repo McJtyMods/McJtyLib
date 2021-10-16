@@ -91,10 +91,6 @@ public class DimensionId {
         return otherWorld.getServer().getLevel(id);
     }
 
-    public static boolean sameDimension(World world1, World world2) {
-        return world1.dimension().equals(world2.dimension());
-    }
-
     public boolean sameDimension(World world) {
         return id.equals(world.dimension());
     }
