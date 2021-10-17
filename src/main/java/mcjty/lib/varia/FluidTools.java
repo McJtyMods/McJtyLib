@@ -26,9 +26,6 @@ public class FluidTools {
     /**
      * Make sure the forge bucket is enabled. If needed do this in your mod constructor:
      * FluidRegistry.enableUniversalBucket();
-     *
-     * @param fluidStack
-     * @return
      */
     @Nonnull
     public static ItemStack convertFluidToBucket(@Nonnull FluidStack fluidStack) {

@@ -15,7 +15,6 @@ public class FakePlayerGetter {
     private final GenericTileEntity te;
     private final String fakeName;
     private ServerPlayerEntity harvester = null;
-//    private final LazyGetter<ServerPlayerEntity> harvester = LazyGetter.of(this::getFakeHarvester);
 
     public FakePlayerGetter(GenericTileEntity te, String fakeName) {
         this.te = te;

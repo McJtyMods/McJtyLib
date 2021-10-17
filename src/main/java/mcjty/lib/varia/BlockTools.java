@@ -23,61 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 
 public class BlockTools {
-
-    private static final Random random = new Random();
-
-    public static String getModid(ItemStack stack) {
-        if (!stack.isEmpty()) {
-            return stack.getItem().getRegistryName().getNamespace();
-        } else {
-            return "";
-        }
-    }
-
-    public static String getModidForBlock(Block block) {
-        ResourceLocation nameForObject = block.getRegistryName();
-        if (nameForObject == null) {
-            return "?";
-        }
-        return nameForObject.getNamespace();
-    }
-
-    public static String getReadableName(World world, BlockPos pos) {
-        BlockState state = world.getBlockState(pos);
-        return getReadableName(state.getBlock().getCloneItemStack(world, pos, state));
-    }
-
-    public static String getReadableName(ItemStack stack) {
-        return stack.getHoverName().getString() /* was getFormattedText() */;
-    }
-
-    @Nullable
-    public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
-        BlockRayTraceResult trace = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, pos, false);
-        BlockItemUseContext context = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, trace));
-        if (blockStack.getItem() instanceof BlockItem) {
-            BlockItem itemBlock = (BlockItem) blockStack.getItem();
-            if (origState == null) {
-                origState = itemBlock.getBlock().getStateForPlacement(context);
-                if (origState == null) {
-                    // Cannot place!
-                    return null;
-                }
-            }
-            if (itemBlock.place(context).consumesAction()) {
-                blockStack.shrink(1);
-            }
-            return origState;
-        } else {
-            player.setItemInHand(Hand.MAIN_HAND, blockStack);
-            player.setPos(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
-            blockStack.getItem().useOn(context);
-            return world.getBlockState(pos);
-        }
-    }
 
     // Write a blockstate to a string
     public static String writeBlockState(BlockState tag) {
