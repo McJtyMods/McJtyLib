@@ -7,7 +7,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -29,7 +28,7 @@ public class PacketRequestDataFromServer {
 
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        type = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
+        type = WorldTools.getId(buf.readResourceLocation());
         command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
         dummy = buf.readBoolean();
@@ -54,7 +53,7 @@ public class PacketRequestDataFromServer {
     public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            World world = WorldTools.getWorld(ctx.getSender().getCommandSenderWorld(), type);
+            World world = WorldTools.getLevel(ctx.getSender().getCommandSenderWorld(), type);
             if (world.hasChunkAt(pos)) {
                 TileEntity te = world.getBlockEntity(pos);
                 if (!(te instanceof ICommandHandler)) {

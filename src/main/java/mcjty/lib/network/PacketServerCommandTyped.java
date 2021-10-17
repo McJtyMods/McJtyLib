@@ -8,7 +8,6 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -31,7 +30,7 @@ public class PacketServerCommandTyped {
         command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
         if (buf.readBoolean()) {
-            dimensionId = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
+            dimensionId = WorldTools.getId(buf.readResourceLocation());
         } else {
             dimensionId = null;
         }
@@ -71,7 +70,7 @@ public class PacketServerCommandTyped {
             if (dimensionId == null) {
                 world = playerEntity.getCommandSenderWorld();
             } else {
-                world = WorldTools.getWorld(playerEntity.level, dimensionId);
+                world = WorldTools.getLevel(playerEntity.level, dimensionId);
             }
             if (world == null) {
                 return;

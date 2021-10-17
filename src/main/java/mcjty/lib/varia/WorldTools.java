@@ -3,8 +3,10 @@ package mcjty.lib.varia;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ChunkHolder;
 import net.minecraft.world.server.ServerWorld;
@@ -31,22 +33,26 @@ public class WorldTools {
         return server.getLevel(World.OVERWORLD);
     }
 
-    public static ServerWorld loadWorld(RegistryKey<World> type) {
-        ServerWorld world = getWorld(type);
-        if (world == null) {
-            // Worlds in 1.16 are always loaded
-            return ServerLifecycleHooks.getCurrentServer().getLevel(type);
-        }
-        return world;
-    }
-
-    public static ServerWorld getWorld(RegistryKey<World> type) {
+    public static ServerWorld getLevel(RegistryKey<World> type) {
         return ServerLifecycleHooks.getCurrentServer().getLevel(type);
     }
 
-    public static ServerWorld getWorld(World world, RegistryKey<World> type) {
+    public static ServerWorld getLevel(World world, RegistryKey<World> type) {
         // Worlds in 1.16 are always loaded
         return world.getServer().getLevel(type);
+    }
+
+    public static ServerWorld getLevel(World world, ResourceLocation id) {
+        // Worlds in 1.16 are always loaded
+        return world.getServer().getLevel(RegistryKey.create(Registry.DIMENSION_REGISTRY, id));
+    }
+
+    public static RegistryKey<World> getId(ResourceLocation id) {
+        return RegistryKey.create(Registry.DIMENSION_REGISTRY, id);
+    }
+
+    public static RegistryKey<World> getId(String id) {
+        return RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(id));
     }
 
     /**

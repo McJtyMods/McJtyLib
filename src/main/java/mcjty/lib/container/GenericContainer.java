@@ -11,6 +11,7 @@ import mcjty.lib.network.PacketContainerDataToClient;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.TriFunction;
+import mcjty.lib.varia.WorldTools;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -23,7 +24,6 @@ import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -488,9 +488,8 @@ public class GenericContainer extends Container implements IGenericContainer {
             TriFunction<Integer, BlockPos, E, T> containerFactory, int slots) {
         return IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            RegistryKey<World> type = RegistryKey.create(Registry.DIMENSION_REGISTRY, data.readResourceLocation());
 
-            E te = dummyTEFactory.apply(type);
+            E te = dummyTEFactory.apply(WorldTools.getId(data.readResourceLocation()));
             te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter
             CompoundNBT compound = data.readNbt();
             te.read(compound);

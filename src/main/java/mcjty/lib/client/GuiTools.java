@@ -75,7 +75,7 @@ public class GuiTools {
         if (dimensionType == null) {
             dimensionType = player.getCommandSenderWorld().dimension();
         }
-        World world = WorldTools.getWorld(player.getCommandSenderWorld(), dimensionType);
+        World world = WorldTools.getLevel(player.getCommandSenderWorld(), dimensionType);
         if (!WorldTools.isLoaded(world, pos)) {
             player.displayClientMessage(new StringTextComponent(TextFormatting.RED + "Position is not loaded!"), false);
             return false;

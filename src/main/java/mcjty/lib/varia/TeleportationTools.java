@@ -37,7 +37,7 @@ public class TeleportationTools {
     }
 
     public static void teleportToDimension(PlayerEntity player, RegistryKey<World> dimension, double x, double y, double z) {
-        ServerWorld world = player.getCommandSenderWorld().getServer().getLevel(dimension);
+        ServerWorld world = WorldTools.getLevel(player.getCommandSenderWorld(), dimension);
         if (world == null) {
             McJtyLib.setup.getLogger().error("Something went wrong teleporting to dimension " + dimension.location().getPath());
             return;

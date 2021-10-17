@@ -10,7 +10,6 @@ import net.minecraft.server.management.OpEntry;
 import net.minecraft.server.management.OpList;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.logging.log4j.Level;
@@ -33,7 +32,7 @@ public class PacketDumpBlockInfo {
     }
 
     public PacketDumpBlockInfo(PacketBuffer buf) {
-        dimid = RegistryKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation());
+        dimid = WorldTools.getId(buf.readResourceLocation());
         pos = buf.readBlockPos();
         verbose = buf.readBoolean();
     }
@@ -53,7 +52,7 @@ public class PacketDumpBlockInfo {
             OpEntry entry = oppedPlayers.get(player.getGameProfile());
             int perm = entry == null ? server.getOperatorUserPermissionLevel() : entry.getLevel();
             if (perm >= 1) {
-                World world = WorldTools.getWorld(player.level, dimid);
+                World world = WorldTools.getLevel(player.level, dimid);
                 String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
                 Logging.getLogger().log(Level.INFO, "### Server side ###");
                 Logging.getLogger().log(Level.INFO, output);
