@@ -1,7 +1,7 @@
 package mcjty.lib.client;
 
 import mcjty.lib.api.container.CapabilityContainerProvider;
-import mcjty.lib.varia.WorldTools;
+import mcjty.lib.varia.LevelTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHelper;
 import net.minecraft.client.gui.screen.Screen;
@@ -75,8 +75,8 @@ public class GuiTools {
         if (dimensionType == null) {
             dimensionType = player.getCommandSenderWorld().dimension();
         }
-        World world = WorldTools.getLevel(player.getCommandSenderWorld(), dimensionType);
-        if (!WorldTools.isLoaded(world, pos)) {
+        World world = LevelTools.getLevel(player.getCommandSenderWorld(), dimensionType);
+        if (!LevelTools.isLoaded(world, pos)) {
             player.displayClientMessage(new StringTextComponent(TextFormatting.RED + "Position is not loaded!"), false);
             return false;
         }

@@ -2,7 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import mcjty.lib.varia.WorldTools;
+import mcjty.lib.varia.LevelTools;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.RegistryKey;
@@ -28,7 +28,7 @@ public class PacketRequestDataFromServer {
 
     public PacketRequestDataFromServer(PacketBuffer buf) {
         pos = buf.readBlockPos();
-        type = WorldTools.getId(buf.readResourceLocation());
+        type = LevelTools.getId(buf.readResourceLocation());
         command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
         dummy = buf.readBoolean();
@@ -53,7 +53,7 @@ public class PacketRequestDataFromServer {
     public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            World world = WorldTools.getLevel(ctx.getSender().getCommandSenderWorld(), type);
+            World world = LevelTools.getLevel(ctx.getSender().getCommandSenderWorld(), type);
             if (world.hasChunkAt(pos)) {
                 TileEntity te = world.getBlockEntity(pos);
                 if (!(te instanceof ICommandHandler)) {

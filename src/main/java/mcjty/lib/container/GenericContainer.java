@@ -11,7 +11,7 @@ import mcjty.lib.network.PacketContainerDataToClient;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.TriFunction;
-import mcjty.lib.varia.WorldTools;
+import mcjty.lib.varia.LevelTools;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -489,7 +489,7 @@ public class GenericContainer extends Container implements IGenericContainer {
         return IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
 
-            E te = dummyTEFactory.apply(WorldTools.getId(data.readResourceLocation()));
+            E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()));
             te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter
             CompoundNBT compound = data.readNbt();
             te.read(compound);

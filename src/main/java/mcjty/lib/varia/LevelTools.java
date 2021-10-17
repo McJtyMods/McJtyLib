@@ -14,7 +14,7 @@ import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.util.stream.Stream;
 
-public class WorldTools {
+public class LevelTools {
 
     public static boolean isLoaded(World world, BlockPos pos) {
         if (world == null || pos == null) {

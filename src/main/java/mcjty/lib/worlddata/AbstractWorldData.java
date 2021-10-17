@@ -1,6 +1,6 @@
 package mcjty.lib.worlddata;
 
-import mcjty.lib.varia.WorldTools;
+import mcjty.lib.varia.LevelTools;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.DimensionSavedDataManager;
 import net.minecraft.world.storage.WorldSavedData;
@@ -26,7 +26,7 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
         if (world.isClientSide) {
             throw new RuntimeException("Don't access this client-side!");
         }
-        DimensionSavedDataManager storage = WorldTools.getOverworld(world).getDataStorage();
+        DimensionSavedDataManager storage = LevelTools.getOverworld(world).getDataStorage();
         return storage.computeIfAbsent(supplier, name);
     }
 

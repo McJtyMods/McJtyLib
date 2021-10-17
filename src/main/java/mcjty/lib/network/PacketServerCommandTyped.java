@@ -2,7 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import mcjty.lib.varia.WorldTools;
+import mcjty.lib.varia.LevelTools;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -30,7 +30,7 @@ public class PacketServerCommandTyped {
         command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
         if (buf.readBoolean()) {
-            dimensionId = WorldTools.getId(buf.readResourceLocation());
+            dimensionId = LevelTools.getId(buf.readResourceLocation());
         } else {
             dimensionId = null;
         }
@@ -70,7 +70,7 @@ public class PacketServerCommandTyped {
             if (dimensionId == null) {
                 world = playerEntity.getCommandSenderWorld();
             } else {
-                world = WorldTools.getLevel(playerEntity.level, dimensionId);
+                world = LevelTools.getLevel(playerEntity.level, dimensionId);
             }
             if (world == null) {
                 return;

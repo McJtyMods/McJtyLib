@@ -54,7 +54,7 @@ public class ModuleTools {
     public static RegistryKey<World> getDimensionFromModule(ItemStack stack) {
         CompoundNBT tag = stack.getOrCreateTag();
         if (tag.contains("monitordim")) {
-            return WorldTools.getId(tag.getString("monitordim"));
+            return LevelTools.getId(tag.getString("monitordim"));
         } else {
             return null;
         }

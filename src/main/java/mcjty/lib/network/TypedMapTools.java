@@ -3,7 +3,7 @@ package mcjty.lib.network;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.WorldTools;
+import mcjty.lib.varia.LevelTools;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.RegistryKey;
@@ -71,7 +71,7 @@ public class TypedMapTools {
                         break;
                     case TYPE_DIMENSION_TYPE:
                         if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.DIMENSION_TYPE), WorldTools.getId(buf.readResourceLocation()));
+                            args.put(new Key<>(key, Type.DIMENSION_TYPE), LevelTools.getId(buf.readResourceLocation()));
                         } else {
                             args.put(new Key<>(key, Type.DIMENSION_TYPE), null);
                         }

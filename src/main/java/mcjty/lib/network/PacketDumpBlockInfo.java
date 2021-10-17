@@ -2,7 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.debugtools.DumpBlockNBT;
 import mcjty.lib.varia.Logging;
-import mcjty.lib.varia.WorldTools;
+import mcjty.lib.varia.LevelTools;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
@@ -32,7 +32,7 @@ public class PacketDumpBlockInfo {
     }
 
     public PacketDumpBlockInfo(PacketBuffer buf) {
-        dimid = WorldTools.getId(buf.readResourceLocation());
+        dimid = LevelTools.getId(buf.readResourceLocation());
         pos = buf.readBlockPos();
         verbose = buf.readBoolean();
     }
@@ -52,7 +52,7 @@ public class PacketDumpBlockInfo {
             OpEntry entry = oppedPlayers.get(player.getGameProfile());
             int perm = entry == null ? server.getOperatorUserPermissionLevel() : entry.getLevel();
             if (perm >= 1) {
-                World world = WorldTools.getLevel(player.level, dimid);
+                World world = LevelTools.getLevel(player.level, dimid);
                 String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
                 Logging.getLogger().log(Level.INFO, "### Server side ###");
                 Logging.getLogger().log(Level.INFO, output);
