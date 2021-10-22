@@ -72,7 +72,7 @@ public class MultiblockSupport {
             BlockPos p = pos.relative(direction);
             if (!positions.contains(p)) {
                 if (getter.apply(level, p) != null) {
-                    findMultiblockInt(level, pos, getter, positions);
+                    findMultiblockInt(level, p, getter, positions);
                 }
             }
         }
