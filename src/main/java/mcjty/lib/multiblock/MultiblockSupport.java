@@ -40,10 +40,12 @@ public class MultiblockSupport {
             int mbId = driver.createId();
             driver.createOrUpdate(mbId, newMb);
             fixer.initialize(driver, level, newMb, mbId);
+            thisHolder.setMultiblockId(mbId);
         } else if (adjacentGeneratorIds.size() == 1) {
             // Only one network adjacent. So we can simply join this new block to that network
             int mbId = adjacentGeneratorIds.iterator().next();
             fixer.blockAdded(driver, level, thisPos, mbId, newMb);
+            thisHolder.setMultiblockId(mbId);
         } else {
             // We need to merge networks
             Set<T> mbs = adjacentGeneratorIds.stream().map(driver::get).collect(Collectors.toSet());
@@ -129,7 +131,7 @@ public class MultiblockSupport {
                     Set<BlockPos> done = Sets.newHashSet();
                     done.add(thisPos);
                     setBlocksToNetwork(level, newC, done, idToUse, driver);
-                    T mb = driver.get(idToUse);
+                    done.remove(thisPos);
                     todo.add(Pair.of(idToUse, done));
 
                     idToUse = -1;
