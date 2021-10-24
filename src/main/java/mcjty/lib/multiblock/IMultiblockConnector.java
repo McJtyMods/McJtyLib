@@ -1,6 +1,13 @@
 package mcjty.lib.multiblock;
 
+import net.minecraft.util.ResourceLocation;
+
 public interface IMultiblockConnector {
+
+    /**
+     * Get an ID representing the type of this multiblock
+     */
+    ResourceLocation getId();
 
     int getMultiblockId();
 
