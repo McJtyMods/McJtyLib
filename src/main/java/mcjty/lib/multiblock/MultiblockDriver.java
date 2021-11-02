@@ -9,10 +9,7 @@ import net.minecraftforge.common.util.Constants;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.*;
 
 public class MultiblockDriver<T extends IMultiblock> {
 
@@ -22,6 +19,7 @@ public class MultiblockDriver<T extends IMultiblock> {
     private final Function<CompoundNBT, T> loader;
     private final BiConsumer<CompoundNBT, T> saver;
     private final Consumer<MultiblockDriver<T>> dirtySetter;
+    private final BiPredicate<T, T> mergeChecker;
     private final IMultiblockFixer<T> fixer;
     private final BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
 
@@ -29,6 +27,7 @@ public class MultiblockDriver<T extends IMultiblock> {
         this.loader = builder.loader;
         this.saver = builder.saver;
         this.dirtySetter = builder.dirtySetter;
+        this.mergeChecker = builder.mergeChecker;
         this.fixer = builder.fixer;
         this.holderGetter = builder.holderGetter;
     }
@@ -44,6 +43,10 @@ public class MultiblockDriver<T extends IMultiblock> {
 
     public BiFunction<World, BlockPos, IMultiblockConnector> getHolderGetter() {
         return holderGetter;
+    }
+
+    public BiPredicate<T, T> getMergeChecker() {
+        return mergeChecker;
     }
 
     /**
@@ -127,6 +130,7 @@ public class MultiblockDriver<T extends IMultiblock> {
         private Function<CompoundNBT, T> loader;
         private BiConsumer<CompoundNBT, T> saver;
         private Consumer<MultiblockDriver<T>> dirtySetter;
+        private BiPredicate<T, T> mergeChecker;
         private IMultiblockFixer<T> fixer;
         private BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
 
@@ -142,6 +146,11 @@ public class MultiblockDriver<T extends IMultiblock> {
 
         public Builder<T> dirtySetter(Consumer<MultiblockDriver<T>> dirtySetter) {
             this.dirtySetter = dirtySetter;
+            return this;
+        }
+
+        public Builder<T> mergeChecker(BiPredicate<T, T> mergeChecker) {
+            this.mergeChecker = mergeChecker;
             return this;
         }
 
