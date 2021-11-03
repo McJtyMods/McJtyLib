@@ -34,32 +34,7 @@ public class DefaultServerProxy implements IProxy {
     }
 
     @Override
-    public boolean isJumpKeyDown() {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public boolean isForwardKeyDown() {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public boolean isBackKeyDown() {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public boolean isSneakKeyDown() {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
     public boolean isSneaking() {
-        throw new IllegalStateException("This should only be called from client side");
-    }
-
-    @Override
-    public boolean isAltKeyDown() {
         throw new IllegalStateException("This should only be called from client side");
     }
 

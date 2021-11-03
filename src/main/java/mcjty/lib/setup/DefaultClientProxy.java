@@ -35,33 +35,8 @@ public class DefaultClientProxy implements IProxy {
     }
 
     @Override
-    public boolean isJumpKeyDown() {
-        return Minecraft.getInstance().options.keyJump.isDown();
-    }
-
-    @Override
-    public boolean isForwardKeyDown() {
-        return Minecraft.getInstance().options.keyUp.isDown();
-    }
-
-    @Override
-    public boolean isBackKeyDown() {
-        return Minecraft.getInstance().options.keyDown.isDown();
-    }
-
-    @Override
-    public boolean isSneakKeyDown() {
-        return Minecraft.getInstance().options.keyShift.isDown();
-    }
-
-    @Override
     public boolean isSneaking() {
         return Screen.hasShiftDown();
-    }
-
-    @Override
-    public boolean isAltKeyDown() {
-        return Screen.hasAltDown();
     }
 
     @Override

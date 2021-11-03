@@ -18,19 +18,8 @@ public interface IProxy {
 
     RayTraceResult getClientMouseOver();
 
-    boolean isJumpKeyDown();
-
-    boolean isForwardKeyDown();
-
-    boolean isBackKeyDown();
-
-    boolean isSneakKeyDown();
-
     // This version directly checks the actual key
     boolean isSneaking();
-
-    // This version directly checks the actual key
-    boolean isAltKeyDown();
 
     // This version directly checks the actual key
     boolean isCtrlKeyDown();
