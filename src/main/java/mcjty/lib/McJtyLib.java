@@ -5,6 +5,7 @@ import mcjty.lib.multipart.MultipartModelLoader;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.*;
+import mcjty.lib.sync.PositionalDataSyncer;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -35,6 +36,8 @@ public class McJtyLib {
 
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
+
+    public static final PositionalDataSyncer SYNCER = new PositionalDataSyncer();
 
     public McJtyLib() {
         instance = this;

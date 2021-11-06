@@ -29,6 +29,7 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -38,7 +39,7 @@ import static mcjty.lib.McJtyLib.MODID;
 
 public class ModSetup extends DefaultModSetup {
 
-    public static ResourceLocation PREFERENCES_CAPABILITY_KEY;
+    public static final ResourceLocation PREFERENCES_CAPABILITY_KEY = new ResourceLocation(MODID, "preferences");
 
     public static boolean patchouli = false;
 
@@ -69,10 +70,18 @@ public class ModSetup extends DefaultModSetup {
         patchouli = ModList.get().isLoaded("patchouli");
     }
 
-
     public static class EventHandler {
 
-        private EventHandler(){
+        @SubscribeEvent
+        public void onWorldTick(TickEvent.WorldTickEvent event) {
+            if (event.phase == TickEvent.Phase.START && event.world.dimension() == World.OVERWORLD) {
+                McJtyLib.SYNCER.sendOutData(event.world.getServer());
+            }
+        }
+
+        @SubscribeEvent
+        public void onChunkWatch(ChunkWatchEvent.Watch event) {
+            McJtyLib.SYNCER.startWatching(event.getPlayer());
         }
 
         @SubscribeEvent
@@ -123,10 +132,5 @@ public class ModSetup extends DefaultModSetup {
         }
 
     }
-
-    static {
-        ModSetup.PREFERENCES_CAPABILITY_KEY = new ResourceLocation(MODID, "preferences");
-    }
-
 
 }
