@@ -1,5 +1,6 @@
 package mcjty.lib.client;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -19,6 +20,8 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.dispenser.IPosition;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
@@ -29,8 +32,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.util.math.vector.Vector4f;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.client.model.generators.ModelBuilder;
+import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.fluids.FluidStack;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -1033,6 +1038,50 @@ public class RenderHelper {
                 .uv2(lu, lv)
                 .normal(1, 0, 0)
                 .endVertex();
+    }
+
+    public static void putVertex(Matrix4f matrix, IVertexConsumer builder, IPosition normal,
+                                 double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
+        Vector4f vector4f = new Vector4f((float)x, (float)y, (float)z, 1.0F);
+        vector4f.transform(matrix);
+        putVertex(builder, normal, vector4f.x(), vector4f.y(), vector4f.z(), u, v, sprite, r, g, b, a);
+    }
+
+    public static void putVertex(IVertexConsumer builder, IPosition normal,
+                                 double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
+        ImmutableList<VertexFormatElement> elements = builder.getVertexFormat().getElements().asList();
+        for (int e = 0; e < elements.size(); e++) {
+            switch (elements.get(e).getUsage()) {
+                case POSITION:
+                    builder.put(e, (float)x, (float)y, (float)z);
+                    break;
+                case COLOR:
+                    builder.put(e, r, g, b, a);
+                    break;
+                case UV:
+                    switch (elements.get(e).getIndex()) {
+                        case 0:
+                            float iu = sprite.getU(u);
+                            float iv = sprite.getV(v);
+                            builder.put(e, iu, iv);
+                            break;
+                        case 2:
+                            builder.put(e, (short) 0, (short) 0);
+//                            builder.put(e, 0f, 1f);
+                            break;
+                        default:
+                            builder.put(e);
+                            break;
+                    }
+                    break;
+                case NORMAL:
+                    builder.put(e, (float) normal.x(), (float) normal.y(), (float) normal.z());
+                    break;
+                default:
+                    builder.put(e);
+                    break;
+            }
+        }
     }
 
     public static class Vector {
