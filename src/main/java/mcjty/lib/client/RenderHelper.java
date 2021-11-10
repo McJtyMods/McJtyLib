@@ -1040,6 +1040,16 @@ public class RenderHelper {
                 .endVertex();
     }
 
+    public static void vt(IVertexBuilder renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int lu, int lv, float r, float g, float b, float a) {
+        renderer
+                .vertex(matrix, x, y, z)
+                .color(r, g, b, a)
+                .uv(u, v)
+                .uv2(lu, lv)
+                .normal(1, 0, 0)
+                .endVertex();
+    }
+
     public static void putVertex(Matrix4f matrix, IVertexConsumer builder, IPosition normal,
                                  double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
         Vector4f vector4f = new Vector4f((float)x, (float)y, (float)z, 1.0F);
