@@ -924,18 +924,18 @@ public class RenderHelper {
     /**
      * Draw a beam with some thickness.
      */
-    public static void drawBeam(Matrix4f matrix, IVertexBuilder builder, TextureAtlasSprite sprite, Vector S, Vector E, Vector P, float width) {
-        Vector PS = Sub(S, P);
-        Vector SE = Sub(E, S);
+    public static void drawBeam(Matrix4f matrix, IVertexBuilder builder, TextureAtlasSprite sprite, Vector3f S, Vector3f E, Vector3f P, float width) {
+        Vector3f PS = Sub(S, P);
+        Vector3f SE = Sub(E, S);
 
-        Vector normal = Cross(PS, SE);
-        normal = normal.normalize();
+        Vector3f normal = Cross(PS, SE);
+        normal.normalize();
 
-        Vector half = Mul(normal, width);
-        Vector p1 = Add(S, half);
-        Vector p2 = Sub(S, half);
-        Vector p3 = Add(E, half);
-        Vector p4 = Sub(E, half);
+        Vector3f half = Mul(normal, width);
+        Vector3f p1 = Add(S, half);
+        Vector3f p2 = Sub(S, half);
+        Vector3f p3 = Add(E, half);
+        Vector3f p4 = Sub(E, half);
 
         drawQuad(matrix, builder, sprite, p1, p3, p4, p2, DEFAULT_SETTINGS);
     }
@@ -943,71 +943,71 @@ public class RenderHelper {
     /**
      * Draw a beam with some thickness.
      */
-    public static void drawBeam(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector S, Vector E, Vector P, RenderSettings settings) {
-        Vector PS = Sub(S, P);
-        Vector SE = Sub(E, S);
+    public static void drawBeam(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector3f S, Vector3f E, Vector3f P, RenderSettings settings) {
+        Vector3f PS = Sub(S, P);
+        Vector3f SE = Sub(E, S);
 
-        Vector normal = Cross(PS, SE);
-        normal = normal.normalize();
+        Vector3f normal = Cross(PS, SE);
+        normal.normalize();
 
-        Vector half = Mul(normal, settings.getWidth());
-        Vector p1 = Add(S, half);
-        Vector p2 = Sub(S, half);
-        Vector p3 = Add(E, half);
-        Vector p4 = Sub(E, half);
+        Vector3f half = Mul(normal, settings.getWidth());
+        Vector3f p1 = Add(S, half);
+        Vector3f p2 = Sub(S, half);
+        Vector3f p3 = Add(E, half);
+        Vector3f p4 = Sub(E, half);
 
         drawQuad(matrix, buffer, sprite, p1, p3, p4, p2, settings);
     }
 
-    public static void drawQuad(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector p1, Vector p2, Vector p3, Vector p4,
+    public static void drawQuad(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4,
                                 RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
 
-        vt(buffer, matrix, p1.getX(), p1.getY(), p1.getZ(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, p2.getX(), p2.getY(), p2.getZ(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, p3.getX(), p3.getY(), p3.getZ(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, p4.getX(), p4.getY(), p4.getZ(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, p1.x(), p1.y(), p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, p2.x(), p2.y(), p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, p3.x(), p3.y(), p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, p4.x(), p4.y(), p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
     }
 
-    public static void drawQuad(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector p1, Vector p2, Vector p3, Vector p4,
+    public static void drawQuad(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4,
                                 boolean opposite,
                                 RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
 
         if (opposite) {
-            vt(buffer, matrix, p1.getX(), p1.getY(), p1.getZ(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p2.getX(), p2.getY(), p2.getZ(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p3.getX(), p3.getY(), p3.getZ(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p4.getX(), p4.getY(), p4.getZ(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, p1.x(), p1.y(), p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, p2.x(), p2.y(), p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, p3.x(), p3.y(), p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, p4.x(), p4.y(), p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
         } else {
-            vt(buffer, matrix, p4.getX(), p4.getY(), p4.getZ(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p3.getX(), p3.getY(), p3.getZ(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p2.getX(), p2.getY(), p2.getZ(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p1.getX(), p1.getY(), p1.getZ(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, p4.x(), p4.y(), p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, p3.x(), p3.y(), p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, p2.x(), p2.y(), p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, p1.x(), p1.y(), p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
         }
     }
 
     public static void drawQuad(Matrix4f matrix, IVertexBuilder buffer, TextureAtlasSprite sprite, Direction side, boolean opposite, float offset, RenderSettings settings) {
         switch (side) {
             case DOWN:
-                drawQuad(matrix, buffer, sprite, Vector.Vector(0, offset, 1), Vector.Vector(1, offset, 1), Vector.Vector(1, offset, 0), Vector.Vector(0, offset, 0), opposite, settings);
+                drawQuad(matrix, buffer, sprite, new Vector3f(0, offset, 1), new Vector3f(1, offset, 1), new Vector3f(1, offset, 0), new Vector3f(0, offset, 0), opposite, settings);
                 break;
             case UP:
-                drawQuad(matrix, buffer, sprite, Vector.Vector(1, 1-offset, 1), Vector.Vector(0, 1-offset, 1), Vector.Vector(0, 1-offset, 0), Vector.Vector(1, 1-offset, 0), opposite, settings);
+                drawQuad(matrix, buffer, sprite, new Vector3f(1, 1-offset, 1), new Vector3f(0, 1-offset, 1), new Vector3f(0, 1-offset, 0), new Vector3f(1, 1-offset, 0), opposite, settings);
                 break;
             case NORTH:
-                drawQuad(matrix, buffer, sprite, Vector.Vector(0, 0, offset), Vector.Vector(1, 0, offset), Vector.Vector(1, 1, offset), Vector.Vector(0, 1, offset), opposite, settings);
+                drawQuad(matrix, buffer, sprite, new Vector3f(0, 0, offset), new Vector3f(1, 0, offset), new Vector3f(1, 1, offset), new Vector3f(0, 1, offset), opposite, settings);
                 break;
             case SOUTH:
-                drawQuad(matrix, buffer, sprite, Vector.Vector(0, 1, 1-offset), Vector.Vector(1, 1, 1-offset), Vector.Vector(1, 0, 1-offset), Vector.Vector(0, 0, 1-offset), opposite, settings);
+                drawQuad(matrix, buffer, sprite, new Vector3f(0, 1, 1-offset), new Vector3f(1, 1, 1-offset), new Vector3f(1, 0, 1-offset), new Vector3f(0, 0, 1-offset), opposite, settings);
                 break;
             case WEST:
-                drawQuad(matrix, buffer, sprite, Vector.Vector(offset, 0, 0), Vector.Vector(offset, 1, 0), Vector.Vector(offset, 1, 1), Vector.Vector(offset, 0, 1), opposite, settings);
+                drawQuad(matrix, buffer, sprite, new Vector3f(offset, 0, 0), new Vector3f(offset, 1, 0), new Vector3f(offset, 1, 1), new Vector3f(offset, 0, 1), opposite, settings);
                 break;
             case EAST:
-                drawQuad(matrix, buffer, sprite, Vector.Vector(1-offset, 0, 1), Vector.Vector(1-offset, 1, 1), Vector.Vector(1-offset, 1, 0), Vector.Vector(1-offset, 0, 0), opposite, settings);
+                drawQuad(matrix, buffer, sprite, new Vector3f(1-offset, 0, 1), new Vector3f(1-offset, 1, 1), new Vector3f(1-offset, 1, 0), new Vector3f(1-offset, 0, 0), opposite, settings);
                 break;
         }
     }
@@ -1086,60 +1086,23 @@ public class RenderHelper {
         }
     }
 
-    public static class Vector {
-        public final float x;
-        public final float y;
-        public final float z;
-
-        public Vector(float x, float y, float z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public static Vector Vector(float x, float y, float z) {
-            return new Vector(x, y, z);
-        }
-
-        public float getX() {
-            return x;
-        }
-
-        public float getY() {
-            return y;
-        }
-
-        public float getZ() {
-            return z;
-        }
-
-        public float norm() {
-            return (float) Math.sqrt(x * x + y * y + z * z);
-        }
-
-        public Vector normalize() {
-            float n = norm();
-            return new Vector(x / n, y / n, z / n);
-        }
+    private static Vector3f Cross(Vector3f a, Vector3f b) {
+        float x = a.y() * b.z() - a.z() * b.y();
+        float y = a.z() * b.x() - a.x() * b.z();
+        float z = a.x() * b.y() - a.y() * b.x();
+        return new Vector3f(x, y, z);
     }
 
-    private static Vector Cross(Vector a, Vector b) {
-        float x = a.y * b.z - a.z * b.y;
-        float y = a.z * b.x - a.x * b.z;
-        float z = a.x * b.y - a.y * b.x;
-        return new Vector(x, y, z);
+    private static Vector3f Sub(Vector3f a, Vector3f b) {
+        return new Vector3f(a.x() - b.x(), a.y() - b.y(), a.z() - b.z());
     }
 
-    private static Vector Sub(Vector a, Vector b) {
-        return new Vector(a.x - b.x, a.y - b.y, a.z - b.z);
+    private static Vector3f Add(Vector3f a, Vector3f b) {
+        return new Vector3f(a.x() + b.x(), a.y() + b.y(), a.z() + b.z());
     }
 
-    private static Vector Add(Vector a, Vector b) {
-        return new Vector(a.x + b.x, a.y + b.y, a.z + b.z);
-    }
-
-    private static Vector Mul(Vector a, float f) {
-        return new Vector(a.x * f, a.y * f, a.z * f);
+    private static Vector3f Mul(Vector3f a, float f) {
+        return new Vector3f(a.x() * f, a.y() * f, a.z() * f);
     }
 
     public static void renderHighLightedBlocksOutline(IVertexBuilder buffer, Matrix4f positionMatrix, float mx, float my, float mz, float r, float g, float b, float a) {
