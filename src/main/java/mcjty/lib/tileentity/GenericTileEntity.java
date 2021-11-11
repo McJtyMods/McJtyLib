@@ -218,7 +218,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * @param tagCompound
      */
     public void writeClientDataToNBT(CompoundNBT tagCompound) {
-        save(tagCompound); // @todo TEST IF THIS IS REALLY NEEDED
     }
 
     /**
