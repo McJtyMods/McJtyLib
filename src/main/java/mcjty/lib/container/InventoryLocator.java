@@ -58,9 +58,7 @@ public class InventoryLocator {
                 break;
             }
             ItemStack finalStack = stack;
-            stack = getItemHandlerAtDirection(worldObj, thisCoordinate, dir).map(handler -> {
-                return ItemHandlerHelper.insertItem(handler, finalStack, false);
-            }).orElse(ItemStack.EMPTY);
+            stack = getItemHandlerAtDirection(worldObj, thisCoordinate, dir).map(handler -> ItemHandlerHelper.insertItem(handler, finalStack, false)).orElse(stack);
         }
 
         if (!stack.isEmpty()) {
