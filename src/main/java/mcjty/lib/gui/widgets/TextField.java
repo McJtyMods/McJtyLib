@@ -20,6 +20,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class TextField extends AbstractWidget<TextField> {
 
@@ -54,6 +55,9 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     public TextField text(String text) {
+        if (Objects.equals(this.text, text)) {
+            return this;
+        }
         this.text = text;
         cursor = text.length();
         if (startOffset >= cursor) {

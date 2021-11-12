@@ -285,25 +285,23 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected void readInfo(CompoundNBT tagCompound) {
         if (tagCompound.contains("Info")) {
             CompoundNBT infoTag = tagCompound.getCompound("Info");
-            powerLevel = infoTag.getByte("powered");
-            if (needsRedstoneMode()) {
+            if (infoTag.contains("powered")) {
+                powerLevel = infoTag.getByte("powered");
+            }
+            if (needsRedstoneMode() && infoTag.contains("rsMode")) {
                 int m = infoTag.getByte("rsMode");
                 rsMode = RedstoneMode.values()[m];
             }
 
-            ownerName = infoTag.getString("owner");
+            if (infoTag.contains("owner")) {
+                ownerName = infoTag.getString("owner");
+            }
             if (infoTag.hasUUID("ownerId")) {
                 ownerUUID = infoTag.getUUID("ownerId");
-            } else {
-                ownerUUID = null;
             }
             if (infoTag.contains("secChannel")) {
                 securityChannel = infoTag.getInt("secChannel");
-            } else {
-                securityChannel = -1;
             }
-        } else {
-            securityChannel = -1;
         }
     }
 
