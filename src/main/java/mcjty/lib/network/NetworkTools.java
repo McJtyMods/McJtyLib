@@ -1,11 +1,11 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.varia.Logging;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
@@ -50,7 +50,7 @@ public class NetworkTools {
 
     public static void writeStringList(PacketBuffer dataOut, @Nonnull List<String> list) {
         dataOut.writeInt(list.size());
-        list.stream().forEach(s -> writeStringUTF8(dataOut, s));
+        list.forEach(s -> writeStringUTF8(dataOut, s));
     }
 
     @Nonnull
@@ -127,4 +127,21 @@ public class NetworkTools {
             buf.writeItem(output);
         }
     }
+
+    public static void writeBlockPosList(PacketBuffer dataOut, @Nonnull List<BlockPos> list) {
+        dataOut.writeInt(list.size());
+        list.forEach(dataOut::writeBlockPos);
+    }
+
+    @Nonnull
+    public static List<BlockPos> readBlockPosList(PacketBuffer dataIn) {
+        int size = dataIn.readInt();
+        List<BlockPos> list = new ArrayList<>(size);
+        for (int i = 0 ; i < size ; i++) {
+            list.add(dataIn.readBlockPos());
+        }
+        return list;
+    }
+
+
 }

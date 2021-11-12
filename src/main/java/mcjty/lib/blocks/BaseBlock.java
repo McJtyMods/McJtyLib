@@ -249,6 +249,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         if (te == null) {
             return false;
         }
+
         return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> {
             if (world.isClientSide) {
                 return true;

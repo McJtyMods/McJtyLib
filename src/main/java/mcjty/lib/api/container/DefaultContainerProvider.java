@@ -1,5 +1,6 @@
 package mcjty.lib.api.container;
 
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -83,6 +84,10 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         }
         for (IContainerDataListener dataListener : containerDataListeners) {
             container.addContainerDataListener(dataListener);
+        }
+
+        if (container instanceof GenericContainer) {
+            ((GenericContainer) container).forceBroadcast();
         }
 
         return container.getAsContainer();

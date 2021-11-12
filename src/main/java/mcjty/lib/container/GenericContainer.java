@@ -9,9 +9,9 @@ import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.network.PacketContainerDataToClient;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.TriFunction;
-import mcjty.lib.varia.LevelTools;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -33,10 +33,7 @@ import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -49,6 +46,8 @@ public class GenericContainer extends Container implements IGenericContainer {
     private final ContainerFactory factory;
     protected final BlockPos pos;
     protected final GenericTileEntity te;
+    private final List<IntReferenceHolder> intReferenceHolders = new ArrayList<>();
+    private boolean doForce = true;
 
     public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity te) {
         super(type, id);
@@ -64,6 +63,12 @@ public class GenericContainer extends Container implements IGenericContainer {
 
     public GenericTileEntity getTe() {
         return te;
+    }
+
+    @Override
+    protected IntReferenceHolder addDataSlot(IntReferenceHolder holder) {
+        intReferenceHolders.add(holder);
+        return super.addDataSlot(holder);
     }
 
     @Override
@@ -439,8 +444,37 @@ public class GenericContainer extends Container implements IGenericContainer {
         return containerData.get(id);
     }
 
+    private void broadcast() {
+        for (int i = 0; i < intReferenceHolders.size(); i++) {
+            IntReferenceHolder holder = intReferenceHolders.get(i);
+            for (IContainerListener listener : this.containerListeners) {
+                listener.setContainerData(this, i, holder.get());
+            }
+        }
+        for (IContainerDataListener data : containerData.values()) {
+            ByteBuf newbuf = Unpooled.buffer();
+            PacketBuffer buffer = new PacketBuffer(newbuf);
+            data.toBytes(buffer);
+            PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
+            for (IContainerListener listener : this.containerListeners) {
+                if (listener instanceof ServerPlayerEntity) {
+                    McJtyLib.networkHandler.sendTo(packet, ((ServerPlayerEntity) listener).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                }
+            }
+        }
+    }
+
+    public void forceBroadcast() {
+        this.doForce = true;
+    }
+
     @Override
     public void broadcastChanges() {
+        if (doForce) {
+            broadcast();
+            doForce = false;
+        }
+
         super.broadcastChanges();
 
         for (IContainerDataListener data : containerData.values()) {

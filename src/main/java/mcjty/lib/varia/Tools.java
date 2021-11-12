@@ -1,11 +1,16 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.api.container.IContainerDataListener;
+import mcjty.lib.bindings.IValue;
+import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.typed.Key;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.IntReferenceHolder;
@@ -19,11 +24,103 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Tools {
+
+    /**
+     * A data listener that listens to the values of the given tile entity. Use this
+     * in a GenericContainer (using dataListener) to sync data for your gui
+     */
+    public static IContainerDataListener values(ResourceLocation id, GenericTileEntity te) {
+        return new IContainerDataListener() {
+
+            private Map<Key, Object> oldValues = new HashMap<>();
+
+            @Override
+            public ResourceLocation getId() {
+                return id;
+            }
+
+            private void copyToOld() {
+                oldValues.clear();
+                for (IValue<?> value : te.getValues()) {
+                    Object v = value.getter().get();
+                    oldValues.put(value.getKey(), v);
+                }
+            }
+
+            @Override
+            public boolean isDirtyAndClear() {
+                for (IValue<?> value : te.getValues()) {
+                    Object v = value.getter().get();
+                    Key<?> key = value.getKey();
+                    if (!oldValues.containsKey(key) || !Objects.equals(oldValues.get(key), v)) {
+                        // Dirty
+                        copyToOld();
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public void toBytes(PacketBuffer buf) {
+                for (IValue<?> value : te.getValues()) {
+                    Object v = value.getter().get();
+                    value.getKey().getType().serialize(buf, v);
+                }
+            }
+
+            @Override
+            public void readBuf(PacketBuffer buf) {
+                for (IValue value : te.getValues()) {
+                    value.getKey().getType().deserialize(buf, value);
+                }
+            }
+        };
+    }
+
+    /**
+     * A data listener for a string. Use this
+     * in a GenericContainer (using dataListener) to sync data for your gui
+     */
+    public static IContainerDataListener string(ResourceLocation id, Supplier<String> getter, Consumer<String> setter) {
+        return new IContainerDataListener() {
+
+            private String oldString = null;
+
+            @Override
+            public ResourceLocation getId() {
+                return id;
+            }
+
+            @Override
+            public boolean isDirtyAndClear() {
+                String newValue = getter.get();
+                if (!Objects.equals(newValue, oldString)) {
+                    oldString = newValue;
+                    return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void toBytes(PacketBuffer buf) {
+                buf.writeUtf(getter.get());
+            }
+
+            @Override
+            public void readBuf(PacketBuffer buf) {
+                setter.accept(buf.readUtf(32767));
+            }
+        };
+    }
 
     public static IntReferenceHolder holder(Supplier<Integer> getter, Consumer<Integer> setter) {
         return new IntReferenceHolder() {
@@ -35,6 +132,20 @@ public class Tools {
             @Override
             public void set(int v) {
                 setter.accept(v);
+            }
+        };
+    }
+
+    public static IntReferenceHolder bool(Supplier<Boolean> getter, Consumer<Boolean> setter) {
+        return new IntReferenceHolder() {
+            @Override
+            public int get() {
+                return getter.get() ? 1 : 0;
+            }
+
+            @Override
+            public void set(int v) {
+                setter.accept(v != 0);
             }
         };
     }
