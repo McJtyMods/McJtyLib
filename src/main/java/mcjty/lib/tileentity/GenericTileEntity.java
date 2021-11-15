@@ -93,7 +93,13 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         } else {
             try {
                 Cap annotation = caps[index].getAnnotation(Cap.class);
-                LazyOptional lazy = (LazyOptional) FieldUtils.readField(caps[index], this, true);
+                Object instance = FieldUtils.readField(caps[index], this, true);
+                LazyOptional lazy;
+                if (instance instanceof LazyOptional) {
+                    lazy = (LazyOptional) instance;
+                } else {
+                    lazy = LazyOptional.of(() -> instance);
+                }
                 BiFunction<Capability, Direction, LazyOptional> tail = generateCapTests(caps, index + 1);
                 switch (annotation.type()) {
                     case ITEMS:
