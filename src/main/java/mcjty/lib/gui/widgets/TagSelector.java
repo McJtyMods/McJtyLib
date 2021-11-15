@@ -33,6 +33,9 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     }
 
     public TagSelector current(String tag) {
+        if (currentTag == tag) {
+            return this;
+        }
         currentTag = tag;
         return this;
     }

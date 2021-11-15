@@ -1,6 +1,6 @@
 package mcjty.lib.network;
 
-import mcjty.lib.sync.PacketSendPositionalDataToClients;
+import mcjty.lib.syncpositional.PacketSendPositionalDataToClients;
 import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 

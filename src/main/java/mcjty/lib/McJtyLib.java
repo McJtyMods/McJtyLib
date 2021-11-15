@@ -5,7 +5,7 @@ import mcjty.lib.multipart.MultipartModelLoader;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.*;
-import mcjty.lib.sync.PositionalDataSyncer;
+import mcjty.lib.syncpositional.PositionalDataSyncer;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.api.distmarker.Dist;

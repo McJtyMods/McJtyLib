@@ -1,4 +1,4 @@
-package mcjty.lib.sync;
+package mcjty.lib.syncpositional;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;

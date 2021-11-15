@@ -155,6 +155,20 @@ public class Sync {
         };
     }
 
+    public static IntReferenceHolder shortint(Supplier<Short> getter, Consumer<Short> setter) {
+        return new IntReferenceHolder() {
+            @Override
+            public int get() {
+                return getter.get();
+            }
+
+            @Override
+            public void set(int v) {
+                setter.accept((short) v);
+            }
+        };
+    }
+
     public static <T extends Enum<T>> IntReferenceHolder enumeration(Supplier<T> getter, Consumer<T> setter, T[] values) {
         return new IntReferenceHolder() {
             @Override

@@ -48,6 +48,9 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
     }
 
     public ChoiceLabel choice(String choice) {
+        if (Objects.equals(currentChoice, choice)) {
+            return this;
+        }
         currentChoice = choice;
         text(currentChoice);
         return this;

@@ -131,6 +131,9 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
 
 
     public void setCurrentChoice(int currentChoice) {
+        if (this.currentChoice == currentChoice) {
+            return;
+        }
         this.currentChoice = currentChoice;
         image(choiceList.get(currentChoice).getImage(), choiceList.get(currentChoice).getU(), choiceList.get(currentChoice).getV());
     }

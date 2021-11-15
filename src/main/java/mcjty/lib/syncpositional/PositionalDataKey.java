@@ -1,4 +1,4 @@
-package mcjty.lib.sync;
+package mcjty.lib.syncpositional;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.GlobalPos;

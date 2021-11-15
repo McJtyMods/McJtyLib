@@ -1,4 +1,4 @@
-package mcjty.lib.sync;
+package mcjty.lib.syncpositional;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.varia.LevelTools;

@@ -33,6 +33,9 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
     }
 
     public ToggleButton pressed(boolean pressed) {
+        if (this.pressed == pressed) {
+            return this;
+        }
         this.pressed = pressed;
         return this;
     }
