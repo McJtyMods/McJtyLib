@@ -7,6 +7,8 @@ import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
+import mcjty.lib.container.AutomationFilterItemHander;
+import mcjty.lib.container.NoDirectionItemHander;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.network.IClientCommandHandler;
@@ -97,12 +99,22 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
                 LazyOptional lazy;
                 if (instance instanceof LazyOptional) {
                     lazy = (LazyOptional) instance;
+                } else if (annotation.type() == CapType.ITEMS_AUTOMATION) {
+                    lazy = LazyOptional.of(() -> new AutomationFilterItemHander((NoDirectionItemHander) instance));
                 } else {
                     lazy = LazyOptional.of(() -> instance);
                 }
                 BiFunction<Capability, Direction, LazyOptional> tail = generateCapTests(caps, index + 1);
                 switch (annotation.type()) {
                     case ITEMS:
+                        return (cap, dir) -> {
+                            if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+                                return lazy;
+                            } else {
+                                return tail.apply(cap, dir);
+                            }
+                        };
+                    case ITEMS_AUTOMATION:
                         return (cap, dir) -> {
                             if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
                                 return lazy;
