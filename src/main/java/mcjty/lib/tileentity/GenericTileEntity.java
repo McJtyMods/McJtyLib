@@ -1,6 +1,9 @@
 package mcjty.lib.tileentity;
 
+import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
+import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
@@ -29,17 +32,23 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
@@ -62,8 +71,99 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     protected int powerLevel = 0;
 
+    // This is a generated function (from the annotated capabilities) that is initially (by the TE
+    // constructor) set to be a function that looks for tne annotations and replaces itself with
+    // a function that does the actual testing
+    private BiFunction<Capability, Direction, LazyOptional> capSetup;
+
     public GenericTileEntity(TileEntityType<?> type) {
         super(type);
+        // Setup code to find the capability annotations and in that code we
+        // replace 'capSetup' with the actual code to execute the annotations
+        capSetup = (cap,dir) -> {
+            Field[] caps = CapScanner.scan(getClass(), this);
+            capSetup = generateCapTests(caps, 0);
+            return capSetup.apply(cap, dir);
+        };
+    }
+
+    private BiFunction<Capability, Direction, LazyOptional> generateCapTests(Field[] caps, int index) {
+        if (index >= caps.length) {
+            return super::getCapability;
+        } else {
+            try {
+                Cap annotation = caps[index].getAnnotation(Cap.class);
+                LazyOptional lazy = (LazyOptional) FieldUtils.readField(caps[index], this, true);
+                BiFunction<Capability, Direction, LazyOptional> tail = generateCapTests(caps, index + 1);
+                switch (annotation.type()) {
+                    case ITEMS:
+                        return (cap, dir) -> {
+                            if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+                                return lazy;
+                            } else {
+                                return tail.apply(cap, dir);
+                            }
+                        };
+                    case CONTAINER:
+                        return (cap, dir) -> {
+                            if (cap == CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY) {
+                                return lazy;
+                            } else {
+                                return tail.apply(cap, dir);
+                            }
+                        };
+                    case ENERGY:
+                        return (cap, dir) -> {
+                            if (cap == CapabilityEnergy.ENERGY) {
+                                return lazy;
+                            } else {
+                                return tail.apply(cap, dir);
+                            }
+                        };
+                    case INFUSABLE:
+                        return (cap, dir) -> {
+                            if (cap == CapabilityInfusable.INFUSABLE_CAPABILITY) {
+                                return lazy;
+                            } else {
+                                return tail.apply(cap, dir);
+                            }
+                        };
+                    case MODULE:
+                        return (cap, dir) -> {
+                            if (cap == CapabilityModuleSupport.MODULE_CAPABILITY) {
+                                return lazy;
+                            } else {
+                                return tail.apply(cap, dir);
+                            }
+                        };
+                    case POWER_INFO:
+                        return (cap, dir) -> {
+                            if (cap == CapabilityPowerInformation.POWER_INFORMATION_CAPABILITY) {
+                                return lazy;
+                            } else {
+                                return tail.apply(cap, dir);
+                            }
+                        };
+                    case FLUIDS:
+                        return (cap, dir) -> {
+                            if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+                                return lazy;
+                            } else {
+                                return tail.apply(cap, dir);
+                            }
+                        };
+                }
+                throw new RuntimeException("Unknown cap type");
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        return capSetup.apply(cap, side);
     }
 
     public void markDirtyClient() {

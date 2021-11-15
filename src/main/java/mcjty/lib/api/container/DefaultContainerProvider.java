@@ -1,7 +1,7 @@
 package mcjty.lib.api.container;
 
 import mcjty.lib.container.GenericContainer;
-import mcjty.lib.sync.AnnotationSyncScanner;
+import mcjty.lib.sync.GuiSyncScanner;
 import mcjty.lib.sync.GuiSync;
 import mcjty.lib.sync.SyncType;
 import mcjty.lib.tileentity.GenericEnergyStorage;
@@ -76,7 +76,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     }
 
     public DefaultContainerProvider<C> setupSync(GenericTileEntity te) {
-        AnnotationSyncScanner.scanGuiSync(te.getClass(), te, (guiSync, field) -> {
+        GuiSyncScanner.scan(te.getClass(), te, (guiSync, field) -> {
             SyncType type = guiSync.type();
             if (type == SyncType.AUTOMATIC) {
                 type = guessType(field);

@@ -7,9 +7,9 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 
-public class AnnotationSyncScanner {
+public class GuiSyncScanner {
 
-    public static <T extends GenericTileEntity> void scanGuiSync(Class teClass, T instance, BiConsumer<GuiSync, Field> consumer) {
+    public static <T extends GenericTileEntity> void scan(Class teClass, T instance, BiConsumer<GuiSync, Field> consumer) {
         Field[] fields = FieldUtils.getFieldsWithAnnotation(teClass, GuiSync.class);
         Arrays.stream(fields).forEach(field -> {
             GuiSync annotation = field.getAnnotation(GuiSync.class);
