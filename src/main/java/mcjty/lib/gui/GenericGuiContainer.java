@@ -3,6 +3,7 @@ package mcjty.lib.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.McJtyLib;
+import mcjty.lib.blockcommands.Command;
 import mcjty.lib.client.GuiTools;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
@@ -459,6 +460,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     public void sendServerCommandTyped(SimpleChannel network, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
+    }
+
+    public void sendServerCommandTyped(SimpleChannel network, Command command, TypedMap params) {
+        network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command.getName(), params));
     }
 
     public void sendServerCommandTyped(SimpleChannel network, RegistryKey<World> dimensionId, String command, TypedMap params) {

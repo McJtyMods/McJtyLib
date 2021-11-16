@@ -14,6 +14,7 @@ import java.util.List;
  */
 public interface ICommandHandler {
     /// Return true if command was handled correctly. False if not.
+    @Deprecated
     default boolean execute(PlayerEntity playerMP, String command, TypedMap params) {
         return false;
     }

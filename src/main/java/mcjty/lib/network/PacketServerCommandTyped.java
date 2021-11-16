@@ -1,8 +1,9 @@
 package mcjty.lib.network;
 
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.LevelTools;
+import mcjty.lib.varia.Logging;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -81,6 +82,12 @@ public class PacketServerCommandTyped {
                     Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
                     return;
                 }
+                if (te instanceof GenericTileEntity) {
+                    if (((GenericTileEntity) te).executeServerCommand(command, playerEntity, params)) {
+                        return;
+                    }
+                }
+
                 ICommandHandler commandHandler = (ICommandHandler) te;
                 if (!commandHandler.execute(playerEntity, command, params)) {
                     Logging.log("Command " + command + " was not handled!");

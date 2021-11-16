@@ -404,7 +404,8 @@ public class Window {
     }
 
     private void sendAction(SimpleChannel network, IAction action) {
-        ((GenericGuiContainer<?,?>)gui).sendServerCommandTyped(network, GenericTileEntity.COMMAND_SYNC_ACTION,
+        GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
+        guiContainer.sendServerCommandTyped(network, guiContainer.tileEntity.COMMAND_SYNC_ACTION,
                 TypedMap.builder()
                         .put(GenericTileEntity.PARAM_KEY, action.getKey())
                         .build());
@@ -435,7 +436,8 @@ public class Window {
 
         event(componentName, (source, params) -> {
             Type<V> type = value.getKey().getType();
-            ((GenericGuiContainer<?,?>)gui).sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING,
+            GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
+            guiContainer.sendServerCommandTyped(network, dimensionType, guiContainer.tileEntity.COMMAND_SYNC_BINDING.getName(),
                     TypedMap.builder()
                             // @todo this conversion can fail!
                             .put(value.getKey(), type.convert(component.getGenericValue(type)))

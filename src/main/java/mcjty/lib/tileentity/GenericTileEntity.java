@@ -7,6 +7,9 @@ import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
+import mcjty.lib.blockcommands.Command;
+import mcjty.lib.blockcommands.ICommand;
+import mcjty.lib.blockcommands.ServerCommand;
 import mcjty.lib.container.AutomationFilterItemHander;
 import mcjty.lib.container.NoDirectionItemHander;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
@@ -47,9 +50,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -57,12 +58,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     public static final IValue<?>[] EMPTY_VALUES = new IValue[0];
     public static final IAction[] EMPTY_ACTIONS = new IAction[0];
-
-    public static final String CMD_RSMODE = "mcjtylib.setRsMode";
-
-    public static final String COMMAND_SYNC_BINDING = "generic.syncBinding";
-    public static final String COMMAND_SYNC_ACTION = "generic.syncAction";
-    public static final Key<String> PARAM_KEY = new Key<>("key", Type.STRING);
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
@@ -72,6 +67,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     protected int powerLevel = 0;
+
+    private Map<String, ICommand> serverCommands = null;
 
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for tne annotations and replaces itself with
@@ -643,7 +640,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
         network.sendToServer(new PacketServerCommandTyped(getBlockPos(),
                 getDimension(),
-                COMMAND_SYNC_BINDING,
+                COMMAND_SYNC_BINDING.getName(),
                 TypedMap.builder()
                         .put(valueKey, value)
                         .build()));
@@ -656,23 +653,47 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command, params, false));
     }
 
-
-    @Override
-    public boolean execute(PlayerEntity playerMP, String command, TypedMap params) {
-        if (COMMAND_SYNC_BINDING.equals(command)) {
-            syncBinding(params);
-            return true;
-        } else if (COMMAND_SYNC_ACTION.equals(command)) {
-            String key = params.get(PARAM_KEY);
-            findConsumer(key).run();
-            return true;
-        } else if (CMD_RSMODE.equals(command)) {
-            setRSMode(RedstoneMode.values()[params.get(ImageChoiceLabel.PARAM_CHOICE_IDX)]);
-            return true;
+    /**
+     * Execute a server side command (annotated with @ServerCommand)
+     */
+    public boolean executeServerCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
+        if (serverCommands == null) {
+            serverCommands = new HashMap<>();
+            Field[] fieldsWithAnnotation = FieldUtils.getFieldsWithAnnotation(getClass(), ServerCommand.class);
+            for (Field field : fieldsWithAnnotation) {
+                ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
+                try {
+                    Command cmd = (Command) field.get(this);
+                    serverCommands.put(cmd.getName(), cmd.getCmd());
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
 
+        ICommand serverCommand = serverCommands.get(command);
+        if (serverCommand != null) {
+            serverCommand.run(this, player, params);
+            return true;
+        }
         return false;
     }
+
+    @ServerCommand
+    public static final Command<?> COMMAND_SYNC_BINDING = Command.create("generic.syncBinding")
+            .buildCommand((te, playerEntity, params) -> te.syncBinding(params));
+
+    public static final Key<String> PARAM_KEY = new Key<>("key", Type.STRING);
+    @ServerCommand
+    public static final Command<?> COMMAND_SYNC_ACTION = Command.create("generic.syncAction")
+            .buildCommand((te, playerEntity, params) -> {
+                String key = params.get(PARAM_KEY);
+                te.findConsumer(key).run();
+            });
+
+    @ServerCommand
+    public static final Command<?> CMD_RSMODE = Command.create("mcjtylib.setRsMode")
+            .buildCommand((te, playerEntity, params) -> te.setRSMode(RedstoneMode.values()[params.get(ImageChoiceLabel.PARAM_CHOICE_IDX)]));
 
     private <T> void syncBindingHelper(TypedMap params, Key<T> bkey) {
         T o = params.get(bkey);
