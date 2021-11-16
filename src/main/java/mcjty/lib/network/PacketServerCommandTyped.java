@@ -38,20 +38,6 @@ public class PacketServerCommandTyped {
         }
     }
 
-    public PacketServerCommandTyped(BlockPos pos, Command<?> command, TypedMap params) {
-        this.pos = pos;
-        this.command = command.getName();
-        this.params = params;
-        this.dimensionId = null;
-    }
-
-    public PacketServerCommandTyped(BlockPos pos, String command, TypedMap params) {
-        this.pos = pos;
-        this.command = command;
-        this.params = params;
-        this.dimensionId = null;
-    }
-
     public PacketServerCommandTyped(BlockPos pos, RegistryKey<World> dimensionId, String command, TypedMap params) {
         this.pos = pos;
         this.command = command;

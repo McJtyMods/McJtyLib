@@ -18,7 +18,6 @@ import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.network.IClientCommandHandler;
 import mcjty.lib.network.ICommandHandler;
 import mcjty.lib.network.PacketRequestDataFromServer;
-import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -69,9 +68,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     protected int powerLevel = 0;
 
-    private Map<String, ICommand> serverCommands = null;
-    private Map<String, ICommandWithResult> serverCommandsWithResult = null;
-    private Map<String, ICommand> clientCommands = null;
+    private static final Map<TileEntityType, CommandHolder> commands = new HashMap<>();
 
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for tne annotations and replaces itself with
@@ -628,24 +625,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return level.dimension();
     }
 
-        // Client side function to send a value to the server
-    public <T> void valueToServer(SimpleChannel network, Key<T> valueKey, T value) {
-
-        network.sendToServer(new PacketServerCommandTyped(getBlockPos(),
-                getDimension(),
-                COMMAND_SYNC_BINDING.getName(),
-                TypedMap.builder()
-                        .put(valueKey, value)
-                        .build()));
-    }
-
-    /**
-     * Call this client-side to this TE to request data from the server
-     */
-    public void requestDataFromServer(SimpleChannel channel, String command, @Nonnull TypedMap params) {
-        channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command, params, false));
-    }
-
     /**
      * Call this client-side to this TE to request data from the server
      */
@@ -657,9 +636,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * Execute a client side command (annotated with @ServerCommand)
      */
     public boolean executeClientCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
-        initCommands();
-
-        ICommand clientCommand = clientCommands.get(command);
+        CommandHolder holder = getCommandHolder();
+        ICommand clientCommand = holder.clientCommands.get(command);
         if (clientCommand != null) {
             clientCommand.run(this, player, params);
             return true;
@@ -671,9 +649,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * Execute a server side command (annotated with @ServerCommand)
      */
     public boolean executeServerCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
-        initCommands();
-
-        ICommand serverCommand = serverCommands.get(command);
+        CommandHolder holder = getCommandHolder();
+        ICommand serverCommand = holder.serverCommands.get(command);
         if (serverCommand != null) {
             serverCommand.run(this, player, params);
             return true;
@@ -686,39 +663,40 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      */
     @Nullable
     public TypedMap executeServerCommandWR(String command, PlayerEntity player, @Nonnull TypedMap params) {
-        initCommands();
-
-        ICommandWithResult serverCommand = serverCommandsWithResult.get(command);
+        CommandHolder holder = getCommandHolder();
+        ICommandWithResult serverCommand = holder.serverCommandsWithResult.get(command);
         if (serverCommand != null) {
             return serverCommand.run(this, player, params);
         }
         return null;
     }
 
-    private void initCommands() {
-        if (serverCommands == null || serverCommandsWithResult == null || clientCommands == null) {
-            serverCommands = new HashMap<>();
-            serverCommandsWithResult = new HashMap<>();
-            clientCommands = new HashMap<>();
+    private CommandHolder getCommandHolder() {
+        CommandHolder holder = commands.get(getType());
+
+        if (holder == null) {
+            holder = new CommandHolder();
+            commands.put(getType(), holder);
             Field[] fieldsWithAnnotation = FieldUtils.getFieldsWithAnnotation(getClass(), ServerCommand.class);
             for (Field field : fieldsWithAnnotation) {
                 ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
                 try {
                     Command cmd = (Command) field.get(this);
                     if (cmd.getCmd() != null) {
-                        serverCommands.put(cmd.getName(), cmd.getCmd());
+                        holder.serverCommands.put(cmd.getName(), cmd.getCmd());
                     }
                     if (cmd.getCmdWithResult() != null) {
-                        serverCommandsWithResult.put(cmd.getName(), cmd.getCmdWithResult());
+                        holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmdWithResult());
                     }
                     if (cmd.getClientCommand() != null) {
-                        clientCommands.put(cmd.getName(), cmd.getClientCommand());
+                        holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
                     }
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             }
         }
+        return holder;
     }
 
     @ServerCommand
