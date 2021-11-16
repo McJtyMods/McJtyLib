@@ -2,6 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericContainer;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import net.minecraft.inventory.container.Container;
@@ -73,16 +74,15 @@ public class PacketDataFromServer {
                 te = container.getTe();
             } else {
                 te = McJtyLib.proxy.getClientWorld().getBlockEntity(pos);
-                if (!(te instanceof IClientCommandHandler)) {
-                    Logging.log("TileEntity is not a ClientCommandHandler!");
+            }
+
+            if (te instanceof GenericTileEntity) {
+                if (((GenericTileEntity) te).executeClientCommand(command, McJtyLib.proxy.getClientPlayer(), result)) {
                     return;
                 }
             }
 
-            IClientCommandHandler clientCommandHandler = (IClientCommandHandler) te;
-            if (!clientCommandHandler.receiveDataFromServer(command, result)) {
-                Logging.log("Command " + command + " was not handled!");
-            }
+            Logging.log("Command " + command + " was not handled!");
         });
         ctx.setPacketHandled(true);
     }

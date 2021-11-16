@@ -7,10 +7,12 @@ public class Command<T extends GenericTileEntity> {
     private final String name;
     private final ICommand<T> cmd;
     private final ICommandWithResult<T> cmdWithResult;
+    private final ICommand<T> clientCommand;
 
     private Command(Builder<T> builder) {
         this.name = builder.name;
         this.cmd = builder.cmd;
+        this.clientCommand = builder.clientCommand;
         this.cmdWithResult = builder.cmdWithResult;
     }
 
@@ -26,6 +28,10 @@ public class Command<T extends GenericTileEntity> {
         return cmdWithResult;
     }
 
+    public ICommand<T> getClientCommand() {
+        return clientCommand;
+    }
+
     public static <E extends GenericTileEntity> Builder<E> builder(String name) {
         return new Builder<E>(name);
     }
@@ -38,9 +44,10 @@ public class Command<T extends GenericTileEntity> {
     }
 
     /// Create a command with a TypedMap result
-    public static <E extends GenericTileEntity> Command<E> createWR(String name, ICommandWithResult<E> command) {
+    public static <E extends GenericTileEntity> Command<E> createWR(String name, ICommandWithResult<E> command, ICommand<E> clientCommand) {
         return new Builder<E>(name)
                 .command(command)
+                .clientCommand(clientCommand)
                 .build();
     }
 
@@ -49,6 +56,7 @@ public class Command<T extends GenericTileEntity> {
         private final String name;
         private ICommand<T> cmd = null;
         private ICommandWithResult<T> cmdWithResult = null;
+        private ICommand<T> clientCommand = null;
 
         public Builder(String name) {
             this.name = name;
@@ -61,6 +69,11 @@ public class Command<T extends GenericTileEntity> {
 
         public Builder<T> command(ICommandWithResult<T> command) {
             this.cmdWithResult = command;
+            return this;
+        }
+
+        public Builder<T> clientCommand(ICommand<T> clientCommand) {
+            this.clientCommand = clientCommand;
             return this;
         }
 

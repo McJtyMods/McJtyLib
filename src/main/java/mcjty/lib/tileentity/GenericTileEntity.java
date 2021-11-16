@@ -71,6 +71,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     private Map<String, ICommand> serverCommands = null;
     private Map<String, ICommandWithResult> serverCommandsWithResult = null;
+    private Map<String, ICommand> clientCommands = null;
 
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for tne annotations and replaces itself with
@@ -531,11 +532,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return false;
     }
 
-    @Override
-    public boolean receiveDataFromServer(String command, @Nonnull TypedMap result) {
-        return false;
-    }
-
     public boolean checkAccess(PlayerEntity player) {
         return false;
     }
@@ -658,6 +654,20 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     /**
+     * Execute a client side command (annotated with @ServerCommand)
+     */
+    public boolean executeClientCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
+        initCommands();
+
+        ICommand clientCommand = clientCommands.get(command);
+        if (clientCommand != null) {
+            clientCommand.run(this, player, params);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Execute a server side command (annotated with @ServerCommand)
      */
     public boolean executeServerCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
@@ -686,9 +696,10 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     private void initCommands() {
-        if (serverCommands == null || serverCommandsWithResult == null) {
+        if (serverCommands == null || serverCommandsWithResult == null || clientCommands == null) {
             serverCommands = new HashMap<>();
             serverCommandsWithResult = new HashMap<>();
+            clientCommands = new HashMap<>();
             Field[] fieldsWithAnnotation = FieldUtils.getFieldsWithAnnotation(getClass(), ServerCommand.class);
             for (Field field : fieldsWithAnnotation) {
                 ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
@@ -699,6 +710,9 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
                     }
                     if (cmd.getCmdWithResult() != null) {
                         serverCommandsWithResult.put(cmd.getName(), cmd.getCmdWithResult());
+                    }
+                    if (cmd.getClientCommand() != null) {
+                        clientCommands.put(cmd.getName(), cmd.getClientCommand());
                     }
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
