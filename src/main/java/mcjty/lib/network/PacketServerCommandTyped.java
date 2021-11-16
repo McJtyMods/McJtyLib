@@ -86,10 +86,6 @@ public class PacketServerCommandTyped {
             }
             if (world.hasChunkAt(pos)) {
                 TileEntity te = world.getBlockEntity(pos);
-                if (!(te instanceof ICommandHandler)) {
-                    Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
-                    return;
-                }
                 if (te instanceof GenericTileEntity) {
                     if (((GenericTileEntity) te).executeServerCommand(command, playerEntity, params)) {
                         return;

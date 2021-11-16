@@ -1,8 +1,10 @@
 package mcjty.lib.network;
 
+import mcjty.lib.blockcommands.Command;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.LevelTools;
+import mcjty.lib.varia.Logging;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.RegistryKey;
@@ -50,25 +52,31 @@ public class PacketRequestDataFromServer {
         this.dummy = dummy;
     }
 
+    public PacketRequestDataFromServer(RegistryKey<World> type, BlockPos pos, Command command, TypedMap params, boolean dummy) {
+        this.type = type;
+        this.pos = pos;
+        this.command = command.getName();
+        this.params = params;
+        this.dummy = dummy;
+    }
+
     public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             World world = LevelTools.getLevel(ctx.getSender().getCommandSenderWorld(), type);
             if (world.hasChunkAt(pos)) {
                 TileEntity te = world.getBlockEntity(pos);
-                if (!(te instanceof ICommandHandler)) {
-                    Logging.log("createStartScanPacket: TileEntity is not a CommandHandler!");
-                    return;
-                }
-                ICommandHandler commandHandler = (ICommandHandler) te;
-                TypedMap result = commandHandler.executeWithResult(command, params);
-                if (result == null) {
-                    Logging.log("Command " + command + " was not handled!");
-                    return;
+
+                if (te instanceof GenericTileEntity) {
+                    TypedMap result = ((GenericTileEntity) te).executeServerCommandWR(command, ctx.getSender(), params);
+                    if (result != null) {
+                        PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
+                        channel.sendTo(msg, ctx.getSender().connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                        return;
+                    }
                 }
 
-                PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
-                channel.sendTo(msg, ctx.getSender().connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                Logging.log("Command " + command + " was not handled!");
             }
         });
         ctx.setPacketHandled(true);

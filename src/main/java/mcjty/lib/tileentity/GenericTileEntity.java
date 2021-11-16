@@ -9,6 +9,7 @@ import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.ICommand;
+import mcjty.lib.blockcommands.ICommandWithResult;
 import mcjty.lib.blockcommands.ServerCommand;
 import mcjty.lib.container.AutomationFilterItemHander;
 import mcjty.lib.container.NoDirectionItemHander;
@@ -69,6 +70,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected int powerLevel = 0;
 
     private Map<String, ICommand> serverCommands = null;
+    private Map<String, ICommandWithResult> serverCommandsWithResult = null;
 
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for tne annotations and replaces itself with
@@ -525,11 +527,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public TypedMap executeWithResult(String command, TypedMap args) {
-        return null;
-    }
-
-    @Override
     public <T> boolean receiveListFromServer(String command, List<T> list, Type<T> type) {
         return false;
     }
@@ -654,22 +651,17 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     /**
+     * Call this client-side to this TE to request data from the server
+     */
+    public void requestDataFromServer(SimpleChannel channel, Command command, @Nonnull TypedMap params) {
+        channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command.getName(), params, false));
+    }
+
+    /**
      * Execute a server side command (annotated with @ServerCommand)
      */
     public boolean executeServerCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
-        if (serverCommands == null) {
-            serverCommands = new HashMap<>();
-            Field[] fieldsWithAnnotation = FieldUtils.getFieldsWithAnnotation(getClass(), ServerCommand.class);
-            for (Field field : fieldsWithAnnotation) {
-                ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
-                try {
-                    Command cmd = (Command) field.get(this);
-                    serverCommands.put(cmd.getName(), cmd.getCmd());
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
+        initCommands();
 
         ICommand serverCommand = serverCommands.get(command);
         if (serverCommand != null) {
@@ -677,6 +669,42 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             return true;
         }
         return false;
+    }
+
+    /**
+     * Execute a server side command with a return value (annotated with @ServerCommand)
+     */
+    @Nullable
+    public TypedMap executeServerCommandWR(String command, PlayerEntity player, @Nonnull TypedMap params) {
+        initCommands();
+
+        ICommandWithResult serverCommand = serverCommandsWithResult.get(command);
+        if (serverCommand != null) {
+            return serverCommand.run(this, player, params);
+        }
+        return null;
+    }
+
+    private void initCommands() {
+        if (serverCommands == null || serverCommandsWithResult == null) {
+            serverCommands = new HashMap<>();
+            serverCommandsWithResult = new HashMap<>();
+            Field[] fieldsWithAnnotation = FieldUtils.getFieldsWithAnnotation(getClass(), ServerCommand.class);
+            for (Field field : fieldsWithAnnotation) {
+                ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
+                try {
+                    Command cmd = (Command) field.get(this);
+                    if (cmd.getCmd() != null) {
+                        serverCommands.put(cmd.getName(), cmd.getCmd());
+                    }
+                    if (cmd.getCmdWithResult() != null) {
+                        serverCommandsWithResult.put(cmd.getName(), cmd.getCmdWithResult());
+                    }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     @ServerCommand
