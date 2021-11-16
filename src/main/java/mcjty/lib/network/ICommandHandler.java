@@ -13,11 +13,6 @@ import java.util.List;
  * implements PacketRequestListFromServer or PacketServerCommand).
  */
 public interface ICommandHandler {
-    /// Return true if command was handled correctly. False if not.
-    @Deprecated
-    default boolean execute(PlayerEntity playerMP, String command, TypedMap params) {
-        return false;
-    }
 
     /// Return the result which will be sent back to the client
     @Nonnull

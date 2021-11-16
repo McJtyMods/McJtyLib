@@ -1,5 +1,6 @@
 package mcjty.lib.network;
 
+import mcjty.lib.blockcommands.Command;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.LevelTools;
@@ -35,6 +36,13 @@ public class PacketServerCommandTyped {
         } else {
             dimensionId = null;
         }
+    }
+
+    public PacketServerCommandTyped(BlockPos pos, Command<?> command, TypedMap params) {
+        this.pos = pos;
+        this.command = command.getName();
+        this.params = params;
+        this.dimensionId = null;
     }
 
     public PacketServerCommandTyped(BlockPos pos, String command, TypedMap params) {
@@ -87,11 +95,7 @@ public class PacketServerCommandTyped {
                         return;
                     }
                 }
-
-                ICommandHandler commandHandler = (ICommandHandler) te;
-                if (!commandHandler.execute(playerEntity, command, params)) {
-                    Logging.log("Command " + command + " was not handled!");
-                }
+                Logging.log("Command " + command + " was not handled!");
             }
         });
         ctx.setPacketHandled(true);

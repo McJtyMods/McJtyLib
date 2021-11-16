@@ -20,8 +20,14 @@ public class Command<T extends GenericTileEntity> {
         return cmd;
     }
 
-    public static <E extends GenericTileEntity> Builder<E> create(String name) {
+    public static <E extends GenericTileEntity> Builder<E> builder(String name) {
         return new Builder<E>(name);
+    }
+
+    public static <E extends GenericTileEntity> Command<E> create(String name, ICommand<E> command) {
+        return new Builder<E>(name)
+                .command(command)
+                .build();
     }
 
     public static class Builder<T extends GenericTileEntity> {
@@ -36,11 +42,6 @@ public class Command<T extends GenericTileEntity> {
         public Builder<T> command(ICommand<T> command) {
             this.cmd = command;
             return this;
-        }
-
-        public Command<T> buildCommand(ICommand<T> command) {
-            this.cmd = command;
-            return build();
         }
 
         public Command<T> build() {

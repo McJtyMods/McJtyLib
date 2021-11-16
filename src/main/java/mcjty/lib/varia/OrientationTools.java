@@ -15,8 +15,8 @@ import static net.minecraft.util.Direction.*;
 
 public class OrientationTools {
 
-    public static Direction[] DIRECTION_VALUES = Direction.values();
-    public static Direction[] HORIZONTAL_DIRECTION_VALUES = new Direction[]{NORTH, SOUTH, WEST, EAST};
+    public static final Direction[] DIRECTION_VALUES = Direction.values();
+    public static final Direction[] HORIZONTAL_DIRECTION_VALUES = new Direction[]{NORTH, SOUTH, WEST, EAST};
 
     public static Direction rotateAround(Direction input, Direction.Axis axis) {
         switch (axis) {

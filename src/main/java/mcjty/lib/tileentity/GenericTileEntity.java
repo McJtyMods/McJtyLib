@@ -680,20 +680,20 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @ServerCommand
-    public static final Command<?> COMMAND_SYNC_BINDING = Command.create("generic.syncBinding")
-            .buildCommand((te, playerEntity, params) -> te.syncBinding(params));
+    public static final Command<?> COMMAND_SYNC_BINDING = Command.create("generic.syncBinding",
+            (te, playerEntity, params) -> te.syncBinding(params));
 
     public static final Key<String> PARAM_KEY = new Key<>("key", Type.STRING);
     @ServerCommand
-    public static final Command<?> COMMAND_SYNC_ACTION = Command.create("generic.syncAction")
-            .buildCommand((te, playerEntity, params) -> {
+    public static final Command<?> COMMAND_SYNC_ACTION = Command.create("generic.syncAction",
+            (te, playerEntity, params) -> {
                 String key = params.get(PARAM_KEY);
                 te.findConsumer(key).run();
             });
 
     @ServerCommand
-    public static final Command<?> CMD_RSMODE = Command.create("mcjtylib.setRsMode")
-            .buildCommand((te, playerEntity, params) -> te.setRSMode(RedstoneMode.values()[params.get(ImageChoiceLabel.PARAM_CHOICE_IDX)]));
+    public static final Command<?> CMD_RSMODE = Command.create("mcjtylib.setRsMode",
+            (te, playerEntity, params) -> te.setRSMode(RedstoneMode.values()[params.get(ImageChoiceLabel.PARAM_CHOICE_IDX)]));
 
     private <T> void syncBindingHelper(TypedMap params, Key<T> bkey) {
         T o = params.get(bkey);
