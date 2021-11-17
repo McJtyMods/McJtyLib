@@ -13,7 +13,5 @@ class AnnotationHolder {
     final Map<String, ICommand> serverCommands = new HashMap<>();
     final Map<String, ICommandWithResult> serverCommandsWithResult = new HashMap<>();
     final Map<String, ICommand> clientCommands = new HashMap<>();
-//    final Map<String, Function<GenericTileEntity, Object>> valueGetters = new HashMap<>();
-//    final Map<String, BiConsumer<GenericTileEntity, Object>> valueSetters = new HashMap<>();
     final Map<String, IValue<?>> valueMap = new HashMap<>();
 }

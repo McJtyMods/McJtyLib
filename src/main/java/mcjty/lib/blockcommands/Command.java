@@ -9,11 +9,11 @@ public class Command<T extends GenericTileEntity> {
     private final ICommandWithResult<T> cmdWithResult;
     private final ICommand<T> clientCommand;
 
-    private Command(Builder<T> builder) {
-        this.name = builder.name;
-        this.cmd = builder.cmd;
-        this.clientCommand = builder.clientCommand;
-        this.cmdWithResult = builder.cmdWithResult;
+    private Command(String name, ICommand<T> cmd, ICommandWithResult<T> cmdWithResult, ICommand<T> clientCommand) {
+        this.name = name;
+        this.cmd = cmd;
+        this.clientCommand = clientCommand;
+        this.cmdWithResult = cmdWithResult;
     }
 
     public String getName() {
@@ -32,53 +32,13 @@ public class Command<T extends GenericTileEntity> {
         return clientCommand;
     }
 
-    public static <E extends GenericTileEntity> Builder<E> builder(String name) {
-        return new Builder<E>(name);
-    }
-
     /// Create a command without a result
     public static <E extends GenericTileEntity> Command<E> create(String name, ICommand<E> command) {
-        return new Builder<E>(name)
-                .command(command)
-                .build();
+        return new Command<>(name, command, null, null);
     }
 
     /// Create a command with a TypedMap result
     public static <E extends GenericTileEntity> Command<E> createWR(String name, ICommandWithResult<E> command, ICommand<E> clientCommand) {
-        return new Builder<E>(name)
-                .command(command)
-                .clientCommand(clientCommand)
-                .build();
-    }
-
-    public static class Builder<T extends GenericTileEntity> {
-
-        private final String name;
-        private ICommand<T> cmd = null;
-        private ICommandWithResult<T> cmdWithResult = null;
-        private ICommand<T> clientCommand = null;
-
-        public Builder(String name) {
-            this.name = name;
-        }
-
-        public Builder<T> command(ICommand<T> command) {
-            this.cmd = command;
-            return this;
-        }
-
-        public Builder<T> command(ICommandWithResult<T> command) {
-            this.cmdWithResult = command;
-            return this;
-        }
-
-        public Builder<T> clientCommand(ICommand<T> clientCommand) {
-            this.clientCommand = clientCommand;
-            return this;
-        }
-
-        public Command<T> build() {
-            return new Command<T>(this);
-        }
+        return new Command<>(name, null, command, clientCommand);
     }
 }

@@ -5,20 +5,22 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
+/**
+ * Declare this as a static field in your GenericTileEntity and annotate with @Val to make this
+ * a client <-> gui synced value
+ */
 public class Value<T extends GenericTileEntity, V> {
 
     private final Key<V> key;
     private final Function<T, V> supplier;
     private final BiConsumer<T, V> consumer;
 
-    private Value(Builder<T, V> builder) {
-        this.key = builder.key;
-        this.supplier = builder.supplier;
-        this.consumer = builder.consumer;
+    private Value(Key<V> key, Function<T, V> supplier, BiConsumer<T, V> consumer) {
+        this.key = key;
+        this.supplier = supplier;
+        this.consumer = consumer;
     }
 
     public Key<V> getKey() {
@@ -33,40 +35,8 @@ public class Value<T extends GenericTileEntity, V> {
         return consumer;
     }
 
-    public static <TT extends GenericTileEntity, VV> Builder<TT, VV> builder(String name, Type<VV> type) {
-        return new Builder<TT, VV>(name, type);
-    }
-
-    /// Create a command without a result
+    /// Create a value with a getter and setter
     public static <TT extends GenericTileEntity, VV> Value<TT, VV> create(String name, Type<VV> type, Function<TT, VV> supplier, BiConsumer<TT, VV> consumer) {
-        return new Builder<TT, VV>(name, type)
-                .supplier(supplier)
-                .consumer(consumer)
-                .build();
-    }
-
-    public static class Builder<T extends GenericTileEntity, V> {
-
-        private final Key<V> key;
-        private Function<T, V> supplier;
-        private BiConsumer<T, V> consumer;
-
-        public Builder(String name, Type<V> type) {
-            this.key = new Key<>(name, type);
-        }
-
-        public Builder<T, V> supplier(Function<T, V> supplier) {
-            this.supplier = supplier;
-            return this;
-        }
-
-        public Builder<T, V> consumer(BiConsumer<T, V> consumer) {
-            this.consumer = consumer;
-            return this;
-        }
-
-        public Value<T, V> build() {
-            return new Value<T, V>(this);
-        }
+        return new Value<>(new Key<>(name, type), supplier, consumer);
     }
 }
