@@ -23,12 +23,11 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static mcjty.lib.varia.LogicFacing.*;
 import static net.minecraft.util.Direction.*;
-
-import net.minecraft.util.Direction.Axis;
 
 /**
  * The superclass for logic slabs.
@@ -139,8 +138,10 @@ public class LogicSlabBlock extends BaseBlock {
     public static final VoxelShape BLOCK_WEST = VoxelShapes.box(0.0F, 0.0F, 0.0F, 0.25F, 1.0F, 1.0F);
     public static final VoxelShape BLOCK_EAST = VoxelShapes.box(0.75F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 
+    @SuppressWarnings("deprecation")
+    @Nonnull
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(BlockState state, @Nonnull IBlockReader worldIn, @Nonnull BlockPos pos, @Nonnull ISelectionContext context) {
         switch (state.getValue(LOGIC_FACING).getSide()) {
             case DOWN:
                 return BLOCK_DOWN;
@@ -239,17 +240,17 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     @Override
-    public boolean isSignalSource(BlockState state) {
+    public boolean isSignalSource(@Nonnull BlockState state) {
         return true;
     }
 
     @Override
-    public int getSignal(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
+    public int getSignal(@Nonnull BlockState blockState, @Nonnull IBlockReader blockAccess, @Nonnull BlockPos pos, @Nonnull Direction side) {
         return getRedstoneOutput(blockState, blockAccess, pos, side);
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(@Nonnull StateContainer.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(LOGIC_FACING);
     }

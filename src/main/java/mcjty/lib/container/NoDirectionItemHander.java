@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 
 public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
 
-    public final GenericTileEntity tileEntity;
+    private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
     private ItemStackList stacks;
 

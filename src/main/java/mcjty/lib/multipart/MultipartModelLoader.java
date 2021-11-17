@@ -14,6 +14,7 @@ import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.geometry.IModelGeometry;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -26,12 +27,13 @@ public class MultipartModelLoader implements IModelLoader<MultipartModelLoader.M
     }
 
     @Override
-    public void onResourceManagerReload(IResourceManager resourceManager) {
+    public void onResourceManagerReload(@Nonnull IResourceManager resourceManager) {
 
     }
 
+    @Nonnull
     @Override
-    public MultipartModelGeometry read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
+    public MultipartModelGeometry read(@Nonnull JsonDeserializationContext deserializationContext, @Nonnull JsonObject modelContents) {
         return new MultipartModelGeometry();
     }
 

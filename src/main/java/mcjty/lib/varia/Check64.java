@@ -109,8 +109,9 @@ public class Check64 {
     }
 
     public void update(final byte[] buffer) {
-        for (int i = 0; i < buffer.length; i++)
-            update(buffer[i]);
+        for (byte b : buffer) {
+            update(b);
+        }
     }
 
     public long getValue() {

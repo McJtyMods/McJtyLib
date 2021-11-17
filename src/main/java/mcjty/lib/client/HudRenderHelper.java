@@ -10,7 +10,6 @@ import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import org.apache.commons.lang3.tuple.Pair;
@@ -131,7 +130,7 @@ public class HudRenderHelper {
                     String prefix = "";
                     if (!stack.isEmpty()) {
                         matrixStack.pushPose();
-                        matrixStack.translate((float)14f, (float)currenty+4f, 0);
+                        matrixStack.translate(14f, currenty +4f, 0);
                         matrixStack.scale(10, -10, 16);
 //                        matrixStack.translate(0, 0, -150);
                         // @todo 1.15 this needs more work! we ignore 'currenty'!

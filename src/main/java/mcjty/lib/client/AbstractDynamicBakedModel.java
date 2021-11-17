@@ -12,6 +12,8 @@ import net.minecraft.util.math.vector.Vector3d;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
 import net.minecraftforge.client.model.pipeline.BakedQuadBuilder;
 
+import javax.annotation.Nonnull;
+
 public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
 
     @Override
@@ -95,12 +97,14 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
     }
 
     @Override
+    @Nonnull
     public ItemOverrideList getOverrides() {
         return ItemOverrideList.EMPTY;
     }
 
     @SuppressWarnings("deprecation")
     @Override
+    @Nonnull
     public ItemCameraTransforms getTransforms() {
         return ItemCameraTransforms.NO_TRANSFORMS;
     }

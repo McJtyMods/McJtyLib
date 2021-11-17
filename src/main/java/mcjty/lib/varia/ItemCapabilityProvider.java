@@ -19,6 +19,7 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower {
 
     private final LazyOptional<IEnergyStorage> energy = LazyOptional.of(this::createEnergyStorage);
 
+    @Nonnull
     private <T> IEnergyStorage createEnergyStorage() {
         return new IEnergyStorage() {
             @Override

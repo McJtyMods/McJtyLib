@@ -32,6 +32,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
@@ -65,8 +66,9 @@ public class GenericContainer extends Container implements IGenericContainer {
         return te;
     }
 
+    @Nonnull
     @Override
-    protected IntReferenceHolder addDataSlot(IntReferenceHolder holder) {
+    protected IntReferenceHolder addDataSlot(@Nonnull IntReferenceHolder holder) {
         intReferenceHolders.add(holder);
         return super.addDataSlot(holder);
     }
@@ -144,7 +146,7 @@ public class GenericContainer extends Container implements IGenericContainer {
     }
 
     @Override
-    public boolean stillValid(PlayerEntity player) {
+    public boolean stillValid(@Nonnull PlayerEntity player) {
         if (te == null || te.canPlayerAccess(player)) {
             return true;
         }
@@ -201,7 +203,7 @@ public class GenericContainer extends Container implements IGenericContainer {
             final SlotDefinition slotDefinition = slotFactory.getSlotDefinition();
             slot = new SlotItemHandler(inventory, index, x, y) {
                 @Override
-                public boolean mayPlace(ItemStack stack) {
+                public boolean mayPlace(@Nonnull ItemStack stack) {
                     return slotDefinition.itemStackMatches(stack);
                 }
             };
@@ -259,8 +261,9 @@ public class GenericContainer extends Container implements IGenericContainer {
 //        return false;
 //    }
 
+    @Nonnull
     @Override
-    public ItemStack quickMoveStack(PlayerEntity player, int index) {
+    public ItemStack quickMoveStack(@Nonnull PlayerEntity player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.slots.get(index);
 
@@ -324,7 +327,7 @@ public class GenericContainer extends Container implements IGenericContainer {
 
 
     @Override
-    protected boolean moveItemStackTo(ItemStack par1ItemStack, int fromIndex, int toIndex, boolean reverseOrder) {
+    protected boolean moveItemStackTo(@Nonnull ItemStack par1ItemStack, int fromIndex, int toIndex, boolean reverseOrder) {
         boolean result = false;
         int checkIndex = fromIndex;
 
@@ -419,8 +422,9 @@ public class GenericContainer extends Container implements IGenericContainer {
         return result;
     }
 
+    @Nonnull
     @Override
-    public ItemStack clicked(int index, int button, ClickType mode, PlayerEntity player) {
+    public ItemStack clicked(int index, int button, @Nonnull ClickType mode, @Nonnull PlayerEntity player) {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.hasItem()) {
@@ -530,7 +534,7 @@ public class GenericContainer extends Container implements IGenericContainer {
 
             T container = containerFactory.apply(windowId, pos, te);
             container.setupInventories(new ItemStackHandler(slots), inv);
-            return (T) container;
+            return container;
         });
     }
 }

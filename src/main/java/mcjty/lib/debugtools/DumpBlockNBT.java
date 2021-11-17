@@ -66,7 +66,7 @@ public class DumpBlockNBT {
         Vector3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
         RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, liquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, player);
         RayTraceResult result = player.getCommandSenderWorld().clip(context);
-        if (result == null || result.getType() != RayTraceResult.Type.BLOCK) {
+        if (result.getType() != RayTraceResult.Type.BLOCK) {
             return;
         }
 

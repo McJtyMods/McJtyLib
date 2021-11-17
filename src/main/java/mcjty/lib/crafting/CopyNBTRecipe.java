@@ -9,15 +9,18 @@ import net.minecraft.item.crafting.ShapedRecipe;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 
+import javax.annotation.Nonnull;
+
 public class CopyNBTRecipe extends AbstractRecipeAdaptor {
 
     public CopyNBTRecipe(ShapedRecipe recipe) {
         super(recipe);
     }
 
+    @Nonnull
     @Override
-    public ItemStack assemble(CraftingInventory inv) {
-        ItemStack result = recipe.assemble(inv);
+    public ItemStack assemble(@Nonnull CraftingInventory inv) {
+        ItemStack result = getRecipe().assemble(inv);
         CompoundNBT nbt = null;
         for (int i = 0 ; i < inv.getContainerSize() ; i++) {
             ItemStack stack = inv.getItem(i);
@@ -48,6 +51,7 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
     }
 
     @Override
+    @Nonnull
     public IRecipeSerializer<?> getSerializer() {
         return Registration.COPYNBT_SERIALIZER;
     }

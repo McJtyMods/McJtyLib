@@ -11,7 +11,8 @@ public class PositionalLayout extends AbstractLayout<PositionalLayout> {
         for (Widget<?> child : children) {
             PositionalHint hint = (PositionalHint) child.getLayoutHint();
             if (hint != null) {
-                int w, h;
+                int w;
+                int h;
                 if (hint.width == -1) {
                     w = child.getDesiredWidth();
                 } else {

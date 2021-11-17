@@ -87,7 +87,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable IBlockReader world, List<ITextComponent> tooltip, ITooltipFlag advanced) {
+    public void appendHoverText(@Nonnull ItemStack stack, @Nullable IBlockReader world, @Nonnull List<ITextComponent> tooltip, @Nonnull ITooltipFlag advanced) {
         intAddInformation(stack, tooltip);
 
         if (tooltipBuilder.isActive()) {
@@ -138,9 +138,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         WrenchUsage wrenchUsed = WrenchUsage.NOT;
         if (!itemStack.isEmpty()) {
             Item item = itemStack.getItem();
-            if (item != null) {
-                wrenchUsed = getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
-            }
+            wrenchUsed = getWrenchUsage(pos, player, itemStack, wrenchUsed, item);
         }
         if (wrenchUsed == WrenchUsage.NORMAL && player.isShiftKeyDown()) {
             wrenchUsed = WrenchUsage.SNEAKING;
@@ -165,7 +163,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @SuppressWarnings("deprecation")
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+    @Nonnull
+    public ActionResultType use(@Nonnull BlockState state, World world, @Nonnull BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand hand, @Nonnull BlockRayTraceResult result) {
         TileEntity te = world.getBlockEntity(pos);
         if (te instanceof GenericTileEntity) {
             ActionResultType resultType = ((GenericTileEntity) te).onBlockActivated(state, player, hand, result);
@@ -264,7 +263,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
 
     @Override
-    public void setPlacedBy(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+    public void setPlacedBy(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nullable LivingEntity placer, @Nonnull ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
         if (!world.isClientSide && GeneralConfig.manageOwnership.get()) {
             setOwner(world, pos, placer);
@@ -281,8 +280,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @SuppressWarnings("deprecation")
     @Override
-    public void neighborChanged(BlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
-        super.neighborChanged(state, world, pos, blockIn, fromPos, p_220069_6_);
+    public void neighborChanged(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull Block blockIn, @Nonnull BlockPos fromPos, boolean isMoving) {
+        super.neighborChanged(state, world, pos, blockIn, fromPos, isMoving);
         checkRedstone(world, pos);
     }
 
@@ -305,7 +304,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @SuppressWarnings("deprecation")
     @Override
-    public boolean triggerEvent(BlockState state, World worldIn, BlockPos pos, int id, int param) {
+    public boolean triggerEvent(@Nonnull BlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, int id, int param) {
         if (hasTileEntity(state)) {
             super.triggerEvent(state, worldIn, pos, id, param);
             TileEntity tileentity = worldIn.getBlockEntity(pos);
@@ -324,12 +323,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @Nullable
     @Override
-    public ToolType getHarvestTool(BlockState state) {
+    public ToolType getHarvestTool(@Nonnull BlockState state) {
         return toolType;
     }
 
     @Override
-    public int getHarvestLevel(BlockState state) {
+    public int getHarvestLevel(@Nonnull BlockState state) {
         return harvestLevel;
     }
 
@@ -364,7 +363,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @SuppressWarnings("deprecation")
     @Override
-    public void onRemove(BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState newstate, boolean isMoving) {
+    public void onRemove(@Nonnull BlockState state, @Nonnull World world, @Nonnull BlockPos pos, @Nonnull BlockState newstate, boolean isMoving) {
         if (!world.isClientSide) {
             TileEntity te = world.getBlockEntity(pos);
             if (te instanceof GenericTileEntity) {
@@ -392,7 +391,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     @Override
-    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(@Nonnull StateContainer.Builder<Block, BlockState> builder) {
         for (Property<?> property : getProperties()) {
             builder.add(property);
         }
@@ -410,6 +409,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return state.setValue(BlockStateProperties.HORIZONTAL_FACING, placer.getDirection().getOpposite());
             case ROTATION:
                 return state.setValue(BlockStateProperties.FACING, OrientationTools.getFacingFromEntity(pos, placer));
+            case NONE:
             default:
                 return state;
         }
@@ -421,6 +421,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return OrientationTools.determineOrientationHoriz(entity);
             case ROTATION:
                 return OrientationTools.determineOrientation(pos, entity);
+            case NONE:
             default:
                 return null;
         }
@@ -432,6 +433,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return state.getValue(BlockStateProperties.HORIZONTAL_FACING);
             case ROTATION:
                 return state.getValue(BlockStateProperties.FACING);
+            case NONE:
             default:
                 return Direction.NORTH;
         }
@@ -470,6 +472,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 return OrientationTools.getOrientationHoriz(state);
             case ROTATION:
                 return OrientationTools.getOrientation(state);
+            case NONE:
             default:
                 return Direction.SOUTH;
         }

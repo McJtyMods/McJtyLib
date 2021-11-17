@@ -153,7 +153,7 @@ public class TooltipRender {
         net.minecraft.client.renderer.RenderHelper.setupForFlatItems();
         matrixStack.pushPose();
         matrixStack.translate(0, 0, 400f);
-        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, (World)null, (LivingEntity)null));
+        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, null, null));
 //        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
         matrixStack.popPose();
 

@@ -5,6 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import javax.annotation.Nonnull;
+
 public class BaseSlot extends SlotItemHandler {
 
     private final GenericTileEntity te;
@@ -15,7 +17,7 @@ public class BaseSlot extends SlotItemHandler {
     }
 
     @Override
-    public void set(ItemStack stack) {
+    public void set(@Nonnull ItemStack stack) {
         if (te != null) {
             te.onSlotChanged(getSlotIndex(), stack);
         }

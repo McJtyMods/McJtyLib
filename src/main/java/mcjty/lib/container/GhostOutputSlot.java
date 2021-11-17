@@ -5,6 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import javax.annotation.Nonnull;
+
 public class GhostOutputSlot extends SlotItemHandler {
 
     public GhostOutputSlot(IItemHandler inventory, int index, int x, int y) {
@@ -16,6 +18,7 @@ public class GhostOutputSlot extends SlotItemHandler {
         return false;
     }
 
+    @Nonnull
     @Override
     public ItemStack remove(int amount) {
         return ItemStack.EMPTY;
@@ -27,7 +30,7 @@ public class GhostOutputSlot extends SlotItemHandler {
     }
 
     @Override
-    public boolean mayPlace(ItemStack stack) {
+    public boolean mayPlace(@Nonnull ItemStack stack) {
         return false;
     }
 }

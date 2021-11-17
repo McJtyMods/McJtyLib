@@ -10,6 +10,7 @@ import mcjty.lib.varia.MathTools;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -313,7 +314,7 @@ public class RenderHelper {
             net.minecraft.client.renderer.RenderHelper.turnBackOn();
             // @todo 1.14 check if right?
             // @todo 1.15
-            RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, (float) 240, (float) 240);
+            RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240, 240);
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             itemRender.renderAndDecorateItem(itm, x, y);
@@ -347,7 +348,7 @@ public class RenderHelper {
                     fr.drawShadow(matrixStack, s, ((xPosition - 2) * 1.34f + 24 - fr.width(s)), yPosition * 1.34f + 14, 16777215);
                     matrixStack.popPose();
                 } else {
-                    fr.drawShadow(matrixStack, s, (xPosition + 19 - 2 - fr.width(s)), (float)(yPosition + 6 + 3), 16777215);
+                    fr.drawShadow(matrixStack, s, (xPosition + 19 - 2 - fr.width(s)), (yPosition + 6 + 3), 16777215);
                 }
 
                 buffer.endBatch();
@@ -599,11 +600,11 @@ public class RenderHelper {
     }
 
     public static void drawHorizontalLine(MatrixStack matrixStack, int x1, int y1, int x2, int color) {
-        Screen.fill(matrixStack, x1, y1, x2, y1 + 1, color);
+        AbstractGui.fill(matrixStack, x1, y1, x2, y1 + 1, color);
     }
 
     public static void drawVerticalLine(MatrixStack matrixStack, int x1, int y1, int y2, int color) {
-        Screen.fill(matrixStack, x1, y1, x1 + 1, y2, color);
+        AbstractGui.fill(matrixStack, x1, y1, x1 + 1, y2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
@@ -649,7 +650,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThickButtonBox(MatrixStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Screen.fill(matrixStack, x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
+        AbstractGui.fill(matrixStack, x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
         drawHorizontalLine(matrixStack, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(matrixStack, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(matrixStack, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -670,7 +671,7 @@ public class RenderHelper {
      * Draw a button box. x2 and y2 are not included.
      */
     public static void drawThinButtonBox(MatrixStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        Screen.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
+        AbstractGui.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
         drawHorizontalLine(matrixStack, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(matrixStack, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(matrixStack, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -730,7 +731,7 @@ public class RenderHelper {
      */
     public static void drawBeveledBox(MatrixStack matrixStack, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Screen.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            AbstractGui.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
         drawHorizontalLine(matrixStack, x1, y1, x2 - 1, topleftcolor);
         drawVerticalLine(matrixStack, x1, y1, y2 - 1, topleftcolor);
@@ -756,12 +757,12 @@ public class RenderHelper {
      */
     public static void drawThickBeveledBox(MatrixStack matrixStack, int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            Screen.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            AbstractGui.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
-        Screen.fill(matrixStack, x1, y1, x2 - 1, y1 + thickness, topleftcolor);
-        Screen.fill(matrixStack, x1, y1, x1 + thickness, y2 - 1, topleftcolor);
-        Screen.fill(matrixStack, x2 - thickness, y1, x2, y2 - 1, botrightcolor);
-        Screen.fill(matrixStack, x1, y2 - thickness, x2, y2, botrightcolor);
+        AbstractGui.fill(matrixStack, x1, y1, x2 - 1, y1 + thickness, topleftcolor);
+        AbstractGui.fill(matrixStack, x1, y1, x1 + thickness, y2 - 1, topleftcolor);
+        AbstractGui.fill(matrixStack, x2 - thickness, y1, x2, y2 - 1, botrightcolor);
+        AbstractGui.fill(matrixStack, x1, y2 - thickness, x2, y2, botrightcolor);
     }
 
     /**
@@ -769,7 +770,7 @@ public class RenderHelper {
      */
     public static void drawFlatBox(MatrixStack matrixStack, int x1, int y1, int x2, int y2, int border, int fill) {
         if (fill != -1) {
-            Screen.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
+            AbstractGui.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
         }
         drawHorizontalLine(matrixStack, x1, y1, x2 - 1, border);
         drawVerticalLine(matrixStack, x1, y1, y2 - 1, border);

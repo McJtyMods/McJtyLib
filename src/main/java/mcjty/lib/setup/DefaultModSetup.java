@@ -6,6 +6,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
 public abstract class DefaultModSetup {
@@ -25,6 +26,7 @@ public abstract class DefaultModSetup {
     protected void createTab(String name, Supplier<ItemStack> stack) {
         creativeTab = new ItemGroup(name) {
             @Override
+            @Nonnull
             public ItemStack makeIcon() {
                 return stack.get();
             }

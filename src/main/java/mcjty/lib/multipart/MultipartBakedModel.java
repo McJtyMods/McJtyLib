@@ -74,16 +74,19 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
         return false;
     }
 
+    @Nonnull
     @Override
     public TextureAtlasSprite getParticleIcon() {
         return getTexture(new ResourceLocation("minecraft", "missingno"));  // @todo 1.15
     }
 
+    @Nonnull
     @Override
     public ItemCameraTransforms getTransforms() {
         return ItemCameraTransforms.NO_TRANSFORMS;
     }
 
+    @Nonnull
     @Override
     public ItemOverrideList getOverrides() {
         return ItemOverrideList.EMPTY;

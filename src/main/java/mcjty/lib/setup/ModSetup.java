@@ -120,7 +120,7 @@ public class ModSetup extends DefaultModSetup {
                         Vector3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
                         RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, player);
                         RayTraceResult result = player.getCommandSenderWorld().clip(context);
-                        Vector3d hitVec = result == null ? null : result.getLocation();
+                        Vector3d hitVec = result.getLocation();
 
                         if (MultipartHelper.removePart((MultipartTE) tileEntity, state, player, hitVec/*@todo*/)) {
                             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

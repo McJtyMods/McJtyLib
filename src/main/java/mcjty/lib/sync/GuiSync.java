@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  * is open. To use this you need to call setupSync(this) on your DefaultContainerProvider
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target(ElementType.FIELD)
 @Inherited
 public @interface GuiSync {
 

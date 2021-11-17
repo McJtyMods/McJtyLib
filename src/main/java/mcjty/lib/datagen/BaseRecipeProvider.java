@@ -59,7 +59,7 @@ public class BaseRecipeProvider extends RecipeProvider {
         }
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, IRecipeBuilder builder, String... lines) {
+    protected void build(Consumer<IFinishedRecipe> consumer, IRecipeBuilder<?> builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::define, lines);
         builder.setGroup(group).build(consumer);
     }
@@ -77,7 +77,7 @@ public class BaseRecipeProvider extends RecipeProvider {
         builder.group(group).save(consumer, id);
     }
 
-    protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, IRecipeBuilder builder, String... lines) {
+    protected void build(Consumer<IFinishedRecipe> consumer, ResourceLocation id, IRecipeBuilder<?> builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::define, lines);
         builder.setGroup(group).build(consumer, id);
     }

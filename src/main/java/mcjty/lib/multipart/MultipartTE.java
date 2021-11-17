@@ -146,6 +146,7 @@ public class MultipartTE extends TileEntity {
         }
     }
 
+    @Nonnull
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT updateTag = super.getUpdateTag();
@@ -184,7 +185,7 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public void load(BlockState st, CompoundNBT compound) {
+    public void load(@Nonnull BlockState st, @Nonnull CompoundNBT compound) {
         super.load(st, compound);
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
@@ -243,7 +244,7 @@ public class MultipartTE extends TileEntity {
 
 
     @Override
-    public void setLevelAndPosition(World worldIn, BlockPos pos) {
+    public void setLevelAndPosition(@Nonnull World worldIn, @Nonnull BlockPos pos) {
         super.setLevelAndPosition(worldIn, pos);
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             if (entry.getValue().getTileEntity() != null) {
@@ -252,8 +253,9 @@ public class MultipartTE extends TileEntity {
         }
     }
 
+    @Nonnull
     @Override
-    public CompoundNBT save(CompoundNBT compound) {
+    public CompoundNBT save(@Nonnull CompoundNBT compound) {
         ListNBT list = new ListNBT();
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             PartSlot slot = entry.getKey();

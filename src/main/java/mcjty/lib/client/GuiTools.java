@@ -55,6 +55,7 @@ public class GuiTools {
     public static boolean openRemoteGui(@Nonnull PlayerEntity player, @Nullable RegistryKey<World> dimensionType, @Nonnull BlockPos pos) {
         return openRemoteGui(player, dimensionType, pos,
                 te -> new INamedContainerProvider() {
+                    @Nonnull
                     @Override
                     public ITextComponent getDisplayName() {
                         return new StringTextComponent("Remote Gui");
@@ -62,7 +63,7 @@ public class GuiTools {
 
                     @Nullable
                     @Override
-                    public Container createMenu(int id, PlayerInventory inventory, PlayerEntity player) {
+                    public Container createMenu(int id, @Nonnull PlayerInventory inventory, @Nonnull PlayerEntity player) {
                         return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY)
                                 .map(h -> h.createMenu(id, inventory, player))
                                 .orElse(null);

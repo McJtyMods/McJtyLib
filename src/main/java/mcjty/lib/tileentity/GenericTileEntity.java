@@ -314,6 +314,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return !isRemoved() && player.distanceToSqr(new Vector3d(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
+    @Nonnull
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT updateTag = super.getUpdateTag();
@@ -356,7 +357,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     @Override
-    public void load(BlockState state, CompoundNBT tagCompound) {
+    public void load(@Nonnull BlockState state, @Nonnull CompoundNBT tagCompound) {
         super.load(state, tagCompound);
         read(tagCompound);
     }
@@ -425,8 +426,9 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return data;
     }
 
+    @Nonnull
     @Override
-    public CompoundNBT save(CompoundNBT tagCompound) {
+    public CompoundNBT save(@Nonnull CompoundNBT tagCompound) {
         super.save(tagCompound);
         writeCaps(tagCompound);
         writeInfo(tagCompound);
@@ -616,7 +618,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     /**
      * Call this client-side to this TE to request data from the server
      */
-    public void requestDataFromServer(SimpleChannel channel, Command command, @Nonnull TypedMap params) {
+    public void requestDataFromServer(SimpleChannel channel, Command<?> command, @Nonnull TypedMap params) {
         channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command.getName(), params, false));
     }
 

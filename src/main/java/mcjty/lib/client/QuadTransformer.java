@@ -113,7 +113,7 @@ public class QuadTransformer {
      * @param transform The matrix to apply. E.g. from TRSRTransformation#getMatrix()
      */
     public static void processManyInPlace(List<BakedQuad> inputs, Matrix4f transform) {
-        if (inputs.size() == 0) {
+        if (inputs.isEmpty()) {
             return;
         }
 

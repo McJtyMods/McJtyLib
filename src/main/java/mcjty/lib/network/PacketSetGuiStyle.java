@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public class PacketSetGuiStyle {
 
     // Package visible for unit tests
-    String style;
+    private String style;
 
     public PacketSetGuiStyle(PacketBuffer buf) {
         style = buf.readUtf(32767);

@@ -10,9 +10,11 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+
 public abstract class AbstractRecipeAdaptor implements ICraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingInventory> {
 
-    protected final ShapedRecipe recipe;
+    private final ShapedRecipe recipe;
 
     public AbstractRecipeAdaptor(ShapedRecipe recipe) {
         this.recipe = recipe;
@@ -24,11 +26,13 @@ public abstract class AbstractRecipeAdaptor implements ICraftingRecipe, net.mine
     }
 
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
+    @Nonnull
+    public NonNullList<ItemStack> getRemainingItems(@Nonnull CraftingInventory inv) {
         return recipe.getRemainingItems(inv);
     }
 
     @Override
+    @Nonnull
     public NonNullList<Ingredient> getIngredients() {
         return recipe.getIngredients();
     }
@@ -39,11 +43,13 @@ public abstract class AbstractRecipeAdaptor implements ICraftingRecipe, net.mine
     }
 
     @Override
+    @Nonnull
     public String getGroup() {
         return recipe.getGroup();
     }
 
     @Override
+    @Nonnull
     public ItemStack getToastSymbol() {
         return recipe.getToastSymbol();
     }
@@ -63,26 +69,30 @@ public abstract class AbstractRecipeAdaptor implements ICraftingRecipe, net.mine
     }
 
     @Override
-    public boolean matches(CraftingInventory inv, World worldIn) {
+    public boolean matches(@Nonnull CraftingInventory inv, @Nonnull World worldIn) {
         return recipe.matches(inv, worldIn);
     }
 
     @Override
-    public ItemStack assemble(CraftingInventory inv) {
+    @Nonnull
+    public ItemStack assemble(@Nonnull CraftingInventory inv) {
         return recipe.assemble(inv);
     }
 
     @Override
+    @Nonnull
     public ItemStack getResultItem() {
         return recipe.getResultItem();
     }
 
     @Override
+    @Nonnull
     public ResourceLocation getId() {
         return recipe.getId();
     }
 
     @Override
+    @Nonnull
     public IRecipeType<?> getType() {
         return recipe.getType();
     }

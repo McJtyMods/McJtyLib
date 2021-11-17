@@ -143,7 +143,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
 
     }
 
-    public void setFluid(FluidStack stack) {
+    public void setFluid(@Nonnull FluidStack stack) {
         this.fluid = stack;
     }
 

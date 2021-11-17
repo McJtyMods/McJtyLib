@@ -12,7 +12,6 @@ import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
@@ -31,6 +30,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.function.Function;
@@ -54,7 +54,7 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 
     @Nullable
     @Override
-    public TileEntity newBlockEntity(IBlockReader worldIn) {
+    public TileEntity newBlockEntity(@Nonnull IBlockReader worldIn) {
         return new MultipartTE();
     }
 
@@ -68,28 +68,33 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
         }
     }
 
+    @Nonnull
     @Override
-    public ItemStack getCloneItemStack(IBlockReader worldIn, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(@Nonnull IBlockReader worldIn, @Nonnull BlockPos pos, @Nonnull BlockState state) {
         return ItemStack.EMPTY;
     }
 
+    @Nonnull
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getShape(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull ISelectionContext context) {
         return combinePartShapes(world, pos, s -> s.getShape(world, pos, context));
     }
 
+    @Nonnull
     @Override
-    public VoxelShape getCollisionShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context) {
+    public VoxelShape getCollisionShape(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos, @Nonnull ISelectionContext context) {
         return combinePartShapes(world, pos, s -> s.getCollisionShape(world, pos, context));
     }
 
+    @Nonnull
     @Override
-    public VoxelShape getInteractionShape(BlockState state, IBlockReader world, BlockPos pos) {
+    public VoxelShape getInteractionShape(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos) {
         return combinePartShapes(world, pos, s -> s.getVisualShape(world, pos, ISelectionContext.empty()));
     }
 
+    @Nonnull
     @Override
-    public VoxelShape getOcclusionShape(BlockState state, IBlockReader world, BlockPos pos) {
+    public VoxelShape getOcclusionShape(@Nonnull BlockState state, @Nonnull IBlockReader world, @Nonnull BlockPos pos) {
         return combinePartShapes(world, pos, s -> s.getOcclusionShape(world, pos));
     }
 
@@ -111,8 +116,9 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
         return combined;
     }
 
+    @Nonnull
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
+    public ActionResultType use(@Nonnull BlockState state, @Nonnull World world, BlockPos pos, @Nonnull PlayerEntity player, @Nonnull Hand hand, BlockRayTraceResult result) {
         Vector3d hit = result.getLocation();
         Direction facing = result.getDirection();
         Vector3d start = MultipartHelper.getPlayerEyes(player);

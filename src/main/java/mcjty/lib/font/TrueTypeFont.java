@@ -27,10 +27,9 @@ import java.util.Map;
  */
 
 public class TrueTypeFont {
-    public final static int
-            ALIGN_LEFT = 0,
-            ALIGN_RIGHT = 1,
-            ALIGN_CENTER = 2;
+    public static final int ALIGN_LEFT = 0;
+    public static final int ALIGN_RIGHT = 1;
+    public static final int ALIGN_CENTER = 2;
 
 
     /**
@@ -84,9 +83,10 @@ public class TrueTypeFont {
     private FontMetrics fontMetrics;
 
 
-    private int correctL = 9, correctR = 8;
+    private int correctL = 9;
+    private int correctR = 8;
 
-    private class FloatObject {
+    private static class FloatObject {
         /**
          * Character's width
          */
@@ -330,7 +330,7 @@ public class TrueTypeFont {
 
         for (int l = j; l >= 0 && l < text.length() && i < width; l += k) {
             char c0 = text.charAt(l);
-            int i1 = (int) this.getWidth("" + c0);
+            int i1 = (int) this.getWidth(String.valueOf(c0));
 
             if (flag) {
                 flag = false;
@@ -409,7 +409,9 @@ public class TrueTypeFont {
 
         int endIndex = whatchars.length() - 1;
         float totalwidth = 0;
-        int i = 0, d, c;
+        int i = 0;
+        int d;
+        int c;
         float startY = 0;
 
         switch (format) {
@@ -527,8 +529,8 @@ public class TrueTypeFont {
             byteBuffer.flip();
 
 
-            int internalFormat = GL11.GL_RGBA8,
-                    format = GL11.GL_RGBA;
+            int internalFormat = GL11.GL_RGBA8;
+            int format = GL11.GL_RGBA;
             IntBuffer textureId = BufferUtils.createIntBuffer(1);
 
             GL11.glGenTextures(textureId);

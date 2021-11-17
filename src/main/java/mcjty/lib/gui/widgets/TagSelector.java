@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static mcjty.lib.gui.TagSelectorWindow.TYPE_ITEM;
 
@@ -22,6 +23,8 @@ public class TagSelector extends AbstractLabel<TagSelector> {
 
     public static final String TYPE_TAGSELECTOR = "tagselector";
     public static final Key<String> PARAM_TAG = new Key<>("tag", Type.STRING);
+
+    private static final Pattern COMPILE = Pattern.compile("[/:]");
 
     private String currentTag = null;
     private List<TagChoiceEvent> choiceEvents = null;
@@ -33,7 +36,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     }
 
     public TagSelector current(String tag) {
-        if (currentTag == tag) {
+        if (currentTag.equals(tag)) {
             return this;
         }
         currentTag = tag;
@@ -67,7 +70,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
         }
 
         String tag = getCurrentTagSafe();
-        String[] split = tag.split("[/:]");
+        String[] split = COMPILE.split(tag);
         text(split[split.length - 1]); // @todo maybe not very clean like this? Better override getText()
 
         super.drawOffset(gui, matrixStack, x, y, 0, 1);

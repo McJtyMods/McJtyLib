@@ -9,7 +9,7 @@ import java.lang.annotation.*;
  * lazyoptional) in which case it will automatically generate a LazyOptional
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target(ElementType.FIELD)
 @Inherited
 public @interface Cap {
 

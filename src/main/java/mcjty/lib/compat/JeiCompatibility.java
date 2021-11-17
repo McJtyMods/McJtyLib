@@ -11,11 +11,13 @@ import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 @JeiPlugin
 public class JeiCompatibility implements IModPlugin {
 
+    @Nonnull
     @Override
     public ResourceLocation getPluginUid() {
         return new ResourceLocation(McJtyLib.MODID, "mcjtylib");
@@ -27,6 +29,7 @@ public class JeiCompatibility implements IModPlugin {
     }
 
     static class Handler<T extends Container> implements IGuiContainerHandler<GenericGuiContainer<?,T>> {
+        @Nonnull
         @Override
         public List<Rectangle2d> getGuiExtraAreas(GenericGuiContainer containerScreen) {
             return containerScreen.getExtraWindowBounds();

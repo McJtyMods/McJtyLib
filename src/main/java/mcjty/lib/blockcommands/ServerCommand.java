@@ -7,7 +7,7 @@ import java.lang.annotation.*;
  * from the client to the server
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD})
+@Target(ElementType.FIELD)
 @Inherited
 public @interface ServerCommand {
 }

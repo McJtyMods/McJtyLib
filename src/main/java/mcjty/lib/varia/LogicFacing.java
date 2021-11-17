@@ -3,6 +3,8 @@ package mcjty.lib.varia;
 import net.minecraft.util.Direction;
 import net.minecraft.util.IStringSerializable;
 
+import javax.annotation.Nonnull;
+
 import static net.minecraft.util.Direction.*;
 
 public enum LogicFacing implements IStringSerializable {
@@ -49,6 +51,7 @@ public enum LogicFacing implements IStringSerializable {
         this.rotationStep = rotationStep;
     }
 
+    @Nonnull
     @Override
     public String getSerializedName() {
         return name;

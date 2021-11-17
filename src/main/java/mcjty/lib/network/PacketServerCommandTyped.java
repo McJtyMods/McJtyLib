@@ -1,6 +1,5 @@
 package mcjty.lib.network;
 
-import mcjty.lib.blockcommands.Command;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.LevelTools;

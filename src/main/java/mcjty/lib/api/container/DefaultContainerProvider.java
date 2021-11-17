@@ -17,6 +17,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     }
 
     @Override
+    @Nonnull
     public ITextComponent getDisplayName() {
         return new StringTextComponent(name);
     }
@@ -82,6 +84,8 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
                 type = guessType(field);
             }
             switch (type) {
+                case AUTOMATIC:
+                    throw new IllegalStateException("This can't be! The universe must be ending!");
                 case SHORT:
                     addSyncShortListener(te, field);
                     break;
@@ -194,7 +198,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
 
     @Nullable
     @Override
-    public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public Container createMenu(int windowId, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity playerEntity) {
         C container = containerSupplier.apply(windowId, playerEntity);
         IItemHandler itemHandler = this.itemHandler.get();
         container.setupInventories(itemHandler, playerInventory);

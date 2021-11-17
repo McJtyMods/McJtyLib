@@ -13,6 +13,7 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -124,10 +125,10 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     protected void drawBox(MatrixStack matrixStack, int xx, int yy, int color) {
-        Screen.fill(matrixStack, xx, yy, xx, yy + bounds.height, color);
-        Screen.fill(matrixStack, xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
-        Screen.fill(matrixStack, xx, yy, xx + bounds.width, yy, color);
-        Screen.fill(matrixStack, xx, yy + bounds.height, xx + bounds.width, yy + bounds.height, color);
+        AbstractGui.fill(matrixStack, xx, yy, xx, yy + bounds.height, color);
+        AbstractGui.fill(matrixStack, xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
+        AbstractGui.fill(matrixStack, xx, yy, xx + bounds.width, yy, color);
+        AbstractGui.fill(matrixStack, xx, yy + bounds.height, xx + bounds.width, yy + bounds.height, color);
     }
 
     @Override

@@ -58,7 +58,7 @@ public class GuiItemScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double x, double y, int button, double scaledX, double scaledY) {
-        boolean rc = super.mouseDragged(x, y, button, scaledX, scaledX);
+        boolean rc = super.mouseDragged(x, y, button, scaledX, scaledY);
         window.mouseDragged(x, y, button);
         sideWindow.getWindow().mouseDragged(x, y, button);
         return rc;

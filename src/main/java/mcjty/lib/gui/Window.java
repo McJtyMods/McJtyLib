@@ -28,6 +28,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -118,7 +119,7 @@ public class Window {
     }
 
     public <T extends Widget<T>> T findChild(String name) {
-        Widget<?> widget = ((AbstractContainerWidget<?>) toplevel).findChildRecursive(name);
+        Widget<?> widget = toplevel.findChildRecursive(name);
         if (widget == null) {
             Logging.logError("Could not find widget '" + name + "'!");
         }
@@ -308,6 +309,7 @@ public class Window {
         return currentStyle;
     }
 
+    @Nullable
     public List<String> getTooltips() {
         int x = getRelativeX();
         int y = getRelativeY();
@@ -321,6 +323,7 @@ public class Window {
         return null;
     }
 
+    @Nullable
     public List<ItemStack> getTooltipItems() {
         int x = getRelativeX();
         int y = getRelativeY();

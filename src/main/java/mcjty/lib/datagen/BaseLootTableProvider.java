@@ -22,6 +22,7 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -98,11 +99,11 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         return LootTable.lootTable().withPool(builder);
     }
 
-    protected void addBlockStateTable(Block block, Property property) {
+    protected void addBlockStateTable(Block block, Property<?> property) {
         lootTables.put(block, createBlockStateTable(block.getRegistryName().getPath(), block, property));
     }
 
-    protected LootTable.Builder createBlockStateTable(String name, Block block, Property property) {
+    protected LootTable.Builder createBlockStateTable(String name, Block block, Property<?> property) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(block.getRegistryName().getPath())
                 .setRolls(ConstantRange.exactly(1))
@@ -153,7 +154,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     @Override
-    public void run(DirectoryCache cache) {
+    public void run(@Nonnull DirectoryCache cache) {
         addTables();
 
         Map<ResourceLocation, LootTable> tables = new HashMap<>();

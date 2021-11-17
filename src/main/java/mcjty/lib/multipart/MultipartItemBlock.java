@@ -18,7 +18,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.Constants.BlockFlags;
 
 import javax.annotation.Nonnull;
@@ -36,12 +35,13 @@ public class MultipartItemBlock extends BlockItem {
     }
 
     @Override
-    protected boolean canPlace(BlockItemUseContext context, BlockState state) {
+    protected boolean canPlace(@Nonnull BlockItemUseContext context, @Nonnull BlockState state) {
         // Return true to make this work all the time.
         return true;
     }
 
 
+    @Nonnull
     @Override
     public ActionResultType place(BlockItemUseContext context) {
         World world = context.getLevel();
@@ -135,7 +135,7 @@ public class MultipartItemBlock extends BlockItem {
     }
 
     @Override
-    protected boolean placeBlock(BlockItemUseContext context, BlockState state) {
+    protected boolean placeBlock(@Nonnull BlockItemUseContext context, @Nonnull BlockState state) {
         // Not implemented
         return false;
     }

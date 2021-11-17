@@ -47,16 +47,16 @@ public class OrientationTools {
         switch(input) {
             case NORTH:
                 return DOWN;
-            case EAST:
-            case WEST:
-            default:
-                throw new IllegalStateException("Unable to get X-rotated facing of " + input);
             case SOUTH:
                 return UP;
             case UP:
                 return NORTH;
             case DOWN:
                 return SOUTH;
+            case EAST:
+            case WEST:
+            default:
+                throw new IllegalStateException("Unable to get X-rotated facing of " + input);
         }
     }
 
@@ -67,15 +67,15 @@ public class OrientationTools {
         switch(input) {
             case EAST:
                 return DOWN;
-            case SOUTH:
-            default:
-                throw new IllegalStateException("Unable to get Z-rotated facing of " + input);
             case WEST:
                 return UP;
             case UP:
                 return EAST;
             case DOWN:
                 return WEST;
+            case SOUTH:
+            default:
+                throw new IllegalStateException("Unable to get Z-rotated facing of " + input);
         }
     }
 
@@ -106,13 +106,29 @@ public class OrientationTools {
         }
         int i = (int) ((entity.yRot * 4.0F / 360.0F) + 0.5D);
         int l = ((entity.yRot * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
-        return l == 0 ? Direction.NORTH : (l == 1 ? Direction.EAST : (l == 2 ? SOUTH : (l == 3 ? Direction.WEST : DOWN)));
+        if (l == 0) {
+            return Direction.NORTH;
+        } else if (l == 1) {
+            return Direction.EAST;
+        } else if (l == 2) {
+            return SOUTH;
+        } else {
+            return Direction.WEST;
+        }
     }
 
     public static Direction determineOrientationHoriz(LivingEntity MobEntity) {
         int i = (int) ((MobEntity.yRot * 4.0F / 360.0F) + 0.5D);
         int l = ((MobEntity.yRot * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
-        return l == 0 ? Direction.NORTH : (l == 1 ? Direction.EAST : (l == 2 ? SOUTH : (l == 3 ? Direction.WEST : DOWN)));
+        if (l == 0) {
+            return Direction.NORTH;
+        } else if (l == 1) {
+            return Direction.EAST;
+        } else if (l == 2) {
+            return SOUTH;
+        } else {
+            return Direction.WEST;
+        }
     }
 
     public static Direction getTopDirection(Direction rotation) {

@@ -4,10 +4,11 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.TriConsumer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.AbstractFurnaceTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
+
+import javax.annotation.Nonnull;
 
 public class CraftingSlot extends SlotItemHandler {
     private final GenericTileEntity te;
@@ -31,6 +32,7 @@ public class CraftingSlot extends SlotItemHandler {
     }
 
     @Override
+    @Nonnull
     public ItemStack remove(int amount) {
         if (this.hasItem()) {
             this.removeCount += Math.min(amount, this.getItem().getCount());
@@ -39,7 +41,7 @@ public class CraftingSlot extends SlotItemHandler {
     }
 
     @Override
-    public void set(ItemStack stack) {
+    public void set(@Nonnull ItemStack stack) {
         if (te != null) {
             te.onSlotChanged(getSlotIndex(), stack);
         }
@@ -47,19 +49,20 @@ public class CraftingSlot extends SlotItemHandler {
     }
 
     @Override
-    public boolean mayPlace(ItemStack stack) {
+    public boolean mayPlace(@Nonnull ItemStack stack) {
         return false;
     }
 
     @Override
-    public ItemStack onTake(PlayerEntity thePlayer, ItemStack stack) {
+    @Nonnull
+    public ItemStack onTake(@Nonnull PlayerEntity thePlayer, @Nonnull ItemStack stack) {
         this.checkTakeAchievements(stack);
         super.onTake(thePlayer, stack);
         return stack;
     }
 
     @Override
-    protected void onQuickCraft(ItemStack stack, int amount) {
+    protected void onQuickCraft(@Nonnull ItemStack stack, int amount) {
         this.removeCount += amount;
         this.checkTakeAchievements(stack);
     }

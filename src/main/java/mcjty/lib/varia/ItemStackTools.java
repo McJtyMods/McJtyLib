@@ -1,7 +1,6 @@
 package mcjty.lib.varia;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.GuiParser;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

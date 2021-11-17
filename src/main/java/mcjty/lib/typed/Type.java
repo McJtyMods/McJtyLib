@@ -70,12 +70,12 @@ public final class Type<V> {
         value.setter().accept(v);
     }
 
-    @Nonnull
+    @Nullable
     public BiConsumer<V, PacketBuffer> getSerializer() {
         return serializer;
     }
 
-    @Nonnull
+    @Nullable
     public Function<PacketBuffer, V> getDeserializer() {
         return deserializer;
     }

@@ -5,6 +5,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import javax.annotation.Nonnull;
+
 /**
  * A slot typically used for crafting grids.
  */
@@ -19,6 +21,7 @@ public class GhostSlot extends SlotItemHandler {
         return false;
     }
 
+    @Nonnull
     @Override
     public ItemStack remove(int amount) {
         return ItemStack.EMPTY;
@@ -30,12 +33,12 @@ public class GhostSlot extends SlotItemHandler {
     }
 
     @Override
-    public int getMaxStackSize(ItemStack stack) {
+    public int getMaxStackSize(@Nonnull ItemStack stack) {
         return 1;
     }
 
     @Override
-    public boolean mayPlace(ItemStack stack) {
+    public boolean mayPlace(@Nonnull ItemStack stack) {
         return true;
     }
 

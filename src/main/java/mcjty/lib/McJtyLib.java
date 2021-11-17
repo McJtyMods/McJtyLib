@@ -26,13 +26,14 @@ public class McJtyLib {
 
     public static final String MODID = "mcjtylib";
 
-    public static IProxy proxy = DistExecutor.runForDist(() -> () -> new DefaultClientProxy(), () -> () -> new DefaultServerProxy());
-    public static ModSetup setup = new ModSetup();
+    public static final IProxy proxy = DistExecutor.runForDist(() -> () -> new DefaultClientProxy(), () -> () -> new DefaultServerProxy());
+    public static final ModSetup setup = new ModSetup();
 
     public static McJtyLib instance;
 
     public static SimpleChannel networkHandler;
-    public static boolean tesla, cofhapiitem;
+    public static boolean tesla;
+    public static boolean cofhapiitem;
 
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
