@@ -2,13 +2,15 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.McJtyLib;
-import mcjty.lib.bindings.IAction;
 import mcjty.lib.bindings.IValue;
+import mcjty.lib.blockcommands.Command;
+import mcjty.lib.blockcommands.ICommand;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
@@ -374,41 +376,30 @@ public class Window {
         channelEvents.get(channel).add(event);
         return this;
     }
+    public <T extends GenericTileEntity> Window action(SimpleChannel network, String componentName, T te, Command<?> command) {
+        return action(network, componentName, te, command.getName());
+    }
 
     public <T extends GenericTileEntity> Window action(SimpleChannel network, String componentName, T te, String keyName) {
-        for (IAction action : te.getActions()) {
-            if (keyName.equals(action.getKey())) {
-                initializeAction(network, componentName, action);
-                return this;
-            }
+        ICommand<?> serverCommand = te.findServerCommand(keyName);
+        if (serverCommand != null) {
+            initializeAction(network, componentName, keyName, te);
+            return this;
         }
 
         Logging.message(Minecraft.getInstance().player, "Could not find action '" + keyName + "' in supplied TE!");
         return this;
     }
 
-    private void initializeAction(SimpleChannel network, String componentName, IAction action) {
-        event(componentName, (source, params) -> sendAction(network, action));
+    private <T extends GenericTileEntity> void initializeAction(SimpleChannel network, String componentName, String command, T te) {
+        event(componentName, (source, params) -> {
+            network.sendToServer(new PacketServerCommandTyped(te.getBlockPos(), te.getDimension(), command, params));
+        });
     }
 
-    public <T extends GenericTileEntity> void sendAction(SimpleChannel network, T te, String actionKey) {
-        for (IAction action : te.getActions()) {
-            if (actionKey.equals(action.getKey())) {
-                sendAction(network, action);
-                return;
-            }
-        }
-
-        Logging.message(Minecraft.getInstance().player, "Could not find action '" + actionKey + "' in supplied TE!");
-
-    }
-
-    private void sendAction(SimpleChannel network, IAction action) {
+    public void sendServerCommand(SimpleChannel network, Command<?> action, @Nonnull TypedMap params) {
         GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
-        guiContainer.sendServerCommandTyped(network, guiContainer.tileEntity.COMMAND_SYNC_ACTION,
-                TypedMap.builder()
-                        .put(GenericTileEntity.PARAM_KEY, action.getKey())
-                        .build());
+        guiContainer.sendServerCommandTyped(network, action, params);
     }
 
     public <T extends GenericTileEntity> Window bind(SimpleChannel network, String componentName, T te, String keyName) {

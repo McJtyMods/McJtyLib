@@ -5,7 +5,10 @@ import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.bindings.*;
+import mcjty.lib.bindings.DefaultValue;
+import mcjty.lib.bindings.IValue;
+import mcjty.lib.bindings.Val;
+import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.ICommand;
 import mcjty.lib.blockcommands.ICommandWithResult;
@@ -56,8 +59,6 @@ import java.util.function.Consumer;
 public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
-
-    public static final IAction[] EMPTY_ACTIONS = new IAction[0];
 
     private String ownerName = "";
     private UUID ownerUUID = null;
@@ -196,10 +197,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     public Map<String, IValue<?>> getValueMap() {
         AnnotationHolder holder = getAnnotationHolder();
         return holder.valueMap;
-    }
-
-    public IAction[] getActions() {
-        return EMPTY_ACTIONS;
     }
 
     // @todo 1.14
@@ -611,15 +608,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return null;
     }
 
-    private Runnable findConsumer(String key) {
-        for (IAction action : getActions()) {
-            if (key.equals(action.getKey())) {
-                return action.consumer();
-            }
-        }
-        return null;
-    }
-
     /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
     public RegistryKey<World> getDimension() {
         return level.dimension();
@@ -643,6 +631,14 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             return true;
         }
         return false;
+    }
+
+    /**
+     * Find a server command
+     */
+    public ICommand<?> findServerCommand(String command) {
+        AnnotationHolder holder = getAnnotationHolder();
+        return holder.serverCommands.get(command);
     }
 
     /**
@@ -716,14 +712,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     @ServerCommand
     public static final Command<?> COMMAND_SYNC_BINDING = Command.create("generic.syncBinding",
             (te, playerEntity, params) -> te.syncBinding(params));
-
-    public static final Key<String> PARAM_KEY = new Key<>("key", Type.STRING);
-    @ServerCommand
-    public static final Command<?> COMMAND_SYNC_ACTION = Command.create("generic.syncAction",
-            (te, playerEntity, params) -> {
-                String key = params.get(PARAM_KEY);
-                te.findConsumer(key).run();
-            });
 
     @ServerCommand
     public static final Command<?> CMD_RSMODE = Command.create("mcjtylib.setRsMode",
