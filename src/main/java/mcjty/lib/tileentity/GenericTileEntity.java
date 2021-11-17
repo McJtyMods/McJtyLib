@@ -5,8 +5,7 @@ import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.bindings.IAction;
-import mcjty.lib.bindings.IValue;
+import mcjty.lib.bindings.*;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.ICommand;
 import mcjty.lib.blockcommands.ICommandWithResult;
@@ -56,10 +55,9 @@ import java.util.function.Consumer;
 
 public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
 
-    public static final IValue<?>[] EMPTY_VALUES = new IValue[0];
-    public static final IAction[] EMPTY_ACTIONS = new IAction[0];
-
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
+
+    public static final IAction[] EMPTY_ACTIONS = new IAction[0];
 
     private String ownerName = "";
     private UUID ownerUUID = null;
@@ -68,7 +66,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     protected int powerLevel = 0;
 
-    private static final Map<TileEntityType, CommandHolder> commands = new HashMap<>();
+    private static final Map<TileEntityType, AnnotationHolder> annotations = new HashMap<>();
 
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for tne annotations and replaces itself with
@@ -195,8 +193,9 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         }
     }
 
-    public IValue<?>[] getValues() {
-        return EMPTY_VALUES;
+    public Map<String, IValue<?>> getValueMap() {
+        AnnotationHolder holder = getAnnotationHolder();
+        return holder.valueMap;
     }
 
     public IAction[] getActions() {
@@ -603,7 +602,8 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
 
     private <V> Consumer<V> findSetter(Key<V> key) {
         // Cache or use Map?
-        for (IValue value : getValues()) {
+        for (Map.Entry<String, IValue<?>> entry : getValueMap().entrySet()) {
+            IValue value = entry.getValue();
             if (key.getName().equals(value.getKey().getName())) {
                 return value.setter();
             }
@@ -636,7 +636,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * Execute a client side command (annotated with @ServerCommand)
      */
     public boolean executeClientCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
-        CommandHolder holder = getCommandHolder();
+        AnnotationHolder holder = getAnnotationHolder();
         ICommand clientCommand = holder.clientCommands.get(command);
         if (clientCommand != null) {
             clientCommand.run(this, player, params);
@@ -649,7 +649,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      * Execute a server side command (annotated with @ServerCommand)
      */
     public boolean executeServerCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
-        CommandHolder holder = getCommandHolder();
+        AnnotationHolder holder = getAnnotationHolder();
         ICommand serverCommand = holder.serverCommands.get(command);
         if (serverCommand != null) {
             serverCommand.run(this, player, params);
@@ -663,7 +663,7 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
      */
     @Nullable
     public TypedMap executeServerCommandWR(String command, PlayerEntity player, @Nonnull TypedMap params) {
-        CommandHolder holder = getCommandHolder();
+        AnnotationHolder holder = getAnnotationHolder();
         ICommandWithResult serverCommand = holder.serverCommandsWithResult.get(command);
         if (serverCommand != null) {
             return serverCommand.run(this, player, params);
@@ -671,14 +671,14 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return null;
     }
 
-    private CommandHolder getCommandHolder() {
-        CommandHolder holder = commands.get(getType());
+    private AnnotationHolder getAnnotationHolder() {
+        AnnotationHolder holder = annotations.get(getType());
 
         if (holder == null) {
-            holder = new CommandHolder();
-            commands.put(getType(), holder);
-            Field[] fieldsWithAnnotation = FieldUtils.getFieldsWithAnnotation(getClass(), ServerCommand.class);
-            for (Field field : fieldsWithAnnotation) {
+            holder = new AnnotationHolder();
+            annotations.put(getType(), holder);
+            Field[] commandFields = FieldUtils.getFieldsWithAnnotation(getClass(), ServerCommand.class);
+            for (Field field : commandFields) {
                 ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
                 try {
                     Command cmd = (Command) field.get(this);
@@ -694,6 +694,20 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
+            }
+
+            Field[] valFields = FieldUtils.getFieldsWithAnnotation(getClass(), Val.class);
+            for (Field field : valFields) {
+                Val val = field.getAnnotation(Val.class);
+                try {
+                    Value value = (Value) field.get(this);
+                    holder.valueMap.put(value.getKey().getName(), new DefaultValue<>(value.getKey(), () -> value.getSupplier().apply(this), o -> value.getConsumer().accept(this, o)));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (needsRedstoneMode()) {
+                holder.valueMap.put(VALUE_RSMODE.getName(), new DefaultValue<>(VALUE_RSMODE, this::getRSModeInt, this::setRSModeInt));
             }
         }
         return holder;

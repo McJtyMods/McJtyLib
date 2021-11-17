@@ -412,12 +412,12 @@ public class Window {
     }
 
     public <T extends GenericTileEntity> Window bind(SimpleChannel network, String componentName, T te, String keyName) {
-        for (IValue<?> value : te.getValues()) {
+        Map<String, IValue<?>> valueMap = te.getValueMap();
+        if (valueMap.containsKey(keyName)) {
+            IValue<?> value = valueMap.get(keyName);
             Key<?> key = value.getKey();
-            if (keyName.equals(key.getName())) {
-                initializeBinding(network, te.getDimension(), componentName, value);
-                return this;
-            }
+            initializeBinding(network, te.getDimension(), componentName, value);
+            return this;
         }
 
         Logging.message(Minecraft.getInstance().player, "Could not find value '" + keyName + "' in supplied TE!");
