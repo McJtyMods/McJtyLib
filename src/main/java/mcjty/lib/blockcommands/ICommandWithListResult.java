@@ -5,8 +5,10 @@ import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.PlayerEntity;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 
 @FunctionalInterface
-public interface ICommandWithResult<TE extends GenericTileEntity> {
-    @Nonnull TypedMap run(TE te, PlayerEntity player, TypedMap params);
+public interface ICommandWithListResult<TE extends GenericTileEntity, T> {
+    @Nonnull
+    List<T> run(TE te, PlayerEntity player, TypedMap params);
 }

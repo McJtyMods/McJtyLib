@@ -2,14 +2,14 @@ package mcjty.lib.blockcommands;
 
 import mcjty.lib.tileentity.GenericTileEntity;
 
-public class Command<T extends GenericTileEntity> {
+public class Command<TE extends GenericTileEntity> {
 
     private final String name;
-    private final ICommand<T> cmd;
-    private final ICommandWithResult<T> cmdWithResult;
-    private final ICommand<T> clientCommand;
+    private final ICommand<TE> cmd;
+    private final ICommandWithResult<TE> cmdWithResult;
+    private final ICommand<TE> clientCommand;
 
-    private Command(String name, ICommand<T> cmd, ICommandWithResult<T> cmdWithResult, ICommand<T> clientCommand) {
+    private Command(String name, ICommand<TE> cmd, ICommandWithResult<TE> cmdWithResult, ICommand<TE> clientCommand) {
         this.name = name;
         this.cmd = cmd;
         this.clientCommand = clientCommand;
@@ -20,15 +20,15 @@ public class Command<T extends GenericTileEntity> {
         return name;
     }
 
-    public ICommand<T> getCmd() {
+    public ICommand<TE> getCmd() {
         return cmd;
     }
 
-    public ICommandWithResult<T> getCmdWithResult() {
+    public ICommandWithResult<TE> getCmdWithResult() {
         return cmdWithResult;
     }
 
-    public ICommand<T> getClientCommand() {
+    public ICommand<TE> getClientCommand() {
         return clientCommand;
     }
 

@@ -1,5 +1,6 @@
 package mcjty.lib.tileentity;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
@@ -9,20 +10,16 @@ import mcjty.lib.bindings.DefaultValue;
 import mcjty.lib.bindings.IValue;
 import mcjty.lib.bindings.Val;
 import mcjty.lib.bindings.Value;
-import mcjty.lib.blockcommands.Command;
-import mcjty.lib.blockcommands.ICommand;
-import mcjty.lib.blockcommands.ICommandWithResult;
-import mcjty.lib.blockcommands.ServerCommand;
+import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
 import mcjty.lib.container.NoDirectionItemHander;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
-import mcjty.lib.network.IClientCommandHandler;
-import mcjty.lib.network.ICommandHandler;
 import mcjty.lib.network.PacketRequestDataFromServer;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
@@ -56,7 +53,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-public class GenericTileEntity extends TileEntity implements ICommandHandler, IClientCommandHandler {
+public class GenericTileEntity extends TileEntity {
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
@@ -516,17 +513,6 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
         return ownerUUID;
     }
 
-    @Nonnull
-    @Override
-    public <T> List<T> executeWithResultList(String command, TypedMap args, Type<T> type) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public <T> boolean receiveListFromServer(String command, List<T> list, Type<T> type) {
-        return false;
-    }
-
     public boolean checkAccess(PlayerEntity player) {
         return false;
     }
@@ -657,6 +643,43 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
     }
 
     /**
+     * Execute a server side listcommand (annotated with @ServerCommand)
+     */
+    public <T> List<T> executeServerCommandList(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull Class<T> type) {
+        AnnotationHolder holder = getAnnotationHolder();
+        ICommandWithListResult cmd = holder.serverCommandsWithListResult.get(command);
+        if (cmd != null) {
+            return cmd.run(this, player, params);
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * Helper command that's useful from within client side packets to execute a client command with a list
+     */
+    public static <T> void executeClientCommandHelper(BlockPos pos, String command, List<T> list) {
+        TileEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(pos);
+        if (te instanceof GenericTileEntity) {
+            ((GenericTileEntity) te).executeClientCommandList(command, McJtyLib.proxy.getClientPlayer(), TypedMap.EMPTY, list);
+        } else {
+            Logging.logError("Can't handle command '" + command + "'!");
+        }
+    }
+
+    /**
+     * Execute a client side command that handles the list sent by the server side ListCommand
+     */
+    public <T> boolean executeClientCommandList(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull List<T> list) {
+        AnnotationHolder holder = getAnnotationHolder();
+        ICommandWithList cmd = holder.clientCommandsWithList.get(command);
+        if (cmd != null) {
+            cmd.run(this, player, params, list);
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Execute a server side command with a return value (annotated with @ServerCommand)
      */
     @Nullable
@@ -679,15 +702,24 @@ public class GenericTileEntity extends TileEntity implements ICommandHandler, IC
             for (Field field : commandFields) {
                 ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
                 try {
-                    Command cmd = (Command) field.get(this);
-                    if (cmd.getCmd() != null) {
-                        holder.serverCommands.put(cmd.getName(), cmd.getCmd());
-                    }
-                    if (cmd.getCmdWithResult() != null) {
-                        holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmdWithResult());
-                    }
-                    if (cmd.getClientCommand() != null) {
-                        holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
+                    Object o = field.get(this);
+                    if (o instanceof Command) {
+                        Command cmd = (Command) o;
+                        if (cmd.getCmd() != null) {
+                            holder.serverCommands.put(cmd.getName(), cmd.getCmd());
+                        }
+                        if (cmd.getCmdWithResult() != null) {
+                            holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmdWithResult());
+                        }
+                        if (cmd.getClientCommand() != null) {
+                            holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
+                        }
+                    } else if (o instanceof ListCommand) {
+                        ListCommand cmd = (ListCommand) o;
+                        holder.serverCommandsWithListResult.put(cmd.getName(), cmd.getCmd());
+                        holder.clientCommandsWithList.put(cmd.getName(), cmd.getClientCommand());
+                    } else {
+                        throw new IllegalStateException("Only use @ServerCommand with either a Command, a ListCommand or a ResultCommand!");
                     }
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
