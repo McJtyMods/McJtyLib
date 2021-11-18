@@ -10,4 +10,15 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 @Inherited
 public @interface ServerCommand {
+
+    /**
+     * Optionally specify a class. If this is specified then this command will be registered using McJtyLib.registerCommandInfo()
+     */
+    Class type() default void.class;
+
+    /**
+     * Specify the serializer to use for McJtyLib.registerCommandInfo().
+     * This is required except for these types: ItemStack, FluidStack, BlockPos, Integer, String
+     */
+    Class<? extends ISerializer> serializer() default ISerializer.class;
 }

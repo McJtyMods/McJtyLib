@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.LevelTools;
@@ -73,7 +74,8 @@ public class PacketGetListFromServer {
             if (world.hasChunkAt(pos)) {
                 TileEntity te = world.getBlockEntity(pos);
                 if (te instanceof GenericTileEntity) {
-                    Class type = McJtyLib.getType(command);
+                    CommandInfo<?> info = McJtyLib.getCommandInfo(command);
+                    Class type = info.getType();
                     if (type == null) {
                         throw new IllegalStateException("Command '" + command + "' is not registered!");
                     }

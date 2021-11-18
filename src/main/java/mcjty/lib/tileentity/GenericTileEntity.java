@@ -1,5 +1,6 @@
 package mcjty.lib.tileentity;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
@@ -39,6 +40,7 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -700,6 +702,10 @@ public class GenericTileEntity extends TileEntity {
                         ListCommand cmd = (ListCommand) o;
                         holder.serverCommandsWithListResult.put(cmd.getName(), cmd.getCmd());
                         holder.clientCommandsWithList.put(cmd.getName(), cmd.getClientCommand());
+                        if (serverCommand.type() != void.class) {
+                            ISerializer instance = getSerializer(serverCommand);
+                            McJtyLib.registerCommandInfo(cmd.getName(), serverCommand.type(), instance.getDeserializer(), instance.getSerializer());
+                        }
                     } else {
                         throw new IllegalStateException("Only use @ServerCommand with either a Command, a ListCommand or a ResultCommand!");
                     }
@@ -723,6 +729,27 @@ public class GenericTileEntity extends TileEntity {
             }
         }
         return holder;
+    }
+
+    @Nonnull
+    private ISerializer getSerializer(ServerCommand serverCommand) throws IllegalAccessException {
+        if (serverCommand.type() == Integer.class) {
+            return new ISerializer.IntegerSerializer();
+        } else if (serverCommand.type() == String.class) {
+            return new ISerializer.StringSerializer();
+        } else if (serverCommand.type() == BlockPos.class) {
+            return new ISerializer.BlockPosSerializer();
+        } else if (serverCommand.type() == ItemStack.class) {
+            return new ISerializer.ItemStackSerializer();
+        } else if (serverCommand.type() == FluidStack.class) {
+            return new ISerializer.FluidStackSerializer();
+        }
+        Class<? extends ISerializer> serializer = serverCommand.serializer();
+        try {
+            return serializer.newInstance();
+        } catch (InstantiationException e) {
+            throw new IllegalStateException("Can't instantiate serializer!", e);
+        }
     }
 
     @ServerCommand

@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
@@ -28,10 +29,11 @@ public class PacketSendResultToClient {
     public PacketSendResultToClient(PacketBuffer buf) {
         pos = buf.readBlockPos();
         command = buf.readUtf(32767);
-        Function<PacketBuffer, Object> deserializer = McJtyLib.getDeserializer(command);
-        if (deserializer == null) {
+        CommandInfo<?> info = McJtyLib.getCommandInfo(command);
+        if (info == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }
+        Function<PacketBuffer, ?> deserializer = info.getDeserializer();
         int size = buf.readInt();
         if (size != -1) {
             list = new ArrayList<>(size);
@@ -52,7 +54,11 @@ public class PacketSendResultToClient {
     public void toBytes(PacketBuffer buf) {
         buf.writeBlockPos(pos);
         buf.writeUtf(command);
-        BiConsumer<PacketBuffer, Object> serializer = McJtyLib.getSerializer(command);
+        CommandInfo<?> info = McJtyLib.getCommandInfo(command);
+        if (info == null) {
+            throw new IllegalStateException("Command '" + command + "' is not registered!");
+        }
+        BiConsumer<PacketBuffer, Object> serializer = (BiConsumer<PacketBuffer, Object>) info.getSerializer();
         if (serializer == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }

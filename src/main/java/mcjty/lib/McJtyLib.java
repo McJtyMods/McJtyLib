@@ -1,6 +1,7 @@
 package mcjty.lib;
 
 import mcjty.lib.base.GeneralConfig;
+import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.multipart.MultipartModelLoader;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
@@ -38,19 +39,6 @@ public class McJtyLib {
     public static boolean tesla;
     public static boolean cofhapiitem;
 
-    // @todo cleanup!
-    private static class CommandInfo<T> {
-        private final Class<T> type;
-        private final Function<PacketBuffer, T> deserializer;
-        private final BiConsumer<PacketBuffer, T> serializer;
-
-        public CommandInfo(Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
-            this.type = type;
-            this.deserializer = deserializer;
-            this.serializer = serializer;
-        }
-    }
-
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
     private static final Map<String, CommandInfo> commandInfos = new HashMap<>();
@@ -77,16 +65,8 @@ public class McJtyLib {
         commandInfos.put(command, new CommandInfo<T>(type, deserializer, serializer));
     }
 
-    public static Class getType(String command) {
-        return commandInfos.get(command).type;
-    }
-
-    public static Function<PacketBuffer, Object> getDeserializer(String command) {
-        return commandInfos.get(command).deserializer;
-    }
-
-    public static BiConsumer<PacketBuffer, Object> getSerializer(String command) {
-        return commandInfos.get(command).serializer;
+    public static CommandInfo getCommandInfo(String command) {
+        return commandInfos.get(command);
     }
 
     public static void registerCommand(String modid, String id, IServerCommand command) {
