@@ -4,12 +4,13 @@ import java.lang.annotation.*;
 
 /**
  * Annotate a field with this annotation to declare that it requires syncing to the client (GUI) whenever a container
- * is open. To use this you need to call setupSync(this) on your DefaultContainerProvider
+ * is open. To use this you need to call setupSync(this) on your DefaultContainerProvider. Note that this syncing is one-way
+ * only (from server to client)
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 @Inherited
-public @interface GuiSync {
+public @interface SyncToGui {
 
     /**
      * The type of this field. Default it will try to detect the type from the type of the field.

@@ -9,10 +9,10 @@ import java.util.function.BiConsumer;
 
 public class GuiSyncScanner {
 
-    public static <T extends GenericTileEntity> void scan(Class teClass, T instance, BiConsumer<GuiSync, Field> consumer) {
-        Field[] fields = FieldUtils.getFieldsWithAnnotation(teClass, GuiSync.class);
+    public static <T extends GenericTileEntity> void scan(Class teClass, T instance, BiConsumer<SyncToGui, Field> consumer) {
+        Field[] fields = FieldUtils.getFieldsWithAnnotation(teClass, SyncToGui.class);
         Arrays.stream(fields).forEach(field -> {
-            GuiSync annotation = field.getAnnotation(GuiSync.class);
+            SyncToGui annotation = field.getAnnotation(SyncToGui.class);
             consumer.accept(annotation, field);
         });
     }

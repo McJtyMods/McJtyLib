@@ -2,7 +2,7 @@ package mcjty.lib.api.container;
 
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.sync.GuiSyncScanner;
-import mcjty.lib.sync.GuiSync;
+import mcjty.lib.sync.SyncToGui;
 import mcjty.lib.sync.SyncType;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -127,7 +127,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         throw new RuntimeException("Can't guess type for field " + field.getName() + "!");
     }
 
-    private void addSyncEnumListener(GenericTileEntity te, GuiSync guiSync, Field field) {
+    private void addSyncEnumListener(GenericTileEntity te, SyncToGui guiSync, Field field) {
         shortListener(Sync.enumeration(() -> {
             try {
                 return (Enum) FieldUtils.readField(field, te, true);

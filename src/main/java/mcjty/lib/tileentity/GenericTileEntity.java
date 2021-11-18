@@ -8,7 +8,7 @@ import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.DefaultValue;
 import mcjty.lib.bindings.IValue;
-import mcjty.lib.bindings.Val;
+import mcjty.lib.bindings.GuiValue;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
@@ -714,9 +714,9 @@ public class GenericTileEntity extends TileEntity {
                 }
             }
 
-            Field[] valFields = FieldUtils.getFieldsWithAnnotation(getClass(), Val.class);
+            Field[] valFields = FieldUtils.getFieldsWithAnnotation(getClass(), GuiValue.class);
             for (Field field : valFields) {
-                Val val = field.getAnnotation(Val.class);
+                GuiValue val = field.getAnnotation(GuiValue.class);
                 try {
                     Value value = (Value) field.get(this);
                     holder.valueMap.put(value.getKey().getName(), new DefaultValue<>(value.getKey(), () -> value.getSupplier().apply(this), o -> value.getConsumer().accept(this, o)));
