@@ -4,7 +4,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.bindings.IValue;
 import mcjty.lib.blockcommands.Command;
-import mcjty.lib.blockcommands.ICommand;
+import mcjty.lib.blockcommands.IRunnable;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
@@ -384,7 +384,7 @@ public class Window {
     }
 
     public <T extends GenericTileEntity> Window action(SimpleChannel network, String componentName, T te, String keyName) {
-        ICommand<?> serverCommand = te.findServerCommand(keyName);
+        IRunnable<?> serverCommand = te.findServerCommand(keyName);
         if (serverCommand != null) {
             initializeAction(network, componentName, keyName, te);
             return this;

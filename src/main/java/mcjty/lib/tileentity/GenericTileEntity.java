@@ -602,7 +602,7 @@ public class GenericTileEntity extends TileEntity {
     /**
      * Call this client-side to this TE to request data from the server
      */
-    public void requestDataFromServer(SimpleChannel channel, Command<?> command, @Nonnull TypedMap params) {
+    public void requestDataFromServer(SimpleChannel channel, ICommand command, @Nonnull TypedMap params) {
         channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command.getName(), params, false));
     }
 
@@ -611,7 +611,7 @@ public class GenericTileEntity extends TileEntity {
      */
     public boolean executeClientCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
         AnnotationHolder holder = getAnnotationHolder();
-        ICommand clientCommand = holder.clientCommands.get(command);
+        IRunnable clientCommand = holder.clientCommands.get(command);
         if (clientCommand != null) {
             clientCommand.run(this, player, params);
             return true;
@@ -622,7 +622,7 @@ public class GenericTileEntity extends TileEntity {
     /**
      * Find a server command
      */
-    public ICommand<?> findServerCommand(String command) {
+    public IRunnable<?> findServerCommand(String command) {
         AnnotationHolder holder = getAnnotationHolder();
         return holder.serverCommands.get(command);
     }
@@ -632,7 +632,7 @@ public class GenericTileEntity extends TileEntity {
      */
     public boolean executeServerCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
         AnnotationHolder holder = getAnnotationHolder();
-        ICommand serverCommand = holder.serverCommands.get(command);
+        IRunnable serverCommand = holder.serverCommands.get(command);
         if (serverCommand != null) {
             serverCommand.run(this, player, params);
             return true;
@@ -645,7 +645,7 @@ public class GenericTileEntity extends TileEntity {
      */
     public <T> List<T> executeServerCommandList(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull Class<T> type) {
         AnnotationHolder holder = getAnnotationHolder();
-        ICommandWithListResult cmd = holder.serverCommandsWithListResult.get(command);
+        IRunnableWithListResult cmd = holder.serverCommandsWithListResult.get(command);
         if (cmd != null) {
             return cmd.run(this, player, params);
         }
@@ -657,7 +657,7 @@ public class GenericTileEntity extends TileEntity {
      */
     public <T> boolean executeClientCommandList(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull List<T> list) {
         AnnotationHolder holder = getAnnotationHolder();
-        ICommandWithList cmd = holder.clientCommandsWithList.get(command);
+        IRunnableWithList cmd = holder.clientCommandsWithList.get(command);
         if (cmd != null) {
             cmd.run(this, player, params, list);
             return true;
@@ -671,7 +671,7 @@ public class GenericTileEntity extends TileEntity {
     @Nullable
     public TypedMap executeServerCommandWR(String command, PlayerEntity player, @Nonnull TypedMap params) {
         AnnotationHolder holder = getAnnotationHolder();
-        ICommandWithResult serverCommand = holder.serverCommandsWithResult.get(command);
+        IRunnableWithResult serverCommand = holder.serverCommandsWithResult.get(command);
         if (serverCommand != null) {
             return serverCommand.run(this, player, params);
         }
@@ -691,15 +691,11 @@ public class GenericTileEntity extends TileEntity {
                     Object o = field.get(this);
                     if (o instanceof Command) {
                         Command cmd = (Command) o;
-                        if (cmd.getCmd() != null) {
-                            holder.serverCommands.put(cmd.getName(), cmd.getCmd());
-                        }
-                        if (cmd.getCmdWithResult() != null) {
-                            holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmdWithResult());
-                        }
-                        if (cmd.getClientCommand() != null) {
-                            holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
-                        }
+                        holder.serverCommands.put(cmd.getName(), cmd.getCmd());
+                    } else if (o instanceof ResultCommand) {
+                        ResultCommand cmd = (ResultCommand) o;
+                        holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmd());
+                        holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
                     } else if (o instanceof ListCommand) {
                         ListCommand cmd = (ListCommand) o;
                         holder.serverCommandsWithListResult.put(cmd.getName(), cmd.getCmd());

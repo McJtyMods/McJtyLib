@@ -4,9 +4,7 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.PlayerEntity;
 
-import javax.annotation.Nonnull;
-
 @FunctionalInterface
-public interface ICommandWithResult<TE extends GenericTileEntity> {
-    @Nonnull TypedMap run(TE te, PlayerEntity player, TypedMap params);
+public interface IRunnable<TE extends GenericTileEntity> {
+    void run(TE te, PlayerEntity player, TypedMap params);
 }

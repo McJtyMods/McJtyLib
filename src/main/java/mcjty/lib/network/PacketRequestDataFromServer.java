@@ -1,6 +1,7 @@
 package mcjty.lib.network;
 
 import mcjty.lib.blockcommands.Command;
+import mcjty.lib.blockcommands.ICommand;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.LevelTools;
@@ -52,7 +53,7 @@ public class PacketRequestDataFromServer {
         this.dummy = dummy;
     }
 
-    public PacketRequestDataFromServer(RegistryKey<World> type, BlockPos pos, Command command, TypedMap params, boolean dummy) {
+    public PacketRequestDataFromServer(RegistryKey<World> type, BlockPos pos, ICommand command, TypedMap params, boolean dummy) {
         this.type = type;
         this.pos = pos;
         this.command = command.getName();
