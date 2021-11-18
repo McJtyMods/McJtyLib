@@ -8,6 +8,7 @@ import mcjty.lib.setup.*;
 import mcjty.lib.syncpositional.PositionalDataSyncer;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
@@ -20,6 +21,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @Mod(McJtyLib.MODID)
 public class McJtyLib {
@@ -35,8 +38,22 @@ public class McJtyLib {
     public static boolean tesla;
     public static boolean cofhapiitem;
 
+    // @todo cleanup!
+    private static class CommandInfo<T> {
+        private final Class<T> type;
+        private final Function<PacketBuffer, T> deserializer;
+        private final BiConsumer<PacketBuffer, T> serializer;
+
+        public CommandInfo(Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
+            this.type = type;
+            this.deserializer = deserializer;
+            this.serializer = serializer;
+        }
+    }
+
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
+    private static final Map<String, CommandInfo> commandInfos = new HashMap<>();
 
     public static final PositionalDataSyncer SYNCER = new PositionalDataSyncer();
 
@@ -51,6 +68,22 @@ public class McJtyLib {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
+    }
+
+    public static <T> void registerCommandInfo(String command, Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
+        commandInfos.put(command, new CommandInfo<T>(type, deserializer, serializer));
+    }
+
+    public static Class getType(String command) {
+        return commandInfos.get(command).type;
+    }
+
+    public static Function<PacketBuffer, Object> getDeserializer(String command) {
+        return commandInfos.get(command).deserializer;
+    }
+
+    public static BiConsumer<PacketBuffer, Object> getSerializer(String command) {
+        return commandInfos.get(command).serializer;
     }
 
     public static void registerCommand(String modid, String id, IServerCommand command) {

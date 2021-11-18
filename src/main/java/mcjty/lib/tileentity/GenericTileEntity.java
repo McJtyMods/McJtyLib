@@ -24,6 +24,7 @@ import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
@@ -36,12 +37,14 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -52,6 +55,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class GenericTileEntity extends TileEntity {
 
@@ -640,6 +645,24 @@ public class GenericTileEntity extends TileEntity {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Helper command that's useful from within server side packets to return the list to the client
+     */
+    public static <T> void executeServerCommandHelper(String command, ServerPlayerEntity player,
+                                                      BlockPos pos, @Nonnull TypedMap params, Class<T> type,
+                                                      Function<List<T>, Object> packetToClient, SimpleChannel channel) {
+        ServerWorld world = player.getLevel();
+        if (world.hasChunkAt(pos)) {
+            TileEntity te = world.getBlockEntity(pos);
+            if (te instanceof GenericTileEntity) {
+                List<T> list = ((GenericTileEntity) te).executeServerCommandList(command, player, params, type);
+                channel.sendTo(packetToClient.apply(list), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+            } else {
+                Logging.logError("Command '" + command + "' not handled!");
+            }
+        }
     }
 
     /**

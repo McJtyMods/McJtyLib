@@ -42,6 +42,7 @@ public class PacketHandler {
         channel.registerMessage(id++, PacketSendClientCommand.class, PacketSendClientCommand::toBytes, PacketSendClientCommand::new, PacketSendClientCommand::handle);
         channel.registerMessage(id++, PacketDataFromServer.class, PacketDataFromServer::toBytes, PacketDataFromServer::new, PacketDataFromServer::handle);
         channel.registerMessage(id++, PacketFinalizeLogin.class, PacketFinalizeLogin::toBytes, PacketFinalizeLogin::new, PacketFinalizeLogin::handle);
+        channel.registerMessage(id++, PacketSendResultToClient.class, PacketSendResultToClient::toBytes, PacketSendResultToClient::new, PacketSendResultToClient::handle);
     }
 
     // From client side only: send server command
