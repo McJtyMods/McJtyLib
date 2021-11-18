@@ -2,9 +2,11 @@ package mcjty.lib.container;
 
 import mcjty.lib.varia.TriConsumer;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Predicate;
 
@@ -53,6 +55,14 @@ public class SlotDefinition {
 
 
     public static SlotDefinition specific(ItemStack... stacks) {
+        return new SlotDefinition(SlotType.SLOT_SPECIFICITEM, stacks);
+    }
+
+    public static SlotDefinition specific(Item... items) {
+        ItemStack[] stacks = new ItemStack[items.length];
+        for (int i = 0 ; i < items.length ; i++) {
+            stacks[i] = new ItemStack(items[i]);
+        }
         return new SlotDefinition(SlotType.SLOT_SPECIFICITEM, stacks);
     }
 

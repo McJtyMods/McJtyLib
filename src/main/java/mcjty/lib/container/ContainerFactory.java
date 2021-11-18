@@ -113,6 +113,10 @@ public class ContainerFactory {
         return ranges;
     }
 
+    public ContainerFactory slot(SlotDefinition slotDefinition, int index, int x, int y) {
+        return slot(slotDefinition, CONTAINER_CONTAINER, index, x, y);
+    }
+
     public ContainerFactory slot(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y) {
         SlotFactory slotFactory = new SlotFactory(slotDefinition, inventoryName, index, x, y);
         int slotIndex = slots.size();
@@ -137,6 +141,10 @@ public class ContainerFactory {
         return this;
     }
 
+    public ContainerFactory box(SlotDefinition slotDefinition, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
+        return box(slotDefinition, CONTAINER_CONTAINER, index, x, y, horAmount, dx, verAmount, dy);
+    }
+
     public ContainerFactory box(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
         for (int j = 0 ; j < verAmount ; j++) {
             range(slotDefinition, inventoryName, index, x, y, horAmount, dx);
@@ -148,6 +156,10 @@ public class ContainerFactory {
 
     public ContainerFactory box(SlotDefinition slotDefinition, String inventoryName, int index, int x, int y, int horAmount, int verAmount) {
         return box(slotDefinition, inventoryName, index, x, y, horAmount, 18, verAmount, 18);
+    }
+
+    public ContainerFactory box(SlotDefinition slotDefinition, int index, int x, int y, int horAmount, int verAmount) {
+        return box(slotDefinition, CONTAINER_CONTAINER, index, x, y, horAmount, 18, verAmount, 18);
     }
 
     public ContainerFactory playerSlots(int leftCol, int topRow) {
