@@ -33,6 +33,7 @@ public class PacketHandler {
     public static void registerStandardMessages(int id, SimpleChannel channel) {
 
         // Server side
+        channel.registerMessage(id++, PacketGetListFromServer.class, PacketGetListFromServer::toBytes, PacketGetListFromServer::new, PacketGetListFromServer::handle);
         channel.registerMessage(id++, PacketServerCommandTyped.class, PacketServerCommandTyped::toBytes, PacketServerCommandTyped::new, PacketServerCommandTyped::handle);
         channel.registerMessage(id++, PacketSendServerCommand.class, PacketSendServerCommand::toBytes, PacketSendServerCommand::new, PacketSendServerCommand::handle);
         channel.registerMessage(id++, PacketDumpItemInfo.class, PacketDumpItemInfo::toBytes, PacketDumpItemInfo::new, PacketDumpItemInfo::handle);

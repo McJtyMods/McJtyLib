@@ -2,7 +2,10 @@ package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.Logging;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -26,6 +29,9 @@ public class PacketSendResultToClient {
         pos = buf.readBlockPos();
         command = buf.readUtf(32767);
         Function<PacketBuffer, Object> deserializer = McJtyLib.getDeserializer(command);
+        if (deserializer == null) {
+            throw new IllegalStateException("Command '" + command + "' is not registered!");
+        }
         int size = buf.readInt();
         if (size != -1) {
             list = new ArrayList<>(size);
@@ -47,6 +53,9 @@ public class PacketSendResultToClient {
         buf.writeBlockPos(pos);
         buf.writeUtf(command);
         BiConsumer<PacketBuffer, Object> serializer = McJtyLib.getSerializer(command);
+        if (serializer == null) {
+            throw new IllegalStateException("Command '" + command + "' is not registered!");
+        }
         if (list == null) {
             buf.writeInt(-1);
         } else {
@@ -60,7 +69,12 @@ public class PacketSendResultToClient {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            GenericTileEntity.executeClientCommandHelper(pos, command, list);
+            TileEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(pos);
+            if (te instanceof GenericTileEntity) {
+                ((GenericTileEntity) te).executeClientCommandList(command, McJtyLib.proxy.getClientPlayer(), TypedMap.EMPTY, list);
+            } else {
+                Logging.logError("Can't handle command '" + command + "'!");
+            }
         });
         ctx.setPacketHandled(true);
     }

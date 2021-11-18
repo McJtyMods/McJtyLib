@@ -71,6 +71,9 @@ public class McJtyLib {
     }
 
     public static <T> void registerCommandInfo(String command, Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
+        if (commandInfos.containsKey(command)) {
+            throw new IllegalStateException(("The command '" + command + "' is already registered!"));
+        }
         commandInfos.put(command, new CommandInfo<T>(type, deserializer, serializer));
     }
 
