@@ -67,7 +67,7 @@ public class GenericTileEntity extends TileEntity {
     private static final Map<TileEntityType, AnnotationHolder> annotations = new HashMap<>();
 
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
-    // constructor) set to be a function that looks for tne annotations and replaces itself with
+    // constructor) set to be a function that looks for the annotations and replaces itself with
     // a function that does the actual testing
     private BiFunction<Capability, Direction, LazyOptional> capSetup;
 
