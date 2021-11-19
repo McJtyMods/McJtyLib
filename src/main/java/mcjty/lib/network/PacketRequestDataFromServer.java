@@ -1,6 +1,5 @@
 package mcjty.lib.network;
 
-import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.ICommand;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
@@ -19,8 +18,7 @@ import java.util.function.Supplier;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
- * a tile entity on the server side that implements CommandHandler. This will call 'executeWithResultInteger()' on
- * that command handler. A PacketIntegerFromServer will be sent back from the client.
+ * a tile entity on the server that has a ResultCommand annotated with @ServerCommand
  */
 public class PacketRequestDataFromServer {
     protected BlockPos pos;

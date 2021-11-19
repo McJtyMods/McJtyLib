@@ -630,7 +630,9 @@ public class GenericTileEntity extends TileEntity {
     }
 
     /**
-     * Execute a server side command (annotated with @ServerCommand)
+     * Execute a server side command (annotated with @ServerCommand). Note! Do not call this client-side!
+     * This is meant to be called server side. If you want to call this client-side use the
+     * PacketServerCommandTyped packet
      */
     public boolean executeServerCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
         AnnotationHolder holder = getAnnotationHolder();
@@ -643,7 +645,9 @@ public class GenericTileEntity extends TileEntity {
     }
 
     /**
-     * Execute a server side listcommand (annotated with @ServerCommand)
+     * Execute a server side listcommand (annotated with @ServerCommand). Note! Do not call this client-side!
+     * This is meant to be called server side. If you want to call this client-side use the
+     * PacketGetListFromServer packet
      */
     public <T> List<T> executeServerCommandList(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull Class<T> type) {
         AnnotationHolder holder = getAnnotationHolder();
@@ -657,7 +661,7 @@ public class GenericTileEntity extends TileEntity {
     /**
      * Execute a client side command that handles the list sent by the server side ListCommand
      */
-    public <T> boolean executeClientCommandList(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull List<T> list) {
+    public <T> boolean handleListFromServer(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull List<T> list) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnableWithList cmd = holder.clientCommandsWithList.get(command);
         if (cmd != null) {
@@ -668,7 +672,9 @@ public class GenericTileEntity extends TileEntity {
     }
 
     /**
-     * Execute a server side command with a return value (annotated with @ServerCommand)
+     * Execute a server side command with a return value (annotated with @ServerCommand). Note! Do not call this client-side!
+     * This is meant to be called server side. If you want to call this client-side use the
+     * PacketRequestDataFromServer packet
      */
     @Nullable
     public TypedMap executeServerCommandWR(String command, PlayerEntity player, @Nonnull TypedMap params) {

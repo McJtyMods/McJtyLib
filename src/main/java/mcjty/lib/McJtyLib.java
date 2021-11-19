@@ -58,11 +58,14 @@ public class McJtyLib {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
     }
 
+    /**
+     * This is automatically called by annotated ListCommands (@ServerCommand) if they have
+     * an associated type parameter
+     */
     public static <T> void registerCommandInfo(String command, Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
         if (commandInfos.containsKey(command)) {
             throw new IllegalStateException(("The command '" + command + "' is already registered!"));
         }
-        System.out.println("McJtyLib.registerCommandInfo: " + command);
         commandInfos.put(command, new CommandInfo<T>(type, deserializer, serializer));
     }
 
@@ -70,6 +73,9 @@ public class McJtyLib {
         return commandInfos.get(command);
     }
 
+    /**
+     * Used in combination with PacketSendServerCommand for a more global command
+     */
     public static void registerCommand(String modid, String id, IServerCommand command) {
         serverCommands.put(Pair.of(modid, id), command);
     }

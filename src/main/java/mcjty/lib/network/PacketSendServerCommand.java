@@ -9,7 +9,10 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
-@SuppressWarnings("PackageVisibleField")
+/**
+ * Send a packet from the client to the server in order to execute a server side command
+ * registered with McJtyLib.registerCommand()
+ */
 public class PacketSendServerCommand {
 
     // Package visible for unit tests
