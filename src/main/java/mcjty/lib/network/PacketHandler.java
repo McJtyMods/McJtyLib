@@ -28,6 +28,7 @@ public class PacketHandler {
         channel.registerMessage(startIndex++, PacketOpenManual.class, PacketOpenManual::toBytes, PacketOpenManual::new, PacketOpenManual::handle);
         channel.registerMessage(startIndex++, PacketContainerDataToClient.class, PacketContainerDataToClient::toBytes, PacketContainerDataToClient::new, PacketContainerDataToClient::handle);
         channel.registerMessage(startIndex++, PacketSendPositionalDataToClients.class, PacketSendPositionalDataToClients::toBytes, PacketSendPositionalDataToClients::new, PacketSendPositionalDataToClients::handle);
+        channel.registerMessage(startIndex++, PacketSendResultToClient.class, PacketSendResultToClient::toBytes, PacketSendResultToClient::new, PacketSendResultToClient::handle);
     }
 
     public static void registerStandardMessages(int id, SimpleChannel channel) {
@@ -43,7 +44,6 @@ public class PacketHandler {
         channel.registerMessage(id++, PacketSendClientCommand.class, PacketSendClientCommand::toBytes, PacketSendClientCommand::new, PacketSendClientCommand::handle);
         channel.registerMessage(id++, PacketDataFromServer.class, PacketDataFromServer::toBytes, PacketDataFromServer::new, PacketDataFromServer::handle);
         channel.registerMessage(id++, PacketFinalizeLogin.class, PacketFinalizeLogin::toBytes, PacketFinalizeLogin::new, PacketFinalizeLogin::handle);
-        channel.registerMessage(id++, PacketSendResultToClient.class, PacketSendResultToClient::toBytes, PacketSendResultToClient::new, PacketSendResultToClient::handle);
     }
 
     // From client side only: send server command
