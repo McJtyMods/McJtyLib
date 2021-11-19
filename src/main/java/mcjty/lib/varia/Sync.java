@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.api.container.IContainerDataListener;
-import mcjty.lib.bindings.IValue;
+import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 import net.minecraft.network.PacketBuffer;
@@ -32,7 +32,7 @@ public class Sync {
 
             private void copyToOld() {
                 oldValues.clear();
-                for (IValue value : te.getValueMap().values()) {
+                for (ValueHolder value : te.getValueMap().values()) {
                     Object v = value.getter().apply(te);
                     oldValues.put(value.getKey(), v);
                 }
@@ -40,7 +40,7 @@ public class Sync {
 
             @Override
             public boolean isDirtyAndClear() {
-                for (IValue value : te.getValueMap().values()) {
+                for (ValueHolder value : te.getValueMap().values()) {
                     Object v = value.getter().apply(te);
                     Key<?> key = value.getKey();
                     if (!oldValues.containsKey(key) || !Objects.equals(oldValues.get(key), v)) {
@@ -54,7 +54,7 @@ public class Sync {
 
             @Override
             public void toBytes(PacketBuffer buf) {
-                for (IValue value : te.getValueMap().values()) {
+                for (ValueHolder value : te.getValueMap().values()) {
                     Object v = value.getter().apply(te);
                     value.getKey().getType().serialize(buf, v);
                 }
@@ -62,7 +62,7 @@ public class Sync {
 
             @Override
             public void readBuf(PacketBuffer buf) {
-                for (IValue value : te.getValueMap().values()) {
+                for (ValueHolder value : te.getValueMap().values()) {
                     value.getKey().getType().deserialize(buf, value, te);
                 }
             }

@@ -1,6 +1,6 @@
 package mcjty.lib.typed;
 
-import mcjty.lib.bindings.IValue;
+import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.network.NetworkTools;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LevelTools;
@@ -66,7 +66,7 @@ public final class Type<V> {
         serializer.accept((V) value, buf);
     }
 
-    public <T extends GenericTileEntity> void deserialize(PacketBuffer buf, IValue<T, V> value, T te) {
+    public <T extends GenericTileEntity> void deserialize(PacketBuffer buf, ValueHolder<T, V> value, T te) {
         V v = deserializer.apply(buf);
         value.setter().accept(te, v);
     }

@@ -1,6 +1,5 @@
 package mcjty.lib.tileentity;
 
-import mcjty.lib.bindings.IValue;
 import mcjty.lib.blockcommands.IRunnable;
 import mcjty.lib.blockcommands.IRunnableWithList;
 import mcjty.lib.blockcommands.IRunnableWithListResult;
@@ -15,5 +14,5 @@ class AnnotationHolder {
     final Map<String, IRunnable<?>> clientCommands = new HashMap<>();
     final Map<String, IRunnableWithListResult<?, ?>> serverCommandsWithListResult = new HashMap<>();
     final Map<String, IRunnableWithList<?, ?>> clientCommandsWithList = new HashMap<>();
-    final Map<String, IValue<?, ?>> valueMap = new HashMap<>();
+    final Map<String, ValueHolder<?, ?>> valueMap = new HashMap<>();
 }

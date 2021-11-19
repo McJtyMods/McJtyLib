@@ -2,7 +2,7 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.McJtyLib;
-import mcjty.lib.bindings.IValue;
+import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.IRunnable;
 import mcjty.lib.gui.events.ChannelEvent;
@@ -406,9 +406,9 @@ public class Window {
     }
 
     public <T extends GenericTileEntity> Window bind(SimpleChannel network, String componentName, T te, String keyName) {
-        Map<String, IValue<?, ?>> valueMap = te.getValueMap();
+        Map<String, ValueHolder<?, ?>> valueMap = te.getValueMap();
         if (valueMap.containsKey(keyName)) {
-            IValue<?, ?> value = valueMap.get(keyName);
+            ValueHolder<?, ?> value = valueMap.get(keyName);
             initializeBinding(network, te.getDimension(), componentName, te, value);
             return this;
         }
@@ -417,7 +417,7 @@ public class Window {
         return this;
     }
 
-    private <T extends GenericTileEntity, V> void initializeBinding(SimpleChannel network, @Nonnull RegistryKey<World> dimensionType, String componentName, T te, IValue value) {
+    private <T extends GenericTileEntity, V> void initializeBinding(SimpleChannel network, @Nonnull RegistryKey<World> dimensionType, String componentName, T te, ValueHolder value) {
         V v = (V) value.getter().apply(te);
         Widget<?> component = findChild(componentName);
 
