@@ -32,16 +32,16 @@ public class Sync {
 
             private void copyToOld() {
                 oldValues.clear();
-                for (IValue<?> value : te.getValueMap().values()) {
-                    Object v = value.getter().get();
+                for (IValue value : te.getValueMap().values()) {
+                    Object v = value.getter().apply(te);
                     oldValues.put(value.getKey(), v);
                 }
             }
 
             @Override
             public boolean isDirtyAndClear() {
-                for (IValue<?> value : te.getValueMap().values()) {
-                    Object v = value.getter().get();
+                for (IValue value : te.getValueMap().values()) {
+                    Object v = value.getter().apply(te);
                     Key<?> key = value.getKey();
                     if (!oldValues.containsKey(key) || !Objects.equals(oldValues.get(key), v)) {
                         // Dirty
@@ -54,8 +54,8 @@ public class Sync {
 
             @Override
             public void toBytes(PacketBuffer buf) {
-                for (IValue<?> value : te.getValueMap().values()) {
-                    Object v = value.getter().get();
+                for (IValue value : te.getValueMap().values()) {
+                    Object v = value.getter().apply(te);
                     value.getKey().getType().serialize(buf, v);
                 }
             }
@@ -63,7 +63,7 @@ public class Sync {
             @Override
             public void readBuf(PacketBuffer buf) {
                 for (IValue value : te.getValueMap().values()) {
-                    value.getKey().getType().deserialize(buf, value);
+                    value.getKey().getType().deserialize(buf, value, te);
                 }
             }
         };

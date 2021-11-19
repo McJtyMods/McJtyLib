@@ -98,8 +98,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     public ImageChoiceLabel choice(String choice, String tooltips, ResourceLocation image, int u, int v) {
         choiceList.add(new ChoiceEntry(choice, Arrays.asList(StringUtils.split(tooltips, "\n")), image, u, v));
         if (currentChoice == -1) {
-            currentChoice = 0;
-            setCurrentChoice(currentChoice);
+            setCurrentChoice(0);
         }
         return this;
     }

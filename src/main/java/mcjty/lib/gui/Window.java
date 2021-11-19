@@ -406,11 +406,10 @@ public class Window {
     }
 
     public <T extends GenericTileEntity> Window bind(SimpleChannel network, String componentName, T te, String keyName) {
-        Map<String, IValue<?>> valueMap = te.getValueMap();
+        Map<String, IValue<?, ?>> valueMap = te.getValueMap();
         if (valueMap.containsKey(keyName)) {
-            IValue<?> value = valueMap.get(keyName);
-            Key<?> key = value.getKey();
-            initializeBinding(network, te.getDimension(), componentName, value);
+            IValue<?, ?> value = valueMap.get(keyName);
+            initializeBinding(network, te.getDimension(), componentName, te, value);
             return this;
         }
 
@@ -418,8 +417,8 @@ public class Window {
         return this;
     }
 
-    private <V> void initializeBinding(SimpleChannel network, @Nonnull RegistryKey<World> dimensionType, String componentName, IValue<V> value) {
-        V v = value.getter().get();
+    private <T extends GenericTileEntity, V> void initializeBinding(SimpleChannel network, @Nonnull RegistryKey<World> dimensionType, String componentName, T te, IValue value) {
+        V v = (V) value.getter().apply(te);
         Widget<?> component = findChild(componentName);
 
         if (component == null) {
@@ -431,7 +430,7 @@ public class Window {
         event(componentName, (source, params) -> {
             Type<V> type = value.getKey().getType();
             GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
-            guiContainer.sendServerCommandTyped(network, dimensionType, guiContainer.tileEntity.COMMAND_SYNC_BINDING.getName(),
+            guiContainer.sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING.getName(),
                     TypedMap.builder()
                             // @todo this conversion can fail!
                             .put(value.getKey(), type.convert(component.getGenericValue(type)))

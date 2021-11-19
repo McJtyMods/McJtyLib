@@ -1,17 +1,18 @@
 package mcjty.lib.bindings;
 
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
-public class DefaultValue<V> implements IValue<V> {
+public class DefaultValue<T extends GenericTileEntity, V> implements IValue<T, V> {
 
     private final Key<V> key;
-    private final Supplier<V> getter;
-    private final Consumer<V> setter;
+    private final Function<T, V> getter;
+    private final BiConsumer<T, V> setter;
 
-    public DefaultValue(Key<V> key, Supplier<V> getter, Consumer<V> setter) {
+    public DefaultValue(Key<V> key, Function<T, V> getter, BiConsumer<T, V> setter) {
         this.key = key;
         this.getter = getter;
         this.setter = setter;
@@ -23,12 +24,12 @@ public class DefaultValue<V> implements IValue<V> {
     }
 
     @Override
-    public Supplier<V> getter() {
+    public Function<T, V> getter() {
         return getter;
     }
 
     @Override
-    public Consumer<V> setter() {
+    public BiConsumer<T, V> setter() {
         return setter;
     }
 }

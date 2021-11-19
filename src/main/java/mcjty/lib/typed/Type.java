@@ -2,6 +2,7 @@ package mcjty.lib.typed;
 
 import mcjty.lib.bindings.IValue;
 import mcjty.lib.network.NetworkTools;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LevelTools;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -65,9 +66,9 @@ public final class Type<V> {
         serializer.accept((V) value, buf);
     }
 
-    public void deserialize(PacketBuffer buf, IValue<V> value) {
+    public <T extends GenericTileEntity> void deserialize(PacketBuffer buf, IValue<T, V> value, T te) {
         V v = deserializer.apply(buf);
-        value.setter().accept(v);
+        value.setter().accept(te, v);
     }
 
     @Nullable

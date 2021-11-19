@@ -7,8 +7,8 @@ import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.bindings.DefaultValue;
-import mcjty.lib.bindings.IValue;
 import mcjty.lib.bindings.GuiValue;
+import mcjty.lib.bindings.IValue;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
@@ -50,8 +50,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 public class GenericTileEntity extends TileEntity {
 
@@ -191,7 +191,7 @@ public class GenericTileEntity extends TileEntity {
         }
     }
 
-    public Map<String, IValue<?>> getValueMap() {
+    public Map<String, IValue<?, ?>> getValueMap() {
         AnnotationHolder holder = getAnnotationHolder();
         return holder.valueMap;
     }
@@ -585,9 +585,9 @@ public class GenericTileEntity extends TileEntity {
         return false;
     }
 
-    private <V> Consumer<V> findSetter(Key<V> key) {
+    private <T extends GenericTileEntity, V> BiConsumer<T, V> findSetter(Key<V> key) {
         // Cache or use Map?
-        for (Map.Entry<String, IValue<?>> entry : getValueMap().entrySet()) {
+        for (Map.Entry<String, IValue<?, ?>> entry : getValueMap().entrySet()) {
             IValue value = entry.getValue();
             if (key.getName().equals(value.getKey().getName())) {
                 return value.setter();
@@ -719,13 +719,13 @@ public class GenericTileEntity extends TileEntity {
                 GuiValue val = field.getAnnotation(GuiValue.class);
                 try {
                     Value value = (Value) field.get(this);
-                    holder.valueMap.put(value.getKey().getName(), new DefaultValue<>(value.getKey(), () -> value.getSupplier().apply(this), o -> value.getConsumer().accept(this, o)));
+                    holder.valueMap.put(value.getKey().getName(), new DefaultValue<>(value.getKey(), te -> value.getSupplier().apply(te), (te, o) -> value.getConsumer().accept(te, o)));
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
             }
             if (needsRedstoneMode()) {
-                holder.valueMap.put(VALUE_RSMODE.getName(), new DefaultValue<>(VALUE_RSMODE, this::getRSModeInt, this::setRSModeInt));
+                holder.valueMap.put(VALUE_RSMODE.getName(), new DefaultValue<>(VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
             }
         }
         return holder;
@@ -762,7 +762,7 @@ public class GenericTileEntity extends TileEntity {
 
     private <T> void syncBindingHelper(TypedMap params, Key<T> bkey) {
         T o = params.get(bkey);
-        findSetter(bkey).accept(o);
+        findSetter(bkey).accept(this, o);
     }
 
     private void syncBinding(TypedMap params) {

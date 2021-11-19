@@ -15,5 +15,5 @@ class AnnotationHolder {
     final Map<String, IRunnable<?>> clientCommands = new HashMap<>();
     final Map<String, IRunnableWithListResult<?, ?>> serverCommandsWithListResult = new HashMap<>();
     final Map<String, IRunnableWithList<?, ?>> clientCommandsWithList = new HashMap<>();
-    final Map<String, IValue<?>> valueMap = new HashMap<>();
+    final Map<String, IValue<?, ?>> valueMap = new HashMap<>();
 }
