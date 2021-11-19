@@ -75,10 +75,10 @@ public class PacketGetListFromServer {
                 TileEntity te = world.getBlockEntity(pos);
                 if (te instanceof GenericTileEntity) {
                     CommandInfo<?> info = McJtyLib.getCommandInfo(command);
-                    Class type = info.getType();
-                    if (type == null) {
+                    if (info == null) {
                         throw new IllegalStateException("Command '" + command + "' is not registered!");
                     }
+                    Class type = info.getType();
                     List list = ((GenericTileEntity) te).executeServerCommandList(command, player, params, type);
                     McJtyLib.networkHandler.sendTo(new PacketSendResultToClient(pos, command, list), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                 } else {

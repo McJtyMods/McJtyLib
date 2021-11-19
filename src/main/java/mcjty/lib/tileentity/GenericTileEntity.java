@@ -78,6 +78,8 @@ public class GenericTileEntity extends TileEntity {
             capSetup = generateCapTests(caps, 0);
             return capSetup.apply(cap, dir);
         };
+        // Make sure the annotation holder exists
+        getAnnotationHolder();
     }
 
     private BiFunction<Capability, Direction, LazyOptional> generateCapTests(Field[] caps, int index) {
@@ -680,57 +682,62 @@ public class GenericTileEntity extends TileEntity {
 
     private AnnotationHolder getAnnotationHolder() {
         AnnotationHolder holder = annotations.get(getType());
-
         if (holder == null) {
-            holder = new AnnotationHolder();
-            annotations.put(getType(), holder);
-            Field[] commandFields = FieldUtils.getFieldsWithAnnotation(getClass(), ServerCommand.class);
-            for (Field field : commandFields) {
-                ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
-                try {
-                    Object o = field.get(this);
-                    if (o instanceof Command) {
-                        Command cmd = (Command) o;
-                        holder.serverCommands.put(cmd.getName(), cmd.getCmd());
-                    } else if (o instanceof ResultCommand) {
-                        ResultCommand cmd = (ResultCommand) o;
-                        holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmd());
-                        holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
-                    } else if (o instanceof ListCommand) {
-                        ListCommand cmd = (ListCommand) o;
-                        holder.serverCommandsWithListResult.put(cmd.getName(), cmd.getCmd());
-                        holder.clientCommandsWithList.put(cmd.getName(), cmd.getClientCommand());
-                        if (serverCommand.type() != void.class) {
-                            ISerializer instance = getSerializer(serverCommand);
-                            McJtyLib.registerCommandInfo(cmd.getName(), serverCommand.type(), instance.getDeserializer(), instance.getSerializer());
-                        }
-                    } else {
-                        throw new IllegalStateException("Only use @ServerCommand with either a Command, a ListCommand or a ResultCommand!");
-                    }
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            Field[] valFields = FieldUtils.getFieldsWithAnnotation(getClass(), GuiValue.class);
-            for (Field field : valFields) {
-                GuiValue val = field.getAnnotation(GuiValue.class);
-                try {
-                    Value value = (Value) field.get(this);
-                    holder.valueMap.put(value.getKey().getName(), new ValueHolder<>(value.getKey(), te -> value.getSupplier().apply(te), (te, o) -> value.getConsumer().accept(te, o)));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            if (needsRedstoneMode()) {
-                holder.valueMap.put(VALUE_RSMODE.getName(), new ValueHolder<>(VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
-            }
+            holder = createAnnotationHolder(getType(), getClass());
         }
         return holder;
     }
 
+    private static AnnotationHolder createAnnotationHolder(TileEntityType type, Class<? extends GenericTileEntity> clazz) {
+        AnnotationHolder holder;
+        holder = new AnnotationHolder();
+        annotations.put(type, holder);
+        Field[] commandFields = FieldUtils.getFieldsWithAnnotation(clazz, ServerCommand.class);
+        for (Field field : commandFields) {
+            ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
+            try {
+                Object o = field.get(null);
+                if (o instanceof Command) {
+                    Command cmd = (Command) o;
+                    holder.serverCommands.put(cmd.getName(), cmd.getCmd());
+                } else if (o instanceof ResultCommand) {
+                    ResultCommand cmd = (ResultCommand) o;
+                    holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmd());
+                    holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
+                } else if (o instanceof ListCommand) {
+                    ListCommand cmd = (ListCommand) o;
+                    holder.serverCommandsWithListResult.put(cmd.getName(), cmd.getCmd());
+                    holder.clientCommandsWithList.put(cmd.getName(), cmd.getClientCommand());
+                    if (serverCommand.type() != void.class) {
+                        ISerializer instance = getSerializer(serverCommand);
+                        McJtyLib.registerCommandInfo(cmd.getName(), serverCommand.type(), instance.getDeserializer(), instance.getSerializer());
+                    }
+                } else {
+                    throw new IllegalStateException("Only use @ServerCommand with either a Command, a ListCommand or a ResultCommand!");
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        Field[] valFields = FieldUtils.getFieldsWithAnnotation(clazz, GuiValue.class);
+        for (Field field : valFields) {
+            GuiValue val = field.getAnnotation(GuiValue.class);
+            try {
+                Value value = (Value) field.get(null);
+                holder.valueMap.put(value.getKey().getName(), new ValueHolder<>(value.getKey(), te -> value.getSupplier().apply(te), (te, o) -> value.getConsumer().accept(te, o)));
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+//        if (needsRedstoneMode()) {
+            holder.valueMap.put(VALUE_RSMODE.getName(), new ValueHolder<>(VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
+//        }
+        return holder;
+    }
+
     @Nonnull
-    private ISerializer getSerializer(ServerCommand serverCommand) throws IllegalAccessException {
+    private static ISerializer getSerializer(ServerCommand serverCommand) throws IllegalAccessException {
         if (serverCommand.type() == Integer.class) {
             return new ISerializer.IntegerSerializer();
         } else if (serverCommand.type() == String.class) {

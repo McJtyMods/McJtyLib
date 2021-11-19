@@ -62,6 +62,7 @@ public class McJtyLib {
         if (commandInfos.containsKey(command)) {
             throw new IllegalStateException(("The command '" + command + "' is already registered!"));
         }
+        System.out.println("McJtyLib.registerCommandInfo: " + command);
         commandInfos.put(command, new CommandInfo<T>(type, deserializer, serializer));
     }
 
