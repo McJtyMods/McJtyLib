@@ -320,24 +320,15 @@ public class GenericTileEntity extends TileEntity {
     }
 
     /**
-     * For compatibility reasons this calls write() but for
-     * efficiency reasons you should override this in your tile
-     * entity to only write what you need on the client.
-     *
-     * @param tagCompound
+     * Override to write only the data you need on the client
      */
     public void writeClientDataToNBT(CompoundNBT tagCompound) {
     }
 
     /**
-     * For compatibility reasons this calls read() but for
-     * efficiency reasons you should override this in your tile
-     * entity to only read what you need on the client.
-     *
-     * @param tagCompound
+     * Override to read only the data you need on the client
      */
     public void readClientDataFromNBT(CompoundNBT tagCompound) {
-        read(tagCompound);  // @TEST IF THIS IS REALLY NEEDED
     }
 
     /**

@@ -1,5 +1,6 @@
 package mcjty.lib.api.container;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.sync.GuiSyncScanner;
 import mcjty.lib.sync.SyncToGui;
@@ -12,6 +13,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.util.IntReferenceHolder;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.items.IItemHandler;
@@ -23,6 +25,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -78,6 +81,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     }
 
     public DefaultContainerProvider<C> setupSync(GenericTileEntity te) {
+        AtomicInteger idx = new AtomicInteger();
         GuiSyncScanner.scan(te.getClass(), te, (guiSync, field) -> {
             SyncType type = guiSync.type();
             if (type == SyncType.AUTOMATIC) {
@@ -93,6 +97,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
                     addSyncIntegerListener(te, field);
                     break;
                 case STRING:
+                    addSyncStringListener(te, idx, field);
                     break;
                 case BOOL:
                     addSyncBoolListener(te, field);
@@ -125,6 +130,22 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
             return SyncType.STRING;
         }
         throw new RuntimeException("Can't guess type for field " + field.getName() + "!");
+    }
+
+    private void addSyncStringListener(GenericTileEntity te, AtomicInteger idx, Field field) {
+        dataListener(Sync.string(new ResourceLocation(McJtyLib.MODID, "s" + idx.getAndIncrement()), () -> {
+            try {
+                return (String) FieldUtils.readField(field, te, true);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Error accessing field", e);
+            }
+        }, s -> {
+            try {
+                FieldUtils.writeField(field, te, s, true);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Error accessing field", e);
+            }
+        }));
     }
 
     private void addSyncEnumListener(GenericTileEntity te, SyncToGui guiSync, Field field) {
