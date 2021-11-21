@@ -188,14 +188,17 @@ public class IntegerField extends AbstractWidget<IntegerField> {
         if (isEnabledAndVisible() && editable) {
             if (isRegionSelected()) {
                 replaceSelectedRegion(Character.toString(codePoint));
+                cursor++;
+                fireIntegerEvents(getInt());
+                return true;
             } else {
                 if (Character.isDigit(codePoint) || codePoint == '-') {
                     text = text.substring(0, cursor) + codePoint + text.substring(cursor);
+                    cursor++;
+                    fireIntegerEvents(getInt());
+                    return true;
                 }
             }
-            cursor++;
-            fireIntegerEvents(getInt());
-            return true;
         }
         return false;
     }
@@ -206,6 +209,9 @@ public class IntegerField extends AbstractWidget<IntegerField> {
     }
 
     private void ensureVisible() {
+        if (cursor > text.length()) {
+            cursor = text.length();
+        }
         if (cursor < startOffset) {
             startOffset = cursor;
         } else {
