@@ -446,9 +446,7 @@ public class GenericTileEntity extends TileEntity {
 
     protected void writeInfo(CompoundNBT tagCompound) {
         CompoundNBT infoTag = getOrCreateInfo(tagCompound);
-        if (powerLevel > 0) {
-            infoTag.putByte("powered", (byte) powerLevel);
-        }
+        infoTag.putByte("powered", (byte) powerLevel);
         if (needsRedstoneMode()) {
             infoTag.putByte("rsMode", (byte) rsMode.ordinal());
         }
