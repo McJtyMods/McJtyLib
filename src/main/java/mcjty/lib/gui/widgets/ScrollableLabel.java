@@ -99,6 +99,9 @@ public class ScrollableLabel extends AbstractLabel<ScrollableLabel> implements S
 
     @Override
     public void setFirstSelected(int first) {
+        if (this.first == first) {
+            return;
+        }
         this.first = first;
         text(getRealValue() + suffix);
         fireValueEvents(getRealValue());

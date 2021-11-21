@@ -2,7 +2,6 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import mcjty.lib.McJtyLib;
-import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.IRunnable;
 import mcjty.lib.gui.events.ChannelEvent;
@@ -13,6 +12,7 @@ import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * This class represents a window. It contains a single Widget which
@@ -50,6 +51,7 @@ public class Window {
     private WindowManager windowManager;
 
     private final Map<String, List<ChannelEvent>> channelEvents = new HashMap<>();
+    private final Map<Widget, Function> bindings = new HashMap<>();
     private Set<Integer> activeFlags = new HashSet<>();
 
     private List<FocusEvent> focusEvents = null;
@@ -273,6 +275,10 @@ public class Window {
         return windowCmd;
     }
 
+    public <T extends GenericTileEntity> void syncBindings(T te) {
+        bindings.entrySet().stream().forEach(entry -> entry.getKey().setGenericValue(entry.getValue().apply(te)));
+    }
+
     public void draw(MatrixStack matrixStack) {
         int x = getRelativeX();
         int y = getRelativeY();
@@ -426,6 +432,7 @@ public class Window {
             return;
         }
         component.setGenericValue(v);
+        bindings.put(component, value.getter());
 
         event(componentName, (source, params) -> {
             Type<V> type = value.getKey().getType();

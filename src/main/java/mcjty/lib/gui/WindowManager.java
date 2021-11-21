@@ -5,6 +5,7 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.client.GuiTools;
+import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
@@ -84,6 +85,11 @@ public class WindowManager {
 
     public int getMouseWheel() {
         return mouseWheel;
+    }
+
+    public <T extends GenericTileEntity> void syncBindings(T te) {
+        windows.stream().forEach(window -> window.syncBindings(te));
+        modalWindows.stream().forEach(window -> window.syncBindings(te));
     }
 
     public void draw(MatrixStack matrixStack) {

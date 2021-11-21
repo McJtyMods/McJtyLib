@@ -252,6 +252,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             return;
         }
         renderBackground(matrixStack);
+        getWindowManager().syncBindings(tileEntity);
         getWindowManager().draw(matrixStack);
     }
 
