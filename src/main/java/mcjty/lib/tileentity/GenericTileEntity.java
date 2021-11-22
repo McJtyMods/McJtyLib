@@ -762,6 +762,8 @@ public class GenericTileEntity extends TileEntity {
 
     private <T> void syncBindingHelper(TypedMap params, Key<T> bkey) {
         T o = params.get(bkey);
+        // DELAYDBG
+        System.out.println("syncBindingHelper: key=" + bkey.getName() + ", val=" + o.toString());
         findSetter(bkey).accept(this, o);
     }
 

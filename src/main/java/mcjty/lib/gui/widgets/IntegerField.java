@@ -60,8 +60,12 @@ public class IntegerField extends AbstractWidget<IntegerField> {
         if (getInt() == value) {
             return this;
         }
+        // DELAYDBG
+        System.out.println("integer: old="+this.text+ ", new=" + value + ", cursor=" + cursor);
         this.text = Integer.toString(value);
-        cursor = text.length();
+        if (cursor > text.length()) {
+            cursor = text.length();
+        }
         if (startOffset >= cursor) {
             startOffset = cursor - 1;
             if (startOffset < 0) {
@@ -194,6 +198,8 @@ public class IntegerField extends AbstractWidget<IntegerField> {
             } else {
                 if (Character.isDigit(codePoint) || codePoint == '-') {
                     text = text.substring(0, cursor) + codePoint + text.substring(cursor);
+                    // DELAYDBG
+                    System.out.println("charTyped: new=" + text + ", cursor=" + cursor);
                     cursor++;
                     fireIntegerEvents(getInt());
                     return true;
