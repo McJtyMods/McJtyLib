@@ -705,7 +705,7 @@ public class GenericTileEntity extends TileEntity {
                     holder.clientCommandsWithList.put(cmd.getName(), cmd.getClientCommand());
                     if (serverCommand.type() != void.class) {
                         ISerializer instance = getSerializer(serverCommand);
-                        McJtyLib.registerCommandInfo(cmd.getName(), serverCommand.type(), instance.getDeserializer(), instance.getSerializer());
+                        McJtyLib.registerListCommandInfo(cmd.getName(), serverCommand.type(), instance.getDeserializer(), instance.getSerializer());
                     }
                 } else {
                     throw new IllegalStateException("Only use @ServerCommand with either a Command, a ListCommand or a ResultCommand!");
@@ -762,8 +762,6 @@ public class GenericTileEntity extends TileEntity {
 
     private <T> void syncBindingHelper(TypedMap params, Key<T> bkey) {
         T o = params.get(bkey);
-        // DELAYDBG
-        System.out.println("syncBindingHelper: key=" + bkey.getName() + ", val=" + o.toString());
         findSetter(bkey).accept(this, o);
     }
 

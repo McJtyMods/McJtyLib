@@ -423,7 +423,8 @@ public class Window {
         return this;
     }
 
-    private <T extends GenericTileEntity, V> void initializeBinding(SimpleChannel network, @Nonnull RegistryKey<World> dimensionType, String componentName, T te, ValueHolder value) {
+    private <T extends GenericTileEntity, V> void initializeBinding(SimpleChannel network, @Nonnull RegistryKey<World> dimensionType, String componentName,
+                                                                    T te, ValueHolder value) {
         V v = (V) value.getter().apply(te);
         Widget<?> component = findChild(componentName);
 
@@ -436,11 +437,16 @@ public class Window {
 
         event(componentName, (source, params) -> {
             Type<V> type = value.getKey().getType();
+            // @todo this conversion can fail!
+            V converted = type.convert(component.getGenericValue(type));
+
+            // Set client-side
+            value.setter().accept(te, converted);
+
             GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
             guiContainer.sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING.getName(),
                     TypedMap.builder()
-                            // @todo this conversion can fail!
-                            .put(value.getKey(), type.convert(component.getGenericValue(type)))
+                            .put(value.getKey(), converted)
                             .build());
 
         });

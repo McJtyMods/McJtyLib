@@ -1,5 +1,7 @@
 package mcjty.lib.varia;
 
+import java.util.Objects;
+
 /**
  * Implement this for an enum with names and descriptions. Used
  * inside gui's for example.
@@ -14,7 +16,7 @@ public interface NamedEnum {
 
     public static <T extends NamedEnum> T getEnumByName(String name, T[] values) {
         for (T value : values) {
-            if (name.equals(value.getName())) {
+            if (Objects.equals(name, value.getName())) {
                 return value;
             }
         }

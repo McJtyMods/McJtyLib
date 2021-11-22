@@ -62,7 +62,7 @@ public class McJtyLib {
      * This is automatically called by annotated ListCommands (@ServerCommand) if they have
      * an associated type parameter
      */
-    public static <T> void registerCommandInfo(String command, Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
+    public static <T> void registerListCommandInfo(String command, Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
         if (commandInfos.containsKey(command)) {
             throw new IllegalStateException(("The command '" + command + "' is already registered!"));
         }

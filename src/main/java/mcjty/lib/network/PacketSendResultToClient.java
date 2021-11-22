@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 
 /**
  * Packet to send back the list to the client. This requires
- * that the command is registered to McJtyLib.registerCommandInfo
+ * that the command is registered to McJtyLib.registerListCommandInfo
  */
 public class PacketSendResultToClient {
 

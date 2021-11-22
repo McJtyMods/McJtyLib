@@ -194,6 +194,8 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
             choice(choiceList.get((Integer) value));
         } else if (value instanceof Boolean) {
             choice(choiceList.get(((Boolean) value) ? 1 : 0));
+        } else if (value instanceof String) {
+            choice((String) value);
         } else {
             super.setGenericValue(value);
         }
@@ -205,6 +207,8 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
             return choiceList.indexOf(getCurrentChoice());
         } else if (Type.BOOLEAN.equals(type)) {
             return choiceList.indexOf(getCurrentChoice()) != 0;
+        } else if (Type.STRING.equals(type)) {
+            return getCurrentChoice();
         }
         return getCurrentChoice();
     }

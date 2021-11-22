@@ -12,12 +12,12 @@ import java.lang.annotation.*;
 public @interface ServerCommand {
 
     /**
-     * Optionally specify a class. If this is specified then this command will be registered using McJtyLib.registerCommandInfo()
+     * Optionally specify a class. If this is specified then this command will be registered using McJtyLib.registerListCommandInfo()
      */
     Class type() default void.class;
 
     /**
-     * Specify the serializer to use for McJtyLib.registerCommandInfo().
+     * Specify the serializer to use for McJtyLib.registerListCommandInfo().
      * This is required except for these types: ItemStack, FluidStack, BlockPos, Integer, String
      */
     Class<? extends ISerializer> serializer() default ISerializer.class;
