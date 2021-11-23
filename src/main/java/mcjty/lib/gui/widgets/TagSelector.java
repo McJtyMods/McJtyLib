@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screen.Screen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import static mcjty.lib.gui.TagSelectorWindow.TYPE_ITEM;
@@ -36,7 +37,7 @@ public class TagSelector extends AbstractLabel<TagSelector> {
     }
 
     public TagSelector current(String tag) {
-        if (currentTag.equals(tag)) {
+        if (Objects.equals(currentTag, tag)) {
             return this;
         }
         currentTag = tag;
