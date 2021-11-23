@@ -6,7 +6,7 @@ import java.util.Objects;
  * Implement this for an enum with names and descriptions. Used
  * inside gui's for example.
  */
-public interface NamedEnum {
+public interface NamedEnum<T extends NamedEnum> {
 
     /// Used for displaying on the combo button
     String getName();
@@ -14,7 +14,7 @@ public interface NamedEnum {
     /// Used as the tooltip
     String[] getDescription();
 
-    public static <T extends NamedEnum> T getEnumByName(String name, T[] values) {
+    static <T extends NamedEnum<T>> T getEnumByName(String name, T[] values) {
         for (T value : values) {
             if (Objects.equals(name, value.getName())) {
                 return value;
