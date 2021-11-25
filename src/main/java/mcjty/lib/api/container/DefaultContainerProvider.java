@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,11 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
 
     public DefaultContainerProvider<C> containerSupplier(BiFunction<Integer, PlayerEntity, C> containerSupplier) {
         this.containerSupplier = containerSupplier;
+        return this;
+    }
+
+    public DefaultContainerProvider<C> containerSupplier(Function<Integer, C> containerSupplier) {
+        this.containerSupplier = (windowId, playerEntity) -> containerSupplier.apply(windowId);
         return this;
     }
 
