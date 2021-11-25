@@ -37,6 +37,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Generic container support
@@ -54,6 +55,13 @@ public class GenericContainer extends Container implements IGenericContainer {
         super(type, id);
         this.factory = factory;
         this.pos = pos;
+        this.te = te;
+    }
+
+    public GenericContainer(@Nonnull Supplier<ContainerType<GenericContainer>> type, int id, @Nonnull Supplier<ContainerFactory> factory, @Nullable GenericTileEntity te) {
+        super(type.get(), id);
+        this.factory = factory.get();
+        this.pos = te.getBlockPos();
         this.te = te;
     }
 
