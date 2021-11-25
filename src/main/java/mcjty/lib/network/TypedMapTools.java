@@ -26,6 +26,7 @@ public class TypedMapTools {
             registerMapping(Type.DIMENSION_TYPE, ArgumentType.TYPE_DIMENSION_TYPE);
             registerMapping(Type.BOOLEAN, ArgumentType.TYPE_BOOLEAN);
             registerMapping(Type.DOUBLE, ArgumentType.TYPE_DOUBLE);
+            registerMapping(Type.FLOAT, ArgumentType.TYPE_FLOAT);
             registerMapping(Type.ITEMSTACK, ArgumentType.TYPE_STACK);
             registerMapping(Type.LONG, ArgumentType.TYPE_LONG);
             registerMapping(Type.STRING_LIST, ArgumentType.TYPE_STRING_LIST);
@@ -68,6 +69,9 @@ public class TypedMapTools {
                         break;
                     case TYPE_DOUBLE:
                         args.put(new Key<>(key, Type.DOUBLE), buf.readDouble());
+                        break;
+                    case TYPE_FLOAT:
+                        args.put(new Key<>(key, Type.FLOAT), buf.readFloat());
                         break;
                     case TYPE_DIMENSION_TYPE:
                         if (buf.readBoolean()) {
@@ -179,6 +183,9 @@ public class TypedMapTools {
                 case TYPE_DOUBLE:
                     buf.writeDouble((Double) args.get(key));
                     break;
+                case TYPE_FLOAT:
+                    buf.writeFloat((Float) args.get(key));
+                    break;
                 case TYPE_STACK: {
                     ItemStack stack = (ItemStack) args.get(key);
                     if (stack != null) {
@@ -245,7 +252,8 @@ public class TypedMapTools {
         TYPE_ITEMSTACK_LIST(8),
         TYPE_POS_LIST(9),
         TYPE_UUID(10),
-        TYPE_DIMENSION_TYPE(11);
+        TYPE_DIMENSION_TYPE(11),
+        TYPE_FLOAT(12);
 
         private final int index;
         private static final Map<Integer, ArgumentType> mapping = new HashMap<>();

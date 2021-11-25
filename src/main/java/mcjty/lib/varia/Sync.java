@@ -18,7 +18,9 @@ public class Sync {
 
     /**
      * A data listener that listens to the values of the given tile entity. Use this
-     * in a GenericContainer (using dataListener) to sync data for your gui
+     * in a GenericContainer (using dataListener) to sync data for your gui.
+     *
+     * Note that DefaultContainerProvider.setupSync() already calls this
      */
     public static IContainerDataListener values(ResourceLocation id, GenericTileEntity te) {
         return new IContainerDataListener() {

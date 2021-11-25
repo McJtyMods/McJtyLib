@@ -24,6 +24,7 @@ public final class Type<V> {
 
     // Basic
     public static final Type<Integer> INTEGER = create(Integer.class, (v, buf) -> buf.writeInt(v), PacketBuffer::readInt);
+    public static final Type<Float> FLOAT = create(Float.class, (v, buf) -> buf.writeFloat(v), PacketBuffer::readFloat);
     public static final Type<Double> DOUBLE = create(Double.class, (v, buf) -> buf.writeDouble(v), PacketBuffer::readDouble);
     public static final Type<Long> LONG = create(Long.class, (v, buf) -> buf.writeLong(v), PacketBuffer::readLong);
     public static final Type<String> STRING = create(String.class, (v, buf) -> buf.writeUtf(v), buf -> buf.readUtf(32767));

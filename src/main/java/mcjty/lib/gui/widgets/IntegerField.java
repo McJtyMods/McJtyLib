@@ -453,6 +453,12 @@ public class IntegerField extends AbstractWidget<IntegerField> {
             } catch (NumberFormatException e) {
                 return 0.0;
             }
+        } else if (Type.FLOAT.equals(type)) {
+            try {
+                return Float.parseFloat(text);
+            } catch (NumberFormatException e) {
+                return 0.0f;
+            }
         }
         return getInt();
     }

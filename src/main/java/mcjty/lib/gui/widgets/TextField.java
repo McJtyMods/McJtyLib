@@ -474,6 +474,12 @@ public class TextField extends AbstractWidget<TextField> {
             } catch (NumberFormatException e) {
                 return 0.0;
             }
+        } else if (Type.FLOAT.equals(type)) {
+            try {
+                return Float.parseFloat(getText());
+            } catch (NumberFormatException e) {
+                return 0.0f;
+            }
         }
         return getText();
     }

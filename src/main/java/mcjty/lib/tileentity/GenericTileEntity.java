@@ -1,13 +1,10 @@
 package mcjty.lib.tileentity;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.bindings.GuiValue;
-import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
 import mcjty.lib.container.NoDirectionItemHander;
@@ -38,7 +35,6 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -61,8 +57,6 @@ public class GenericTileEntity extends TileEntity {
 
     protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     protected int powerLevel = 0;
-
-    private static final Map<TileEntityType, AnnotationHolder> annotations = new HashMap<>();
 
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for the annotations and replaces itself with
@@ -676,81 +670,13 @@ public class GenericTileEntity extends TileEntity {
     }
 
     private AnnotationHolder getAnnotationHolder() {
-        AnnotationHolder holder = annotations.get(getType());
+        AnnotationHolder holder = AnnotationHolder.annotations.get(getType());
         if (holder == null) {
-            holder = createAnnotationHolder(getType(), getClass());
+            holder = AnnotationTools.createAnnotationHolder(getType(), getClass());
         }
         return holder;
     }
 
-    private static AnnotationHolder createAnnotationHolder(TileEntityType type, Class<? extends GenericTileEntity> clazz) {
-        AnnotationHolder holder;
-        holder = new AnnotationHolder();
-        annotations.put(type, holder);
-        Field[] commandFields = FieldUtils.getFieldsWithAnnotation(clazz, ServerCommand.class);
-        for (Field field : commandFields) {
-            ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
-            try {
-                Object o = field.get(null);
-                if (o instanceof Command) {
-                    Command cmd = (Command) o;
-                    holder.serverCommands.put(cmd.getName(), cmd.getCmd());
-                } else if (o instanceof ResultCommand) {
-                    ResultCommand cmd = (ResultCommand) o;
-                    holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmd());
-                    holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
-                } else if (o instanceof ListCommand) {
-                    ListCommand cmd = (ListCommand) o;
-                    holder.serverCommandsWithListResult.put(cmd.getName(), cmd.getCmd());
-                    holder.clientCommandsWithList.put(cmd.getName(), cmd.getClientCommand());
-                    if (serverCommand.type() != void.class) {
-                        ISerializer instance = getSerializer(serverCommand);
-                        McJtyLib.registerListCommandInfo(cmd.getName(), serverCommand.type(), instance.getDeserializer(), instance.getSerializer());
-                    }
-                } else {
-                    throw new IllegalStateException("Only use @ServerCommand with either a Command, a ListCommand or a ResultCommand!");
-                }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        Field[] valFields = FieldUtils.getFieldsWithAnnotation(clazz, GuiValue.class);
-        for (Field field : valFields) {
-            GuiValue val = field.getAnnotation(GuiValue.class);
-            try {
-                Value value = (Value) field.get(null);
-                holder.valueMap.put(value.getKey().getName(), new ValueHolder<>(value.getKey(), te -> value.getSupplier().apply(te), (te, o) -> value.getConsumer().accept(te, o)));
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-//        if (needsRedstoneMode()) {
-            holder.valueMap.put(VALUE_RSMODE.getName(), new ValueHolder<>(VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
-//        }
-        return holder;
-    }
-
-    @Nonnull
-    private static ISerializer getSerializer(ServerCommand serverCommand) throws IllegalAccessException {
-        if (serverCommand.type() == Integer.class) {
-            return new ISerializer.IntegerSerializer();
-        } else if (serverCommand.type() == String.class) {
-            return new ISerializer.StringSerializer();
-        } else if (serverCommand.type() == BlockPos.class) {
-            return new ISerializer.BlockPosSerializer();
-        } else if (serverCommand.type() == ItemStack.class) {
-            return new ISerializer.ItemStackSerializer();
-        } else if (serverCommand.type() == FluidStack.class) {
-            return new ISerializer.FluidStackSerializer();
-        }
-        Class<? extends ISerializer> serializer = serverCommand.serializer();
-        try {
-            return serializer.newInstance();
-        } catch (InstantiationException e) {
-            throw new IllegalStateException("Can't instantiate serializer!", e);
-        }
-    }
 
     @ServerCommand
     public static final Command<?> COMMAND_SYNC_BINDING = Command.create("generic.syncBinding",

@@ -2,9 +2,6 @@ package mcjty.lib.api.container;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericContainer;
-import mcjty.lib.sync.GuiSyncScanner;
-import mcjty.lib.sync.SyncToGui;
-import mcjty.lib.sync.SyncType;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Sync;
@@ -81,59 +78,12 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     }
 
     /**
-     * Setup listeners to make sure that all fields annotated with @SyncToGui
+     * Setup listeners to make sure that all fields annotated with @GuiValue
      * get properly propagated to the client when that client has this container open
      */
     public DefaultContainerProvider<C> setupSync(GenericTileEntity te) {
-        AtomicInteger idx = new AtomicInteger();
-        GuiSyncScanner.scan(te.getClass(), te, (guiSync, field) -> {
-            SyncType type = guiSync.type();
-            if (type == SyncType.AUTOMATIC) {
-                type = guessType(field);
-            }
-            switch (type) {
-                case AUTOMATIC:
-                    throw new IllegalStateException("This can't be! The universe must be ending!");
-                case SHORT:
-                    addSyncShortListener(te, field);
-                    break;
-                case INT:
-                    addSyncIntegerListener(te, field);
-                    break;
-                case STRING:
-                    addSyncStringListener(te, idx, field);
-                    break;
-                case BOOL:
-                    addSyncBoolListener(te, field);
-                    break;
-                case ENUM:
-                    addSyncEnumListener(te, guiSync, field);
-                    break;
-            }
-        });
-
+        dataListener(Sync.values(new ResourceLocation(McJtyLib.MODID, "data"), te));
         return this;
-    }
-
-    private SyncType guessType(Field field) {
-        if (field.getType().isEnum()) {
-            return SyncType.ENUM;
-        }
-        if (field.getType().isPrimitive()) {
-            if (field.getType() == int.class || field.getType() == Integer.class) {
-                return SyncType.INT;
-            }
-            if (field.getType() == short.class || field.getType() == Short.class) {
-                return SyncType.SHORT;
-            }
-            if (field.getType() == boolean.class || field.getType() == Boolean.class) {
-                return SyncType.BOOL;
-            }
-        }
-        if (field.getType() == String.class) {
-            return SyncType.STRING;
-        }
-        throw new RuntimeException("Can't guess type for field " + field.getName() + "!");
     }
 
     private void addSyncStringListener(GenericTileEntity te, AtomicInteger idx, Field field) {
@@ -150,22 +100,6 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
                 throw new RuntimeException("Error accessing field", e);
             }
         }));
-    }
-
-    private void addSyncEnumListener(GenericTileEntity te, SyncToGui guiSync, Field field) {
-        shortListener(Sync.enumeration(() -> {
-            try {
-                return (Enum) FieldUtils.readField(field, te, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }, b -> {
-            try {
-                FieldUtils.writeField(field, te, b, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }, getEnumConstants(field.getType())));
     }
 
     private Enum[] getEnumConstants(Class clazz) {
