@@ -239,7 +239,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
     }
 
     public boolean isItemInsertable(int slot, @Nonnull ItemStack stack) {
-        return true;
+        return isItemValid(slot, stack);
     }
 
     public boolean isItemExtractable(int slot, @Nonnull ItemStack stack) {
