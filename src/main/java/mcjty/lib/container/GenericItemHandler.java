@@ -10,6 +10,9 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
 public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
 
@@ -17,8 +20,73 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     private final ContainerFactory containerFactory;
     private ItemStackList stacks;
 
+    /**
+     * Conveniance method to create a basic item handler with no restrictions
+     */
+    public static GenericItemHandler create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
+        return new GenericItemHandler(te, factorySupplier.get());
+    }
+
+    /**
+     * Conveniance method to create a item handler with a predicate to test if a certain
+     * slot can accept a certain item
+     */
+    public static GenericItemHandler create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier, BiPredicate<Integer, ItemStack> validator) {
+        return new GenericItemHandler(te, factorySupplier.get()) {
+            @Override
+            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                return validator.test(slot, stack);
+            }
+        };
+    }
+
+    /**
+     * Conveniance method to create a item handler with a predicate to test if a certain
+     * slot can accept a certain item. In addition this method allows you to control which slots are insertable and extractable
+     */
+    public static GenericItemHandler create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier, BiPredicate<Integer, ItemStack> validator,
+                                            BiPredicate<Integer, ItemStack> insertable, BiPredicate<Integer, ItemStack> extractable) {
+        return new GenericItemHandler(te, factorySupplier.get()) {
+            @Override
+            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                return validator.test(slot, stack);
+            }
+
+            @Override
+            public boolean isItemInsertable(int slot, @Nonnull ItemStack stack) {
+                return insertable.test(slot, stack);
+            }
+
+            @Override
+            public boolean isItemExtractable(int slot, @Nonnull ItemStack stack) {
+                return extractable.test(slot, stack);
+            }
+        };
+    }
+
+    /**
+     * Conveniance method to create a item handler with a predicate to test if a certain
+     * slot can accept a certain item. In addition there is an onUpdate method
+     */
+    public static GenericItemHandler create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier, BiPredicate<Integer, ItemStack> validator,
+                                            BiConsumer<Integer, ItemStack> onUpdate) {
+        return new GenericItemHandler(te, factorySupplier.get()) {
+            @Override
+            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                return validator.test(slot, stack);
+            }
+
+            @Override
+            protected void onUpdate(int slot, ItemStack stack) {
+                super.onUpdate(slot, stack);
+                onUpdate.accept(slot, stack);
+            }
+        };
+    }
+
+
     // Called when something changed
-    protected void onUpdate(int index) {
+    protected void onUpdate(int index, ItemStack stack) {
         tileEntity.markDirtyQuick();
     }
 
@@ -75,7 +143,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
                     ItemStack copy = stack.copy();
                     copy.grow(stackInSlot.getCount());
                     setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
-                    onUpdate(slot);
+                    onUpdate(slot, copy);
                 }
 
                 return ItemStack.EMPTY;
@@ -86,7 +154,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
                     ItemStack copy = stack.split(m);
                     copy.grow(stackInSlot.getCount());
                     setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
-                    onUpdate(slot);
+                    onUpdate(slot, copy);
                     return stack;
                 } else {
                     stack.shrink(m);
@@ -103,8 +171,9 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
                 // copy the stack to not modify the original one
                 stack = stack.copy();
                 if (!simulate) {
-                    setInventorySlotContents(stack.getMaxStackSize(), slot, stack.split(m));
-                    onUpdate(slot);
+                    ItemStack split = stack.split(m);
+                    setInventorySlotContents(stack.getMaxStackSize(), slot, split);
+                    onUpdate(slot, split);
                     return stack;
                 } else {
                     stack.shrink(m);
@@ -113,7 +182,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
             } else {
                 if (!simulate) {
                     setInventorySlotContents(stack.getMaxStackSize(), slot, stack);
-                    onUpdate(slot);
+                    onUpdate(slot, stack);
                 }
                 return ItemStack.EMPTY;
             }
@@ -185,7 +254,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
             int m = Math.min(stackInSlot.getCount(), amount);
 
             ItemStack decrStackSize = decrStackSize(slot, m);
-            onUpdate(slot);
+            onUpdate(slot, decrStackSize);
             return decrStackSize;
         }
     }
@@ -225,7 +294,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
         stacks.set(slot, stack);
-        onUpdate(slot);
+        onUpdate(slot, stack);
     }
 
     @Override
