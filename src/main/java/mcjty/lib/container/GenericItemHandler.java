@@ -11,7 +11,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
-public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
+public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
 
     private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
@@ -22,7 +22,7 @@ public class NoDirectionItemHander implements IItemHandlerModifiable, INBTSerial
         tileEntity.markDirtyQuick();
     }
 
-    public NoDirectionItemHander(GenericTileEntity te, ContainerFactory factory) {
+    public GenericItemHandler(GenericTileEntity te, ContainerFactory factory) {
         this.tileEntity = te;
         this.containerFactory = factory;
         stacks = ItemStackList.create(containerFactory.getContainerSlots());

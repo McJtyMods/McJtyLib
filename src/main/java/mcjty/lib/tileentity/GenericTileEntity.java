@@ -7,7 +7,7 @@ import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
-import mcjty.lib.container.NoDirectionItemHander;
+import mcjty.lib.container.GenericItemHandler;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.network.PacketRequestDataFromServer;
@@ -87,7 +87,7 @@ public class GenericTileEntity extends TileEntity {
                 if (instance instanceof LazyOptional) {
                     lazy = (LazyOptional) instance;
                 } else if (annotation.type() == CapType.ITEMS_AUTOMATION) {
-                    lazy = LazyOptional.of(() -> new AutomationFilterItemHander((NoDirectionItemHander) instance));
+                    lazy = LazyOptional.of(() -> new AutomationFilterItemHander((GenericItemHandler) instance));
                 } else {
                     lazy = LazyOptional.of(() -> instance);
                 }

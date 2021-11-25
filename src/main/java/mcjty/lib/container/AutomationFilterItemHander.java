@@ -15,9 +15,9 @@ import javax.annotation.Nonnull;
  */
 public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
 
-    private final NoDirectionItemHander wrapped;
+    private final GenericItemHandler wrapped;
 
-    public AutomationFilterItemHander(NoDirectionItemHander wrapped) {
+    public AutomationFilterItemHander(GenericItemHandler wrapped) {
         this.wrapped = wrapped;
     }
 
