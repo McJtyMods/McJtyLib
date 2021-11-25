@@ -1,6 +1,7 @@
 package mcjty.lib.api.container;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -8,6 +9,7 @@ import mcjty.lib.varia.Sync;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.util.IntReferenceHolder;
 import net.minecraft.util.ResourceLocation;
@@ -37,6 +39,14 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
     private final List<IntReferenceHolder> integerListeners = new ArrayList<>();
     private final List<IntReferenceHolder> shortListeners = new ArrayList<>();
     private final List<IContainerDataListener> containerDataListeners = new ArrayList<>();
+
+    /**
+     * Conveniance method to make a supplier for an empty container (ContainerFactory.EMPTY).
+     * Use this if you want to have a container for syncing values but otherwise have no items
+     */
+    public static Function<Integer, GenericContainer> empty(@Nonnull Supplier<ContainerType<GenericContainer>> type, GenericTileEntity te) {
+        return windowId -> new GenericContainer(type, windowId, ContainerFactory.EMPTY, te);
+    }
 
     public DefaultContainerProvider(String name) {
         this.name = name;
