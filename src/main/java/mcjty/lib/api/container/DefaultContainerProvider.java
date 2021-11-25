@@ -80,6 +80,10 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         return this;
     }
 
+    /**
+     * Setup listeners to make sure that all fields annotated with @SyncToGui
+     * get properly propagated to the client when that client has this container open
+     */
     public DefaultContainerProvider<C> setupSync(GenericTileEntity te) {
         AtomicInteger idx = new AtomicInteger();
         GuiSyncScanner.scan(te.getClass(), te, (guiSync, field) -> {
