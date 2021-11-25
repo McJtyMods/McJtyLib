@@ -15,6 +15,7 @@ import static mcjty.lib.gui.widgets.ChoiceLabel.TYPE_CHOICELABEL;
 import static mcjty.lib.gui.widgets.ColorChoiceLabel.TYPE_COLORCHOICELABEL;
 import static mcjty.lib.gui.widgets.ColorSelector.TYPE_COLORSELECTOR;
 import static mcjty.lib.gui.widgets.EnergyBar.TYPE_ENERGYBAR;
+import static mcjty.lib.gui.widgets.FloatField.TYPE_FLOATFIELD;
 import static mcjty.lib.gui.widgets.IconHolder.TYPE_ICONHOLDER;
 import static mcjty.lib.gui.widgets.IconRender.TYPE_ICONRENDER;
 import static mcjty.lib.gui.widgets.ImageChoiceLabel.TYPE_IMAGECHOICELABEL;
@@ -52,6 +53,7 @@ public class Widgets {
         FACTORIES.put(TYPE_TABBEDPANEL, TabbedPanel::new);
         FACTORIES.put(TYPE_TEXTFIELD, TextField::new);
         FACTORIES.put(TYPE_INTEGERFIELD, IntegerField::new);
+        FACTORIES.put(TYPE_FLOATFIELD, FloatField::new);
         FACTORIES.put(TYPE_TOGGLEBUTTON, ToggleButton::new);
         FACTORIES.put(TYPE_WIDGETLIST, WidgetList::new);
         FACTORIES.put(TYPE_TAGSELECTOR, TagSelector::new);
