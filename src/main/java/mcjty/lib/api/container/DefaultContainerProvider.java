@@ -48,6 +48,13 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         return windowId -> new GenericContainer(type, windowId, ContainerFactory.EMPTY, te);
     }
 
+    /**
+     * Conveniance method to make a supplier for a non-empty container
+     */
+    public static Function<Integer, GenericContainer> container(@Nonnull Supplier<ContainerType<GenericContainer>> type, @Nonnull Supplier<ContainerFactory> factory, GenericTileEntity te) {
+        return windowId -> new GenericContainer(type, windowId, factory, te);
+    }
+
     public DefaultContainerProvider(String name) {
         this.name = name;
     }
