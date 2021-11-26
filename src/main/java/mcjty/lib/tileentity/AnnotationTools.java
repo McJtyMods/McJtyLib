@@ -82,7 +82,7 @@ public class AnnotationTools {
             name = val.name();
         }
         if (field.getType().isEnum()) {
-            if (field.getType().isAssignableFrom(NamedEnum.class)) {
+            if (NamedEnum.class.isAssignableFrom(field.getType())) {
                 value = Value.createEnum(name, getEnumFields(field.getType().asSubclass(NamedEnum.class)), te -> {
                     try {
                         return (NamedEnum) FieldUtils.readField(field, te, true);
