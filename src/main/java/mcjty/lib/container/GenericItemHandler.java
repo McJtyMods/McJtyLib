@@ -2,6 +2,7 @@ package mcjty.lib.container;
 
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.ItemStackList;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -20,70 +21,44 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     private final ContainerFactory containerFactory;
     private ItemStackList stacks;
 
+    public static BiPredicate<Integer, ItemStack> slot(int s) {
+        return (slot, stack) -> slot == s;
+    }
+
+    public static BiPredicate<Integer, ItemStack> notslot(int s) {
+        return (slot, stack) -> slot != s;
+    }
+
+    public static BiPredicate<Integer, ItemStack> match(Supplier<? extends Item> itemSupplier) {
+        Item item = itemSupplier.get();
+        return (slot, stack) -> stack.getItem() == item;
+    }
+
+    public static BiPredicate<Integer, ItemStack> match(Item item) {
+        return (slot, stack) -> stack.getItem() == item;
+    }
+
+    public static BiPredicate<Integer, ItemStack> no() {
+        return (slot, stack) -> false;
+    }
+
+    public static BiPredicate<Integer, ItemStack> yes() {
+        return (slot, stack) -> true;
+    }
+
+    /**
+     * Make a builder for a GenericItemHandler
+     */
+    public static GenericItemHandler.Builder create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
+        return new Builder(te, factorySupplier);
+    }
+
     /**
      * Conveniance method to create a basic item handler with no restrictions
      */
-    public static GenericItemHandler create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
+    public static GenericItemHandler basic(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
         return new GenericItemHandler(te, factorySupplier.get());
     }
-
-    /**
-     * Conveniance method to create a item handler with a predicate to test if a certain
-     * slot can accept a certain item
-     */
-    public static GenericItemHandler create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier, BiPredicate<Integer, ItemStack> validator) {
-        return new GenericItemHandler(te, factorySupplier.get()) {
-            @Override
-            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                return validator.test(slot, stack);
-            }
-        };
-    }
-
-    /**
-     * Conveniance method to create a item handler with a predicate to test if a certain
-     * slot can accept a certain item. In addition this method allows you to control which slots are insertable and extractable
-     */
-    public static GenericItemHandler create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier, BiPredicate<Integer, ItemStack> validator,
-                                            BiPredicate<Integer, ItemStack> insertable, BiPredicate<Integer, ItemStack> extractable) {
-        return new GenericItemHandler(te, factorySupplier.get()) {
-            @Override
-            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                return validator.test(slot, stack);
-            }
-
-            @Override
-            public boolean isItemInsertable(int slot, @Nonnull ItemStack stack) {
-                return insertable.test(slot, stack);
-            }
-
-            @Override
-            public boolean isItemExtractable(int slot, @Nonnull ItemStack stack) {
-                return extractable.test(slot, stack);
-            }
-        };
-    }
-
-    /**
-     * Conveniance method to create a item handler with a predicate to test if a certain
-     * slot can accept a certain item. In addition there is an onUpdate method
-     */
-    public static GenericItemHandler create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier, BiPredicate<Integer, ItemStack> validator,
-                                            BiConsumer<Integer, ItemStack> onUpdate) {
-        return new GenericItemHandler(te, factorySupplier.get()) {
-            @Override
-            public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-                return validator.test(slot, stack);
-            }
-
-            @Override
-            protected void onUpdate(int slot, ItemStack stack) {
-                super.onUpdate(slot, stack);
-                onUpdate.accept(slot, stack);
-            }
-        };
-    }
-
 
     // Called when something changed
     protected void onUpdate(int index, ItemStack stack) {
@@ -339,6 +314,81 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
             if (i < stacks.size()) {
                 stacks.set(i, ItemStack.of(compoundNBT));
             }
+        }
+    }
+
+    public static class Builder {
+        private final GenericTileEntity te;
+        private final Supplier<ContainerFactory> factorySupplier;
+        private BiPredicate<Integer, ItemStack> itemValid = (slot, stack) -> true;
+        private BiPredicate<Integer, ItemStack> insertable = null;
+        private BiPredicate<Integer, ItemStack> extractable = (slot, stack) -> true;
+        private BiConsumer<Integer, ItemStack> onUpdate = (slot, stack) -> {};
+        private int slotLimit = 64;
+
+        public Builder(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
+            this.te = te;
+            this.factorySupplier = factorySupplier;
+        }
+
+        public Builder slotLimit(int slotLimit) {
+            this.slotLimit = slotLimit;
+            return this;
+        }
+
+        public Builder itemValid(BiPredicate<Integer, ItemStack> itemValid) {
+            this.itemValid = itemValid;
+            return this;
+        }
+
+        public Builder insertable(BiPredicate<Integer, ItemStack> insertable) {
+            this.insertable = insertable;
+            return this;
+        }
+
+        public Builder extractable(BiPredicate<Integer, ItemStack> extractable) {
+            this.extractable = extractable;
+            return this;
+        }
+
+        public Builder onUpdate(BiConsumer<Integer, ItemStack> onUpdate) {
+            this.onUpdate = onUpdate;
+            return this;
+        }
+
+        public GenericItemHandler build() {
+            return new GenericItemHandler(te, factorySupplier.get()) {
+
+                @Override
+                public int getSlotLimit(int slot) {
+                    return slotLimit;
+                }
+
+                @Override
+                public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+                    return itemValid.test(slot, stack);
+                }
+
+                @Override
+                public boolean isItemInsertable(int slot, @Nonnull ItemStack stack) {
+                    if (insertable == null) {
+                        return isItemValid(slot, stack);
+                    } else {
+                        return insertable.test(slot, stack);
+                    }
+                }
+
+                @Override
+                public boolean isItemExtractable(int slot, @Nonnull ItemStack stack) {
+                    return extractable.test(slot, stack);
+                }
+
+                @Override
+                protected void onUpdate(int index, ItemStack stack) {
+                    super.onUpdate(index, stack);
+                    onUpdate.accept(index, stack);
+                }
+            };
         }
     }
 }
