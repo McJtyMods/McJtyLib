@@ -28,6 +28,19 @@ public class NBTTools {
         }
     }
 
+    public static <T> T getBlockEntityNBT(ItemStack stack, BiFunction<CompoundNBT, String, T> getter, String name, T def) {
+        CompoundNBT tag = stack.getTag();
+        if (tag == null) {
+            return def;
+        }
+        CompoundNBT info = tag.getCompound("BlockEntityTag");
+        if (info.contains(name)) {
+            return getter.apply(info, name);
+        } else {
+            return def;
+        }
+    }
+
     public static <T> void setInfoNBT(ItemStack stack, TriConsumer<CompoundNBT, String, T> setter, String name, T value) {
         CompoundNBT entityTag = stack.getOrCreateTagElement("BlockEntityTag");
         CompoundNBT info = entityTag.getCompound("Info");
