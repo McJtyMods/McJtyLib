@@ -1,4 +1,4 @@
-Upcoming:
+1.16-5.1.0:
 - Cleanups of some now obsolete classes (DimensionId and GlobalCoordinate)
 - Massive changes to various syncing systems in McJtyLib
 - New @ServerCommand annotation to implement server-side commands that can be initiated client-side
