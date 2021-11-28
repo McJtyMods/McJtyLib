@@ -11,6 +11,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
@@ -23,6 +24,23 @@ public class AnnotationTools {
         AnnotationHolder holder;
         holder = new AnnotationHolder();
         AnnotationHolder.annotations.put(ttype, holder);
+        scanServerCommands(clazz, holder);
+        scanGuiValues(clazz, holder);
+        scanCaps(clazz, holder);
+
+        holder.valueMap.put(GenericTileEntity.VALUE_RSMODE.getName(), new ValueHolder<>(GenericTileEntity.VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
+        return holder;
+    }
+
+    private static void scanCaps(Class<? extends GenericTileEntity> clazz, AnnotationHolder holder) {
+        Field[] caps = FieldUtils.getFieldsWithAnnotation(clazz, Cap.class);
+        for (Field cap : caps) {
+            Cap annotation = cap.getAnnotation(Cap.class);
+            holder.capabilityList.add(Pair.of(cap, annotation));
+        }
+    }
+
+    private static void scanServerCommands(Class<? extends GenericTileEntity> clazz, AnnotationHolder holder) {
         Field[] commandFields = FieldUtils.getFieldsWithAnnotation(clazz, ServerCommand.class);
         for (Field field : commandFields) {
             ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
@@ -50,7 +68,9 @@ public class AnnotationTools {
                 throw new RuntimeException(e);
             }
         }
+    }
 
+    private static void scanGuiValues(Class<? extends GenericTileEntity> clazz, AnnotationHolder holder) {
         Field[] valFields = FieldUtils.getFieldsWithAnnotation(clazz, GuiValue.class);
         for (Field field : valFields) {
             GuiValue val = field.getAnnotation(GuiValue.class);
@@ -62,14 +82,11 @@ public class AnnotationTools {
                     // The field is not static. We assume it is a regular instance field
                     value = setupInstanceValue(field, val);
                 }
-//                holder.valueMap.put(value.getKey().getName(), new ValueHolder<>(value.getKey(), te -> value.getSupplier().apply(te), (te, o) -> value.getConsumer().accept(te, o)));
                 holder.valueMap.put(value.getKey().getName(), new ValueHolder<>(value.getKey(), value.getSupplier(), value.getConsumer()));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }
-        holder.valueMap.put(GenericTileEntity.VALUE_RSMODE.getName(), new ValueHolder<>(GenericTileEntity.VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
-        return holder;
     }
 
     @Nonnull

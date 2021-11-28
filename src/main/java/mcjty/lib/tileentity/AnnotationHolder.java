@@ -5,8 +5,12 @@ import mcjty.lib.blockcommands.IRunnableWithList;
 import mcjty.lib.blockcommands.IRunnableWithListResult;
 import mcjty.lib.blockcommands.IRunnableWithResult;
 import net.minecraft.tileentity.TileEntityType;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class AnnotationHolder {
@@ -20,4 +24,5 @@ class AnnotationHolder {
     final Map<String, IRunnableWithListResult<?, ?>> serverCommandsWithListResult = new HashMap<>();
     final Map<String, IRunnableWithList<?, ?>> clientCommandsWithList = new HashMap<>();
     final Map<String, ValueHolder<?, ?>> valueMap = new HashMap<>();
+    final List<Pair<Field, Cap>> capabilityList = new ArrayList<>();
 }

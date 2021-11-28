@@ -39,6 +39,7 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -68,21 +69,21 @@ public class GenericTileEntity extends TileEntity {
         // Setup code to find the capability annotations and in that code we
         // replace 'capSetup' with the actual code to execute the annotations
         capSetup = (cap,dir) -> {
-            Field[] caps = CapScanner.scan(getClass(), this);
-            capSetup = generateCapTests(caps, 0);
+            List<Pair<Field, Cap>> list = getAnnotationHolder().capabilityList;
+            capSetup = generateCapTests(list, 0);
             return capSetup.apply(cap, dir);
         };
         // Make sure the annotation holder exists
         getAnnotationHolder();
     }
 
-    private BiFunction<Capability, Direction, LazyOptional> generateCapTests(Field[] caps, int index) {
-        if (index >= caps.length) {
+    private BiFunction<Capability, Direction, LazyOptional> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
+        if (index >= caps.size()) {
             return super::getCapability;
         } else {
             try {
-                Cap annotation = caps[index].getAnnotation(Cap.class);
-                Object instance = FieldUtils.readField(caps[index], this, true);
+                Cap annotation = caps.get(index).getRight();
+                Object instance = FieldUtils.readField(caps.get(index).getLeft(), this, true);
                 LazyOptional lazy;
                 if (instance instanceof LazyOptional) {
                     lazy = (LazyOptional) instance;

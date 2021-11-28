@@ -1,7 +1,10 @@
 Upcoming:
 - Cleanups of some now obsolete classes (DimensionId and GlobalCoordinate)
 - Massive changes to various syncing systems in McJtyLib
-- New IntegerField widget
+- New @ServerCommand annotation to implement server-side commands that can be initiated client-side
+- New @GuiValue annotation to automatically sync values (fields) between client and server (when a container is open)
+- New @Cap annotation to make it easier to attach capabilities
+- New IntegerField and FloatField widgets
 
 1.16-5.0.23:
 - A few small improvements
