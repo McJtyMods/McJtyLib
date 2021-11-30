@@ -106,7 +106,7 @@ public class NBTTools {
 
     @Nonnull
     public static Stream<Tag> getListStream(CompoundTag compound, String tag) {
-        ListTag list = compound.getList("Items", Constants.NBT.TAG_COMPOUND);
+        ListTag list = compound.getList("Items", Tag.TAG_COMPOUND);
         return StreamSupport.stream(list.spliterator(), false);
     }
 }

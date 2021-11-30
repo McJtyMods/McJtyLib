@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
@@ -190,7 +191,7 @@ public class MultipartTE extends BlockEntity {
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
         version = compound.getInt("version");
-        ListTag list = compound.getList("parts", Constants.NBT.TAG_COMPOUND);
+        ListTag list = compound.getList("parts", Tag.TAG_COMPOUND);
         for (int i = 0 ; i < list.size() ; i++) {
             CompoundTag tag = list.getCompound(i);
 
