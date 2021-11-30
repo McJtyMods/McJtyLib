@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.util.Constants.BlockFlags;
 
 import javax.annotation.Nonnull;
 
@@ -158,7 +157,7 @@ public class MultipartItemBlock extends BlockItem {
         }
 
         BlockState multiState = Registration.MULTIPART_BLOCK.defaultBlockState();
-        if (!world.setBlock(pos, multiState, BlockFlags.BLOCK_UPDATE + BlockFlags.NOTIFY_NEIGHBORS + BlockFlags.UPDATE_NEIGHBORS)) {
+        if (!world.setBlock(pos, multiState, Block.UPDATE_CLIENTS + Block.UPDATE_NEIGHBORS + Block.UPDATE_KNOWN_SHAPE)) {
             return false;
         }
 
