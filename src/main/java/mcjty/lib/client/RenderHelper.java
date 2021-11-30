@@ -339,18 +339,17 @@ public class RenderHelper {
                 buffer.endBatch();
             }
 
-            if (stack.getItem().showDurabilityBar(stack)) {
+            if (stack.getItem().isBarVisible(stack)) {
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableTexture();
 //                RenderSystem.disableAlphaTest();  // @todo 1.17
                 RenderSystem.disableBlend();
                 Tesselator tessellator = Tesselator.getInstance();
                 BufferBuilder bufferbuilder = tessellator.getBuilder();
-                double health = stack.getItem().getDurabilityForDisplay(stack);
-                int i = Math.round(13.0F - (float)health * 13.0F);
-                int j = stack.getItem().getRGBDurabilityForDisplay(stack);
+                int barWidth = stack.getItem().getBarWidth(stack);
+                int j = stack.getItem().getBarColor(stack);
                 draw(bufferbuilder, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-                draw(bufferbuilder, xPosition + 2, yPosition + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
+                draw(bufferbuilder, xPosition + 2, yPosition + 13, barWidth, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
                 RenderSystem.enableBlend();
 //                RenderSystem.enableAlphaTest();   // @todo 1.17
                 RenderSystem.enableTexture();
@@ -410,11 +409,11 @@ public class RenderHelper {
                 RenderSystem.enableBlend();
             }
 
-            if (stack.getItem().showDurabilityBar(stack)) {
-                double health = stack.getItem().getDurabilityForDisplay(stack);
-                int j = (int) Math.round(13.0D - health * 13.0D);
-                int i = (int) Math.round(255.0D - health * 255.0D);
-                // @todo 1.17 port rendering
+//            if (stack.getItem().showDurabilityBar(stack)) {
+//                double health = stack.getItem().getDurabilityForDisplay(stack);
+//                int j = (int) Math.round(13.0D - health * 13.0D);
+//                int i = (int) Math.round(255.0D - health * 255.0D);
+//                // @todo 1.17 port rendering
 //                RenderSystem.disableLighting();
 //                RenderSystem.disableDepthTest();
 //                RenderSystem.disableTexture();
@@ -430,7 +429,7 @@ public class RenderHelper {
 //                RenderSystem.enableTexture();
 //                RenderSystem.enableLighting();
 //                RenderSystem.enableDepthTest();
-            }
+//            }
 
             LocalPlayer PlayerEntitysp = Minecraft.getInstance().player;
             float f = PlayerEntitysp == null ? 0.0F : PlayerEntitysp.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getFrameTime());
