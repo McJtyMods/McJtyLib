@@ -7,6 +7,7 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.fmllegacy.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
@@ -114,7 +115,7 @@ public class PreferencesProperties {
         return buffY;
     }
 
-    public static void register() {
-        CapabilityManager.INSTANCE.register(PreferencesProperties.class);
+    public static void register(RegisterCapabilitiesEvent event) {
+        event.register(PreferencesProperties.class);
     }
 }

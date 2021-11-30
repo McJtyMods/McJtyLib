@@ -1,16 +1,16 @@
 package mcjty.lib.api.infusable;
 
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 
 public class CapabilityInfusable {
 
-    @CapabilityInject(IInfusable.class)
-    public static Capability<IInfusable> INFUSABLE_CAPABILITY = null;
+    public static Capability<IInfusable> INFUSABLE_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
-    public static void register() {
-        CapabilityManager.INSTANCE.register(IInfusable.class);
+    public static void register(RegisterCapabilitiesEvent event) {
+        event.register(IInfusable.class);
     }
 
 }

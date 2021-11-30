@@ -25,7 +25,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -42,21 +44,20 @@ public class ModSetup extends DefaultModSetup {
 
     public static boolean patchouli = false;
 
-    @CapabilityInject(PreferencesProperties.class)
-    public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
+    public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
-    private static void registerCapabilities(){
-        CapabilityContainerProvider.register();
-        CapabilityInfusable.register();
-        CapabilityPowerInformation.register();
-        CapabilityModuleSupport.register();
-        PreferencesProperties.register();
+    @SubscribeEvent
+    public static void registerCapabilities(RegisterCapabilitiesEvent event){
+        CapabilityContainerProvider.register(event);
+        CapabilityInfusable.register(event);
+        CapabilityPowerInformation.register(event);
+        CapabilityModuleSupport.register(event);
+        PreferencesProperties.register(event);
     }
 
     @Override
     public void init(FMLCommonSetupEvent e) {
         super.init(e);
-        registerCapabilities();
         McJtyLib.networkHandler = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> "1.0", s -> true, s -> true);
         PacketHandler.registerMessages(McJtyLib.networkHandler);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
