@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed some data communication errors that (for example) manifested itself when opening the gui for a fresh matter transmitter
+
 1.16-5.1.0:
 - Cleanups of some now obsolete classes (DimensionId and GlobalCoordinate)
 - Massive changes to various syncing systems in McJtyLib

@@ -27,10 +27,36 @@ public final class Type<V> {
     public static final Type<Float> FLOAT = create(Float.class, (v, buf) -> buf.writeFloat(v), PacketBuffer::readFloat);
     public static final Type<Double> DOUBLE = create(Double.class, (v, buf) -> buf.writeDouble(v), PacketBuffer::readDouble);
     public static final Type<Long> LONG = create(Long.class, (v, buf) -> buf.writeLong(v), PacketBuffer::readLong);
-    public static final Type<String> STRING = create(String.class, (v, buf) -> buf.writeUtf(v), buf -> buf.readUtf(32767));
-    public static final Type<UUID> UUID = create(UUID.class, (v, buf) -> buf.writeUUID(v), PacketBuffer::readUUID);
+    public static final Type<String> STRING = create(String.class, (v, buf) -> NetworkTools.writeStringUTF8(buf, v), NetworkTools::readStringUTF8);
+    public static final Type<UUID> UUID = create(UUID.class, (v, buf) -> {
+        if (v != null) {
+            buf.writeBoolean(true);
+            buf.writeUUID(v);
+        } else {
+            buf.writeBoolean(false);
+        }
+    }, buf -> {
+        if (buf.readBoolean()) {
+            return buf.readUUID();
+        } else {
+            return null;
+        }
+    });
     public static final Type<Boolean> BOOLEAN = create(Boolean.class, (v, buf) -> buf.writeBoolean(v), PacketBuffer::readBoolean);
-    public static final Type<BlockPos> BLOCKPOS = create(BlockPos.class, (v, buf) -> buf.writeBlockPos(v), PacketBuffer::readBlockPos);
+    public static final Type<BlockPos> BLOCKPOS = create(BlockPos.class, (v, buf) -> {
+        if (v != null) {
+            buf.writeBoolean(true);
+            buf.writeBlockPos(v);
+        } else {
+            buf.writeBoolean(false);
+        }
+    }, buf -> {
+        if (buf.readBoolean()) {
+            return buf.readBlockPos();
+        } else {
+            return null;
+        }
+    });
     public static final Type<ItemStack> ITEMSTACK = create(ItemStack.class, (v, buf) -> buf.writeItem(v), PacketBuffer::readItem);
     public static final Type<RegistryKey<World>> DIMENSION_TYPE = create(RegistryKey.class, (v, buf) -> buf.writeResourceLocation(v.location()), buf -> LevelTools.getId(buf.readResourceLocation()));
 
