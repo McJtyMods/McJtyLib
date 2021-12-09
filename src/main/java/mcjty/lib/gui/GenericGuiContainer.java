@@ -3,6 +3,7 @@ package mcjty.lib.gui;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.McJtyLib;
+import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.client.GuiTools;
 import mcjty.lib.client.RenderHelper;
@@ -456,6 +457,16 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 //                super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
             }
         }
+    }
+
+    /**
+     * Set a 'Value' and make sure it gets communicated to the server
+     */
+    public <T> void setValue(SimpleChannel channel, Value<?, T> value, T v) {
+        sendServerCommandTyped(channel, tileEntity.getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.getName(),
+                TypedMap.builder()
+                        .put(value.getKey(), v)
+                        .build());
     }
 
     public void sendServerCommandTyped(SimpleChannel network, String command, TypedMap params) {
