@@ -1,7 +1,8 @@
 package mcjty.lib.blocks;
 
 import mcjty.lib.builder.BlockBuilder;
-import mcjty.lib.tileentity.LogicTileEntity;
+import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tileentity.LogicSupport;
 import mcjty.lib.varia.LogicFacing;
 import mcjty.lib.varia.OrientationTools;
 import net.minecraft.block.Block;
@@ -15,10 +16,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -185,20 +186,19 @@ public class LogicSlabBlock extends BaseBlock {
         // Old behaviour
         // @todo remove once all implementations do this in the TE.checkRedstone
         TileEntity te = world.getBlockEntity(pos);
-        if (te instanceof LogicTileEntity) {
-            LogicTileEntity logicTileEntity = (LogicTileEntity)te;
-            Direction inputSide = logicTileEntity.getFacing(world.getBlockState(pos)).getInputSide();
+        if (te instanceof GenericTileEntity) {
+            GenericTileEntity generic = (GenericTileEntity)te;
+            Direction inputSide = LogicSupport.getFacing(world.getBlockState(pos)).getInputSide();
             int power = getInputStrength(world, pos, inputSide);
-            logicTileEntity.setPowerInput(power);
+            generic.setPowerInput(power);
         }
     }
 
     @Override
     public boolean canConnectRedstone(BlockState state, IBlockReader world, BlockPos pos, @Nullable Direction side) {
         TileEntity te = world.getBlockEntity(pos);
-        if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
-            LogicTileEntity logicTileEntity = (LogicTileEntity)te;
-            Direction direction = logicTileEntity.getFacing(state).getInputSide();
+        if (state.getBlock() instanceof LogicSlabBlock && te instanceof GenericTileEntity) {
+            Direction direction = LogicSupport.getFacing(state).getInputSide();
             switch (direction) {
                 case NORTH:
                 case SOUTH:
@@ -216,9 +216,9 @@ public class LogicSlabBlock extends BaseBlock {
 
     protected int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
         TileEntity te = world.getBlockEntity(pos);
-        if (state.getBlock() instanceof LogicSlabBlock && te instanceof LogicTileEntity) {
-            LogicTileEntity logicTileEntity = (LogicTileEntity) te;
-            return logicTileEntity.getRedstoneOutput(state, world, pos, side);
+        if (state.getBlock() instanceof LogicSlabBlock && te instanceof GenericTileEntity) {
+            GenericTileEntity generic = (GenericTileEntity) te;
+            return generic.getRedstoneOutput(state, world, pos, side);
         }
         return 0;
     }
@@ -231,8 +231,8 @@ public class LogicSlabBlock extends BaseBlock {
             BlockState newstate = state.getBlock().defaultBlockState().setValue(LOGIC_FACING, newfacing);
             world.setBlock(pos, newstate, 3);
             TileEntity te = world.getBlockEntity(pos);
-            if (te instanceof LogicTileEntity) {
-                ((LogicTileEntity) te).rotateBlock(rot);
+            if (te instanceof GenericTileEntity) {
+                ((GenericTileEntity) te).rotateBlock(rot);
             }
             return newstate;
         }

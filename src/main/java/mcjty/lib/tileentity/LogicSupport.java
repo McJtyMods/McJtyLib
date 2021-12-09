@@ -5,47 +5,44 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import static mcjty.lib.blocks.LogicSlabBlock.LOGIC_FACING;
 
-public class LogicTileEntity extends GenericTileEntity {
+public class LogicSupport {
 
-    protected int powerOutput = 0;
+    private int powerOutput = 0;
 
-    public LogicTileEntity(TileEntityType<?> type) {
-        super(type);
+    public static LogicFacing getFacing(BlockState state) {
+        return state.getValue(LOGIC_FACING);
     }
 
-    public LogicFacing getFacing(BlockState state) {
-        return state.getValue(LOGIC_FACING);
+    public void setPowerOutput(int powerOutput) {
+        this.powerOutput = powerOutput;
     }
 
     public int getPowerOutput() {
         return powerOutput;
     }
 
-    protected void setRedstoneState(int newout) {
+    public void setRedstoneState(GenericTileEntity te, int newout) {
         if (powerOutput == newout) {
             return;
         }
         powerOutput = newout;
-        setChanged();
-        BlockState state = getBlockState();
+        te.setChanged();
+        BlockState state = te.getBlockState();
         Direction outputSide = getFacing(state).getInputSide().getOpposite();
-        getLevel().neighborChanged(this.worldPosition.relative(outputSide), state.getBlock(), this.worldPosition);
+        te.getLevel().neighborChanged(te.getBlockPos().relative(outputSide), state.getBlock(), te.getBlockPos());
         //        getWorld().notifyNeighborsOfStateChange(this.pos, this.getBlockType());
     }
 
-    @Override
-    public void checkRedstone(World world, BlockPos pos) {
+    public void checkRedstone(GenericTileEntity te, World world, BlockPos pos) {
         Direction inputSide = getFacing(world.getBlockState(pos)).getInputSide();
         int power = getInputStrength(world, pos, inputSide);
-        setPowerInput(power);
+        te.setPowerInput(power);
     }
 
     /**
@@ -67,8 +64,7 @@ public class LogicTileEntity extends GenericTileEntity {
         return power;
     }
 
-    @Override
-    public int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
+    public int getRedstoneOutput(BlockState state, Direction side) {
         if (side == getFacing(state).getInputSide()) {
             return getPowerOutput();
         } else {
