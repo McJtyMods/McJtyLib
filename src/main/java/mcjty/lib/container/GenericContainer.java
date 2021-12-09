@@ -538,7 +538,7 @@ public class GenericContainer extends Container implements IGenericContainer {
             E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()));
             te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter
             CompoundNBT compound = data.readNbt();
-            te.read(compound);
+            te.load(compound);
 
             T container = containerFactory.apply(windowId, pos, te);
             container.setupInventories(new ItemStackHandler(slots), inv);

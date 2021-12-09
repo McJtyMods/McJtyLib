@@ -342,31 +342,31 @@ public class GenericTileEntity extends TileEntity {
     @Override
     public void load(@Nonnull BlockState state, @Nonnull CompoundNBT tagCompound) {
         super.load(state, tagCompound);
-        read(tagCompound);
+        load(tagCompound);
     }
 
-    public void read(CompoundNBT tagCompound) {
-        readCaps(tagCompound);
-        readInfo(tagCompound);
+    public void load(CompoundNBT tagCompound) {
+        loadCaps(tagCompound);
+        loadInfo(tagCompound);
     }
 
-    protected void readCaps(CompoundNBT tagCompound) {
+    protected void loadCaps(CompoundNBT tagCompound) {
         if (tagCompound.contains("Info")) {
             CompoundNBT infoTag = tagCompound.getCompound("Info");
             getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
         }
-        readItemHandlerCap(tagCompound);
-        readEnergyCap(tagCompound);
+        loadItemHandlerCap(tagCompound);
+        loadEnergyCap(tagCompound);
     }
 
-    protected void readItemHandlerCap(CompoundNBT tagCompound) {
+    protected void loadItemHandlerCap(CompoundNBT tagCompound) {
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Constants.NBT.TAG_COMPOUND)));
     }
 
-    protected void readEnergyCap(CompoundNBT tagCompound) {
+    protected void loadEnergyCap(CompoundNBT tagCompound) {
         getCapability(CapabilityEnergy.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
@@ -377,7 +377,7 @@ public class GenericTileEntity extends TileEntity {
                 });
     }
 
-    protected void readInfo(CompoundNBT tagCompound) {
+    protected void loadInfo(CompoundNBT tagCompound) {
         if (tagCompound.contains("Info")) {
             CompoundNBT infoTag = tagCompound.getCompound("Info");
             if (infoTag.contains("powered")) {
@@ -413,33 +413,37 @@ public class GenericTileEntity extends TileEntity {
     @Override
     public CompoundNBT save(@Nonnull CompoundNBT tagCompound) {
         super.save(tagCompound);
-        writeCaps(tagCompound);
-        writeInfo(tagCompound);
+        saveAdditional(tagCompound);
         return tagCompound;
     }
 
-    protected void writeCaps(CompoundNBT tagCompound) {
-        CompoundNBT infoTag = getOrCreateInfo(tagCompound);
-        getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> infoTag.putInt("infused", h.getInfused()));
-        writeItemHandlerCap(tagCompound);
-        writeEnergyCap(tagCompound);
+    public void saveAdditional(@Nonnull CompoundNBT tagCompound) {
+        saveCaps(tagCompound);
+        saveInfo(tagCompound);
     }
 
-    protected void writeItemHandlerCap(CompoundNBT tagCompound) {
+    protected void saveCaps(CompoundNBT tagCompound) {
+        CompoundNBT infoTag = getOrCreateInfo(tagCompound);
+        getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> infoTag.putInt("infused", h.getInfused()));
+        saveItemHandlerCap(tagCompound);
+        saveEnergyCap(tagCompound);
+    }
+
+    protected void saveItemHandlerCap(CompoundNBT tagCompound) {
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> tagCompound.put("Items", h.serializeNBT()));
     }
 
-    protected void writeEnergyCap(CompoundNBT tagCompound) {
+    protected void saveEnergyCap(CompoundNBT tagCompound) {
         getCapability(CapabilityEnergy.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> tagCompound.put("Energy", h.serializeNBT()));
     }
 
-    protected void writeInfo(CompoundNBT tagCompound) {
+    protected void saveInfo(CompoundNBT tagCompound) {
         CompoundNBT infoTag = getOrCreateInfo(tagCompound);
         infoTag.putByte("powered", (byte) powerLevel);
         if (needsRedstoneMode()) {
