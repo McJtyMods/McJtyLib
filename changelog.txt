@@ -2,6 +2,7 @@ Upcoming:
 - Preporting to 1.18: introducted saveAdditional() into GenericTileEntity
 - Preporting to 1.18: rename a few writeXxx and readXxx into saveXxx and loadXxx
 - Preporting to 1.18: introduced TickingTileEntity with tickServer() and tickClient()
+- Removed a test on duplicate command registration as this could cause issues
 
 1.16-5.1.1:
 - Fixed some data communication errors that (for example) manifested itself when opening the gui for a fresh matter transmitter
