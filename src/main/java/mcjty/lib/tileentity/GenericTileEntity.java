@@ -44,7 +44,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -273,20 +276,20 @@ public class GenericTileEntity extends TileEntity {
     @Override
     public void handleUpdateTag(BlockState state, CompoundNBT tag) {
         super.handleUpdateTag(state, tag);
-        readClientDataFromNBT(tag);
+        loadClientDataFromNBT(tag);
     }
 
     @Nullable
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTag = new CompoundNBT();
-        this.writeClientDataToNBT(nbtTag);
+        this.saveClientDataToNBT(nbtTag);
         return new SUpdateTileEntityPacket(worldPosition, 1, nbtTag);
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
-        readClientDataFromNBT(packet.getTag());
+        loadClientDataFromNBT(packet.getTag());
     }
 
     //    public void setInfused(int infused) {
@@ -310,33 +313,20 @@ public class GenericTileEntity extends TileEntity {
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT updateTag = super.getUpdateTag();
-        writeClientDataToNBT(updateTag);
+        saveClientDataToNBT(updateTag);
         return updateTag;
     }
 
     /**
      * Override to write only the data you need on the client
      */
-    public void writeClientDataToNBT(CompoundNBT tagCompound) {
+    public void saveClientDataToNBT(CompoundNBT tagCompound) {
     }
 
     /**
      * Override to read only the data you need on the client
      */
-    public void readClientDataFromNBT(CompoundNBT tagCompound) {
-    }
-
-    /**
-     * GUI Data sync
-     */
-    public void syncDataForGUI(Object[] data) {
-    }
-
-    /**
-     * GUI Data sync. Supported types: Integer, Long, Float, String, Byte, Boolean
-     */
-    public Object[] getDataForGUI() {
-        return new Object[0];
+    public void loadClientDataFromNBT(CompoundNBT tagCompound) {
     }
 
     @Override

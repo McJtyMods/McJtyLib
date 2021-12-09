@@ -4,6 +4,7 @@ Upcoming:
 - Preporting to 1.18: introduced TickingTileEntity with tickServer() and tickClient()
 - Removed a test on duplicate command registration as this could cause issues
 - Removed LogicTileEntity. Instead logic blocks work with the new LogicSupport helper class
+- Renamed readClientInfo and writeClientInfo
 
 1.16-5.1.1:
 - Fixed some data communication errors that (for example) manifested itself when opening the gui for a fresh matter transmitter
