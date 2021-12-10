@@ -1,6 +1,7 @@
 package mcjty.lib.font;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.varia.Logging;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -449,7 +450,7 @@ public class TrueTypeFont {
         }
         if (rgba.length == 4)
             //worldRenderer.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-            GlStateManager._color4f(rgba[0], rgba[1], rgba[2], rgba[3]);
+            RenderSystem.setShaderColor(rgba[0], rgba[1], rgba[2], rgba[3]);
         while (i >= 0 && i <= endIndex) {
 
             charCurrent = whatchars.charAt(i);
