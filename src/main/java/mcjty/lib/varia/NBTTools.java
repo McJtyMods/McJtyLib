@@ -119,7 +119,7 @@ public class NBTTools {
 
     @Nonnull
     public static Stream<INBT> getListStream(CompoundNBT compound, String tag) {
-        ListNBT list = compound.getList("Items", Constants.NBT.TAG_COMPOUND);
+        ListNBT list = compound.getList("Items", Tag.TAG_COMPOUND);
         return StreamSupport.stream(list.spliterator(), false);
     }
 }

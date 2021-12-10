@@ -6,6 +6,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.state.Property;
@@ -142,7 +143,7 @@ public class MultipartTE extends TileEntity {
         load(getBlockState(), packet.getTag());
         if (level.isClientSide && version != oldVersion) {
             ModelDataManager.requestModelDataRefresh(this);
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS + Block.UPDATE_NEIGHBORS);
         }
     }
 
@@ -190,7 +191,7 @@ public class MultipartTE extends TileEntity {
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
         version = compound.getInt("version");
-        ListNBT list = compound.getList("parts", Constants.NBT.TAG_COMPOUND);
+        ListNBT list = compound.getList("parts", Tag.TAG_COMPOUND);
         for (int i = 0 ; i < list.size() ; i++) {
             CompoundNBT tag = list.getCompound(i);
 

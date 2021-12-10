@@ -2,6 +2,7 @@ package mcjty.lib.multiblock;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
@@ -95,7 +96,7 @@ public class MultiblockDriver<T extends IMultiblock> {
 
     public void load(CompoundNBT tagCompound) {
         clear();
-        ListNBT lst = tagCompound.getList("mb", Constants.NBT.TAG_COMPOUND);
+        ListNBT lst = tagCompound.getList("mb", Tag.TAG_COMPOUND);
         for (int i = 0 ; i < lst.size() ; i++) {
             CompoundNBT tc = lst.getCompound(i);
             int id = tc.getInt("id");

@@ -18,7 +18,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants.BlockFlags;
 
 import javax.annotation.Nonnull;
 

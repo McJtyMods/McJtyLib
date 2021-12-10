@@ -179,7 +179,7 @@ public class GenericTileEntity extends TileEntity {
         setChanged();
         if (getLevel() != null) {
             BlockState state = getLevel().getBlockState(getBlockPos());
-            getLevel().sendBlockUpdated(getBlockPos(), state, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+            getLevel().sendBlockUpdated(getBlockPos(), state, state, Block.UPDATE_CLIENTS + Block.UPDATE_NEIGHBORS);
         }
     }
 
@@ -353,7 +353,7 @@ public class GenericTileEntity extends TileEntity {
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
-                .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Constants.NBT.TAG_COMPOUND)));
+                .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Tag.TAG_COMPOUND)));
     }
 
     protected void loadEnergyCap(CompoundNBT tagCompound) {
