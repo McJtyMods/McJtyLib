@@ -5,12 +5,12 @@ import mcjty.lib.crafting.CopyNBTRecipeSerializer;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartItemBlock;
 import mcjty.lib.multipart.MultipartTE;
-import net.minecraft.block.Block;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.item.Item;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -20,7 +20,7 @@ import net.minecraftforge.registries.ObjectHolder;
 public class Registration {
 
     @ObjectHolder(McJtyLib.MODID + ":generic")
-    public static ContainerType GENERIC_CONTAINER_TYPE;
+    public static MenuType GENERIC_CONTAINER_TYPE;
     @ObjectHolder(McJtyLib.MODID + ":multipart")
     public static MultipartBlock MULTIPART_BLOCK;
     @ObjectHolder(McJtyLib.MODID + ":multipart")
@@ -30,11 +30,11 @@ public class Registration {
     public static CopyNBTRecipeSerializer COPYNBT_SERIALIZER;
 
     @ObjectHolder(McJtyLib.MODID + ":multipart")
-    public static TileEntityType<?> TYPE_MULTIPART;
+    public static BlockEntityType<?> TYPE_MULTIPART;
 
     @SubscribeEvent
-    public static void registerTiles(final RegistryEvent.Register<TileEntityType<?>> registry) {
-        registry.getRegistry().register(TYPE_MULTIPART = TileEntityType.Builder.of(MultipartTE::new).build(null).setRegistryName(new ResourceLocation(McJtyLib.MODID, "multipart")));
+    public static void registerTiles(final RegistryEvent.Register<BlockEntityType<?>> registry) {
+        registry.getRegistry().register(TYPE_MULTIPART = BlockEntityType.Builder.of(MultipartTE::new).build(null).setRegistryName(new ResourceLocation(McJtyLib.MODID, "multipart")));
     }
 
     @SubscribeEvent
@@ -48,7 +48,7 @@ public class Registration {
     }
 
     @SubscribeEvent
-    public static void onRecipeRegister(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
+    public static void onRecipeRegister(final RegistryEvent.Register<RecipeSerializer<?>> e) {
         e.getRegistry().register(new CopyNBTRecipeSerializer().setRegistryName(new ResourceLocation(McJtyLib.MODID, "copy_nbt")));
     }
 }

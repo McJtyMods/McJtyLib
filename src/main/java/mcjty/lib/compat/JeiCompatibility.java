@@ -7,9 +7,9 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -28,10 +28,10 @@ public class JeiCompatibility implements IModPlugin {
         registration.addGenericGuiContainerHandler(GenericGuiContainer.class, new Handler<GenericContainer>());
     }
 
-    static class Handler<T extends Container> implements IGuiContainerHandler<GenericGuiContainer<?,T>> {
+    static class Handler<T extends AbstractContainerMenu> implements IGuiContainerHandler<GenericGuiContainer<?,T>> {
         @Nonnull
         @Override
-        public List<Rectangle2d> getGuiExtraAreas(GenericGuiContainer containerScreen) {
+        public List<Rect2i> getGuiExtraAreas(GenericGuiContainer containerScreen) {
             return containerScreen.getExtraWindowBounds();
         }
     }

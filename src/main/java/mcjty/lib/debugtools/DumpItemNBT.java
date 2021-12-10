@@ -3,9 +3,9 @@ package mcjty.lib.debugtools;
 import com.google.gson.*;
 import mcjty.lib.network.PacketDumpItemInfo;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import org.apache.logging.log4j.Level;
 
@@ -22,7 +22,7 @@ public class DumpItemNBT {
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("item", new JsonPrimitive(item.getItem().getRegistryName().toString()));
         if (item.hasTag()) {
-            CompoundNBT tag = item.getTag();
+            CompoundTag tag = item.getTag();
             if (verbose) {
                 String nbtJson = tag.toString();
                 JsonParser parser = new JsonParser();
@@ -42,7 +42,7 @@ public class DumpItemNBT {
     }
 
     // Use client-side
-    public static void dumpHeldItem(@Nullable SimpleChannel network, @Nonnull PlayerEntity player, boolean verbose) {
+    public static void dumpHeldItem(@Nullable SimpleChannel network, @Nonnull Player player, boolean verbose) {
         ItemStack item = player.getMainHandItem();
         if (item.isEmpty()) {
             return;

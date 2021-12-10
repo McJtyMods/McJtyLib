@@ -2,9 +2,9 @@ package mcjty.lib.multiblock;
 
 import com.google.common.collect.Sets;
 import mcjty.lib.varia.OrientationTools;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
@@ -19,8 +19,8 @@ public class MultiblockSupport {
      * Try to merge the multiblock on the given position to adjacent compatible multiblocks.
      * Return true if something was changed
      */
-    public static <T extends IMultiblock> boolean merge(World level, BlockPos thisPos, MultiblockDriver<T> driver) {
-        BiFunction<World, BlockPos, IMultiblockConnector> holderGetter = driver.getHolderGetter();
+    public static <T extends IMultiblock> boolean merge(Level level, BlockPos thisPos, MultiblockDriver<T> driver) {
+        BiFunction<Level, BlockPos, IMultiblockConnector> holderGetter = driver.getHolderGetter();
         IMultiblockFixer<T> fixer = driver.getFixer();
         BiPredicate<T, T> mergeChecker = driver.getMergeChecker();
 
@@ -76,8 +76,8 @@ public class MultiblockSupport {
      * Add a new block to the adjacent multiblocks (possibly merging adjacent multiblocks)
      * The new block should not have a network id yet (set to -1!)
      */
-    public static <T extends IMultiblock> void addBlock(World level, BlockPos thisPos, MultiblockDriver<T> driver, T newMb) {
-        BiFunction<World, BlockPos, IMultiblockConnector> holderGetter = driver.getHolderGetter();
+    public static <T extends IMultiblock> void addBlock(Level level, BlockPos thisPos, MultiblockDriver<T> driver, T newMb) {
+        BiFunction<Level, BlockPos, IMultiblockConnector> holderGetter = driver.getHolderGetter();
         IMultiblockFixer<T> fixer = driver.getFixer();
 
         int mbId = driver.createId();
@@ -88,7 +88,7 @@ public class MultiblockSupport {
         merge(level, thisPos, driver);
     }
 
-    public static <T extends IMultiblock> Set<BlockPos> findMultiblock(World level, BlockPos pos, MultiblockDriver<T> driver) {
+    public static <T extends IMultiblock> Set<BlockPos> findMultiblock(Level level, BlockPos pos, MultiblockDriver<T> driver) {
         Set<BlockPos> positions = new HashSet<>();
         IMultiblockConnector holder = driver.getHolderGetter().apply(level, pos);
         if (holder != null) {
@@ -97,7 +97,7 @@ public class MultiblockSupport {
         return positions;
     }
 
-    private static <T extends IMultiblock> void findMultiblockInt(World level, BlockPos pos, BiFunction<World, BlockPos, IMultiblockConnector> getter, Set<BlockPos> positions) {
+    private static <T extends IMultiblock> void findMultiblockInt(Level level, BlockPos pos, BiFunction<Level, BlockPos, IMultiblockConnector> getter, Set<BlockPos> positions) {
         positions.add(pos);
         for (Direction direction : OrientationTools.DIRECTION_VALUES) {
             BlockPos p = pos.relative(direction);
@@ -110,7 +110,7 @@ public class MultiblockSupport {
     }
 
     /// After this routine the 'done' set will be all the blocks for this network
-    private static <T extends IMultiblock> void setBlocksToNetwork(World level, BlockPos c,
+    private static <T extends IMultiblock> void setBlocksToNetwork(Level level, BlockPos c,
                                                                    @Nonnull Set<Integer> ids, @Nullable Set<BlockPos> done, int newId, MultiblockDriver<T> driver) {
         IMultiblockConnector connector = driver.getHolderGetter().apply(level, c);
         if (connector == null) {
@@ -136,9 +136,9 @@ public class MultiblockSupport {
         }
     }
 
-    public static <T extends IMultiblock> void removeBlock(World level, BlockPos thisPos, MultiblockDriver<T> driver) {
+    public static <T extends IMultiblock> void removeBlock(Level level, BlockPos thisPos, MultiblockDriver<T> driver) {
 
-        BiFunction<World, BlockPos, IMultiblockConnector> holderGetter = driver.getHolderGetter();
+        BiFunction<Level, BlockPos, IMultiblockConnector> holderGetter = driver.getHolderGetter();
         IMultiblockConnector thisHolder = holderGetter.apply(level, thisPos);
         T thisData = driver.get(thisHolder.getMultiblockId());
 

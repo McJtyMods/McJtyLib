@@ -6,9 +6,9 @@ import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.typed.Type;
 import mcjty.lib.varia.NamedEnum;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -20,7 +20,7 @@ import java.util.Arrays;
 
 public class AnnotationTools {
 
-    static AnnotationHolder createAnnotationHolder(TileEntityType ttype, Class<? extends GenericTileEntity> clazz) {
+    static AnnotationHolder createAnnotationHolder(BlockEntityType ttype, Class<? extends GenericTileEntity> clazz) {
         AnnotationHolder holder;
         holder = new AnnotationHolder();
         AnnotationHolder.annotations.put(ttype, holder);

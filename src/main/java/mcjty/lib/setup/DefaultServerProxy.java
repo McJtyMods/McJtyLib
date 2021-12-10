@@ -1,35 +1,35 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.varia.LevelTools;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.Level;
 
 public class DefaultServerProxy implements IProxy {
 
     @Override
-    public World getClientWorld() {
+    public Level getClientWorld() {
         throw new IllegalStateException("This should only be called from client side");
     }
 
     @Override
-    public World getWorld() {
+    public Level getWorld() {
         return LevelTools.getOverworld();
     }
 
     @Override
-    public PlayerEntity getClientPlayer() {
+    public Player getClientPlayer() {
         throw new IllegalStateException("This should only be called from client side");
     }
 
     @Override
-    public RecipeManager getRecipeManager(World world) {
+    public RecipeManager getRecipeManager(Level world) {
         return world.getServer().getRecipeManager();
     }
 
     @Override
-    public RayTraceResult getClientMouseOver() {
+    public HitResult getClientMouseOver() {
         throw new IllegalStateException("This should only be called from client side");
     }
 

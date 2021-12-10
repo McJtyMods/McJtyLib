@@ -5,9 +5,9 @@ import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.ArrayList;
@@ -26,14 +26,14 @@ public class PacketSendResultToClient {
     private final List list;
     private final String command;
 
-    public PacketSendResultToClient(PacketBuffer buf) {
+    public PacketSendResultToClient(FriendlyByteBuf buf) {
         pos = buf.readBlockPos();
         command = buf.readUtf(32767);
         CommandInfo<?> info = McJtyLib.getCommandInfo(command);
         if (info == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }
-        Function<PacketBuffer, ?> deserializer = info.getDeserializer();
+        Function<FriendlyByteBuf, ?> deserializer = info.getDeserializer();
         int size = buf.readInt();
         if (size != -1) {
             list = new ArrayList<>(size);
@@ -51,14 +51,14 @@ public class PacketSendResultToClient {
         this.list = new ArrayList<>(list);
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
         buf.writeUtf(command);
         CommandInfo<?> info = McJtyLib.getCommandInfo(command);
         if (info == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }
-        BiConsumer<PacketBuffer, Object> serializer = (BiConsumer<PacketBuffer, Object>) info.getSerializer();
+        BiConsumer<FriendlyByteBuf, Object> serializer = (BiConsumer<FriendlyByteBuf, Object>) info.getSerializer();
         if (serializer == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }
@@ -75,7 +75,7 @@ public class PacketSendResultToClient {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            TileEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(pos);
+            BlockEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(pos);
             if (te instanceof GenericTileEntity) {
                 ((GenericTileEntity) te).handleListFromServer(command, McJtyLib.proxy.getClientPlayer(), TypedMap.EMPTY, list);
             } else {

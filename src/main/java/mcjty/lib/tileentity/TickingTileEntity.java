@@ -1,11 +1,11 @@
 package mcjty.lib.tileentity;
 
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
-public class TickingTileEntity extends GenericTileEntity implements ITickableTileEntity {
+public class TickingTileEntity extends GenericTileEntity implements TickableBlockEntity {
 
-    public TickingTileEntity(TileEntityType<?> type) {
+    public TickingTileEntity(BlockEntityType<?> type) {
         super(type);
     }
 

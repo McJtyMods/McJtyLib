@@ -1,7 +1,7 @@
 package mcjty.lib.multiblock;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -15,16 +15,16 @@ public interface IMultiblockFixer<T extends IMultiblock> {
     /**
      * Initialize a new multiblock with a single block
      */
-    void initialize(MultiblockDriver<T> driver, World level, T newMb, int id);
+    void initialize(MultiblockDriver<T> driver, Level level, T newMb, int id);
 
     /**
      * Merge the other multiblock into the main one. The given multiblocks
      * are guaranteed to be compatible
      */
-    void merge(MultiblockDriver<T> driver, World level, T mbMain, T mbOther);
+    void merge(MultiblockDriver<T> driver, Level level, T mbMain, T mbOther);
 
     /**
      * Take an original multiblock and distribute it to the multiblocks in the todo list
      */
-    void distribute(MultiblockDriver<T> driver, World level, T original, List<Pair<Integer, Set<BlockPos>>> todo);
+    void distribute(MultiblockDriver<T> driver, Level level, T original, List<Pair<Integer, Set<BlockPos>>> todo);
 }

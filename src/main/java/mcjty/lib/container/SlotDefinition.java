@@ -1,10 +1,10 @@
 package mcjty.lib.container;
 
 import mcjty.lib.varia.TriConsumer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -15,7 +15,7 @@ public class SlotDefinition {
     private boolean input = false;
     private boolean output = false;
     private final Predicate<ItemStack> validItems;
-    private TriConsumer<TileEntity, PlayerEntity, ItemStack> onCraft = (te, playerEntity, stack) -> {};
+    private TriConsumer<BlockEntity, Player, ItemStack> onCraft = (te, playerEntity, stack) -> {};
 
     SlotDefinition(SlotType type, ItemStack... itemStacks) {
         this.type = type;
@@ -29,7 +29,7 @@ public class SlotDefinition {
         };
     }
 
-    public SlotDefinition onCraft(TriConsumer<TileEntity, PlayerEntity, ItemStack> onCraft) {
+    public SlotDefinition onCraft(TriConsumer<BlockEntity, Player, ItemStack> onCraft) {
         this.onCraft = onCraft;
         return this;
     }
@@ -44,7 +44,7 @@ public class SlotDefinition {
         return this;
     }
 
-    public TriConsumer<TileEntity, PlayerEntity, ItemStack> getOnCraft() {
+    public TriConsumer<BlockEntity, Player, ItemStack> getOnCraft() {
         return onCraft;
     }
 

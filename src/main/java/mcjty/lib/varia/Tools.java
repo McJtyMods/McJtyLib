@@ -1,18 +1,18 @@
 package mcjty.lib.varia;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +62,7 @@ public class Tools {
         }
     }
 
-    public static String getReadableName(World world, BlockPos pos) {
+    public static String getReadableName(Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
         return getReadableName(state.getBlock().getCloneItemStack(world, pos, state));
     }
@@ -72,9 +72,9 @@ public class Tools {
     }
 
     @Nullable
-    public static BlockState placeStackAt(PlayerEntity player, ItemStack blockStack, World world, BlockPos pos, @Nullable BlockState origState) {
-        BlockRayTraceResult trace = new BlockRayTraceResult(new Vector3d(0, 0, 0), Direction.UP, pos, false);
-        BlockItemUseContext context = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, trace));
+    public static BlockState placeStackAt(Player player, ItemStack blockStack, Level world, BlockPos pos, @Nullable BlockState origState) {
+        BlockHitResult trace = new BlockHitResult(new Vec3(0, 0, 0), Direction.UP, pos, false);
+        BlockPlaceContext context = new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, trace));
         if (blockStack.getItem() instanceof BlockItem) {
             BlockItem itemBlock = (BlockItem) blockStack.getItem();
             if (origState == null) {
@@ -89,7 +89,7 @@ public class Tools {
             }
             return origState;
         } else {
-            player.setItemInHand(Hand.MAIN_HAND, blockStack);
+            player.setItemInHand(InteractionHand.MAIN_HAND, blockStack);
             player.setPos(pos.getX()+.5, pos.getY()+1.5, pos.getZ()+.5);
             blockStack.getItem().useOn(context);
             return world.getBlockState(pos);

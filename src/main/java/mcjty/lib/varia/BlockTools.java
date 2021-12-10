@@ -1,11 +1,11 @@
 package mcjty.lib.varia;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.Property;
-import net.minecraft.state.StateContainer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,7 +54,7 @@ public class BlockTools {
         }
         BlockState state = block.defaultBlockState();
         if (properties != null) {
-            StateContainer<Block, BlockState> statecontainer = state.getBlock().getStateDefinition();
+            StateDefinition<Block, BlockState> statecontainer = state.getBlock().getStateDefinition();
             String[] split = StringUtils.split(properties, ',');
             for (String pv : split) {
                 String[] sp = StringUtils.split(pv, '=');

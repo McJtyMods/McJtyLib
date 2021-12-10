@@ -1,10 +1,10 @@
 package mcjty.lib.varia;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -17,7 +17,7 @@ public class InventoryTools {
     /**
      * Get the size of the inventory
      */
-    public static int getInventorySize(TileEntity tileEntity) {
+    public static int getInventorySize(BlockEntity tileEntity) {
         if (tileEntity == null) {
             return 0;
         }
@@ -25,7 +25,7 @@ public class InventoryTools {
         return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(IItemHandler::getSlots).orElse(0);
     }
 
-    public static boolean isInventory(TileEntity te) {
+    public static boolean isInventory(BlockEntity te) {
         return te != null && te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent();
     }
 
@@ -36,7 +36,7 @@ public class InventoryTools {
      * @param predicate
      * @return
      */
-    public static Stream<ItemStack> getItems(TileEntity tileEntity, Predicate<ItemStack> predicate) {
+    public static Stream<ItemStack> getItems(BlockEntity tileEntity, Predicate<ItemStack> predicate) {
         Stream.Builder<ItemStack> builder = Stream.builder();
 
         if (tileEntity != null) {
@@ -60,7 +60,7 @@ public class InventoryTools {
      * @return
      */
     @Nonnull
-    public static ItemStack getFirstMatchingItem(TileEntity tileEntity, Predicate<ItemStack> predicate) {
+    public static ItemStack getFirstMatchingItem(BlockEntity tileEntity, Predicate<ItemStack> predicate) {
         if (tileEntity != null) {
             return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(handler -> {
                 for (int i = 0; i < handler.getSlots(); i++) {
@@ -81,8 +81,8 @@ public class InventoryTools {
      * on succcess.
      */
     @Nonnull
-    public static ItemStack insertItem(World world, BlockPos pos, Direction direction, @Nonnull ItemStack s) {
-        TileEntity te = world.getBlockEntity(direction == null ? pos : pos.relative(direction));
+    public static ItemStack insertItem(Level world, BlockPos pos, Direction direction, @Nonnull ItemStack s) {
+        BlockEntity te = world.getBlockEntity(direction == null ? pos : pos.relative(direction));
         if (te != null) {
             Direction opposite = direction == null ? null : direction.getOpposite();
             return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite)

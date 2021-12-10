@@ -1,14 +1,14 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -198,7 +198,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     }
 
     @Override
-    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
         if (withBorder) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;

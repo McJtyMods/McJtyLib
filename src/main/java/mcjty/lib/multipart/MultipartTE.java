@@ -1,16 +1,16 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.state.Property;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelDataManager;
@@ -27,15 +27,15 @@ import java.util.Map;
 
 import static mcjty.lib.setup.Registration.TYPE_MULTIPART;
 
-public class MultipartTE extends TileEntity {
+public class MultipartTE extends BlockEntity {
 
     public static final ModelProperty<Map<PartSlot, MultipartTE.Part>> PARTS = new ModelProperty<>();
 
     public static class Part {
         private final BlockState state;
-        private final TileEntity tileEntity;
+        private final BlockEntity tileEntity;
 
-        public Part(BlockState state, TileEntity tileEntity) {
+        public Part(BlockState state, BlockEntity tileEntity) {
             this.state = state;
             this.tileEntity = tileEntity;
         }
@@ -44,7 +44,7 @@ public class MultipartTE extends TileEntity {
             return state;
         }
 
-        public TileEntity getTileEntity() {
+        public BlockEntity getTileEntity() {
             return tileEntity;
         }
     }
@@ -73,7 +73,7 @@ public class MultipartTE extends TileEntity {
         }
     }
 
-    public void addPart(PartSlot slot, BlockState state, TileEntity te) {
+    public void addPart(PartSlot slot, BlockState state, BlockEntity te) {
         System.out.println("MultipartTE.addPart: " + level.isClientSide);
         parts.put(slot, new Part(state, te));
 
@@ -138,7 +138,7 @@ public class MultipartTE extends TileEntity {
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
         int oldVersion = version;
         load(getBlockState(), packet.getTag());
         if (level.isClientSide && version != oldVersion) {

@@ -1,12 +1,12 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +39,7 @@ public class Logging {
         getLogger().log(Level.ERROR, msg);
     }
 
-    public static void log(World world, TileEntity te, String message) {
+    public static void log(Level world, BlockEntity te, String message) {
         if (doLogging.get()) {
             long ticks = world.getGameTime();
             if (ticks != prevTicks) {
@@ -69,11 +69,11 @@ public class Logging {
         }
     }
 
-    public static void message(@Nonnull PlayerEntity player, String message) {
-        player.displayClientMessage(new StringTextComponent(message), false);
+    public static void message(@Nonnull Player player, String message) {
+        player.displayClientMessage(new TextComponent(message), false);
     }
 
-    public static void warn(@Nonnull PlayerEntity player, String message) {
-        player.displayClientMessage(new StringTextComponent(message).setStyle(Style.EMPTY.withColor(TextFormatting.RED)), false);
+    public static void warn(@Nonnull Player player, String message) {
+        player.displayClientMessage(new TextComponent(message).setStyle(Style.EMPTY.withColor(ChatFormatting.RED)), false);
     }
 }

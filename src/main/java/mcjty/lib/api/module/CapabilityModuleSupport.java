@@ -1,7 +1,7 @@
 package mcjty.lib.api.module;
 
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -14,12 +14,12 @@ public class CapabilityModuleSupport {
     public static void register() {
         CapabilityManager.INSTANCE.register(IModuleSupport.class, new Capability.IStorage<IModuleSupport>() {
             @Override
-            public INBT writeNBT(Capability<IModuleSupport> capability, IModuleSupport instance, Direction side) {
+            public Tag writeNBT(Capability<IModuleSupport> capability, IModuleSupport instance, Direction side) {
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public void readNBT(Capability<IModuleSupport> capability, IModuleSupport instance, Direction side, INBT nbt) {
+            public void readNBT(Capability<IModuleSupport> capability, IModuleSupport instance, Direction side, Tag nbt) {
                 throw new UnsupportedOperationException();
             }
         }, () -> {

@@ -1,12 +1,12 @@
 package mcjty.lib.api.smartwrench;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
 
 public interface ISmartWrenchSelector {
 
     /**
      * This is only called server side. Select a block for this tile entity.
      */
-    void selectBlock(PlayerEntity player, BlockPos pos);
+    void selectBlock(Player player, BlockPos pos);
 }

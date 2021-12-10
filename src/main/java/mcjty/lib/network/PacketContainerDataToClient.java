@@ -5,9 +5,9 @@ import io.netty.buffer.Unpooled;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.container.GenericContainer;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -15,16 +15,16 @@ import java.util.function.Supplier;
 public class PacketContainerDataToClient {
 
     private ResourceLocation id;
-    private PacketBuffer buffer;
+    private FriendlyByteBuf buffer;
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(id);
         int l = buffer.array().length;
         buf.writeInt(l);
         buf.writeBytes(buffer.array());
     }
 
-    public PacketContainerDataToClient(PacketBuffer buf) {
+    public PacketContainerDataToClient(FriendlyByteBuf buf) {
         id = buf.readResourceLocation();
         int l = buf.readInt();
 
@@ -32,10 +32,10 @@ public class PacketContainerDataToClient {
         byte[] bytes = new byte[l];
         buf.readBytes(bytes);
         newbuf.writeBytes(bytes);
-        buffer = new PacketBuffer(newbuf);
+        buffer = new FriendlyByteBuf(newbuf);
     }
 
-    public PacketContainerDataToClient(ResourceLocation id, PacketBuffer buffer) {
+    public PacketContainerDataToClient(ResourceLocation id, FriendlyByteBuf buffer) {
         this.id = id;
         this.buffer = buffer;
     }
@@ -43,7 +43,7 @@ public class PacketContainerDataToClient {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            Container container = McJtyLib.proxy.getClientPlayer().containerMenu;
+            AbstractContainerMenu container = McJtyLib.proxy.getClientPlayer().containerMenu;
             if (container instanceof GenericContainer) {
                 GenericContainer gc = (GenericContainer) container;
                 IContainerDataListener listener = gc.getListener(id);

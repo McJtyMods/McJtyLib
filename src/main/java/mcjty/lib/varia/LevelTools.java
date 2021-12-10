@@ -1,66 +1,66 @@
 package mcjty.lib.varia;
 
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ChunkHolder;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ChunkHolder;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
 import java.util.stream.Stream;
 
 public class LevelTools {
 
-    public static boolean isLoaded(World world, BlockPos pos) {
+    public static boolean isLoaded(Level world, BlockPos pos) {
         if (world == null || pos == null) {
             return false;
         }
         return world.hasChunkAt(pos);
     }
 
-    public static ServerWorld getOverworld() {
+    public static ServerLevel getOverworld() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
-        return server.getLevel(World.OVERWORLD);
+        return server.getLevel(Level.OVERWORLD);
     }
 
-    public static ServerWorld getOverworld(World world) {
+    public static ServerLevel getOverworld(Level world) {
         MinecraftServer server = world.getServer();
-        return server.getLevel(World.OVERWORLD);
+        return server.getLevel(Level.OVERWORLD);
     }
 
-    public static ServerWorld getLevel(RegistryKey<World> type) {
+    public static ServerLevel getLevel(ResourceKey<Level> type) {
         return ServerLifecycleHooks.getCurrentServer().getLevel(type);
     }
 
-    public static ServerWorld getLevel(World world, RegistryKey<World> type) {
+    public static ServerLevel getLevel(Level world, ResourceKey<Level> type) {
         // Worlds in 1.16 are always loaded
         return world.getServer().getLevel(type);
     }
 
-    public static ServerWorld getLevel(World world, ResourceLocation id) {
+    public static ServerLevel getLevel(Level world, ResourceLocation id) {
         // Worlds in 1.16 are always loaded
-        return world.getServer().getLevel(RegistryKey.create(Registry.DIMENSION_REGISTRY, id));
+        return world.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, id));
     }
 
-    public static RegistryKey<World> getId(ResourceLocation id) {
-        return RegistryKey.create(Registry.DIMENSION_REGISTRY, id);
+    public static ResourceKey<Level> getId(ResourceLocation id) {
+        return ResourceKey.create(Registry.DIMENSION_REGISTRY, id);
     }
 
-    public static RegistryKey<World> getId(String id) {
-        return RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(id));
+    public static ResourceKey<Level> getId(String id) {
+        return ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(id));
     }
 
     /**
      * Gets all players who have the chunk in which the provided (x,z) coordinates are located loaded
      */
-    public static Stream<ServerPlayerEntity> getAllPlayersWatchingBlock(World world, BlockPos pos) {
-        if (world instanceof ServerWorld) {
-            ChunkHolder.IPlayerProvider playerManager = ((ServerWorld)world).getChunkSource().chunkMap;
+    public static Stream<ServerPlayer> getAllPlayersWatchingBlock(Level world, BlockPos pos) {
+        if (world instanceof ServerLevel) {
+            ChunkHolder.PlayerProvider playerManager = ((ServerLevel)world).getChunkSource().chunkMap;
             return playerManager.getPlayers(new ChunkPos(pos), false);
         }
         return Stream.empty();

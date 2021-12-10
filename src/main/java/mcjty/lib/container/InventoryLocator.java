@@ -1,11 +1,11 @@
 package mcjty.lib.container;
 
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -23,14 +23,14 @@ public class InventoryLocator {
     private Direction inventorySide = null;
 
     @Nonnull
-    private LazyOptional<IItemHandler> getItemHandlerAtDirection(World worldObj, BlockPos thisCoordinate, Direction direction) {
+    private LazyOptional<IItemHandler> getItemHandlerAtDirection(Level worldObj, BlockPos thisCoordinate, Direction direction) {
         if (direction == null) {
             if (inventoryCoordinate != null) {
                 return getItemHandlerAtCoordinate(worldObj, inventoryCoordinate, inventorySide);
             }
             return LazyOptional.empty();
         }
-        TileEntity te = worldObj.getBlockEntity(thisCoordinate);
+        BlockEntity te = worldObj.getBlockEntity(thisCoordinate);
         if (te == null) {
             return LazyOptional.empty();
         }
@@ -43,8 +43,8 @@ public class InventoryLocator {
     }
 
     @Nonnull
-    private LazyOptional<IItemHandler> getItemHandlerAtCoordinate(World worldObj, BlockPos c, Direction direction) {
-        TileEntity te = worldObj.getBlockEntity(c);
+    private LazyOptional<IItemHandler> getItemHandlerAtCoordinate(Level worldObj, BlockPos c, Direction direction) {
+        BlockEntity te = worldObj.getBlockEntity(c);
         if (te == null) {
             return LazyOptional.empty();
         }
@@ -52,7 +52,7 @@ public class InventoryLocator {
     }
 
 
-    public void ejectStack(World worldObj, BlockPos pos, ItemStack stack, BlockPos thisCoordinate, Direction[] directions) {
+    public void ejectStack(Level worldObj, BlockPos pos, ItemStack stack, BlockPos thisCoordinate, Direction[] directions) {
         for (Direction dir : directions) {
             if (stack.isEmpty()) {
                 break;

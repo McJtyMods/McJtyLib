@@ -20,7 +20,7 @@ package mcjty.lib.font;
 
 import mcjty.lib.varia.Logging;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
 import java.io.IOException;

@@ -6,13 +6,13 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -26,26 +26,26 @@ import java.util.function.Supplier;
  */
 public class PacketGetListFromServer {
 
-    protected final RegistryKey<World> dimension;
+    protected final ResourceKey<Level> dimension;
     protected final BlockPos pos;
     protected final String command;
     protected final TypedMap params;
 
-    public PacketGetListFromServer(PacketBuffer buf) {
+    public PacketGetListFromServer(FriendlyByteBuf buf) {
         dimension = LevelTools.getId(buf.readResourceLocation());
         pos = buf.readBlockPos();
         command = buf.readUtf(32767);
         params = TypedMapTools.readArguments(buf);
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(dimension.location());
         buf.writeBlockPos(pos);
         buf.writeUtf(command);
         TypedMapTools.writeArguments(buf, params);
     }
 
-    public PacketGetListFromServer(RegistryKey<World> dimension, BlockPos pos, String cmd, @Nonnull TypedMap params) {
+    public PacketGetListFromServer(ResourceKey<Level> dimension, BlockPos pos, String cmd, @Nonnull TypedMap params) {
         this.dimension = dimension;
         this.pos = pos;
         this.command = cmd;
@@ -69,10 +69,10 @@ public class PacketGetListFromServer {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            ServerPlayerEntity player = ctx.getSender();
-            ServerWorld world = LevelTools.getLevel(ctx.getSender().getCommandSenderWorld(), dimension);
+            ServerPlayer player = ctx.getSender();
+            ServerLevel world = LevelTools.getLevel(ctx.getSender().getCommandSenderWorld(), dimension);
             if (world.hasChunkAt(pos)) {
-                TileEntity te = world.getBlockEntity(pos);
+                BlockEntity te = world.getBlockEntity(pos);
                 if (te instanceof GenericTileEntity) {
                     CommandInfo<?> info = McJtyLib.getCommandInfo(command);
                     if (info == null) {

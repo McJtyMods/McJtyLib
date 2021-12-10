@@ -8,8 +8,8 @@ import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.*;
 import mcjty.lib.syncpositional.PositionalDataSyncer;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
@@ -62,7 +62,7 @@ public class McJtyLib {
      * This is automatically called by annotated ListCommands (@ServerCommand) if they have
      * an associated type parameter
      */
-    public static <T> void registerListCommandInfo(String command, Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
+    public static <T> void registerListCommandInfo(String command, Class<T> type, Function<FriendlyByteBuf, T> deserializer, BiConsumer<FriendlyByteBuf, T> serializer) {
         commandInfos.put(command, new CommandInfo<T>(type, deserializer, serializer));
     }
 
@@ -81,7 +81,7 @@ public class McJtyLib {
         clientCommands.put(Pair.of(modid, id), command);
     }
 
-    public static boolean handleCommand(String modid, String id, PlayerEntity player, TypedMap arguments) {
+    public static boolean handleCommand(String modid, String id, Player player, TypedMap arguments) {
         IServerCommand command = serverCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;
@@ -89,7 +89,7 @@ public class McJtyLib {
         return command.execute(player, arguments);
     }
 
-    public static boolean handleClientCommand(String modid, String id, PlayerEntity player, TypedMap arguments) {
+    public static boolean handleClientCommand(String modid, String id, Player player, TypedMap arguments) {
         IServerCommand command = clientCommands.get(Pair.of(modid, id));
         if (command == null) {
             return false;
@@ -97,7 +97,7 @@ public class McJtyLib {
         return command.execute(player, arguments);
     }
 
-    public static LazyOptional<PreferencesProperties> getPreferencesProperties(PlayerEntity player) {
+    public static LazyOptional<PreferencesProperties> getPreferencesProperties(Player player) {
         return player.getCapability(ModSetup.PREFERENCES_CAPABILITY);
     }
 }

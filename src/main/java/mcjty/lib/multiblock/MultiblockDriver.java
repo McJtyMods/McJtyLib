@@ -1,10 +1,10 @@
 package mcjty.lib.multiblock;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -17,12 +17,12 @@ public class MultiblockDriver<T extends IMultiblock> {
     private final Map<Integer,MultiblockHolder<T>> multiblocks = new HashMap<>();
     private int lastId = 0;
 
-    private final Function<CompoundNBT, T> loader;
-    private final BiConsumer<CompoundNBT, T> saver;
+    private final Function<CompoundTag, T> loader;
+    private final BiConsumer<CompoundTag, T> saver;
     private final Consumer<MultiblockDriver<T>> dirtySetter;
     private final BiPredicate<T, T> mergeChecker;
     private final IMultiblockFixer<T> fixer;
-    private final BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
+    private final BiFunction<Level, BlockPos, IMultiblockConnector> holderGetter;
 
     private MultiblockDriver(Builder<T> builder) {
         this.loader = builder.loader;
@@ -42,7 +42,7 @@ public class MultiblockDriver<T extends IMultiblock> {
         return fixer;
     }
 
-    public BiFunction<World, BlockPos, IMultiblockConnector> getHolderGetter() {
+    public BiFunction<Level, BlockPos, IMultiblockConnector> getHolderGetter() {
         return holderGetter;
     }
 
@@ -94,9 +94,9 @@ public class MultiblockDriver<T extends IMultiblock> {
         return lastId;
     }
 
-    public void load(CompoundNBT tagCompound) {
+    public void load(CompoundTag tagCompound) {
         clear();
-        ListNBT lst = tagCompound.getList("mb", Tag.TAG_COMPOUND);
+        ListTag lst = tagCompound.getList("mb", Tag.TAG_COMPOUND);
         for (int i = 0 ; i < lst.size() ; i++) {
             CompoundNBT tc = lst.getCompound(i);
             int id = tc.getInt("id");

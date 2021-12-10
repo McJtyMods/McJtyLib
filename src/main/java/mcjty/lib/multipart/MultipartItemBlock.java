@@ -4,24 +4,26 @@ package mcjty.lib.multipart;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
 
-import net.minecraft.item.Item.Properties;
+import net.minecraft.world.item.Item.Properties;
+
+import net.minecraft.core.BlockPos;
 
 public class MultipartItemBlock extends BlockItem {
 
@@ -34,7 +36,7 @@ public class MultipartItemBlock extends BlockItem {
     }
 
     @Override
-    protected boolean canPlace(@Nonnull BlockItemUseContext context, @Nonnull BlockState state) {
+    protected boolean canPlace(@Nonnull BlockPlaceContext context, @Nonnull BlockState state) {
         // Return true to make this work all the time.
         return true;
     }
@@ -42,17 +44,17 @@ public class MultipartItemBlock extends BlockItem {
 
     @Nonnull
     @Override
-    public ActionResultType place(BlockItemUseContext context) {
-        World world = context.getLevel();
+    public InteractionResult place(BlockPlaceContext context) {
+        Level world = context.getLevel();
         BlockPos pos = context.getClickedPos();
-        PlayerEntity player = context.getPlayer();
+        Player player = context.getPlayer();
 
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
 
         ItemStack itemstack = context.getItemInHand();
         if (itemstack.isEmpty()) {
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
         }
 
         BlockState toPlace = this.getBlock().getStateForPlacement(context);
@@ -79,31 +81,31 @@ public class MultipartItemBlock extends BlockItem {
             if (canFitInside(block, world, pos, slot)) {
                 if (placeBlockAtInternal(itemstack, player, world, pos, toPlace, slot)) {
                     SoundType soundtype = toPlace.getBlock().getSoundType(toPlace, world, pos, player);
-                    world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                    world.playSound(player, pos, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                     itemstack.shrink(1);
                 }
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             } else if (true /* @todo 1.14 world.mayPlace(this.getBlock(), pos, false, facing, null)*/) {
                 if (placeBlockAtInternal(itemstack, player, world, pos, toPlace, slot)) {
                     SoundType soundtype = toPlace.getBlock().getSoundType(toPlace, world, pos, player);
-                    world.playSound(player, pos, soundtype.getPlaceSound(), SoundCategory.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
+                    world.playSound(player, pos, soundtype.getPlaceSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F);
                     itemstack.shrink(1);
                 }
 
-                return ActionResultType.SUCCESS;
+                return InteractionResult.SUCCESS;
             } else {
-                return ActionResultType.FAIL;
+                return InteractionResult.FAIL;
             }
         } else {
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
         }
     }
 
-    private boolean canFitInside(Block block, World world, BlockPos pos, PartSlot slot) {
+    private boolean canFitInside(Block block, Level world, BlockPos pos, PartSlot slot) {
         if (block != Registration.MULTIPART_BLOCK) {
             return false;
         }
-        TileEntity te = world.getBlockEntity(pos);
+        BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
             return part == null;
@@ -129,21 +131,21 @@ public class MultipartItemBlock extends BlockItem {
 //        }
 //    }
 
-    private TileEntity createTileEntity(World world, BlockState state) {
+    private BlockEntity createTileEntity(Level world, BlockState state) {
         return state.getBlock().createTileEntity(state, world);
     }
 
     @Override
-    protected boolean placeBlock(@Nonnull BlockItemUseContext context, @Nonnull BlockState state) {
+    protected boolean placeBlock(@Nonnull BlockPlaceContext context, @Nonnull BlockState state) {
         // Not implemented
         return false;
     }
 
-    private boolean placeBlockAtInternal(ItemStack stack, PlayerEntity player, World world, BlockPos pos, BlockState newState,
+    private boolean placeBlockAtInternal(ItemStack stack, Player player, Level world, BlockPos pos, BlockState newState,
                                          @Nonnull PartSlot slot) {
-        TileEntity te = world.getBlockEntity(pos);
+        BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
-            TileEntity tileEntity = createTileEntity(world, newState);
+            BlockEntity tileEntity = createTileEntity(world, newState);
             if (tileEntity instanceof GenericTileEntity && stack.getTag() != null) {
                 // @todo how to do this?
 //                ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());

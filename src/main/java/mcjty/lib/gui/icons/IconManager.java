@@ -1,10 +1,10 @@
 package mcjty.lib.gui.icons;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.IconHolder;
 import mcjty.lib.gui.widgets.Widget;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 import java.util.Optional;
 
@@ -92,7 +92,7 @@ public class IconManager {
         return draggingIcon != null;
     }
 
-    public void draw(Screen gui, MatrixStack matrixStack) {
+    public void draw(Screen gui, PoseStack matrixStack) {
         if (draggingIcon != null) {
             draggingIcon.draw(gui, matrixStack, getRelativeX() - dx, getRelativeY() - dy);
         }

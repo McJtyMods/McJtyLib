@@ -1,6 +1,6 @@
 package mcjty.lib.varia;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface IEnergyItem {
     long receiveEnergyL(ItemStack container, long maxReceive, boolean simulate);

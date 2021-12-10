@@ -6,15 +6,15 @@ import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Sync;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
@@ -30,28 +30,28 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class DefaultContainerProvider<C extends IGenericContainer> implements INamedContainerProvider {
+public class DefaultContainerProvider<C extends IGenericContainer> implements MenuProvider {
 
     private final String name;
-    private BiFunction<Integer, PlayerEntity, C> containerSupplier;
+    private BiFunction<Integer, Player, C> containerSupplier;
     private Supplier<? extends IItemHandler> itemHandler = () -> null;
     private Supplier<? extends GenericEnergyStorage> energyHandler = () -> null;
-    private final List<IntReferenceHolder> integerListeners = new ArrayList<>();
-    private final List<IntReferenceHolder> shortListeners = new ArrayList<>();
+    private final List<DataSlot> integerListeners = new ArrayList<>();
+    private final List<DataSlot> shortListeners = new ArrayList<>();
     private final List<IContainerDataListener> containerDataListeners = new ArrayList<>();
 
     /**
      * Conveniance method to make a supplier for an empty container (ContainerFactory.EMPTY).
      * Use this if you want to have a container for syncing values but otherwise have no items
      */
-    public static Function<Integer, GenericContainer> empty(@Nonnull Supplier<ContainerType<GenericContainer>> type, GenericTileEntity te) {
+    public static Function<Integer, GenericContainer> empty(@Nonnull Supplier<MenuType<GenericContainer>> type, GenericTileEntity te) {
         return windowId -> new GenericContainer(type, windowId, ContainerFactory.EMPTY, te);
     }
 
     /**
      * Conveniance method to make a supplier for a non-empty container
      */
-    public static Function<Integer, GenericContainer> container(@Nonnull Supplier<ContainerType<GenericContainer>> type, @Nonnull Supplier<ContainerFactory> factory, GenericTileEntity te) {
+    public static Function<Integer, GenericContainer> container(@Nonnull Supplier<MenuType<GenericContainer>> type, @Nonnull Supplier<ContainerFactory> factory, GenericTileEntity te) {
         return windowId -> new GenericContainer(type, windowId, factory, te);
     }
 
@@ -61,11 +61,11 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
 
     @Override
     @Nonnull
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent(name);
+    public Component getDisplayName() {
+        return new TextComponent(name);
     }
 
-    public DefaultContainerProvider<C> containerSupplier(BiFunction<Integer, PlayerEntity, C> containerSupplier) {
+    public DefaultContainerProvider<C> containerSupplier(BiFunction<Integer, Player, C> containerSupplier) {
         this.containerSupplier = containerSupplier;
         return this;
     }
@@ -90,12 +90,12 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         return this;
     }
 
-    public DefaultContainerProvider<C> integerListener(IntReferenceHolder holder) {
+    public DefaultContainerProvider<C> integerListener(DataSlot holder) {
         integerListeners.add(holder);
         return this;
     }
 
-    public DefaultContainerProvider<C> shortListener(IntReferenceHolder holder) {
+    public DefaultContainerProvider<C> shortListener(DataSlot holder) {
         shortListeners.add(holder);
         return this;
     }
@@ -180,7 +180,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
 
     @Nullable
     @Override
-    public Container createMenu(int windowId, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity playerEntity) {
+    public AbstractContainerMenu createMenu(int windowId, @Nonnull Inventory playerInventory, @Nonnull Player playerEntity) {
         C container = containerSupplier.apply(windowId, playerEntity);
         IItemHandler itemHandler = this.itemHandler.get();
         container.setupInventories(itemHandler, playerInventory);
@@ -188,10 +188,10 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
         if (energyHandler != null) {
             energyHandler.addIntegerListeners(container);
         }
-        for (IntReferenceHolder listener : integerListeners) {
+        for (DataSlot listener : integerListeners) {
             container.addIntegerListener(listener);
         }
-        for (IntReferenceHolder listener : shortListeners) {
+        for (DataSlot listener : shortListeners) {
             container.addShortListener(listener);
         }
         for (IContainerDataListener dataListener : containerDataListeners) {

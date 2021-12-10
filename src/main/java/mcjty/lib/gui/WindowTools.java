@@ -1,9 +1,9 @@
 package mcjty.lib.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.resources.IResource;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.resources.ResourceLocation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class WindowTools {
 
     public static void parseAndHandleClient(ResourceLocation guiDescription, Consumer<GuiParser.GuiCommand> consumer) {
         try {
-            IResource resource = Minecraft.getInstance().getResourceManager().getResource(guiDescription);
+            Resource resource = Minecraft.getInstance().getResourceManager().getResource(guiDescription);
             try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
                 GuiParser.parse(br).forEach(consumer);
             } catch (GuiParser.ParserException e) {

@@ -1,14 +1,14 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class AbstractLabel<P extends AbstractLabel<P>> extends AbstractWidget<P> {
 
@@ -133,11 +133,11 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
     }
 
     @Override
-    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
         drawOffset(gui, matrixStack, x, y, 0, 0);
     }
 
-    public void drawOffset(Screen gui, MatrixStack matrixStack, int x, int y, int offsetx, int offsety) {
+    public void drawOffset(Screen gui, PoseStack matrixStack, int x, int y, int offsetx, int offsety) {
         if (!visible) {
             return;
         }

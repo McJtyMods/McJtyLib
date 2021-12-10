@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
 public class CapabilityTools {
 
     @Nonnull
-    public static LazyOptional<IItemHandler> getItemCapabilitySafe(TileEntity tileEntity) {
+    public static LazyOptional<IItemHandler> getItemCapabilitySafe(BlockEntity tileEntity) {
         if (tileEntity == null) {
             return LazyOptional.empty();
         }
@@ -26,7 +26,7 @@ public class CapabilityTools {
     }
 
     @Nonnull
-    public static LazyOptional<IFluidHandler> getFluidCapabilitySafe(TileEntity tileEntity) {
+    public static LazyOptional<IFluidHandler> getFluidCapabilitySafe(BlockEntity tileEntity) {
         if (tileEntity == null) {
             return LazyOptional.empty();
         }
@@ -38,7 +38,7 @@ public class CapabilityTools {
         }
     }
 
-    private static void reportWrongBlock(TileEntity tileEntity, Exception e) {
+    private static void reportWrongBlock(BlockEntity tileEntity, Exception e) {
         if (tileEntity != null) {
             ResourceLocation name = tileEntity.getLevel().getBlockState(tileEntity.getBlockPos()).getBlock().getRegistryName();
             Logging.logError("Block " + name.toString() + " at " + BlockPosTools.toString(tileEntity.getBlockPos()) + " does not respect the capability API and crashes on null side.");

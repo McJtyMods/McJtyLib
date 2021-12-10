@@ -1,7 +1,7 @@
 package mcjty.lib.container;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.ListTag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
  * and 'canAutomationExtract'. Most TE's have another IItemHandler that is used
  * for the container so that the player can interact with slots even if automation can't
  */
-public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
+public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTSerializable<ListTag> {
 
     private final GenericItemHandler wrapped;
 
@@ -74,12 +74,12 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTS
     }
 
     @Override
-    public ListNBT serializeNBT() {
+    public ListTag serializeNBT() {
         return wrapped.serializeNBT();
     }
 
     @Override
-    public void deserializeNBT(ListNBT nbt) {
+    public void deserializeNBT(ListTag nbt) {
         wrapped.deserializeNBT(nbt);
     }
 }

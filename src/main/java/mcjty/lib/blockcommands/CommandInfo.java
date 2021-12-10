@@ -1,6 +1,6 @@
 package mcjty.lib.blockcommands;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -10,10 +10,10 @@ import java.util.function.Function;
  */
 public class CommandInfo<T> {
     private final Class<T> type;
-    private final Function<PacketBuffer, T> deserializer;
-    private final BiConsumer<PacketBuffer, T> serializer;
+    private final Function<FriendlyByteBuf, T> deserializer;
+    private final BiConsumer<FriendlyByteBuf, T> serializer;
 
-    public CommandInfo(Class<T> type, Function<PacketBuffer, T> deserializer, BiConsumer<PacketBuffer, T> serializer) {
+    public CommandInfo(Class<T> type, Function<FriendlyByteBuf, T> deserializer, BiConsumer<FriendlyByteBuf, T> serializer) {
         this.type = type;
         this.deserializer = deserializer;
         this.serializer = serializer;
@@ -23,11 +23,11 @@ public class CommandInfo<T> {
         return type;
     }
 
-    public Function<PacketBuffer, T> getDeserializer() {
+    public Function<FriendlyByteBuf, T> getDeserializer() {
         return deserializer;
     }
 
-    public BiConsumer<PacketBuffer, T> getSerializer() {
+    public BiConsumer<FriendlyByteBuf, T> getSerializer() {
         return serializer;
     }
 }

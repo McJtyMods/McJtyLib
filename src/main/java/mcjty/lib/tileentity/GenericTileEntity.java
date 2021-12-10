@@ -15,15 +15,15 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.RedstoneMode;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -51,7 +51,9 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class GenericTileEntity extends TileEntity {
+import net.minecraft.core.Direction;
+
+public class GenericTileEntity extends BlockEntity {
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
@@ -67,7 +69,7 @@ public class GenericTileEntity extends TileEntity {
     // a function that does the actual testing
     private BiFunction<Capability, Direction, LazyOptional> capSetup;
 
-    public GenericTileEntity(TileEntityType<?> type) {
+    public GenericTileEntity(BlockEntityType<?> type) {
         super(type);
         // Setup code to find the capability annotations and in that code we
         // replace 'capSetup' with the actual code to execute the annotations
