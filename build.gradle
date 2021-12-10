@@ -49,7 +49,7 @@ if (System.getenv('BUILD_NUMBER') != null) {
 java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 minecraft {
-    mappings channel: 'parchment', version: "2021.10.03-1.17.1"
+    mappings channel: 'parchment', version: "2021.12.05-1.17.1"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
