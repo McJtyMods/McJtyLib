@@ -10,6 +10,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
@@ -117,21 +118,7 @@ public class PreferencesProperties {
         return buffY;
     }
 
-    public static void register() {
-        CapabilityManager.INSTANCE.register(PreferencesProperties.class, new Capability.IStorage<PreferencesProperties>() {
-
-            @Override
-            public Tag writeNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void readNBT(Capability<PreferencesProperties> capability, PreferencesProperties instance, Direction side, Tag nbt) {
-                throw new UnsupportedOperationException();
-            }
-
-        }, () -> {
-            throw new UnsupportedOperationException();
-        });
+    public static void register(RegisterCapabilitiesEvent event) {
+        event.register(PreferencesProperties.class);
     }
 }
