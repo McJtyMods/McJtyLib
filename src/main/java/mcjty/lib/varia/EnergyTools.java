@@ -4,12 +4,12 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.api.power.IBigPower;
 import mcjty.lib.compat.TeslaCompatibility;
 import mcjty.lib.tileentity.GenericEnergyStorage;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.energy.CapabilityEnergy;
 
 import javax.annotation.Nullable;
@@ -35,7 +35,7 @@ public class EnergyTools {
         }
     }
 
-    public static boolean isEnergyTE(TileEntity te, @Nullable Direction side) {
+    public static boolean isEnergyTE(BlockEntity te, @Nullable Direction side) {
         if (te == null) {
             return false;
         }
@@ -57,7 +57,7 @@ public class EnergyTools {
     }
 
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
-    public static EnergyLevel getEnergyLevelMulti(TileEntity tileEntity, @Nullable Direction side) {
+    public static EnergyLevel getEnergyLevelMulti(BlockEntity tileEntity, @Nullable Direction side) {
         long maxEnergyStored;
         long energyStored;
         if (tileEntity instanceof IBigPower) {
@@ -75,7 +75,7 @@ public class EnergyTools {
         return new EnergyLevel(energyStored, maxEnergyStored);
     }
 
-    public static EnergyLevel getEnergyLevel(TileEntity tileEntity, @Nullable Direction side) {
+    public static EnergyLevel getEnergyLevel(BlockEntity tileEntity, @Nullable Direction side) {
         AtomicLong maxEnergyStored = new AtomicLong();
         AtomicLong energyStored = new AtomicLong();
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(tileEntity, side)) {
@@ -93,7 +93,7 @@ public class EnergyTools {
         return new EnergyLevel(energyStored.get(), maxEnergyStored.get());
     }
 
-    public static long receiveEnergy(TileEntity tileEntity, Direction from, long maxReceive) {
+    public static long receiveEnergy(BlockEntity tileEntity, Direction from, long maxReceive) {
         if (McJtyLib.tesla && TeslaCompatibility.isEnergyReceiver(tileEntity, from)) {
             return TeslaCompatibility.receiveEnergy(tileEntity, from, maxReceive);
         } else if (tileEntity != null) {
@@ -151,10 +151,10 @@ public class EnergyTools {
     /**
      * Send out energy to all adjacent devices that support receiving energy
      */
-    public static void handleSendingEnergy(World world, BlockPos pos, long storedPower, long sendPerTick, GenericEnergyStorage storage) {
+    public static void handleSendingEnergy(Level world, BlockPos pos, long storedPower, long sendPerTick, GenericEnergyStorage storage) {
         for (Direction facing : OrientationTools.DIRECTION_VALUES) {
             BlockPos p = pos.relative(facing);
-            TileEntity te = world.getBlockEntity(p);
+            BlockEntity te = world.getBlockEntity(p);
             Direction opposite = facing.getOpposite();
             if (EnergyTools.isEnergyTE(te, opposite)) {
                 long rfToGive = Math.min(sendPerTick, storedPower);

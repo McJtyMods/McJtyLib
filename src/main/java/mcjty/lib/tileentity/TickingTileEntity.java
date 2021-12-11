@@ -1,15 +1,15 @@
 package mcjty.lib.tileentity;
 
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
-public class TickingTileEntity extends GenericTileEntity implements ITickableTileEntity {
+public class TickingTileEntity extends GenericTileEntity {
 
-    public TickingTileEntity(TileEntityType<?> type) {
-        super(type);
+    public TickingTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
-    @Override
     public void tick() {
         if (level != null) {
             if (level.isClientSide()) {

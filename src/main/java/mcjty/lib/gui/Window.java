@@ -1,6 +1,6 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.IRunnable;
@@ -19,12 +19,12 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
@@ -279,7 +279,7 @@ public class Window {
         bindings.entrySet().stream().forEach(entry -> entry.getKey().setGenericValue(entry.getValue().apply(te)));
     }
 
-    public void draw(MatrixStack matrixStack) {
+    public void draw(PoseStack matrixStack) {
         int x = getRelativeX();
         int y = getRelativeY();
 
@@ -423,7 +423,7 @@ public class Window {
         return this;
     }
 
-    private <T extends GenericTileEntity, V> void initializeBinding(SimpleChannel network, @Nonnull RegistryKey<World> dimensionType, String componentName,
+    private <T extends GenericTileEntity, V> void initializeBinding(SimpleChannel network, @Nonnull ResourceKey<Level> dimensionType, String componentName,
                                                                     T te, ValueHolder value) {
         V v = (V) value.getter().apply(te);
         Widget<?> component = findChild(componentName);

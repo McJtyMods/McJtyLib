@@ -1,18 +1,18 @@
 package mcjty.lib.crafting;
 
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ICraftingRecipe;
-import net.minecraft.item.crafting.IRecipeType;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
 
-public abstract class AbstractRecipeAdaptor implements ICraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingInventory> {
+public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingContainer> {
 
     private final ShapedRecipe recipe;
 
@@ -27,7 +27,7 @@ public abstract class AbstractRecipeAdaptor implements ICraftingRecipe, net.mine
 
     @Override
     @Nonnull
-    public NonNullList<ItemStack> getRemainingItems(@Nonnull CraftingInventory inv) {
+    public NonNullList<ItemStack> getRemainingItems(@Nonnull CraftingContainer inv) {
         return recipe.getRemainingItems(inv);
     }
 
@@ -69,13 +69,13 @@ public abstract class AbstractRecipeAdaptor implements ICraftingRecipe, net.mine
     }
 
     @Override
-    public boolean matches(@Nonnull CraftingInventory inv, @Nonnull World worldIn) {
+    public boolean matches(@Nonnull CraftingContainer inv, @Nonnull Level worldIn) {
         return recipe.matches(inv, worldIn);
     }
 
     @Override
     @Nonnull
-    public ItemStack assemble(@Nonnull CraftingInventory inv) {
+    public ItemStack assemble(@Nonnull CraftingContainer inv) {
         return recipe.assemble(inv);
     }
 
@@ -93,7 +93,7 @@ public abstract class AbstractRecipeAdaptor implements ICraftingRecipe, net.mine
 
     @Override
     @Nonnull
-    public IRecipeType<?> getType() {
+    public RecipeType<?> getType() {
         return recipe.getType();
     }
 }

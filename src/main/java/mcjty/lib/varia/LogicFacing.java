@@ -1,13 +1,13 @@
 package mcjty.lib.varia;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.core.Direction;
+import net.minecraft.util.StringRepresentable;
 
 import javax.annotation.Nonnull;
 
-import static net.minecraft.util.Direction.*;
+import static net.minecraft.core.Direction.*;
 
-public enum LogicFacing implements IStringSerializable {
+public enum LogicFacing implements StringRepresentable {
     DOWN_TONORTH("down_tonorth", NORTH, 0),
     DOWN_TOSOUTH("down_tosouth", SOUTH, 1),
     DOWN_TOWEST("down_towest", WEST, 2),

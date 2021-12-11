@@ -5,11 +5,11 @@ import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -24,7 +24,7 @@ public class PacketDataFromServer {
     TypedMap result;
     String command;
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         if (pos != null) {
             buf.writeBoolean(true);
             buf.writeBlockPos(pos);
@@ -39,7 +39,7 @@ public class PacketDataFromServer {
         }
     }
 
-    public PacketDataFromServer(PacketBuffer buf) {
+    public PacketDataFromServer(FriendlyByteBuf buf) {
         if (buf.readBoolean()) {
             pos = buf.readBlockPos();
         } else {
@@ -63,7 +63,7 @@ public class PacketDataFromServer {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            TileEntity te;
+            BlockEntity te;
             if (pos == null) {
                 // We are working from a tablet. Find the tile entity through the open container
                 GenericContainer container = getOpenContainer();
@@ -88,7 +88,7 @@ public class PacketDataFromServer {
     }
 
     private static GenericContainer getOpenContainer() {
-        Container container = McJtyLib.proxy.getClientPlayer().containerMenu;
+        AbstractContainerMenu container = McJtyLib.proxy.getClientPlayer().containerMenu;
         if (container instanceof GenericContainer) {
             return (GenericContainer) container;
         } else {

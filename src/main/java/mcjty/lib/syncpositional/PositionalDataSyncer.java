@@ -1,17 +1,17 @@
 package mcjty.lib.syncpositional;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.GlobalPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -26,7 +26,7 @@ import java.util.function.Function;
  */
 public class PositionalDataSyncer {
 
-    private final Map<ResourceLocation, Function<PacketBuffer, IPositionalData>> factories = new HashMap<>();
+    private final Map<ResourceLocation, Function<FriendlyByteBuf, IPositionalData>> factories = new HashMap<>();
     private final Map<ResourceLocation, BiConsumer<GlobalPos, IPositionalData>> clientHandlers = new HashMap<>();
     private final Map<ChunkPos, Map<PositionalDataKey, Runnable>> watchHandlers = Collections.synchronizedMap(new HashMap<>());
 
@@ -37,7 +37,7 @@ public class PositionalDataSyncer {
     /**
      * Register a factory to create positional data. Call this in FMLCommonSetup
      */
-    public void registerPositionalDataFactory(ResourceLocation id, Function<PacketBuffer, IPositionalData> factory) {
+    public void registerPositionalDataFactory(ResourceLocation id, Function<FriendlyByteBuf, IPositionalData> factory) {
         factories.put(id, factory);
     }
 
@@ -72,7 +72,7 @@ public class PositionalDataSyncer {
      * Create a positional data element from a packet
      */
     @Nullable
-    public IPositionalData create(ResourceLocation id, PacketBuffer buf) {
+    public IPositionalData create(ResourceLocation id, FriendlyByteBuf buf) {
         return factories.getOrDefault(id, b -> null).apply(buf);
     }
 
@@ -86,7 +86,7 @@ public class PositionalDataSyncer {
     /**
      * Publish new data for the given position
      */
-    public void publish(World world, BlockPos pos, IPositionalData data) {
+    public void publish(Level world, BlockPos pos, IPositionalData data) {
         PositionalDataKey key = new PositionalDataKey(data.getId(), GlobalPos.of(world.dimension(), pos));
         syncTodo.put(key, data);
     }
@@ -94,7 +94,7 @@ public class PositionalDataSyncer {
     /**
      * Forget any possible data for a certain type that may be stored with the given position
      */
-    public void forget(World world, BlockPos pos, ResourceLocation id) {
+    public void forget(Level world, BlockPos pos, ResourceLocation id) {
         PositionalDataKey key = new PositionalDataKey(id, GlobalPos.of(world.dimension(), pos));
         syncTodo.remove(key);
     }
@@ -109,8 +109,8 @@ public class PositionalDataSyncer {
             for (Map.Entry<PositionalDataKey, IPositionalData> entry : syncTodo.entrySet()) {
                 GlobalPos pos = entry.getKey().getPos();
                 McJtyLib.networkHandler.send(PacketDistributor.TRACKING_CHUNK.with(() -> {
-                    ServerWorld level = server.getLevel(pos.dimension());
-                    return (Chunk)(level.getChunk(pos.pos()));
+                    ServerLevel level = server.getLevel(pos.dimension());
+                    return (LevelChunk)(level.getChunk(pos.pos()));
                 }), new PacketSendPositionalDataToClients(pos, entry.getValue()));
             }
             syncTodo.clear();
@@ -120,7 +120,7 @@ public class PositionalDataSyncer {
     /**
      * A new player arrived. Check if any watch handlers need to be modified
      */
-    public void startWatching(ServerPlayerEntity player) {
+    public void startWatching(ServerPlayer player) {
         BlockPos blockPos = player.blockPosition();
         ChunkPos cp = new ChunkPos(blockPos);
         Map<PositionalDataKey, Runnable> runnableMap = watchHandlers.get(cp);

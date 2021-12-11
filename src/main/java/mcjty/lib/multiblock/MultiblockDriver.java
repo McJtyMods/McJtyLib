@@ -1,10 +1,10 @@
 package mcjty.lib.multiblock;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -16,12 +16,12 @@ public class MultiblockDriver<T extends IMultiblock> {
     private final Map<Integer,MultiblockHolder<T>> multiblocks = new HashMap<>();
     private int lastId = 0;
 
-    private final Function<CompoundNBT, T> loader;
-    private final BiConsumer<CompoundNBT, T> saver;
+    private final Function<CompoundTag, T> loader;
+    private final BiConsumer<CompoundTag, T> saver;
     private final Consumer<MultiblockDriver<T>> dirtySetter;
     private final BiPredicate<T, T> mergeChecker;
     private final IMultiblockFixer<T> fixer;
-    private final BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
+    private final BiFunction<Level, BlockPos, IMultiblockConnector> holderGetter;
 
     private MultiblockDriver(Builder<T> builder) {
         this.loader = builder.loader;
@@ -41,7 +41,7 @@ public class MultiblockDriver<T extends IMultiblock> {
         return fixer;
     }
 
-    public BiFunction<World, BlockPos, IMultiblockConnector> getHolderGetter() {
+    public BiFunction<Level, BlockPos, IMultiblockConnector> getHolderGetter() {
         return holderGetter;
     }
 
@@ -93,11 +93,11 @@ public class MultiblockDriver<T extends IMultiblock> {
         return lastId;
     }
 
-    public void load(CompoundNBT tagCompound) {
+    public void load(CompoundTag tagCompound) {
         clear();
-        ListNBT lst = tagCompound.getList("mb", Constants.NBT.TAG_COMPOUND);
+        ListTag lst = tagCompound.getList("mb", Tag.TAG_COMPOUND);
         for (int i = 0 ; i < lst.size() ; i++) {
-            CompoundNBT tc = lst.getCompound(i);
+            CompoundTag tc = lst.getCompound(i);
             int id = tc.getInt("id");
             T value = loader.apply(tc);
             MultiblockHolder<T> holder = new MultiblockHolder<>(value);
@@ -107,10 +107,10 @@ public class MultiblockDriver<T extends IMultiblock> {
         lastId = tagCompound.getInt("lastId");
     }
 
-    public CompoundNBT save(CompoundNBT tagCompound) {
-        ListNBT lst = new ListNBT();
+    public CompoundTag save(CompoundTag tagCompound) {
+        ListTag lst = new ListTag();
         for (Map.Entry<Integer, MultiblockHolder<T>> entry : multiblocks.entrySet()) {
-            CompoundNBT tc = new CompoundNBT();
+            CompoundTag tc = new CompoundTag();
             tc.putInt("id", entry.getKey());
             saver.accept(tc, entry.getValue().getMb());
             entry.getValue().save(tc);
@@ -127,19 +127,19 @@ public class MultiblockDriver<T extends IMultiblock> {
 
     public static class Builder<T extends IMultiblock> {
 
-        private Function<CompoundNBT, T> loader;
-        private BiConsumer<CompoundNBT, T> saver;
+        private Function<CompoundTag, T> loader;
+        private BiConsumer<CompoundTag, T> saver;
         private Consumer<MultiblockDriver<T>> dirtySetter;
         private BiPredicate<T, T> mergeChecker;
         private IMultiblockFixer<T> fixer;
-        private BiFunction<World, BlockPos, IMultiblockConnector> holderGetter;
+        private BiFunction<Level, BlockPos, IMultiblockConnector> holderGetter;
 
-        public Builder<T> loader(Function<CompoundNBT, T> loader) {
+        public Builder<T> loader(Function<CompoundTag, T> loader) {
             this.loader = loader;
             return this;
         }
 
-        public Builder<T> saver(BiConsumer<CompoundNBT, T> saver) {
+        public Builder<T> saver(BiConsumer<CompoundTag, T> saver) {
             this.saver = saver;
             return this;
         }
@@ -159,7 +159,7 @@ public class MultiblockDriver<T extends IMultiblock> {
             return this;
         }
 
-        public Builder<T> holderGetter(BiFunction<World, BlockPos, IMultiblockConnector> holderGetter) {
+        public Builder<T> holderGetter(BiFunction<Level, BlockPos, IMultiblockConnector> holderGetter) {
             this.holderGetter = holderGetter;
             return this;
         }

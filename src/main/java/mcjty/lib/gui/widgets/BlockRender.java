@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
@@ -8,11 +8,11 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.typed.Type;
 import mcjty.lib.varia.ItemStackTools;
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -96,7 +96,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
@@ -114,7 +114,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
             mc.getItemRenderer().blitOffset = 0;
             this.window.getGui().setBlitOffset(0);
             if (hilightOnHover && isHovering()) {
-                RenderSystem.disableLighting();
+                // @todo 1.17 RenderSystem.disableLighting();
                 RenderSystem.disableDepthTest();
                 RenderSystem.colorMask(true, true, true, false);
                 RenderHelper.drawVerticalGradientRect(xx, yy, xx + 16, yy + 16, -2130706433, -2130706433);

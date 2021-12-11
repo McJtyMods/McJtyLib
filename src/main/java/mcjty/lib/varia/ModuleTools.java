@@ -1,14 +1,14 @@
 package mcjty.lib.varia;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Hand;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -21,8 +21,8 @@ public class ModuleTools {
         return stack.getTag().contains("monitorx");
     }
 
-    public static void setPositionInModule(ItemStack stack, RegistryKey<World> dimension, BlockPos pos, String name) {
-        CompoundNBT tag = stack.getOrCreateTag();
+    public static void setPositionInModule(ItemStack stack, ResourceKey<Level> dimension, BlockPos pos, String name) {
+        CompoundTag tag = stack.getOrCreateTag();
         if (dimension != null) {
             tag.putString("monitordim", dimension.location().toString());
         }
@@ -35,7 +35,7 @@ public class ModuleTools {
     }
 
     public static void clearPositionInModule(ItemStack stack) {
-        CompoundNBT tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
         tag.remove("monitordim");
         tag.remove("monitorx");
         tag.remove("monitory");
@@ -44,15 +44,15 @@ public class ModuleTools {
     }
 
     public static BlockPos getPositionFromModule(ItemStack stack) {
-        CompoundNBT tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
         int monitorx = tag.getInt("monitorx");
         int monitory = tag.getInt("monitory");
         int monitorz = tag.getInt("monitorz");
         return new BlockPos(monitorx, monitory, monitorz);
     }
 
-    public static RegistryKey<World> getDimensionFromModule(ItemStack stack) {
-        CompoundNBT tag = stack.getOrCreateTag();
+    public static ResourceKey<Level> getDimensionFromModule(ItemStack stack) {
+        CompoundTag tag = stack.getOrCreateTag();
         if (tag.contains("monitordim")) {
             return LevelTools.getId(tag.getString("monitordim"));
         } else {
@@ -61,7 +61,7 @@ public class ModuleTools {
     }
 
     public static String getTargetString(ItemStack stack) {
-        CompoundNBT tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag != null) {
             if (tag.contains("monitorx")) {
                 int monitorx = tag.getInt("monitorx");
@@ -84,9 +84,9 @@ public class ModuleTools {
      *
      * @return true if successful
      */
-    public static boolean installModule(PlayerEntity player, ItemStack heldItem, Hand hand, BlockPos pos, int start, int stop) {
-        World world = player.getCommandSenderWorld();
-        TileEntity te = world.getBlockEntity(pos);
+    public static boolean installModule(Player player, ItemStack heldItem, InteractionHand hand, BlockPos pos, int start, int stop) {
+        Level world = player.getCommandSenderWorld();
+        BlockEntity te = world.getBlockEntity(pos);
         if (te == null) {
             return false;
         }
@@ -105,7 +105,7 @@ public class ModuleTools {
                         player.setItemInHand(hand, ItemStack.EMPTY);
                     }
                     if (world.isClientSide) {
-                        player.displayClientMessage(new StringTextComponent("Installed module"), false);
+                        player.displayClientMessage(new TextComponent("Installed module"), false);
                     }
                     return true;
                 }

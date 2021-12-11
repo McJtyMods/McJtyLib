@@ -1,16 +1,21 @@
 package mcjty.lib.builder;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.*;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 public class TooltipBuilder {
 
@@ -33,16 +38,16 @@ public class TooltipBuilder {
         return this;
     }
 
-    private static TranslationTextComponent stylize(String translationKey, TextFormatting... formattings) {
-        TranslationTextComponent component = new TranslationTextComponent(translationKey);
-        for (TextFormatting format : formattings) {
+    private static TranslatableComponent stylize(String translationKey, ChatFormatting... formattings) {
+        TranslatableComponent component = new TranslatableComponent(translationKey);
+        for (ChatFormatting format : formattings) {
             component.withStyle(format);
         }
         return component;
     }
 
 
-    public void makeTooltip(@Nonnull ResourceLocation id, @Nonnull ItemStack stack, @Nonnull List<ITextComponent> tooltip, ITooltipFlag flag) {
+    public void makeTooltip(@Nonnull ResourceLocation id, @Nonnull ItemStack stack, @Nonnull List<Component> tooltip, TooltipFlag flag) {
         String namespace = id.getNamespace();
         String path = id.getPath();
         String prefix = "message." + namespace + "." + path + ".";
@@ -57,22 +62,22 @@ public class TooltipBuilder {
         }
     }
 
-    private void addLines(@Nonnull ItemStack stack, @Nonnull List<ITextComponent> tooltip, String prefix, InfoLine[] lines) {
+    private void addLines(@Nonnull ItemStack stack, @Nonnull List<Component> tooltip, String prefix, InfoLine[] lines) {
         for (InfoLine line : lines) {
             if (line.getCondition().test(stack)) {
                 if (line.getRepeatingParameter() != null) {
                     line.getRepeatingParameter().apply(stack).forEach(s -> {
-                        ITextComponent component;
+                        Component component;
                         if (line.getTranslationKey() != null) {
                             component = stylize(line.getTranslationKey(), line.getStyles());
                         } else {
                             component = stylize(prefix + line.getSuffix(), line.getStyles());
                         }
-                        ((IFormattableTextComponent)component).append(new StringTextComponent(TextFormatting.WHITE + s));
+                        ((MutableComponent)component).append(new TextComponent(ChatFormatting.WHITE + s));
                         tooltip.add(component);
                     });
                 } else {
-                    ITextComponent component;
+                    Component component;
                     if (line.getTranslationKey() != null) {
                         component = stylize(line.getTranslationKey(), line.getStyles());
                     } else {
@@ -81,7 +86,7 @@ public class TooltipBuilder {
                     if (line.getInformationGetter() != null) {
                         String extra = line.getInformationGetter().apply(stack);
                         if (extra != null) {
-                            ((IFormattableTextComponent)component).append(new StringTextComponent(TextFormatting.WHITE + extra));
+                            ((MutableComponent)component).append(new TextComponent(ChatFormatting.WHITE + extra));
                             tooltip.add(component);
                         } // Else we don't add the entire component
                     } else {
@@ -97,46 +102,46 @@ public class TooltipBuilder {
     }
 
     public static InfoLine key(String key) {
-        return new InfoLine(key, null, stack -> true, null, null, TextFormatting.YELLOW);
+        return new InfoLine(key, null, stack -> true, null, null, ChatFormatting.YELLOW);
     }
 
     public static InfoLine header() {
-        return new InfoLine(null, "header", stack -> true, null, null, TextFormatting.GREEN);
+        return new InfoLine(null, "header", stack -> true, null, null, ChatFormatting.GREEN);
     }
 
     public static InfoLine warning(Predicate<ItemStack> condition) {
-        return new InfoLine(null, "warning", condition, null, null, TextFormatting.RED);
+        return new InfoLine(null, "warning", condition, null, null, ChatFormatting.RED);
     }
 
     public static InfoLine warning() {
-        return new InfoLine(null, "warning", stack -> true, null, null, TextFormatting.RED);
+        return new InfoLine(null, "warning", stack -> true, null, null, ChatFormatting.RED);
     }
 
     public static InfoLine gold(Predicate<ItemStack> condition) {
-        return new InfoLine(null, "gold", condition, null, null, TextFormatting.GOLD);
+        return new InfoLine(null, "gold", condition, null, null, ChatFormatting.GOLD);
     }
 
     public static InfoLine gold() {
-        return new InfoLine(null, "gold", stack -> true, null, null, TextFormatting.GOLD);
+        return new InfoLine(null, "gold", stack -> true, null, null, ChatFormatting.GOLD);
     }
 
-    public static InfoLine general(String suffix, TextFormatting... styles) {
+    public static InfoLine general(String suffix, ChatFormatting... styles) {
         return new InfoLine(null, suffix, stack -> true, null, null, styles);
     }
 
-    public static InfoLine general(String suffix, Predicate<ItemStack> condition, TextFormatting... styles) {
+    public static InfoLine general(String suffix, Predicate<ItemStack> condition, ChatFormatting... styles) {
         return new InfoLine(null, suffix, condition, null, null, styles);
     }
 
     public static InfoLine parameter(String suffix, Function<ItemStack, String> getter) {
-        return new InfoLine(null, suffix, stack -> true, getter, null, TextFormatting.GRAY, TextFormatting.BOLD);
+        return new InfoLine(null, suffix, stack -> true, getter, null, ChatFormatting.GRAY, ChatFormatting.BOLD);
     }
 
     public static InfoLine parameter(String suffix, Predicate<ItemStack> condition, Function<ItemStack, String> getter) {
-        return new InfoLine(null, suffix, condition, getter, null, TextFormatting.GRAY, TextFormatting.BOLD);
+        return new InfoLine(null, suffix, condition, getter, null, ChatFormatting.GRAY, ChatFormatting.BOLD);
     }
 
     public static InfoLine repeatingParameter(String suffix, Function<ItemStack, Stream<String>> repeater) {
-        return new InfoLine(null, suffix, stack -> true, null, repeater, TextFormatting.GRAY, TextFormatting.BOLD);
+        return new InfoLine(null, suffix, stack -> true, null, repeater, ChatFormatting.GRAY, ChatFormatting.BOLD);
     }
 }

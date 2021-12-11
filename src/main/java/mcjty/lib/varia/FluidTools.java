@@ -1,18 +1,19 @@
 package mcjty.lib.varia;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FlowingFluidBlock;
-import net.minecraft.block.IBucketPickupHandler;
-import net.minecraft.block.material.Material;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.BucketPickup;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -104,19 +105,20 @@ public class FluidTools {
     }
 
     @Nonnull
-    public static FluidStack pickupFluidBlock(World world, BlockPos pos, @Nonnull Predicate<FluidStack> action, @Nonnull Runnable clearBlock) {
+    public static FluidStack pickupFluidBlock(Level world, BlockPos pos, @Nonnull Predicate<FluidStack> action, @Nonnull Runnable clearBlock) {
         BlockState blockstate = world.getBlockState(pos);
         FluidState fluidstate = world.getFluidState(pos);
         Material material = blockstate.getMaterial();
         Fluid fluid = fluidstate.getType();
 
-        if (blockstate.getBlock() instanceof IBucketPickupHandler && fluid != Fluids.EMPTY) {
+        if (blockstate.getBlock() instanceof BucketPickup && fluid != Fluids.EMPTY) {
             FluidStack stack = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
             if (action.test(stack)) {
-                return new FluidStack(((IBucketPickupHandler) blockstate.getBlock()).takeLiquid(world, pos, blockstate), FluidAttributes.BUCKET_VOLUME);
+                ItemStack fluidBucket = ((BucketPickup) blockstate.getBlock()).pickupBlock(world, pos, blockstate);
+                return FluidUtil.getFluidContained(fluidBucket).map(f -> new FluidStack(f, FluidAttributes.BUCKET_VOLUME)).orElse(FluidStack.EMPTY);
             }
             return stack;
-        } else if (blockstate.getBlock() instanceof FlowingFluidBlock) {
+        } else if (blockstate.getBlock() instanceof LiquidBlock) {
             FluidStack stack = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
             if (action.test(stack)) {
                 clearBlock.run();
@@ -125,7 +127,7 @@ public class FluidTools {
         } else if (material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT) {
             FluidStack stack = new FluidStack(Fluids.WATER, FluidAttributes.BUCKET_VOLUME);
             if (action.test(stack)) {
-                TileEntity tileentity = blockstate.getBlock().hasTileEntity(blockstate) ? world.getBlockEntity(pos) : null;
+                BlockEntity tileentity = blockstate.getBlock() instanceof EntityBlock ? world.getBlockEntity(pos) : null;
                 Block.dropResources(blockstate, world, pos, tileentity);
                 clearBlock.run();
             }

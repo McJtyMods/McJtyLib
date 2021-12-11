@@ -1,6 +1,6 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
@@ -12,10 +12,10 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.screens.Screen;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
@@ -105,7 +105,7 @@ public class FloatField extends AbstractWidget<FloatField> {
 
     private static boolean isControlDown() {
         long handle = Minecraft.getInstance().getWindow().getWindow();
-        return InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputMappings.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_CONTROL);
+        return InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 
     @Override
@@ -325,7 +325,7 @@ public class FloatField extends AbstractWidget<FloatField> {
     }
 
     @Override
-    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
         super.draw(gui, matrixStack, x, y);
 
         int xx = x + bounds.x;
@@ -356,8 +356,8 @@ public class FloatField extends AbstractWidget<FloatField> {
                 int selectionStart = getSelectionStart();
                 int selectionEnd = getSelectionEnd();
 
-                int renderedStart = MathHelper.clamp(selectionStart - startOffset, 0, renderedText.length());
-                int renderedEnd = MathHelper.clamp(selectionEnd - startOffset, 0, renderedText.length());
+                int renderedStart = Mth.clamp(selectionStart - startOffset, 0, renderedText.length());
+                int renderedEnd = Mth.clamp(selectionEnd - startOffset, 0, renderedText.length());
 
                 String renderedSelection = renderedText.substring(renderedStart, renderedEnd);
                 String renderedPreSelection = renderedText.substring(0, renderedStart);
@@ -371,7 +371,7 @@ public class FloatField extends AbstractWidget<FloatField> {
 
         if (window.getTextFocus() == this) {
             int w = mc.font.width(this.text.substring(startOffset, cursor));
-            AbstractGui.fill(matrixStack, xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
+            GuiComponent.fill(matrixStack, xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }
 

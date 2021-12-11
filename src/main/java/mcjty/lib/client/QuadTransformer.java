@@ -2,10 +2,10 @@ package mcjty.lib.client;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
-import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
+import com.mojang.math.Matrix4f;
 
 import java.util.Arrays;
 import java.util.Collections;

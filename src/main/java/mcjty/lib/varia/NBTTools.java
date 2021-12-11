@@ -1,9 +1,9 @@
 package mcjty.lib.varia;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nonnull;
@@ -15,12 +15,12 @@ import java.util.stream.StreamSupport;
 
 public class NBTTools {
 
-    public static <T> T getInfoNBT(ItemStack stack, BiFunction<CompoundNBT, String, T> getter, String name, T def) {
-        CompoundNBT tag = stack.getTag();
+    public static <T> T getInfoNBT(ItemStack stack, BiFunction<CompoundTag, String, T> getter, String name, T def) {
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return def;
         }
-        CompoundNBT info = tag.getCompound("BlockEntityTag").getCompound("Info");
+        CompoundTag info = tag.getCompound("BlockEntityTag").getCompound("Info");
         if (info.contains(name)) {
             return getter.apply(info, name);
         } else {
@@ -28,12 +28,12 @@ public class NBTTools {
         }
     }
 
-    public static <T> T getBlockEntityNBT(ItemStack stack, BiFunction<CompoundNBT, String, T> getter, String name, T def) {
-        CompoundNBT tag = stack.getTag();
+    public static <T> T getBlockEntityNBT(ItemStack stack, BiFunction<CompoundTag, String, T> getter, String name, T def) {
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return def;
         }
-        CompoundNBT info = tag.getCompound("BlockEntityTag");
+        CompoundTag info = tag.getCompound("BlockEntityTag");
         if (info.contains(name)) {
             return getter.apply(info, name);
         } else {
@@ -41,24 +41,24 @@ public class NBTTools {
         }
     }
 
-    public static <T> void setInfoNBT(ItemStack stack, TriConsumer<CompoundNBT, String, T> setter, String name, T value) {
-        CompoundNBT entityTag = stack.getOrCreateTagElement("BlockEntityTag");
-        CompoundNBT info = entityTag.getCompound("Info");
+    public static <T> void setInfoNBT(ItemStack stack, TriConsumer<CompoundTag, String, T> setter, String name, T value) {
+        CompoundTag entityTag = stack.getOrCreateTagElement("BlockEntityTag");
+        CompoundTag info = entityTag.getCompound("Info");
         setter.accept(info, name, value);
         entityTag.put("Info", info);
     }
 
     public static boolean hasInfoNBT(ItemStack stack, String name) {
-        CompoundNBT tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return false;
         }
-        CompoundNBT info = tag.getCompound("BlockEntityTag").getCompound("Info");
+        CompoundTag info = tag.getCompound("BlockEntityTag").getCompound("Info");
         return info.contains(name);
     }
 
     public static int getInt(ItemStack stack, String name, int def) {
-        CompoundNBT tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return def;
         }
@@ -70,7 +70,7 @@ public class NBTTools {
     }
 
     public static float getFloat(ItemStack stack, String name, float def) {
-        CompoundNBT tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return def;
         }
@@ -82,7 +82,7 @@ public class NBTTools {
     }
 
     public static String getString(ItemStack stack, String name, String def) {
-        CompoundNBT tag = stack.getTag();
+        CompoundTag tag = stack.getTag();
         if (tag == null) {
             return def;
         }
@@ -94,12 +94,12 @@ public class NBTTools {
     }
 
     @Nonnull
-    public static Optional<CompoundNBT> getTag(@Nonnull ItemStack stack) {
+    public static Optional<CompoundTag> getTag(@Nonnull ItemStack stack) {
         return Optional.ofNullable(stack.getTag());
     }
 
     @Nonnull
-    public static <R> R mapTag(@Nonnull ItemStack stack, Function<CompoundNBT,R> mapping, @Nonnull R def) {
+    public static <R> R mapTag(@Nonnull ItemStack stack, Function<CompoundTag,R> mapping, @Nonnull R def) {
         if (stack.hasTag()) {
             return mapping.apply(stack.getTag());
         } else {
@@ -118,8 +118,8 @@ public class NBTTools {
     }
 
     @Nonnull
-    public static Stream<INBT> getListStream(CompoundNBT compound, String tag) {
-        ListNBT list = compound.getList("Items", Constants.NBT.TAG_COMPOUND);
+    public static Stream<Tag> getListStream(CompoundTag compound, String tag) {
+        ListTag list = compound.getList("Items", Tag.TAG_COMPOUND);
         return StreamSupport.stream(list.spliterator(), false);
     }
 }

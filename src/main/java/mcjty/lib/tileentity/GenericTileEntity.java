@@ -15,28 +15,32 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.RedstoneMode;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -51,7 +55,10 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-public class GenericTileEntity extends TileEntity {
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+
+public class GenericTileEntity extends BlockEntity {
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
@@ -67,8 +74,8 @@ public class GenericTileEntity extends TileEntity {
     // a function that does the actual testing
     private BiFunction<Capability, Direction, LazyOptional> capSetup;
 
-    public GenericTileEntity(TileEntityType<?> type) {
-        super(type);
+    public GenericTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
         // Setup code to find the capability annotations and in that code we
         // replace 'capSetup' with the actual code to execute the annotations
         capSetup = (cap,dir) -> {
@@ -179,13 +186,13 @@ public class GenericTileEntity extends TileEntity {
         setChanged();
         if (getLevel() != null) {
             BlockState state = getLevel().getBlockState(getBlockPos());
-            getLevel().sendBlockUpdated(getBlockPos(), state, state, Constants.BlockFlags.BLOCK_UPDATE + Constants.BlockFlags.NOTIFY_NEIGHBORS);
+            getLevel().sendBlockUpdated(getBlockPos(), state, state, Block.UPDATE_CLIENTS + Block.UPDATE_NEIGHBORS);
         }
     }
 
     public void markDirtyQuick() {
         if (getLevel() != null) {
-            getLevel().blockEntityChanged(this.worldPosition, this);
+            getLevel().blockEntityChanged(this.worldPosition);
         }
     }
 
@@ -196,21 +203,21 @@ public class GenericTileEntity extends TileEntity {
 
     // @todo 1.14
 //    @Override
-//    public boolean shouldRefresh(World world, BlockPos pos, BlockState oldState, BlockState newSate) {
+//    public boolean shouldRefresh(Level world, BlockPos pos, BlockState oldState, BlockState newSate) {
 //        return oldState.getBlock() != newSate.getBlock();
 //    }
 
-    public void onBlockPlacedBy(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
+    public void onBlockPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
     }
 
-    public void onReplaced(World world, BlockPos pos, BlockState state, BlockState newstate) {
+    public void onReplaced(Level world, BlockPos pos, BlockState state, BlockState newstate) {
     }
 
-    public void onPartAdded(PartSlot slot, BlockState state, TileEntity multipartTile) {
+    public void onPartAdded(PartSlot slot, BlockState state, BlockEntity multipartTile) {
     }
 
-    public ActionResultType onBlockActivated(BlockState state, PlayerEntity player, Hand hand, BlockRayTraceResult result) {
-        return ActionResultType.PASS;
+    public InteractionResult onBlockActivated(BlockState state, Player player, InteractionHand hand, BlockHitResult result) {
+        return InteractionResult.PASS;
     }
 
     // ------------------------------------------------------
@@ -220,7 +227,7 @@ public class GenericTileEntity extends TileEntity {
         return false;
     }
 
-    public void checkRedstone(World world, BlockPos pos) {
+    public void checkRedstone(Level world, BlockPos pos) {
         int powered = world.getBestNeighborSignal(pos); // @todo check
         setPowerInput(powered);
     }
@@ -273,26 +280,20 @@ public class GenericTileEntity extends TileEntity {
     public void onSlotChanged(int index, ItemStack stack) {
     }
 
-    @Override
-    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
-        super.handleUpdateTag(state, tag);
-        loadClientDataFromNBT(tag);
-    }
-
     @Nullable
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        CompoundNBT nbtTag = new CompoundNBT();
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        CompoundTag nbtTag = new CompoundTag();
         this.saveClientDataToNBT(nbtTag);
-        return new SUpdateTileEntityPacket(worldPosition, 1, nbtTag);
+        return new ClientboundBlockEntityDataPacket(worldPosition, 1, nbtTag);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
+    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
         loadClientDataFromNBT(packet.getTag());
     }
 
-    //    public void setInfused(int infused) {
+//    public void setInfused(int infused) {
 //        this.infused = infused;
 //        markDirtyClient();
 //    }
@@ -305,14 +306,14 @@ public class GenericTileEntity extends TileEntity {
 //        return ((float) infused) / GeneralConfig.maxInfuse.get();
 //    }
 
-    public boolean canPlayerAccess(PlayerEntity player) {
-        return !isRemoved() && player.distanceToSqr(new Vector3d(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(0.5D, 0.5D, 0.5D)) <= 64D;
+    public boolean canPlayerAccess(Player player) {
+        return !isRemoved() && player.distanceToSqr(new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(new Vec3(0.5D, 0.5D, 0.5D))) <= 64D;
     }
 
     @Nonnull
     @Override
-    public CompoundNBT getUpdateTag() {
-        CompoundNBT updateTag = super.getUpdateTag();
+    public CompoundTag getUpdateTag() {
+        CompoundTag updateTag = super.getUpdateTag();
         saveClientDataToNBT(updateTag);
         return updateTag;
     }
@@ -320,43 +321,38 @@ public class GenericTileEntity extends TileEntity {
     /**
      * Override to write only the data you need on the client
      */
-    public void saveClientDataToNBT(CompoundNBT tagCompound) {
+    public void saveClientDataToNBT(CompoundTag tagCompound) {
     }
 
     /**
      * Override to read only the data you need on the client
      */
-    public void loadClientDataFromNBT(CompoundNBT tagCompound) {
+    public void loadClientDataFromNBT(CompoundTag tagCompound) {
     }
 
     @Override
-    public void load(@Nonnull BlockState state, @Nonnull CompoundNBT tagCompound) {
-        super.load(state, tagCompound);
-        load(tagCompound);
-    }
-
-    public void load(CompoundNBT tagCompound) {
+    public void load(CompoundTag tagCompound) {
         loadCaps(tagCompound);
         loadInfo(tagCompound);
     }
 
-    protected void loadCaps(CompoundNBT tagCompound) {
+    protected void loadCaps(CompoundTag tagCompound) {
         if (tagCompound.contains("Info")) {
-            CompoundNBT infoTag = tagCompound.getCompound("Info");
+            CompoundTag infoTag = tagCompound.getCompound("Info");
             getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
         }
         loadItemHandlerCap(tagCompound);
         loadEnergyCap(tagCompound);
     }
 
-    protected void loadItemHandlerCap(CompoundNBT tagCompound) {
+    protected void loadItemHandlerCap(CompoundTag tagCompound) {
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
-                .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Constants.NBT.TAG_COMPOUND)));
+                .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Tag.TAG_COMPOUND)));
     }
 
-    protected void loadEnergyCap(CompoundNBT tagCompound) {
+    protected void loadEnergyCap(CompoundTag tagCompound) {
         getCapability(CapabilityEnergy.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
@@ -367,9 +363,9 @@ public class GenericTileEntity extends TileEntity {
                 });
     }
 
-    protected void loadInfo(CompoundNBT tagCompound) {
+    protected void loadInfo(CompoundTag tagCompound) {
         if (tagCompound.contains("Info")) {
-            CompoundNBT infoTag = tagCompound.getCompound("Info");
+            CompoundTag infoTag = tagCompound.getCompound("Info");
             if (infoTag.contains("powered")) {
                 powerLevel = infoTag.getByte("powered");
             }
@@ -390,51 +386,51 @@ public class GenericTileEntity extends TileEntity {
         }
     }
 
-    protected CompoundNBT getOrCreateInfo(CompoundNBT tagCompound) {
+    protected CompoundTag getOrCreateInfo(CompoundTag tagCompound) {
         if (tagCompound.contains("Info")) {
             return tagCompound.getCompound("Info");
         }
-        CompoundNBT data = new CompoundNBT();
+        CompoundTag data = new CompoundTag();
         tagCompound.put("Info", data);
         return data;
     }
 
     @Nonnull
     @Override
-    public CompoundNBT save(@Nonnull CompoundNBT tagCompound) {
+    public CompoundTag save(@Nonnull CompoundTag tagCompound) {
         super.save(tagCompound);
         saveAdditional(tagCompound);
         return tagCompound;
     }
 
-    public void saveAdditional(@Nonnull CompoundNBT tagCompound) {
+    public void saveAdditional(@Nonnull CompoundTag tagCompound) {
         saveCaps(tagCompound);
         saveInfo(tagCompound);
     }
 
-    protected void saveCaps(CompoundNBT tagCompound) {
-        CompoundNBT infoTag = getOrCreateInfo(tagCompound);
+    protected void saveCaps(CompoundTag tagCompound) {
+        CompoundTag infoTag = getOrCreateInfo(tagCompound);
         getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> infoTag.putInt("infused", h.getInfused()));
         saveItemHandlerCap(tagCompound);
         saveEnergyCap(tagCompound);
     }
 
-    protected void saveItemHandlerCap(CompoundNBT tagCompound) {
+    protected void saveItemHandlerCap(CompoundTag tagCompound) {
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> tagCompound.put("Items", h.serializeNBT()));
     }
 
-    protected void saveEnergyCap(CompoundNBT tagCompound) {
+    protected void saveEnergyCap(CompoundTag tagCompound) {
         getCapability(CapabilityEnergy.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> tagCompound.put("Energy", h.serializeNBT()));
     }
 
-    protected void saveInfo(CompoundNBT tagCompound) {
-        CompoundNBT infoTag = getOrCreateInfo(tagCompound);
+    protected void saveInfo(CompoundTag tagCompound) {
+        CompoundTag infoTag = getOrCreateInfo(tagCompound);
         infoTag.putByte("powered", (byte) powerLevel);
         if (needsRedstoneMode()) {
             infoTag.putByte("rsMode", (byte) rsMode.ordinal());
@@ -448,7 +444,7 @@ public class GenericTileEntity extends TileEntity {
         }
     }
 
-    public boolean setOwner(PlayerEntity player) {
+    public boolean setOwner(Player player) {
         if (!GeneralConfig.manageOwnership.get()) {
             return false;
         }
@@ -491,12 +487,12 @@ public class GenericTileEntity extends TileEntity {
         return ownerUUID;
     }
 
-    public boolean checkAccess(PlayerEntity player) {
+    public boolean checkAccess(Player player) {
         return false;
     }
 
 //    @Optional.Method(modid = "theoneprobe")
-//    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, PlayerEntity player, World world, BlockState blockState, IProbeHitData data) {
+//    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState blockState, IProbeHitData data) {
 //        if (blockState.getBlock() instanceof Infusable) {
 //            int infused = getInfused();
 //            int pct = infused * 100 / GeneralConfig.maxInfuse;
@@ -545,11 +541,11 @@ public class GenericTileEntity extends TileEntity {
 //        }
 //    }
 
-    public int getRedstoneOutput(BlockState state, IBlockReader world, BlockPos pos, Direction side) {
+    public int getRedstoneOutput(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
         return -1;
     }
 
-    public void getDrops(NonNullList<ItemStack> drops, IBlockReader world, BlockPos pos, BlockState metadata, int fortune) {
+    public void getDrops(NonNullList<ItemStack> drops, BlockGetter world, BlockPos pos, BlockState metadata, int fortune) {
     }
 
     public void rotateBlock(Rotation axis) {
@@ -559,7 +555,7 @@ public class GenericTileEntity extends TileEntity {
     /**
      * Return false if this was not handled here. In that case the default rotateBlock() will be done
      */
-    public boolean wrenchUse(World world, BlockPos pos, Direction side, PlayerEntity player) {
+    public boolean wrenchUse(Level world, BlockPos pos, Direction side, Player player) {
         return false;
     }
 
@@ -575,7 +571,7 @@ public class GenericTileEntity extends TileEntity {
     }
 
     /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
-    public RegistryKey<World> getDimension() {
+    public ResourceKey<Level> getDimension() {
         return level.dimension();
     }
 
@@ -589,7 +585,7 @@ public class GenericTileEntity extends TileEntity {
     /**
      * Execute a client side command (annotated with @ServerCommand)
      */
-    public boolean executeClientCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
+    public boolean executeClientCommand(String command, Player player, @Nonnull TypedMap params) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnable clientCommand = holder.clientCommands.get(command);
         if (clientCommand != null) {
@@ -612,7 +608,7 @@ public class GenericTileEntity extends TileEntity {
      * This is meant to be called server side. If you want to call this client-side use the
      * PacketServerCommandTyped packet
      */
-    public boolean executeServerCommand(String command, PlayerEntity player, @Nonnull TypedMap params) {
+    public boolean executeServerCommand(String command, Player player, @Nonnull TypedMap params) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnable serverCommand = holder.serverCommands.get(command);
         if (serverCommand != null) {
@@ -627,7 +623,7 @@ public class GenericTileEntity extends TileEntity {
      * This is meant to be called server side. If you want to call this client-side use the
      * PacketGetListFromServer packet
      */
-    public <T> List<T> executeServerCommandList(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull Class<T> type) {
+    public <T> List<T> executeServerCommandList(String command, Player player, @Nonnull TypedMap params, @Nonnull Class<T> type) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnableWithListResult cmd = holder.serverCommandsWithListResult.get(command);
         if (cmd != null) {
@@ -639,7 +635,7 @@ public class GenericTileEntity extends TileEntity {
     /**
      * Execute a client side command that handles the list sent by the server side ListCommand
      */
-    public <T> boolean handleListFromServer(String command, PlayerEntity player, @Nonnull TypedMap params, @Nonnull List<T> list) {
+    public <T> boolean handleListFromServer(String command, Player player, @Nonnull TypedMap params, @Nonnull List<T> list) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnableWithList cmd = holder.clientCommandsWithList.get(command);
         if (cmd != null) {
@@ -655,7 +651,7 @@ public class GenericTileEntity extends TileEntity {
      * PacketRequestDataFromServer packet
      */
     @Nullable
-    public TypedMap executeServerCommandWR(String command, PlayerEntity player, @Nonnull TypedMap params) {
+    public TypedMap executeServerCommandWR(String command, Player player, @Nonnull TypedMap params) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnableWithResult serverCommand = holder.serverCommandsWithResult.get(command);
         if (serverCommand != null) {
@@ -671,7 +667,6 @@ public class GenericTileEntity extends TileEntity {
         }
         return holder;
     }
-
 
     @ServerCommand
     public static final Command<?> COMMAND_SYNC_BINDING = Command.create("generic.syncBinding",

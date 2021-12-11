@@ -1,6 +1,6 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.bindings.Value;
@@ -18,26 +18,26 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.Tools;
-import net.minecraft.block.Block;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fml.client.gui.GuiUtils;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmlclient.gui.GuiUtils;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,7 +49,7 @@ import java.util.List;
 /**
  * The main parent for all container based gui's in McJtyLib based mods
  */
-public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends Container> extends ContainerScreen<C> implements IKeyReceiver {
+public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends AbstractContainerMenu> extends AbstractContainerScreen<C> implements IKeyReceiver {
 
     protected Window window;
     private WindowManager windowManager;
@@ -62,26 +62,26 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         this.imageHeight = y;
     }
 
-    public GenericGuiContainer(T tileEntity, C container, PlayerInventory inventory, ManualEntry manualEntry) {
-        super(container, inventory, new StringTextComponent("test"));   // @todo
+    public GenericGuiContainer(T tileEntity, C container, Inventory inventory, ManualEntry manualEntry) {
+        super(container, inventory, new TextComponent("test"));   // @todo
         this.tileEntity = tileEntity;
         sideWindow = new GuiSideWindow(manualEntry.getManual(), manualEntry.getEntry(), manualEntry.getPage());
         windowManager = null;
     }
 
     // Mostly for JEI: get a list of all bounds additional to the main window. That includes modal windows, the side window, ...
-    public List<Rectangle2d> getExtraWindowBounds() {
+    public List<Rect2i> getExtraWindowBounds() {
         if (sideWindow.getWindow() == null || sideWindow.getWindow().getToplevel() == null) {
             Logging.getLogger().error(new RuntimeException("Internal error! getExtraWindowBounds() called before initGui!"));
             return Collections.emptyList();
         }
-        List<Rectangle2d> bounds = new ArrayList<>();
+        List<Rect2i> bounds = new ArrayList<>();
         Rectangle r1 = sideWindow.getWindow().getToplevel().getBounds();
-        bounds.add(new Rectangle2d(r1.x, r1.y, r1.width, r1.height));
+        bounds.add(new Rect2i(r1.x, r1.y, r1.width, r1.height));
         if (windowManager != null) {
             for (Window w : windowManager.getWindows()) {
                 Rectangle r = w.getToplevel().getBounds();
-                bounds.add(new Rectangle2d(r.x, r.y, r.width, r.height));
+                bounds.add(new Rect2i(r.x, r.y, r.width, r.height));
             }
         }
         return bounds;
@@ -117,16 +117,16 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void renderLabels(@Nonnull MatrixStack matrixStack, int p_230451_2_, int p_230451_3_) {
+    protected void renderLabels(@Nonnull PoseStack matrixStack, int p_230451_2_, int p_230451_3_) {
         getWindowManager().drawTooltips(matrixStack);
     }
 
-    public void drawHoveringText(MatrixStack matrixStack, List<String> textLines, List<ItemStack> items, int x, int y, FontRenderer font) {
+    public void drawHoveringText(PoseStack matrixStack, List<String> textLines, List<ItemStack> items, int x, int y, Font font) {
         if (!textLines.isEmpty()) {
             matrixStack.pushPose();
-            RenderSystem.disableRescaleNormal();
-            net.minecraft.client.renderer.RenderHelper.turnOff();
-            RenderSystem.disableLighting();
+            // @todo 1.17 RenderSystem.disableRescaleNormal();
+            // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
+            // @todo 1.17 RenderSystem.disableLighting();
             RenderSystem.disableDepthTest();
             int i = 0;
 
@@ -196,21 +196,21 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
             this.fillGradient(matrixStack, xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
-            RenderSystem.translated(0.0D, 0.0D, this.itemRenderer.blitOffset);
+            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
 
             renderTextLines(matrixStack, textLines, items, font, xx, yy);
 
             setBlitOffset(0);
             this.itemRenderer.blitOffset = 0.0F;
-            RenderSystem.enableLighting();
             RenderSystem.enableDepthTest();
-            net.minecraft.client.renderer.RenderHelper.turnBackOn();
-            RenderSystem.enableRescaleNormal();
+            // @todo 1.17 RenderSystem.enableLighting();
+            // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
+            // @todo 1.17 RenderSystem.enableRescaleNormal();
             matrixStack.popPose();
         }
     }
 
-    private void renderTextLines(MatrixStack matrixStack, List<String> textLines, List<ItemStack> items, FontRenderer font, int xx, int yy) {
+    private void renderTextLines(PoseStack matrixStack, List<String> textLines, List<ItemStack> items, Font font, int xx, int yy) {
         for (int i = 0; i < textLines.size(); ++i) {
             String s1 = textLines.get(i);
             if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
@@ -244,11 +244,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void renderBg(@Nonnull MatrixStack matrixStack, float partialTicks, int x, int y) {
+    protected void renderBg(@Nonnull PoseStack matrixStack, float partialTicks, int x, int y) {
         drawWindow(matrixStack);
     }
 
-    protected void drawWindow(MatrixStack matrixStack) {
+    protected void drawWindow(PoseStack matrixStack) {
         if (window == null) {
             return;
         }
@@ -258,7 +258,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         if (window == null) {
             return;
         }
@@ -268,7 +268,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public void renderSlot(@Nonnull MatrixStack matrixStack, @Nonnull Slot slot) {
+    public void renderSlot(@Nonnull PoseStack matrixStack, @Nonnull Slot slot) {
         // Prevent slots from being rendered if they are (partially) covered by a modal window
         if (!isPartiallyCoveredByModalWindow(slot)) {
             super.renderSlot(matrixStack, slot);
@@ -307,7 +307,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     /**
      * Draw tooltips for itemstacks that are in BlockRender widgets
      */
-    protected void drawStackTooltips(MatrixStack matrixStack, int mouseX, int mouseY) {
+    protected void drawStackTooltips(PoseStack matrixStack, int mouseX, int mouseY) {
         int x = GuiTools.getRelativeX(window.getGui());
         int y = GuiTools.getRelativeY(window.getGui());
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
@@ -330,28 +330,27 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
-    protected List<ITextComponent> addCustomLines(List<ITextComponent> oldList, BlockRender blockRender, ItemStack stack) {
+    protected List<Component> addCustomLines(List<Component> oldList, BlockRender blockRender, ItemStack stack) {
         return oldList;
     }
 
-    protected void customRenderToolTip(MatrixStack matrixStack, BlockRender blockRender, ItemStack stack, int x, int y) {
-        List<ITextComponent> list;
+    protected void customRenderToolTip(PoseStack matrixStack, BlockRender blockRender, ItemStack stack, int x, int y) {
+        List<Component> list;
         //noinspection ConstantConditions
         if (stack.getItem() == null) {
             // Protection for bad itemstacks
             list = new ArrayList<>();
         } else {
-            ITooltipFlag flag = this.getMinecraft().options.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL;
+            TooltipFlag flag = this.getMinecraft().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
             list = stack.getTooltipLines(this.getMinecraft().player, flag);
         }
 
         list = addCustomLines(list, blockRender, stack);
 
-        FontRenderer font = null;
+        Font font = getMinecraft().font;
         stack.getItem();
-        font = stack.getItem().getFontRenderer(stack);
         GuiUtils.preItemToolTip(stack);
-        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, (font == null ? getMinecraft().font : font));
+        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, font);
     }
 
     @Override
@@ -477,7 +476,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command.getName(), params));
     }
 
-    public void sendServerCommandTyped(SimpleChannel network, RegistryKey<World> dimensionId, String command, TypedMap params) {
+    public void sendServerCommandTyped(SimpleChannel network, ResourceKey<Level> dimensionId, String command, TypedMap params) {
         network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), dimensionId, command, params));
     }
 
@@ -491,18 +490,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     // Register a container/gui on the client side
     public static <C extends GenericContainer, S extends GenericGuiContainer<T,C>, T extends GenericTileEntity> void register(
-            ContainerType<C> type,
+            MenuType<C> type,
             GuiSupplier<C, S, T> guiSupplier) {
-        ScreenManager.IScreenFactory<C, S> factory = (container, inventory, title) -> {
-            TileEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(container.getPos());
+        MenuScreens.ScreenConstructor<C, S> factory = (container, inventory, title) -> {
+            BlockEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(container.getPos());
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid tile entity!");
         };
-        ScreenManager.register(type, factory);
+        MenuScreens.register(type, factory);
     }
 
     @FunctionalInterface
     public static interface GuiSupplier<C extends GenericContainer, S extends GenericGuiContainer, T extends GenericTileEntity> {
-        S create(T tile, C container, PlayerInventory inventory);
+        S create(T tile, C container, Inventory inventory);
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {

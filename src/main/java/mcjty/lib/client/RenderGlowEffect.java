@@ -1,16 +1,16 @@
 package mcjty.lib.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix4f;
+import net.minecraft.world.phys.Vec3;
 
 public class RenderGlowEffect {
 
@@ -18,10 +18,10 @@ public class RenderGlowEffect {
      * Render a glow effect at the given position. The texture to use
      * for glowing should be bound before calling this.
      */
-    public static void renderGlow(MatrixStack matrixStack, IRenderTypeBuffer buffer, ResourceLocation texture) {
-        IVertexBuilder builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS);
+    public static void renderGlow(PoseStack matrixStack, MultiBufferSource buffer, ResourceLocation texture) {
+        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS);
 
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(AtlasTexture.LOCATION_BLOCKS).apply(texture);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(texture);
 
         Matrix4f matrix = matrixStack.last().pose();
         RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.UP.ordinal(), 1.1f, -0.05f);
@@ -42,7 +42,7 @@ public class RenderGlowEffect {
             new Quad(new Vt(1, 0, 0), new Vt(1, 1, 0), new Vt(1, 1, 1), new Vt(1, 0, 1)),       // EAST
     };
 
-    public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset, Vector3d offs) {
+    public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset, Vec3 offs) {
         int brightness = 240;
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;
@@ -53,7 +53,7 @@ public class RenderGlowEffect {
         buffer.vertex(offs.x + quad.v4.x * mult + offset, offs.y + quad.v4.y * mult + offset, offs.z + quad.v4.z * mult + offset).uv(1, 0).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
     }
 
-    public static void addSideFullTexture(Matrix4f positionMatrix, IVertexBuilder buffer, TextureAtlasSprite sprite, int side, float mult, float offset) {
+    public static void addSideFullTexture(Matrix4f positionMatrix, VertexConsumer buffer, TextureAtlasSprite sprite, int side, float mult, float offset) {
         int brightness = 240;
         int b1 = brightness >> 16 & 65535;
         int b2 = brightness & 65535;

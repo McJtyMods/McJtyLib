@@ -3,7 +3,7 @@ package mcjty.lib.network;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 

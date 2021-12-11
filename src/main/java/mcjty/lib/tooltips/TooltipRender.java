@@ -1,25 +1,22 @@
 package mcjty.lib.tooltips;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.keys.KeyBindings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,6 +24,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * This class was adapted from code written by Vazkii which was adapted by Direwolf20
@@ -47,7 +50,7 @@ public class TooltipRender {
             ITooltipExtras extras = (ITooltipExtras) stack.getItem();
             List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
             if (!items.isEmpty()) {
-                List<ITextComponent> tooltip = event.getToolTip();
+                List<Component> tooltip = event.getToolTip();
                 int count = items.size();
                 int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
                 int width = Math.min(STACKS_PER_LINE, count) * 18;
@@ -57,7 +60,7 @@ public class TooltipRender {
                 }
 
                 for (int j = 0; j < lines; j++) {
-                    tooltip.add(new StringTextComponent(spaces));
+                    tooltip.add(new TextComponent(spaces));
                 }
             }
         }
@@ -84,9 +87,9 @@ public class TooltipRender {
                 if (KeyBindings.openManual != null) {
                     if (!McJtyLib.proxy.isSneaking()) {
                         String translationKey = KeyBindings.openManual.saveString();
-                        event.getToolTip().add(new StringTextComponent("<Press ").withStyle(TextFormatting.YELLOW)
-                                .append(new TranslationTextComponent(translationKey).withStyle(TextFormatting.GREEN))
-                                .append(new StringTextComponent(" for help>").withStyle(TextFormatting.YELLOW)));
+                        event.getToolTip().add(new TextComponent("<Press ").withStyle(ChatFormatting.YELLOW)
+                                .append(new TranslatableComponent(translationKey).withStyle(ChatFormatting.GREEN))
+                                .append(new TextComponent(" for help>").withStyle(ChatFormatting.YELLOW)));
                     }
                 }
             }
@@ -115,12 +118,12 @@ public class TooltipRender {
             int bx = event.getX();
             int by = event.getY()+3;
 
-            List<? extends ITextProperties> tooltip = event.getLines();
+            List<? extends FormattedText> tooltip = event.getLines();
             int lines = (((count - 1) / STACKS_PER_LINE) + 1);
             int width = Math.min(STACKS_PER_LINE, count) * 18;
             int height = lines * 20 + 1;
 
-            for (ITextProperties s : tooltip) {
+            for (FormattedText s : tooltip) {
                 // @todo 1.16 is this right?
                 if (s.getString().startsWith("    ")) {
 //                if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r")) {
@@ -145,15 +148,15 @@ public class TooltipRender {
         }
     }
 
-    private static void renderBlocks(MatrixStack matrixStack, ItemStack itemStack, int x, int y, int count, int errorAmount) {
+    private static void renderBlocks(PoseStack matrixStack, ItemStack itemStack, int x, int y, int count, int errorAmount) {
         Minecraft mc = Minecraft.getInstance();
         GlStateManager._disableDepthTest();
         ItemRenderer render = mc.getItemRenderer();
 
-        net.minecraft.client.renderer.RenderHelper.setupForFlatItems();
+        com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
         matrixStack.pushPose();
         matrixStack.translate(0, 0, 400f);
-        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, null, null));
+        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, null, null, 1));
 //        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
         matrixStack.popPose();
 
@@ -191,35 +194,35 @@ public class TooltipRender {
         GlStateManager._enableDepthTest();
     }
 
-    private static void renderItemModelIntoGUI(ItemRenderer render, MatrixStack matrixStack, ItemStack itemStack, int x, int y, IBakedModel bakedmodel) {
+    private static void renderItemModelIntoGUI(ItemRenderer render, PoseStack matrixStack, ItemStack itemStack, int x, int y, BakedModel bakedmodel) {
         matrixStack.pushPose();
-        Minecraft.getInstance().getTextureManager().bind(AtlasTexture.LOCATION_BLOCKS);
-        Minecraft.getInstance().getTextureManager().getTexture(AtlasTexture.LOCATION_BLOCKS).setFilter(false, false);
-        RenderSystem.enableRescaleNormal();
-        RenderSystem.enableAlphaTest();
-        RenderSystem.defaultAlphaFunc();
+        Minecraft.getInstance().getTextureManager().bindForSetup(TextureAtlas.LOCATION_BLOCKS);
+        Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
+        // @todo 1.17 RenderSystem.enableRescaleNormal();
+        // @todo 1.17 RenderSystem.enableAlphaTest();
+        // @todo 1.17 RenderSystem.defaultAlphaFunc();
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         matrixStack.translate((float)x, (float)y, 100.0F + render.blitOffset);
         matrixStack.translate(8.0F, 8.0F, 0.0F);
         matrixStack.scale(1.0F, -1.0F, 1.0F);
         matrixStack.scale(16.0F, 16.0F, 16.0F);
-        IRenderTypeBuffer.Impl irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
+        MultiBufferSource.BufferSource irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
         boolean flag = !bakedmodel.usesBlockLight();
         if (flag) {
-            RenderHelper.setupForFlatItems();
+            Lighting.setupForFlatItems();
         }
 
-        render.render(itemStack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
+        render.render(itemStack, ItemTransforms.TransformType.GUI, false, matrixStack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
         irendertypebuffer$impl.endBatch();
         RenderSystem.enableDepthTest();
         if (flag) {
-            RenderHelper.setupFor3DItems();
+            Lighting.setupFor3DItems();
         }
 
-        RenderSystem.disableAlphaTest();
-        RenderSystem.disableRescaleNormal();
+        // @todo 1.17 RenderSystem.disableAlphaTest();
+        // @todo 1.17 RenderSystem.disableRescaleNormal();
         matrixStack.popPose();
     }
 

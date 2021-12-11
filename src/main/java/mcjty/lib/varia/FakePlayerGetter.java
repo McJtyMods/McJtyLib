@@ -2,9 +2,9 @@ package mcjty.lib.varia;
 
 import com.mojang.authlib.GameProfile;
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.util.FakePlayerFactory;
 
 import java.util.Objects;
@@ -14,19 +14,19 @@ public class FakePlayerGetter {
 
     private final GenericTileEntity te;
     private final String fakeName;
-    private ServerPlayerEntity harvester = null;
+    private ServerPlayer harvester = null;
 
     public FakePlayerGetter(GenericTileEntity te, String fakeName) {
         this.te = te;
         this.fakeName = fakeName;
     }
 
-    public ServerPlayerEntity get() {
-        ServerPlayerEntity playerEntity = getFakeHarvester();
+    public ServerPlayer get() {
+        ServerPlayer playerEntity = getFakeHarvester();
 
         UUID owner = te.getOwnerUUID();
         if (owner != null) {
-            ServerPlayerEntity player = te.getLevel().getServer().getPlayerList().getPlayer(owner);
+            ServerPlayer player = te.getLevel().getServer().getPlayerList().getPlayer(owner);
             if (player != null) {
                 // Check if the name matches
                 if (!Objects.equals(playerEntity.getGameProfile().getName(), player.getGameProfile().getName())) {
@@ -38,14 +38,15 @@ public class FakePlayerGetter {
         return playerEntity;
     }
 
-    private ServerPlayerEntity getFakeHarvester() {
+    private ServerPlayer getFakeHarvester() {
         if (harvester == null) {
             UUID owner = te.getOwnerUUID();
             if (owner == null) {
                 owner = UUID.nameUUIDFromBytes("rftools_builder".getBytes());
             }
-            harvester = FakePlayerFactory.get((ServerWorld) te.getLevel(), new GameProfile(owner, getName()));
-            harvester.setLevel(te.getLevel());
+            ServerLevel serverLevel = (ServerLevel) te.getLevel();
+            harvester = FakePlayerFactory.get(serverLevel, new GameProfile(owner, getName()));
+            harvester.setLevel(serverLevel);
             BlockPos worldPosition = te.getBlockPos();
             harvester.setPos(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
         }
@@ -57,7 +58,7 @@ public class FakePlayerGetter {
         if (owner == null) {
             return fakeName;
         }
-        ServerPlayerEntity player = te.getLevel().getServer().getPlayerList().getPlayer(owner);
+        ServerPlayer player = te.getLevel().getServer().getPlayerList().getPlayer(owner);
         if (player == null) {
             return fakeName;
         }

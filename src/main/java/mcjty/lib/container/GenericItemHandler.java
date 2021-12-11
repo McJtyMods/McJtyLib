@@ -2,10 +2,10 @@ package mcjty.lib.container;
 
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.ItemStackList;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -15,7 +15,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
-public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<ListNBT> {
+public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<ListTag> {
 
     private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
@@ -295,10 +295,10 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     }
 
     @Override
-    public ListNBT serializeNBT() {
-        ListNBT bufferTagList = new ListNBT();
+    public ListTag serializeNBT() {
+        ListTag bufferTagList = new ListTag();
         for (ItemStack stack : stacks) {
-            CompoundNBT compoundNBT = new CompoundNBT();
+            CompoundTag compoundNBT = new CompoundTag();
             if (!stack.isEmpty()) {
                 stack.save(compoundNBT);
             }
@@ -308,9 +308,9 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     }
 
     @Override
-    public void deserializeNBT(ListNBT nbt) {
+    public void deserializeNBT(ListTag nbt) {
         for (int i = 0; i < nbt.size(); i++) {
-            CompoundNBT compoundNBT = nbt.getCompound(i);
+            CompoundTag compoundNBT = nbt.getCompound(i);
             if (i < stacks.size()) {
                 stacks.set(i, ItemStack.of(compoundNBT));
             }

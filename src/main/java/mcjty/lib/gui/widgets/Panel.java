@@ -1,10 +1,10 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.*;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class Panel extends AbstractContainerWidget<Panel> {
 
@@ -31,7 +31,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void draw(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }
@@ -53,7 +53,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void drawPhase2(Screen gui, MatrixStack matrixStack, int x, int y) {
+    public void drawPhase2(Screen gui, PoseStack matrixStack, int x, int y) {
         if (!visible) {
             return;
         }

@@ -1,9 +1,9 @@
 package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -15,11 +15,11 @@ public class PacketSetGuiStyle {
     // Package visible for unit tests
     private String style;
 
-    public PacketSetGuiStyle(PacketBuffer buf) {
+    public PacketSetGuiStyle(FriendlyByteBuf buf) {
         style = buf.readUtf(32767);
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeUtf(style);
     }
 
@@ -33,7 +33,7 @@ public class PacketSetGuiStyle {
     }
 
     private static void handle(PacketSetGuiStyle message, NetworkEvent.Context ctx) {
-        PlayerEntity playerEntity = ctx.getSender();
+        Player playerEntity = ctx.getSender();
         McJtyLib.getPreferencesProperties(playerEntity).ifPresent(p -> p.setStyle(message.style));
     }
 }

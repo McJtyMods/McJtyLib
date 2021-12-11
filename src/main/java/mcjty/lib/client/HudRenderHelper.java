@@ -1,17 +1,17 @@
 package mcjty.lib.client;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Direction;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class HudRenderHelper {
 
-    public static void renderHudItems(MatrixStack matrixStack, IRenderTypeBuffer buffer, List<Pair<ItemStack, String>> messages,
+    public static void renderHudItems(PoseStack matrixStack, MultiBufferSource buffer, List<Pair<ItemStack, String>> messages,
                                       HudPlacement hudPlacement,
                                       HudOrientation hudOrientation,
                                       Direction orientation,
@@ -76,7 +76,7 @@ public class HudRenderHelper {
         matrixStack.popPose();
     }
 
-    public static void renderHud(MatrixStack stack, IRenderTypeBuffer buffer, List<String> messages,
+    public static void renderHud(PoseStack stack, MultiBufferSource buffer, List<String> messages,
                                  HudPlacement hudPlacement,
                                  HudOrientation hudOrientation,
                                  Direction orientation,
@@ -106,7 +106,7 @@ public class HudRenderHelper {
         return f3;
     }
 
-    private static void renderText(MatrixStack matrixStack, IRenderTypeBuffer buffer, FontRenderer fontrenderer, List<Pair<ItemStack, String>> messages, int lines, float scale) {
+    private static void renderText(PoseStack matrixStack, MultiBufferSource buffer, Font fontrenderer, List<Pair<ItemStack, String>> messages, int lines, float scale) {
         matrixStack.translate(-0.5F, 0.5F, 0.07F);
         float f3 = 0.0075F;
         matrixStack.scale(f3 * scale, -f3 * scale, f3);
@@ -116,7 +116,7 @@ public class HudRenderHelper {
         renderLog(matrixStack, buffer, fontrenderer, messages, lines);
     }
 
-    private static void renderLog(MatrixStack matrixStack, IRenderTypeBuffer buffer, FontRenderer fontrenderer, List<Pair<ItemStack, String>> messages, int lines) {
+    private static void renderLog(PoseStack matrixStack, MultiBufferSource buffer, Font fontrenderer, List<Pair<ItemStack, String>> messages, int lines) {
         int currenty = 7;
         int height = 10;
         int logsize = messages.size();
@@ -135,8 +135,8 @@ public class HudRenderHelper {
 //                        matrixStack.translate(0, 0, -150);
                         // @todo 1.15 this needs more work! we ignore 'currenty'!
                         ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
-                        IBakedModel ibakedmodel = itemRender.getModel(stack, Minecraft.getInstance().level, null);
-                        itemRender.render(stack, ItemCameraTransforms.TransformType.GUI, false, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS, OverlayTexture.NO_OVERLAY, ibakedmodel);
+                        BakedModel ibakedmodel = itemRender.getModel(stack, Minecraft.getInstance().level, null, 1);
+                        itemRender.render(stack, ItemTransforms.TransformType.GUI, false, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS, OverlayTexture.NO_OVERLAY, ibakedmodel);
 
 //                        itemRender.renderItemAndEffectIntoGUI(stack, 0, currenty);
                         prefix = "    ";

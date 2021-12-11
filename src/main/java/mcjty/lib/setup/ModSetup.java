@@ -11,21 +11,23 @@ import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -33,7 +35,7 @@ import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fmllegacy.network.NetworkRegistry;
 
 import static mcjty.lib.McJtyLib.MODID;
 
@@ -43,21 +45,20 @@ public class ModSetup extends DefaultModSetup {
 
     public static boolean patchouli = false;
 
-    @CapabilityInject(PreferencesProperties.class)
-    public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY;
+    public static Capability<PreferencesProperties> PREFERENCES_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
-    private static void registerCapabilities(){
-        CapabilityContainerProvider.register();
-        CapabilityInfusable.register();
-        CapabilityPowerInformation.register();
-        CapabilityModuleSupport.register();
-        PreferencesProperties.register();
+    @SubscribeEvent
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        CapabilityContainerProvider.register(event);
+        CapabilityInfusable.register(event);
+        CapabilityPowerInformation.register(event);
+        CapabilityModuleSupport.register(event);
+        PreferencesProperties.register(event);
     }
 
     @Override
     public void init(FMLCommonSetupEvent e) {
         super.init(e);
-        registerCapabilities();
         McJtyLib.networkHandler = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> "1.0", s -> true, s -> true);
         PacketHandler.registerMessages(McJtyLib.networkHandler);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
@@ -74,7 +75,7 @@ public class ModSetup extends DefaultModSetup {
 
         @SubscribeEvent
         public void onWorldTick(TickEvent.WorldTickEvent event) {
-            if (event.phase == TickEvent.Phase.START && event.world.dimension() == World.OVERWORLD) {
+            if (event.phase == TickEvent.Phase.START && event.world.dimension() == Level.OVERWORLD) {
                 McJtyLib.SYNCER.sendOutData(event.world.getServer());
             }
         }
@@ -87,13 +88,13 @@ public class ModSetup extends DefaultModSetup {
         @SubscribeEvent
         public void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
             if (event.phase == TickEvent.Phase.START && !event.player.getCommandSenderWorld().isClientSide) {
-                McJtyLib.getPreferencesProperties(event.player).ifPresent(handler -> handler.tick((ServerPlayerEntity) event.player));
+                McJtyLib.getPreferencesProperties(event.player).ifPresent(handler -> handler.tick((ServerPlayer) event.player));
             }
         }
 
         @SubscribeEvent
         public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
-            if (event.getObject() instanceof PlayerEntity) {
+            if (event.getObject() instanceof Player) {
                 if (!event.getCapabilities().containsKey(PREFERENCES_CAPABILITY_KEY) && !event.getObject().getCapability(PREFERENCES_CAPABILITY).isPresent()) {
                     event.addCapability(PREFERENCES_CAPABILITY_KEY, new PreferencesDispatcher());
                 } else {
@@ -104,23 +105,23 @@ public class ModSetup extends DefaultModSetup {
 
         @SubscribeEvent
         public void onPlayerInteract(PlayerInteractEvent.LeftClickBlock event) {
-            World world = event.getWorld();
+            Level world = event.getWorld();
             BlockPos pos = event.getPos();
             BlockState state = world.getBlockState(pos);
             if (state.getBlock() instanceof MultipartBlock) {
-                TileEntity tileEntity = world.getBlockEntity(pos);
+                BlockEntity tileEntity = world.getBlockEntity(pos);
                 if (tileEntity instanceof MultipartTE) {
                     if (!world.isClientSide) {
 
                         // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
-                        PlayerEntity player = event.getPlayer();
-                        Vector3d start = player.getEyePosition(1.0f);
-                        Vector3d vec31 = player.getViewVector(1.0f);
+                        Player player = event.getPlayer();
+                        Vec3 start = player.getEyePosition(1.0f);
+                        Vec3 vec31 = player.getViewVector(1.0f);
                         float dist = 20;
-                        Vector3d end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
-                        RayTraceContext context = new RayTraceContext(start, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, player);
-                        RayTraceResult result = player.getCommandSenderWorld().clip(context);
-                        Vector3d hitVec = result.getLocation();
+                        Vec3 end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
+                        ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
+                        HitResult result = player.getCommandSenderWorld().clip(context);
+                        Vec3 hitVec = result.getLocation();
 
                         if (MultipartHelper.removePart((MultipartTE) tileEntity, state, player, hitVec/*@todo*/)) {
                             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

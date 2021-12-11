@@ -1,8 +1,8 @@
 package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
@@ -28,13 +28,13 @@ public class PacketSendClientCommand {
         return arguments;
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeUtf(modid);
         buf.writeUtf(command);
         TypedMapTools.writeArguments(buf, arguments);
     }
 
-    public PacketSendClientCommand(PacketBuffer buf) {
+    public PacketSendClientCommand(FriendlyByteBuf buf) {
         modid = buf.readUtf(32767);
         command = buf.readUtf(32767);
         arguments = TypedMapTools.readArguments(buf);

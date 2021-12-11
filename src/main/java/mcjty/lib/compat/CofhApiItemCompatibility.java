@@ -1,10 +1,10 @@
 package mcjty.lib.compat;
 
 import mcjty.lib.varia.WrenchUsage;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 
 public class CofhApiItemCompatibility {
     public static boolean isToolHammer(Item item) {
@@ -12,7 +12,7 @@ public class CofhApiItemCompatibility {
         // @todo 1.14 return item instanceof IToolHammer;
     }
 
-    public static WrenchUsage getWrenchUsage(Item item, ItemStack itemStack, PlayerEntity player, BlockPos pos) {
+    public static WrenchUsage getWrenchUsage(Item item, ItemStack itemStack, Player player, BlockPos pos) {
         return WrenchUsage.DISABLED;
         // @todo 1.14
 //        IToolHammer hammer = (IToolHammer) item;

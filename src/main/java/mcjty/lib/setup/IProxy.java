@@ -1,22 +1,22 @@
 package mcjty.lib.setup;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.crafting.RecipeManager;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.crafting.RecipeManager;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.Level;
 
 public interface IProxy {
 
-    World getClientWorld();
+    Level getClientWorld();
 
     // Return current world on client and overworld on server
-    World getWorld();
+    Level getWorld();
 
-    RecipeManager getRecipeManager(World world);
+    RecipeManager getRecipeManager(Level world);
 
-    PlayerEntity getClientPlayer();
+    Player getClientPlayer();
 
-    RayTraceResult getClientMouseOver();
+    HitResult getClientMouseOver();
 
     // This version directly checks the actual key
     boolean isSneaking();

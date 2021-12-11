@@ -1,13 +1,13 @@
 package mcjty.lib.api.infusable;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class DefaultInfusable implements IInfusable {
 
-    private final TileEntity owner;
+    private final BlockEntity owner;
     private int infused = 0;
 
-    public DefaultInfusable(TileEntity owner) {
+    public DefaultInfusable(BlockEntity owner) {
         this.owner = owner;
     }
 

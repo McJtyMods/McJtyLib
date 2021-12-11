@@ -1,7 +1,7 @@
 package mcjty.lib.syncpositional;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
 public interface IPositionalData {
 
@@ -11,5 +11,5 @@ public interface IPositionalData {
     /**
      * Convert this data to a packet
      */
-    void toBytes(PacketBuffer buf);
+    void toBytes(FriendlyByteBuf buf);
 }

@@ -1,7 +1,7 @@
 package mcjty.lib.syncpositional;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.GlobalPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.GlobalPos;
 
 import java.util.Objects;
 

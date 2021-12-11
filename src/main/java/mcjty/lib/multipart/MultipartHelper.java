@@ -2,22 +2,26 @@ package mcjty.lib.multipart;
 
 import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
 
 public class MultipartHelper {
 
-    public static TileEntity getTileEntity(IBlockReader access, BlockPos pos, PartSlot slot) {
-        TileEntity te = access.getBlockEntity(pos);
+    public static BlockEntity getTileEntity(BlockGetter access, BlockPos pos, PartSlot slot) {
+        BlockEntity te = access.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
             if (part != null) {
@@ -27,8 +31,8 @@ public class MultipartHelper {
         return null;
     }
 
-    public static TileEntity getTileEntity(IBlockReader access, PartPos pos) {
-        TileEntity te = access.getBlockEntity(pos.getPos());
+    public static BlockEntity getTileEntity(BlockGetter access, PartPos pos) {
+        BlockEntity te = access.getBlockEntity(pos.getPos());
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(pos.getSlot());
             if (part != null) {
@@ -38,8 +42,8 @@ public class MultipartHelper {
         return null;
     }
 
-    public static BlockState getBlockState(IBlockReader access, BlockPos pos, PartSlot slot) {
-        TileEntity te = access.getBlockEntity(pos);
+    public static BlockState getBlockState(BlockGetter access, BlockPos pos, PartSlot slot) {
+        BlockEntity te = access.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
             MultipartTE.Part part = ((MultipartTE) te).getParts().get(slot);
             if (part != null) {
@@ -50,7 +54,7 @@ public class MultipartHelper {
     }
 
     // Return true if there are no more parts left
-    public static boolean removePart(MultipartTE multipartTE, BlockState state, PlayerEntity player, Vector3d hitVec) {
+    public static boolean removePart(MultipartTE multipartTE, BlockState state, Player player, Vec3 hitVec) {
         BlockPos pos = multipartTE.getBlockPos();
         MultipartTE.Part hitPart = Registration.MULTIPART_BLOCK.getHitPart(state, multipartTE.getLevel(), pos, getPlayerEyes(player), hitVec);
         if (hitPart == null) {
@@ -58,47 +62,47 @@ public class MultipartHelper {
         }
 
         BlockState hitState = hitPart.getState();
-        TileEntity hitTile = hitPart.getTileEntity();
+        BlockEntity hitTile = hitPart.getTileEntity();
 
         ItemStack stack = new ItemStack(hitState.getBlock().asItem());
         if (hitTile instanceof GenericTileEntity) {
-            CompoundNBT tagCompound = new CompoundNBT();
+            CompoundTag tagCompound = new CompoundTag();
             // @todo how to fix the restorable parts from NBT?
 //            ((GenericTileEntity) hitTile).writeRestorableToNBT(tagCompound);
             ((GenericTileEntity) hitTile).onReplaced(multipartTE.getLevel(), multipartTE.getBlockPos(), hitState, hitState); // @todo check?
             stack.setTag(tagCompound);
         }
-        InventoryHelper.dropItemStack(multipartTE.getLevel(), pos.getX(), pos.getY(), pos.getZ(), stack);
+        Containers.dropItemStack(multipartTE.getLevel(), pos.getX(), pos.getY(), pos.getZ(), stack);
 
         multipartTE.removePart(hitState);
 
         return multipartTE.getParts().isEmpty();
     }
 
-    private static RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, PlayerEntity playerIn, boolean useLiquids) {
-        float pitch = playerIn.xRot;
-        float yaw = playerIn.yRot;
-        Vector3d vec3 = getPlayerEyes(playerIn);
-        float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
-        float f3 = MathHelper.sin(-yaw * 0.017453292F - (float)Math.PI);
-        float f4 = -MathHelper.cos(-pitch * 0.017453292F);
-        float f5 = MathHelper.sin(-pitch * 0.017453292F);
+    private static HitResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn, boolean useLiquids) {
+        float pitch = playerIn.getXRot();
+        float yaw = playerIn.getYRot();
+        Vec3 vec3 = getPlayerEyes(playerIn);
+        float f2 = Mth.cos(-yaw * 0.017453292F - (float) Math.PI);
+        float f3 = Mth.sin(-yaw * 0.017453292F - (float)Math.PI);
+        float f4 = -Mth.cos(-pitch * 0.017453292F);
+        float f5 = Mth.sin(-pitch * 0.017453292F);
         float f6 = f3 * f4;
         float f7 = f2 * f4;
         double reach = 5.0D;
-        if (playerIn instanceof ServerPlayerEntity) {
+        if (playerIn instanceof ServerPlayer) {
             // @todo 1.14
 //            reach = ((ServerPlayerEntity)playerIn).interactionManager.getBlockReachDistance();
         }
-        Vector3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
-        RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
+        Vec3 vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
+        ClipContext context = new ClipContext(vec3, vec31, ClipContext.Block.COLLIDER, useLiquids ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE, playerIn);
         return worldIn.clip(context);
     }
 
-    public static Vector3d getPlayerEyes(PlayerEntity playerIn) {
+    public static Vec3 getPlayerEyes(Player playerIn) {
         double x = playerIn.getX();
         double y = playerIn.getY() + playerIn.getEyeHeight();
         double z = playerIn.getZ();
-        return new Vector3d(x, y, z);
+        return new Vec3(x, y, z);
     }
 }

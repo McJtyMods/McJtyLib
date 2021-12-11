@@ -1,6 +1,6 @@
 package mcjty.lib.multiblock;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class MultiblockHolder<T extends IMultiblock> {
 
@@ -19,7 +19,7 @@ public class MultiblockHolder<T extends IMultiblock> {
 //        return positions;
 //    }
 
-    public void load(CompoundNBT tagCompound) {
+    public void load(CompoundTag tagCompound) {
 //        positions.clear();
 //        ListNBT lst = tagCompound.getList("pos", Constants.NBT.TAG_LONG);
 //        for (INBT nbt : lst) {
@@ -27,7 +27,7 @@ public class MultiblockHolder<T extends IMultiblock> {
 //        }
     }
 
-    public CompoundNBT save(CompoundNBT tagCompound) {
+    public CompoundTag save(CompoundTag tagCompound) {
 //        ListNBT list = new ListNBT();
 //        positions.forEach(p -> list.add(LongNBT.valueOf(p.asLong())));
 //        tagCompound.put("pos", list);

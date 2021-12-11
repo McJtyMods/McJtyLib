@@ -1,11 +1,11 @@
 package mcjty.lib.network;
 
 import mcjty.lib.compat.patchouli.PatchouliCompatibility;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -18,13 +18,13 @@ public class PacketOpenManual {
     private ResourceLocation entry;
     private int page;
 
-    public PacketOpenManual(PacketBuffer buf) {
+    public PacketOpenManual(FriendlyByteBuf buf) {
         manual = buf.readResourceLocation();
         entry = buf.readResourceLocation();
         page = buf.readInt();
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(manual);
         buf.writeResourceLocation(entry);
         buf.writeInt(page);
@@ -42,7 +42,7 @@ public class PacketOpenManual {
     }
 
     private static void handle(PacketOpenManual message, NetworkEvent.Context ctx) {
-        PlayerEntity playerEntity = ctx.getSender();
-        PatchouliCompatibility.openBookEntry((ServerPlayerEntity) playerEntity, message.manual, message.entry, message.page);
+        Player playerEntity = ctx.getSender();
+        PatchouliCompatibility.openBookEntry((ServerPlayer) playerEntity, message.manual, message.entry, message.page);
     }
 }

@@ -1,6 +1,7 @@
 package mcjty.lib.font;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import mcjty.lib.varia.Logging;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -237,7 +238,7 @@ public class TrueTypeFont {
                 if (i < 256) { // standard characters
                     charArray[i] = newIntObject;
                 } else { // custom characters
-                    customChars.put(new Character(ch), newIntObject);
+                    customChars.put(Character.valueOf(ch), newIntObject);
                 }
 
                 fontImage = null;
@@ -294,7 +295,7 @@ public class TrueTypeFont {
             if (currentChar < 256) {
                 floatObject = charArray[currentChar];
             } else {
-                floatObject = customChars.get(new Character((char) currentChar));
+                floatObject = customChars.get(Character.valueOf((char) currentChar));
             }
 
             if (floatObject != null) {
@@ -370,10 +371,11 @@ public class TrueTypeFont {
 
     public void drawString(float x, float y, String text, float scaleX, float scaleY, int format, float yoffset, float... rgba) {
         if (rgba.length == 0) rgba = new float[]{1f, 1f, 1f, 1f};
-        GlStateManager._pushMatrix();
-        GlStateManager._scalef(-scaleX, -scaleY, 1.0f);
-        GlStateManager._rotatef(180, 0, 1, 0);
-        GlStateManager._translatef(0, yoffset, 0);
+        // @todo 1.17
+        // GlStateManager._pushMatrix();
+        // GlStateManager._scalef(-scaleX, -scaleY, 1.0f);
+        // GlStateManager._rotatef(180, 0, 1, 0);
+        // GlStateManager._translatef(0, yoffset, 0);
 
         GlStateManager._bindTexture(fontTextureID);
         // @todo 1.15 needs rework
@@ -401,7 +403,8 @@ public class TrueTypeFont {
         // @todo 1.15
 //        GlStateManager.end();
 
-        GlStateManager._popMatrix();
+        // @todo 1.17
+        // GlStateManager._popMatrix();
     }
 
     private void drawTextInternal(float x, float y, String whatchars, float scaleX, float scaleY, int format, float[] rgba) {
@@ -449,7 +452,7 @@ public class TrueTypeFont {
         }
         if (rgba.length == 4)
             //worldRenderer.color(rgba[0], rgba[1], rgba[2], rgba[3]);
-            GlStateManager._color4f(rgba[0], rgba[1], rgba[2], rgba[3]);
+            RenderSystem.setShaderColor(rgba[0], rgba[1], rgba[2], rgba[3]);
         while (i >= 0 && i <= endIndex) {
 
             charCurrent = whatchars.charAt(i);
@@ -457,7 +460,7 @@ public class TrueTypeFont {
             if (charCurrent < 256) {
                 floatObject = charArray[charCurrent];
             } else {
-                floatObject = customChars.get(new Character((char) charCurrent));
+                floatObject = customChars.get(Character.valueOf((char) charCurrent));
             }
 
             if (floatObject != null) {
@@ -472,7 +475,7 @@ public class TrueTypeFont {
                             if (charCurrent < 256) {
                                 floatObject = charArray[charCurrent];
                             } else {
-                                floatObject = customChars.get(new Character((char) charCurrent));
+                                floatObject = customChars.get(Character.valueOf((char) charCurrent));
                             }
                             totalwidth += floatObject.width - correctL;
                         }

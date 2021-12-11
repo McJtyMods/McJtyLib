@@ -1,17 +1,17 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.blocks.BaseBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 
 import javax.annotation.Nullable;
 
-import static net.minecraft.util.Direction.*;
+import static net.minecraft.core.Direction.*;
 
 public class OrientationTools {
 
@@ -93,7 +93,7 @@ public class OrientationTools {
     }
 
     public static Direction determineOrientation(int x, int y, int z, LivingEntity entity) {
-        if (MathHelper.abs((float) entity.getX() - x) < 2.0F && MathHelper.abs((float) entity.getZ() - z) < 2.0F) {
+        if (Mth.abs((float) entity.getX() - x) < 2.0F && Mth.abs((float) entity.getZ() - z) < 2.0F) {
             double d0 = entity.getY() + 1.82D - entity.getMyRidingOffset();
 
             if (d0 - y > 2.0D) {
@@ -104,8 +104,8 @@ public class OrientationTools {
                 return DOWN;
             }
         }
-        int i = (int) ((entity.yRot * 4.0F / 360.0F) + 0.5D);
-        int l = ((entity.yRot * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        int i = (int) ((entity.getYRot() * 4.0F / 360.0F) + 0.5D);
+        int l = ((entity.getYRot()  * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
         if (l == 0) {
             return Direction.NORTH;
         } else if (l == 1) {
@@ -118,8 +118,8 @@ public class OrientationTools {
     }
 
     public static Direction determineOrientationHoriz(LivingEntity MobEntity) {
-        int i = (int) ((MobEntity.yRot * 4.0F / 360.0F) + 0.5D);
-        int l = ((MobEntity.yRot * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        int i = (int) ((MobEntity.getYRot() * 4.0F / 360.0F) + 0.5D);
+        int l = ((MobEntity.getYRot()  * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
         if (l == 0) {
             return Direction.NORTH;
         } else if (l == 1) {
@@ -157,7 +157,7 @@ public class OrientationTools {
         if (entityIn == null) {
             return UP;
         }
-        if (MathHelper.abs((float) entityIn.getX() - clickedBlock.getX()) < 2.0F && MathHelper.abs((float) entityIn.getZ() - clickedBlock.getZ()) < 2.0F) {
+        if (Mth.abs((float) entityIn.getX() - clickedBlock.getX()) < 2.0F && Mth.abs((float) entityIn.getZ() - clickedBlock.getZ()) < 2.0F) {
             double d0 = entityIn.getY() + entityIn.getEyeHeight();
 
             if (d0 - clickedBlock.getY() > 2.0D) {

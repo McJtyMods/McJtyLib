@@ -1,6 +1,6 @@
 package mcjty.lib.api.module;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Implement this capability based interface in your TE if you want to support

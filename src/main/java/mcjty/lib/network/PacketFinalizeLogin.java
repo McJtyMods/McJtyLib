@@ -1,7 +1,7 @@
 package mcjty.lib.network;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -11,10 +11,10 @@ import java.util.function.Supplier;
  */
 public class PacketFinalizeLogin {
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
     }
 
-    public PacketFinalizeLogin(PacketBuffer buf) {
+    public PacketFinalizeLogin(FriendlyByteBuf buf) {
     }
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {

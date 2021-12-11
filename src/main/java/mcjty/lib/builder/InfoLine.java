@@ -1,7 +1,7 @@
 package mcjty.lib.builder;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.ChatFormatting;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -14,10 +14,10 @@ public class InfoLine {
     private final String suffix;
     private final Predicate<ItemStack> condition;
     private final Function<ItemStack, String> informationGetter;
-    private final TextFormatting[] styles;
+    private final ChatFormatting[] styles;
     private final Function<ItemStack, Stream<String>> repeatingParameter;
 
-    InfoLine(String translationKey, String suffix, Predicate<ItemStack> condition, @Nullable Function<ItemStack, String> informationGetter, Function<ItemStack, Stream<String>> repeatingParameter, TextFormatting... styles) {
+    InfoLine(String translationKey, String suffix, Predicate<ItemStack> condition, @Nullable Function<ItemStack, String> informationGetter, Function<ItemStack, Stream<String>> repeatingParameter, ChatFormatting... styles) {
         this.translationKey = translationKey;
         this.suffix = suffix;
         this.condition = condition;
@@ -47,7 +47,7 @@ public class InfoLine {
         return repeatingParameter;
     }
 
-    public TextFormatting[] getStyles() {
+    public ChatFormatting[] getStyles() {
         return styles;
     }
 }

@@ -2,12 +2,12 @@ package mcjty.lib.tileentity;
 
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.varia.EnergyTools;
-import net.minecraft.nbt.LongNBT;
-import net.minecraft.util.IntReferenceHolder;
+import net.minecraft.nbt.LongTag;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<LongNBT> {
+public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<LongTag> {
 
     private final GenericTileEntity tileEntity;
     private final boolean isReceiver;
@@ -85,12 +85,12 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
     }
 
     @Override
-    public LongNBT serializeNBT() {
-        return LongNBT.valueOf(energy);
+    public LongTag serializeNBT() {
+        return LongTag.valueOf(energy);
     }
 
     @Override
-    public void deserializeNBT(LongNBT nbt) {
+    public void deserializeNBT(LongTag nbt) {
         energy = nbt.getAsLong();
     }
 
@@ -111,7 +111,7 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
 
     public void addIntegerListeners(IGenericContainer container) {
         // Least significant part
-        container.addIntegerListener(new IntReferenceHolder() {
+        container.addIntegerListener(new DataSlot() {
             @Override
             public int get() {
                 return (int) (getEnergy());     // Least significant bits
@@ -125,7 +125,7 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
             }
         });
         // Most significant part
-        container.addIntegerListener(new IntReferenceHolder() {
+        container.addIntegerListener(new DataSlot() {
             @Override
             public int get() {
                 return (int) (getEnergy() >> 32L);     // Most significant bits

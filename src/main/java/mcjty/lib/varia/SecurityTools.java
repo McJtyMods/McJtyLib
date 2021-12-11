@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 public class SecurityTools {
 
@@ -10,8 +10,8 @@ public class SecurityTools {
 //        return player.capabilities.isCreativeMode || MinecraftServer.getServer().getConfigurationManager().getOppedPlayers().canBypassPlayerLimit(player.getGameProfile());
 //    }
 
-    public static boolean isPrivileged(PlayerEntity player, World world) {
-        return player.abilities.instabuild || world.getServer().getPlayerList().isOp(player.getGameProfile());
+    public static boolean isPrivileged(Player player, Level world) {
+        return player.getAbilities().instabuild || world.getServer().getPlayerList().isOp(player.getGameProfile());
     }
 
 }

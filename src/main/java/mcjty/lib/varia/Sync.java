@@ -4,9 +4,9 @@ import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.IntReferenceHolder;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +55,7 @@ public class Sync {
             }
 
             @Override
-            public void toBytes(PacketBuffer buf) {
+            public void toBytes(FriendlyByteBuf buf) {
                 for (ValueHolder value : te.getValueMap().values()) {
                     Object v = value.getter().apply(te);
                     value.getKey().getType().serialize(buf, v);
@@ -63,7 +63,7 @@ public class Sync {
             }
 
             @Override
-            public void readBuf(PacketBuffer buf) {
+            public void readBuf(FriendlyByteBuf buf) {
                 for (ValueHolder value : te.getValueMap().values()) {
                     value.getKey().getType().deserialize(buf, value, te);
                 }
@@ -96,12 +96,12 @@ public class Sync {
             }
 
             @Override
-            public void toBytes(PacketBuffer buf) {
+            public void toBytes(FriendlyByteBuf buf) {
                 buf.writeUtf(getter.get());
             }
 
             @Override
-            public void readBuf(PacketBuffer buf) {
+            public void readBuf(FriendlyByteBuf buf) {
                 setter.accept(buf.readUtf(32767));
             }
         };
@@ -132,19 +132,19 @@ public class Sync {
             }
 
             @Override
-            public void toBytes(PacketBuffer buf) {
+            public void toBytes(FriendlyByteBuf buf) {
                 buf.writeFloat(getter.get());
             }
 
             @Override
-            public void readBuf(PacketBuffer buf) {
+            public void readBuf(FriendlyByteBuf buf) {
                 setter.accept(buf.readFloat());
             }
         };
     }
 
-    public static IntReferenceHolder integer(Supplier<Integer> getter, Consumer<Integer> setter) {
-        return new IntReferenceHolder() {
+    public static DataSlot integer(Supplier<Integer> getter, Consumer<Integer> setter) {
+        return new DataSlot() {
             @Override
             public int get() {
                 return getter.get();
@@ -157,8 +157,8 @@ public class Sync {
         };
     }
 
-    public static IntReferenceHolder shortint(Supplier<Short> getter, Consumer<Short> setter) {
-        return new IntReferenceHolder() {
+    public static DataSlot shortint(Supplier<Short> getter, Consumer<Short> setter) {
+        return new DataSlot() {
             @Override
             public int get() {
                 return getter.get();
@@ -171,8 +171,8 @@ public class Sync {
         };
     }
 
-    public static <T extends Enum<T>> IntReferenceHolder enumeration(Supplier<T> getter, Consumer<T> setter, T[] values) {
-        return new IntReferenceHolder() {
+    public static <T extends Enum<T>> DataSlot enumeration(Supplier<T> getter, Consumer<T> setter, T[] values) {
+        return new DataSlot() {
             @Override
             public int get() {
                 return getter.get().ordinal();
@@ -185,8 +185,8 @@ public class Sync {
         };
     }
 
-    public static IntReferenceHolder bool(Supplier<Boolean> getter, Consumer<Boolean> setter) {
-        return new IntReferenceHolder() {
+    public static DataSlot bool(Supplier<Boolean> getter, Consumer<Boolean> setter) {
+        return new DataSlot() {
             @Override
             public int get() {
                 return getter.get() ? 1 : 0;

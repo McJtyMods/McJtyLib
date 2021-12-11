@@ -2,13 +2,13 @@ package mcjty.lib.varia;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lib.gui.GuiParser;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -30,7 +30,7 @@ public class ItemStackTools {
      * @param amount
      */
     @Nonnull
-    public static ItemStack extractItem(@Nullable TileEntity tileEntity, int slot, int amount) {
+    public static ItemStack extractItem(@Nullable BlockEntity tileEntity, int slot, int amount) {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
@@ -45,7 +45,7 @@ public class ItemStackTools {
      * @param slot
      */
     @Nonnull
-    public static ItemStack getStack(@Nullable TileEntity tileEntity, int slot) {
+    public static ItemStack getStack(@Nullable BlockEntity tileEntity, int slot) {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
@@ -72,7 +72,7 @@ public class ItemStackTools {
         ItemStack stack = new ItemStack(item, amount);
         obj.findCommand("tag").ifPresent(cmd -> {
             try {
-                CompoundNBT nbt = JsonToNBT.parseTag(cmd.getOptionalPar(0, ""));
+                CompoundTag nbt = TagParser.parseTag(cmd.getOptionalPar(0, ""));
                 stack.setTag(nbt);
             } catch (CommandSyntaxException e) {
                 Logging.logError("Error", e);
