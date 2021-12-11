@@ -4,7 +4,6 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import mcjty.lib.McJtyLib;
-import net.minecraft.client.renderer.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.resources.ResourceLocation;

@@ -36,8 +36,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fml.client.gui.GuiUtils;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmlclient.gui.GuiUtils;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -124,9 +124,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public void drawHoveringText(PoseStack matrixStack, List<String> textLines, List<ItemStack> items, int x, int y, Font font) {
         if (!textLines.isEmpty()) {
             matrixStack.pushPose();
-            RenderSystem.disableRescaleNormal();
-            com.mojang.blaze3d.platform.Lighting.turnOff();
-            RenderSystem.disableLighting();
+            // @todo 1.17 RenderSystem.disableRescaleNormal();
+            // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
+            // @todo 1.17 RenderSystem.disableLighting();
             RenderSystem.disableDepthTest();
             int i = 0;
 
@@ -196,16 +196,16 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
             this.fillGradient(matrixStack, xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
-            RenderSystem.translated(0.0D, 0.0D, this.itemRenderer.blitOffset);
+            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
 
             renderTextLines(matrixStack, textLines, items, font, xx, yy);
 
             setBlitOffset(0);
             this.itemRenderer.blitOffset = 0.0F;
-            RenderSystem.enableLighting();
             RenderSystem.enableDepthTest();
-            com.mojang.blaze3d.platform.Lighting.turnBackOn();
-            RenderSystem.enableRescaleNormal();
+            // @todo 1.17 RenderSystem.enableLighting();
+            // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
+            // @todo 1.17 RenderSystem.enableRescaleNormal();
             matrixStack.popPose();
         }
     }
@@ -347,11 +347,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
         list = addCustomLines(list, blockRender, stack);
 
-        Font font = null;
+        Font font = getMinecraft().font;
         stack.getItem();
-        font = stack.getItem().getFontRenderer(stack);
         GuiUtils.preItemToolTip(stack);
-        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, (font == null ? getMinecraft().font : font));
+        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, font);
     }
 
     @Override

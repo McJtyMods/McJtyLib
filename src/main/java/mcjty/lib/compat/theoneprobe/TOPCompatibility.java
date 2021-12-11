@@ -8,6 +8,7 @@ import mcjty.lib.varia.Logging;
 import mcjty.theoneprobe.api.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -45,8 +46,8 @@ public class TOPCompatibility {
             Logging.log("Enabled support for The One Probe");
             probe.registerProvider(new IProbeInfoProvider() {
                 @Override
-                public String getID() {
-                    return "mcjtylib:default";
+                public ResourceLocation getID() {
+                    return new ResourceLocation("mcjtylib:default");
                 }
 
                 @Override

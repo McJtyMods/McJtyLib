@@ -35,7 +35,7 @@ import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fmllegacy.network.NetworkRegistry;
 
 import static mcjty.lib.McJtyLib.MODID;
 

@@ -11,7 +11,7 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.Collections;

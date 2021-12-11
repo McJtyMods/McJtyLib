@@ -24,7 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;

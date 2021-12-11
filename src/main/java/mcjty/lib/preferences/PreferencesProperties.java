@@ -6,12 +6,8 @@ import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.core.Direction;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
 

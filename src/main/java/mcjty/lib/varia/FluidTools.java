@@ -4,6 +4,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.BucketPickup;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -113,7 +114,8 @@ public class FluidTools {
         if (blockstate.getBlock() instanceof BucketPickup && fluid != Fluids.EMPTY) {
             FluidStack stack = new FluidStack(fluid, FluidAttributes.BUCKET_VOLUME);
             if (action.test(stack)) {
-                return new FluidStack(((BucketPickup) blockstate.getBlock()).takeLiquid(world, pos, blockstate), FluidAttributes.BUCKET_VOLUME);
+                ItemStack fluidBucket = ((BucketPickup) blockstate.getBlock()).pickupBlock(world, pos, blockstate);
+                return FluidUtil.getFluidContained(fluidBucket).map(f -> new FluidStack(f, FluidAttributes.BUCKET_VOLUME)).orElse(FluidStack.EMPTY);
             }
             return stack;
         } else if (blockstate.getBlock() instanceof LiquidBlock) {
@@ -125,7 +127,7 @@ public class FluidTools {
         } else if (material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT) {
             FluidStack stack = new FluidStack(Fluids.WATER, FluidAttributes.BUCKET_VOLUME);
             if (action.test(stack)) {
-                BlockEntity tileentity = blockstate.getBlock().hasTileEntity(blockstate) ? world.getBlockEntity(pos) : null;
+                BlockEntity tileentity = blockstate.getBlock() instanceof EntityBlock ? world.getBlockEntity(pos) : null;
                 Block.dropResources(blockstate, world, pos, tileentity);
                 clearBlock.run();
             }

@@ -8,7 +8,7 @@ import mcjty.lib.varia.Logging;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.List;

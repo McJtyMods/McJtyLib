@@ -135,7 +135,7 @@ public class HudRenderHelper {
 //                        matrixStack.translate(0, 0, -150);
                         // @todo 1.15 this needs more work! we ignore 'currenty'!
                         ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
-                        BakedModel ibakedmodel = itemRender.getModel(stack, Minecraft.getInstance().level, null);
+                        BakedModel ibakedmodel = itemRender.getModel(stack, Minecraft.getInstance().level, null, 1);
                         itemRender.render(stack, ItemTransforms.TransformType.GUI, false, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS, OverlayTexture.NO_OVERLAY, ibakedmodel);
 
 //                        itemRender.renderItemAndEffectIntoGUI(stack, 0, currenty);

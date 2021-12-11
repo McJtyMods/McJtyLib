@@ -1,29 +1,25 @@
 package mcjty.lib.multipart;
 
-
 import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.math.*;
-import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.level.Level;
+import net.minecraft.core.BlockPos;
 
 import javax.annotation.Nonnull;
-
-import net.minecraft.world.item.Item.Properties;
-
-import net.minecraft.core.BlockPos;
+import javax.annotation.Nullable;
 
 public class MultipartItemBlock extends BlockItem {
 
@@ -131,8 +127,12 @@ public class MultipartItemBlock extends BlockItem {
 //        }
 //    }
 
-    private BlockEntity createTileEntity(Level world, BlockState state) {
-        return state.getBlock().createTileEntity(state, world);
+    @Nullable
+    private BlockEntity createTileEntity(BlockPos pos, BlockState state) {
+        if (state.getBlock() instanceof EntityBlock entityBlock) {
+            return entityBlock.newBlockEntity(pos, state);
+        }
+        return null;
     }
 
     @Override
@@ -145,7 +145,7 @@ public class MultipartItemBlock extends BlockItem {
                                          @Nonnull PartSlot slot) {
         BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof MultipartTE) {
-            BlockEntity tileEntity = createTileEntity(world, newState);
+            BlockEntity tileEntity = createTileEntity(pos, newState);
             if (tileEntity instanceof GenericTileEntity && stack.getTag() != null) {
                 // @todo how to do this?
 //                ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
@@ -155,7 +155,7 @@ public class MultipartItemBlock extends BlockItem {
         }
 
         BlockState multiState = Registration.MULTIPART_BLOCK.defaultBlockState();
-        if (!world.setBlock(pos, multiState, BlockFlags.BLOCK_UPDATE + BlockFlags.NOTIFY_NEIGHBORS + BlockFlags.UPDATE_NEIGHBORS)) {
+        if (!world.setBlock(pos, multiState, Block.UPDATE_CLIENTS + Block.UPDATE_NEIGHBORS + Block.UPDATE_KNOWN_SHAPE)) {
             return false;
         }
 
@@ -165,7 +165,7 @@ public class MultipartItemBlock extends BlockItem {
 
             te = world.getBlockEntity(pos);
             if (te instanceof MultipartTE) {
-                TileEntity tileEntity = createTileEntity(world, newState);
+                BlockEntity tileEntity = createTileEntity(pos, newState);
                 if (tileEntity instanceof GenericTileEntity && stack.hasTag()) {
                     // @todo how to do this?
 //                    ((GenericTileEntity) tileEntity).readRestorableFromNBT(stack.getTag());
@@ -176,8 +176,8 @@ public class MultipartItemBlock extends BlockItem {
 
             newState.getBlock().setPlacedBy(world, pos, newState, player, stack);
 
-            if (player instanceof ServerPlayerEntity) {
-                CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayerEntity) player, pos, stack);
+            if (player instanceof ServerPlayer serverPlayer) {
+                CriteriaTriggers.PLACED_BLOCK.trigger(serverPlayer, pos, stack);
             }
         }
 
@@ -211,27 +211,27 @@ public class MultipartItemBlock extends BlockItem {
 //    }
 
 
-    private RayTraceResult getMovingObjectPositionFromPlayer(World worldIn, PlayerEntity playerIn, boolean useLiquids) {
-        float pitch = playerIn.xRot;
-        float yaw = playerIn.yRot;
-        double x = playerIn.getX();
-        double y = playerIn.getY() + playerIn.getEyeHeight();
-        double z = playerIn.getZ();
-        Vector3d vec3 = new Vector3d(x, y, z);
-        float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
-        float f3 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
-        float f4 = -MathHelper.cos(-pitch * 0.017453292F);
-        float f5 = MathHelper.sin(-pitch * 0.017453292F);
-        float f6 = f3 * f4;
-        float f7 = f2 * f4;
-        double reach = 5.0D;
-        if (playerIn instanceof ServerPlayerEntity) {
+    // private RayTraceResult getMovingObjectPositionFromPlayer(Level worldIn, Player playerIn, boolean useLiquids) {
+        // float pitch = playerIn.getXRot();
+        // float yaw = playerIn.getYRot();
+        // double x = playerIn.getX();
+        // double y = playerIn.getY() + playerIn.getEyeHeight();
+        // double z = playerIn.getZ();
+        // Vector3d vec3 = new Vector3d(x, y, z);
+        // float f2 = MathHelper.cos(-yaw * 0.017453292F - (float) Math.PI);
+        // float f3 = MathHelper.sin(-yaw * 0.017453292F - (float) Math.PI);
+        // float f4 = -MathHelper.cos(-pitch * 0.017453292F);
+        // float f5 = MathHelper.sin(-pitch * 0.017453292F);
+        // float f6 = f3 * f4;
+        // float f7 = f2 * f4;
+        // double reach = 5.0D;
+        // if (playerIn instanceof ServerPlayer serverPlayer) {
             // @todo 1.14
-//            reach = ((ServerPlayerEntity) playerIn).interactionManager.getBlockReachDistance();
-        }
-        Vector3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
-        RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
-        return worldIn.clip(context);
-    }
+        //    reach = serverPlayer.interactionManager.getBlockReachDistance();
+        // }
+        // Vector3d vec31 = vec3.add(f6 * reach, f5 * reach, f7 * reach);
+        // RayTraceContext context = new RayTraceContext(vec3, vec31, RayTraceContext.BlockMode.COLLIDER, useLiquids ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE, playerIn);
+        // return worldIn.clip(context);
+    // }
 
 }

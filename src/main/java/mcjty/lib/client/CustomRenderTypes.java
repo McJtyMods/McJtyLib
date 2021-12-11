@@ -6,18 +6,18 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import java.util.OptionalDouble;
 import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
 
-import net.minecraft.client.renderer.RenderStateShard.LineStateShard;
 import net.minecraft.client.renderer.RenderType.CompositeState;
 
 public class CustomRenderTypes extends RenderType {
 
     // Dummy
-    public CustomRenderTypes(String name, VertexFormat format, int p_i225992_3_, int p_i225992_4_, boolean p_i225992_5_, boolean p_i225992_6_, Runnable setup, Runnable clear) {
-        super(name, format, p_i225992_3_, p_i225992_4_, p_i225992_5_, p_i225992_6_, setup, clear);
+    private CustomRenderTypes(String p_173178_, VertexFormat p_173179_, VertexFormat.Mode p_173180_, int p_173181_, boolean p_173182_, boolean p_173183_, Runnable p_173184_, Runnable p_173185_) {
+        super(p_173178_, p_173179_, p_173180_, p_173181_, p_173182_, p_173183_, p_173184_, p_173185_);
     }
 
 //    public static final VertexFormat POSITION_COLOR_LIGHTMAP_NORMAL;
@@ -29,16 +29,18 @@ public class CustomRenderTypes extends RenderType {
 //    }
 
 
-    public static final RenderType TRANSLUCENT_ADD = create("translucent_add", DefaultVertexFormat.BLOCK, GL11.GL_QUADS, 262144, true, false,
-            CompositeState.builder().setShadeModelState(SMOOTH_SHADE)
+    public static final RenderType TRANSLUCENT_ADD = create("translucent_add", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
+            CompositeState.builder()
+                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
                     .setLightmapState(LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(true));
 
-    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = create("translucent_add_nolightmaps", DefaultVertexFormat.BLOCK, GL11.GL_QUADS, 262144, true, false,
-            CompositeState.builder().setShadeModelState(SMOOTH_SHADE)
+    public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = create("translucent_add_nolightmaps", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
+            CompositeState.builder()
+                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
                     .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
@@ -46,8 +48,9 @@ public class CustomRenderTypes extends RenderType {
                     .createCompositeState(true));
 
 
-    public static final RenderType TRANSLUCENT_LIGHTNING_NOLIGHTMAPS = create("translucent_lightning_nolightmaps", DefaultVertexFormat.BLOCK, GL11.GL_QUADS, 262144, true, false,
-            CompositeState.builder().setShadeModelState(SMOOTH_SHADE)
+    public static final RenderType TRANSLUCENT_LIGHTNING_NOLIGHTMAPS = create("translucent_lightning_nolightmaps", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
+            CompositeState.builder()
+                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
                     .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(LIGHTNING_TRANSPARENCY)
@@ -58,7 +61,7 @@ public class CustomRenderTypes extends RenderType {
     private static final LineStateShard THICK_LINES = new LineStateShard(OptionalDouble.of(2.0D));
 
     public static final RenderType OVERLAY_LINES = create("overlay_lines",
-            DefaultVertexFormat.POSITION_COLOR, GL11.GL_LINES, 256,
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINES, 256, true, false,
             CompositeState.builder().setLineState(THICK_LINES)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
@@ -70,18 +73,20 @@ public class CustomRenderTypes extends RenderType {
                     .createCompositeState(false));
 
     public static final RenderType QUADS_NOTEXTURE = create("quads_notexture",
-            DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, GL11.GL_QUADS, 2097152, true, false,
+            DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, VertexFormat.Mode.QUADS, 2097152, true, false,
             CompositeState.builder()
                     .setTextureState(NO_TEXTURE)
-                    .setShadeModelState(SMOOTH_SHADE).setLightmapState(LIGHTMAP)
+                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(LIGHTMAP)
                     .createCompositeState(false));
 
     public static final RenderType LINES_LIGHTMAP = create("lines_lightmap",
-            DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, GL11.GL_LINES, 256, true, false,
+            DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, VertexFormat.Mode.LINES, 256, true, false,
             CompositeState.builder()
                     .setLineState(new LineStateShard(OptionalDouble.of(1.0)))
                     .setTextureState(NO_TEXTURE)
-                    .setShadeModelState(SMOOTH_SHADE).setLightmapState(LIGHTMAP)
+                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(LIGHTMAP)
                     .createCompositeState(false));
 
     // Workaround for a weird bug with lambda's
@@ -102,11 +107,12 @@ public class CustomRenderTypes extends RenderType {
     public static final RenderStateShard.TransparencyStateShard LINESTRIP_TRANSP = new RenderStateShard.TransparencyStateShard("linestrip_transp", TRANSP_ENABLE, TRANSP_DISABLE);
 
     public static final RenderType LINESTRIP = create("linestrip",
-            DefaultVertexFormat.POSITION_COLOR, GL11.GL_LINE_STRIP, 256, true, false,
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINE_STRIP, 256, true, false,
             CompositeState.builder()
                     .setLineState(new LineStateShard(OptionalDouble.of(2.0)))
                     .setTransparencyState(LINESTRIP_TRANSP)
                     .setTextureState(NO_TEXTURE)
-                    .setShadeModelState(SMOOTH_SHADE).setLightmapState(RenderStateShard.NO_LIGHTMAP)
+                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                     .createCompositeState(false));
 }

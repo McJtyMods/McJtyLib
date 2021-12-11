@@ -2,6 +2,7 @@ package mcjty.lib.client;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -12,7 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -24,6 +25,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.core.Position;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -117,31 +119,31 @@ public class RenderHelper {
 
     public static void renderEntity(PoseStack matrixStack, Entity entity, int xPos, int yPos, float scale) {
         matrixStack.pushPose();
-        GlStateManager._color4f(1f, 1f, 1f, 1f);
-        GlStateManager._enableRescaleNormal();
-        GlStateManager._enableColorMaterial();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+        // @todo 1.17 GlStateManager._enableRescaleNormal();
+        // @todo 1.17 GlStateManager._enableColorMaterial();
         matrixStack.pushPose();
         matrixStack.translate(xPos + 8, yPos + 16, 50F);
         matrixStack.scale(-scale, scale, scale);
         matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180F));
         matrixStack.mulPose(Vector3f.YP.rotationDegrees(135F));
-        com.mojang.blaze3d.platform.Lighting.turnBackOn();
+        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
         matrixStack.mulPose(Vector3f.YN.rotationDegrees(135F));
         matrixStack.mulPose(Vector3f.YP.rotationDegrees(rot));
 //        GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
-        entity.xRot = 0.0F;
+        entity.setXRot(0.0F);
         matrixStack.translate(0.0F, (float) entity.getMyRidingOffset(), 0.0F);
         // @todo 1.15
 //        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
 //        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
         matrixStack.popPose();
-        com.mojang.blaze3d.platform.Lighting.turnOff();
+        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
 
-        GlStateManager._disableRescaleNormal();
+        // @todo 1.17 GlStateManager._disableRescaleNormal();
         matrixStack.translate(0F, 0F, 0.0F);
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager._enableRescaleNormal();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        // @todo 1.17 GlStateManager._enableRescaleNormal();
         int i1 = 240;
         int k1 = 240;
 
@@ -150,10 +152,10 @@ public class RenderHelper {
 //        GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
 //        OpenGlHelper.setLightmapTextureCoords(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
 
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager._disableRescaleNormal();
-        com.mojang.blaze3d.platform.Lighting.turnOff();
-        GlStateManager._disableLighting();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        // @todo 1.17 GlStateManager._disableRescaleNormal();
+        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
+        // @todo 1.17 GlStateManager._disableLighting();
         GlStateManager._disableDepthTest();
         matrixStack.popPose();
     }
@@ -205,14 +207,14 @@ public class RenderHelper {
         ResourceLocation fluidStill = fluid.getAttributes().getStillTexture();
         TextureAtlasSprite fluidStillSprite = null;
         if (fluidStill != null) {
-            fluidStillSprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(fluidStill);
+            fluidStillSprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fluidStill);
         }
         if (fluidStillSprite == null) {
             return false;
         }
 
         int fluidColor = fluid.getAttributes().getColor(fluidStack);
-        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bind(TextureAtlas.LOCATION_BLOCKS);
+        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bindForSetup(InventoryMenu.BLOCK_ATLAS);
         setGLColorFromInt(fluidColor);
         drawFluidTexture(x, y, fluidStillSprite, 100);
 
@@ -227,7 +229,7 @@ public class RenderHelper {
 
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder vertexBuffer = tessellator.getBuilder();
-        vertexBuffer.begin(7, DefaultVertexFormat.POSITION_TEX);
+        vertexBuffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         vertexBuffer.vertex(xCoord, yCoord + 16, zLevel).uv(uMin, vMax).endVertex();
         vertexBuffer.vertex(xCoord + 16, yCoord + 16, zLevel).uv(uMax, vMax).endVertex();
         vertexBuffer.vertex(xCoord + 16, yCoord, zLevel).uv(uMax, vMin).endVertex();
@@ -241,7 +243,7 @@ public class RenderHelper {
         float green = (color >> 8 & 0xFF) / 255.0F;
         float blue = (color & 0xFF) / 255.0F;
 
-        GlStateManager._color4f(red, green, blue, 1.0F);
+        RenderSystem.setShaderColor(red, green, blue, 1.0F);
     }
 
 
@@ -270,13 +272,13 @@ public class RenderHelper {
 
     public static void renderStackOnGround(PoseStack matrixStack, ItemStack stack, double alpha) {
         if (!stack.isEmpty()) {
-            BakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getModel(stack, null, null);
+            BakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getModel(stack, null, null, 1);
             if (!stack.isEmpty()) {
-                Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
-                Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
-                GlStateManager._color4f(1.0F, 1.0F, 1.0F, (float) alpha);
-                GlStateManager._enableRescaleNormal();
-                GlStateManager._alphaFunc(GL11.GL_GREATER, 0.1F);
+                Minecraft.getInstance().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
+                Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
+                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) alpha);
+                // @todo 1.17 GlStateManager._enableRescaleNormal();
+                // @todo 1.17 GlStateManager._alphaFunc(GL11.GL_GREATER, 0.1F);
                 GlStateManager._enableBlend();
                 GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
                 matrixStack.pushPose();
@@ -288,41 +290,41 @@ public class RenderHelper {
                 // @todo 1.15
 //                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
                 matrixStack.popPose();
-                GlStateManager._disableRescaleNormal();
+                // @todo 1.17 GlStateManager._disableRescaleNormal();
                 GlStateManager._disableBlend();
-                Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
-                Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).restoreLastBlurMipmap();
+                Minecraft.getInstance().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
+                Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).restoreLastBlurMipmap();
             }
         }
 
     }
 
     public static boolean renderItemStack(PoseStack matrixStack, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
-        RenderSystem.color4f(1F, 1F, 1F, 1f);
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1f);
 
         boolean rc = false;
         if (highlight) {
-            RenderSystem.disableLighting();
+            // @todo 1.17 RenderSystem.disableLighting();
             drawVerticalGradientRect(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
         }
         if (!itm.isEmpty() && itm.getItem() != null) {
             rc = true;
             matrixStack.pushPose();
-            RenderSystem.color4f(1F, 1F, 1F, 1F);
-            RenderSystem.enableRescaleNormal();
-            RenderSystem.enableLighting();
-            com.mojang.blaze3d.platform.Lighting.turnBackOn();
+            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+            // @todo 1.17 enderSystem.enableRescaleNormal();
+            // @todo 1.17 enderSystem.enableLighting();
+            // @todo 1.17 om.mojang.blaze3d.platform.Lighting.turnBackOn();
             // @todo 1.14 check if right?
             // @todo 1.15
-            RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240, 240);
+            // @todo 1.17 RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240, 240);
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             itemRender.renderAndDecorateItem(itm, x, y);
             renderItemOverlayIntoGUI(matrixStack, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
 //            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
             matrixStack.popPose();
-            RenderSystem.disableRescaleNormal();
-            RenderSystem.disableLighting();
+            // @todo 1.17 RenderSystem.disableRescaleNormal();
+            // @todo 1.17 RenderSystem.disableLighting();
         }
 
         return rc;
@@ -354,20 +356,19 @@ public class RenderHelper {
                 buffer.endBatch();
             }
 
-            if (stack.getItem().showDurabilityBar(stack)) {
+            if (stack.getItem().isBarVisible(stack)) {
                 RenderSystem.disableDepthTest();
                 RenderSystem.disableTexture();
-                RenderSystem.disableAlphaTest();
+                // @todo 1.17 RenderSystem.disableAlphaTest();
                 RenderSystem.disableBlend();
                 Tesselator tessellator = Tesselator.getInstance();
                 BufferBuilder bufferbuilder = tessellator.getBuilder();
-                double health = stack.getItem().getDurabilityForDisplay(stack);
-                int i = Math.round(13.0F - (float)health * 13.0F);
-                int j = stack.getItem().getRGBDurabilityForDisplay(stack);
+                int barWidth = stack.getItem().getBarWidth(stack);
+                int j = stack.getItem().getBarColor(stack);
                 draw(bufferbuilder, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-                draw(bufferbuilder, xPosition + 2, yPosition + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
+                draw(bufferbuilder, xPosition + 2, yPosition + 13, barWidth, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
                 RenderSystem.enableBlend();
-                RenderSystem.enableAlphaTest();
+                // @todo 1.17 RenderSystem.enableAlphaTest();
                 RenderSystem.enableTexture();
                 RenderSystem.enableDepthTest();
             }
@@ -390,84 +391,10 @@ public class RenderHelper {
     }
 
     /**
-     * Renders the stack size and/or damage bar for the given ItemStack.
-     */
-    private static void renderItemOverlayIntoGUIOld(PoseStack matrixStack, Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
-                                                 int scaled) {
-        if (!stack.isEmpty()) {
-            int stackSize = stack.getCount();
-            if (stackSize != 1 || text != null) {
-                String s = text == null ? String.valueOf(stackSize) : text;
-                if (text == null && stackSize < 1) {
-                    s = ChatFormatting.RED + String.valueOf(stackSize);
-                }
-
-                RenderSystem.disableLighting();
-                RenderSystem.disableDepthTest();
-                RenderSystem.disableBlend();
-                if (scaled >= 2) {
-                    matrixStack.pushPose();
-                    matrixStack.scale(.5f, .5f, .5f);
-                    fr.drawShadow(matrixStack, s, ((xPosition + 19 - 2) * 2 - 1 - fr.width(s)), yPosition * 2 + 24, 16777215);
-                    matrixStack.popPose();
-                } else if (scaled == 1) {
-                    matrixStack.pushPose();
-                    matrixStack.scale(.75f, .75f, .75f);
-                    fr.drawShadow(matrixStack, s, ((xPosition - 2) * 1.34f + 24 - fr.width(s)), yPosition * 1.34f + 14, 16777215);
-                    matrixStack.popPose();
-                } else {
-                    fr.drawShadow(matrixStack, s, (xPosition + 19 - 2 - fr.width(s)), (yPosition + 6 + 3), 16777215);
-                }
-                RenderSystem.enableLighting();
-                RenderSystem.enableDepthTest();
-                // Fixes opaque cooldown overlay a bit lower
-                // TODO: check if enabled blending still screws things up down the line.
-                RenderSystem.enableBlend();
-            }
-
-            if (stack.getItem().showDurabilityBar(stack)) {
-                double health = stack.getItem().getDurabilityForDisplay(stack);
-                int j = (int) Math.round(13.0D - health * 13.0D);
-                int i = (int) Math.round(255.0D - health * 255.0D);
-                RenderSystem.disableLighting();
-                RenderSystem.disableDepthTest();
-                RenderSystem.disableTexture();
-                RenderSystem.disableAlphaTest();
-                RenderSystem.disableBlend();
-                Tesselator tessellator = Tesselator.getInstance();
-                BufferBuilder vertexbuffer = tessellator.getBuilder();
-                draw(vertexbuffer, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-                draw(vertexbuffer, xPosition + 2, yPosition + 13, 12, 1, (255 - i) / 4, 64, 0, 255);
-                draw(vertexbuffer, xPosition + 2, yPosition + 13, j, 1, 255 - i, i, 0, 255);
-                RenderSystem.enableBlend();
-                RenderSystem.enableAlphaTest();
-                RenderSystem.enableTexture();
-                RenderSystem.enableLighting();
-                RenderSystem.enableDepthTest();
-            }
-
-            LocalPlayer PlayerEntitysp = Minecraft.getInstance().player;
-            float f = PlayerEntitysp == null ? 0.0F : PlayerEntitysp.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getFrameTime());
-
-            if (f > 0.0F) {
-                RenderSystem.disableLighting();
-                RenderSystem.disableDepthTest();
-                RenderSystem.disableTexture();
-                Tesselator tessellator1 = Tesselator.getInstance();
-                BufferBuilder vertexbuffer1 = tessellator1.getBuilder();
-                draw(vertexbuffer1, xPosition, yPosition + MathTools.floor(16.0F * (1.0F - f)), 16, MathTools.ceiling(16.0F * f), 255, 255, 255, 127);
-                RenderSystem.enableTexture();
-                RenderSystem.enableLighting();
-                RenderSystem.enableDepthTest();
-            }
-        }
-    }
-
-    /**
      * Draw with the WorldRenderer
      */
     private static void draw(BufferBuilder renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
-        renderer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+        renderer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         renderer.vertex((x + 0), (y + 0), 0.0D).color(red, green, blue, alpha).endVertex();
         renderer.vertex((x + 0), (y + height), 0.0D).color(red, green, blue, alpha).endVertex();
         renderer.vertex((x + width), (y + height), 0.0D).color(red, green, blue, alpha).endVertex();
@@ -494,25 +421,25 @@ public class RenderHelper {
         float f7 = (color2 & 255) / 255.0F;
         GlStateManager._disableTexture();
         GlStateManager._enableBlend();
-        GlStateManager._disableAlphaTest();
+        // @todo 1.17 GlStateManager._disableAlphaTest();
 
         // @todo 1.14 check
 //        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
 
-        GlStateManager._shadeModel(GL11.GL_SMOOTH);
+        // @todo 1.17 GlStateManager._shadeModel(GL11.GL_SMOOTH);
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         buffer.vertex(x2, y1, zLevel).color(f1, f2, f3, f).endVertex();
         buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
         buffer.vertex(x1, y2, zLevel).color(f5, f6, f7, f4).endVertex();
         buffer.vertex(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.end();
 
-        GlStateManager._shadeModel(GL11.GL_FLAT);
+        // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
         GlStateManager._disableBlend();
-        GlStateManager._enableAlphaTest();
+        // @todo 1.17 GlStateManager._enableAlphaTest();
         GlStateManager._enableTexture();
     }
 
@@ -534,24 +461,24 @@ public class RenderHelper {
         float f7 = (color2 & 255) / 255.0F;
         GlStateManager._disableTexture();
         GlStateManager._enableBlend();
-        GlStateManager._disableAlphaTest();
+        // @todo 1.17 GlStateManager._disableAlphaTest();
 
         // @todo 1.14 check
 //        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
 
-        GlStateManager._shadeModel(GL11.GL_SMOOTH);
+        // @todo 1.17 GlStateManager._shadeModel(GL11.GL_SMOOTH);
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
         buffer.vertex(x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
         buffer.vertex(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
         buffer.vertex(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.end();
-        GlStateManager._shadeModel(GL11.GL_FLAT);
+        // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
         GlStateManager._disableBlend();
-        GlStateManager._enableAlphaTest();
+        // @todo 1.17 GlStateManager._enableAlphaTest();
         GlStateManager._enableTexture();
     }
 
@@ -787,7 +714,7 @@ public class RenderHelper {
         float f1 = (1 / 256.0f);
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         buffer.vertex((x + 0), (y + height), zLevel).uv(((u + 0) * f), ((v + height) * f1)).endVertex();
         buffer.vertex((x + width), (y + height), zLevel).uv(((u + width) * f), ((v + height) * f1)).endVertex();
         buffer.vertex((x + width), (y + 0), zLevel).uv(((u + width) * f), ((v + 0) * f1)).endVertex();
@@ -801,7 +728,7 @@ public class RenderHelper {
         double zLevel = 50;
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder vertexbuffer = tessellator.getBuilder();
-        vertexbuffer.begin(7, DefaultVertexFormat.POSITION_TEX);
+        vertexbuffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         vertexbuffer.vertex((x + 0), (y + height), zLevel).uv(((textureX + 0) * f), ((textureY + height) * f1)).endVertex();
         vertexbuffer.vertex((x + width), (y + height), zLevel).uv(((textureX + width) * f), ((textureY + height) * f1)).endVertex();
         vertexbuffer.vertex((x + width), (y + 0), zLevel).uv(((textureX + width) * f), ((textureY + 0) * f1)).endVertex();
@@ -829,7 +756,7 @@ public class RenderHelper {
         float f1 = (1 / 256.0f);
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormat.POSITION_TEX);
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         buffer.vertex(matrix, (x + 0), (y + height), zLevel).uv(((u + 0) * f), ((v + height) * f1)).endVertex();
         buffer.vertex(matrix, (x + width), (y + height), zLevel).uv(((u + width) * f), ((v + height) * f1)).endVertex();
         buffer.vertex(matrix, (x + width), (y + 0), zLevel).uv(((u + width) * f), ((v + 0) * f1)).endVertex();
@@ -844,7 +771,7 @@ public class RenderHelper {
     public static void renderBillboardQuadBright(PoseStack matrixStack, MultiBufferSource buffer, float scale, ResourceLocation texture, RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(texture);
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
         matrixStack.pushPose();
         matrixStack.translate(0.5, 0.5, 0.5);
         RenderHelper.rotateToPlayer(matrixStack);
@@ -863,22 +790,22 @@ public class RenderHelper {
     }
 
     public static int renderText(PoseStack matrixStack, int x, int y, String txt) {
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1f);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1f);
 
         matrixStack.pushPose();
         matrixStack.translate(0.0F, 0.0F, 32.0F);
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager._enableRescaleNormal();
-        GlStateManager._enableLighting();
-        com.mojang.blaze3d.platform.Lighting.turnBackOn();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        // @todo 1.17 GlStateManager._enableRescaleNormal();
+        // @todo 1.17 GlStateManager._enableLighting();
+        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
 
-        GlStateManager._disableLighting();
+        // @todo 1.17 GlStateManager._disableLighting();
         GlStateManager._disableDepthTest();
         GlStateManager._disableBlend();
         Minecraft mc = Minecraft.getInstance();
         int width = mc.font.width(txt);
         mc.font.drawShadow(matrixStack, txt, x, y, 16777215);
-        GlStateManager._enableLighting();
+        // @todo 1.17 GlStateManager._enableLighting();
         GlStateManager._enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower
         // TODO: check if enabled blending still screws things up down the line.
@@ -886,29 +813,29 @@ public class RenderHelper {
 
 
         matrixStack.popPose();
-        GlStateManager._disableRescaleNormal();
-        GlStateManager._disableLighting();
+        // @todo 1.17 GlStateManager._disableRescaleNormal();
+        // @todo 1.17 GlStateManager._disableLighting();
 
         return width;
     }
 
     public static int renderText(PoseStack matrixStack, int x, int y, String txt, int color) {
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0f);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0f);
 
         matrixStack.pushPose();
         matrixStack.translate(0.0F, 0.0F, 32.0F);
-        GlStateManager._color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager._enableRescaleNormal();
-        GlStateManager._enableLighting();
-        com.mojang.blaze3d.platform.Lighting.turnBackOn();
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        // @todo 1.17 GlStateManager._enableRescaleNormal();
+        // @todo 1.17 GlStateManager._enableLighting();
+        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
 
-        GlStateManager._disableLighting();
+        // @todo 1.17 GlStateManager._disableLighting();
         GlStateManager._disableDepthTest();
         GlStateManager._disableBlend();
         Minecraft mc = Minecraft.getInstance();
         int width = mc.font.width(txt);
         mc.font.draw(matrixStack, txt, x, y, color);
-        GlStateManager._enableLighting();
+        // @todo 1.17 GlStateManager._enableLighting();
         GlStateManager._enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower
         // TODO: check if enabled blending still screws things up down the line.
@@ -916,8 +843,8 @@ public class RenderHelper {
 
 
         matrixStack.popPose();
-        GlStateManager._disableRescaleNormal();
-        GlStateManager._disableLighting();
+        // @todo 1.17 GlStateManager._disableRescaleNormal();
+        // @todo 1.17 GlStateManager._disableLighting();
 
         return width;
     }

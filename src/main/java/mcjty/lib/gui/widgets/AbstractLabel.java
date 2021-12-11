@@ -147,8 +147,8 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         int dy = calculateVerticalOffset() + offsety + txtDy;
 
         if (image != null) {
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.getTextureManager().bind(image);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            mc.getTextureManager().bindForSetup(image);
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;
             gui.blit(matrixStack, xx, yy, u, v, iw, ih);

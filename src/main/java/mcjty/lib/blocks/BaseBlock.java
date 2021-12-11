@@ -44,21 +44,20 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ToolType;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Supplier;
 
-public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings {
+public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings, EntityBlock {
 
     private final boolean infusable;
-    private final Supplier<BlockEntity> tileEntitySupplier;
+    private final BlockEntityType.BlockEntitySupplier<BlockEntity> tileEntitySupplier;
     private final TooltipBuilder tooltipBuilder;
-    private final ToolType toolType;
-    private final int harvestLevel;
     private final TOPDriver topDriver;
     private final ManualEntry manualEntry;
 
@@ -71,8 +70,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         this.infusable = builder.isInfusable();
         this.tileEntitySupplier = builder.getTileEntitySupplier();
         this.tooltipBuilder = builder.getTooltipBuilder();
-        this.toolType = builder.getToolType();
-        this.harvestLevel = builder.getHarvestLevel();
         this.topDriver = builder.getTopDriver();
         this.manualEntry = builder.getManualEntry();
     }
@@ -166,8 +163,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @Nonnull
     public InteractionResult use(@Nonnull BlockState state, Level world, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult result) {
         BlockEntity te = world.getBlockEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            InteractionResult resultType = ((GenericTileEntity) te).onBlockActivated(state, player, hand, result);
+        if (te instanceof GenericTileEntity genTileEntity) {
+            InteractionResult resultType = genTileEntity.onBlockActivated(state, player, hand, result);
             if (resultType != InteractionResult.PASS) {
                 return resultType;
             }
@@ -207,8 +204,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     protected boolean wrenchUse(Level world, BlockPos pos, Direction side, Player player) {
         BlockEntity tileEntity = world.getBlockEntity(pos);
-        if (tileEntity instanceof GenericTileEntity) {
-            if (!((GenericTileEntity) tileEntity).wrenchUse(world, pos, side, player)) {
+        if (tileEntity instanceof GenericTileEntity genTileEntity) {
+            if (!genTileEntity.wrenchUse(world, pos, side, player)) {
                 rotate(world.getBlockState(pos), world, pos, Rotation.CLOCKWISE_90);
             }
         } else {
@@ -270,8 +267,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
 
         BlockEntity te = world.getBlockEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
+        if (te instanceof GenericTileEntity genericTileEntity) {
             genericTileEntity.onBlockPlacedBy(world, pos, state, placer, stack);
         }
 
@@ -287,17 +283,15 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     protected void checkRedstone(Level world, BlockPos pos) {
         BlockEntity te = world.getBlockEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            ((GenericTileEntity) te).checkRedstone(world, pos);
+        if (te instanceof GenericTileEntity genericTileEntity) {
+            genericTileEntity.checkRedstone(world, pos);
         }
     }
 
 
     protected void setOwner(Level world, BlockPos pos, LivingEntity entity) {
         BlockEntity te = world.getBlockEntity(pos);
-        if (te instanceof GenericTileEntity && entity instanceof Player) {
-            GenericTileEntity genericTileEntity = (GenericTileEntity) te;
-            Player player = (Player) entity;
+        if (te instanceof GenericTileEntity genericTileEntity && entity instanceof Player player) {
             genericTileEntity.setOwner(player);
         }
     }
@@ -305,7 +299,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @SuppressWarnings("deprecation")
     @Override
     public boolean triggerEvent(@Nonnull BlockState state, @Nonnull Level worldIn, @Nonnull BlockPos pos, int id, int param) {
-        if (hasTileEntity(state)) {
+        if (hasTileEntitySupplier()) {
             super.triggerEvent(state, worldIn, pos, id, param);
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
             return tileentity == null ? false : tileentity.triggerEvent(id, param);
@@ -315,25 +309,13 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     protected boolean checkAccess(Level world, Player player, BlockEntity te) {
-        if (te instanceof GenericTileEntity) {
-            ((GenericTileEntity) te).checkAccess(player);
+        if (te instanceof GenericTileEntity genericTileEntity) {
+            genericTileEntity.checkAccess(player);
         }
         return false;
     }
 
-    @Nullable
-    @Override
-    public ToolType getHarvestTool(@Nonnull BlockState state) {
-        return toolType;
-    }
-
-    @Override
-    public int getHarvestLevel(@Nonnull BlockState state) {
-        return harvestLevel;
-    }
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
+    protected boolean hasTileEntitySupplier() {
         return tileEntitySupplier != null;
     }
 
@@ -345,13 +327,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return infusable;
     }
 
-    @Nullable
     @Override
-    public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-        if (tileEntitySupplier == null) {
-            return null;
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        if (hasTileEntitySupplier()) {
+            return tileEntitySupplier.create(pos, state);
         } else {
-            return tileEntitySupplier.get();
+            return null;
         }
     }
 
@@ -366,8 +347,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public void onRemove(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull BlockState newstate, boolean isMoving) {
         if (!world.isClientSide) {
             BlockEntity te = world.getBlockEntity(pos);
-            if (te instanceof GenericTileEntity) {
-                GenericTileEntity genericTileEntity = (GenericTileEntity) te;
+            if (te instanceof GenericTileEntity genericTileEntity) {
                 genericTileEntity.onReplaced(world, pos, state, newstate);
             }
         }
@@ -396,7 +376,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             builder.add(property);
         }
     }
-
 
     @Nullable
     @Override
@@ -452,8 +431,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 break;
         }
         BlockEntity tileEntity = world.getBlockEntity(pos);
-        if (tileEntity instanceof GenericTileEntity) {
-            ((GenericTileEntity) tileEntity).rotateBlock(rot);
+        if (tileEntity instanceof GenericTileEntity genericTileEntity) {
+            genericTileEntity.rotateBlock(rot);
         }
         return state;
     }

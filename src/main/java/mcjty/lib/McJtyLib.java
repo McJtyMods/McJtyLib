@@ -17,7 +17,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public class McJtyLib {
 
     public static final String MODID = "mcjtylib";
 
-    public static final IProxy proxy = DistExecutor.runForDist(() -> () -> new DefaultClientProxy(), () -> () -> new DefaultServerProxy());
+    public static final IProxy proxy = DistExecutor.safeRunForDist(() -> () -> new DefaultClientProxy(), () -> () -> new DefaultServerProxy());
     public static final ModSetup setup = new ModSetup();
 
     public static McJtyLib instance;

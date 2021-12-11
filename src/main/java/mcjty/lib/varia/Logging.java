@@ -6,7 +6,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -39,7 +38,7 @@ public class Logging {
         getLogger().log(Level.ERROR, msg);
     }
 
-    public static void log(Level world, BlockEntity te, String message) {
+    public static void log(net.minecraft.world.level.Level world, BlockEntity te, String message) {
         if (doLogging.get()) {
             long ticks = world.getGameTime();
             if (ticks != prevTicks) {

@@ -14,12 +14,9 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.util.text.*;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -159,7 +156,7 @@ public class TooltipRender {
         com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
         matrixStack.pushPose();
         matrixStack.translate(0, 0, 400f);
-        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, null, null));
+        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, null, null, 1));
 //        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
         matrixStack.popPose();
 
@@ -199,14 +196,14 @@ public class TooltipRender {
 
     private static void renderItemModelIntoGUI(ItemRenderer render, PoseStack matrixStack, ItemStack itemStack, int x, int y, BakedModel bakedmodel) {
         matrixStack.pushPose();
-        Minecraft.getInstance().getTextureManager().bind(TextureAtlas.LOCATION_BLOCKS);
+        Minecraft.getInstance().getTextureManager().bindForSetup(TextureAtlas.LOCATION_BLOCKS);
         Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
-        RenderSystem.enableRescaleNormal();
-        RenderSystem.enableAlphaTest();
-        RenderSystem.defaultAlphaFunc();
+        // @todo 1.17 RenderSystem.enableRescaleNormal();
+        // @todo 1.17 RenderSystem.enableAlphaTest();
+        // @todo 1.17 RenderSystem.defaultAlphaFunc();
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         matrixStack.translate((float)x, (float)y, 100.0F + render.blitOffset);
         matrixStack.translate(8.0F, 8.0F, 0.0F);
         matrixStack.scale(1.0F, -1.0F, 1.0F);
@@ -224,8 +221,8 @@ public class TooltipRender {
             Lighting.setupFor3DItems();
         }
 
-        RenderSystem.disableAlphaTest();
-        RenderSystem.disableRescaleNormal();
+        // @todo 1.17 RenderSystem.disableAlphaTest();
+        // @todo 1.17 RenderSystem.disableRescaleNormal();
         matrixStack.popPose();
     }
 

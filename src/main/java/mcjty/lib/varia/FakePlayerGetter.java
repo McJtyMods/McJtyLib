@@ -44,8 +44,9 @@ public class FakePlayerGetter {
             if (owner == null) {
                 owner = UUID.nameUUIDFromBytes("rftools_builder".getBytes());
             }
-            harvester = FakePlayerFactory.get((ServerLevel) te.getLevel(), new GameProfile(owner, getName()));
-            harvester.setLevel(te.getLevel());
+            ServerLevel serverLevel = (ServerLevel) te.getLevel();
+            harvester = FakePlayerFactory.get(serverLevel, new GameProfile(owner, getName()));
+            harvester.setLevel(serverLevel);
             BlockPos worldPosition = te.getBlockPos();
             harvester.setPos(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
         }

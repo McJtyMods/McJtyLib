@@ -104,8 +104,8 @@ public class OrientationTools {
                 return DOWN;
             }
         }
-        int i = (int) ((entity.yRot * 4.0F / 360.0F) + 0.5D);
-        int l = ((entity.yRot * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        int i = (int) ((entity.getYRot() * 4.0F / 360.0F) + 0.5D);
+        int l = ((entity.getYRot()  * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
         if (l == 0) {
             return Direction.NORTH;
         } else if (l == 1) {
@@ -118,8 +118,8 @@ public class OrientationTools {
     }
 
     public static Direction determineOrientationHoriz(LivingEntity MobEntity) {
-        int i = (int) ((MobEntity.yRot * 4.0F / 360.0F) + 0.5D);
-        int l = ((MobEntity.yRot * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
+        int i = (int) ((MobEntity.getYRot() * 4.0F / 360.0F) + 0.5D);
+        int l = ((MobEntity.getYRot()  * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
         if (l == 0) {
             return Direction.NORTH;
         } else if (l == 1) {

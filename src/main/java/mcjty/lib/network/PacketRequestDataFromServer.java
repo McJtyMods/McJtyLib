@@ -10,9 +10,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.NetworkDirection;
-import net.minecraftforge.fml.network.NetworkEvent;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import java.util.function.Supplier;
 

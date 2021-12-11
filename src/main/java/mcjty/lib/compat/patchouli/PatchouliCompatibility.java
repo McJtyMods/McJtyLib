@@ -12,7 +12,7 @@ public class PatchouliCompatibility {
 
     public static void openBookGUI(ServerPlayer player, ResourceLocation id) {
         if (ModSetup.patchouli) {
-            PatchouliAPI.instance.openBookGUI(player, id);
+            PatchouliAPI.get().openBookGUI(player, id);
         } else {
             player.sendMessage(new TextComponent(ChatFormatting.RED + "Patchouli is missing! No manual present"), Util.NIL_UUID);
         }
@@ -20,7 +20,7 @@ public class PatchouliCompatibility {
 
     public static void openBookEntry(ServerPlayer player, ResourceLocation id, ResourceLocation entry, int page) {
         if (ModSetup.patchouli) {
-            PatchouliAPI.instance.openBookEntry(player, id, entry, page);
+            PatchouliAPI.get().openBookEntry(player, id, entry, page);
         } else {
             player.sendMessage(new TextComponent(ChatFormatting.RED + "Patchouli is missing! No manual present"), Util.NIL_UUID);
         }

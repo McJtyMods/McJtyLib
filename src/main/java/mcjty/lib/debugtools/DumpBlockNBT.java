@@ -8,11 +8,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.util.math.*;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.network.simple.SimpleChannel;
-import org.apache.logging.log4j.Level;
+import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,8 +54,8 @@ public class DumpBlockNBT {
     // Use client-side
     public static void dumpBlock(@Nullable SimpleChannel network, @Nonnull Level world, @Nonnull BlockPos pos, boolean verbose) {
         String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
-        Logging.getLogger().log(Level.INFO, "### Client side ###");
-        Logging.getLogger().log(Level.INFO, output);
+        Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, "### Client side ###");
+        Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, output);
         if (network != null) {
             network.sendToServer(new PacketDumpBlockInfo(world, pos, verbose));
         }
@@ -76,8 +74,8 @@ public class DumpBlockNBT {
         }
 
         String output = DumpBlockNBT.dumpBlockNBT(player.getCommandSenderWorld(), ((BlockHitResult) result).getBlockPos(), verbose);
-        Logging.getLogger().log(Level.INFO, "### Client side ###");
-        Logging.getLogger().log(Level.INFO, output);
+        Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, "### Client side ###");
+        Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, output);
         if (network != null) {
             network.sendToServer(new PacketDumpBlockInfo(player.getCommandSenderWorld(), ((BlockHitResult) result).getBlockPos(), verbose));
         }

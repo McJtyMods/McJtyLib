@@ -15,7 +15,6 @@ import mcjty.lib.varia.TriFunction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.inventory.container.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -26,7 +25,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.extensions.IForgeContainerType;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
@@ -438,23 +437,22 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
     @Nonnull
     @Override
-    public ItemStack clicked(int index, int button, @Nonnull ClickType mode, @Nonnull Player player) {
+    public void clicked(int index, int button, @Nonnull ClickType mode, @Nonnull Player player) {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.hasItem()) {
                 slot.set(ItemStack.EMPTY);
             }
 
-            ItemStack clickedWith = player.inventory.getCarried();
+            ItemStack clickedWith = player.getMainHandItem();
             if (!clickedWith.isEmpty()) {
                 ItemStack copy = clickedWith.copy();
                 copy.setCount(1);
                 slot.set(copy);
             }
             broadcastChanges();
-            return ItemStack.EMPTY;
         } else {
-            return super.clicked(index, button, mode, player);
+            super.clicked(index, button, mode, player);
         }
     }
 
@@ -466,7 +464,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         for (int i = 0; i < intReferenceHolders.size(); i++) {
             DataSlot holder = intReferenceHolders.get(i);
             for (ContainerListener listener : this.containerListeners) {
-                listener.setContainerData(this, i, holder.get());
+                listener.dataChanged(this, i, holder.get());
             }
         }
         for (IContainerDataListener data : containerData.values()) {
@@ -475,8 +473,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             data.toBytes(buffer);
             PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
             for (ContainerListener listener : this.containerListeners) {
-                if (listener instanceof ServerPlayer) {
-                    McJtyLib.networkHandler.sendTo(packet, ((ServerPlayer) listener).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                if (listener instanceof ServerPlayer serverPlayer) {
+                    McJtyLib.networkHandler.sendTo(packet, serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                 }
             }
         }
@@ -502,8 +500,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 data.toBytes(buffer);
                 PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
                 for (ContainerListener listener : this.containerListeners) {
-                    if (listener instanceof ServerPlayer) {
-                        McJtyLib.networkHandler.sendTo(packet, ((ServerPlayer) listener).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                    if (listener instanceof ServerPlayer serverPlayer) {
+                        McJtyLib.networkHandler.sendTo(packet, serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                     }
                 }
             }
@@ -542,7 +540,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             BlockPos pos = data.readBlockPos();
 
             E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()));
-            te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter
+            // @todo 1.17 te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter
             CompoundTag compound = data.readNbt();
             te.load(compound);
 

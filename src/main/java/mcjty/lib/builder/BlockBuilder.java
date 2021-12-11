@@ -6,10 +6,7 @@ import mcjty.lib.gui.ManualEntry;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.ToolType;
-
-import java.util.function.Supplier;
-
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class BlockBuilder {
@@ -21,9 +18,7 @@ public class BlockBuilder {
     private BlockBehaviour.Properties properties = STANDARD_IRON;
     private boolean infusable = false;
     private TooltipBuilder tooltipBuilder = new TooltipBuilder();
-    private Supplier<BlockEntity> tileEntitySupplier;
-    private ToolType toolType = ToolType.PICKAXE;
-    private int harvestLevel = 0;
+    private BlockEntityType.BlockEntitySupplier<BlockEntity> tileEntitySupplier;
     private TOPDriver topDriver = McJtyLibTOPDriver.DRIVER;
     private ManualEntry manualEntry = ManualEntry.EMPTY;
 
@@ -43,16 +38,8 @@ public class BlockBuilder {
         return tooltipBuilder;
     }
 
-    public Supplier<BlockEntity> getTileEntitySupplier() {
+    public BlockEntityType.BlockEntitySupplier<BlockEntity> getTileEntitySupplier() {
         return tileEntitySupplier;
-    }
-
-    public ToolType getToolType() {
-        return toolType;
-    }
-
-    public int getHarvestLevel() {
-        return harvestLevel;
     }
 
     public TOPDriver getTopDriver() {
@@ -96,14 +83,8 @@ public class BlockBuilder {
         return this;
     }
 
-    public BlockBuilder tileEntitySupplier(Supplier<BlockEntity> supplier) {
+    public BlockBuilder tileEntitySupplier(BlockEntityType.BlockEntitySupplier<BlockEntity> supplier) {
         this.tileEntitySupplier = supplier;
-        return this;
-    }
-
-    public BlockBuilder harvestLevel(ToolType type, int level) {
-        this.toolType = type;
-        this.harvestLevel = level;
         return this;
     }
 }

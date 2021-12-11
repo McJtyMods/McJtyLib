@@ -3,7 +3,7 @@ package mcjty.lib.network;
 import mcjty.lib.McJtyLib;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 

@@ -13,9 +13,10 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
-import net.minecraft.loot.*;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
-import net.minecraft.loot.functions.*;
+import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
@@ -28,11 +29,9 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.minecraft.world.level.storage.loot.ConstantIntValue;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
-import net.minecraft.world.level.storage.loot.RandomValueBounds;
 import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
 import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -81,7 +80,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     protected LootTable.Builder createItemDropTable(String name, ItemLike item) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantIntValue.exactly(1))
+                .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item));
         return LootTable.lootTable().withPool(builder);
     }
@@ -91,25 +90,25 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
                                                     float lmin, float lmax) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantIntValue.exactly(1))
+                .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item)
                         .apply(SetItemCountFunction
-                                .setCount(RandomValueBounds.between(min, max)))
+                                .setCount(UniformGenerator.between(min, max)))
                         .apply(LootingEnchantFunction
-                                .lootingMultiplier(RandomValueBounds.between(lmin, lmax))));
+                                .lootingMultiplier(UniformGenerator.between(lmin, lmax))));
         return LootTable.lootTable().withPool(builder);
     }
 
     protected LootTable.Builder createSilkTouchTable(String name, Block block, Item lootItem, float min, float max) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantIntValue.exactly(1))
+                .setRolls(ConstantValue.exactly(1))
                 .add(AlternativesEntry.alternatives(
                         LootItem.lootTableItem(block)
                                 .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
                                         .hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.Ints.atLeast(1))))),
                         LootItem.lootTableItem(lootItem)
-                                .apply(SetItemCountFunction.setCount(new RandomValueBounds(min, max)))
+                                .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
                                 .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 1))
                                 .apply(ApplyExplosionDecay.explosionDecay())
                         )
@@ -124,7 +123,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     protected LootTable.Builder createBlockStateTable(String name, Block block, Property<?> property) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(block.getRegistryName().getPath())
-                .setRolls(ConstantIntValue.exactly(1))
+                .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyBlockState.copyState(block).copy(property))
                 );
@@ -138,10 +137,10 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     protected LootTable.Builder createStandardTable(String name, Block block) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantIntValue.exactly(1))
+                .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-                        .apply(CopyNbtFunction.copyData(CopyNbtFunction.DataSource.BLOCK_ENTITY)
+                        .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
                                 .copy("Info", "BlockEntityTag.Info", CopyNbtFunction.MergeStrategy.REPLACE)
                                 .copy("Items", "BlockEntityTag.Items", CopyNbtFunction.MergeStrategy.REPLACE)
                                 .copy("Energy", "BlockEntityTag.Energy", CopyNbtFunction.MergeStrategy.REPLACE))
@@ -158,7 +157,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     protected LootTable.Builder createSimpleTable(String name, Block block) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantIntValue.exactly(1))
+                .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block));
         return LootTable.lootTable().withPool(builder);
     }
@@ -166,7 +165,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     protected LootTable.Builder createSimpleTable(String name, Item item) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantIntValue.exactly(1))
+                .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item));
         return LootTable.lootTable().withPool(builder);
     }

@@ -54,11 +54,9 @@ public class CraftingSlot extends SlotItemHandler {
     }
 
     @Override
-    @Nonnull
-    public ItemStack onTake(@Nonnull Player thePlayer, @Nonnull ItemStack stack) {
+    public void onTake(@Nonnull Player thePlayer, @Nonnull ItemStack stack) {
         this.checkTakeAchievements(stack);
         super.onTake(thePlayer, stack);
-        return stack;
     }
 
     @Override
@@ -76,6 +74,6 @@ public class CraftingSlot extends SlotItemHandler {
         onCraft.accept(te, player, stack);
 
         this.removeCount = 0;
-        net.minecraftforge.fml.hooks.BasicEventHooks.firePlayerSmeltedEvent(this.player, stack);
+        net.minecraftforge.fmllegacy.hooks.BasicEventHooks.firePlayerSmeltedEvent(this.player, stack);
     }
 }
