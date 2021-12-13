@@ -24,7 +24,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
@@ -509,7 +509,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     public static MenuType<AbstractContainerMenu> createContainerType(String registryName) {
-        MenuType<AbstractContainerMenu> containerType = IForgeContainerType.create((windowId, inv, data) -> {
+        MenuType<AbstractContainerMenu> containerType = IForgeMenuType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
             BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
             if (te == null) {
@@ -522,7 +522,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     public static <T extends AbstractContainerMenu> MenuType<T> createContainerType() {
-        MenuType<AbstractContainerMenu> containerType = IForgeContainerType.create((windowId, inv, data) -> {
+        MenuType<AbstractContainerMenu> containerType = IForgeMenuType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
             BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
             if (te == null) {
@@ -536,7 +536,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     public static <T extends GenericContainer, E extends GenericTileEntity> MenuType<T> createRemoteContainerType(
             Function<ResourceKey<Level>, E> dummyTEFactory,
             TriFunction<Integer, BlockPos, E, T> containerFactory, int slots) {
-        return IForgeContainerType.create((windowId, inv, data) -> {
+        return IForgeMenuType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
 
             E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()));

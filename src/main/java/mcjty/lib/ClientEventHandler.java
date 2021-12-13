@@ -3,7 +3,7 @@ package mcjty.lib;
 import mcjty.lib.gui.IKeyReceiver;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.Widget;
-import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -13,9 +13,9 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseDragged(GuiScreenEvent.MouseDragEvent.Pre event) {
-        if (event.getGui() instanceof IKeyReceiver) {
-            IKeyReceiver container = (IKeyReceiver) event.getGui();
+    public void onMouseDragged(ScreenEvent.MouseDragEvent.Pre event) {
+        if (event.getScreen() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getScreen();
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
                 if (manager != null) {
@@ -30,9 +30,9 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseScolled(GuiScreenEvent.MouseScrollEvent.Pre event) {
-        if (event.getGui() instanceof IKeyReceiver) {
-            IKeyReceiver container = (IKeyReceiver) event.getGui();
+    public void onMouseScolled(ScreenEvent.MouseScrollEvent.Pre event) {
+        if (event.getScreen() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getScreen();
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
                 if (manager != null) {
@@ -48,9 +48,9 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseClicked(GuiScreenEvent.MouseClickedEvent event) {
-        if (event.getGui() instanceof IKeyReceiver) {
-            IKeyReceiver container = (IKeyReceiver) event.getGui();
+    public void onMouseClicked(ScreenEvent.MouseClickedEvent event) {
+        if (event.getScreen() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getScreen();
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
                 if (manager != null) {
@@ -66,9 +66,9 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseReleased(GuiScreenEvent.MouseReleasedEvent event) {
-        if (event.getGui() instanceof IKeyReceiver) {
-            IKeyReceiver container = (IKeyReceiver) event.getGui();
+    public void onMouseReleased(ScreenEvent.MouseReleasedEvent event) {
+        if (event.getScreen() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getScreen();
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
                 if (manager != null) {
@@ -84,9 +84,9 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onGuiInput(GuiScreenEvent.KeyboardCharTypedEvent event) {
-        if (event.getGui() instanceof IKeyReceiver) {
-            IKeyReceiver container = (IKeyReceiver) event.getGui();
+    public void onGuiInput(ScreenEvent.KeyboardCharTypedEvent event) {
+        if (event.getScreen() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getScreen();
             if (container.getWindow() != null) {
                 Widget<?> focus;
                 if (container.getWindow().getWindowManager() == null) {
@@ -110,9 +110,9 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onKeyboardInput(GuiScreenEvent.KeyboardKeyPressedEvent event) {
-        if (event.getGui() instanceof IKeyReceiver) {
-            IKeyReceiver container = (IKeyReceiver) event.getGui();
+    public void onKeyboardInput(ScreenEvent.KeyboardKeyPressedEvent event) {
+        if (event.getScreen() instanceof IKeyReceiver) {
+            IKeyReceiver container = (IKeyReceiver) event.getScreen();
             if (container.getWindow() != null) {
                 Widget<?> focus;
                 if (container.getWindow().getWindowManager() == null) {

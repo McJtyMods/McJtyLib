@@ -285,7 +285,7 @@ public class GenericTileEntity extends BlockEntity {
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         CompoundTag nbtTag = new CompoundTag();
         this.saveClientDataToNBT(nbtTag);
-        return new ClientboundBlockEntityDataPacket(worldPosition, 1, nbtTag);
+        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity) -> {return nbtTag;});
     }
 
     @Override

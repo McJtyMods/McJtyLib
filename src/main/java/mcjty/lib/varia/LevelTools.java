@@ -61,7 +61,7 @@ public class LevelTools {
     public static Stream<ServerPlayer> getAllPlayersWatchingBlock(Level world, BlockPos pos) {
         if (world instanceof ServerLevel) {
             ChunkHolder.PlayerProvider playerManager = ((ServerLevel)world).getChunkSource().chunkMap;
-            return playerManager.getPlayers(new ChunkPos(pos), false);
+            return playerManager.getPlayers(new ChunkPos(pos), false).stream();
         }
         return Stream.empty();
     }

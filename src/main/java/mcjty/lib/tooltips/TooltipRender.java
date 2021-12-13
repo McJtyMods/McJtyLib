@@ -97,8 +97,8 @@ public class TooltipRender {
     }
 
     @SubscribeEvent
-    public void onTooltipPre(RenderTooltipEvent.Pre event) {
-        Item item = event.getStack().getItem();
+    public void onTooltipGatherComponents(RenderTooltipEvent.GatherComponents event) {
+        Item item = event.getItemStack().getItem();
         ITooltipSettings settings = getSettings(item);
         lastUsedTooltipItem = settings;
         if (settings != null) {
