@@ -2,7 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;

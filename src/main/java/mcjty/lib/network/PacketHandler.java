@@ -2,7 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.syncpositional.PacketSendPositionalDataToClients;
 import mcjty.lib.typed.TypedMap;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 

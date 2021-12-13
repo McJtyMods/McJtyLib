@@ -4,7 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
