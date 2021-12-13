@@ -349,8 +349,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
         Font font = getMinecraft().font;
         stack.getItem();
-        GuiUtils.preItemToolTip(stack);
-        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, font);
+        // @todo 1.18 GuiUtils.preItemToolTip(stack);
+        // @todo 1.18 GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, font);
     }
 
     @Override
