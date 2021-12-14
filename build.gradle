@@ -30,12 +30,8 @@ repositories {
     maven { // Patchouli
         url "https://maven.blamejared.com"
     }
-    maven {
-        url "https://maven.k-4u.nl"
-    }
     maven { // TOP
-        name 'tterrag maven'
-        url "https://maven.tterrag.com/"
+        url "https://maven.k-4u.nl"
     }
 }
 
@@ -135,7 +131,7 @@ dependencies {
     if (findProject(':TheOneProbe') != null) {
         implementation project(':TheOneProbe')
     } else {
-        implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:TheOneProbe-${top_version}") {
+        implementation fg.deobf(project.dependencies.create("mcjty.theoneprobe:theoneprobe:${top_version}") {
             transitive = false
         })
     }
