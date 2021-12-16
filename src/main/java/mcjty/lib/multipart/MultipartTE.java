@@ -160,7 +160,7 @@ public class MultipartTE extends BlockEntity {
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         CompoundTag nbtTag = new CompoundTag();
         save(nbtTag);
-        return new ClientboundBlockEntityDataPacket(worldPosition, 1, nbtTag);
+        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity) -> {return nbtTag;});
     }
 
 

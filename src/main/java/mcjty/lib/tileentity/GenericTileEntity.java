@@ -40,7 +40,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -285,7 +285,7 @@ public class GenericTileEntity extends BlockEntity {
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         CompoundTag nbtTag = new CompoundTag();
         this.saveClientDataToNBT(nbtTag);
-        return new ClientboundBlockEntityDataPacket(worldPosition, 1, nbtTag);
+        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity) -> {return nbtTag;});
     }
 
     @Override

@@ -97,8 +97,8 @@ public class TooltipRender {
     }
 
     @SubscribeEvent
-    public void onTooltipPre(RenderTooltipEvent.Pre event) {
-        Item item = event.getStack().getItem();
+    public void onTooltipGatherComponents(RenderTooltipEvent.GatherComponents event) {
+        Item item = event.getItemStack().getItem();
         ITooltipSettings settings = getSettings(item);
         lastUsedTooltipItem = settings;
         if (settings != null) {
@@ -106,47 +106,47 @@ public class TooltipRender {
         }
     }
 
-    @SubscribeEvent
-    public void onDrawTooltip(RenderTooltipEvent.PostText event) {
-        //This method will draw items on the tooltip
-        ItemStack stack = event.getStack();
-        if (stack.getItem() instanceof ITooltipExtras) {
-            ITooltipExtras extras = (ITooltipExtras) stack.getItem();
-            List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
-            int count = items.size();
-
-            int bx = event.getX();
-            int by = event.getY()+3;
-
-            List<? extends FormattedText> tooltip = event.getLines();
-            int lines = (((count - 1) / STACKS_PER_LINE) + 1);
-            int width = Math.min(STACKS_PER_LINE, count) * 18;
-            int height = lines * 20 + 1;
-
-            for (FormattedText s : tooltip) {
-                // @todo 1.16 is this right?
-                if (s.getString().startsWith("    ")) {
-//                if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r")) {
-                    break;
-                } else {
-                    by += 10;
-                }
-            }
-
-            GlStateManager._enableBlend();
-            GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            //Gui.drawRect(bx, by, bx + width, by + height, 0x55000000);
-
-            int j = 0;
-            //Look through all the ItemStacks and draw each one in the specified X/Y position
-            for (Pair<ItemStack, Integer> item : items) {
-                int x = bx + (j % STACKS_PER_LINE) * 18;
-                int y = by + (j / STACKS_PER_LINE) * 20;
-                renderBlocks(event.getMatrixStack(), item.getLeft(), x, y, item.getLeft().getCount(), item.getRight());
-                j++;
-            }
-        }
-    }
+// @todo 1.18    @SubscribeEvent
+// @todo 1.18    public void onDrawTooltip(RenderTooltipEvent.PostText event) {
+// @todo 1.18        //This method will draw items on the tooltip
+// @todo 1.18        ItemStack stack = event.getItemStack();
+// @todo 1.18        if (stack.getItem() instanceof ITooltipExtras) {
+// @todo 1.18            ITooltipExtras extras = (ITooltipExtras) stack.getItem();
+// @todo 1.18            List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
+// @todo 1.18            int count = items.size();
+// @todo 1.18
+// @todo 1.18            int bx = event.getX();
+// @todo 1.18            int by = event.getY()+3;
+// @todo 1.18
+// @todo 1.18            List<? extends FormattedText> tooltip = event.getLines();
+// @todo 1.18            int lines = (((count - 1) / STACKS_PER_LINE) + 1);
+// @todo 1.18            int width = Math.min(STACKS_PER_LINE, count) * 18;
+// @todo 1.18            int height = lines * 20 + 1;
+// @todo 1.18
+// @todo 1.18            for (FormattedText s : tooltip) {
+// @todo 1.18                // @todo 1.16 is this right?
+// @todo 1.18                if (s.getString().startsWith("    ")) {
+// @todo 1.18//                if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r")) {
+// @todo 1.18                    break;
+// @todo 1.18                } else {
+// @todo 1.18                    by += 10;
+// @todo 1.18                }
+// @todo 1.18            }
+// @todo 1.18
+// @todo 1.18            GlStateManager._enableBlend();
+// @todo 1.18            GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+// @todo 1.18            //Gui.drawRect(bx, by, bx + width, by + height, 0x55000000);
+// @todo 1.18
+// @todo 1.18            int j = 0;
+// @todo 1.18            //Look through all the ItemStacks and draw each one in the specified X/Y position
+// @todo 1.18            for (Pair<ItemStack, Integer> item : items) {
+// @todo 1.18                int x = bx + (j % STACKS_PER_LINE) * 18;
+// @todo 1.18                int y = by + (j / STACKS_PER_LINE) * 20;
+// @todo 1.18                renderBlocks(event.getMatrixStack(), item.getLeft(), x, y, item.getLeft().getCount(), item.getRight());
+// @todo 1.18                j++;
+// @todo 1.18            }
+// @todo 1.18        }
+// @todo 1.18    }
 
     private static void renderBlocks(PoseStack matrixStack, ItemStack itemStack, int x, int y, int count, int errorAmount) {
         Minecraft mc = Minecraft.getInstance();

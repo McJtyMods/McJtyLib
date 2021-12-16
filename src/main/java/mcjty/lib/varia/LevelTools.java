@@ -10,7 +10,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.fmllegacy.server.ServerLifecycleHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.stream.Stream;
 
@@ -61,7 +61,7 @@ public class LevelTools {
     public static Stream<ServerPlayer> getAllPlayersWatchingBlock(Level world, BlockPos pos) {
         if (world instanceof ServerLevel) {
             ChunkHolder.PlayerProvider playerManager = ((ServerLevel)world).getChunkSource().chunkMap;
-            return playerManager.getPlayers(new ChunkPos(pos), false);
+            return playerManager.getPlayers(new ChunkPos(pos), false).stream();
         }
         return Stream.empty();
     }

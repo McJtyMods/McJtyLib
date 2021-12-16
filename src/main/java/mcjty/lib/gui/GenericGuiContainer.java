@@ -36,8 +36,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fmlclient.gui.GuiUtils;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.client.gui.GuiUtils;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -349,8 +349,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
         Font font = getMinecraft().font;
         stack.getItem();
-        GuiUtils.preItemToolTip(stack);
-        GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, font);
+        // @todo 1.18 GuiUtils.preItemToolTip(stack);
+        // @todo 1.18 GuiUtils.drawHoveringText(matrixStack, list, x, y, imageWidth, imageHeight, -1, font);
     }
 
     @Override

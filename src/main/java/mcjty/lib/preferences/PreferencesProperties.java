@@ -7,7 +7,7 @@ import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
 

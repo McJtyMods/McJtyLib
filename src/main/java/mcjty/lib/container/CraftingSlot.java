@@ -74,6 +74,6 @@ public class CraftingSlot extends SlotItemHandler {
         onCraft.accept(te, player, stack);
 
         this.removeCount = 0;
-        net.minecraftforge.fmllegacy.hooks.BasicEventHooks.firePlayerSmeltedEvent(this.player, stack);
+        net.minecraftforge.event.ForgeEventFactory.firePlayerSmeltedEvent(this.player, stack);
     }
 }

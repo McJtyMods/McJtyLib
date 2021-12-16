@@ -6,7 +6,7 @@ import mcjty.lib.varia.Logging;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.Level;
 
 import javax.annotation.Nonnull;

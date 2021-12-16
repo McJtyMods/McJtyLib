@@ -42,7 +42,7 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
 
         if (parts != null) {
             List<BakedQuad> quads = new ArrayList<>();
-            RenderType layer = MinecraftForgeClient.getRenderLayer();
+            RenderType layer = MinecraftForgeClient.getRenderType();
 
             for (Map.Entry<PartSlot, MultipartTE.Part> entry : parts.entrySet()) {
                 MultipartTE.Part part = entry.getValue();
