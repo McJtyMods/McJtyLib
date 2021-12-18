@@ -1,19 +1,11 @@
 package mcjty.lib.tooltips;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.datafixers.util.Either;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.keys.KeyBindings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import com.mojang.blaze3d.platform.Lighting;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +13,6 @@ import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
@@ -104,126 +95,18 @@ public class TooltipRender {
         if (settings != null) {
             event.setMaxWidth(Math.max(event.getMaxWidth(), settings.getMaxWidth()));
         }
+
+        onTooltipAddIcons(event);
     }
 
-// @todo 1.18    @SubscribeEvent
-// @todo 1.18    public void onDrawTooltip(RenderTooltipEvent.PostText event) {
-// @todo 1.18        //This method will draw items on the tooltip
-// @todo 1.18        ItemStack stack = event.getItemStack();
-// @todo 1.18        if (stack.getItem() instanceof ITooltipExtras) {
-// @todo 1.18            ITooltipExtras extras = (ITooltipExtras) stack.getItem();
-// @todo 1.18            List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
-// @todo 1.18            int count = items.size();
-// @todo 1.18
-// @todo 1.18            int bx = event.getX();
-// @todo 1.18            int by = event.getY()+3;
-// @todo 1.18
-// @todo 1.18            List<? extends FormattedText> tooltip = event.getLines();
-// @todo 1.18            int lines = (((count - 1) / STACKS_PER_LINE) + 1);
-// @todo 1.18            int width = Math.min(STACKS_PER_LINE, count) * 18;
-// @todo 1.18            int height = lines * 20 + 1;
-// @todo 1.18
-// @todo 1.18            for (FormattedText s : tooltip) {
-// @todo 1.18                // @todo 1.16 is this right?
-// @todo 1.18                if (s.getString().startsWith("    ")) {
-// @todo 1.18//                if (s.trim().equals("\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r")) {
-// @todo 1.18                    break;
-// @todo 1.18                } else {
-// @todo 1.18                    by += 10;
-// @todo 1.18                }
-// @todo 1.18            }
-// @todo 1.18
-// @todo 1.18            GlStateManager._enableBlend();
-// @todo 1.18            GlStateManager._blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-// @todo 1.18            //Gui.drawRect(bx, by, bx + width, by + height, 0x55000000);
-// @todo 1.18
-// @todo 1.18            int j = 0;
-// @todo 1.18            //Look through all the ItemStacks and draw each one in the specified X/Y position
-// @todo 1.18            for (Pair<ItemStack, Integer> item : items) {
-// @todo 1.18                int x = bx + (j % STACKS_PER_LINE) * 18;
-// @todo 1.18                int y = by + (j / STACKS_PER_LINE) * 20;
-// @todo 1.18                renderBlocks(event.getMatrixStack(), item.getLeft(), x, y, item.getLeft().getCount(), item.getRight());
-// @todo 1.18                j++;
-// @todo 1.18            }
-// @todo 1.18        }
-// @todo 1.18    }
+    protected void onTooltipAddIcons(RenderTooltipEvent.GatherComponents event) {
+        ItemStack stack = event.getItemStack();
+        if (stack.getItem() instanceof ITooltipExtras extras) {
+            List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
+            List<Either<FormattedText, TooltipComponent>> components = event.getTooltipElements();
 
-    private static void renderBlocks(PoseStack matrixStack, ItemStack itemStack, int x, int y, int count, int errorAmount) {
-        Minecraft mc = Minecraft.getInstance();
-        GlStateManager._disableDepthTest();
-        ItemRenderer render = mc.getItemRenderer();
-
-        com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
-        matrixStack.pushPose();
-        matrixStack.translate(0, 0, 400f);
-        renderItemModelIntoGUI(render, matrixStack, itemStack, x, y, render.getModel(itemStack, null, null, 1));
-//        render.renderItemIntoGUI(itemStack, x, y);  // @todo 1.16. Is there a version with matrixstack?
-        matrixStack.popPose();
-
-        //String s1 = count == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
-        String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString((int) ((float) count));
-        int w1 = mc.font.width(s1);
-        int color = 0xFFFFFF;
-
-        boolean hasReq = true;
-
-        if (errorAmount != ITooltipExtras.NOAMOUNT) {
-            matrixStack.pushPose();
-            matrixStack.translate(16 - w1, (hasReq ? 8 : 10), 550f);
-//            matrixStack.scale(0.5F, 0.5F, 0.5F);
-//            matrixStack.translate(8 - w1/5, 0, 400f);
-            mc.font.drawShadow(matrixStack, s1, x, y, color);
-            matrixStack.popPose();
+            components.add(Either.right(new ClientTooltipIcon(items, STACKS_PER_LINE)));
         }
-
-        int missingCount = 0;
-
-        if (errorAmount >= 0) {
-            String fs = Integer.toString(errorAmount);
-            //String s2 = TextFormatting.BOLD + "(" + fs + ")";
-            String s2 = "(" + fs + ")";
-            int w2 = mc.font.width(s2);
-
-            matrixStack.pushPose();
-            matrixStack.translate(x + 8 - w2 / 4, y + 17, 550f);
-
-//            matrixStack.scale(0.5F, 0.5F, 0.5F);
-            mc.font.drawShadow(matrixStack, s2, 0, 0, 0xFFFF0000);
-            matrixStack.popPose();
-        }
-        GlStateManager._enableDepthTest();
-    }
-
-    private static void renderItemModelIntoGUI(ItemRenderer render, PoseStack matrixStack, ItemStack itemStack, int x, int y, BakedModel bakedmodel) {
-        matrixStack.pushPose();
-        Minecraft.getInstance().getTextureManager().bindForSetup(TextureAtlas.LOCATION_BLOCKS);
-        Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
-        // @todo 1.17 RenderSystem.enableRescaleNormal();
-        // @todo 1.17 RenderSystem.enableAlphaTest();
-        // @todo 1.17 RenderSystem.defaultAlphaFunc();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        matrixStack.translate((float)x, (float)y, 100.0F + render.blitOffset);
-        matrixStack.translate(8.0F, 8.0F, 0.0F);
-        matrixStack.scale(1.0F, -1.0F, 1.0F);
-        matrixStack.scale(16.0F, 16.0F, 16.0F);
-        MultiBufferSource.BufferSource irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
-        boolean flag = !bakedmodel.usesBlockLight();
-        if (flag) {
-            Lighting.setupForFlatItems();
-        }
-
-        render.render(itemStack, ItemTransforms.TransformType.GUI, false, matrixStack, irendertypebuffer$impl, 15728880, OverlayTexture.NO_OVERLAY, bakedmodel);
-        irendertypebuffer$impl.endBatch();
-        RenderSystem.enableDepthTest();
-        if (flag) {
-            Lighting.setupFor3DItems();
-        }
-
-        // @todo 1.17 RenderSystem.disableAlphaTest();
-        // @todo 1.17 RenderSystem.disableRescaleNormal();
-        matrixStack.popPose();
     }
 
 }
