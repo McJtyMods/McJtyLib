@@ -30,7 +30,7 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
 
     @Override
     public int getWidth(Font font) {
-        return Math.min(itemsPerLine, itemStack.size()) * 20;
+        return (Math.min(itemsPerLine, itemStack.size()) * 21) + 4;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
         int j = 0;
         // Look through all the ItemStacks and add them to the tooltip at an x/y
         for (Pair<ItemStack, Integer> item : itemStack) {
-            int x = offsetX + (Math.floorMod(j, itemsPerLine) * 18);
+            int x = offsetX + (Math.floorMod(j, itemsPerLine) * 21);
             int y = offsetY + (Math.floorDiv(j, itemsPerLine) * 20) - 20;
             // Render item
             itemRenderer.renderAndDecorateItem(item.getLeft(), x, y, p_174257_);
