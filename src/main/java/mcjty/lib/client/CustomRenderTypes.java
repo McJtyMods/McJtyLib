@@ -31,7 +31,7 @@ public class CustomRenderTypes extends RenderType {
 
     public static final RenderType TRANSLUCENT_ADD = create("translucent_add", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
             CompositeState.builder()
-                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
                     .setLightmapState(LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
@@ -40,7 +40,7 @@ public class CustomRenderTypes extends RenderType {
 
     public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = create("translucent_add_nolightmaps", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
             CompositeState.builder()
-                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
                     .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
@@ -50,7 +50,7 @@ public class CustomRenderTypes extends RenderType {
 
     public static final RenderType TRANSLUCENT_LIGHTNING_NOLIGHTMAPS = create("translucent_lightning_nolightmaps", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
             CompositeState.builder()
-                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
                     .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(LIGHTNING_TRANSPARENCY)
@@ -76,7 +76,7 @@ public class CustomRenderTypes extends RenderType {
             DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, VertexFormat.Mode.QUADS, 2097152, true, false,
             CompositeState.builder()
                     .setTextureState(NO_TEXTURE)
-                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
                     .setLightmapState(LIGHTMAP)
                     .createCompositeState(false));
 
@@ -85,7 +85,7 @@ public class CustomRenderTypes extends RenderType {
             CompositeState.builder()
                     .setLineState(new LineStateShard(OptionalDouble.of(1.0)))
                     .setTextureState(NO_TEXTURE)
-                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
                     .setLightmapState(LIGHTMAP)
                     .createCompositeState(false));
 
@@ -112,7 +112,7 @@ public class CustomRenderTypes extends RenderType {
                     .setLineState(new LineStateShard(OptionalDouble.of(2.0)))
                     .setTransparencyState(LINESTRIP_TRANSP)
                     .setTextureState(NO_TEXTURE)
-                    // @todo 1.17 .setShadeModelState(SMOOTH_SHADE)
+                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
                     .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                     .createCompositeState(false));
 }
