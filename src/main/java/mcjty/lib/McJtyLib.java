@@ -5,11 +5,12 @@ import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.multipart.MultipartModelLoader;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.setup.*;
+import mcjty.lib.setup.ClientSetup;
+import mcjty.lib.setup.ModSetup;
 import mcjty.lib.syncpositional.PositionalDataSyncer;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
@@ -30,7 +31,6 @@ public class McJtyLib {
 
     public static final String MODID = "mcjtylib";
 
-    public static final IProxy proxy = DistExecutor.safeRunForDist(() -> () -> new DefaultClientProxy(), () -> () -> new DefaultServerProxy());
     public static final ModSetup setup = new ModSetup();
 
     public static McJtyLib instance;

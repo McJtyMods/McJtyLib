@@ -5,9 +5,10 @@ import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.SafeClientTools;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
@@ -75,9 +76,9 @@ public class PacketSendResultToClient {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            BlockEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(pos);
+            BlockEntity te = SafeClientTools.getClientWorld().getBlockEntity(pos);
             if (te instanceof GenericTileEntity) {
-                ((GenericTileEntity) te).handleListFromServer(command, McJtyLib.proxy.getClientPlayer(), TypedMap.EMPTY, list);
+                ((GenericTileEntity) te).handleListFromServer(command, SafeClientTools.getClientPlayer(), TypedMap.EMPTY, list);
             } else {
                 Logging.logError("Can't handle command '" + command + "'!");
             }

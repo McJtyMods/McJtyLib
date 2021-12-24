@@ -1,46 +1,39 @@
-package mcjty.lib.setup;
+package mcjty.lib.varia;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.crafting.RecipeManager;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.HitResult;
 
-public class DefaultClientProxy implements IProxy {
+public class SafeClientTools {
 
-    @Override
-    public Level getClientWorld() {
+    public static Level getClientWorld() {
         return Minecraft.getInstance().level;
     }
 
-    @Override
-    public Level getWorld() {
+    public static Level getWorld() {
         return Minecraft.getInstance().level;
     }
 
-    @Override
-    public Player getClientPlayer() {
+    public static Player getClientPlayer() {
         return Minecraft.getInstance().player;
     }
 
-    @Override
-    public RecipeManager getRecipeManager(Level world) {
+    public static RecipeManager getRecipeManager(Level world) {
         return world.getRecipeManager();
     }
 
-    @Override
-    public HitResult getClientMouseOver() {
+    public static HitResult getClientMouseOver() {
         return Minecraft.getInstance().hitResult;
     }
 
-    @Override
-    public boolean isSneaking() {
+    public static boolean isSneaking() {
         return Screen.hasShiftDown();
     }
 
-    @Override
-    public boolean isCtrlKeyDown() {
+    public static boolean isCtrlKeyDown() {
         return Screen.hasControlDown();
     }
 }

@@ -10,6 +10,7 @@ import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.*;
@@ -102,7 +103,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            if (button == 1 || McJtyLib.proxy.isSneaking()) {
+            if (button == 1 || SafeClientTools.isSneaking()) {
                 index--;
                 if (index < 0) {
                     index = choiceList.size()-1;

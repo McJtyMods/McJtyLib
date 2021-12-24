@@ -2,12 +2,12 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.container.GenericContainer;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -43,7 +43,7 @@ public class PacketContainerDataToClient {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            AbstractContainerMenu container = McJtyLib.proxy.getClientPlayer().containerMenu;
+            AbstractContainerMenu container = SafeClientTools.getClientPlayer().containerMenu;
             if (container instanceof GenericContainer) {
                 GenericContainer gc = (GenericContainer) container;
                 IContainerDataListener listener = gc.getListener(id);

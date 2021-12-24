@@ -89,7 +89,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             int index = colorList.indexOf(currentColor);
-            if (button == 1) {// @todo 1.14 || McJtyLib.proxy.isSneaking()) {
+            if (button == 1) {// @todo 1.14 || SafeClientTools.isSneaking()) {
                 index--;
                 if (index < 0) {
                     index = colorList.size()-1;

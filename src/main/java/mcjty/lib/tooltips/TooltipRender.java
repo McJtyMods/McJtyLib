@@ -1,10 +1,15 @@
 package mcjty.lib.tooltips;
 
 import com.mojang.datafixers.util.Either;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.keys.KeyBindings;
+import mcjty.lib.varia.SafeClientTools;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -15,12 +20,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 /**
  * This class was adapted from code written by Vazkii which was adapted by Direwolf20
@@ -76,7 +75,7 @@ public class TooltipRender {
             ManualEntry entry = settings.getManualEntry();
             if (entry.getManual() != null) {
                 if (KeyBindings.openManual != null) {
-                    if (!McJtyLib.proxy.isSneaking()) {
+                    if (!SafeClientTools.isSneaking()) {
                         String translationKey = KeyBindings.openManual.saveString();
                         event.getToolTip().add(new TextComponent("<Press ").withStyle(ChatFormatting.YELLOW)
                                 .append(new TranslatableComponent(translationKey).withStyle(ChatFormatting.GREEN))

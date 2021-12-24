@@ -1,21 +1,20 @@
 package mcjty.lib.builder;
 
-import mcjty.lib.McJtyLib;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.ItemStack;
+import mcjty.lib.varia.SafeClientTools;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 
 public class TooltipBuilder {
 
@@ -52,7 +51,7 @@ public class TooltipBuilder {
         String path = id.getPath();
         String prefix = "message." + namespace + "." + path + ".";
         InfoLine[] lines = infoLines;
-        if (infoLines == null || (McJtyLib.proxy.isSneaking() && shiftInfoLines != null)) {
+        if (infoLines == null || (SafeClientTools.isSneaking() && shiftInfoLines != null)) {
             lines = shiftInfoLines;
         }
         addLines(stack, tooltip, prefix, lines);

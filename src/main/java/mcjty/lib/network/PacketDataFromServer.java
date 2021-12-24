@@ -1,14 +1,14 @@
 package mcjty.lib.network;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.network.NetworkEvent;
 
 import javax.annotation.Nullable;
@@ -73,11 +73,11 @@ public class PacketDataFromServer {
                 }
                 te = container.getTe();
             } else {
-                te = McJtyLib.proxy.getClientWorld().getBlockEntity(pos);
+                te = SafeClientTools.getClientWorld().getBlockEntity(pos);
             }
 
             if (te instanceof GenericTileEntity) {
-                if (((GenericTileEntity) te).executeClientCommand(command, McJtyLib.proxy.getClientPlayer(), result)) {
+                if (((GenericTileEntity) te).executeClientCommand(command, SafeClientTools.getClientPlayer(), result)) {
                     return;
                 }
             }
@@ -88,7 +88,7 @@ public class PacketDataFromServer {
     }
 
     private static GenericContainer getOpenContainer() {
-        AbstractContainerMenu container = McJtyLib.proxy.getClientPlayer().containerMenu;
+        AbstractContainerMenu container = SafeClientTools.getClientPlayer().containerMenu;
         if (container instanceof GenericContainer) {
             return (GenericContainer) container;
         } else {

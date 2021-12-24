@@ -1,8 +1,7 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import mcjty.lib.McJtyLib;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.client.GuiTools;
@@ -17,24 +16,25 @@ import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.SafeClientTools;
 import mcjty.lib.varia.Tools;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -490,7 +490,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             MenuType<C> type,
             GuiSupplier<C, S, T> guiSupplier) {
         MenuScreens.ScreenConstructor<C, S> factory = (container, inventory, title) -> {
-            BlockEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(container.getPos());
+            BlockEntity te = SafeClientTools.getClientWorld().getBlockEntity(container.getPos());
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid tile entity!");
         };
         MenuScreens.register(type, factory);
