@@ -31,7 +31,7 @@ public class CustomRenderTypes extends RenderType {
 
     public static final RenderType TRANSLUCENT_ADD = create("translucent_add", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
             CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
+                    .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
                     .setLightmapState(LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
@@ -40,8 +40,8 @@ public class CustomRenderTypes extends RenderType {
 
     public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = create("translucent_add_nolightmaps", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
             CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
-                    .setLightmapState(RenderStateShard.NO_LIGHTMAP)
+                    .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
+                    .setLightmapState(NO_LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
                     .setWriteMaskState(COLOR_WRITE)
@@ -50,7 +50,7 @@ public class CustomRenderTypes extends RenderType {
 
     public static final RenderType TRANSLUCENT_LIGHTNING_NOLIGHTMAPS = create("translucent_lightning_nolightmaps", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
             CompositeState.builder()
-                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
+                    .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
                     .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(LIGHTNING_TRANSPARENCY)
