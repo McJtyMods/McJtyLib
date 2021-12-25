@@ -15,9 +15,11 @@ import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tileentity.TickingTileEntity;
 import mcjty.lib.tooltips.ITooltipSettings;
 import mcjty.lib.varia.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.TooltipFlag;
@@ -46,7 +48,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import javax.annotation.Nonnull;
@@ -333,6 +334,18 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             return tileEntitySupplier.create(pos, state);
         } else {
             return null;
+        }
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState blockState, BlockEntityType<T> blockEntityType) {
+        return BaseBlock::runTick;
+    }
+
+    public static void runTick(Level world, BlockPos blockPos, BlockState state, BlockEntity blockEntity) {
+        if (blockEntity instanceof TickingTileEntity ticking) {
+            ticking.tick();
         }
     }
 
