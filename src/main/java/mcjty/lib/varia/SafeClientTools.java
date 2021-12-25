@@ -36,4 +36,8 @@ public class SafeClientTools {
     public static boolean isCtrlKeyDown() {
         return Screen.hasControlDown();
     }
+
+    public static boolean isJumpKeyDown() {
+        return Minecraft.getInstance().options.keyJump.isDown();
+    }
 }
