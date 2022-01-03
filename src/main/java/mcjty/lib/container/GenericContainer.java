@@ -435,7 +435,6 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         return result;
     }
 
-    @Nonnull
     @Override
     public void clicked(int index, int button, @Nonnull ClickType mode, @Nonnull Player player) {
         if (factory.isGhostSlot(index)) {
@@ -444,7 +443,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 slot.set(ItemStack.EMPTY);
             }
 
-            ItemStack clickedWith = player.getMainHandItem();
+            ItemStack clickedWith = getCarried();
             if (!clickedWith.isEmpty()) {
                 ItemStack copy = clickedWith.copy();
                 copy.setCount(1);

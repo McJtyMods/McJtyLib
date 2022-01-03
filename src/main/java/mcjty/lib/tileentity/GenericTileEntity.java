@@ -15,33 +15,35 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.RedstoneMode;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -54,9 +56,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 
 public class GenericTileEntity extends BlockEntity {
 
@@ -393,14 +392,6 @@ public class GenericTileEntity extends BlockEntity {
         CompoundTag data = new CompoundTag();
         tagCompound.put("Info", data);
         return data;
-    }
-
-    @Nonnull
-    @Override
-    public CompoundTag save(@Nonnull CompoundTag tagCompound) {
-        super.save(tagCompound);
-        saveAdditional(tagCompound);
-        return tagCompound;
     }
 
     public void saveAdditional(@Nonnull CompoundTag tagCompound) {
