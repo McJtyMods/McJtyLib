@@ -13,6 +13,7 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -130,11 +131,11 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         return LootTable.lootTable().withPool(builder);
     }
 
-    protected void addStandardTable(Block block) {
-        lootTables.put(block, createStandardTable(block.getRegistryName().getPath(), block));
+    protected void addStandardTable(Block block, BlockEntityType<?> type) {
+        lootTables.put(block, createStandardTable(block.getRegistryName().getPath(), block, type));
     }
 
-    protected LootTable.Builder createStandardTable(String name, Block block) {
+    protected LootTable.Builder createStandardTable(String name, Block block, BlockEntityType<?> type) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
@@ -144,8 +145,8 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
                                 .copy("Info", "BlockEntityTag.Info", CopyNbtFunction.MergeStrategy.REPLACE)
                                 .copy("Items", "BlockEntityTag.Items", CopyNbtFunction.MergeStrategy.REPLACE)
                                 .copy("Energy", "BlockEntityTag.Energy", CopyNbtFunction.MergeStrategy.REPLACE))
-                        // @todo 1.18 .apply(SetContainerContents.setContents()
-                        // @todo 1.18         .withEntry(DynamicLoot.dynamicEntry(new ResourceLocation("minecraft", "contents"))))
+                        .apply(SetContainerContents.setContents(type)
+                                .withEntry(DynamicLoot.dynamicEntry(new ResourceLocation("minecraft", "contents"))))
                 );
         return LootTable.lootTable().withPool(builder);
     }
