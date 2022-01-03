@@ -1,7 +1,7 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -15,15 +15,13 @@ import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-
-import mcjty.lib.gui.widgets.Widget.Dimension;
 
 public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Widget<P> {
 
@@ -336,17 +334,17 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         if (background1 != null) {
-            mc.getTextureManager().bindForSetup(background1);
+            RenderSystem.setShaderTexture(0, background1);
             if (background2 == null) {
                 gui.blit(matrixStack, xx, yy, 0, 0, w, h);
             } else {
                 if (background2Horizontal) {
                     gui.blit(matrixStack, xx, yy, 0, 0, backgroundOffset, h);
-                    mc.getTextureManager().bindForSetup(background2);
+                    RenderSystem.setShaderTexture(0, background2);
                     gui.blit(matrixStack, xx + backgroundOffset, yy, 0, 0, w - backgroundOffset, h);
                 } else {
                     gui.blit(matrixStack, xx, yy, 0, 0, w, backgroundOffset);
-                    mc.getTextureManager().bindForSetup(background2);
+                    RenderSystem.setShaderTexture(0, background2);
                     gui.blit(matrixStack, xx, yy + backgroundOffset, 0, 0, w, h - backgroundOffset);
                 }
             }

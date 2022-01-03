@@ -150,8 +150,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
         } else if (layout instanceof PositionalLayout) {
             command.parameter("positional");
         }
-        if (layout instanceof AbstractLayout) {
-            AbstractLayout<?> abstractLayout = (AbstractLayout<?>) layout;
+        if (layout instanceof AbstractLayout<?> abstractLayout) {
             GuiParser.put(command, "spacing", abstractLayout.getSpacing(), AbstractLayout.DEFAULT_SPACING);
             GuiParser.put(command, "horizalign", abstractLayout.getHorizontalAlignment().name(), AbstractLayout.DEFAULT_HORIZONTAL_ALIGN.name());
             GuiParser.put(command, "vertalign", abstractLayout.getVerticalAlignment().name(), AbstractLayout.DEFAULT_VERTICAL_ALIGN.name());

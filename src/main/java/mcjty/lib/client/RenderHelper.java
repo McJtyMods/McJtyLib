@@ -210,7 +210,8 @@ public class RenderHelper {
         }
 
         int fluidColor = fluid.getAttributes().getColor(fluidStack);
-        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bindForSetup(InventoryMenu.BLOCK_ATLAS);
+        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+//        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bindForSetup(InventoryMenu.BLOCK_ATLAS);
         setGLColorFromInt(fluidColor);
         drawFluidTexture(x, y, fluidStillSprite, 100);
 
@@ -270,7 +271,8 @@ public class RenderHelper {
         if (!stack.isEmpty()) {
             BakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getModel(stack, null, null, 1);
             if (!stack.isEmpty()) {
-                Minecraft.getInstance().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
+                RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+//                Minecraft.getInstance().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
                 Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) alpha);
                 // @todo 1.17 GlStateManager._enableRescaleNormal();
@@ -288,7 +290,8 @@ public class RenderHelper {
                 matrixStack.popPose();
                 // @todo 1.17 GlStateManager._disableRescaleNormal();
                 GlStateManager._disableBlend();
-                Minecraft.getInstance().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
+                RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
+//                Minecraft.getInstance().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
                 Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).restoreLastBlurMipmap();
             }
         }

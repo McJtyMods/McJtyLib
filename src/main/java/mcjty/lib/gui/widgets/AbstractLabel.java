@@ -1,7 +1,7 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.HorizontalAlignment;
@@ -148,7 +148,7 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
 
         if (image != null) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.getTextureManager().bindForSetup(image);
+            RenderSystem.setShaderTexture(0, image);
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;
             gui.blit(matrixStack, xx, yy, u, v, iw, ih);

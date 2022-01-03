@@ -1,7 +1,7 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ImageEvent;
@@ -10,8 +10,8 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -113,7 +113,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
         if (image != null) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            mc.getTextureManager().bindForSetup(image);
+            RenderSystem.setShaderTexture(0, image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
             gui.blit(matrixStack, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
