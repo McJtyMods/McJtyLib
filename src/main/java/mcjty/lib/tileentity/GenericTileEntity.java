@@ -368,11 +368,7 @@ public class GenericTileEntity extends BlockEntity {
             if (infoTag.contains("powered")) {
                 powerLevel = infoTag.getByte("powered");
             }
-            if (needsRedstoneMode() && infoTag.contains("rsMode")) {
-                int m = infoTag.getByte("rsMode");
-                rsMode = RedstoneMode.values()[m];
-            }
-
+            loadRSMode(infoTag);
             if (infoTag.contains("owner")) {
                 ownerName = infoTag.getString("owner");
             }
@@ -382,6 +378,13 @@ public class GenericTileEntity extends BlockEntity {
             if (infoTag.contains("secChannel")) {
                 securityChannel = infoTag.getInt("secChannel");
             }
+        }
+    }
+
+    protected void loadRSMode(CompoundTag infoTag) {
+        if (needsRedstoneMode() && infoTag.contains("rsMode")) {
+            int m = infoTag.getByte("rsMode");
+            rsMode = RedstoneMode.values()[m];
         }
     }
 
@@ -423,15 +426,19 @@ public class GenericTileEntity extends BlockEntity {
     protected void saveInfo(CompoundTag tagCompound) {
         CompoundTag infoTag = getOrCreateInfo(tagCompound);
         infoTag.putByte("powered", (byte) powerLevel);
-        if (needsRedstoneMode()) {
-            infoTag.putByte("rsMode", (byte) rsMode.ordinal());
-        }
+        saveRSMode(infoTag);
         infoTag.putString("owner", ownerName);
         if (ownerUUID != null) {
             infoTag.putUUID("ownerId", ownerUUID);
         }
         if (securityChannel != -1) {
             infoTag.putInt("secChannel", securityChannel);
+        }
+    }
+
+    protected void saveRSMode(CompoundTag infoTag) {
+        if (needsRedstoneMode()) {
+            infoTag.putByte("rsMode", (byte) rsMode.ordinal());
         }
     }
 
