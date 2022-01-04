@@ -44,15 +44,15 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements IN
      * Conveniance method to make a supplier for an empty container (ContainerFactory.EMPTY).
      * Use this if you want to have a container for syncing values but otherwise have no items
      */
-    public static Function<Integer, GenericContainer> empty(@Nonnull Supplier<ContainerType<GenericContainer>> type, GenericTileEntity te) {
-        return windowId -> new GenericContainer(type, windowId, ContainerFactory.EMPTY, te);
+    public static BiFunction<Integer, PlayerEntity, GenericContainer> empty(@Nonnull Supplier<ContainerType<GenericContainer>> type, GenericTileEntity te) {
+        return (windowId, player) -> new GenericContainer(type, windowId, ContainerFactory.EMPTY, te, player);
     }
 
     /**
      * Conveniance method to make a supplier for a non-empty container
      */
-    public static Function<Integer, GenericContainer> container(@Nonnull Supplier<ContainerType<GenericContainer>> type, @Nonnull Supplier<ContainerFactory> factory, GenericTileEntity te) {
-        return windowId -> new GenericContainer(type, windowId, factory, te);
+    public static BiFunction<Integer, PlayerEntity, GenericContainer> container(@Nonnull Supplier<ContainerType<GenericContainer>> type, @Nonnull Supplier<ContainerFactory> factory, GenericTileEntity te) {
+        return (windowId, player) -> new GenericContainer(type, windowId, factory, te, player);
     }
 
     public DefaultContainerProvider(String name) {

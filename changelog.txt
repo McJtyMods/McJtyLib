@@ -1,3 +1,7 @@
+Upcoming:
+- Backported SafeClientTools from 1.18
+- Backported better container system from 1.18
+
 1.16-5.1.2:
 - Preporting to 1.18: introducted saveAdditional() into GenericTileEntity
 - Preporting to 1.18: rename a few writeXxx and readXxx into saveXxx and loadXxx

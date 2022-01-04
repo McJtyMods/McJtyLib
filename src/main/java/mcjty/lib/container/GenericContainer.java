@@ -11,7 +11,6 @@ import mcjty.lib.network.PacketContainerDataToClient;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
-import mcjty.lib.varia.TriFunction;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -50,19 +49,22 @@ public class GenericContainer extends Container implements IGenericContainer {
     protected final GenericTileEntity te;
     private final List<IntReferenceHolder> intReferenceHolders = new ArrayList<>();
     private boolean doForce = true;
+    private final PlayerEntity player;
 
-    public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity te) {
+    public GenericContainer(@Nullable ContainerType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity te, @Nonnull PlayerEntity player) {
         super(type, id);
         this.factory = factory;
         this.pos = pos;
         this.te = te;
+        this.player = player;
     }
 
-    public GenericContainer(@Nonnull Supplier<ContainerType<GenericContainer>> type, int id, @Nonnull Supplier<ContainerFactory> factory, @Nullable GenericTileEntity te) {
+    public GenericContainer(@Nonnull Supplier<ContainerType<GenericContainer>> type, int id, @Nonnull Supplier<ContainerFactory> factory, @Nullable GenericTileEntity te, @Nonnull PlayerEntity player) {
         super(type.get(), id);
         this.factory = factory.get();
         this.pos = te.getBlockPos();
         this.te = te;
+        this.player = player;
     }
 
     @Override
@@ -463,15 +465,14 @@ public class GenericContainer extends Container implements IGenericContainer {
                 listener.setContainerData(this, i, holder.get());
             }
         }
-        for (IContainerDataListener data : containerData.values()) {
-            ByteBuf newbuf = Unpooled.buffer();
-            PacketBuffer buffer = new PacketBuffer(newbuf);
-            data.toBytes(buffer);
-            PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
-            for (IContainerListener listener : this.containerListeners) {
-                if (listener instanceof ServerPlayerEntity) {
-                    McJtyLib.networkHandler.sendTo(packet, ((ServerPlayerEntity) listener).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-                }
+        if (player instanceof ServerPlayerEntity) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            for (IContainerDataListener data : containerData.values()) {
+                ByteBuf newbuf = Unpooled.buffer();
+                PacketBuffer buffer = new PacketBuffer(newbuf);
+                data.toBytes(buffer);
+                PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
+                McJtyLib.networkHandler.sendTo(packet, serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             }
         }
     }
@@ -489,16 +490,15 @@ public class GenericContainer extends Container implements IGenericContainer {
 
         super.broadcastChanges();
 
-        for (IContainerDataListener data : containerData.values()) {
-            if (data.isDirtyAndClear()) {
-                ByteBuf newbuf = Unpooled.buffer();
-                PacketBuffer buffer = new PacketBuffer(newbuf);
-                data.toBytes(buffer);
-                PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
-                for (IContainerListener listener : this.containerListeners) {
-                    if (listener instanceof ServerPlayerEntity) {
-                        McJtyLib.networkHandler.sendTo(packet, ((ServerPlayerEntity) listener).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-                    }
+        if (player instanceof ServerPlayerEntity) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            for (IContainerDataListener data : containerData.values()) {
+                if (data.isDirtyAndClear()) {
+                    ByteBuf newbuf = Unpooled.buffer();
+                    PacketBuffer buffer = new PacketBuffer(newbuf);
+                    data.toBytes(buffer);
+                    PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
+                    McJtyLib.networkHandler.sendTo(packet, serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                 }
             }
         }
@@ -531,7 +531,7 @@ public class GenericContainer extends Container implements IGenericContainer {
 
     public static <T extends GenericContainer, E extends GenericTileEntity> ContainerType<T> createRemoteContainerType(
             Function<RegistryKey<World>, E> dummyTEFactory,
-            TriFunction<Integer, BlockPos, E, T> containerFactory, int slots) {
+            ContainerSupplier<T, E> containerFactory, int slots) {
         return IForgeContainerType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
 
@@ -540,9 +540,13 @@ public class GenericContainer extends Container implements IGenericContainer {
             CompoundNBT compound = data.readNbt();
             te.load(compound);
 
-            T container = containerFactory.apply(windowId, pos, te);
+            T container = containerFactory.create(windowId, pos, te, inv.player);
             container.setupInventories(new ItemStackHandler(slots), inv);
             return container;
         });
+    }
+
+    public interface ContainerSupplier<T extends GenericContainer, E extends GenericTileEntity> {
+        T create(int windowId, BlockPos pos, E te, PlayerEntity player);
     }
 }
