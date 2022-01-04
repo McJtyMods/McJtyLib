@@ -6,15 +6,15 @@ import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.Sync;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.DataSlot;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
@@ -44,15 +44,15 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
      * Conveniance method to make a supplier for an empty container (ContainerFactory.EMPTY).
      * Use this if you want to have a container for syncing values but otherwise have no items
      */
-    public static Function<Integer, GenericContainer> empty(@Nonnull Supplier<MenuType<GenericContainer>> type, GenericTileEntity te) {
-        return windowId -> new GenericContainer(type, windowId, ContainerFactory.EMPTY, te);
+    public static BiFunction<Integer, Player, GenericContainer> empty(@Nonnull Supplier<MenuType<GenericContainer>> type, GenericTileEntity te) {
+        return (windowId, player) -> new GenericContainer(type, windowId, ContainerFactory.EMPTY, te, player);
     }
 
     /**
      * Conveniance method to make a supplier for a non-empty container
      */
-    public static Function<Integer, GenericContainer> container(@Nonnull Supplier<MenuType<GenericContainer>> type, @Nonnull Supplier<ContainerFactory> factory, GenericTileEntity te) {
-        return windowId -> new GenericContainer(type, windowId, factory, te);
+    public static BiFunction<Integer, Player, GenericContainer> container(@Nonnull Supplier<MenuType<GenericContainer>> type, @Nonnull Supplier<ContainerFactory> factory, GenericTileEntity te) {
+        return (windowId, player) -> new GenericContainer(type, windowId, factory, te, player);
     }
 
     public DefaultContainerProvider(String name) {
@@ -67,11 +67,6 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
 
     public DefaultContainerProvider<C> containerSupplier(BiFunction<Integer, Player, C> containerSupplier) {
         this.containerSupplier = containerSupplier;
-        return this;
-    }
-
-    public DefaultContainerProvider<C> containerSupplier(Function<Integer, C> containerSupplier) {
-        this.containerSupplier = (windowId, playerEntity) -> containerSupplier.apply(windowId);
         return this;
     }
 
