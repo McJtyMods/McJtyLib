@@ -22,7 +22,11 @@ public class SafeClientTools {
     }
 
     public static RecipeManager getRecipeManager(Level world) {
-        return world.getRecipeManager();
+        if (world.isClientSide()) {
+            return world.getRecipeManager();
+        } else {
+            return world.getServer().getRecipeManager();
+        }
     }
 
     public static HitResult getClientMouseOver() {
