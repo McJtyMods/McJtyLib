@@ -2,7 +2,6 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.client.GuiTools;
@@ -17,6 +16,7 @@ import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.SafeClientTools;
 import mcjty.lib.varia.Tools;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.FontRenderer;
@@ -494,7 +494,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             ContainerType<C> type,
             GuiSupplier<C, S, T> guiSupplier) {
         ScreenManager.IScreenFactory<C, S> factory = (container, inventory, title) -> {
-            TileEntity te = McJtyLib.proxy.getClientWorld().getBlockEntity(container.getPos());
+            TileEntity te = SafeClientTools.getClientWorld().getBlockEntity(container.getPos());
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid tile entity!");
         };
         ScreenManager.register(type, factory);

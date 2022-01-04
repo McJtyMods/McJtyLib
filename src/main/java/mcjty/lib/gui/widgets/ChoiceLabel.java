@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -10,6 +9,7 @@ import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.client.gui.screen.Screen;
 
 import java.util.*;
@@ -102,7 +102,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            if (button == 1 || McJtyLib.proxy.isSneaking()) {
+            if (button == 1 || SafeClientTools.isSneaking()) {
                 index--;
                 if (index < 0) {
                     index = choiceList.size()-1;

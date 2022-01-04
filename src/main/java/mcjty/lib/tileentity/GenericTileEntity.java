@@ -528,7 +528,7 @@ public class GenericTileEntity extends TileEntity {
 //            int pct = infused * 100 / GeneralConfig.maxInfuse;
 //            currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
 //        }
-//        if (McJtyLib.proxy.isSneaking()) {
+//        if (SafeClientTools.isSneaking()) {
 //            if (GeneralConfig.manageOwnership) {
 //                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
 //                    int securityChannel = getSecurityChannel();

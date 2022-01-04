@@ -6,6 +6,7 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
@@ -53,14 +54,14 @@ public class PacketGetListFromServer {
     }
 
     public PacketGetListFromServer(BlockPos pos, String cmd, @Nonnull TypedMap params) {
-        this.dimension = McJtyLib.proxy.getWorld().dimension();
+        this.dimension = SafeClientTools.getWorld().dimension();
         this.pos = pos;
         this.command = cmd;
         this.params = params;
     }
 
     public PacketGetListFromServer(BlockPos pos, String cmd) {
-        this.dimension = McJtyLib.proxy.getWorld().dimension();
+        this.dimension = SafeClientTools.getWorld().dimension();
         this.pos = pos;
         this.command = cmd;
         this.params = TypedMap.EMPTY;

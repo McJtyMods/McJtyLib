@@ -1,6 +1,7 @@
 package mcjty.lib.builder;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -47,7 +48,7 @@ public class TooltipBuilder {
         String path = id.getPath();
         String prefix = "message." + namespace + "." + path + ".";
         InfoLine[] lines = infoLines;
-        if (infoLines == null || (McJtyLib.proxy.isSneaking() && shiftInfoLines != null)) {
+        if (infoLines == null || (SafeClientTools.isSneaking() && shiftInfoLines != null)) {
             lines = shiftInfoLines;
         }
         addLines(stack, tooltip, prefix, lines);

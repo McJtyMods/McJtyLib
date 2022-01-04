@@ -3,9 +3,9 @@ package mcjty.lib.tooltips;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.keys.KeyBindings;
+import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -14,12 +14,10 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.*;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -82,7 +80,7 @@ public class TooltipRender {
             ManualEntry entry = settings.getManualEntry();
             if (entry.getManual() != null) {
                 if (KeyBindings.openManual != null) {
-                    if (!McJtyLib.proxy.isSneaking()) {
+                    if (!SafeClientTools.isSneaking()) {
                         String translationKey = KeyBindings.openManual.saveString();
                         event.getToolTip().add(new StringTextComponent("<Press ").withStyle(TextFormatting.YELLOW)
                                 .append(new TranslationTextComponent(translationKey).withStyle(TextFormatting.GREEN))
