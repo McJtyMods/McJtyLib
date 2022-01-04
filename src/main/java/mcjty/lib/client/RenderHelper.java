@@ -1,43 +1,36 @@
 package mcjty.lib.client;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import mcjty.lib.base.StyleConfig;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.Font;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import com.mojang.blaze3d.vertex.Tesselator;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormatElement;
-import net.minecraft.core.Position;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
+import mcjty.lib.base.StyleConfig;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.fluids.FluidStack;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 
 import javax.annotation.Nullable;
 
@@ -418,13 +411,12 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-        GlStateManager._disableTexture();
-        GlStateManager._enableBlend();
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
         // @todo 1.17 GlStateManager._disableAlphaTest();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
-        // @todo 1.14 check
-//        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
 
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_SMOOTH);
         Tesselator tessellator = Tesselator.getInstance();
@@ -437,9 +429,9 @@ public class RenderHelper {
         tessellator.end();
 
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
-        GlStateManager._disableBlend();
+        RenderSystem.disableBlend();
         // @todo 1.17 GlStateManager._enableAlphaTest();
-        GlStateManager._enableTexture();
+        RenderSystem.enableTexture();
     }
 
     /**
@@ -458,13 +450,10 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-        GlStateManager._disableTexture();
-        GlStateManager._enableBlend();
-        // @todo 1.17 GlStateManager._disableAlphaTest();
-
-        // @todo 1.14 check
-//        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
+        RenderSystem.disableTexture();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
 
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_SMOOTH);
         Tesselator tessellator = Tesselator.getInstance();
@@ -476,9 +465,9 @@ public class RenderHelper {
         buffer.vertex(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.end();
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
-        GlStateManager._disableBlend();
+        RenderSystem.disableBlend();
         // @todo 1.17 GlStateManager._enableAlphaTest();
-        GlStateManager._enableTexture();
+        RenderSystem.enableTexture();
     }
 
     /**
@@ -497,20 +486,6 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-//        GlStateManager.disableTexture();
-//        GlStateManager.enableBlend();
-//        GlStateManager.disableAlphaTest();
-
-        // @todo 1.14 check
-//        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-
-
-//        GlStateManager.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.param, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.param, GlStateManager.SourceFactor.ONE.param, GlStateManager.DestFactor.ZERO.param);
-
-//        GlStateManager.shadeModel(GL11.GL_SMOOTH);
-//        Tessellator tessellator = Tessellator.getInstance();
-//        BufferBuilder buffer = tessellator.getBuffer();
-//        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
         VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.QUADS_NOTEXTURE);
 
@@ -519,10 +494,6 @@ public class RenderHelper {
         builder.vertex(positionMatrix, x1, y2, zLevel).color(f1, f2, f3, f).uv2(lightmap).endVertex();
         builder.vertex(positionMatrix, x2, y2, zLevel).color(f5, f6, f7, f4).uv2(lightmap).endVertex();
         builder.vertex(positionMatrix, x2, y1, zLevel).color(f5, f6, f7, f4).uv2(lightmap).endVertex();
-//        GlStateManager.shadeModel(GL11.GL_FLAT);
-//        GlStateManager.disableBlend();
-//        GlStateManager.enableAlphaTest();
-//        GlStateManager.enableTexture();
     }
 
     public static void drawHorizontalLine(PoseStack matrixStack, int x1, int y1, int x2, int color) {
