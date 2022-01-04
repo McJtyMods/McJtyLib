@@ -3,7 +3,6 @@ package mcjty.lib.varia;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 
@@ -19,14 +18,6 @@ public class SafeClientTools {
 
     public static Player getClientPlayer() {
         return Minecraft.getInstance().player;
-    }
-
-    public static RecipeManager getRecipeManager(Level world) {
-        if (world.isClientSide()) {
-            return world.getRecipeManager();
-        } else {
-            return world.getServer().getRecipeManager();
-        }
     }
 
     public static HitResult getClientMouseOver() {
