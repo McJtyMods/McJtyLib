@@ -22,11 +22,7 @@ public class SafeClientTools {
     }
 
     public static RecipeManager getRecipeManager(World world) {
-        if (world.isClientSide()) {
-            return world.getRecipeManager();
-        } else {
-            return world.getServer().getRecipeManager();
-        }
+        return world.getRecipeManager();
     }
 
     public static RayTraceResult getClientMouseOver() {
