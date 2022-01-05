@@ -33,7 +33,7 @@ import net.minecraftforge.network.NetworkDirection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -530,13 +530,12 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     public static <T extends GenericContainer, E extends GenericTileEntity> MenuType<T> createRemoteContainerType(
-            Function<ResourceKey<Level>, E> dummyTEFactory,
+            BiFunction<ResourceKey<Level>, BlockPos, E> dummyTEFactory,
             ContainerSupplier<T, E> containerFactory, int slots) {
         return IForgeMenuType.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
 
-            E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()));
-            // @todo 1.17 te.setLevelAndPosition(inv.player.getCommandSenderWorld(), pos);    // Wrong world but doesn't really matter
+            E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()), pos);
             CompoundTag compound = data.readNbt();
             te.load(compound);
 
