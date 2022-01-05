@@ -76,6 +76,10 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         return te;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     @Nonnull
     @Override
     protected DataSlot addDataSlot(@Nonnull DataSlot holder) {
