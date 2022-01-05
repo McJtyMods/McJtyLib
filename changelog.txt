@@ -1,3 +1,6 @@
+1.18-6.0.3:
+- Bugfix for sub-dialogs
+
 1.18-6.0.2:
 - Small helper for datagen
 

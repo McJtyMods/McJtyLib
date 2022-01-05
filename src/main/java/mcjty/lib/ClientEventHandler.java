@@ -48,7 +48,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseClicked(ScreenEvent.MouseClickedEvent event) {
+    public void onMouseClicked(ScreenEvent.MouseClickedEvent.Pre event) {
         if (event.getScreen() instanceof IKeyReceiver) {
             IKeyReceiver container = (IKeyReceiver) event.getScreen();
             if (container.getWindow() != null) {
