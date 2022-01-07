@@ -1,15 +1,14 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.ITeleporter;
 
 import javax.annotation.Nullable;
@@ -45,9 +44,10 @@ public class TeleportationTools {
         player.changeDimension(world, new ITeleporter() {
             @Override
             public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                entity.changeDimension(destWorld);
-                world.addDuringPortalTeleport((ServerPlayer) entity);
-                entity.moveTo(x, y, z);
+                entity = repositionEntity.apply(false);
+//                entity.changeDimension(destWorld);
+//                world.addDuringPortalTeleport((ServerPlayer) entity);
+//                entity.moveTo(x, y, z);
                 entity.teleportTo(x, y, z);
                 return entity;
             }
