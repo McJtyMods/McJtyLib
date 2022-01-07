@@ -6,7 +6,7 @@ import net.minecraft.core.GlobalPos;
 
 public class BlockPosTools {
 
-    public static final BlockPos INVALID = new BlockPos(-1, -1, -1);
+    public static final BlockPos INVALID = new BlockPos(-1, -1000, -1);
 
     public static BlockPos read(CompoundTag tagCompound, String tagName) {
         int[] array = tagCompound.getIntArray(tagName);

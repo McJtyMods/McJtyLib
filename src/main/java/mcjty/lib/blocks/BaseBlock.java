@@ -18,37 +18,37 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tileentity.TickingTileEntity;
 import mcjty.lib.tooltips.ITooltipSettings;
 import mcjty.lib.varia.*;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraft.ChatFormatting;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkHooks;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -145,12 +145,11 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     protected WrenchUsage getWrenchUsage(BlockPos pos, Player player, ItemStack itemStack, WrenchUsage wrenchUsed, Item item) {
-        if (item instanceof SmartWrench) {
-            switch(((SmartWrench)item).getMode(itemStack)) {
-                case MODE_WRENCH: return WrenchUsage.NORMAL;
-                case MODE_SELECT: return player.isShiftKeyDown() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
-                default:          throw new RuntimeException("SmartWrench in unknown mode!");
-            }
+        if (item instanceof SmartWrench wrench) {
+            return switch (wrench.getMode(itemStack)) {
+                case MODE_WRENCH -> WrenchUsage.NORMAL;
+                case MODE_SELECT -> player.isShiftKeyDown() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
+            };
         } else if (McJtyLib.cofhapiitem && CofhApiItemCompatibility.isToolHammer(item)) {
             return CofhApiItemCompatibility.getWrenchUsage(item, itemStack, player, pos);
         } else if (WrenchChecker.isAWrench(item)) {
@@ -175,15 +174,14 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             return InteractionResult.SUCCESS;
         }
         WrenchUsage wrenchUsed = testWrenchUsage(pos, player);
-        switch (wrenchUsed) {
-            case NOT:          return openGui(world, pos.getX(), pos.getY(), pos.getZ(), player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
-            case NORMAL:       return wrenchUse(world, pos, result.getDirection(), player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
-            case SNEAKING:     return wrenchSneak(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
-            case DISABLED:     return wrenchDisabled(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
-            case SELECT:       return wrenchSelect(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
-            case SNEAK_SELECT: return wrenchSneakSelect(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
-        }
-        return InteractionResult.PASS;
+        return switch (wrenchUsed) {
+            case NOT -> openGui(world, pos.getX(), pos.getY(), pos.getZ(), player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case NORMAL -> wrenchUse(world, pos, result.getDirection(), player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case SNEAKING -> wrenchSneak(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case DISABLED -> wrenchDisabled(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case SELECT -> wrenchSelect(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            case SNEAK_SELECT -> wrenchSneakSelect(world, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        };
     }
 
     public boolean handleModule(Level world, BlockPos pos, BlockState state, Player player, InteractionHand hand, ItemStack heldItem, BlockHitResult result) {
@@ -192,9 +190,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             if (te != null) {
                 return te.getCapability(CapabilityModuleSupport.MODULE_CAPABILITY).map(h -> {
                     if (h.isModule(heldItem)) {
-                        if (ModuleTools.installModule(player, heldItem, hand, pos, h.getFirstSlot(), h.getLastSlot())) {
-                            return true;
-                        }
+                        return ModuleTools.installModule(player, heldItem, hand, pos, h.getFirstSlot(), h.getLastSlot());
                     }
                     return false;
                 }).orElse(false);
@@ -303,7 +299,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         if (hasTileEntitySupplier()) {
             super.triggerEvent(state, worldIn, pos, id, param);
             BlockEntity tileentity = worldIn.getBlockEntity(pos);
-            return tileentity == null ? false : tileentity.triggerEvent(id, param);
+            return tileentity != null && tileentity.triggerEvent(id, param);
         } else {
             return super.triggerEvent(state, worldIn, pos, id, param);
         }
@@ -340,6 +336,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState blockState, BlockEntityType<T> blockEntityType) {
+        // @todo 1.18 figure out a way to only return a ticker client/server if needed
         return BaseBlock::runTick;
     }
 
@@ -372,15 +369,11 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public static Property<?>[] getProperties(RotationType rotationType) {
-        switch (rotationType) {
-            case HORIZROTATION:
-                return HORIZ_PROPERTIES;
-            case ROTATION:
-                return ROTATING_PROPERTIES;
-            case NONE:
-            default:
-                return NONE_PROPERTIES;
-        }
+        return switch (rotationType) {
+            case HORIZROTATION -> HORIZ_PROPERTIES;
+            case ROTATION -> ROTATING_PROPERTIES;
+            case NONE -> NONE_PROPERTIES;
+        };
     }
 
     @Override
@@ -396,53 +389,36 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         Player placer = context.getPlayer();
         BlockPos pos = context.getClickedPos();
         BlockState state = super.getStateForPlacement(context);
-        switch (getRotationType()) {
-            case HORIZROTATION:
-                return state.setValue(BlockStateProperties.HORIZONTAL_FACING, placer.getDirection().getOpposite());
-            case ROTATION:
-                return state.setValue(BlockStateProperties.FACING, OrientationTools.getFacingFromEntity(pos, placer));
-            case NONE:
-            default:
-                return state;
-        }
+        return switch (getRotationType()) {
+            case HORIZROTATION -> state.setValue(BlockStateProperties.HORIZONTAL_FACING, placer.getDirection().getOpposite());
+            case ROTATION -> state.setValue(BlockStateProperties.FACING, OrientationTools.getFacingFromEntity(pos, placer));
+            case NONE -> state;
+        };
     }
 
     protected Direction getOrientation(BlockPos pos, LivingEntity entity) {
-        switch (getRotationType()) {
-            case HORIZROTATION:
-                return OrientationTools.determineOrientationHoriz(entity);
-            case ROTATION:
-                return OrientationTools.determineOrientation(pos, entity);
-            case NONE:
-            default:
-                return null;
-        }
+        return switch (getRotationType()) {
+            case HORIZROTATION -> OrientationTools.determineOrientationHoriz(entity);
+            case ROTATION -> OrientationTools.determineOrientation(pos, entity);
+            case NONE -> null;
+        };
     }
 
     public Direction getFrontDirection(BlockState state) {
-        switch (getRotationType()) {
-            case HORIZROTATION:
-                return state.getValue(BlockStateProperties.HORIZONTAL_FACING);
-            case ROTATION:
-                return state.getValue(BlockStateProperties.FACING);
-            case NONE:
-            default:
-                return Direction.NORTH;
-        }
+        return switch (getRotationType()) {
+            case HORIZROTATION -> state.getValue(BlockStateProperties.HORIZONTAL_FACING);
+            case ROTATION -> state.getValue(BlockStateProperties.FACING);
+            case NONE -> Direction.NORTH;
+        };
     }
 
     @Override
     public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rot) {
-        switch (getRotationType()) {
-            case HORIZROTATION:
-                state = state.setValue(BlockStateProperties.HORIZONTAL_FACING, rot.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
-                break;
-            case ROTATION:
-                state = state.setValue(BlockStateProperties.FACING, rot.rotate(state.getValue(BlockStateProperties.FACING)));
-                break;
-            case NONE:
-                break;
-        }
+        state = switch (getRotationType()) {
+            case HORIZROTATION -> state.setValue(BlockStateProperties.HORIZONTAL_FACING, rot.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
+            case ROTATION -> state.setValue(BlockStateProperties.FACING, rot.rotate(state.getValue(BlockStateProperties.FACING)));
+            case NONE -> state;
+        };
         BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof GenericTileEntity genericTileEntity) {
             genericTileEntity.rotateBlock(rot);
@@ -459,15 +435,11 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public static Direction getFrontDirection(RotationType rotationType, BlockState state) {
-        switch (rotationType) {
-            case HORIZROTATION:
-                return OrientationTools.getOrientationHoriz(state);
-            case ROTATION:
-                return OrientationTools.getOrientation(state);
-            case NONE:
-            default:
-                return Direction.SOUTH;
-        }
+        return switch (rotationType) {
+            case HORIZROTATION -> OrientationTools.getOrientationHoriz(state);
+            case ROTATION -> OrientationTools.getOrientation(state);
+            case NONE -> Direction.SOUTH;
+        };
     }
 
     @Override

@@ -25,9 +25,6 @@ public class ItemStackTools {
 
     /**
      * Extract itemstack out of a slot and return a new stack.
-     * @param tileEntity
-     * @param slot
-     * @param amount
      */
     @Nonnull
     public static ItemStack extractItem(@Nullable BlockEntity tileEntity, int slot, int amount) {
@@ -41,8 +38,6 @@ public class ItemStackTools {
 
     /**
      * Get an item from an inventory
-     * @param tileEntity
-     * @param slot
      */
     @Nonnull
     public static ItemStack getStack(@Nullable BlockEntity tileEntity, int slot) {

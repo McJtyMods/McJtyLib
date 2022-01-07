@@ -44,21 +44,14 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     public static Direction rotateLeft(Direction downSide, Direction inputSide) {
-        switch (downSide) {
-            case DOWN:
-                return inputSide.getClockWise();
-            case UP:
-                return inputSide.getCounterClockWise();
-            case NORTH:
-                return OrientationTools.rotateAround(inputSide, Axis.Z);
-            case SOUTH:
-                return OrientationTools.rotateAround(inputSide.getOpposite(), Axis.Z);
-            case WEST:
-                return OrientationTools.rotateAround(inputSide, Axis.X);
-            case EAST:
-                return OrientationTools.rotateAround(inputSide.getOpposite(), Axis.X);
-        }
-        return inputSide;
+        return switch (downSide) {
+            case DOWN -> inputSide.getClockWise();
+            case UP -> inputSide.getCounterClockWise();
+            case NORTH -> OrientationTools.rotateAround(inputSide, Axis.Z);
+            case SOUTH -> OrientationTools.rotateAround(inputSide.getOpposite(), Axis.Z);
+            case WEST -> OrientationTools.rotateAround(inputSide, Axis.X);
+            case EAST -> OrientationTools.rotateAround(inputSide.getOpposite(), Axis.X);
+        };
     }
 
     public static Direction rotateRight(Direction downSide, Direction inputSide) {
@@ -145,21 +138,14 @@ public class LogicSlabBlock extends BaseBlock {
     @Nonnull
     @Override
     public VoxelShape getShape(BlockState state, @Nonnull BlockGetter worldIn, @Nonnull BlockPos pos, @Nonnull CollisionContext context) {
-        switch (state.getValue(LOGIC_FACING).getSide()) {
-            case DOWN:
-                return BLOCK_DOWN;
-            case UP:
-                return BLOCK_UP;
-            case NORTH:
-                return BLOCK_NORTH;
-            case SOUTH:
-                return BLOCK_SOUTH;
-            case WEST:
-                return BLOCK_WEST;
-            case EAST:
-                return BLOCK_EAST;
-        }
-        return BLOCK_DOWN;
+        return switch (state.getValue(LOGIC_FACING).getSide()) {
+            case DOWN -> BLOCK_DOWN;
+            case UP -> BLOCK_UP;
+            case NORTH -> BLOCK_NORTH;
+            case SOUTH -> BLOCK_SOUTH;
+            case WEST -> BLOCK_WEST;
+            case EAST -> BLOCK_EAST;
+        };
     }
 
     /**
@@ -188,8 +174,7 @@ public class LogicSlabBlock extends BaseBlock {
         // Old behaviour
         // @todo remove once all implementations do this in the TE.checkRedstone
         BlockEntity te = world.getBlockEntity(pos);
-        if (te instanceof GenericTileEntity) {
-            GenericTileEntity generic = (GenericTileEntity)te;
+        if (te instanceof GenericTileEntity generic) {
             Direction inputSide = LogicSupport.getFacing(world.getBlockState(pos)).getInputSide();
             int power = getInputStrength(world, pos, inputSide);
             generic.setPowerInput(power);
@@ -201,25 +186,18 @@ public class LogicSlabBlock extends BaseBlock {
         BlockEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof GenericTileEntity) {
             Direction direction = LogicSupport.getFacing(state).getInputSide();
-            switch (direction) {
-                case NORTH:
-                case SOUTH:
-                    return side == NORTH || side == SOUTH;
-                case WEST:
-                case EAST:
-                    return side == WEST || side == EAST;
-                case DOWN:
-                case UP:
-                    return side == DOWN || side == UP;
-            }
+            return switch (direction) {
+                case NORTH, SOUTH -> side == NORTH || side == SOUTH;
+                case WEST, EAST -> side == WEST || side == EAST;
+                case DOWN, UP -> side == DOWN || side == UP;
+            };
         }
         return false;
     }
 
     protected int getRedstoneOutput(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
         BlockEntity te = world.getBlockEntity(pos);
-        if (state.getBlock() instanceof LogicSlabBlock && te instanceof GenericTileEntity) {
-            GenericTileEntity generic = (GenericTileEntity) te;
+        if (state.getBlock() instanceof LogicSlabBlock && te instanceof GenericTileEntity generic) {
             return generic.getRedstoneOutput(state, world, pos, side);
         }
         return 0;

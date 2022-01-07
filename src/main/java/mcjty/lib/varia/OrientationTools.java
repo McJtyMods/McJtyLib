@@ -20,63 +20,49 @@ public class OrientationTools {
 
     public static Direction rotateAround(Direction input, Direction.Axis axis) {
         switch (axis) {
-            case X:
+            case X -> {
                 if (input != WEST && input != EAST) {
                     return rotateX(input);
                 }
-
                 return input;
-            case Y:
+            }
+            case Y -> {
                 if (input != UP && input != DOWN) {
                     return input.getClockWise();
                 }
-
                 return input;
-            case Z:
+            }
+            case Z -> {
                 if (input != NORTH && input != SOUTH) {
                     return rotateZ(input);
                 }
-
                 return input;
-            default:
-                throw new IllegalStateException("Unable to get CW facing for axis " + axis);
+            }
+            default -> throw new IllegalStateException("Unable to get CW facing for axis " + axis);
         }
     }
 
     private static Direction rotateX(Direction input) {
-        switch(input) {
-            case NORTH:
-                return DOWN;
-            case SOUTH:
-                return UP;
-            case UP:
-                return NORTH;
-            case DOWN:
-                return SOUTH;
-            case EAST:
-            case WEST:
-            default:
-                throw new IllegalStateException("Unable to get X-rotated facing of " + input);
-        }
+        return switch (input) {
+            case NORTH -> DOWN;
+            case SOUTH -> UP;
+            case UP -> NORTH;
+            case DOWN -> SOUTH;
+            case EAST, WEST -> throw new IllegalStateException("Unable to get X-rotated facing of " + input);
+        };
     }
 
     /**
      * Rotate this Facing around the Z axis (EAST => DOWN => WEST => UP => EAST)
      */
     private static Direction rotateZ(Direction input) {
-        switch(input) {
-            case EAST:
-                return DOWN;
-            case WEST:
-                return UP;
-            case UP:
-                return EAST;
-            case DOWN:
-                return WEST;
-            case SOUTH:
-            default:
-                throw new IllegalStateException("Unable to get Z-rotated facing of " + input);
-        }
+        return switch (input) {
+            case EAST -> DOWN;
+            case WEST -> UP;
+            case UP -> EAST;
+            case DOWN -> WEST;
+            case SOUTH, NORTH -> throw new IllegalStateException("Unable to get Z-rotated facing of " + input);
+        };
     }
 
 
@@ -120,37 +106,28 @@ public class OrientationTools {
     public static Direction determineOrientationHoriz(LivingEntity MobEntity) {
         int i = (int) ((MobEntity.getYRot() * 4.0F / 360.0F) + 0.5D);
         int l = ((MobEntity.getYRot()  * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
-        if (l == 0) {
-            return Direction.NORTH;
-        } else if (l == 1) {
-            return Direction.EAST;
-        } else if (l == 2) {
-            return SOUTH;
-        } else {
-            return Direction.WEST;
-        }
+        return switch (l) {
+            case 0 -> Direction.NORTH;
+            case 1 -> Direction.EAST;
+            case 2 -> SOUTH;
+            default -> Direction.WEST;
+        };
     }
 
     public static Direction getTopDirection(Direction rotation) {
-        switch (rotation) {
-            case DOWN:
-                return SOUTH;
-            case UP:
-                return Direction.NORTH;
-            default:
-                return Direction.UP;
-        }
+        return switch (rotation) {
+            case DOWN -> SOUTH;
+            case UP -> Direction.NORTH;
+            default -> Direction.UP;
+        };
     }
 
     public static Direction getBottomDirection(Direction rotation) {
-        switch (rotation) {
-            case DOWN:
-                return Direction.NORTH;
-            case UP:
-                return SOUTH;
-            default:
-                return DOWN;
-        }
+        return switch (rotation) {
+            case DOWN -> Direction.NORTH;
+            case UP -> SOUTH;
+            default -> DOWN;
+        };
     }
 
     public static Direction getFacingFromEntity(BlockPos clickedBlock, @Nullable Entity entityIn) {

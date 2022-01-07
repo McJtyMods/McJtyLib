@@ -16,7 +16,7 @@ public class VerticalLayout extends AbstractLayout<VerticalLayout> {
             if (h == Widget.SIZE_UNKNOWN) {
                 h = otherHeight;
             }
-            ((AbstractWidget)child).setBounds(align(getHorizontalMargin(), top, width-getHorizontalMargin()*2, h, child));
+            ((AbstractWidget<?>)child).setBounds(align(getHorizontalMargin(), top, width-getHorizontalMargin()*2, h, child));
             top += h;
             top += getSpacing();
         }

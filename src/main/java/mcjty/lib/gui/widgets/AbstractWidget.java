@@ -43,7 +43,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     protected boolean visible = true;
     protected List<String> tooltips = null;
     protected List<ItemStack> items = null;
-    private Set<Integer> enableFlags = new HashSet<>();
+    private final Set<Integer> enableFlags = new HashSet<>();
     private String name;
     private String channel;
 
@@ -391,21 +391,11 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
 
     private void drawStyledBox(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int average1, int average2, int dark) {
         switch (window.getCurrentStyle()) {
-            case STYLE_BEVEL:
-                RenderHelper.drawThinButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
-                break;
-            case STYLE_BEVEL_GRADIENT:
-                RenderHelper.drawThinButtonBoxGradient(matrixStack, x1, y1, x2, y2, bright, average1, average2, dark);
-                break;
-            case STYLE_FLAT:
-                RenderHelper.drawFlatButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
-                break;
-            case STYLE_FLAT_GRADIENT:
-                RenderHelper.drawFlatButtonBoxGradient(matrixStack, x1, y1, x2, y2, bright, average1, average2, dark);
-                break;
-            case STYLE_THICK:
-                RenderHelper.drawThickButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
-                break;
+            case STYLE_BEVEL -> RenderHelper.drawThinButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
+            case STYLE_BEVEL_GRADIENT -> RenderHelper.drawThinButtonBoxGradient(matrixStack, x1, y1, x2, y2, bright, average1, average2, dark);
+            case STYLE_FLAT -> RenderHelper.drawFlatButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
+            case STYLE_FLAT_GRADIENT -> RenderHelper.drawFlatButtonBoxGradient(matrixStack, x1, y1, x2, y2, bright, average1, average2, dark);
+            case STYLE_THICK -> RenderHelper.drawThickButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
         }
     }
 
@@ -540,8 +530,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
             command.command(new GuiCommand("desired").parameter(desiredWidth).parameter(desiredHeight));
         }
 
-        if (layoutHint instanceof PositionalLayout.PositionalHint) {
-            PositionalLayout.PositionalHint hint = (PositionalLayout.PositionalHint) layoutHint;
+        if (layoutHint instanceof PositionalLayout.PositionalHint hint) {
             command.command(new GuiCommand("hint").parameter(hint.getX()).parameter(hint.getY()).parameter(hint.getWidth()).parameter(hint.getHeight()));
         }
 

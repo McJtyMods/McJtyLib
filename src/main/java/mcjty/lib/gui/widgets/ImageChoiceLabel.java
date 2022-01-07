@@ -25,43 +25,11 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
 
     public static final boolean DEFAULT_WITH_BORDER = false;
 
-    private static class ChoiceEntry {
-        private final String choice;
-        private final List<String> tooltips;
-        private final ResourceLocation image;
-        private final int u;
-        private final int v;
-
-        public ChoiceEntry(String choice, List<String> tooltips, ResourceLocation image, int u, int v) {
-            this.choice = choice;
-            this.tooltips = tooltips;
-            this.image = image;
-            this.u = u;
-            this.v = v;
-        }
-
-        public String getChoice() {
-            return choice;
-        }
-
-        public List<String> getTooltips() {
-            return tooltips;
-        }
-
-        public ResourceLocation getImage() {
-            return image;
-        }
-
-        public int getU() {
-            return u;
-        }
-
-        public int getV() {
-            return v;
-        }
+    private record ChoiceEntry(String choice, List<String> tooltips,
+                               ResourceLocation image, int u, int v) {
     }
 
-    private List<ChoiceEntry> choiceList = new ArrayList<>();
+    private final List<ChoiceEntry> choiceList = new ArrayList<>();
     private boolean withBorder = DEFAULT_WITH_BORDER;
     private int highlightedChoice = -1;     // If this choice is selected we 'highlight' it (only in combination with withBorder=true)
 
@@ -91,7 +59,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         if (currentChoice == -1) {
             return super.getTooltips();
         } else {
-            return choiceList.get(currentChoice).getTooltips();
+            return choiceList.get(currentChoice).tooltips();
         }
     }
 
@@ -124,7 +92,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
                 }
             }
             setCurrentChoice(c);
-            fireChoiceEvents(choiceList.get(c).getChoice());
+            fireChoiceEvents(choiceList.get(c).choice());
         }
         return null;
     }
@@ -135,7 +103,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
             return;
         }
         this.currentChoice = currentChoice;
-        image(choiceList.get(currentChoice).getImage(), choiceList.get(currentChoice).getU(), choiceList.get(currentChoice).getV());
+        image(choiceList.get(currentChoice).image(), choiceList.get(currentChoice).u(), choiceList.get(currentChoice).v());
     }
 
     public int findChoice(String choice) {
@@ -144,7 +112,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         }
         int i = 0;
         for (ChoiceEntry s : choiceList) {
-            if (choice.equals(s.getChoice())) {
+            if (choice.equals(s.choice())) {
                 return i;
             }
             i++;
@@ -167,7 +135,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         if (currentChoice == -1) {
             return null;
         }
-        return choiceList.get(currentChoice).getChoice();
+        return choiceList.get(currentChoice).choice();
     }
 
     public ImageChoiceLabel event(ChoiceEvent event) {
@@ -245,17 +213,17 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         super.fillGuiCommand(command);
         GuiParser.GuiCommand choicesCmd = new GuiParser.GuiCommand("choices");
         for (ChoiceEntry entry : choiceList) {
-            GuiParser.GuiCommand choiceCmd = new GuiParser.GuiCommand("choice").parameter(entry.getChoice());
+            GuiParser.GuiCommand choiceCmd = new GuiParser.GuiCommand("choice").parameter(entry.choice());
             choicesCmd.command(choiceCmd);
-            choiceCmd.command(new GuiParser.GuiCommand("uv").parameter(entry.getU()).parameter(entry.getV()));
-            if (entry.getTooltips() != null && !entry.getTooltips().isEmpty()) {
+            choiceCmd.command(new GuiParser.GuiCommand("uv").parameter(entry.u()).parameter(entry.v()));
+            if (entry.tooltips() != null && !entry.tooltips().isEmpty()) {
                 GuiParser.GuiCommand tooltipsCmd = new GuiParser.GuiCommand("tooltips");
                 choiceCmd.command(tooltipsCmd);
-                for (String tt : entry.getTooltips()) {
+                for (String tt : entry.tooltips()) {
                     tooltipsCmd.parameter(tt);
                 }
             }
-            choiceCmd.command(new GuiParser.GuiCommand("image").parameter(entry.getImage().toString()));
+            choiceCmd.command(new GuiParser.GuiCommand("image").parameter(entry.image().toString()));
         }
         command.command(choicesCmd);
         GuiParser.put(command, "border", withBorder, DEFAULT_WITH_BORDER);

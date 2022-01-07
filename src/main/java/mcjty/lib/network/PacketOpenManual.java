@@ -14,9 +14,9 @@ import java.util.function.Supplier;
  */
 public class PacketOpenManual {
 
-    private ResourceLocation manual;
-    private ResourceLocation entry;
-    private int page;
+    private final ResourceLocation manual;
+    private final ResourceLocation entry;
+    private final int page;
 
     public PacketOpenManual(FriendlyByteBuf buf) {
         manual = buf.readResourceLocation();
@@ -42,7 +42,7 @@ public class PacketOpenManual {
     }
 
     private static void handle(PacketOpenManual message, NetworkEvent.Context ctx) {
-        Player playerEntity = ctx.getSender();
-        PatchouliCompatibility.openBookEntry((ServerPlayer) playerEntity, message.manual, message.entry, message.page);
+        ServerPlayer playerEntity = ctx.getSender();
+        PatchouliCompatibility.openBookEntry(playerEntity, message.manual, message.entry, message.page);
     }
 }

@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 
 public abstract class DefaultModSetup {
 
-//    private File modConfigDir;
     private Logger logger;
     protected CreativeModeTab creativeTab;
 

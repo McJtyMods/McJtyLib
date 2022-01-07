@@ -11,7 +11,7 @@ public class FastByteArray {
     private List<byte[]> buffers;
     private byte[] buffer;
 
-    private int blockSize;
+    private final int blockSize;
     private int index;
     private int size;
 

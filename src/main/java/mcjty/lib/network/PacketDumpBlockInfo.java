@@ -20,9 +20,9 @@ import java.util.function.Supplier;
  */
 public class PacketDumpBlockInfo {
 
-    private ResourceKey<Level> dimid;
-    private BlockPos pos;
-    private boolean verbose;
+    private final ResourceKey<Level> dimid;
+    private final BlockPos pos;
+    private final boolean verbose;
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(dimid.location());

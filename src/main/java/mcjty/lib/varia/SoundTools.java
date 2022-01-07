@@ -16,12 +16,12 @@ public class SoundTools {
         for (int j = 0; j < worldObj.players().size(); ++j) {
             ServerPlayer player = (ServerPlayer)worldObj.players().get(j);
             BlockPos chunkcoordinates = player.blockPosition();
-            double d7 = x - chunkcoordinates.getX();
-            double d8 = y - chunkcoordinates.getY();
-            double d9 = z - chunkcoordinates.getZ();
-            double d10 = d7 * d7 + d8 * d8 + d9 * d9;
+            double xx = x - chunkcoordinates.getX();
+            double yy = y - chunkcoordinates.getY();
+            double zz = z - chunkcoordinates.getZ();
+            double sqDist = xx * xx + yy * yy + zz * zz;
 
-            if (d10 <= 256.0D) {
+            if (sqDist <= 256.0D) {
                 player.connection.send(soundEffect);
             }
         }

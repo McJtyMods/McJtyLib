@@ -34,7 +34,7 @@ public class PacketSendResultToClient {
         if (info == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }
-        Function<FriendlyByteBuf, ?> deserializer = info.getDeserializer();
+        Function<FriendlyByteBuf, ?> deserializer = info.deserializer();
         int size = buf.readInt();
         if (size != -1) {
             list = new ArrayList<>(size);
@@ -59,7 +59,7 @@ public class PacketSendResultToClient {
         if (info == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }
-        BiConsumer<FriendlyByteBuf, Object> serializer = (BiConsumer<FriendlyByteBuf, Object>) info.getSerializer();
+        BiConsumer<FriendlyByteBuf, Object> serializer = (BiConsumer<FriendlyByteBuf, Object>) info.serializer();
         if (serializer == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }
@@ -77,8 +77,8 @@ public class PacketSendResultToClient {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             BlockEntity te = SafeClientTools.getClientWorld().getBlockEntity(pos);
-            if (te instanceof GenericTileEntity) {
-                ((GenericTileEntity) te).handleListFromServer(command, SafeClientTools.getClientPlayer(), TypedMap.EMPTY, list);
+            if (te instanceof GenericTileEntity generic) {
+                generic.handleListFromServer(command, SafeClientTools.getClientPlayer(), TypedMap.EMPTY, list);
             } else {
                 Logging.logError("Can't handle command '" + command + "'!");
             }

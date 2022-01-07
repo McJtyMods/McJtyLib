@@ -32,9 +32,9 @@ public class MultipartHelper {
     }
 
     public static BlockEntity getTileEntity(BlockGetter access, PartPos pos) {
-        BlockEntity te = access.getBlockEntity(pos.getPos());
+        BlockEntity te = access.getBlockEntity(pos.pos());
         if (te instanceof MultipartTE) {
-            MultipartTE.Part part = ((MultipartTE) te).getParts().get(pos.getSlot());
+            MultipartTE.Part part = ((MultipartTE) te).getParts().get(pos.slot());
             if (part != null) {
                 return part.getTileEntity();
             }

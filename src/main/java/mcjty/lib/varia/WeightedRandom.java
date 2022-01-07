@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class WeightedRandom<T> {
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
     public List<Pair<T, Float>> weightedList = new ArrayList<>();
     private boolean sorted = false;
     private float maximum = 0;

@@ -66,17 +66,17 @@ public class TooltipBuilder {
             if (line.getCondition().test(stack)) {
                 if (line.getRepeatingParameter() != null) {
                     line.getRepeatingParameter().apply(stack).forEach(s -> {
-                        Component component;
+                        MutableComponent component;
                         if (line.getTranslationKey() != null) {
                             component = stylize(line.getTranslationKey(), line.getStyles());
                         } else {
                             component = stylize(prefix + line.getSuffix(), line.getStyles());
                         }
-                        ((MutableComponent)component).append(new TextComponent(ChatFormatting.WHITE + s));
+                        component.append(new TextComponent(ChatFormatting.WHITE + s));
                         tooltip.add(component);
                     });
                 } else {
-                    Component component;
+                    MutableComponent component;
                     if (line.getTranslationKey() != null) {
                         component = stylize(line.getTranslationKey(), line.getStyles());
                     } else {
@@ -85,7 +85,7 @@ public class TooltipBuilder {
                     if (line.getInformationGetter() != null) {
                         String extra = line.getInformationGetter().apply(stack);
                         if (extra != null) {
-                            ((MutableComponent)component).append(new TextComponent(ChatFormatting.WHITE + extra));
+                            component.append(new TextComponent(ChatFormatting.WHITE + extra));
                             tooltip.add(component);
                         } // Else we don't add the entire component
                     } else {

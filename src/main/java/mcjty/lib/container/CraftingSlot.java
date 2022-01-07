@@ -5,6 +5,7 @@ import mcjty.lib.varia.TriConsumer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
@@ -74,6 +75,6 @@ public class CraftingSlot extends SlotItemHandler {
         onCraft.accept(te, player, stack);
 
         this.removeCount = 0;
-        net.minecraftforge.event.ForgeEventFactory.firePlayerSmeltedEvent(this.player, stack);
+        ForgeEventFactory.firePlayerSmeltedEvent(this.player, stack);
     }
 }

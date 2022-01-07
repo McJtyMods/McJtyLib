@@ -17,7 +17,7 @@ public class Logging {
     private static Logging instance = null;
 
     public static long prevTicks = -1;
-    private Logger logger;
+    private final Logger logger;
 
     public static boolean debugMode = false;
     public static ForgeConfigSpec.BooleanValue doLogging;

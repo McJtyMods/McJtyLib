@@ -13,8 +13,8 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
     private final boolean isReceiver;
 
     private long energy;
-    private long capacity;
-    private long maxReceive;
+    private final long capacity;
+    private final long maxReceive;
 
     public GenericEnergyStorage(GenericTileEntity tileEntity, boolean isReceiver, long capacity, long maxReceive) {
         this.tileEntity = tileEntity;

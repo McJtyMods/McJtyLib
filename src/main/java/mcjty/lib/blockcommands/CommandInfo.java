@@ -8,26 +8,5 @@ import java.util.function.Function;
 /**
  * Internal class used by McJtyLib to keep track of things needed for list commands
  */
-public class CommandInfo<T> {
-    private final Class<T> type;
-    private final Function<FriendlyByteBuf, T> deserializer;
-    private final BiConsumer<FriendlyByteBuf, T> serializer;
-
-    public CommandInfo(Class<T> type, Function<FriendlyByteBuf, T> deserializer, BiConsumer<FriendlyByteBuf, T> serializer) {
-        this.type = type;
-        this.deserializer = deserializer;
-        this.serializer = serializer;
-    }
-
-    public Class<T> getType() {
-        return type;
-    }
-
-    public Function<FriendlyByteBuf, T> getDeserializer() {
-        return deserializer;
-    }
-
-    public BiConsumer<FriendlyByteBuf, T> getSerializer() {
-        return serializer;
-    }
+public record CommandInfo<T>(Class<T> type, Function<FriendlyByteBuf, T> deserializer, BiConsumer<FriendlyByteBuf, T> serializer) {
 }

@@ -36,21 +36,18 @@ public class HudRenderHelper {
 
         Quaternion quaternion = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         switch (hudOrientation) {
-            case HUD_SOUTH:
-                matrixStack.mulPose(new Quaternion(new Vector3f(0, 1, 0), -getHudAngle(orientation), true));
-                break;
-            case HUD_TOPLAYER_HORIZ:
-                // @todo 1.15 change to correct quaternion? This is most likely not correct?
-                matrixStack.mulPose(quaternion);   // @todo 1.15 test
+            case HUD_SOUTH -> matrixStack.mulPose(new Quaternion(new Vector3f(0, 1, 0), -getHudAngle(orientation), true));
+            case HUD_TOPLAYER_HORIZ ->
+                    // @todo 1.15 change to correct quaternion? This is most likely not correct?
+                    matrixStack.mulPose(quaternion);   // @todo 1.15 test
+
 //                GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
 //                GlStateManager.rotatef(180, 0.0F, 1.0F, 0.0F);
-                break;
-            case HUD_TOPLAYER:
-                matrixStack.mulPose(quaternion);   // @todo 1.15 test
+            case HUD_TOPLAYER -> matrixStack.mulPose(quaternion);   // @todo 1.15 test
+
 //                GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
 //                GlStateManager.rotatef(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
 //                GlStateManager.rotatef(180, 0.0F, 1.0F, 0.0F);
-                break;
         }
 
         if (hudPlacement == HudPlacement.HUD_FRONT || hudPlacement == HudPlacement.HUD_ABOVE_FRONT) {
@@ -89,19 +86,12 @@ public class HudRenderHelper {
         float f3 = 0.0f;
 
         if (orientation != null) {
-            switch (orientation) {
-                case NORTH:
-                    f3 = 180.0F;
-                    break;
-                case WEST:
-                    f3 = 90.0F;
-                    break;
-                case EAST:
-                    f3 = -90.0F;
-                    break;
-                default:
-                    f3 = 0.0f;
-            }
+            f3 = switch (orientation) {
+                case NORTH -> 180.0F;
+                case WEST -> 90.0F;
+                case EAST -> -90.0F;
+                default -> 0.0f;
+            };
         }
         return f3;
     }

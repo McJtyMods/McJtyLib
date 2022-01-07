@@ -9,6 +9,7 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -92,7 +93,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
             try {
                 Resource resource = Minecraft.getInstance().getResourceManager().getResource(image);
                 bufferedImage = ImageIO.read(resource.getInputStream());
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             }
         }
 
@@ -116,7 +117,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
             RenderSystem.setShaderTexture(0, image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            gui.blit(matrixStack, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
+            GuiComponent.blit(matrixStack, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
         }
     }
 

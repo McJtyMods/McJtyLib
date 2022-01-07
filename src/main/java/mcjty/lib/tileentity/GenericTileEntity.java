@@ -102,73 +102,64 @@ public class GenericTileEntity extends BlockEntity {
                     lazy = LazyOptional.of(() -> instance);
                 }
                 BiFunction<Capability, Direction, LazyOptional> tail = generateCapTests(caps, index + 1);
-                switch (annotation.type()) {
-                    case ITEMS:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case ITEMS_AUTOMATION:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case CONTAINER:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case ENERGY:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityEnergy.ENERGY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case INFUSABLE:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityInfusable.INFUSABLE_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case MODULE:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityModuleSupport.MODULE_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case POWER_INFO:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityPowerInformation.POWER_INFORMATION_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case FLUIDS:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                }
-                throw new RuntimeException("Unknown cap type");
+                return switch (annotation.type()) {
+                    case ITEMS -> (cap, dir) -> {
+                        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+                            return lazy;
+                        } else {
+                            return tail.apply(cap, dir);
+                        }
+                    };
+                    case ITEMS_AUTOMATION -> (cap, dir) -> {
+                        if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+                            return lazy;
+                        } else {
+                            return tail.apply(cap, dir);
+                        }
+                    };
+                    case CONTAINER -> (cap, dir) -> {
+                        if (cap == CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY) {
+                            return lazy;
+                        } else {
+                            return tail.apply(cap, dir);
+                        }
+                    };
+                    case ENERGY -> (cap, dir) -> {
+                        if (cap == CapabilityEnergy.ENERGY) {
+                            return lazy;
+                        } else {
+                            return tail.apply(cap, dir);
+                        }
+                    };
+                    case INFUSABLE -> (cap, dir) -> {
+                        if (cap == CapabilityInfusable.INFUSABLE_CAPABILITY) {
+                            return lazy;
+                        } else {
+                            return tail.apply(cap, dir);
+                        }
+                    };
+                    case MODULE -> (cap, dir) -> {
+                        if (cap == CapabilityModuleSupport.MODULE_CAPABILITY) {
+                            return lazy;
+                        } else {
+                            return tail.apply(cap, dir);
+                        }
+                    };
+                    case POWER_INFO -> (cap, dir) -> {
+                        if (cap == CapabilityPowerInformation.POWER_INFORMATION_CAPABILITY) {
+                            return lazy;
+                        } else {
+                            return tail.apply(cap, dir);
+                        }
+                    };
+                    case FLUIDS -> (cap, dir) -> {
+                        if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+                            return lazy;
+                        } else {
+                            return tail.apply(cap, dir);
+                        }
+                    };
+                };
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -561,7 +552,7 @@ public class GenericTileEntity extends BlockEntity {
         // Cache or use Map?
         for (Map.Entry<String, ValueHolder<?, ?>> entry : getValueMap().entrySet()) {
             ValueHolder value = entry.getValue();
-            if (key.getName().equals(value.getKey().getName())) {
+            if (key.name().equals(value.key().name())) {
                 return value.setter();
             }
         }
@@ -577,7 +568,7 @@ public class GenericTileEntity extends BlockEntity {
      * Call this client-side to this TE to request data from the server
      */
     public void requestDataFromServer(SimpleChannel channel, ICommand command, @Nonnull TypedMap params) {
-        channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command.getName(), params, false));
+        channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command.name(), params, false));
     }
 
     /**

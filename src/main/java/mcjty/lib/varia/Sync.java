@@ -36,7 +36,7 @@ public class Sync {
                 oldValues.clear();
                 for (ValueHolder value : te.getValueMap().values()) {
                     Object v = value.getter().apply(te);
-                    oldValues.put(value.getKey(), v);
+                    oldValues.put(value.key(), v);
                 }
             }
 
@@ -44,7 +44,7 @@ public class Sync {
             public boolean isDirtyAndClear() {
                 for (ValueHolder value : te.getValueMap().values()) {
                     Object v = value.getter().apply(te);
-                    Key<?> key = value.getKey();
+                    Key<?> key = value.key();
                     if (!oldValues.containsKey(key) || !Objects.equals(oldValues.get(key), v)) {
                         // Dirty
                         copyToOld();
@@ -58,14 +58,14 @@ public class Sync {
             public void toBytes(FriendlyByteBuf buf) {
                 for (ValueHolder value : te.getValueMap().values()) {
                     Object v = value.getter().apply(te);
-                    value.getKey().getType().serialize(buf, v);
+                    value.key().type().serialize(buf, v);
                 }
             }
 
             @Override
             public void readBuf(FriendlyByteBuf buf) {
                 for (ValueHolder value : te.getValueMap().values()) {
-                    value.getKey().getType().deserialize(buf, value, te);
+                    value.key().type().deserialize(buf, value, te);
                 }
             }
         };

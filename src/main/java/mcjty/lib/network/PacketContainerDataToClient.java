@@ -14,8 +14,8 @@ import java.util.function.Supplier;
 
 public class PacketContainerDataToClient {
 
-    private ResourceLocation id;
-    private FriendlyByteBuf buffer;
+    private final ResourceLocation id;
+    private final FriendlyByteBuf buffer;
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeResourceLocation(id);
@@ -44,8 +44,7 @@ public class PacketContainerDataToClient {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
             AbstractContainerMenu container = SafeClientTools.getClientPlayer().containerMenu;
-            if (container instanceof GenericContainer) {
-                GenericContainer gc = (GenericContainer) container;
+            if (container instanceof GenericContainer gc) {
                 IContainerDataListener listener = gc.getListener(id);
                 if (listener != null) {
                     listener.readBuf(buffer);

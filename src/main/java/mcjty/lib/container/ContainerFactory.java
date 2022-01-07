@@ -18,7 +18,6 @@ public class ContainerFactory {
     public static final Lazy<ContainerFactory> EMPTY = Lazy.of(() -> new ContainerFactory(0));
 
     private Map<Integer,SlotDefinition> indexToType = new HashMap<>();
-//    private Map<SlotDefinition,SlotRanges> slotRangesMap = new HashMap<>();
     private List<SlotFactory> slots = new ArrayList<>();
 
     public static final String CONTAINER_CONTAINER = "container";
@@ -33,11 +32,6 @@ public class ContainerFactory {
     public int getContainerSlots() {
         return containerSlots;
     }
-
-    // @todo
-//    public Map<SlotDefinition, SlotRanges> getSlotRangesMap() {
-//        return slotRangesMap;
-//    }
 
     public Iterable<SlotFactory> getSlots() {
         return slots;
@@ -105,7 +99,7 @@ public class ContainerFactory {
         SlotRanges ranges = new SlotRanges();
         int idx = 0;
         for (SlotFactory slot : slots) {
-            if (matcher.test(slot.getSlotDefinition())) {
+            if (matcher.test(slot.slotDefinition())) {
                 ranges.addSingle(idx);
             }
             idx++;
@@ -121,13 +115,6 @@ public class ContainerFactory {
         SlotFactory slotFactory = new SlotFactory(slotDefinition, inventoryName, index, x, y);
         int slotIndex = slots.size();
         slots.add(slotFactory);
-
-//        SlotRanges slotRanges = slotRangesMap.get(slotDefinition);
-//        if (slotRanges == null) {
-//            slotRanges = new SlotRanges();
-//            slotRangesMap.put(slotDefinition, slotRanges);
-//        }
-//        slotRanges.addSingle(slotIndex);
         indexToType.put(slotIndex, slotDefinition);
         return this;
     }

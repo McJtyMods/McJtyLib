@@ -18,7 +18,7 @@ import java.util.function.Supplier;
  */
 public class PacketDumpItemInfo {
 
-    private boolean verbose;
+    private final boolean verbose;
 
     public void toBytes(ByteBuf buf) {
         buf.writeBoolean(verbose);

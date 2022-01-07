@@ -197,10 +197,10 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
     public void generateSlots(Player player) {
         for (SlotFactory slotFactory : factory.getSlots()) {
-            IItemHandler inventory = inventories.get(slotFactory.getInventoryName());
-            int index = slotFactory.getIndex();
-            int x = slotFactory.getX();
-            int y = slotFactory.getY();
+            IItemHandler inventory = inventories.get(slotFactory.inventoryName());
+            int index = slotFactory.index();
+            int x = slotFactory.x();
+            int y = slotFactory.y();
             SlotType slotType = slotFactory.getSlotType();
             Slot slot = createSlot(slotFactory, player, inventory, index, x, y, slotType);
             addSlot(slot);
@@ -214,7 +214,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         } else if (slotType == SlotType.SLOT_GHOSTOUT) {
             slot = new GhostOutputSlot(inventory, index, x, y);
         } else if (slotType == SlotType.SLOT_SPECIFICITEM) {
-            final SlotDefinition slotDefinition = slotFactory.getSlotDefinition();
+            final SlotDefinition slotDefinition = slotFactory.slotDefinition();
             slot = new SlotItemHandler(inventory, index, x, y) {
                 @Override
                 public boolean mayPlace(@Nonnull ItemStack stack) {
@@ -223,7 +223,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             };
         } else if (slotType == SlotType.SLOT_CRAFTRESULT) {
             slot = new CraftingSlot(playerEntity, inventory, te, index, x, y)
-                    .onCraft(slotFactory.getSlotDefinition().getOnCraft());
+                    .onCraft(slotFactory.slotDefinition().getOnCraft());
         } else {
             slot = new BaseSlot(inventory, te, index, x, y);
         }
@@ -365,21 +365,13 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                     int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getMaxStackSize());
                     if (mergedSize <= maxStackSize) {
                         par1ItemStack.setCount(0);
-                        if (mergedSize <= 0) {
-                            itemstack1.setCount(0);
-                        } else {
-                            itemstack1.setCount(mergedSize);
-                        }
+                        itemstack1.setCount(Math.max(mergedSize, 0));
                         slot.setChanged();
                         result = true;
                     } else if (itemstack1.getCount() < maxStackSize) {
                         int amount = -(maxStackSize - itemstack1.getCount());
                         par1ItemStack.grow(amount);
-                        if (maxStackSize <= 0) {
-                            itemstack1.setCount(0);
-                        } else {
-                            itemstack1.setCount(maxStackSize);
-                        }
+                        itemstack1.setCount(Math.max(maxStackSize, 0));
                         slot.setChanged();
                         result = true;
                     }
@@ -407,11 +399,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 if (itemstack1.isEmpty() && slot.mayPlace(par1ItemStack)) {
                     ItemStack in = par1ItemStack.copy();
                     int amount1 = Math.min(in.getCount(), slot.getMaxStackSize());
-                    if (amount1 <= 0) {
-                        in.setCount(0);
-                    } else {
-                        in.setCount(amount1);
-                    }
+                    in.setCount(Math.max(amount1, 0));
 
                     slot.set(in);
                     slot.setChanged();

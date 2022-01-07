@@ -19,11 +19,11 @@ import java.util.stream.Stream;
  */
 public class WindowManager {
 
-    private IconManager iconManager = new IconManager(this);
+    private final IconManager iconManager = new IconManager(this);
     private final Screen gui;
 
-    private List<Window> windows = new ArrayList<>();
-    private List<Window> modalWindows = new ArrayList<>();
+    private final List<Window> windows = new ArrayList<>();
+    private final List<Window> modalWindows = new ArrayList<>();
 
     // If -1 it is not this window manager that manages the mousewheel but
     // the window itself
@@ -88,14 +88,14 @@ public class WindowManager {
     }
 
     public <T extends GenericTileEntity> void syncBindings(T te) {
-        windows.stream().forEach(window -> window.syncBindings(te));
-        modalWindows.stream().forEach(window -> window.syncBindings(te));
+        windows.forEach(window -> window.syncBindings(te));
+        modalWindows.forEach(window -> window.syncBindings(te));
     }
 
     public void draw(PoseStack matrixStack) {
         mouseWheel = 0;// @todo 1.14 Mouse.getDWheel();
-        windows.stream().forEach(window -> window.draw(matrixStack));
-        modalWindows.stream().forEach(window -> window.draw(matrixStack));
+        windows.forEach(window -> window.draw(matrixStack));
+        modalWindows.forEach(window -> window.draw(matrixStack));
         iconManager.draw(gui, matrixStack);
     }
 
@@ -165,10 +165,10 @@ public class WindowManager {
     }
 
     public boolean keyTyped(int keyCode, int scanCode) {
-        return getInteractableWindows().allMatch(w -> !w.keyTyped(keyCode, scanCode));
+        return getInteractableWindows().noneMatch(w -> w.keyTyped(keyCode, scanCode));
     }
 
     public boolean charTyped(char codePoint) {
-        return getInteractableWindows().allMatch(w -> !w.charTyped(codePoint));
+        return getInteractableWindows().noneMatch(w -> w.charTyped(codePoint));
     }
 }

@@ -32,7 +32,7 @@ public interface Cached<T> extends Supplier<T> {
 
         @Nullable
         @Override
-        public final T get() {
+        public T get() {
             if (instance == null) {
                 instance = supplier.get();
             }

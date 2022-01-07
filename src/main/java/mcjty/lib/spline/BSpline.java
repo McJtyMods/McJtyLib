@@ -13,18 +13,15 @@ public class BSpline<T> extends Spline<T> {
     }
 
     protected float baseFunction(int i, float t) {
-        switch (i) {
-            case -2:
-                return (((-t + 3) * t - 3) * t + 1) / 6;
-            case -1:
-                return (((3 * t - 6) * t) * t + 4) / 6;
-            case 0:
-                return (((-3 * t + 3) * t + 3) * t + 1) / 6;
-            case 1:
-                return (t * t * t) / 6;
-        }
+        return switch (i) {
+            case -2 -> (((-t + 3) * t - 3) * t + 1) / 6;
+            case -1 -> (((3 * t - 6) * t) * t + 4) / 6;
+            case 0 -> (((-3 * t + 3) * t + 3) * t + 1) / 6;
+            case 1 -> (t * t * t) / 6;
+            default -> 0;
+        };
 
-        return 0;         // We only get here if an invalid i is specified.
+        // We only get here if an invalid i is specified.
     }
 
     @Override

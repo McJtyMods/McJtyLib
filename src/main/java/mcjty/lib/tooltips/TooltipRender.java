@@ -36,8 +36,7 @@ public class TooltipRender {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getInstance();
         ItemStack stack = event.getItemStack();
-        if (stack.getItem() instanceof ITooltipExtras) {
-            ITooltipExtras extras = (ITooltipExtras) stack.getItem();
+        if (stack.getItem() instanceof ITooltipExtras extras) {
             List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
             if (!items.isEmpty()) {
                 List<Component> tooltip = event.getToolTip();
@@ -73,7 +72,7 @@ public class TooltipRender {
         lastUsedTooltipItem = settings;
         if (settings != null) {
             ManualEntry entry = settings.getManualEntry();
-            if (entry.getManual() != null) {
+            if (entry.manual() != null) {
                 if (KeyBindings.openManual != null) {
                     if (!SafeClientTools.isSneaking()) {
                         String translationKey = KeyBindings.openManual.saveString();

@@ -21,10 +21,10 @@ import java.util.function.Supplier;
  */
 public class PacketServerCommandTyped {
 
-    protected BlockPos pos;
-    protected ResourceKey<Level> dimensionId;
-    protected String command;
-    protected TypedMap params;
+    private final BlockPos pos;
+    private final ResourceKey<Level> dimensionId;
+    private final String command;
+    private final TypedMap params;
 
     public PacketServerCommandTyped(FriendlyByteBuf buf) {
         pos = buf.readBlockPos();
@@ -70,9 +70,8 @@ public class PacketServerCommandTyped {
                 return;
             }
             if (world.hasChunkAt(pos)) {
-                BlockEntity te = world.getBlockEntity(pos);
-                if (te instanceof GenericTileEntity) {
-                    if (((GenericTileEntity) te).executeServerCommand(command, playerEntity, params)) {
+                if (world.getBlockEntity(pos) instanceof GenericTileEntity generic) {
+                    if (generic.executeServerCommand(command, playerEntity, params)) {
                         return;
                     }
                 }

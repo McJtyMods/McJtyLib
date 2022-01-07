@@ -6,7 +6,6 @@ package mcjty.lib.gui;
 public interface Scrollable {
     /**
      * Get the maximum amount of items.
-     * @return
      */
     int getMaximum();
 

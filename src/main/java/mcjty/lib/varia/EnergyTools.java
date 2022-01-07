@@ -17,22 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class EnergyTools {
 
-    public static class EnergyLevel {
-        private final long energy;
-        private final long maxEnergy;
-
-        public EnergyLevel(long energy, long maxEnergy) {
-            this.energy = energy;
-            this.maxEnergy = maxEnergy;
-        }
-
-        public long getEnergy() {
-            return energy;
-        }
-
-        public long getMaxEnergy() {
-            return maxEnergy;
-        }
+    public record EnergyLevel(long energy, long maxEnergy) {
     }
 
     public static boolean isEnergyTE(BlockEntity te, @Nullable Direction side) {

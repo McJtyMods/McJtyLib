@@ -76,7 +76,7 @@ public class CustomRenderTypes extends RenderType {
             DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, VertexFormat.Mode.QUADS, 2097152, true, false,
             CompositeState.builder()
                     .setTextureState(NO_TEXTURE)
-                    .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
+                    .setShaderState(POSITION_COLOR_LIGHTMAP_SHADER)
                     .setLightmapState(LIGHTMAP)
                     .createCompositeState(false));
 

@@ -19,7 +19,7 @@ public class ResultCommand<TE extends GenericTileEntity> implements ICommand {
     }
 
     @Override
-    public String getName() {
+    public String name() {
         return name;
     }
 

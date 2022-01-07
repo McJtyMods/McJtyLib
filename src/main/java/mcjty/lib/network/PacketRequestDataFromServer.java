@@ -22,10 +22,10 @@ import java.util.function.Supplier;
  */
 public class PacketRequestDataFromServer {
     protected BlockPos pos;
-    private ResourceKey<Level> type;
+    private final ResourceKey<Level> type;
     protected String command;
     protected TypedMap params;
-    private boolean dummy;
+    private final boolean dummy;
 
     public PacketRequestDataFromServer(FriendlyByteBuf buf) {
         pos = buf.readBlockPos();
@@ -54,7 +54,7 @@ public class PacketRequestDataFromServer {
     public PacketRequestDataFromServer(ResourceKey<Level> type, BlockPos pos, ICommand command, TypedMap params, boolean dummy) {
         this.type = type;
         this.pos = pos;
-        this.command = command.getName();
+        this.command = command.name();
         this.params = params;
         this.dummy = dummy;
     }
@@ -64,10 +64,8 @@ public class PacketRequestDataFromServer {
         ctx.enqueueWork(() -> {
             Level world = LevelTools.getLevel(ctx.getSender().getCommandSenderWorld(), type);
             if (world.hasChunkAt(pos)) {
-                BlockEntity te = world.getBlockEntity(pos);
-
-                if (te instanceof GenericTileEntity) {
-                    TypedMap result = ((GenericTileEntity) te).executeServerCommandWR(command, ctx.getSender(), params);
+                if (world.getBlockEntity(pos) instanceof GenericTileEntity generic) {
+                    TypedMap result = generic.executeServerCommandWR(command, ctx.getSender(), params);
                     if (result != null) {
                         PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
                         channel.sendTo(msg, ctx.getSender().connection.connection, NetworkDirection.PLAY_TO_CLIENT);

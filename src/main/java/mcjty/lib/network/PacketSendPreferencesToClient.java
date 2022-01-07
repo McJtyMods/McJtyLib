@@ -8,10 +8,10 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class PacketSendPreferencesToClient {
-    private BuffStyle buffStyle;
-    private int buffX;
-    private int buffY;
-    private GuiStyle style;
+    private final BuffStyle buffStyle;
+    private final int buffX;
+    private final int buffY;
+    private final GuiStyle style;
 
     public PacketSendPreferencesToClient(ByteBuf buf) {
         buffStyle = BuffStyle.values()[buf.readInt()];

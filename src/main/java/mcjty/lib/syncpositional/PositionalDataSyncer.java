@@ -1,16 +1,16 @@
 package mcjty.lib.syncpositional;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -107,7 +107,7 @@ public class PositionalDataSyncer {
         if (timeout < 0) {
             timeout = 10;   // @todo configurable
             for (Map.Entry<PositionalDataKey, IPositionalData> entry : syncTodo.entrySet()) {
-                GlobalPos pos = entry.getKey().getPos();
+                GlobalPos pos = entry.getKey().pos();
                 McJtyLib.networkHandler.send(PacketDistributor.TRACKING_CHUNK.with(() -> {
                     ServerLevel level = server.getLevel(pos.dimension());
                     return (LevelChunk)(level.getChunk(pos.pos()));
@@ -127,7 +127,7 @@ public class PositionalDataSyncer {
         if (runnableMap != null) {
             GlobalPos pos = GlobalPos.of(player.level.dimension(), blockPos);
             for (Map.Entry<PositionalDataKey, Runnable> entry : runnableMap.entrySet()) {
-                if (pos.equals(entry.getKey().getPos())) {
+                if (pos.equals(entry.getKey().pos())) {
                     entry.getValue().run();
                 }
             }

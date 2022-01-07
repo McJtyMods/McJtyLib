@@ -74,13 +74,13 @@ public class PacketGetListFromServer {
             ServerLevel world = LevelTools.getLevel(ctx.getSender().getCommandSenderWorld(), dimension);
             if (world.hasChunkAt(pos)) {
                 BlockEntity te = world.getBlockEntity(pos);
-                if (te instanceof GenericTileEntity) {
+                if (te instanceof GenericTileEntity generic) {
                     CommandInfo<?> info = McJtyLib.getCommandInfo(command);
                     if (info == null) {
                         throw new IllegalStateException("Command '" + command + "' is not registered!");
                     }
-                    Class type = info.getType();
-                    List list = ((GenericTileEntity) te).executeServerCommandList(command, player, params, type);
+                    Class type = info.type();
+                    List list = generic.executeServerCommandList(command, player, params, type);
                     McJtyLib.networkHandler.sendTo(new PacketSendResultToClient(pos, command, list), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                 } else {
                     Logging.logError("Command '" + command + "' not handled!");

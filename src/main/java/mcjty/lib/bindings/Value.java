@@ -12,29 +12,9 @@ import java.util.function.Function;
  * Declare this as a static field in your GenericTileEntity and annotate with @Val to make this
  * a client <-> gui synced value
  */
-public class Value<T extends GenericTileEntity, V> {
-
-    private final Key<V> key;
-    private final Function<T, V> supplier;
-    private final BiConsumer<T, V> consumer;
-
-    private Value(Key<V> key, Function<T, V> supplier, BiConsumer<T, V> consumer) {
-        this.key = key;
-        this.supplier = supplier;
-        this.consumer = consumer;
-    }
-
-    public Key<V> getKey() {
-        return key;
-    }
-
-    public Function<T, V> getSupplier() {
-        return supplier;
-    }
-
-    public BiConsumer<T, V> getConsumer() {
-        return consumer;
-    }
+public record Value<T extends GenericTileEntity, V>(Key<V> key,
+                                                    Function<T, V> supplier,
+                                                    BiConsumer<T, V> consumer) {
 
     /// Create a value with a getter and setter
     public static <TT extends GenericTileEntity, VV> Value<TT, VV> create(String name, Type<VV> type, Function<TT, VV> supplier, BiConsumer<TT, VV> consumer) {

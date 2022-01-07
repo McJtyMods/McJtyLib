@@ -76,7 +76,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
     // Get logic slab models indexed by the logic facing rotation step
     public ModelFile[] getLogicSlabModels(String modelPrefix, ResourceLocation topTexture) {
-        ModelFile models[] = new ModelFile[4];
+        ModelFile[] models = new ModelFile[4];
         models[0] = logicSlabModel(modelPrefix + "_0", topTexture, ModelBuilder.FaceRotation.ZERO);
         models[1] = logicSlabModel(modelPrefix + "_1", topTexture, ModelBuilder.FaceRotation.UPSIDE_DOWN);
         models[2] = logicSlabModel(modelPrefix + "_2", topTexture, ModelBuilder.FaceRotation.COUNTERCLOCKWISE_90);
@@ -107,27 +107,25 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     }
 
     public int getXRotation(Direction direction) {
-        switch (direction) {
-            case DOWN: return 0;
-            case UP: return 180;
-            case NORTH: return -90;
-            case SOUTH: return 90;
-            case WEST: return 90;
-            case EAST: return 90;
-        }
-        return 0;
+        return switch (direction) {
+            case DOWN -> 0;
+            case UP -> 180;
+            case NORTH -> -90;
+            case SOUTH -> 90;
+            case WEST -> 90;
+            case EAST -> 90;
+        };
     }
 
     public int getYRotation(Direction direction) {
-        switch (direction) {
-            case DOWN: return 0;
-            case UP: return 0;
-            case NORTH: return 0;
-            case SOUTH: return 0;
-            case WEST: return 90;
-            case EAST: return 270;
-        }
-        return 0;
+        return switch (direction) {
+            case DOWN -> 0;
+            case UP -> 0;
+            case NORTH -> 0;
+            case SOUTH -> 0;
+            case WEST -> 90;
+            case EAST -> 270;
+        };
     }
 
     public void applyRotation(ConfiguredModel.Builder<?> builder, Direction direction) {
@@ -164,15 +162,9 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
     private void applyHorizRotationBld(ConfiguredModel.Builder<VariantBlockStateBuilder> builder, Direction direction) {
         switch (direction) {
-            case SOUTH:
-                builder.rotationY(180);
-                break;
-            case WEST:
-                builder.rotationY(270);
-                break;
-            case EAST:
-                builder.rotationY(90);
-                break;
+            case SOUTH -> builder.rotationY(180);
+            case WEST -> builder.rotationY(270);
+            case EAST -> builder.rotationY(90);
         }
     }
 

@@ -1,13 +1,13 @@
 package mcjty.lib.crafting;
 
 import mcjty.lib.setup.Registration;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 
 import javax.annotation.Nonnull;
 
@@ -26,11 +26,11 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
             ItemStack stack = inv.getItem(i);
 
             INBTPreservingIngredient inbt = null;
-            if (stack.getItem() instanceof INBTPreservingIngredient) {
-                inbt = (INBTPreservingIngredient) stack.getItem();
-            } else if (stack.getItem() instanceof BlockItem) {
-                if (((BlockItem)stack.getItem()).getBlock() instanceof INBTPreservingIngredient) {
-                    inbt = (INBTPreservingIngredient) ((BlockItem)stack.getItem()).getBlock();
+            if (stack.getItem() instanceof INBTPreservingIngredient ingredient) {
+                inbt = ingredient;
+            } else if (stack.getItem() instanceof BlockItem blockItem) {
+                if (blockItem.getBlock() instanceof INBTPreservingIngredient ingredient) {
+                    inbt = ingredient;
                 }
             }
 

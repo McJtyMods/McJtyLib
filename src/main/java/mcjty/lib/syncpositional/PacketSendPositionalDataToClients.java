@@ -16,8 +16,8 @@ import java.util.function.Supplier;
  */
 public class PacketSendPositionalDataToClients {
 
-    private GlobalPos pos;
-    private IPositionalData data;
+    private final GlobalPos pos;
+    private final IPositionalData data;
 
     public PacketSendPositionalDataToClients(GlobalPos pos, IPositionalData data) {
         this.pos = pos;

@@ -17,7 +17,7 @@ public class HorizontalLayout extends AbstractLayout<HorizontalLayout> {
             if (w == Widget.SIZE_UNKNOWN) {
                 w = otherWidth;
             }
-            ((AbstractWidget)child).setBounds(align(left, getVerticalMargin(), w, height-getVerticalMargin()*2, child));
+            ((AbstractWidget<?>)child).setBounds(align(left, getVerticalMargin(), w, height-getVerticalMargin()*2, child));
             left += w;
             left += getSpacing();
         }

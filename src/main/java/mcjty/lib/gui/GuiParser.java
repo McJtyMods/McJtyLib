@@ -225,10 +225,8 @@ public class GuiParser {
 "        }");
 
         try {
-            parse(reader).stream().forEach(command -> command.dump(1));
-        } catch (IOException e) {
-            Logging.logError("Error parsing!", e);
-        } catch (ParserException e) {
+            parse(reader).forEach(command -> command.dump(1));
+        } catch (IOException | ParserException e) {
             Logging.logError("Error parsing!", e);
         }
     }

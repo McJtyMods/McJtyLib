@@ -79,30 +79,30 @@ public class RenderHelper {
 
     public static void renderNorthSouthQuad(VertexConsumer builder, Matrix4f matrix, TextureAtlasSprite sprite, ModelBuilder.FaceRotation rotation, float offset) {
         switch (rotation) {
-            case ZERO:
+            case ZERO -> {
                 RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getU0(), sprite.getV1());
                 RenderHelper.vt(builder, matrix, 1, 1, .73f, sprite.getU1(), sprite.getV1());
                 RenderHelper.vt(builder, matrix, 1, 0, .73f, sprite.getU1(), sprite.getV0());
                 RenderHelper.vt(builder, matrix, 0, 0, .73f, sprite.getU0(), sprite.getV0());
-                break;
-            case CLOCKWISE_90:
+            }
+            case CLOCKWISE_90 -> {
                 RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getU1(), sprite.getV0());
                 RenderHelper.vt(builder, matrix, 1, 1, .73f, sprite.getU0(), sprite.getV0());
                 RenderHelper.vt(builder, matrix, 1, 0, .73f, sprite.getU0(), sprite.getV1());
                 RenderHelper.vt(builder, matrix, 0, 0, .73f, sprite.getU1(), sprite.getV1());
-                break;
-            case UPSIDE_DOWN:
+            }
+            case UPSIDE_DOWN -> {
                 RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getU0(), sprite.getV0());
                 RenderHelper.vt(builder, matrix, 1, 1, .73f, sprite.getU0(), sprite.getV1());
                 RenderHelper.vt(builder, matrix, 1, 0, .73f, sprite.getU1(), sprite.getV1());
                 RenderHelper.vt(builder, matrix, 0, 0, .73f, sprite.getU1(), sprite.getV0());
-                break;
-            case COUNTERCLOCKWISE_90:
+            }
+            case COUNTERCLOCKWISE_90 -> {
                 RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getU1(), sprite.getV1());
                 RenderHelper.vt(builder, matrix, 1, 1, .73f, sprite.getU1(), sprite.getV0());
                 RenderHelper.vt(builder, matrix, 1, 0, .73f, sprite.getU0(), sprite.getV0());
                 RenderHelper.vt(builder, matrix, 0, 0, .73f, sprite.getU0(), sprite.getV1());
-                break;
+            }
         }
     }
 
@@ -889,24 +889,12 @@ public class RenderHelper {
 
     public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Direction side, boolean opposite, float offset, RenderSettings settings) {
         switch (side) {
-            case DOWN:
-                drawQuad(matrix, buffer, sprite, new Vector3f(0, offset, 1), new Vector3f(1, offset, 1), new Vector3f(1, offset, 0), new Vector3f(0, offset, 0), opposite, settings);
-                break;
-            case UP:
-                drawQuad(matrix, buffer, sprite, new Vector3f(1, 1-offset, 1), new Vector3f(0, 1-offset, 1), new Vector3f(0, 1-offset, 0), new Vector3f(1, 1-offset, 0), opposite, settings);
-                break;
-            case NORTH:
-                drawQuad(matrix, buffer, sprite, new Vector3f(0, 0, offset), new Vector3f(1, 0, offset), new Vector3f(1, 1, offset), new Vector3f(0, 1, offset), opposite, settings);
-                break;
-            case SOUTH:
-                drawQuad(matrix, buffer, sprite, new Vector3f(0, 1, 1-offset), new Vector3f(1, 1, 1-offset), new Vector3f(1, 0, 1-offset), new Vector3f(0, 0, 1-offset), opposite, settings);
-                break;
-            case WEST:
-                drawQuad(matrix, buffer, sprite, new Vector3f(offset, 0, 0), new Vector3f(offset, 1, 0), new Vector3f(offset, 1, 1), new Vector3f(offset, 0, 1), opposite, settings);
-                break;
-            case EAST:
-                drawQuad(matrix, buffer, sprite, new Vector3f(1-offset, 0, 1), new Vector3f(1-offset, 1, 1), new Vector3f(1-offset, 1, 0), new Vector3f(1-offset, 0, 0), opposite, settings);
-                break;
+            case DOWN -> drawQuad(matrix, buffer, sprite, new Vector3f(0, offset, 1), new Vector3f(1, offset, 1), new Vector3f(1, offset, 0), new Vector3f(0, offset, 0), opposite, settings);
+            case UP -> drawQuad(matrix, buffer, sprite, new Vector3f(1, 1 - offset, 1), new Vector3f(0, 1 - offset, 1), new Vector3f(0, 1 - offset, 0), new Vector3f(1, 1 - offset, 0), opposite, settings);
+            case NORTH -> drawQuad(matrix, buffer, sprite, new Vector3f(0, 0, offset), new Vector3f(1, 0, offset), new Vector3f(1, 1, offset), new Vector3f(0, 1, offset), opposite, settings);
+            case SOUTH -> drawQuad(matrix, buffer, sprite, new Vector3f(0, 1, 1 - offset), new Vector3f(1, 1, 1 - offset), new Vector3f(1, 0, 1 - offset), new Vector3f(0, 0, 1 - offset), opposite, settings);
+            case WEST -> drawQuad(matrix, buffer, sprite, new Vector3f(offset, 0, 0), new Vector3f(offset, 1, 0), new Vector3f(offset, 1, 1), new Vector3f(offset, 0, 1), opposite, settings);
+            case EAST -> drawQuad(matrix, buffer, sprite, new Vector3f(1 - offset, 0, 1), new Vector3f(1 - offset, 1, 1), new Vector3f(1 - offset, 1, 0), new Vector3f(1 - offset, 0, 0), opposite, settings);
         }
     }
 
@@ -960,18 +948,15 @@ public class RenderHelper {
                     break;
                 case UV:
                     switch (elements.get(e).getIndex()) {
-                        case 0:
+                        case 0 -> {
                             float iu = sprite.getU(u);
                             float iv = sprite.getV(v);
                             builder.put(e, iu, iv);
-                            break;
-                        case 2:
-                            builder.put(e, (short) 0, (short) 0);
+                        }
+                        case 2 -> builder.put(e, (short) 0, (short) 0);
+
 //                            builder.put(e, 0f, 1f);
-                            break;
-                        default:
-                            builder.put(e);
-                            break;
+                        default -> builder.put(e);
                     }
                     break;
                 case NORMAL:

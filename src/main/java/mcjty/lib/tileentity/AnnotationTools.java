@@ -28,7 +28,7 @@ public class AnnotationTools {
         scanGuiValues(clazz, holder);
         scanCaps(clazz, holder);
 
-        holder.valueMap.put(GenericTileEntity.VALUE_RSMODE.getName(), new ValueHolder<>(GenericTileEntity.VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
+        holder.valueMap.put(GenericTileEntity.VALUE_RSMODE.name(), new ValueHolder<>(GenericTileEntity.VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
         return holder;
     }
 
@@ -46,20 +46,17 @@ public class AnnotationTools {
             ServerCommand serverCommand = field.getAnnotation(ServerCommand.class);
             try {
                 Object o = field.get(null);
-                if (o instanceof Command) {
-                    Command cmd = (Command) o;
-                    holder.serverCommands.put(cmd.getName(), cmd.getCmd());
-                } else if (o instanceof ResultCommand) {
-                    ResultCommand cmd = (ResultCommand) o;
-                    holder.serverCommandsWithResult.put(cmd.getName(), cmd.getCmd());
-                    holder.clientCommands.put(cmd.getName(), cmd.getClientCommand());
-                } else if (o instanceof ListCommand) {
-                    ListCommand cmd = (ListCommand) o;
-                    holder.serverCommandsWithListResult.put(cmd.getName(), cmd.getCmd());
-                    holder.clientCommandsWithList.put(cmd.getName(), cmd.getClientCommand());
+                if (o instanceof Command cmd) {
+                    holder.serverCommands.put(cmd.name(), cmd.cmd());
+                } else if (o instanceof ResultCommand cmd) {
+                    holder.serverCommandsWithResult.put(cmd.name(), cmd.getCmd());
+                    holder.clientCommands.put(cmd.name(), cmd.getClientCommand());
+                } else if (o instanceof ListCommand cmd) {
+                    holder.serverCommandsWithListResult.put(cmd.name(), cmd.cmd());
+                    holder.clientCommandsWithList.put(cmd.name(), cmd.clientCommand());
                     if (serverCommand.type() != void.class) {
                         ISerializer instance = getSerializer(serverCommand);
-                        McJtyLib.registerListCommandInfo(cmd.getName(), serverCommand.type(), instance.getDeserializer(), instance.getSerializer());
+                        McJtyLib.registerListCommandInfo(cmd.name(), serverCommand.type(), instance.getDeserializer(), instance.getSerializer());
                     }
                 } else {
                     throw new IllegalStateException("Only use @ServerCommand with either a Command, a ListCommand or a ResultCommand!");
@@ -82,7 +79,7 @@ public class AnnotationTools {
                     // The field is not static. We assume it is a regular instance field
                     value = setupInstanceValue(field, val);
                 }
-                holder.valueMap.put(value.getKey().getName(), new ValueHolder<>(value.getKey(), value.getSupplier(), value.getConsumer()));
+                holder.valueMap.put(value.key().name(), new ValueHolder<>(value.key(), value.supplier(), value.consumer()));
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

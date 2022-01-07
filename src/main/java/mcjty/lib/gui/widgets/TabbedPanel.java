@@ -13,7 +13,7 @@ public class TabbedPanel extends AbstractContainerWidget<Panel> {
     public static final String TYPE_TABBEDPANEL = "tabbedpanel";
 
     private Widget<?> current = null;
-    private Map<String,Widget<?>> pages = new HashMap<>();
+    private final Map<String,Widget<?>> pages = new HashMap<>();
 
     public TabbedPanel page(String name, Widget<?> child) {
         children(child);

@@ -19,7 +19,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
 
     private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
-    private ItemStackList stacks;
+    private final ItemStackList stacks;
 
     public static BiPredicate<Integer, ItemStack> slot(int s) {
         return (slot, stack) -> slot == s;
@@ -189,11 +189,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
         } else {
             stacks.set(index, stack);
             if (!stack.isEmpty() && stack.getCount() > stackLimit) {
-                if (stackLimit <= 0) {
-                    stack.setCount(0);
-                } else {
-                    stack.setCount(stackLimit);
-                }
+                stack.setCount(Math.max(stackLimit, 0));
             }
             tileEntity.setChanged();
         }

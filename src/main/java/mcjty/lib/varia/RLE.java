@@ -2,7 +2,7 @@ package mcjty.lib.varia;
 
 public class RLE {
 
-    private FastByteArray stream = new FastByteArray();
+    private final FastByteArray stream = new FastByteArray();
     private byte[] data = null;
     private int cnt = 0;
     private int prev = -1;

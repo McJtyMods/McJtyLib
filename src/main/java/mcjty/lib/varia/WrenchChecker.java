@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WrenchChecker {
 
@@ -15,10 +16,10 @@ public class WrenchChecker {
 
     public static boolean isAWrench(Item item) {
         if (wrenches == null) {
-            wrenches = Arrays.<String>asList(
+            wrenches = Stream.of(
                     "rftoolsbase:smartwrench",
                     "rftoolsbase:smartwrench_select"
-            ).stream().map(ResourceLocation::new).collect(Collectors.toSet());
+            ).map(ResourceLocation::new).collect(Collectors.toSet());
         }
         if (wrenches.contains(item.getRegistryName())) {
             return true;

@@ -16,9 +16,9 @@ import java.util.function.Supplier;
 public class PacketSendServerCommand {
 
     // Package visible for unit tests
-    String modid;
-    String command;
-    TypedMap arguments;
+    private final String modid;
+    private final String command;
+    private final TypedMap arguments;
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeUtf(modid);

@@ -41,7 +41,6 @@ public class TagSelectorWindow {
      */
     public void create(Window parentWindow, String type, Consumer<String> tagSetter, Supplier<String> tagGetter,
                        boolean onlyDoubleClick) {
-        Minecraft mc = Minecraft.getInstance();
         Screen gui = parentWindow.getWindowManager().getGui();
         this.tagSetter = tagSetter;
         this.tagGetter = tagGetter;

@@ -52,7 +52,7 @@ public class Window {
 
     private final Map<String, List<ChannelEvent>> channelEvents = new HashMap<>();
     private final Map<Widget, Function> bindings = new HashMap<>();
-    private Set<Integer> activeFlags = new HashSet<>();
+    private final Set<Integer> activeFlags = new HashSet<>();
 
     private List<FocusEvent> focusEvents = null;
 
@@ -276,7 +276,7 @@ public class Window {
     }
 
     public <T extends GenericTileEntity> void syncBindings(T te) {
-        bindings.entrySet().stream().forEach(entry -> entry.getKey().setGenericValue(entry.getValue().apply(te)));
+        bindings.entrySet().forEach(entry -> entry.getKey().setGenericValue(entry.getValue().apply(te)));
     }
 
     public void draw(PoseStack matrixStack) {
@@ -335,10 +335,7 @@ public class Window {
         int y = getRelativeY();
         if (toplevel.in(x, y) && toplevel.isVisible()) {
             Widget<?> w = toplevel.getWidgetAtPosition(x, y);
-            List<ItemStack> tooltips = w.getTooltipItems();
-            if (tooltips != null) {
-                return tooltips;
-            }
+            return w.getTooltipItems();
         }
         return null;
     }
@@ -386,7 +383,7 @@ public class Window {
         return this;
     }
     public <T extends GenericTileEntity> Window action(SimpleChannel network, String componentName, T te, Command<?> command) {
-        return action(network, componentName, te, command.getName());
+        return action(network, componentName, te, command.name());
     }
 
     public <T extends GenericTileEntity> Window action(SimpleChannel network, String componentName, T te, String keyName) {
@@ -436,7 +433,7 @@ public class Window {
         bindings.put(component, value.getter());
 
         event(componentName, (source, params) -> {
-            Type<V> type = value.getKey().getType();
+            Type<V> type = value.key().type();
             // @todo this conversion can fail!
             V converted = type.convert(component.getGenericValue(type));
 
@@ -444,9 +441,9 @@ public class Window {
             value.setter().accept(te, converted);
 
             GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
-            guiContainer.sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING.getName(),
+            guiContainer.sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING.name(),
                     TypedMap.builder()
-                            .put(value.getKey(), converted)
+                            .put(value.key(), converted)
                             .build());
 
         });

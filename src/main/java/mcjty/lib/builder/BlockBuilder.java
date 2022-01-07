@@ -13,11 +13,12 @@ public class BlockBuilder {
 
     public static final BlockBehaviour.Properties STANDARD_IRON = BlockBehaviour.Properties.of(Material.METAL)
             .strength(2.0f)
+            .requiresCorrectToolForDrops()
             .sound(SoundType.METAL);
 
     private BlockBehaviour.Properties properties = STANDARD_IRON;
     private boolean infusable = false;
-    private TooltipBuilder tooltipBuilder = new TooltipBuilder();
+    private final TooltipBuilder tooltipBuilder = new TooltipBuilder();
     private BlockEntityType.BlockEntitySupplier<BlockEntity> tileEntitySupplier;
     private TOPDriver topDriver = McJtyLibTOPDriver.DRIVER;
     private ManualEntry manualEntry = ManualEntry.EMPTY;

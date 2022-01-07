@@ -19,9 +19,9 @@ import java.util.Set;
  * more complicated table with images and descriptions.
  */
 public interface Widget<P extends Widget<P>> {
-    static final int SIZE_UNKNOWN = -1;
+    int SIZE_UNKNOWN = -1;
 
-    static enum Dimension {
+    enum Dimension {
         DIMENSION_WIDTH,
         DIMENSION_HEIGHT
     }
@@ -54,8 +54,6 @@ public interface Widget<P extends Widget<P>> {
 
     /**
      * Version of getDesiredWidth/getDesiredHeight that accepts a dimension parameter.
-     * @param dimension
-     * @return
      */
     int getDesiredSize(Dimension dimension);
 
@@ -82,7 +80,6 @@ public interface Widget<P extends Widget<P>> {
 
     /**
      * Set itemstacks that the tooltips can use with @<index> notation
-     * @return
      */
     P tooltipItems(ItemStack... items);
 
@@ -121,7 +118,6 @@ public interface Widget<P extends Widget<P>> {
     /**
      * Get the bounds for this widget relative to the parents coordinate system.
      * Can be null in case the layout for this widget hasn't been set yet.
-     * @return
      */
     Rectangle getBounds();
 
@@ -134,8 +130,6 @@ public interface Widget<P extends Widget<P>> {
      * Find the widget at the given position. It can be assumed in this function that it
      * is only called for valid coordaintes that are guaranteed to be in this widget. So widgets
      * that don't have children should just return themselves.
-     * @param x
-     * @param y
      */
     Widget<?> getWidgetAtPosition(double x, double y);
 
@@ -156,62 +150,40 @@ public interface Widget<P extends Widget<P>> {
     /**
      * Handle a mouse click for this widget. This widget does not have to check if the coordinate is
      * in the bounds. The given coordinates are relative to the parent of this widget.
-     *
-     *
-     * @param x
-     * @param y
-     * @param button
      * @return a reference to the widget that wants focus (or null if not)
      */
     Widget<?> mouseClick(double x, double y, int button);
 
     /**
      * Handle a mouse release for this widget.
-     * @param x
-     * @param y
-     * @param button
      */
     void mouseRelease(double x, double y, int button);
 
     /**
      * Handle a mouse move event.
-     * @param x
-     * @param y
      */
     void mouseMove(double x, double y);
 
     /**
      * Handle mousewheel.
-     *
-     *
-     * @param x
-     * @param y
-     * @param amount
      * @return true if handled
      */
     boolean mouseScrolled(double x, double y, double amount);
 
     /**
      * Handle a keyboard event.
-     *
-     * @param keyCode
-     * @param scanCode
      * @return true if key was handled
      */
     boolean keyTyped(int keyCode, int scanCode);
 
     /**
      * Handle a keyboard event.
-     *
-     * @param codePoint
      * @return true if key was handled
      */
     boolean charTyped(char codePoint);
 
     /**
      * Some layout managers need a layout hint.
-     *
-     * @param hint
      * @return this widget
      */
     P hint(LayoutHint hint);

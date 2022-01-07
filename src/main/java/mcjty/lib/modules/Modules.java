@@ -15,14 +15,14 @@ public class Modules {
     }
 
     public void init(FMLCommonSetupEvent event) {
-        modules.stream().forEach(m -> m.init(event));
+        modules.forEach(m -> m.init(event));
     }
 
     public void initClient(FMLClientSetupEvent event) {
-        modules.stream().forEach(m -> m.initClient(event));
+        modules.forEach(m -> m.initClient(event));
     }
 
     public void initConfig() {
-        modules.stream().forEach(IModule::initConfig);
+        modules.forEach(IModule::initConfig);
     }
 }

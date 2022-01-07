@@ -2,12 +2,11 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.client.GuiTools;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.locale.Language;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class GuiItemScreen extends Screen {
         this.network = network;
         this.xSize = xSize;
         this.ySize = ySize;
-        sideWindow = new GuiSideWindow(manualEntry.getManual(), manualEntry.getEntry(), manualEntry.getPage());
+        sideWindow = new GuiSideWindow(manualEntry.manual(), manualEntry.entry(), manualEntry.page());
     }
 
     @Override
@@ -93,7 +92,6 @@ public class GuiItemScreen extends Screen {
         window.draw(matrixStack);
         sideWindow.getWindow().draw(matrixStack);
         List<String> tooltips = window.getTooltips();
-        Minecraft mc = getMinecraft();
         if (tooltips != null) {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);

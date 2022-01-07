@@ -144,20 +144,14 @@ public class TypedMapTools {
     public static void writeArguments(FriendlyByteBuf buf, TypedMap args) {
         buf.writeInt(args.size());
         for (Key<?> key : args.getKeys()) {
-            buf.writeUtf(key.getName());
-            ArgumentType argumentType = getArgumentType(key.getType());
+            buf.writeUtf(key.name());
+            ArgumentType argumentType = getArgumentType(key.type());
             buf.writeByte(argumentType.ordinal());
             switch (argumentType) {
-                case TYPE_STRING:
-                    NetworkTools.writeStringUTF8(buf, (String)args.get(key));
-                    break;
-                case TYPE_UUID:
-                    buf.writeUUID((UUID) args.get(key));
-                    break;
-                case TYPE_INTEGER:
-                    buf.writeInt((Integer) args.get(key));
-                    break;
-                case TYPE_DIMENSION_TYPE: {
+                case TYPE_STRING -> NetworkTools.writeStringUTF8(buf, (String) args.get(key));
+                case TYPE_UUID -> buf.writeUUID((UUID) args.get(key));
+                case TYPE_INTEGER -> buf.writeInt((Integer) args.get(key));
+                case TYPE_DIMENSION_TYPE -> {
                     ResourceKey<Level> type = (ResourceKey<Level>) args.get(key);
                     if (type != null) {
                         buf.writeBoolean(true);
@@ -165,9 +159,8 @@ public class TypedMapTools {
                     } else {
                         buf.writeBoolean(false);
                     }
-                    break;
                 }
-                case TYPE_BLOCKPOS: {
+                case TYPE_BLOCKPOS -> {
                     BlockPos pos = (BlockPos) args.get(key);
                     if (pos != null) {
                         buf.writeBoolean(true);
@@ -175,18 +168,11 @@ public class TypedMapTools {
                     } else {
                         buf.writeBoolean(false);
                     }
-                    break;
                 }
-                case TYPE_BOOLEAN:
-                    buf.writeBoolean((Boolean) args.get(key));
-                    break;
-                case TYPE_DOUBLE:
-                    buf.writeDouble((Double) args.get(key));
-                    break;
-                case TYPE_FLOAT:
-                    buf.writeFloat((Float) args.get(key));
-                    break;
-                case TYPE_STACK: {
+                case TYPE_BOOLEAN -> buf.writeBoolean((Boolean) args.get(key));
+                case TYPE_DOUBLE -> buf.writeDouble((Double) args.get(key));
+                case TYPE_FLOAT -> buf.writeFloat((Float) args.get(key));
+                case TYPE_STACK -> {
                     ItemStack stack = (ItemStack) args.get(key);
                     if (stack != null) {
                         buf.writeBoolean(true);
@@ -194,12 +180,9 @@ public class TypedMapTools {
                     } else {
                         buf.writeBoolean(false);
                     }
-                    break;
                 }
-                case TYPE_LONG:
-                    buf.writeLong((Long) args.get(key));
-                    break;
-                case TYPE_STRING_LIST: {
+                case TYPE_LONG -> buf.writeLong((Long) args.get(key));
+                case TYPE_STRING_LIST -> {
                     List<String> list = (List<String>) args.get(key);
                     if (list != null) {
                         buf.writeInt(list.size());
@@ -209,9 +192,8 @@ public class TypedMapTools {
                     } else {
                         buf.writeInt(-1);
                     }
-                    break;
                 }
-                case TYPE_ITEMSTACK_LIST: {
+                case TYPE_ITEMSTACK_LIST -> {
                     List<ItemStack> list = (List<ItemStack>) args.get(key);
                     if (list != null) {
                         buf.writeInt(list.size());
@@ -221,9 +203,8 @@ public class TypedMapTools {
                     } else {
                         buf.writeInt(-1);
                     }
-                    break;
                 }
-                case TYPE_POS_LIST: {
+                case TYPE_POS_LIST -> {
                     List<BlockPos> list = (List<BlockPos>) args.get(key);
                     if (list != null) {
                         buf.writeInt(list.size());
@@ -233,7 +214,6 @@ public class TypedMapTools {
                     } else {
                         buf.writeInt(-1);
                     }
-                    break;
                 }
             }
         }

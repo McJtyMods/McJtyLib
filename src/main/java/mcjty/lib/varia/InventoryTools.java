@@ -31,10 +31,6 @@ public class InventoryTools {
 
     /**
      * Return a stream of items in an inventory matching the predicate
-     *
-     * @param tileEntity
-     * @param predicate
-     * @return
      */
     public static Stream<ItemStack> getItems(BlockEntity tileEntity, Predicate<ItemStack> predicate) {
         Stream.Builder<ItemStack> builder = Stream.builder();
@@ -54,10 +50,6 @@ public class InventoryTools {
 
     /**
      * Return the first item in an inventory matching the predicate
-     *
-     * @param tileEntity
-     * @param predicate
-     * @return
      */
     @Nonnull
     public static ItemStack getFirstMatchingItem(BlockEntity tileEntity, Predicate<ItemStack> predicate) {

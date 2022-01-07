@@ -55,7 +55,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     private WindowManager windowManager;
     protected final T tileEntity;
 
-    private GuiSideWindow sideWindow;
+    private final GuiSideWindow sideWindow;
 
     public void setWindowDimensions(int x, int y) {
         this.imageWidth = x;
@@ -65,7 +65,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public GenericGuiContainer(T tileEntity, C container, Inventory inventory, ManualEntry manualEntry) {
         super(container, inventory, new TextComponent("test"));   // @todo
         this.tileEntity = tileEntity;
-        sideWindow = new GuiSideWindow(manualEntry.getManual(), manualEntry.getEntry(), manualEntry.getPage());
+        sideWindow = new GuiSideWindow(manualEntry.manual(), manualEntry.entry(), manualEntry.page());
         windowManager = null;
     }
 
@@ -218,8 +218,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 int curx = xx;
                 boolean lineHasItemStacks = false;
                 for (Object o : list) {
-                    if (o instanceof String) {
-                        String s2 = (String)o;
+                    if (o instanceof String s2) {
                         font.drawShadow(matrixStack, s2, curx, yy, -1);
                         curx += font.width(s2);
                     } else {
@@ -311,8 +310,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         int x = GuiTools.getRelativeX(window.getGui());
         int y = GuiTools.getRelativeY(window.getGui());
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
-        if (widget instanceof BlockRender) {
-            BlockRender blockRender = (BlockRender) widget;
+        if (widget instanceof BlockRender blockRender) {
             Object renderItem = blockRender.getRenderItem();
             ItemStack itemStack;
             if (renderItem instanceof ItemStack) {
@@ -459,9 +457,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
      * Set a 'Value' and make sure it gets communicated to the server
      */
     public <T> void setValue(SimpleChannel channel, Value<?, T> value, T v) {
-        sendServerCommandTyped(channel, tileEntity.getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.getName(),
+        sendServerCommandTyped(channel, tileEntity.getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.name(),
                 TypedMap.builder()
-                        .put(value.getKey(), v)
+                        .put(value.key(), v)
                         .build());
     }
 
@@ -470,7 +468,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public void sendServerCommandTyped(SimpleChannel network, Command<?> command, TypedMap params) {
-        network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command.getName(), params));
+        network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command.name(), params));
     }
 
     public void sendServerCommandTyped(SimpleChannel network, ResourceKey<Level> dimensionId, String command, TypedMap params) {

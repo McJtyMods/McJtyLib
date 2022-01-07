@@ -76,8 +76,8 @@ public class PacketDataFromServer {
                 te = SafeClientTools.getClientWorld().getBlockEntity(pos);
             }
 
-            if (te instanceof GenericTileEntity) {
-                if (((GenericTileEntity) te).executeClientCommand(command, SafeClientTools.getClientPlayer(), result)) {
+            if (te instanceof GenericTileEntity generic) {
+                if (generic.executeClientCommand(command, SafeClientTools.getClientPlayer(), result)) {
                     return;
                 }
             }

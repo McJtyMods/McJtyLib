@@ -20,8 +20,8 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     public static final String TYPE_COLORCHOICELABEL = "colorchoicelabel";
     public static final Key<Integer> PARAM_COLOR = new Key<>("color", Type.INTEGER);
 
-    private List<Integer> colorList = new ArrayList<>();
-    private Map<Integer,List<String>> tooltipMap = new HashMap<>();
+    private final List<Integer> colorList = new ArrayList<>();
+    private final Map<Integer,List<String>> tooltipMap = new HashMap<>();
     private Integer currentColor = null;
     private List<ColorChoiceEvent> choiceEvents = null;
 
