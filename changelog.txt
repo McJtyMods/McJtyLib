@@ -1,4 +1,4 @@
-Upcoming:
+1.18-6.0.4:
 - Many cleanups
 - Fixed a crash problem with rendering hilighted blocks as well as XNet cables
 
