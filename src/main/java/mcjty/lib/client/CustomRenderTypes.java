@@ -64,6 +64,7 @@ public class CustomRenderTypes extends RenderType {
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINES, 256, true, false,
             CompositeState.builder().setLineState(THICK_LINES)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
+                    .setShaderState(RENDERTYPE_LINES_SHADER)
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTextureState(NO_TEXTURE)
                     .setDepthTestState(NO_DEPTH_TEST)
@@ -84,6 +85,7 @@ public class CustomRenderTypes extends RenderType {
             DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, VertexFormat.Mode.LINES, 256, true, false,
             CompositeState.builder()
                     .setLineState(new LineStateShard(OptionalDouble.of(1.0)))
+                    .setShaderState(RENDERTYPE_LINES_SHADER)
                     .setTextureState(NO_TEXTURE)
                     .setShaderState(RENDERTYPE_ENTITY_SMOOTH_CUTOUT_SHADER)
                     .setLightmapState(LIGHTMAP)

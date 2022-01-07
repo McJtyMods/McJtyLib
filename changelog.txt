@@ -1,3 +1,7 @@
+Upcoming:
+- Many cleanups
+- Fixed a crash problem with rendering hilighted blocks as well as XNet cables
+
 1.18-6.0.3:
 - Bugfix for sub-dialogs
 
