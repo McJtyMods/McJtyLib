@@ -63,7 +63,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseReleased(ScreenEvent.MouseReleasedEvent event) {
+    public void onMouseReleased(ScreenEvent.MouseReleasedEvent.Pre event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
