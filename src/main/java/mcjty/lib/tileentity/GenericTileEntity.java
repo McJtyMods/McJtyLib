@@ -339,7 +339,14 @@ public class GenericTileEntity extends BlockEntity {
         getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
-                .ifPresent(h -> h.deserializeNBT(tagCompound.getList("Items", Tag.TAG_COMPOUND)));
+                .ifPresent(h -> {
+                    // For compatibility with loot tables we check McItems first
+                    if (tagCompound.contains("McItems")) {
+                        h.deserializeNBT(tagCompound.getList("McItems", Tag.TAG_COMPOUND));
+                    } else {
+                        h.deserializeNBT(tagCompound.getList("Items", Tag.TAG_COMPOUND));
+                    }
+                });
     }
 
     protected void loadEnergyCap(CompoundTag tagCompound) {
