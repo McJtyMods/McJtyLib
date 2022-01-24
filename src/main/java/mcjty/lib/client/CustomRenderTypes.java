@@ -36,6 +36,7 @@ public class CustomRenderTypes extends RenderType {
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
                     .setWriteMaskState(COLOR_WRITE)
+                    .setOutputState(TRANSLUCENT_TARGET)
                     .createCompositeState(true));
 
     public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = create("translucent_add_nolightmaps", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
@@ -45,6 +46,7 @@ public class CustomRenderTypes extends RenderType {
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
                     .setWriteMaskState(COLOR_WRITE)
+                    .setOutputState(TRANSLUCENT_TARGET)
                     .createCompositeState(true));
 
 
@@ -55,6 +57,7 @@ public class CustomRenderTypes extends RenderType {
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(LIGHTNING_TRANSPARENCY)
                     .setWriteMaskState(COLOR_WRITE)
+                    .setOutputState(TRANSLUCENT_TARGET)
                     .createCompositeState(true));
 
 
