@@ -1,19 +1,19 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
@@ -150,17 +150,14 @@ public class MultipartTE extends BlockEntity {
     @Nonnull
     @Override
     public CompoundTag getUpdateTag() {
-        CompoundTag updateTag = super.getUpdateTag();
-        save(updateTag);
-        return updateTag;
+        return saveWithoutMetadata();
     }
 
     @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        CompoundTag nbtTag = new CompoundTag();
-        save(nbtTag);
-        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity) -> {return nbtTag;});
+        CompoundTag compoundTag = saveWithoutMetadata();
+        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity) -> compoundTag);
     }
 
 
@@ -269,9 +266,8 @@ public class MultipartTE extends BlockEntity {
     //     }
     // }
 
-    @Nonnull
     @Override
-    public CompoundTag save(@Nonnull CompoundTag compound) {
+    public void saveAdditional(@Nonnull CompoundTag compound) {
         ListTag list = new ListTag();
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             PartSlot slot = entry.getKey();
@@ -284,8 +280,7 @@ public class MultipartTE extends BlockEntity {
 
             BlockEntity te = part.getTileEntity();
             if (te != null) {
-                CompoundTag tc = new CompoundTag();
-                tc = te.save(tc);
+                CompoundTag tc = te.saveWithoutMetadata();
                 tag.put("te", tc);
             }
 
@@ -293,8 +288,6 @@ public class MultipartTE extends BlockEntity {
         }
         compound.put("parts", list);
         compound.putInt("version", version);
-
-        return super.save(compound);
     }
 
     // @todo 1.14
