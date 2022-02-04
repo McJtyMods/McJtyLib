@@ -1,9 +1,12 @@
 package mcjty.lib;
 
+import mcjty.lib.client.DelayedRenderer;
 import mcjty.lib.gui.IKeyReceiver;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -134,4 +137,8 @@ public class ClientEventHandler {
         }
     }
 
+    @SubscribeEvent
+    public void onGameRenderOverlay(RenderWorldLastEvent e) {
+        DelayedRenderer.render(e.getMatrixStack());
+    }
 }
