@@ -1,3 +1,6 @@
+1.18-6.0.9:
+- Delayed rendering system
+
 1.18-6.0.8:
 - Various small changes
 
