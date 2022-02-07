@@ -7,11 +7,6 @@ import net.minecraft.client.renderer.RenderType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.util.OptionalDouble;
-import org.lwjgl.opengl.GL11;
-
-import java.util.OptionalDouble;
-
-import net.minecraft.client.renderer.RenderType.CompositeState;
 
 public class CustomRenderTypes extends RenderType {
 
@@ -28,25 +23,33 @@ public class CustomRenderTypes extends RenderType {
 //                .build());
 //    }
 
+    public static final RenderType TRANSLUCENTdup = create("translucent_dup", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 2097152, true, true,
+            CompositeState.builder()
+                    .setLightmapState(LIGHTMAP)
+                    .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
+                    .setTextureState(BLOCK_SHEET_MIPPED)
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setOutputState(TRANSLUCENT_TARGET)
+                    .createCompositeState(true));
 
     public static final RenderType TRANSLUCENT_ADD = create("translucent_add", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
             CompositeState.builder()
-                    .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
                     .setLightmapState(LIGHTMAP)
+                    .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
-                    .setWriteMaskState(COLOR_WRITE)
                     .setOutputState(TRANSLUCENT_TARGET)
+                    .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(true));
 
     public static final RenderType TRANSLUCENT_ADD_NOLIGHTMAPS = create("translucent_add_nolightmaps", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 262144, true, false,
             CompositeState.builder()
-                    .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
                     .setLightmapState(NO_LIGHTMAP)
+                    .setShaderState(RENDERTYPE_TRANSLUCENT_SHADER)
                     .setTextureState(BLOCK_SHEET_MIPPED)
                     .setTransparencyState(ADDITIVE_TRANSPARENCY)
-                    .setWriteMaskState(COLOR_WRITE)
                     .setOutputState(TRANSLUCENT_TARGET)
+                    .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(true));
 
 
