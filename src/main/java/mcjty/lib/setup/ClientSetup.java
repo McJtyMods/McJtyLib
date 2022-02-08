@@ -21,6 +21,12 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
 
         ItemBlockRenderTypes.setRenderLayer(Registration.MULTIPART_BLOCK, (RenderType) -> true);
+//        Arrays.stream(new RenderType[]{
+//                        CustomRenderTypes.TRANSLUCENT_LIGHTNING_NOLIGHTMAPS, CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS,
+//                        CustomRenderTypes.TRANSLUCENT_ADD, CustomRenderTypes.OVERLAY_LINES, CustomRenderTypes.QUADS_NOTEXTURE})
+//                .forEach(type -> {
+//                    Minecraft.getInstance().renderBuffers().fixedBuffers.put(type, new BufferBuilder(type.bufferSize()));
+//                });
     }
 
 }
