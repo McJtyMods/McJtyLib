@@ -738,20 +738,23 @@ public class RenderHelper {
         renderBillboardQuadBright(matrixStack, buffer, scale, texture, DEFAULT_SETTINGS);
     }
 
-    public static void renderBillboardQuadBright(PoseStack matrixStack, MultiBufferSource buffer, float scale, ResourceLocation texture, RenderSettings settings) {
+    public static void renderBillboardQuadBright(PoseStack matrixStack, VertexConsumer builder, float scale, ResourceLocation texture, RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
         matrixStack.pushPose();
         matrixStack.translate(0.5, 0.5, 0.5);
         RenderHelper.rotateToPlayer(matrixStack);
-        VertexConsumer builder = buffer.getBuffer(settings.getRenderType());
         Matrix4f matrix = matrixStack.last().pose();
         builder.vertex(matrix, -scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
         builder.vertex(matrix, -scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();
         builder.vertex(matrix, scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU1(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();
         builder.vertex(matrix, scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU1(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
         matrixStack.popPose();
+    }
+
+    public static void renderBillboardQuadBright(PoseStack matrixStack, MultiBufferSource buffer, float scale, ResourceLocation texture, RenderSettings settings) {
+        renderBillboardQuadBright(matrixStack, buffer.getBuffer(settings.getRenderType()), scale, texture, settings);
     }
 
     public static void rotateToPlayer(PoseStack matrixStack) {
