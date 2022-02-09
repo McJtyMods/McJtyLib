@@ -28,7 +28,6 @@ public class DelayedRenderer {
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
         renders.forEach((type, renderlist) -> {
-            buffer.endLastBatch();
             VertexConsumer consumer = buffer.getBuffer(type);
             renderlist.forEach(r -> {
                 RenderSystem.enableDepthTest();

@@ -12,6 +12,9 @@ import net.minecraft.resources.ResourceLocation;
 import com.mojang.math.Matrix4f;
 import net.minecraft.world.phys.Vec3;
 
+import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
+import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
+
 public class RenderGlowEffect {
 
     /**
@@ -43,9 +46,8 @@ public class RenderGlowEffect {
     };
 
     public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset, Vec3 offs) {
-        int brightness = 240;
-        int b1 = brightness >> 16 & 65535;
-        int b2 = brightness & 65535;
+        int b1 = FULL_SKY;
+        int b2 = FULL_BLOCK;
         Quad quad = quads[side];
         buffer.vertex(offs.x + quad.v1.x * mult + offset, offs.y + quad.v1.y * mult + offset, offs.z + quad.v1.z * mult + offset).uv(0, 0).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
         buffer.vertex(offs.x + quad.v2.x * mult + offset, offs.y + quad.v2.y * mult + offset, offs.z + quad.v2.z * mult + offset).uv(0, 1).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
@@ -54,9 +56,8 @@ public class RenderGlowEffect {
     }
 
     public static void addSideFullTexture(Matrix4f positionMatrix, VertexConsumer buffer, TextureAtlasSprite sprite, int side, float mult, float offset) {
-        int brightness = 240;
-        int b1 = brightness >> 16 & 65535;
-        int b2 = brightness & 65535;
+        int b1 = FULL_SKY;
+        int b2 = FULL_BLOCK;
         Quad quad = quads[side];
         buffer.vertex(positionMatrix, quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
         buffer.vertex(positionMatrix, quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();

@@ -28,11 +28,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
+
+import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
+import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
 
 public class RenderHelper {
     public static float rot = 0.0f;
@@ -133,8 +137,8 @@ public class RenderHelper {
         matrixStack.translate(0F, 0F, 0.0F);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         // @todo 1.17 GlStateManager._enableRescaleNormal();
-        int i1 = 240;
-        int k1 = 240;
+        int i1 = FULL_BLOCK;
+        int k1 = FULL_BLOCK;
 
         // @todo 1.14 check if right?
         // @todo 1.15
@@ -732,6 +736,47 @@ public class RenderHelper {
         buffer.vertex(matrix, (x + width), (y + 0), zLevel).uv(((u + width) * f), ((v + 0) * f1)).endVertex();
         buffer.vertex(matrix, (x + 0), (y + 0), zLevel).uv(((u + 0) * f), ((v + 0) * f1)).endVertex();
         tessellator.end();
+    }
+
+    /**
+     * Render a billboard in four sectinos for better depth sorting
+     */
+    public static void renderSplitBillboard(PoseStack matrixStack, VertexConsumer buffer, float scale, Vec3 offset, ResourceLocation texture) {
+        int b1 = FULL_SKY;
+        int b2 = FULL_BLOCK;
+        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
+        matrixStack.pushPose();
+        matrixStack.translate(0.5, 0.5 + offset.y, 0.5);
+        RenderHelper.rotateToPlayer(matrixStack);
+        Matrix4f matrix = matrixStack.last().pose();
+
+        float u0 = sprite.getU0();
+        float v0 = sprite.getV0();
+        float u1 = sprite.getU1();
+        float v1 = sprite.getV1();
+        float um = (u0+u1) / 2f;
+        float vm = (v0+v1) / 2f;
+
+        buffer.vertex(matrix, -scale, -scale, 0.0f).color(255, 255, 255, 255).uv(u0, v0).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, -scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u0, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, 0.0f, -scale, 0.0f).color(255, 255, 255, 255).uv(um, v0).uv2(b1, b2).normal(1,0,0).endVertex();
+
+        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, 0.0f, scale, 0.0f).color(255, 255, 255, 255).uv(um, v1).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, scale, scale, 0.0f).color(255, 255, 255, 255).uv(u1, v1).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u1, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+
+        buffer.vertex(matrix, 0.0f, -scale, 0.0f).color(255, 255, 255, 255).uv(um, v0).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u1, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, scale, -scale, 0.0f).color(255, 255, 255, 255).uv(u1, v0).uv2(b1, b2).normal(1,0,0).endVertex();
+
+        buffer.vertex(matrix, -scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u0, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, -scale, scale, 0.0f).color(255, 255, 255, 255).uv(u0, v1).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, 0.0f, scale, 0.0f).color(255, 255, 255, 255).uv(um, v1).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        matrixStack.popPose();
     }
 
     public static void renderBillboardQuadBright(PoseStack matrixStack, MultiBufferSource buffer, float scale, ResourceLocation texture) {
