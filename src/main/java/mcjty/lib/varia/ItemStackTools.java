@@ -2,13 +2,15 @@ package mcjty.lib.varia;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lib.gui.GuiParser;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -21,7 +23,7 @@ import java.util.Set;
 
 public class ItemStackTools {
 
-    private static Set<ResourceLocation> commonTags = null;
+    private static Set<TagKey<Item>> commonTags = null;
 
     /**
      * Extract itemstack out of a slot and return a new stack.
@@ -76,18 +78,18 @@ public class ItemStackTools {
         return stack;
     }
 
-    public static void addCommonTags(Collection<ResourceLocation> fromItem, Set<ResourceLocation> tags) {
+    public static void addCommonTags(Collection<TagKey<Item>> fromItem, Set<TagKey<Item>> tags) {
         findCommonTags();
-        for (ResourceLocation id : fromItem) {
+        for (TagKey<Item> id : fromItem) {
             if (commonTags.contains(id)) {
                 tags.add(id);
             }
         }
     }
 
-    public static boolean hasCommonTag(Collection<ResourceLocation> fromItem) {
+    public static boolean hasCommonTag(Collection<TagKey<Item>> fromItem) {
         findCommonTags();
-        for (ResourceLocation id : fromItem) {
+        for (TagKey<Item> id : fromItem) {
             if (commonTags.contains(id)) {
                 return true;
             }
@@ -98,57 +100,57 @@ public class ItemStackTools {
     private static void findCommonTags() {
         if (commonTags == null) {
             commonTags = new HashSet<>();
-            commonTags.add(BlockTags.SAND.getName());
-            commonTags.add(BlockTags.FENCES.getName());
-            commonTags.add(BlockTags.SAPLINGS.getName());
-            commonTags.add(BlockTags.LEAVES.getName());
-            commonTags.add(BlockTags.LOGS.getName());
-            commonTags.add(BlockTags.RAILS.getName());
-            commonTags.add(BlockTags.SLABS.getName());
-            commonTags.add(BlockTags.WOOL.getName());
-            commonTags.add(BlockTags.CARPETS.getName());
-            commonTags.add(BlockTags.CROPS.getName());
-            commonTags.add(BlockTags.PLANKS.getName());
-            commonTags.add(BlockTags.STAIRS.getName());
-            commonTags.add(BlockTags.DIRT.getName());
-            commonTags.add(Tags.Blocks.GLASS.getName());
-            commonTags.add(Tags.Blocks.GLASS_PANES.getName());
-            commonTags.add(Tags.Blocks.CHESTS.getName());
-            commonTags.add(Tags.Blocks.COBBLESTONE.getName());
-            commonTags.add(Tags.Blocks.NETHERRACK.getName());
-            commonTags.add(Tags.Blocks.OBSIDIAN.getName());
-            commonTags.add(Tags.Blocks.GRAVEL.getName());
-            commonTags.add(Tags.Blocks.SANDSTONE.getName());
-            commonTags.add(Tags.Blocks.END_STONES.getName());
-            commonTags.add(Tags.Blocks.STONE.getName());
+            commonTags.add(ItemTags.SAND);
+            commonTags.add(ItemTags.FENCES);
+            commonTags.add(ItemTags.SAPLINGS);
+            commonTags.add(ItemTags.LEAVES);
+            commonTags.add(ItemTags.LOGS);
+            commonTags.add(ItemTags.RAILS);
+            commonTags.add(ItemTags.SLABS);
+            commonTags.add(ItemTags.WOOL);
+            commonTags.add(ItemTags.CARPETS);
+            commonTags.add(ItemTags.PLANKS);
+            commonTags.add(ItemTags.STAIRS);
+            commonTags.add(ItemTags.DIRT);
+            commonTags.add(Tags.Items.CROPS);
+            commonTags.add(Tags.Items.GLASS);
+            commonTags.add(Tags.Items.GLASS_PANES);
+            commonTags.add(Tags.Items.CHESTS);
+            commonTags.add(Tags.Items.COBBLESTONE);
+            commonTags.add(Tags.Items.NETHERRACK);
+            commonTags.add(Tags.Items.OBSIDIAN);
+            commonTags.add(Tags.Items.GRAVEL);
+            commonTags.add(Tags.Items.SANDSTONE);
+            commonTags.add(Tags.Items.END_STONES);
+            commonTags.add(Tags.Items.STONE);
 
-            commonTags.add(Tags.Blocks.ORES_COAL.getName());
-            commonTags.add(Tags.Blocks.ORES_DIAMOND.getName());
-            commonTags.add(Tags.Blocks.ORES_EMERALD.getName());
-            commonTags.add(Tags.Blocks.ORES_GOLD.getName());
-            commonTags.add(Tags.Blocks.ORES_REDSTONE.getName());
-            commonTags.add(Tags.Blocks.ORES_QUARTZ.getName());
-            commonTags.add(Tags.Blocks.ORES_IRON.getName());
-            commonTags.add(Tags.Blocks.ORES_LAPIS.getName());
-            commonTags.add(new ResourceLocation("forge", "ores/copper"));
-            commonTags.add(new ResourceLocation("forge", "ores/tin"));
-            commonTags.add(new ResourceLocation("forge", "ores/silver"));
-            commonTags.add(new ResourceLocation("forge", "ores/manganese"));
-            commonTags.add(new ResourceLocation("forge", "ores/platinum"));
+            commonTags.add(Tags.Items.ORES_COAL);
+            commonTags.add(Tags.Items.ORES_DIAMOND);
+            commonTags.add(Tags.Items.ORES_EMERALD);
+            commonTags.add(Tags.Items.ORES_GOLD);
+            commonTags.add(Tags.Items.ORES_REDSTONE);
+            commonTags.add(Tags.Items.ORES_QUARTZ);
+            commonTags.add(Tags.Items.ORES_IRON);
+            commonTags.add(Tags.Items.ORES_LAPIS);
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "ores/copper")));
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "ores/tin")));
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "ores/silver")));
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "ores/manganese")));
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "ores/platinum")));
 
-            commonTags.add(Tags.Blocks.STORAGE_BLOCKS_COAL.getName());
-            commonTags.add(Tags.Blocks.STORAGE_BLOCKS_DIAMOND.getName());
-            commonTags.add(Tags.Blocks.STORAGE_BLOCKS_EMERALD.getName());
-            commonTags.add(Tags.Blocks.STORAGE_BLOCKS_GOLD.getName());
-            commonTags.add(Tags.Blocks.STORAGE_BLOCKS_REDSTONE.getName());
-            commonTags.add(Tags.Blocks.STORAGE_BLOCKS_QUARTZ.getName());
-            commonTags.add(Tags.Blocks.STORAGE_BLOCKS_IRON.getName());
-            commonTags.add(Tags.Blocks.STORAGE_BLOCKS_LAPIS.getName());
-            commonTags.add(new ResourceLocation("forge", "storage_blocks/copper"));
-            commonTags.add(new ResourceLocation("forge", "storage_blocks/tin"));
-            commonTags.add(new ResourceLocation("forge", "storage_blocks/silver"));
-            commonTags.add(new ResourceLocation("forge", "storage_blocks/manganese"));
-            commonTags.add(new ResourceLocation("forge", "storage_blocks/platinum"));
+            commonTags.add(Tags.Items.STORAGE_BLOCKS_COAL);
+            commonTags.add(Tags.Items.STORAGE_BLOCKS_DIAMOND);
+            commonTags.add(Tags.Items.STORAGE_BLOCKS_EMERALD);
+            commonTags.add(Tags.Items.STORAGE_BLOCKS_GOLD);
+            commonTags.add(Tags.Items.STORAGE_BLOCKS_REDSTONE);
+            commonTags.add(Tags.Items.STORAGE_BLOCKS_QUARTZ);
+            commonTags.add(Tags.Items.STORAGE_BLOCKS_IRON);
+            commonTags.add(Tags.Items.STORAGE_BLOCKS_LAPIS);
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "storage_blocks/copper")));
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "storage_blocks/tin")));
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "storage_blocks/silver")));
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "storage_blocks/manganese")));
+            commonTags.add(TagKey.create(Registry.ITEM.key(), new ResourceLocation("forge", "storage_blocks/platinum")));
         }
     }
 }
