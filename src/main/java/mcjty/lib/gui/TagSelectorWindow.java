@@ -4,16 +4,19 @@ import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.widgets.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Registry;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static mcjty.lib.gui.widgets.Widgets.*;
 
@@ -102,13 +105,19 @@ public class TagSelectorWindow {
 
     private java.util.List<String> getTags() {
         if (TYPE_BOTH.equals(type)) {
-            Set<ResourceLocation> tags = new HashSet<>(ItemTags.getAllTags().getAvailableTags());
-            tags.addAll(BlockTags.getAllTags().getAvailableTags());
-            return tags.stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
+            Stream<String> itemStream = Registry.ITEM.getTags().map(pair -> pair.getFirst().location().toString());
+            Stream<String> blockStream = Registry.BLOCK.getTags().map(pair -> pair.getFirst().location().toString());
+            Set<String> tags = itemStream.collect(Collectors.toSet());
+            blockStream.forEach(tags::add);
+            return tags.stream().sorted().collect(Collectors.toList());
         } else if (TYPE_ITEM.equals(type)) {
-            return ItemTags.getAllTags().getAvailableTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
+            Stream<String> itemStream = Registry.ITEM.getTags().map(pair -> pair.getFirst().location().toString());
+            Set<String> tags = itemStream.collect(Collectors.toSet());
+            return tags.stream().sorted().collect(Collectors.toList());
         } else {
-            return BlockTags.getAllTags().getAvailableTags().stream().map(ResourceLocation::toString).sorted().collect(Collectors.toList());
+            Stream<String> blockStream = Registry.BLOCK.getTags().map(pair -> pair.getFirst().location().toString());
+            Set<String> tags = blockStream.collect(Collectors.toSet());
+            return tags.stream().sorted().collect(Collectors.toList());
         }
     }
 

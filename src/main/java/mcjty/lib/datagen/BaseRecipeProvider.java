@@ -1,15 +1,19 @@
 package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.IRecipeBuilder;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.data.*;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.tags.Tag;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 
 import java.util.HashMap;
@@ -18,11 +22,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 
 public class BaseRecipeProvider extends RecipeProvider {
 
@@ -34,7 +33,7 @@ public class BaseRecipeProvider extends RecipeProvider {
         return this;
     }
 
-    protected BaseRecipeProvider add(char c, Tag<Item> itemTag) {
+    protected BaseRecipeProvider add(char c, TagKey<Item> itemTag) {
         defaultIngredients.put(c, Ingredient.of(itemTag));
         return this;
     }

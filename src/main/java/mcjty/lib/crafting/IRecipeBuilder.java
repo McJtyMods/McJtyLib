@@ -1,6 +1,7 @@
 package mcjty.lib.crafting;
 
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.tags.Tag;
@@ -10,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.function.Consumer;
 
 public interface IRecipeBuilder<T extends IRecipeBuilder<T>> {
-    T define(Character symbol, Tag<Item> tagIn);
+    T define(Character symbol, TagKey<Item> tagIn);
 
     T define(Character symbol, ItemLike itemIn);
 

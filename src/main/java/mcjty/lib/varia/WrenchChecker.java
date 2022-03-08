@@ -1,9 +1,10 @@
 package mcjty.lib.varia;
 
-import net.minecraft.world.item.Item;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 
-import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,6 +12,7 @@ import java.util.stream.Stream;
 public class WrenchChecker {
 
     public static final ResourceLocation WRENCH = new ResourceLocation("forge", "wrench");
+    public static final TagKey<Item> WRENCH_TAG = TagKey.create(Registry.ITEM_REGISTRY, WRENCH);
 
     private static Set<ResourceLocation> wrenches;
 
@@ -24,6 +26,6 @@ public class WrenchChecker {
         if (wrenches.contains(item.getRegistryName())) {
             return true;
         }
-        return item.getTags().contains(WRENCH);
+        return item.builtInRegistryHolder().is(WRENCH_TAG);
     }
 }
