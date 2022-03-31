@@ -1,9 +1,6 @@
 package mcjty.lib.tileentity;
 
-import mcjty.lib.api.container.CapabilityContainerProvider;
-import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
-import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
@@ -44,10 +41,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
@@ -66,6 +60,7 @@ public class GenericTileEntity extends TileEntity {
     // constructor) set to be a function that looks for the annotations and replaces itself with
     // a function that does the actual testing
     private BiFunction<Capability, Direction, LazyOptional> capSetup;
+    private final List<LazyOptional> lazyOptsToClean = new ArrayList<>();
 
     public GenericTileEntity(TileEntityType<?> type) {
         super(type);
@@ -78,6 +73,13 @@ public class GenericTileEntity extends TileEntity {
         };
         // Make sure the annotation holder exists
         getAnnotationHolder();
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        lazyOptsToClean.forEach(LazyOptional::invalidate);
+        lazyOptsToClean.clear();
     }
 
     private BiFunction<Capability, Direction, LazyOptional> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
@@ -95,74 +97,16 @@ public class GenericTileEntity extends TileEntity {
                 } else {
                     lazy = LazyOptional.of(() -> instance);
                 }
+                lazyOptsToClean.add(lazy);
                 BiFunction<Capability, Direction, LazyOptional> tail = generateCapTests(caps, index + 1);
-                switch (annotation.type()) {
-                    case ITEMS:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case ITEMS_AUTOMATION:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case CONTAINER:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case ENERGY:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityEnergy.ENERGY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case INFUSABLE:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityInfusable.INFUSABLE_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case MODULE:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityModuleSupport.MODULE_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case POWER_INFO:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityPowerInformation.POWER_INFORMATION_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                    case FLUIDS:
-                        return (cap, dir) -> {
-                            if (cap == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
-                                return lazy;
-                            } else {
-                                return tail.apply(cap, dir);
-                            }
-                        };
-                }
-                throw new RuntimeException("Unknown cap type");
+                Capability desiredCapability = annotation.type().getCapability();
+                return (cap, dir) -> {
+                    if (cap == desiredCapability) {
+                        return lazy;
+                    } else {
+                        return tail.apply(cap, dir);
+                    }
+                };
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }

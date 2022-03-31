@@ -1,3 +1,6 @@
+Upcoming:
+- Implemented proper invalidation of capabilities when block entities are removed/unloaded
+
 1.16-5.1.4:
 - Delayed rendering system
 
