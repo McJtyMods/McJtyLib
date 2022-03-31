@@ -1,4 +1,4 @@
-Upcoming:
+1.16-5.1.5:
 - Implemented proper invalidation of capabilities when block entities are removed/unloaded
 
 1.16-5.1.4:
