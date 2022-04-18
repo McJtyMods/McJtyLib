@@ -78,8 +78,8 @@ public class GenericTileEntity extends TileEntity {
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        lazyOptsToClean.forEach(LazyOptional::invalidate);
-        lazyOptsToClean.clear();
+//        lazyOptsToClean.forEach(LazyOptional::invalidate);
+//        lazyOptsToClean.clear();
     }
 
     private BiFunction<Capability, Direction, LazyOptional> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
