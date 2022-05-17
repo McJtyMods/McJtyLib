@@ -33,15 +33,17 @@ public class DelayedRenderer {
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
 
         Set<BlockPos> todelete = new HashSet<>();
-        delayedRenders.entrySet().forEach(entry -> {
-            BlockPos pos = entry.getKey();
-            BiConsumer<PoseStack, Vec3> consumer = entry.getValue();
+        delayedRenders.forEach((pos, consumer) -> {
             if (renderValidations.getOrDefault(pos, (level, blockPos) -> false).apply(Minecraft.getInstance().level, pos)) {
                 consumer.accept(matrixStack, projectedView);
             } else {
                 todelete.add(pos);
             }
         });
+        for (BlockPos pos : todelete) {
+            delayedRenders.remove(pos);
+            renderValidations.remove(pos);
+        }
 
         renders.forEach((type, renderlist) -> {
             VertexConsumer consumer = buffer.getBuffer(type);
