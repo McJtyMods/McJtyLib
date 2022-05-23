@@ -20,9 +20,9 @@ import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
@@ -439,9 +439,6 @@ public class Window {
 
             // Set client-side
             value.setter().accept(te, converted);
-            if (gui instanceof GenericGuiContainer container) {
-                container.onValueUpdated(value);
-            }
 
             GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
             guiContainer.sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING.name(),

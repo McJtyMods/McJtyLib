@@ -495,10 +495,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         MenuScreens.register(type, factory);
     }
 
-    public void onValueUpdated(ValueHolder value) {
-
-    }
-
     @FunctionalInterface
     public static interface GuiSupplier<C extends GenericContainer, S extends GenericGuiContainer, T extends GenericTileEntity> {
         S create(T tile, C container, Inventory inventory);
