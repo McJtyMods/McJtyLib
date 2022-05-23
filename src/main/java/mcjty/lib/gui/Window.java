@@ -439,6 +439,9 @@ public class Window {
 
             // Set client-side
             value.setter().accept(te, converted);
+            if (gui instanceof GenericGuiContainer container) {
+                container.onValueUpdated(value);
+            }
 
             GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
             guiContainer.sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING.name(),

@@ -14,6 +14,7 @@ import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
@@ -492,6 +493,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid tile entity!");
         };
         MenuScreens.register(type, factory);
+    }
+
+    public void onValueUpdated(ValueHolder value) {
+
     }
 
     @FunctionalInterface
