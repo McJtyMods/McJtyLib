@@ -1,3 +1,6 @@
+Upcoming:
+- New GuiPopupTools (moved from RFTools Control)
+
 1.16-5.1.6:
 - Undo of capability invalidation as it breaks loot tables
 
