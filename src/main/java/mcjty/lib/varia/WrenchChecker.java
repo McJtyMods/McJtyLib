@@ -11,10 +11,11 @@ import java.util.stream.Stream;
 
 public class WrenchChecker {
 
-    public static final ResourceLocation WRENCH = new ResourceLocation("forge", "wrench");
+    private static Set<ResourceLocation> wrenches;
+
+    public static final ResourceLocation WRENCH = new ResourceLocation("forge", "tools/wrench");
     public static final TagKey<Item> WRENCH_TAG = TagKey.create(Registry.ITEM_REGISTRY, WRENCH);
 
-    private static Set<ResourceLocation> wrenches;
 
     public static boolean isAWrench(Item item) {
         if (wrenches == null) {
@@ -26,6 +27,6 @@ public class WrenchChecker {
         if (wrenches.contains(item.getRegistryName())) {
             return true;
         }
-        return item.builtInRegistryHolder().is(WRENCH_TAG);
+        return TagTools.hasTag(item, WRENCH_TAG);
     }
 }
