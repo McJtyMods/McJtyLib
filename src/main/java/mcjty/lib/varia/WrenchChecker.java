@@ -1,6 +1,8 @@
 package mcjty.lib.varia;
 
 import net.minecraft.item.Item;
+import net.minecraft.tags.ITag;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.Arrays;
@@ -10,6 +12,7 @@ import java.util.stream.Collectors;
 public class WrenchChecker {
 
     public static final ResourceLocation WRENCH = new ResourceLocation("forge", "tools/wrench");
+    public static ITag.INamedTag<Item> WRENCH_TAG = ItemTags.bind(WRENCH.toString());
 
     private static Set<ResourceLocation> wrenches;
 
