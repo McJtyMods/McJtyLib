@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class WrenchChecker {
 
-    public static final ResourceLocation WRENCH = new ResourceLocation("forge", "wrench");
+    public static final ResourceLocation WRENCH = new ResourceLocation("forge", "tools/wrench");
 
     private static Set<ResourceLocation> wrenches;
 
