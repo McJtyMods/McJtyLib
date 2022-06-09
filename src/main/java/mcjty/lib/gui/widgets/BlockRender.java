@@ -1,18 +1,19 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.typed.Type;
 import mcjty.lib.varia.ItemStackTools;
-import net.minecraft.world.level.block.Block;
+import mcjty.lib.varia.Tools;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -246,7 +247,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     @Override
     public Object getGenericValue(Type<?> type) {
         if (renderItem instanceof ItemStack) {
-            return ((ItemStack) renderItem).getItem().getRegistryName().toString();
+            return Tools.getId((ItemStack) renderItem).toString();
         } else {
             return null;
         }

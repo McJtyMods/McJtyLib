@@ -23,7 +23,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -89,7 +88,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         intAddInformation(stack, tooltip);
 
         if (tooltipBuilder.isActive()) {
-            tooltipBuilder.makeTooltip(getRegistryName(), stack, tooltip, advanced);
+            tooltipBuilder.makeTooltip(Tools.getId(this), stack, tooltip, advanced);
         }
     }
 

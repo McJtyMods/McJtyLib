@@ -5,12 +5,13 @@ import mcjty.lib.crafting.CopyNBTRecipeSerializer;
 import mcjty.lib.multipart.MultipartBlock;
 import mcjty.lib.multipart.MultipartItemBlock;
 import mcjty.lib.multipart.MultipartTE;
-import net.minecraft.world.level.block.Block;
+import mcjty.lib.varia.Tools;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -44,7 +45,7 @@ public class Registration {
 
     @SubscribeEvent
     public static void onItemRegister(final RegistryEvent.Register<Item> e) {
-        e.getRegistry().register(new MultipartItemBlock(MULTIPART_BLOCK).setRegistryName(MULTIPART_BLOCK.getRegistryName()));
+        e.getRegistry().register(new MultipartItemBlock(MULTIPART_BLOCK).setRegistryName(Tools.getId(MULTIPART_BLOCK)));
     }
 
     @SubscribeEvent

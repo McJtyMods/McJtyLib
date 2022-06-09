@@ -2,25 +2,34 @@ package mcjty.lib.datagen;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import mcjty.lib.varia.Tools;
 import net.minecraft.advancements.critereon.EnchantmentPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.HashCache;
 import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTables;
+import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
+import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.*;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
-import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,22 +38,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
-import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
-import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
-import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
-import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
-import net.minecraft.world.level.storage.loot.functions.CopyBlockState;
-import net.minecraft.world.level.storage.loot.functions.CopyNameFunction;
-import net.minecraft.world.level.storage.loot.functions.CopyNbtFunction;
-import net.minecraft.world.level.storage.loot.functions.LootingEnchantFunction;
-import net.minecraft.world.level.storage.loot.functions.SetContainerContents;
-import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 
 public abstract class BaseLootTableProvider extends LootTableProvider {
 
@@ -64,7 +57,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     protected abstract void addTables();
 
     protected void addItemDropTable(EntityType<?> entityType, ItemLike item) {
-        entityLootTables.put(entityType, createItemDropTable(entityType.getRegistryName().getPath(), item));
+        entityLootTables.put(entityType, createItemDropTable(Tools.getId(entityType).getPath(), item));
     }
 
     protected void addChestLootTable(ResourceLocation id, LootTable.Builder builder) {
@@ -75,7 +68,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
                                     float min, float max,
                                     float lmin, float lmax) {
         entityLootTables.put(entityType, createItemDropTable(
-                entityType.getRegistryName().getPath(), item, min, max, lmin, lmax));
+                Tools.getId(entityType).getPath(), item, min, max, lmin, lmax));
     }
 
     protected LootTable.Builder createItemDropTable(String name, ItemLike item) {
@@ -118,12 +111,12 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     protected void addBlockStateTable(Block block, Property<?> property) {
-        lootTables.put(block, createBlockStateTable(block.getRegistryName().getPath(), block, property));
+        lootTables.put(block, createBlockStateTable(Tools.getId(block).getPath(), block, property));
     }
 
     protected LootTable.Builder createBlockStateTable(String name, Block block, Property<?> property) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(block.getRegistryName().getPath())
+                .name(Tools.getId(block).getPath())
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyBlockState.copyState(block).copy(property))
@@ -132,7 +125,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     protected void addStandardTable(Block block, BlockEntityType<?> type) {
-        lootTables.put(block, createStandardTable(block.getRegistryName().getPath(), block, type));
+        lootTables.put(block, createStandardTable(Tools.getId(block).getPath(), block, type));
     }
 
     protected LootTable.Builder createStandardTable(String name, Block block, BlockEntityType<?> type) {
@@ -152,7 +145,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
     }
 
     protected void addSimpleTable(Block block) {
-        lootTables.put(block, createSimpleTable(block.getRegistryName().getPath(), block));
+        lootTables.put(block, createSimpleTable(Tools.getId(block).getPath(), block));
     }
 
     protected LootTable.Builder createSimpleTable(String name, Block block) {

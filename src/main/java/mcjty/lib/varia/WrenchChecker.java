@@ -24,7 +24,7 @@ public class WrenchChecker {
                     "rftoolsbase:smartwrench_select"
             ).map(ResourceLocation::new).collect(Collectors.toSet());
         }
-        if (wrenches.contains(item.getRegistryName())) {
+        if (wrenches.contains(Tools.getId(item))) {
             return true;
         }
         return TagTools.hasTag(item, WRENCH_TAG);

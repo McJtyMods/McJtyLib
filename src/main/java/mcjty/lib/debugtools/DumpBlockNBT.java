@@ -3,22 +3,22 @@ package mcjty.lib.debugtools;
 import com.google.gson.*;
 import mcjty.lib.network.PacketDumpBlockInfo;
 import mcjty.lib.varia.Logging;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
+import mcjty.lib.varia.Tools;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 
 public class DumpBlockNBT {
 
@@ -28,7 +28,7 @@ public class DumpBlockNBT {
         Block block = state.getBlock();
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("block", new JsonPrimitive(block.getRegistryName().toString()));
+        jsonObject.add("block", new JsonPrimitive(Tools.getId(block).toString()));
         if (te != null) {
             jsonObject.add("teClass", new JsonPrimitive(te.getClass().getCanonicalName()));
             CompoundTag tag = te.saveWithoutMetadata();

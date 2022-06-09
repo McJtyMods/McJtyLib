@@ -3,9 +3,10 @@ package mcjty.lib.debugtools;
 import com.google.gson.*;
 import mcjty.lib.network.PacketDumpItemInfo;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.Tools;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.logging.log4j.Level;
 
@@ -20,7 +21,7 @@ public class DumpItemNBT {
         }
 
         JsonObject jsonObject = new JsonObject();
-        jsonObject.add("item", new JsonPrimitive(item.getItem().getRegistryName().toString()));
+        jsonObject.add("item", new JsonPrimitive(Tools.getId(item).toString()));
         if (item.hasTag()) {
             CompoundTag tag = item.getTag();
             if (verbose) {

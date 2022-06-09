@@ -1,6 +1,7 @@
 package mcjty.lib.multipart;
 
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.varia.Tools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -65,7 +66,7 @@ public class MultipartTE extends BlockEntity {
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             BlockState state = entry.getValue().state;
             System.out.println("    SLOT: " + entry.getKey().name() +
-                    "    " + state.getBlock().getRegistryName().toString());
+                    "    " + Tools.getId(state).toString());
             for (Property<?> property : state.getProperties()) {
                 System.out.println("        PROP: " + property + " = " + state.getValue(property));
             }
@@ -118,7 +119,7 @@ public class MultipartTE extends BlockEntity {
             BlockState state = part.getState();
             Block block = state.getBlock();
             Collection<Property<?>> properties = state.getProperties();
-            System.out.println("        block: " + block.getRegistryName().toString());
+            System.out.println("        block: " + Tools.getId(block).toString());
             for (Property<?> property : properties) {
                 System.out.println("        property: " + property.getName() + " = " + state.getValue(property).toString());
             }

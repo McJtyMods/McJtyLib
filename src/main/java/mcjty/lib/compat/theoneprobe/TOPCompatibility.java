@@ -5,13 +5,14 @@ import mcjty.lib.multipart.MultipartHelper;
 import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.Tools;
 import mcjty.theoneprobe.api.*;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.InterModComms;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -72,7 +73,7 @@ public class TOPCompatibility {
                     MultipartTE.Part part = Registration.MULTIPART_BLOCK.getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
                     if (part != null) {
                         pickBlock = part.getState().getBlock().getCloneItemStack(world, data.getPos(), part.getState());
-                        modid = part.getState().getBlock().getRegistryName().getNamespace();
+                        modid = Tools.getId(part.getState()).getNamespace();
                     }
                     modid = WordUtils.capitalize(modid);
 

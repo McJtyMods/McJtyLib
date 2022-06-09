@@ -1,8 +1,9 @@
 package mcjty.lib.datagen;
 
-import net.minecraft.world.level.block.Block;
+import mcjty.lib.varia.Tools;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -10,7 +11,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 public abstract class BaseItemModelProvider extends ItemModelProvider {
 
     protected String name(Item item) {
-        return item.getRegistryName().getPath();
+        return Tools.getId(item).getPath();
     }
 
 
@@ -19,26 +20,26 @@ public abstract class BaseItemModelProvider extends ItemModelProvider {
     }
 
     public void parentedBlock(Block block) {
-        parentedBlock(block, "block/" + block.getRegistryName().getPath());
+        parentedBlock(block, "block/" + Tools.getId(block).getPath());
     }
 
     public void parentedBlock(Block block, String model) {
-        getBuilder(block.getRegistryName().getPath())
+        getBuilder(Tools.getId(block).getPath())
                 .parent(new ModelFile.UncheckedModelFile(modLoc(model)));
     }
 
     public void parentedItem(Item item, String model) {
-        getBuilder(item.getRegistryName().getPath())
+        getBuilder(Tools.getId(item).getPath())
                 .parent(new ModelFile.UncheckedModelFile(modLoc(model)));
     }
 
     public void itemGenerated(Item item, String texture) {
-        getBuilder(item.getRegistryName().getPath()).parent(getExistingFile(mcLoc("item/generated")))
+        getBuilder(Tools.getId(item).getPath()).parent(getExistingFile(mcLoc("item/generated")))
                 .texture("layer0", texture);
     }
 
     public void itemHandheld(Item item, String texture) {
-        getBuilder(item.getRegistryName().getPath()).parent(getExistingFile(mcLoc("item/handheld")))
+        getBuilder(Tools.getId(item).getPath()).parent(getExistingFile(mcLoc("item/handheld")))
                 .texture("layer0", texture);
     }
 }

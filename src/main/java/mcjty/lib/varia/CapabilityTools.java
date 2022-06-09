@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -40,7 +40,7 @@ public class CapabilityTools {
 
     private static void reportWrongBlock(BlockEntity tileEntity, Exception e) {
         if (tileEntity != null) {
-            ResourceLocation name = tileEntity.getLevel().getBlockState(tileEntity.getBlockPos()).getBlock().getRegistryName();
+            ResourceLocation name = Tools.getId(tileEntity.getLevel().getBlockState(tileEntity.getBlockPos()));
             Logging.logError("Block " + name.toString() + " at " + BlockPosTools.toString(tileEntity.getBlockPos()) + " does not respect the capability API and crashes on null side.");
             Logging.logError("Please report to the corresponding mod. This is not a bug in RFTools!");
         }

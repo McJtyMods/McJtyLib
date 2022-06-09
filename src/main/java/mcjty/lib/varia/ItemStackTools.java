@@ -53,7 +53,7 @@ public class ItemStackTools {
 
     public static GuiParser.GuiCommand itemStackToGuiCommand(String name, ItemStack item) {
         GuiParser.GuiCommand object = new GuiParser.GuiCommand(name);
-        object.parameter(item.getItem().getRegistryName().toString());
+        object.parameter(Tools.getId(item).toString());
         object.parameter(item.getCount());
         if (item.hasTag()) {
             String string = item.getTag().toString();

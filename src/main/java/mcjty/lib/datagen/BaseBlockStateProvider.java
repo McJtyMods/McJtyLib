@@ -1,13 +1,14 @@
 package mcjty.lib.datagen;
 
 import mcjty.lib.blocks.LogicSlabBlock;
+import mcjty.lib.varia.Tools;
+import net.minecraft.core.Direction;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
@@ -23,7 +24,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     public static final ResourceLocation RFTOOLSBASE_BOTTOM = new ResourceLocation("rftoolsbase", "block/base/machinebottom");
 
     protected String name(Block block) {
-        return block.getRegistryName().getPath();
+        return Tools.getId(block).getPath();
     }
 
     public BaseBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
