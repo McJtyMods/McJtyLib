@@ -1,6 +1,7 @@
 package mcjty.lib.client;
 
 import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.LevelTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -58,7 +58,7 @@ public class GuiTools {
                     @Nonnull
                     @Override
                     public Component getDisplayName() {
-                        return new TextComponent("Remote Gui");
+                        return ComponentFactory.literal("Remote Gui");
                     }
 
                     @Nullable
@@ -78,12 +78,12 @@ public class GuiTools {
         }
         Level world = LevelTools.getLevel(player.getCommandSenderWorld(), dimensionType);
         if (!LevelTools.isLoaded(world, pos)) {
-            player.displayClientMessage(new TextComponent(ChatFormatting.RED + "Position is not loaded!"), false);
+            player.displayClientMessage(ComponentFactory.literal(ChatFormatting.RED + "Position is not loaded!"), false);
             return false;
         }
         BlockEntity te = world.getBlockEntity(pos);
         if (te == null) {
-            player.displayClientMessage(new TextComponent(ChatFormatting.RED + "Tile entity is missing!"), false);
+            player.displayClientMessage(ComponentFactory.literal(ChatFormatting.RED + "Tile entity is missing!"), false);
             return false;
         }
 

@@ -2,6 +2,7 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.client.GuiTools;
+import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
@@ -27,7 +28,7 @@ public class GuiItemScreen extends Screen {
     private GuiSideWindow sideWindow;
 
     public GuiItemScreen(SimpleChannel network, int xSize, int ySize, ManualEntry manualEntry) {
-        super(new TextComponent("todo")); // @todo 1.14
+        super(ComponentFactory.literal("todo")); // @todo 1.14
         this.network = network;
         this.xSize = xSize;
         this.ySize = ySize;

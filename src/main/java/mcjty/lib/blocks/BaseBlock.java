@@ -98,12 +98,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         if (tagCompound != null) {
             if (tagCompound.contains("Energy")) {
                 long energy = tagCompound.getLong("Energy");
-                list.add(new TextComponent(ChatFormatting.GREEN + "Energy: " + energy + " rf"));
+                list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Energy: " + energy + " rf"));
             }
             if (isInfusable()) {
                 int infused = getInfused(itemStack);
                 int pct = infused * 100 / GeneralConfig.maxInfuse.get();
-                list.add(new TextComponent(ChatFormatting.YELLOW + "Infused: " + pct + "%"));
+                list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Infused: " + pct + "%"));
             }
 
             if (GeneralConfig.manageOwnership.get() && tagCompound.contains("owner")) {
@@ -114,13 +114,13 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 }
 
                 if (securityChannel == -1) {
-                    list.add(new TextComponent(ChatFormatting.YELLOW + "Owned by: " + owner));
+                    list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Owned by: " + owner));
                 } else {
-                    list.add(new TextComponent(ChatFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")"));
+                    list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")"));
                 }
 
                 if (!tagCompound.contains("idM")) {
-                    list.add(new TextComponent(ChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!"));
+                    list.add(ComponentFactory.literal(ChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!"));
                 }
             }
         }

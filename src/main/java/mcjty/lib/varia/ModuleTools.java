@@ -105,7 +105,7 @@ public class ModuleTools {
                         player.setItemInHand(hand, ItemStack.EMPTY);
                     }
                     if (world.isClientSide) {
-                        player.displayClientMessage(new TextComponent("Installed module"), false);
+                        player.displayClientMessage(ComponentFactory.literal("Installed module"), false);
                     }
                     return true;
                 }

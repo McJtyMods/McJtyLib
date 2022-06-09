@@ -1,11 +1,11 @@
 package mcjty.lib.compat.patchouli;
 
 import mcjty.lib.setup.ModSetup;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.Util;
-import net.minecraft.network.chat.TextComponent;
+import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import vazkii.patchouli.api.PatchouliAPI;
 
 public class PatchouliCompatibility {
@@ -14,7 +14,7 @@ public class PatchouliCompatibility {
         if (ModSetup.patchouli) {
             PatchouliAPI.get().openBookGUI(player, id);
         } else {
-            player.sendMessage(new TextComponent(ChatFormatting.RED + "Patchouli is missing! No manual present"), Util.NIL_UUID);
+            player.sendMessage(ComponentFactory.literal(ChatFormatting.RED + "Patchouli is missing! No manual present"), Util.NIL_UUID);
         }
     }
 
@@ -22,7 +22,7 @@ public class PatchouliCompatibility {
         if (ModSetup.patchouli) {
             PatchouliAPI.get().openBookEntry(player, id, entry, page);
         } else {
-            player.sendMessage(new TextComponent(ChatFormatting.RED + "Patchouli is missing! No manual present"), Util.NIL_UUID);
+            player.sendMessage(ComponentFactory.literal(ChatFormatting.RED + "Patchouli is missing! No manual present"), Util.NIL_UUID);
         }
     }
 }

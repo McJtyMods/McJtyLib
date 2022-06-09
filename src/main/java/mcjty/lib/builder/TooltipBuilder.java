@@ -1,5 +1,6 @@
 package mcjty.lib.builder;
 
+import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -38,7 +39,7 @@ public class TooltipBuilder {
     }
 
     private static TranslatableComponent stylize(String translationKey, ChatFormatting... formattings) {
-        TranslatableComponent component = new TranslatableComponent(translationKey);
+        TranslatableComponent component = ComponentFactory.translatable(translationKey);
         for (ChatFormatting format : formattings) {
             component.withStyle(format);
         }
@@ -72,7 +73,7 @@ public class TooltipBuilder {
                         } else {
                             component = stylize(prefix + line.getSuffix(), line.getStyles());
                         }
-                        component.append(new TextComponent(ChatFormatting.WHITE + s));
+                        component.append(ComponentFactory.literal(ChatFormatting.WHITE + s));
                         tooltip.add(component);
                     });
                 } else {
@@ -85,7 +86,7 @@ public class TooltipBuilder {
                     if (line.getInformationGetter() != null) {
                         String extra = line.getInformationGetter().apply(stack);
                         if (extra != null) {
-                            component.append(new TextComponent(ChatFormatting.WHITE + extra));
+                            component.append(ComponentFactory.literal(ChatFormatting.WHITE + extra));
                             tooltip.add(component);
                         } // Else we don't add the entire component
                     } else {

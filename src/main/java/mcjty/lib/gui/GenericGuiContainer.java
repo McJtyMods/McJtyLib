@@ -16,6 +16,7 @@ import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
 import mcjty.lib.varia.Tools;
@@ -64,7 +65,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public GenericGuiContainer(T tileEntity, C container, Inventory inventory, ManualEntry manualEntry) {
-        super(container, inventory, new TextComponent("test"));   // @todo
+        super(container, inventory, ComponentFactory.literal("test"));   // @todo
         this.tileEntity = tileEntity;
         sideWindow = new GuiSideWindow(manualEntry.manual(), manualEntry.entry(), manualEntry.page());
         windowManager = null;

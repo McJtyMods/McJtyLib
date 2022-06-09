@@ -3,6 +3,7 @@ package mcjty.lib.tooltips;
 import com.mojang.datafixers.util.Either;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.keys.KeyBindings;
+import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -49,7 +50,7 @@ public class TooltipRender {
                 }
 
                 for (int j = 0; j < lines; j++) {
-                    tooltip.add(new TextComponent(spaces));
+                    tooltip.add(ComponentFactory.literal(spaces));
                 }
             }
         }
@@ -76,9 +77,9 @@ public class TooltipRender {
                 if (KeyBindings.openManual != null) {
                     if (!SafeClientTools.isSneaking()) {
                         String translationKey = KeyBindings.openManual.saveString();
-                        event.getToolTip().add(new TextComponent("<Press ").withStyle(ChatFormatting.YELLOW)
-                                .append(new TranslatableComponent(translationKey).withStyle(ChatFormatting.GREEN))
-                                .append(new TextComponent(" for help>").withStyle(ChatFormatting.YELLOW)));
+                        event.getToolTip().add(ComponentFactory.literal("<Press ").withStyle(ChatFormatting.YELLOW)
+                                .append(ComponentFactory.translatable(translationKey).withStyle(ChatFormatting.GREEN))
+                                .append(ComponentFactory.literal(" for help>").withStyle(ChatFormatting.YELLOW)));
                     }
                 }
             }
