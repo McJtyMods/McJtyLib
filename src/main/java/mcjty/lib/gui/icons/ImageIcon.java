@@ -117,7 +117,6 @@ public class ImageIcon implements IIcon, Cloneable {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, image);
         gui.blit(matrixStack, x, y, u, v, width, height);
-        gui.blit()
         if (overlays != null) {
             for (IIcon icon : overlays) {
                 icon.draw(gui, matrixStack, x, y);
