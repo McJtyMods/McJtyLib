@@ -1,3 +1,6 @@
+Upcoming:
+- iTitus fixed a problem with the builder not replacing lava blocks with dirt
+
 1.16-5.1.7:
 - New GuiPopupTools (moved from RFTools Control)
 - Changed the wrench tag from forge:wrench to forge:tools/wrench
