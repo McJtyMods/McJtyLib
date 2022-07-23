@@ -1,26 +1,27 @@
 package mcjty.lib.varia;
 
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public class ComponentFactory {
 
-    public static TranslatableComponent translatable(String key) {
-        return new TranslatableComponent(key);
+    public static MutableComponent translatable(String key) {
+        return Component.translatable(key);
     }
 
     public static MutableComponent translatable(String key, Object... objects) {
-        return new TranslatableComponent(key, objects);
+        return Component.translatable(key, objects);
     }
 
     public static MutableComponent literal(String text) {
-        return new TextComponent(text);
+        return Component.literal(text);
     }
 
-    public static Component empty() {
-        return TextComponent.EMPTY;
+    public static MutableComponent empty() {
+        return Component.empty();
     }
 
     public static MutableComponent keybind(String keybind) {
-        return new KeybindComponent(keybind);
+        return Component.keybind(keybind);
     }
 }

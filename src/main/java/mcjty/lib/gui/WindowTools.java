@@ -1,29 +1,31 @@
 package mcjty.lib.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.item.ItemStack;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class WindowTools {
 
     public static void parseAndHandleClient(ResourceLocation guiDescription, Consumer<GuiParser.GuiCommand> consumer) {
         try {
-            Resource resource = Minecraft.getInstance().getResourceManager().getResource(guiDescription);
-            try(BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-                GuiParser.parse(br).forEach(consumer);
-            } catch (GuiParser.ParserException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (IOException e) {
+            Optional<Resource> res = Minecraft.getInstance().getResourceManager().getResource(guiDescription);
+            res.ifPresent(resource -> {
+                try {
+                    BufferedReader br = resource.openAsReader();
+                    GuiParser.parse(br).forEach(consumer);
+                } catch (IOException | GuiParser.ParserException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
     }

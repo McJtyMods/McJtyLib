@@ -1,41 +1,6 @@
 package mcjty.lib.multipart;
 
-import mcjty.lib.McJtyLib;
-import mcjty.lib.compat.theoneprobe.McJtyLibTOPDriver;
-import mcjty.lib.compat.theoneprobe.TOPDriver;
-import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
-import mcjty.lib.compat.waila.WailaInfoProvider;
-import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.shapes.BooleanOp;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Map;
-import java.util.function.Function;
-
-import net.minecraft.world.level.block.state.BlockBehaviour;
-
-public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoProvider, EntityBlock {
+public class MultipartBlock {}/* extends Block implements WailaInfoProvider, TOPInfoProvider, EntityBlock {
 
     public static final AABB AABB_EMPTY = new AABB(0, 0, 0, 0, 0, 0);
     public static final AABB AABB_CENTER = new AABB(.4, .4, .4, .6, .6, .6);
@@ -220,3 +185,4 @@ public class MultipartBlock extends Block implements WailaInfoProvider, TOPInfoP
 //        return state;
 //    }
 }
+*/

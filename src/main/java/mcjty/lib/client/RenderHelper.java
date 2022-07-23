@@ -1,6 +1,5 @@
 package mcjty.lib.client;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -16,6 +15,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
@@ -29,8 +29,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nullable;
@@ -197,7 +197,8 @@ public class RenderHelper {
             return false;
         }
 
-        ResourceLocation fluidStill = fluid.getAttributes().getStillTexture();
+        IClientFluidTypeExtensions attributes = IClientFluidTypeExtensions.of(fluidStack.getFluid());
+        ResourceLocation fluidStill = attributes.getStillTexture(fluidStack);
         TextureAtlasSprite fluidStillSprite = null;
         if (fluidStill != null) {
             fluidStillSprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fluidStill);
@@ -206,7 +207,7 @@ public class RenderHelper {
             return false;
         }
 
-        int fluidColor = fluid.getAttributes().getColor(fluidStack);
+        int fluidColor = attributes.getTintColor(fluidStack);
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
 //        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bindForSetup(InventoryMenu.BLOCK_ATLAS);
         setGLColorFromInt(fluidColor);
@@ -976,45 +977,23 @@ public class RenderHelper {
                 .endVertex();
     }
 
-    public static void putVertex(Matrix4f matrix, IVertexConsumer builder, Position normal,
+    public static void putVertex(Matrix4f matrix, VertexConsumer builder, Position normal,
                                  double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
         Vector4f vector4f = new Vector4f((float)x, (float)y, (float)z, 1.0F);
         vector4f.transform(matrix);
         putVertex(builder, normal, vector4f.x(), vector4f.y(), vector4f.z(), u, v, sprite, r, g, b, a);
     }
 
-    public static void putVertex(IVertexConsumer builder, Position normal,
+    public static void putVertex(VertexConsumer builder, Position normal,
                                  double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
-        ImmutableList<VertexFormatElement> elements = builder.getVertexFormat().getElements().asList();
-        for (int e = 0; e < elements.size(); e++) {
-            switch (elements.get(e).getUsage()) {
-                case POSITION:
-                    builder.put(e, (float)x, (float)y, (float)z);
-                    break;
-                case COLOR:
-                    builder.put(e, r, g, b, a);
-                    break;
-                case UV:
-                    switch (elements.get(e).getIndex()) {
-                        case 0 -> {
-                            float iu = sprite.getU(u);
-                            float iv = sprite.getV(v);
-                            builder.put(e, iu, iv);
-                        }
-                        case 2 -> builder.put(e, (short) 0, (short) 0);
-
-//                            builder.put(e, 0f, 1f);
-                        default -> builder.put(e);
-                    }
-                    break;
-                case NORMAL:
-                    builder.put(e, (float) normal.x(), (float) normal.y(), (float) normal.z());
-                    break;
-                default:
-                    builder.put(e);
-                    break;
-            }
-        }
+        float iu = sprite.getU(u);
+        float iv = sprite.getV(v);
+        builder.vertex(x, y, z);
+        builder.uv(iu, iv);
+        builder.uv2(OverlayTexture.NO_WHITE_U, OverlayTexture.WHITE_OVERLAY_V)
+        builder.color(r, g, b, a);
+        builder.normal((float)normal.x(), (float)normal.y(), (float)normal.z());
+        builder.endVertex();
     }
 
     private static Vector3f Cross(Vector3f a, Vector3f b) {

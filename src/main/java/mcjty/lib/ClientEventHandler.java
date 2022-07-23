@@ -15,7 +15,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseDragged(ScreenEvent.MouseDragEvent.Pre event) {
+    public void onMouseDragged(ScreenEvent.MouseDragged.Pre event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
@@ -31,7 +31,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseScolled(ScreenEvent.MouseScrollEvent.Pre event) {
+    public void onMouseScolled(ScreenEvent.MouseScrolled.Pre event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
@@ -48,7 +48,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseClicked(ScreenEvent.MouseClickedEvent.Pre event) {
+    public void onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
@@ -65,7 +65,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseReleased(ScreenEvent.MouseReleasedEvent.Pre event) {
+    public void onMouseReleased(ScreenEvent.MouseButtonReleased.Pre event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 WindowManager manager = container.getWindow().getWindowManager();
@@ -82,7 +82,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onGuiInput(ScreenEvent.KeyboardCharTypedEvent event) {
+    public void onGuiInput(ScreenEvent.CharacterTyped event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 Widget<?> focus;
@@ -107,7 +107,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onKeyboardInput(ScreenEvent.KeyboardKeyPressedEvent event) {
+    public void onKeyboardInput(ScreenEvent.KeyPressed event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 Widget<?> focus;

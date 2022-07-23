@@ -1,14 +1,14 @@
 package mcjty.lib.crafting;
 
 import com.google.gson.JsonObject;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 
 import javax.annotation.Nonnull;
 
-public class CopyNBTRecipeSerializer extends net.minecraftforge.registries.ForgeRegistryEntry<RecipeSerializer<?>> implements RecipeSerializer<CopyNBTRecipe> {
+public class CopyNBTRecipeSerializer implements RecipeSerializer<CopyNBTRecipe> {
 
     private final ShapedRecipe.Serializer serializer = new ShapedRecipe.Serializer();
 

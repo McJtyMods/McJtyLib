@@ -2,17 +2,18 @@ package mcjty.lib;
 
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.CommandInfo;
-import mcjty.lib.multipart.MultipartModelLoader;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.ClientSetup;
 import mcjty.lib.setup.ModSetup;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.syncpositional.PositionalDataSyncer;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -48,10 +49,13 @@ public class McJtyLib {
     public McJtyLib() {
         instance = this;
         // Register the setup method for modloading
+        Registration.init();
         FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientSetup::init);
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(MultipartModelLoader::register);
+            IEventBus modbus = FMLJavaModLoadingContext.get().getModEventBus();
+            modbus.addListener(ClientSetup::init);
+            modbus.addListener(ClientSetup::registerClientComponentTooltips);
+//            modbus.addListener(MultipartModelLoader::register);
         });
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);

@@ -5,8 +5,6 @@ import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -38,8 +36,8 @@ public class TooltipBuilder {
         return this;
     }
 
-    private static TranslatableComponent stylize(String translationKey, ChatFormatting... formattings) {
-        TranslatableComponent component = ComponentFactory.translatable(translationKey);
+    private static MutableComponent stylize(String translationKey, ChatFormatting... formattings) {
+        MutableComponent component = ComponentFactory.translatable(translationKey);
         for (ChatFormatting format : formattings) {
             component.withStyle(format);
         }

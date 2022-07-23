@@ -6,7 +6,6 @@ import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -97,7 +96,7 @@ public class GuiItemScreen extends Screen {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);
             // @todo check on 1.16
-            List<FormattedText> properties = tooltips.stream().map(TextComponent::new).collect(Collectors.toList());
+            List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
             List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
             renderTooltip(matrixStack, processors, x-guiLeft, y-guiTop);
         }
@@ -106,7 +105,7 @@ public class GuiItemScreen extends Screen {
             int x = GuiTools.getRelativeX(this);
             int y = GuiTools.getRelativeY(this);
             // @todo check on 1.16
-            List<FormattedText> properties = tooltips.stream().map(TextComponent::new).collect(Collectors.toList());
+            List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
             List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
             renderTooltip(matrixStack, processors, x - guiLeft, y - guiTop);
         }

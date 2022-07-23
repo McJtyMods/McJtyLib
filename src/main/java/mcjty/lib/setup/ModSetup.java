@@ -11,18 +11,18 @@ import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -31,7 +31,7 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.world.ChunkWatchEvent;
+import net.minecraftforge.event.level.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -74,9 +74,9 @@ public class ModSetup extends DefaultModSetup {
     public static class EventHandler {
 
         @SubscribeEvent
-        public void onWorldTick(TickEvent.WorldTickEvent event) {
-            if (event.phase == TickEvent.Phase.START && event.world.dimension() == Level.OVERWORLD) {
-                McJtyLib.SYNCER.sendOutData(event.world.getServer());
+        public void onWorldTick(TickEvent.LevelTickEvent event) {
+            if (event.phase == TickEvent.Phase.START && event.level.dimension() == Level.OVERWORLD) {
+                McJtyLib.SYNCER.sendOutData(event.level.getServer());
             }
         }
 
@@ -105,7 +105,7 @@ public class ModSetup extends DefaultModSetup {
 
         @SubscribeEvent
         public void onPlayerInteract(PlayerInteractEvent.LeftClickBlock event) {
-            Level world = event.getWorld();
+            Level world = event.getLevel();
             BlockPos pos = event.getPos();
             BlockState state = world.getBlockState(pos);
             if (state.getBlock() instanceof MultipartBlock) {
@@ -114,7 +114,7 @@ public class ModSetup extends DefaultModSetup {
                     if (!world.isClientSide) {
 
                         // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
-                        Player player = event.getPlayer();
+                        Player player = event.getEntity();
                         Vec3 start = player.getEyePosition(1.0f);
                         Vec3 vec31 = player.getViewVector(1.0f);
                         float dist = 20;

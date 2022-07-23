@@ -7,7 +7,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 public class KeyInputHandler {
 
     @SubscribeEvent
-    public void onKeyInput(InputEvent.KeyInputEvent event) {
+    public void onKeyInput(InputEvent.Key event) {
         if (KeyBindings.openManual.consumeClick()) {
             ClientManualHelper.openManualFromGui();
         }
