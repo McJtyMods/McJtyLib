@@ -33,7 +33,7 @@ public class BlockStateItem extends BlockItem {
 
     @Override
     public void fillItemCategory(@Nonnull CreativeModeTab group, @Nonnull NonNullList<ItemStack> items) {
-        if (this.allowdedIn(group)) {
+        if (this.allowedIn(group)) {
             items.add(new ItemStack(this));
         }
     }

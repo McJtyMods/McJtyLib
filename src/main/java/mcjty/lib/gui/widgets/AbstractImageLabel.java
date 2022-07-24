@@ -91,8 +91,8 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     private int pickColor(int u, int v) {
         if (bufferedImage == null) {
             try {
-                Resource resource = Minecraft.getInstance().getResourceManager().getResource(image);
-                bufferedImage = ImageIO.read(resource.getInputStream());
+                Resource resource = Minecraft.getInstance().getResourceManager().getResource(image).get();
+                bufferedImage = ImageIO.read(resource.open());
             } catch (IOException ignored) {
             }
         }

@@ -108,7 +108,7 @@ public class ItemStackTools {
             commonTags.add(ItemTags.RAILS);
             commonTags.add(ItemTags.SLABS);
             commonTags.add(ItemTags.WOOL);
-            commonTags.add(ItemTags.CARPETS);
+            commonTags.add(ItemTags.WOOL_CARPETS);
             commonTags.add(ItemTags.PLANKS);
             commonTags.add(ItemTags.STAIRS);
             commonTags.add(ItemTags.DIRT);

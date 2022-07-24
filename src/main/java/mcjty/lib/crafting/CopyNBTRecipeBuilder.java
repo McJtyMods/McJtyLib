@@ -200,7 +200,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
         @Override
         @Nonnull
         public RecipeSerializer<?> getType() {
-            return COPYNBT_SERIALIZER;
+            return COPYNBT_SERIALIZER.get();
         }
 
         /**

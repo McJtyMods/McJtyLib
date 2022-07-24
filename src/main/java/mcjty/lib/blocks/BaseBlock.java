@@ -249,7 +249,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             if (checkAccess(world, player, te)) {
                 return true;
             }
-            NetworkHooks.openGui((ServerPlayer) player, h, te.getBlockPos());
+            NetworkHooks.openScreen((ServerPlayer) player, h, te.getBlockPos());
             return true;
         }).orElse(false);
     }

@@ -2,6 +2,7 @@ package mcjty.lib.varia;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -11,16 +12,19 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.CommonLevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -30,43 +34,43 @@ import java.util.function.Function;
 public class Tools {
 
     public static ResourceLocation getId(EntityType<?> entityType) {
-        return entityType.getRegistryName();
+        return ForgeRegistries.ENTITY_TYPES.getKey(entityType);
     }
 
     public static ResourceLocation getId(ItemStack item) {
-        return item.getItem().getRegistryName();
+        return ForgeRegistries.ITEMS.getKey(item.getItem());
     }
 
     public static ResourceLocation getId(Item item) {
-        return item.getRegistryName();
+        return ForgeRegistries.ITEMS.getKey(item);
     }
 
     public static ResourceLocation getId(BlockState block) {
-        return block.getBlock().getRegistryName();
+        return ForgeRegistries.BLOCKS.getKey(block.getBlock());
     }
 
     public static ResourceLocation getId(Block block) {
-        return block.getRegistryName();
+        return ForgeRegistries.BLOCKS.getKey(block);
     }
 
     public static ResourceLocation getId(FluidStack fluid) {
-        return fluid.getFluid().getRegistryName();
+        return ForgeRegistries.FLUIDS.getKey(fluid.getFluid());
     }
 
     public static ResourceLocation getId(FluidState fluid) {
-        return fluid.getType().getRegistryName();
+        return ForgeRegistries.FLUIDS.getKey(fluid.getType());
     }
 
     public static ResourceLocation getId(Fluid fluid) {
-        return fluid.getRegistryName();
+        return ForgeRegistries.FLUIDS.getKey(fluid);
     }
 
-    public static ResourceLocation getId(Biome biome) {
-        return biome.getRegistryName();
+    public static ResourceLocation getId(CommonLevelAccessor level, Biome biome) {
+        return level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
     }
 
-    public static ResourceLocation getId(StructureFeature<?> feature) {
-        return feature.getRegistryName();
+    public static ResourceLocation getId(CommonLevelAccessor level, Structure feature) {
+        return level.registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY).getKey(feature);
     }
 
     public static String getModid(ItemStack stack) {
@@ -78,7 +82,7 @@ public class Tools {
     }
 
     public static String getModName(Fluid entry) {
-        ResourceLocation registryName = entry.getRegistryName();
+        ResourceLocation registryName = ForgeRegistries.FLUIDS.getKey(entry);
         String modId = registryName == null ? "minecraft" : registryName.getNamespace();
         return ModList.get().getModContainerById(modId)
                 .map(mod -> mod.getModInfo().getDisplayName())
@@ -86,7 +90,7 @@ public class Tools {
     }
 
     public static String getModName(Block entry) {
-        ResourceLocation registryName = entry.getRegistryName();
+        ResourceLocation registryName = ForgeRegistries.BLOCKS.getKey(entry);
         String modId = registryName == null ? "minecraft" : registryName.getNamespace();
         return ModList.get().getModContainerById(modId)
                 .map(mod -> mod.getModInfo().getDisplayName())

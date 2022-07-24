@@ -990,7 +990,7 @@ public class RenderHelper {
         float iv = sprite.getV(v);
         builder.vertex(x, y, z);
         builder.uv(iu, iv);
-        builder.uv2(OverlayTexture.NO_WHITE_U, OverlayTexture.WHITE_OVERLAY_V)
+        builder.uv2(OverlayTexture.NO_WHITE_U, OverlayTexture.WHITE_OVERLAY_V);
         builder.color(r, g, b, a);
         builder.normal((float)normal.x(), (float)normal.y(), (float)normal.z());
         builder.endVertex();

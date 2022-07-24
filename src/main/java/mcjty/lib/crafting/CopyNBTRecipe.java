@@ -53,6 +53,6 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
     @Override
     @Nonnull
     public RecipeSerializer<?> getSerializer() {
-        return Registration.COPYNBT_SERIALIZER;
+        return Registration.COPYNBT_SERIALIZER.get();
     }
 }

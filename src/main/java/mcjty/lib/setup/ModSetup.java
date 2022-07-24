@@ -5,24 +5,14 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
-import mcjty.lib.multipart.MultipartBlock;
-import mcjty.lib.multipart.MultipartHelper;
-import mcjty.lib.multipart.MultipartTE;
 import mcjty.lib.network.PacketHandler;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -30,7 +20,6 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.ChunkWatchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -103,35 +92,36 @@ public class ModSetup extends DefaultModSetup {
             }
         }
 
-        @SubscribeEvent
-        public void onPlayerInteract(PlayerInteractEvent.LeftClickBlock event) {
-            Level world = event.getLevel();
-            BlockPos pos = event.getPos();
-            BlockState state = world.getBlockState(pos);
-            if (state.getBlock() instanceof MultipartBlock) {
-                BlockEntity tileEntity = world.getBlockEntity(pos);
-                if (tileEntity instanceof MultipartTE) {
-                    if (!world.isClientSide) {
-
-                        // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
-                        Player player = event.getEntity();
-                        Vec3 start = player.getEyePosition(1.0f);
-                        Vec3 vec31 = player.getViewVector(1.0f);
-                        float dist = 20;
-                        Vec3 end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
-                        ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
-                        HitResult result = player.getCommandSenderWorld().clip(context);
-                        Vec3 hitVec = result.getLocation();
-
-                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, player, hitVec/*@todo*/)) {
-                            world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                        }
-                    }
-                }
-                event.setCanceled(true);
-            }
-        }
-
+        // @todo multipart
+//        @SubscribeEvent
+//        public void onPlayerInteract(PlayerInteractEvent.LeftClickBlock event) {
+//            Level world = event.getLevel();
+//            BlockPos pos = event.getPos();
+//            BlockState state = world.getBlockState(pos);
+//            if (state.getBlock() instanceof MultipartBlock) {
+//                BlockEntity tileEntity = world.getBlockEntity(pos);
+//                if (tileEntity instanceof MultipartTE) {
+//                    if (!world.isClientSide) {
+//
+//                        // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
+//                        Player player = event.getEntity();
+//                        Vec3 start = player.getEyePosition(1.0f);
+//                        Vec3 vec31 = player.getViewVector(1.0f);
+//                        float dist = 20;
+//                        Vec3 end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
+//                        ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
+//                        HitResult result = player.getCommandSenderWorld().clip(context);
+//                        Vec3 hitVec = result.getLocation();
+//
+//                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, player, hitVec/*@todo*/)) {
+//                            world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+//                        }
+//                    }
+//                }
+//                event.setCanceled(true);
+//            }
+//        }
+//
     }
 
 }

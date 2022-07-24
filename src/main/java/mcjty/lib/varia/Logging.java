@@ -3,7 +3,6 @@ package mcjty.lib.varia;
 import mcjty.lib.McJtyLib;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
 import net.minecraftforge.common.ForgeConfigSpec;

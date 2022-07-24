@@ -26,22 +26,23 @@ public class McJtyLibTOPDriver implements TOPDriver {
 
     @Override
     public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState blockState, IProbeHitData data) {
-        if (blockState.getBlock() == Registration.MULTIPART_BLOCK) {
-            MultipartTE.Part part = MultipartBlock.getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
-            if (part != null) {
-                if (part.getTileEntity() instanceof TOPInfoProvider) {
-                    TOPDriver driver = ((TOPInfoProvider) part.getTileEntity()).getProbeDriver();
-                    if (driver != null) {
-                        driver.addProbeInfo(mode, probeInfo, player, world, blockState, data);
-                    }
-                } else if (part.getState().getBlock() instanceof TOPInfoProvider) {
-                    TOPDriver driver = ((TOPInfoProvider) part.getState().getBlock()).getProbeDriver();
-                    driver.addProbeInfo(mode, probeInfo, player, world, blockState, data);
-                }
-            }
-        } else if (blockState.getBlock() instanceof BaseBlock) {
+        // @todo multipart
+//        if (blockState.getBlock() == Registration.MULTIPART_BLOCK) {
+//            MultipartTE.Part part = MultipartBlock.getHitPart(blockState, world, data.getPos(), MultipartHelper.getPlayerEyes(player), data.getHitVec());
+//            if (part != null) {
+//                if (part.getTileEntity() instanceof TOPInfoProvider) {
+//                    TOPDriver driver = ((TOPInfoProvider) part.getTileEntity()).getProbeDriver();
+//                    if (driver != null) {
+//                        driver.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+//                    }
+//                } else if (part.getState().getBlock() instanceof TOPInfoProvider) {
+//                    TOPDriver driver = ((TOPInfoProvider) part.getState().getBlock()).getProbeDriver();
+//                    driver.addProbeInfo(mode, probeInfo, player, world, blockState, data);
+//                }
+//            }
+//        } else if (blockState.getBlock() instanceof BaseBlock) {
             addStandardProbeInfo(mode, probeInfo, player, world, blockState, data);
-        }
+//        }
     }
 
     public void addStandardProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState blockState, IProbeHitData data) {
