@@ -988,12 +988,12 @@ public class RenderHelper {
                                  double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
         float iu = sprite.getU(u);
         float iv = sprite.getV(v);
-        builder.vertex(x, y, z);
-        builder.uv(iu, iv);
-        builder.uv2(OverlayTexture.NO_WHITE_U, OverlayTexture.WHITE_OVERLAY_V);
-        builder.color(r, g, b, a);
-        builder.normal((float)normal.x(), (float)normal.y(), (float)normal.z());
-        builder.endVertex();
+        builder.vertex(x, y, z)
+                .uv(iu, iv)
+                .uv2(0, 0)
+                .color(r, g, b, a)
+                .normal((float)normal.x(), (float)normal.y(), (float)normal.z())
+                .endVertex();
     }
 
     private static Vector3f Cross(Vector3f a, Vector3f b) {

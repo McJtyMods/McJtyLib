@@ -3,6 +3,7 @@ package mcjty.lib.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import mcjty.lib.varia.TriConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -25,7 +26,7 @@ public class DelayedRenderer {
     private static final Map<RenderType, List<Pair<BlockPos, BiConsumer<PoseStack, VertexConsumer>>>> renders = new HashMap<>();
 
     // Global renderers
-    private static final Map<BlockPos, BiConsumer<PoseStack, Vec3>> delayedRenders = new HashMap<>();
+    private static final Map<BlockPos, TriConsumer<PoseStack, Vec3, RenderType>> delayedRenders = new HashMap<>();
     private static final Map<BlockPos, BiFunction<Level, BlockPos, Boolean>> renderValidations = new HashMap<>();
 
     public static void render(PoseStack matrixStack) {
@@ -35,7 +36,7 @@ public class DelayedRenderer {
         Set<BlockPos> todelete = new HashSet<>();
         delayedRenders.forEach((pos, consumer) -> {
             if (renderValidations.getOrDefault(pos, (level, blockPos) -> false).apply(Minecraft.getInstance().level, pos)) {
-                consumer.accept(matrixStack, projectedView);
+                consumer.accept(matrixStack, projectedView, null);
             } else {
                 todelete.add(pos);
             }
@@ -63,7 +64,7 @@ public class DelayedRenderer {
         buffer.endBatch();
     }
 
-    public static void addRender(BlockPos pos, BiConsumer<PoseStack, Vec3> renderer, BiFunction<Level, BlockPos, Boolean> validator) {
+    public static void addRender(BlockPos pos, TriConsumer<PoseStack, Vec3, RenderType> renderer, BiFunction<Level, BlockPos, Boolean> validator) {
         delayedRenders.put(pos, renderer);
         renderValidations.put(pos, validator);
     }
