@@ -13,6 +13,7 @@ import net.minecraftforge.client.model.generators.*;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static net.minecraftforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
@@ -29,6 +30,12 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
     public BaseBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
         super(gen, modid, exFileHelper);
+    }
+
+    public void simpleBlockC(Block block, Consumer<BlockModelBuilder> consumer) {
+        BlockModelBuilder blockModelBuilder = models().cubeAll(this.name(block), blockTexture(block));
+        consumer.accept(blockModelBuilder);
+        simpleBlock(block, blockModelBuilder);
     }
 
     public ModelFile frontBasedModel(String modelName, ResourceLocation texture) {
@@ -172,6 +179,12 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     protected void singleTextureBlock(Block block, String modelName, String textureName) {
         ModelFile model = models().cubeAll(modelName, modLoc(textureName));
         simpleBlock(block, model);
+    }
+
+    protected void singleTextureBlockC(Block block, String modelName, String textureName, Consumer<BlockModelBuilder> consumer) {
+        BlockModelBuilder builder = models().cubeAll(modelName, modLoc(textureName));
+        consumer.accept(builder);
+        simpleBlock(block, builder);
     }
 
     protected VariantBlockStateBuilder horizontalOrientedBlock(Block block, ModelFile model) {
