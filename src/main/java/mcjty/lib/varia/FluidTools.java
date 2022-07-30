@@ -111,17 +111,17 @@ public class FluidTools {
         Material material = blockstate.getMaterial();
         Fluid fluid = fluidstate.getType();
 
-        if (blockstate.getBlock() instanceof BucketPickup && fluid != Fluids.EMPTY) {
+        if (blockstate.getBlock() instanceof LiquidBlock) {
+            FluidStack stack = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
+            if (action.test(stack)) {
+                clearBlock.run();
+            }
+            return stack;
+        } else if (blockstate.getBlock() instanceof BucketPickup && fluid != Fluids.EMPTY) {
             FluidStack stack = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
             if (action.test(stack)) {
                 ItemStack fluidBucket = ((BucketPickup) blockstate.getBlock()).pickupBlock(world, pos, blockstate);
                 return FluidUtil.getFluidContained(fluidBucket).map(f -> new FluidStack(f, FluidType.BUCKET_VOLUME)).orElse(FluidStack.EMPTY);
-            }
-            return stack;
-        } else if (blockstate.getBlock() instanceof LiquidBlock) {
-            FluidStack stack = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
-            if (action.test(stack)) {
-                clearBlock.run();
             }
             return stack;
         } else if (material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT) {

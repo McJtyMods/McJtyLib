@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem where the builder with the pump card would not replace lava with dirt
+
 1.19-7.0.0:
 - Port to 1.19
 
