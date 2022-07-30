@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem where the builder with the pump card would not replace lava with dirt
+
 1.18-6.0.15:
 - Created ComponentFactory to help with porting to 1.19
 - Created Tools.getId() to make porting to 1.19 easier
