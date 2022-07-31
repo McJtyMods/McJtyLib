@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed keybindings
+
 1.19-7.0.1:
 - Fixed a problem where the builder with the pump card would not replace lava with dirt
 

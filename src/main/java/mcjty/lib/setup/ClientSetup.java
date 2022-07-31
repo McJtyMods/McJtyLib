@@ -6,6 +6,7 @@ import mcjty.lib.keys.KeyInputHandler;
 import mcjty.lib.tooltips.ClientTooltipIcon;
 import mcjty.lib.tooltips.TooltipRender;
 import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -15,7 +16,6 @@ public class ClientSetup {
         MinecraftForge.EVENT_BUS.register(new TooltipRender());
         MinecraftForge.EVENT_BUS.register(new ClientEventHandler());
 
-        KeyBindings.init();
         MinecraftForge.EVENT_BUS.register(new KeyInputHandler());
 
 //        ItemBlockRenderTypes.setRenderLayer(Registration.MULTIPART_BLOCK, (RenderType) -> true);
@@ -25,6 +25,10 @@ public class ClientSetup {
 //                .forEach(type -> {
 //                    Minecraft.getInstance().renderBuffers().fixedBuffers.put(type, new BufferBuilder(type.bufferSize()));
 //                });
+    }
+
+    public static void registerKeyBinds(RegisterKeyMappingsEvent event) {
+        KeyBindings.init(event);
     }
 
     public static void registerClientComponentTooltips(RegisterClientTooltipComponentFactoriesEvent event) {

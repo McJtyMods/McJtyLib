@@ -54,6 +54,7 @@ public class McJtyLib {
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             IEventBus modbus = FMLJavaModLoadingContext.get().getModEventBus();
             modbus.addListener(ClientSetup::init);
+            modbus.addListener(ClientSetup::registerKeyBinds);
             modbus.addListener(ClientSetup::registerClientComponentTooltips);
 //            modbus.addListener(MultipartModelLoader::register);
         });
