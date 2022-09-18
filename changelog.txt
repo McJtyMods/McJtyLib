@@ -1,4 +1,4 @@
-Upcoming:
+1.19-7.0.3:
 - Fixed durability bar on item rendering
 
 1.19-7.0.2:
