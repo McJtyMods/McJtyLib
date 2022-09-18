@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed durability bar on item rendering
+
 1.19-7.0.2:
 - Fixed keybindings
 
