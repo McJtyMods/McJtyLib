@@ -10,18 +10,14 @@ import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
 import mcjty.lib.base.StyleConfig;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
@@ -32,8 +28,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.fluids.FluidStack;
-
-import javax.annotation.Nullable;
 
 import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
 import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
@@ -264,37 +258,6 @@ public class RenderHelper {
 //        }
     }
 
-    public static void renderStackOnGround(PoseStack matrixStack, ItemStack stack, double alpha) {
-        if (!stack.isEmpty()) {
-            BakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getModel(stack, null, null, 1);
-            if (!stack.isEmpty()) {
-                RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-//                Minecraft.getInstance().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
-                Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).setFilter(false, false);
-                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, (float) alpha);
-                // @todo 1.17 GlStateManager._enableRescaleNormal();
-                // @todo 1.17 GlStateManager._alphaFunc(GL11.GL_GREATER, 0.1F);
-                GlStateManager._enableBlend();
-                GlStateManager._blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
-                matrixStack.pushPose();
-
-                // @todo 1.15
-//                ibakedmodel = net.minecraftforge.client.ForgeHooksClient.handleCameraTransforms(ibakedmodel, ItemCameraTransforms.TransformType.GROUND, false);
-//                Minecraft.getInstance().getItemRenderer().renderItem(stack, ibakedmodel);
-
-                // @todo 1.15
-//                GlStateManager.cullFace(GlStateManager.CullFace.BACK);
-                matrixStack.popPose();
-                // @todo 1.17 GlStateManager._disableRescaleNormal();
-                GlStateManager._disableBlend();
-                RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-//                Minecraft.getInstance().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
-                Minecraft.getInstance().getTextureManager().getTexture(InventoryMenu.BLOCK_ATLAS).restoreLastBlurMipmap();
-            }
-        }
-
-    }
-
     public static boolean renderItemStack(PoseStack matrixStack, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
         RenderSystem.setShaderColor(1F, 1F, 1F, 1f);
 
@@ -316,74 +279,13 @@ public class RenderHelper {
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             itemRender.renderAndDecorateItem(itm, x, y);
-            renderItemOverlayIntoGUI(matrixStack, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
-//            itemRender.renderItemOverlayIntoGUI(mc.fontRenderer, itm, x, y, txt);
+            itemRender.renderGuiItemDecorations(Minecraft.getInstance().font, itm, x, y, txt);
             matrixStack.popPose();
             // @todo 1.17 RenderSystem.disableRescaleNormal();
             // @todo 1.17 RenderSystem.disableLighting();
         }
 
         return rc;
-    }
-
-    private static void renderItemOverlayIntoGUI(PoseStack matrixStack, Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text,
-                                                    int scaled) {
-        if (!stack.isEmpty()) {
-            ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-            if (stack.getCount() != 1 || text != null) {
-                String s = text == null ? String.valueOf(stack.getCount()) : text;
-                matrixStack.translate(0.0D, 0.0D, (itemRenderer.blitOffset + 200.0F));
-                MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-
-                if (scaled >= 2) {
-                    matrixStack.pushPose();
-                    matrixStack.scale(.5f, .5f, .5f);
-                    fr.drawShadow(matrixStack, s, ((xPosition + 19 - 2) * 2 - 1 - fr.width(s)), yPosition * 2 + 24, 16777215);
-                    matrixStack.popPose();
-                } else if (scaled == 1) {
-                    matrixStack.pushPose();
-                    matrixStack.scale(.75f, .75f, .75f);
-                    fr.drawShadow(matrixStack, s, ((xPosition - 2) * 1.34f + 24 - fr.width(s)), yPosition * 1.34f + 14, 16777215);
-                    matrixStack.popPose();
-                } else {
-                    fr.drawShadow(matrixStack, s, (xPosition + 19 - 2 - fr.width(s)), (yPosition + 6 + 3), 16777215);
-                }
-
-                buffer.endBatch();
-            }
-
-            if (stack.getItem().isBarVisible(stack)) {
-                RenderSystem.disableDepthTest();
-                RenderSystem.disableTexture();
-                // @todo 1.17 RenderSystem.disableAlphaTest();
-                RenderSystem.disableBlend();
-                Tesselator tessellator = Tesselator.getInstance();
-                BufferBuilder bufferbuilder = tessellator.getBuilder();
-                int barWidth = stack.getItem().getBarWidth(stack);
-                int j = stack.getItem().getBarColor(stack);
-                draw(bufferbuilder, xPosition + 2, yPosition + 13, 13, 2, 0, 0, 0, 255);
-                draw(bufferbuilder, xPosition + 2, yPosition + 13, barWidth, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
-                RenderSystem.enableBlend();
-                // @todo 1.17 RenderSystem.enableAlphaTest();
-                RenderSystem.enableTexture();
-                RenderSystem.enableDepthTest();
-            }
-
-            LocalPlayer clientplayerentity = Minecraft.getInstance().player;
-            float f3 = clientplayerentity == null ? 0.0F : clientplayerentity.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getFrameTime());
-            if (f3 > 0.0F) {
-                RenderSystem.disableDepthTest();
-                RenderSystem.disableTexture();
-                RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
-                Tesselator tessellator1 = Tesselator.getInstance();
-                BufferBuilder bufferbuilder1 = tessellator1.getBuilder();
-                draw(bufferbuilder1, xPosition, yPosition + Mth.floor(16.0F * (1.0F - f3)), 16, Mth.ceil(16.0F * f3), 255, 255, 255, 127);
-                RenderSystem.enableTexture();
-                RenderSystem.enableDepthTest();
-            }
-
-        }
     }
 
     /**

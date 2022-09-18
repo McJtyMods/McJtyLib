@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed durability bar on item rendering
+
 1.18-6.0.16:
 - Fixed a problem where the builder with the pump card would not replace lava with dirt
 
