@@ -10,7 +10,9 @@ import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
 import mcjty.lib.base.StyleConfig;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -18,6 +20,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
@@ -28,6 +31,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.pipeline.IVertexConsumer;
 import net.minecraftforge.fluids.FluidStack;
+
+import javax.annotation.Nullable;
 
 import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
 import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
@@ -279,7 +284,7 @@ public class RenderHelper {
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             itemRender.renderAndDecorateItem(itm, x, y);
-            itemRender.renderGuiItemDecorations(Minecraft.getInstance().font, itm, x, y, txt);
+            renderGuiItemDecorations(itemRender, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
             matrixStack.popPose();
             // @todo 1.17 RenderSystem.disableRescaleNormal();
             // @todo 1.17 RenderSystem.disableLighting();
@@ -287,6 +292,75 @@ public class RenderHelper {
 
         return rc;
     }
+
+    private static void renderGuiItemDecorations(ItemRenderer itemRender, Font font, ItemStack stack, int x, int y, @Nullable String text, int scaled) {
+        if (!stack.isEmpty()) {
+            PoseStack posestack = new PoseStack();
+            if (stack.getCount() != 1 || text != null) {
+                String s = text == null ? String.valueOf(stack.getCount()) : text;
+                posestack.translate(0.0D, 0.0D, itemRender.blitOffset + 200.0F);
+                MultiBufferSource.BufferSource source = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+
+                if (scaled >= 2) {
+                    posestack.pushPose();
+                    posestack.scale(.5f, .5f, .5f);
+                    font.drawInBatch(s, ((x + 19 - 2) * 2 - 1 - font.width(s)), y * 2 + 24, 16777215, true, posestack.last().pose(), source, false, 0, 15728880);
+                    posestack.popPose();
+                } else if (scaled == 1) {
+                    posestack.pushPose();
+                    posestack.scale(.75f, .75f, .75f);
+                    font.drawInBatch(s, ((x - 2) * 1.34f + 24 - font.width(s)), y * 1.34f + 14, 16777215, true, posestack.last().pose(), source, false, 0, 15728880);
+                    posestack.popPose();
+                } else {
+                    font.drawInBatch(s, (x + 19 - 2 - font.width(s)), (y + 6 + 3), 16777215, true, posestack.last().pose(), source, false, 0, 15728880);
+                }
+
+                source.endBatch();
+            }
+
+            if (stack.isBarVisible()) {
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableTexture();
+                RenderSystem.disableBlend();
+                Tesselator tesselator = Tesselator.getInstance();
+                BufferBuilder bufferbuilder = tesselator.getBuilder();
+                int i = stack.getBarWidth();
+                int j = stack.getBarColor();
+                fillRect(bufferbuilder, x + 2, y + 13, 13, 2, 0, 0, 0, 255);
+                fillRect(bufferbuilder, x + 2, y + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
+                RenderSystem.enableBlend();
+                RenderSystem.enableTexture();
+                RenderSystem.enableDepthTest();
+            }
+
+            LocalPlayer localplayer = Minecraft.getInstance().player;
+            float f = localplayer == null ? 0.0F : localplayer.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getFrameTime());
+            if (f > 0.0F) {
+                RenderSystem.disableDepthTest();
+                RenderSystem.disableTexture();
+                RenderSystem.enableBlend();
+                RenderSystem.defaultBlendFunc();
+                Tesselator tesselator1 = Tesselator.getInstance();
+                BufferBuilder bufferbuilder1 = tesselator1.getBuilder();
+                fillRect(bufferbuilder1, x, y + Mth.floor(16.0F * (1.0F - f)), 16, Mth.ceil(16.0F * f), 255, 255, 255, 127);
+                RenderSystem.enableTexture();
+                RenderSystem.enableDepthTest();
+            }
+        }
+    }
+
+    private static void fillRect(BufferBuilder pRenderer, int pX, int pY, int pWidth, int pHeight, int pRed, int pGreen, int pBlue, int pAlpha) {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        pRenderer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        pRenderer.vertex(pX + 0, pY + 0, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
+        pRenderer.vertex(pX + 0, pY + pHeight, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
+        pRenderer.vertex(pX + pWidth, pY + pHeight, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
+        pRenderer.vertex(pX + pWidth, pY + 0, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
+        pRenderer.end();
+        BufferUploader.end(pRenderer);
+    }
+
+
 
     /**
      * Draw with the WorldRenderer
