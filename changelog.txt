@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem with rendering of very large itemstacks. This manifested itself in the RFTools Storage storage scanner
+
 1.19-7.0.3:
 - Fixed durability bar on item rendering
 
