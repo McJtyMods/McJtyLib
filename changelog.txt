@@ -1,4 +1,4 @@
-Upcoming:
+1.18-6.0.18:
 - Fixed a problem with rendering of very large itemstacks. This manifested itself in the RFTools Storage storage scanner
 
 1.18-6.0.17:
