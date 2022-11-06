@@ -284,6 +284,7 @@ public class RenderHelper {
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             itemRender.renderAndDecorateItem(itm, x, y);
+//            itemRender.renderGuiItemDecorations();
             renderGuiItemDecorations(itemRender, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
             matrixStack.popPose();
             // @todo 1.17 RenderSystem.disableRescaleNormal();
@@ -356,7 +357,6 @@ public class RenderHelper {
         pRenderer.vertex(pX + 0, pY + pHeight, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
         pRenderer.vertex(pX + pWidth, pY + pHeight, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
         pRenderer.vertex(pX + pWidth, pY + 0, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
-        pRenderer.end();
         BufferUploader.drawWithShader(pRenderer.end());
     }
 
