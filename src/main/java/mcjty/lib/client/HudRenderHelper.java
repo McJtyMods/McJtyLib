@@ -37,17 +37,15 @@ public class HudRenderHelper {
         Quaternion quaternion = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         switch (hudOrientation) {
             case HUD_SOUTH -> matrixStack.mulPose(new Quaternion(new Vector3f(0, 1, 0), -getHudAngle(orientation), true));
-            case HUD_TOPLAYER_HORIZ ->
-                    // @todo 1.15 change to correct quaternion? This is most likely not correct?
-                    matrixStack.mulPose(quaternion);   // @todo 1.15 test
-
-//                GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-//                GlStateManager.rotatef(180, 0.0F, 1.0F, 0.0F);
-            case HUD_TOPLAYER -> matrixStack.mulPose(quaternion);   // @todo 1.15 test
-
-//                GlStateManager.rotatef(-Minecraft.getInstance().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
-//                GlStateManager.rotatef(Minecraft.getInstance().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
-//                GlStateManager.rotatef(180, 0.0F, 1.0F, 0.0F);
+            case HUD_TOPLAYER_HORIZ -> {
+                // @todo not correct, it just faces camera
+                matrixStack.mulPose(quaternion);
+                matrixStack.mulPose(Quaternion.fromXYZ(0, 3.14159f, 0));
+            }
+            case HUD_TOPLAYER -> {
+                matrixStack.mulPose(quaternion);
+                matrixStack.mulPose(Quaternion.fromXYZ(0, 3.14159f, 0));
+            }
         }
 
         if (hudPlacement == HudPlacement.HUD_FRONT || hudPlacement == HudPlacement.HUD_ABOVE_FRONT) {
