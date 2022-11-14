@@ -63,7 +63,7 @@ public class RenderSettings {
         private int b = 255;
         private int a = 255;
         private float width = 1.0f;
-        private RenderType renderType = CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS;
+        private RenderType renderType = CustomRenderTypes.translucent();
 
         public Builder brightness(int brightness) {
             this.brightness = brightness;

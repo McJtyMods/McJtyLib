@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
@@ -22,7 +23,9 @@ public class RenderGlowEffect {
      * for glowing should be bound before calling this.
      */
     public static void renderGlow(PoseStack matrixStack, MultiBufferSource buffer, ResourceLocation texture) {
-        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS);
+//        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_TEST);
+//        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS);
+        VertexConsumer builder = buffer.getBuffer(RenderType.translucent());
 
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(texture);
 
