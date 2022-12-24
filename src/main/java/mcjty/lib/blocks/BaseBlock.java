@@ -412,12 +412,17 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     @Override
-    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rot) {
-        state = switch (getRotationType()) {
+    public BlockState rotate(BlockState state, Rotation rot) {
+        return switch (getRotationType()) {
             case HORIZROTATION -> state.setValue(BlockStateProperties.HORIZONTAL_FACING, rot.rotate(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
             case ROTATION -> state.setValue(BlockStateProperties.FACING, rot.rotate(state.getValue(BlockStateProperties.FACING)));
             case NONE -> state;
         };
+    }
+
+    @Override
+    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rot) {
+        state = rotate(state, rot);
         BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof GenericTileEntity genericTileEntity) {
             genericTileEntity.rotateBlock(rot);
