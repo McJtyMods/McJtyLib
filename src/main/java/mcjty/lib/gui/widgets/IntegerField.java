@@ -1,7 +1,8 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -14,7 +15,6 @@ import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
@@ -31,6 +31,9 @@ public class IntegerField extends AbstractWidget<IntegerField> {
     private String text = "";
     private int cursor = 0;
     private int startOffset = 0;        // Start character where we are displaying
+    private int minimum = Integer.MIN_VALUE;
+    private int maximum = Integer.MAX_VALUE;
+
     /**
      * One end of the selected region. If nothing is selected, is should be -1.
      */
@@ -53,6 +56,28 @@ public class IntegerField extends AbstractWidget<IntegerField> {
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
             return 0;
+        }
+    }
+
+    public IntegerField minimum(int minimum) {
+        this.minimum = minimum;
+        return this;
+    }
+
+    public IntegerField maximum(int maximum) {
+        this.maximum = maximum;
+        return this;
+    }
+
+    private void validate() {
+        int v = getInt();
+        if (v < minimum) {
+            text = Integer.toString(minimum);
+        } else if (v > maximum) {
+            text = Integer.toString(maximum);
+        }
+        if (cursor > text.length()) {
+            cursor = text.length();
         }
     }
 
@@ -109,6 +134,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                             text = text.substring(0, cursor) + data + text.substring(cursor);
                         }
                         cursor += data.length();
+                        validate();
                         fireIntegerEvents(getInt());
                     }
                 } else if (keyCode == GLFW.GLFW_KEY_C) {
@@ -147,6 +173,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                 } else if (!text.isEmpty() && cursor > 0) {
                     text = text.substring(0, cursor - 1) + text.substring(cursor);
                     cursor--;
+                    validate();
                     fireIntegerEvents(getInt());
                 }
             } else if (keyCode == GLFW.GLFW_KEY_DELETE) {
@@ -155,6 +182,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                     fireIntegerEvents(getInt());
                 } else if (cursor < text.length()) {
                     text = text.substring(0, cursor) + text.substring(cursor + 1);
+                    validate();
                     fireIntegerEvents(getInt());
                 }
             } else if (keyCode == GLFW.GLFW_KEY_HOME) {
@@ -197,6 +225,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                 if (Character.isDigit(codePoint) || codePoint == '-') {
                     text = text.substring(0, cursor) + codePoint + text.substring(cursor);
                     cursor++;
+                    validate();
                     fireIntegerEvents(getInt());
                     return true;
                 }
@@ -264,6 +293,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
         int selectionStart = getSelectionStart();
         text = text.substring(0, selectionStart) + replacement + text.substring(getSelectionEnd());
         cursor = selectionStart;
+        validate();
         clearSelection();
     }
 
@@ -415,6 +445,8 @@ public class IntegerField extends AbstractWidget<IntegerField> {
     public void readFromGuiCommand(GuiParser.GuiCommand command) {
         super.readFromGuiCommand(command);
         editable = GuiParser.get(command, "editable", DEFAULT_EDITABLE);
+        minimum = GuiParser.get(command, "minimum", Integer.MIN_VALUE);
+        maximum = GuiParser.get(command, "maximum", Integer.MAX_VALUE);
     }
 
     @Override

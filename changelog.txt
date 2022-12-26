@@ -1,5 +1,6 @@
 Upcoming:
 - Small fix in BaseBlock.rotate()
+- New mininum/maximum for integerfield
 
 1.19-7.0.6:
 - Fixed a few render issues
