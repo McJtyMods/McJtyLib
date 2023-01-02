@@ -846,42 +846,40 @@ public class RenderHelper {
     /**
      * Draw a beam with some thickness.
      */
-    public static void drawBeam(Matrix4f matrix, VertexConsumer builder, TextureAtlasSprite sprite, Vector3f S, Vector3f E, Vector3f P, float width) {
-        Vector3f PS = Sub(S, P);
-        Vector3f SE = Sub(E, S);
+    public static void drawBeam(PoseStack matrix, VertexConsumer builder, TextureAtlasSprite sprite, Vec3 S, Vec3 E, Vec3 P, float width) {
+        Vec3 PS = S.subtract(P);
+        Vec3 SE = E.subtract(S);
 
-        Vector3f normal = Cross(PS, SE);
-        normal.normalize();
+        Vec3 normal = PS.cross(SE).normalize();
 
-        Vector3f half = Mul(normal, width);
-        Vector3f p1 = Add(S, half);
-        Vector3f p2 = Sub(S, half);
-        Vector3f p3 = Add(E, half);
-        Vector3f p4 = Sub(E, half);
+        Vec3 half = normal.multiply(width, width, width);
+        Vec3 p1 = S.add(half);
+        Vec3 p2 = S.subtract(half);
+        Vec3 p3 = E.add(half);
+        Vec3 p4 = E.subtract(half);
 
-        drawQuad(matrix, builder, sprite, p1, p3, p4, p2, DEFAULT_SETTINGS);
+        drawQuad(matrix.last().pose(), builder, sprite, p1, p3, p4, p2, DEFAULT_SETTINGS);
     }
 
     /**
      * Draw a beam with some thickness.
      */
-    public static void drawBeam(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vector3f S, Vector3f E, Vector3f P, RenderSettings settings) {
-        Vector3f PS = Sub(S, P);
-        Vector3f SE = Sub(E, S);
+    public static void drawBeam(PoseStack poseStack, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 S, Vec3 E, Vec3 P, RenderSettings settings) {
+        Vec3 PS = S.subtract(P);
+        Vec3 SE = E.subtract(S);
 
-        Vector3f normal = Cross(PS, SE);
-        normal.normalize();
+        Vec3 normal = PS.cross(SE).normalize();
 
-        Vector3f half = Mul(normal, settings.getWidth());
-        Vector3f p1 = Add(S, half);
-        Vector3f p2 = Sub(S, half);
-        Vector3f p3 = Add(E, half);
-        Vector3f p4 = Sub(E, half);
+        Vec3 half = normal.multiply(settings.getWidth(), settings.getWidth(), settings.getWidth());
+        Vec3 p1 = S.add(half);
+        Vec3 p2 = S.subtract(half);
+        Vec3 p3 = E.add(half);
+        Vec3 p4 = E.subtract(half);
 
-        drawQuad(matrix, buffer, sprite, p1, p3, p4, p2, settings);
+        drawQuad(poseStack.last().pose(), buffer, sprite, p1, p3, p4, p2, settings);
     }
 
-    public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4,
+    public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
                                 RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
@@ -892,7 +890,7 @@ public class RenderHelper {
         vt(buffer, matrix, p4.x(), p4.y(), p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
     }
 
-    public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vector3f p1, Vector3f p2, Vector3f p3, Vector3f p4,
+    public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
                                 boolean opposite,
                                 RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
@@ -911,14 +909,15 @@ public class RenderHelper {
         }
     }
 
-    public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Direction side, boolean opposite, float offset, RenderSettings settings) {
+    public static void drawQuad(PoseStack poseStack, VertexConsumer buffer, TextureAtlasSprite sprite, Direction side, boolean opposite, float offset, RenderSettings settings) {
+        Matrix4f matrix = poseStack.last().pose();
         switch (side) {
-            case DOWN -> drawQuad(matrix, buffer, sprite, new Vector3f(0, offset, 1), new Vector3f(1, offset, 1), new Vector3f(1, offset, 0), new Vector3f(0, offset, 0), opposite, settings);
-            case UP -> drawQuad(matrix, buffer, sprite, new Vector3f(1, 1 - offset, 1), new Vector3f(0, 1 - offset, 1), new Vector3f(0, 1 - offset, 0), new Vector3f(1, 1 - offset, 0), opposite, settings);
-            case NORTH -> drawQuad(matrix, buffer, sprite, new Vector3f(0, 0, offset), new Vector3f(1, 0, offset), new Vector3f(1, 1, offset), new Vector3f(0, 1, offset), opposite, settings);
-            case SOUTH -> drawQuad(matrix, buffer, sprite, new Vector3f(0, 1, 1 - offset), new Vector3f(1, 1, 1 - offset), new Vector3f(1, 0, 1 - offset), new Vector3f(0, 0, 1 - offset), opposite, settings);
-            case WEST -> drawQuad(matrix, buffer, sprite, new Vector3f(offset, 0, 0), new Vector3f(offset, 1, 0), new Vector3f(offset, 1, 1), new Vector3f(offset, 0, 1), opposite, settings);
-            case EAST -> drawQuad(matrix, buffer, sprite, new Vector3f(1 - offset, 0, 1), new Vector3f(1 - offset, 1, 1), new Vector3f(1 - offset, 1, 0), new Vector3f(1 - offset, 0, 0), opposite, settings);
+            case DOWN -> drawQuad(matrix, buffer, sprite, new Vec3(0, offset, 1), new Vec3(1, offset, 1), new Vec3(1, offset, 0), new Vec3(0, offset, 0), opposite, settings);
+            case UP -> drawQuad(matrix, buffer, sprite, new Vec3(1, 1 - offset, 1), new Vec3(0, 1 - offset, 1), new Vec3(0, 1 - offset, 0), new Vec3(1, 1 - offset, 0), opposite, settings);
+            case NORTH -> drawQuad(matrix, buffer, sprite, new Vec3(0, 0, offset), new Vec3(1, 0, offset), new Vec3(1, 1, offset), new Vec3(0, 1, offset), opposite, settings);
+            case SOUTH -> drawQuad(matrix, buffer, sprite, new Vec3(0, 1, 1 - offset), new Vec3(1, 1, 1 - offset), new Vec3(1, 0, 1 - offset), new Vec3(0, 0, 1 - offset), opposite, settings);
+            case WEST -> drawQuad(matrix, buffer, sprite, new Vec3(offset, 0, 0), new Vec3(offset, 1, 0), new Vec3(offset, 1, 1), new Vec3(offset, 0, 1), opposite, settings);
+            case EAST -> drawQuad(matrix, buffer, sprite, new Vec3(1 - offset, 0, 1), new Vec3(1 - offset, 1, 1), new Vec3(1 - offset, 1, 0), new Vec3(1 - offset, 0, 0), opposite, settings);
         }
     }
 
@@ -952,6 +951,16 @@ public class RenderHelper {
                 .endVertex();
     }
 
+    public static void vt(VertexConsumer renderer, Matrix4f matrix, double x, double y, double z, float u, float v, int lu, int lv, float r, float g, float b, float a) {
+        renderer
+                .vertex(matrix, (float)x, (float)y, (float)z)
+                .color(r, g, b, a)
+                .uv(u, v)
+                .uv2(lu, lv)
+                .normal(1, 0, 0)
+                .endVertex();
+    }
+
     public static void putVertex(Matrix4f matrix, VertexConsumer builder, Position normal,
                                  double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
         Vector4f vector4f = new Vector4f((float)x, (float)y, (float)z, 1.0F);
@@ -969,25 +978,6 @@ public class RenderHelper {
                 .color(r, g, b, a)
                 .normal((float)normal.x(), (float)normal.y(), (float)normal.z())
                 .endVertex();
-    }
-
-    private static Vector3f Cross(Vector3f a, Vector3f b) {
-        float x = a.y() * b.z() - a.z() * b.y();
-        float y = a.z() * b.x() - a.x() * b.z();
-        float z = a.x() * b.y() - a.y() * b.x();
-        return new Vector3f(x, y, z);
-    }
-
-    private static Vector3f Sub(Vector3f a, Vector3f b) {
-        return new Vector3f(a.x() - b.x(), a.y() - b.y(), a.z() - b.z());
-    }
-
-    private static Vector3f Add(Vector3f a, Vector3f b) {
-        return new Vector3f(a.x() + b.x(), a.y() + b.y(), a.z() + b.z());
-    }
-
-    private static Vector3f Mul(Vector3f a, float f) {
-        return new Vector3f(a.x() * f, a.y() * f, a.z() * f);
     }
 
     public static void renderHighLightedBlocksOutline(VertexConsumer buffer, Matrix4f positionMatrix, float mx, float my, float mz, float r, float g, float b, float a) {
@@ -1052,6 +1042,18 @@ public class RenderHelper {
 //        builder.finishDrawing();
 //        RenderSystem.enableTexture();
 //        RenderSystem.disableBlend();
+    }
+
+    public static void rotateXP(PoseStack stack, float degrees) {
+        stack.mulPose(Vector3f.XP.rotationDegrees(degrees));
+    }
+
+    public static void rotateYP(PoseStack stack, float degrees) {
+        stack.mulPose(Vector3f.YP.rotationDegrees(degrees));
+    }
+
+    public static void rotateZP(PoseStack stack, float degrees) {
+        stack.mulPose(Vector3f.ZP.rotationDegrees(degrees));
     }
 
 }
