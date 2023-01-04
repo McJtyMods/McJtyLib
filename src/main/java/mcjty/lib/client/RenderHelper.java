@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceLocation;
@@ -36,6 +37,7 @@ import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
 import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
 
 public class RenderHelper {
+
     public static float rot = 0.0f;
 
     public static final int MAX_BRIGHTNESS = 0xf000f0;
@@ -45,40 +47,41 @@ public class RenderHelper {
             .alpha(128)
             .build();
 
+    public static final RenderSettings FULLBRIGHT_SETTINGS = RenderSettings.builder()
+            .color(255, 255, 255)
+            .alpha(MAX_BRIGHTNESS)
+            .build();
 
-    public static void renderEntity(PoseStack matrixStack, Entity entity, int xPos, int yPos) {
-        float f1 = 10F;
-        renderEntity(matrixStack, entity, xPos, yPos, f1);
-    }
 
     // Adjust the given matrix to the specified direction
     public static void adjustTransformToDirection(PoseStack matrixStack, Direction facing) {
         matrixStack.translate(0.5F, 0.5F, 0.5F);
 
         switch (facing) {
-            case DOWN:
+            case DOWN -> {
                 matrixStack.mulPose(Vector3f.XP.rotationDegrees(90.0F));
-                break;
-            case UP:
+            }
+            case UP -> {
                 matrixStack.mulPose(Vector3f.XP.rotationDegrees(-90.0F));
-                break;
-            case NORTH:
+            }
+            case NORTH -> {
                 matrixStack.mulPose(Vector3f.YP.rotationDegrees(-180.0F));
-                break;
-            case SOUTH:
-                break;
-            case WEST:
+            }
+            case SOUTH -> {
+            }
+            case WEST -> {
                 matrixStack.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
-                break;
-            case EAST:
+            }
+            case EAST -> {
                 matrixStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
-                break;
+            }
         }
 
         matrixStack.translate(-0.5F, -0.5F, -0.5F);
     }
 
-    public static void renderNorthSouthQuad(VertexConsumer builder, Matrix4f matrix, TextureAtlasSprite sprite, ModelBuilder.FaceRotation rotation, float offset) {
+    public static void renderNorthSouthQuad(PoseStack poseStack, VertexConsumer builder, TextureAtlasSprite sprite, ModelBuilder.FaceRotation rotation, float offset) {
+        Matrix4f matrix = poseStack.last().pose();
         switch (rotation) {
             case ZERO -> {
                 RenderHelper.vt(builder, matrix, 0, 1, .73f, sprite.getU0(), sprite.getV1());
@@ -107,7 +110,7 @@ public class RenderHelper {
         }
     }
 
-    public static void renderEntity(PoseStack matrixStack, Entity entity, int xPos, int yPos, float scale) {
+    private static void renderEntity(PoseStack matrixStack, Entity entity, int xPos, int yPos, float scale) {
         matrixStack.pushPose();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         // @todo 1.17 GlStateManager._enableRescaleNormal();
@@ -152,7 +155,7 @@ public class RenderHelper {
 
     public static boolean renderObject(PoseStack matrixStack, int x, int y, Object itm, boolean highlight) {
         if (itm instanceof Entity) {
-            renderEntity(matrixStack, (Entity) itm, x, y);
+            renderEntity(matrixStack, (Entity) itm, x, y, 10F);
             return true;
         }
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
@@ -183,7 +186,7 @@ public class RenderHelper {
         return renderItemStack(matrixStack, itemRender, ItemStack.EMPTY, x, y, "", highlight);
     }
 
-    public static boolean renderIcon(PoseStack matrixStack, ItemRenderer itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
+    private static boolean renderIcon(PoseStack matrixStack, ItemRenderer itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
         //itemRender.draw(xo, yo, itm, 16, 16); //TODO: Make
         return true;
     }
@@ -255,11 +258,6 @@ public class RenderHelper {
         }
 
         return renderItemStack(matrixStack, itemRender, itm, xo, yo, amount, highlight);
-//        if (itm.stackSize==1 || itm.stackSize==0) {
-//            return renderItemStack(mc, itemRender, itm, xo, yo, "", highlight);
-//        } else {
-//            return renderItemStack(mc, itemRender, itm, xo, yo, "" + itm.stackSize, highlight);
-//        }
     }
 
     public static boolean renderItemStack(PoseStack matrixStack, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
@@ -358,7 +356,6 @@ public class RenderHelper {
         pRenderer.vertex(pX + pWidth, pY + 0, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
         BufferUploader.drawWithShader(pRenderer.end());
     }
-
 
 
     /**
@@ -654,52 +651,23 @@ public class RenderHelper {
         drawHorizontalLine(matrixStack, x1, y2 - 1, x2, border);
     }
 
-    /**
-     * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height
-     */
-    public static void drawTexturedModalRect(int x, int y, int u, int v, int width, int height) {
-        float zLevel = 0.01f;
-        float f = (1 / 256.0f);
-        float f1 = (1 / 256.0f);
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        buffer.vertex((x + 0), (y + height), zLevel).uv(((u + 0) * f), ((v + height) * f1)).endVertex();
-        buffer.vertex((x + width), (y + height), zLevel).uv(((u + width) * f), ((v + height) * f1)).endVertex();
-        buffer.vertex((x + width), (y + 0), zLevel).uv(((u + width) * f), ((v + 0) * f1)).endVertex();
-        buffer.vertex((x + 0), (y + 0), zLevel).uv(((u + 0) * f), ((v + 0) * f1)).endVertex();
-        tessellator.end();
-    }
-
-    public static void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int totw, int toth) {
-        float f = 1.0f / totw;
-        float f1 = 1.0f / toth;
-        double zLevel = 50;
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder vertexbuffer = tessellator.getBuilder();
-        vertexbuffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        vertexbuffer.vertex((x + 0), (y + height), zLevel).uv(((textureX + 0) * f), ((textureY + height) * f1)).endVertex();
-        vertexbuffer.vertex((x + width), (y + height), zLevel).uv(((textureX + width) * f), ((textureY + height) * f1)).endVertex();
-        vertexbuffer.vertex((x + width), (y + 0), zLevel).uv(((textureX + width) * f), ((textureY + 0) * f1)).endVertex();
-        vertexbuffer.vertex((x + 0), (y + 0), zLevel).uv(((textureX + 0) * f), ((textureY + 0) * f1)).endVertex();
-        tessellator.end();
-    }
-
-    public static void drawTexturedModalRect(Matrix4f positionMatrix, VertexConsumer builder, int x, int y, int textureX, int textureY, int width, int height, int totw, int toth, float parentU, float parentV) {
+    public static void drawTexturedModalRect(PoseStack poseStack, VertexConsumer builder, int x, int y, int textureX, int textureY, int width, int height, int totw, int toth, float parentU, float parentV) {
+        Matrix4f matrix = poseStack.last().pose();
         float f = 1.0f / totw;
         float f1 = 1.0f / toth;
         float zLevel = 50;
-        builder.vertex(positionMatrix, (x + 0), (y + height), zLevel).uv(parentU + ((textureX + 0) * f), parentV + ((textureY + height) * f1)).endVertex();
-        builder.vertex(positionMatrix, (x + width), (y + height), zLevel).uv(parentU + ((textureX + width) * f), parentV + ((textureY + height) * f1)).endVertex();
-        builder.vertex(positionMatrix, (x + width), (y + 0), zLevel).uv(parentU + ((textureX + width) * f), parentV + ((textureY + 0) * f1)).endVertex();
-        builder.vertex(positionMatrix, (x + 0), (y + 0), zLevel).uv(parentU + ((textureX + 0) * f), parentV + ((textureY + 0) * f1)).endVertex();
+        builder.vertex(matrix, (x + 0), (y + height), zLevel).uv(parentU + ((textureX + 0) * f), parentV + ((textureY + height) * f1)).endVertex();
+        builder.vertex(matrix, (x + width), (y + height), zLevel).uv(parentU + ((textureX + width) * f), parentV + ((textureY + height) * f1)).endVertex();
+        builder.vertex(matrix, (x + width), (y + 0), zLevel).uv(parentU + ((textureX + width) * f), parentV + ((textureY + 0) * f1)).endVertex();
+        builder.vertex(matrix, (x + 0), (y + 0), zLevel).uv(parentU + ((textureX + 0) * f), parentV + ((textureY + 0) * f1)).endVertex();
     }
 
 
     /**
      * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height
      */
-    public static void drawTexturedModalRect(Matrix4f matrix, int x, int y, int u, int v, int width, int height) {
+    public static void drawTexturedModalRect(PoseStack poseStack, int x, int y, int u, int v, int width, int height) {
+        Matrix4f matrix = poseStack.last().pose();
         float zLevel = 0.01f;
         float f = (1 / 256.0f);
         float f1 = (1 / 256.0f);
@@ -714,7 +682,7 @@ public class RenderHelper {
     }
 
     /**
-     * Render a billboard in four sectinos for better depth sorting
+     * Render a billboard in four sections for better depth sorting
      */
     public static void renderSplitBillboard(PoseStack matrixStack, VertexConsumer buffer, float scale, Vec3 offset, ResourceLocation texture) {
         int b1 = FULL_SKY;
@@ -729,28 +697,28 @@ public class RenderHelper {
         float v0 = sprite.getV0();
         float u1 = sprite.getU1();
         float v1 = sprite.getV1();
-        float um = (u0+u1) / 2f;
-        float vm = (v0+v1) / 2f;
+        float um = (u0 + u1) / 2f;
+        float vm = (v0 + v1) / 2f;
 
-        buffer.vertex(matrix, -scale, -scale, 0.0f).color(255, 255, 255, 255).uv(u0, v0).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, -scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u0, vm).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, 0.0f, -scale, 0.0f).color(255, 255, 255, 255).uv(um, v0).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, -scale, -scale, 0.0f).color(255, 255, 255, 255).uv(u0, v0).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, -scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u0, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, 0.0f, -scale, 0.0f).color(255, 255, 255, 255).uv(um, v0).uv2(b1, b2).normal(1, 0, 0).endVertex();
 
-        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, 0.0f, scale, 0.0f).color(255, 255, 255, 255).uv(um, v1).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, scale, scale, 0.0f).color(255, 255, 255, 255).uv(u1, v1).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u1, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, 0.0f, scale, 0.0f).color(255, 255, 255, 255).uv(um, v1).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, scale, scale, 0.0f).color(255, 255, 255, 255).uv(u1, v1).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u1, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
 
-        buffer.vertex(matrix, 0.0f, -scale, 0.0f).color(255, 255, 255, 255).uv(um, v0).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u1, vm).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, scale, -scale, 0.0f).color(255, 255, 255, 255).uv(u1, v0).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, 0.0f, -scale, 0.0f).color(255, 255, 255, 255).uv(um, v0).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u1, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, scale, -scale, 0.0f).color(255, 255, 255, 255).uv(u1, v0).uv2(b1, b2).normal(1, 0, 0).endVertex();
 
-        buffer.vertex(matrix, -scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u0, vm).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, -scale, scale, 0.0f).color(255, 255, 255, 255).uv(u0, v1).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, 0.0f, scale, 0.0f).color(255, 255, 255, 255).uv(um, v1).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.vertex(matrix, -scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u0, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, -scale, scale, 0.0f).color(255, 255, 255, 255).uv(u0, v1).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, 0.0f, scale, 0.0f).color(255, 255, 255, 255).uv(um, v1).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
         matrixStack.popPose();
     }
 
@@ -766,10 +734,10 @@ public class RenderHelper {
         matrixStack.translate(0.5, 0.5, 0.5);
         RenderHelper.rotateToPlayer(matrixStack);
         Matrix4f matrix = matrixStack.last().pose();
-        builder.vertex(matrix, -scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
-        builder.vertex(matrix, -scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();
-        builder.vertex(matrix, scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU1(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();
-        builder.vertex(matrix, scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU1(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
+        builder.vertex(matrix, -scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        builder.vertex(matrix, -scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        builder.vertex(matrix, scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU1(), sprite.getV1()).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        builder.vertex(matrix, scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU1(), sprite.getV0()).uv2(b1, b2).normal(1, 0, 0).endVertex();
         matrixStack.popPose();
     }
 
@@ -878,46 +846,141 @@ public class RenderHelper {
         drawQuad(poseStack.last().pose(), buffer, sprite, p1, p3, p4, p2, settings);
     }
 
-    public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
-                                RenderSettings settings) {
+    public static void renderQuadGui(PoseStack matrixStack, TextureAtlasSprite sprite, int packedLight, VertexConsumer builder, float zfront, float size) {
+        float u0 = sprite.getU0();
+        float v0 = sprite.getV0();
+        float u1 = sprite.getU1();
+        float v1 = sprite.getV1();
+
+        Matrix4f matrix = matrixStack.last().pose();
+        vt(builder, matrix, -size, size, zfront, u0, v0, packedLight);
+        vt(builder, matrix, size, size, zfront, u1, v0, packedLight);
+        vt(builder, matrix, size, -size, zfront, u1, v1, packedLight);
+        vt(builder, matrix, -size, -size, zfront, u0, v1, packedLight);
+    }
+
+    public static void drawQuadGui(PoseStack poseStack, VertexConsumer builder,
+                                   float x1, float x2, float y1, float y2, float z,
+                                   int color, int packedLightIn) {
+        Matrix4f matrix = poseStack.last().pose();
+        float a = (color >> 24 & 255) / 255.0F;
+        float r = (color >> 16 & 255) / 255.0F;
+        float g = (color >> 8 & 255) / 255.0F;
+        float b = (color & 255) / 255.0F;
+
+        builder.vertex(matrix, x1, y2, z).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z).color(r, g, b, a).uv2(packedLightIn).endVertex();
+    }
+
+    private static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
+                                 RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
 
-        vt(buffer, matrix, (float)p1.x(), (float)p1.y(), (float)p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float)p2.x(), (float)p2.y(), (float)p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float)p3.x(), (float)p3.y(), (float)p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float)p4.x(), (float)p4.y(), (float)p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
     }
 
-    public static void drawQuadUnit(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
-                                RenderSettings settings) {
+    private static void drawQuadUnit(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
+                                     double u0Par, double u1Par,
+                                     double v0Par, double v1Par,
+                                     RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
+        u0Par = u0Par < 0 ? (1.0 + (u0Par % 1.0)) : u0Par % 1.0;
+        u1Par = u1Par < 0 ? (-(u1Par % 1.0)) : (1.0 - (u1Par % 1.0));
+        v0Par = v0Par < 0 ? (1.0 + (v0Par % 1.0)) : v0Par % 1.0;
+        v1Par = v1Par < 0 ? (-(v1Par % 1.0)) : (1.0 - (v1Par % 1.0));
+        float du = sprite.getU1() - sprite.getU0();
+        float dv = sprite.getV1() - sprite.getV0();
 
-        //@todo
-        vt(buffer, matrix, (float)p1.x(), (float)p1.y(), (float)p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float)p2.x(), (float)p2.y(), (float)p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float)p3.x(), (float)p3.y(), (float)p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float)p4.x(), (float)p4.y(), (float)p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0() + (float) (du * u0Par), sprite.getV0() + (float) (dv * v0Par), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1() - (float) (du * u1Par), sprite.getV0() + (float) (dv * v0Par), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1() - (float) (du * u1Par), sprite.getV1() - (float) (dv * v1Par), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0() + (float) (du * u0Par), sprite.getV1() - (float) (dv * v1Par), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
     }
 
-    public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
-                                boolean opposite,
-                                RenderSettings settings) {
+    private static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
+                                 boolean opposite,
+                                 RenderSettings settings) {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
 
         if (opposite) {
-            vt(buffer, matrix, (float)p1.x(), (float)p1.y(), (float)p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float)p2.x(), (float)p2.y(), (float)p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float)p3.x(), (float)p3.y(), (float)p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float)p4.x(), (float)p4.y(), (float)p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
         } else {
-            vt(buffer, matrix, (float)p4.x(), (float)p4.y(), (float)p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float)p3.x(), (float)p3.y(), (float)p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float)p2.x(), (float)p2.y(), (float)p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float)p1.x(), (float)p1.y(), (float)p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
         }
+    }
+
+    /**
+     * Render a block outline
+     */
+    public static void renderRect(PoseStack poseStack, VertexConsumer buffer, Rect rect, BlockPos p, float r, float g, float b, float a) {
+        Matrix4f matrix = poseStack.last().pose();
+        buffer.vertex(matrix, (float) (p.getX() + rect.v1.x), (float) (p.getY() + rect.v1.y), (float) (p.getZ() + rect.v1.z)).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, (float) (p.getX() + rect.v2.x), (float) (p.getY() + rect.v2.y), (float) (p.getZ() + rect.v2.z)).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, (float) (p.getX() + rect.v2.x), (float) (p.getY() + rect.v2.y), (float) (p.getZ() + rect.v2.z)).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, (float) (p.getX() + rect.v3.x), (float) (p.getY() + rect.v3.y), (float) (p.getZ() + rect.v3.z)).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, (float) (p.getX() + rect.v3.x), (float) (p.getY() + rect.v3.y), (float) (p.getZ() + rect.v3.z)).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, (float) (p.getX() + rect.v4.x), (float) (p.getY() + rect.v4.y), (float) (p.getZ() + rect.v4.z)).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, (float) (p.getX() + rect.v4.x), (float) (p.getY() + rect.v4.y), (float) (p.getZ() + rect.v4.z)).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, (float) (p.getX() + rect.v1.x), (float) (p.getY() + rect.v1.y), (float) (p.getZ() + rect.v1.z)).color(r, g, b, a).endVertex();
+    }
+
+    /**
+     * Draw a box. No UV mapping
+     */
+    public static void drawBox(PoseStack matrixStack, VertexConsumer builder,
+                               float x1, float x2, float y1, float y2, float z1, float z2,
+                               float r, float g, float b,
+                               int packedLightIn) {
+        Matrix4f matrix = matrixStack.last().pose();
+        // BACK
+        builder.vertex(matrix, x1, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+
+        // FRONT
+        builder.vertex(matrix, x1, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+
+        // DOWN
+        builder.vertex(matrix, x1, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+
+        // UP
+        builder.vertex(matrix, x1, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+
+        // LEFT
+        builder.vertex(matrix, x1, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+
+        // RIGHT
+        builder.vertex(matrix, x2, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
     }
 
     /**
@@ -936,10 +999,10 @@ public class RenderHelper {
         Vec3 c221 = new Vec3(x2, y2, z1);
         Vec3 c222 = new Vec3(x2, y2, z2);
         if (down) {
-            drawQuad(matrix, builder, sprite, c111, c112, c212, c211, settings);
+            drawQuad(matrix, builder, sprite, c211, c212, c112, c111, settings);
         }
         if (up) {
-            drawQuad(matrix, builder, sprite, c221, c222, c122, c121, settings);
+            drawQuad(matrix, builder, sprite, c121, c122, c222, c221, settings);
         }
         if (north) {
             drawQuad(matrix, builder, sprite, c121, c221, c211, c111, settings);
@@ -959,8 +1022,8 @@ public class RenderHelper {
      * Draw a box. The texture is mapped according to unit size and will scale with the size of every face
      */
     public static void drawBoxUnit(PoseStack matrixStack, VertexConsumer builder, TextureAtlasSprite sprite,
-                               boolean down, boolean up, boolean north, boolean south, boolean west, boolean east,
-                               float x1, float x2, float y1, float y2, float z1, float z2, RenderSettings settings) {
+                                   boolean down, boolean up, boolean north, boolean south, boolean west, boolean east,
+                                   float x1, float x2, float y1, float y2, float z1, float z2, RenderSettings settings) {
         Matrix4f matrix = matrixStack.last().pose();
         Vec3 c111 = new Vec3(x1, y1, z1);
         Vec3 c112 = new Vec3(x1, y1, z2);
@@ -971,22 +1034,22 @@ public class RenderHelper {
         Vec3 c221 = new Vec3(x2, y2, z1);
         Vec3 c222 = new Vec3(x2, y2, z2);
         if (down) {
-            drawQuadUnit(matrix, builder, sprite, c111, c112, c212, c211, settings);
+            drawQuadUnit(matrix, builder, sprite, c211, c212, c112, c111, x1, x2, z1, z2, settings);
         }
         if (up) {
-            drawQuadUnit(matrix, builder, sprite, c221, c222, c122, c121, settings);
+            drawQuadUnit(matrix, builder, sprite, c121, c122, c222, c221, x1, x2, z1, z2, settings);
         }
         if (north) {
-            drawQuadUnit(matrix, builder, sprite, c121, c221, c211, c111, settings);
+            drawQuadUnit(matrix, builder, sprite, c121, c221, c211, c111, x1, x2, y1, y2, settings);
         }
         if (south) {
-            drawQuadUnit(matrix, builder, sprite, c112, c212, c222, c122, settings);
+            drawQuadUnit(matrix, builder, sprite, c112, c212, c222, c122, x1, x2, y1, y2, settings);
         }
         if (west) {
-            drawQuadUnit(matrix, builder, sprite, c112, c122, c121, c111, settings);
+            drawQuadUnit(matrix, builder, sprite, c112, c122, c121, c111, y1, y2, z1, z2, settings);
         }
         if (east) {
-            drawQuadUnit(matrix, builder, sprite, c211, c221, c222, c212, settings);
+            drawQuadUnit(matrix, builder, sprite, c211, c221, c222, c212, y1, y2, z1, z2, settings);
         }
     }
 
@@ -1003,14 +1066,34 @@ public class RenderHelper {
                     new Vec3(0, 1 - offset, 1),
                     new Vec3(0, 1 - offset, 0),
                     new Vec3(1, 1 - offset, 0), opposite, settings);
-            case NORTH -> drawQuad(matrix, buffer, sprite, new Vec3(0, 0, offset), new Vec3(1, 0, offset), new Vec3(1, 1, offset), new Vec3(0, 1, offset), opposite, settings);
-            case SOUTH -> drawQuad(matrix, buffer, sprite, new Vec3(0, 1, 1 - offset), new Vec3(1, 1, 1 - offset), new Vec3(1, 0, 1 - offset), new Vec3(0, 0, 1 - offset), opposite, settings);
-            case WEST -> drawQuad(matrix, buffer, sprite, new Vec3(offset, 0, 0), new Vec3(offset, 1, 0), new Vec3(offset, 1, 1), new Vec3(offset, 0, 1), opposite, settings);
-            case EAST -> drawQuad(matrix, buffer, sprite, new Vec3(1 - offset, 0, 1), new Vec3(1 - offset, 1, 1), new Vec3(1 - offset, 1, 0), new Vec3(1 - offset, 0, 0), opposite, settings);
+            case NORTH -> drawQuad(matrix, buffer, sprite,
+                    new Vec3(0, 0, offset),
+                    new Vec3(1, 0, offset),
+                    new Vec3(1, 1, offset),
+                    new Vec3(0, 1, offset), opposite, settings);
+            case SOUTH -> drawQuad(matrix, buffer, sprite,
+                    new Vec3(0, 1, 1 - offset),
+                    new Vec3(1, 1, 1 - offset),
+                    new Vec3(1, 0, 1 - offset),
+                    new Vec3(0, 0, 1 - offset), opposite, settings);
+            case WEST -> drawQuad(matrix, buffer, sprite,
+                    new Vec3(offset, 0, 0),
+                    new Vec3(offset, 1, 0),
+                    new Vec3(offset, 1, 1),
+                    new Vec3(offset, 0, 1), opposite, settings);
+            case EAST -> drawQuad(matrix, buffer, sprite,
+                    new Vec3(1 - offset, 0, 1),
+                    new Vec3(1 - offset, 1, 1),
+                    new Vec3(1 - offset, 1, 0),
+                    new Vec3(1 - offset, 0, 0), opposite, settings);
         }
     }
 
-    public static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v) {
+    private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int packedLight) {
+        renderer.vertex(matrix, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(packedLight).normal(1.0F, 0.0F, 0.0F).endVertex();
+    }
+
+    private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v) {
         renderer
                 .vertex(matrix, x, y, z)
                 .color(1.0f, 1.0f, 1.0f, 1.0f)
@@ -1020,29 +1103,9 @@ public class RenderHelper {
                 .endVertex();
     }
 
-    public static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int lu, int lv, int r, int g, int b, int a) {
+    private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int lu, int lv, int r, int g, int b, int a) {
         renderer
                 .vertex(matrix, x, y, z)
-                .color(r, g, b, a)
-                .uv(u, v)
-                .uv2(lu, lv)
-                .normal(1, 0, 0)
-                .endVertex();
-    }
-
-    public static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int lu, int lv, float r, float g, float b, float a) {
-        renderer
-                .vertex(matrix, x, y, z)
-                .color(r, g, b, a)
-                .uv(u, v)
-                .uv2(lu, lv)
-                .normal(1, 0, 0)
-                .endVertex();
-    }
-
-    public static void vt(VertexConsumer renderer, Matrix4f matrix, double x, double y, double z, float u, float v, int lu, int lv, float r, float g, float b, float a) {
-        renderer
-                .vertex(matrix, (float)x, (float)y, (float)z)
                 .color(r, g, b, a)
                 .uv(u, v)
                 .uv2(lu, lv)
@@ -1051,45 +1114,47 @@ public class RenderHelper {
     }
 
     public static void putVertex(VertexConsumer builder, Position normal,
-                                 double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
+                                 double x, double y, double z, float u, float v,
+                                 TextureAtlasSprite sprite, float r, float g, float b, float a) {
         float iu = sprite.getU(u);
         float iv = sprite.getV(v);
         builder.vertex(x, y, z)
                 .uv(iu, iv)
                 .uv2(0, 0)
                 .color(r, g, b, a)
-                .normal((float)normal.x(), (float)normal.y(), (float)normal.z())
+                .normal((float) normal.x(), (float) normal.y(), (float) normal.z())
                 .endVertex();
     }
 
-    public static void renderHighLightedBlocksOutline(VertexConsumer buffer, Matrix4f positionMatrix, float mx, float my, float mz, float r, float g, float b, float a) {
-        buffer.vertex(positionMatrix, mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+    public static void renderHighLightedBlocksOutline(PoseStack poseStack, VertexConsumer buffer, float mx, float my, float mz, float r, float g, float b, float a) {
+        Matrix4f matrix = poseStack.last().pose();
+        buffer.vertex(matrix, mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(positionMatrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(positionMatrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
 
-        buffer.vertex(positionMatrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(positionMatrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
+        buffer.vertex(matrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
     }
 
     public static void fill(PoseStack matrixStack, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color,
@@ -1136,5 +1201,9 @@ public class RenderHelper {
 
     public static void rotateZP(PoseStack stack, float degrees) {
         stack.mulPose(Vector3f.ZP.rotationDegrees(degrees));
+    }
+
+    public record Rect(Vec3 v1, Vec3 v2,
+                       Vec3 v3, Vec3 v4) {
     }
 }
