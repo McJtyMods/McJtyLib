@@ -90,6 +90,14 @@ public class RenderSettings {
             return this;
         }
 
+        public Builder color(int color) {
+            r = (color >> 16 & 0xFF);
+            g = (color >> 8 & 0xFF);
+            b = (color & 0xFF);
+            a = (color >> 24 & 0xFF);
+            return this;
+        }
+
         public Builder color(int r, int g, int b) {
             this.r = r;
             this.g = g;

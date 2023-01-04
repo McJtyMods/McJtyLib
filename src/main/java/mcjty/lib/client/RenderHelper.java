@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
-import com.mojang.math.Vector4f;
 import mcjty.lib.base.StyleConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -884,10 +883,22 @@ public class RenderHelper {
         int b1 = settings.getBrightness() >> 16 & 65535;
         int b2 = settings.getBrightness() & 65535;
 
-        vt(buffer, matrix, p1.x(), p1.y(), p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, p2.x(), p2.y(), p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, p3.x(), p3.y(), p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, p4.x(), p4.y(), p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float)p1.x(), (float)p1.y(), (float)p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float)p2.x(), (float)p2.y(), (float)p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float)p3.x(), (float)p3.y(), (float)p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float)p4.x(), (float)p4.y(), (float)p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+    }
+
+    public static void drawQuadUnit(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
+                                RenderSettings settings) {
+        int b1 = settings.getBrightness() >> 16 & 65535;
+        int b2 = settings.getBrightness() & 65535;
+
+        //@todo
+        vt(buffer, matrix, (float)p1.x(), (float)p1.y(), (float)p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float)p2.x(), (float)p2.y(), (float)p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float)p3.x(), (float)p3.y(), (float)p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float)p4.x(), (float)p4.y(), (float)p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
     }
 
     public static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
@@ -897,23 +908,101 @@ public class RenderHelper {
         int b2 = settings.getBrightness() & 65535;
 
         if (opposite) {
-            vt(buffer, matrix, p1.x(), p1.y(), p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p2.x(), p2.y(), p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p3.x(), p3.y(), p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p4.x(), p4.y(), p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float)p1.x(), (float)p1.y(), (float)p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float)p2.x(), (float)p2.y(), (float)p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float)p3.x(), (float)p3.y(), (float)p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float)p4.x(), (float)p4.y(), (float)p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
         } else {
-            vt(buffer, matrix, p4.x(), p4.y(), p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p3.x(), p3.y(), p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p2.x(), p2.y(), p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, p1.x(), p1.y(), p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float)p4.x(), (float)p4.y(), (float)p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float)p3.x(), (float)p3.y(), (float)p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float)p2.x(), (float)p2.y(), (float)p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float)p1.x(), (float)p1.y(), (float)p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        }
+    }
+
+    /**
+     * Draw a box. The texture is mapped from 0,0 -> 1,1 on each face regardless of the size of that face
+     */
+    public static void drawBox(PoseStack matrixStack, VertexConsumer builder, TextureAtlasSprite sprite,
+                               boolean down, boolean up, boolean north, boolean south, boolean west, boolean east,
+                               float x1, float x2, float y1, float y2, float z1, float z2, RenderSettings settings) {
+        Matrix4f matrix = matrixStack.last().pose();
+        Vec3 c111 = new Vec3(x1, y1, z1);
+        Vec3 c112 = new Vec3(x1, y1, z2);
+        Vec3 c121 = new Vec3(x1, y2, z1);
+        Vec3 c122 = new Vec3(x1, y2, z2);
+        Vec3 c211 = new Vec3(x2, y1, z1);
+        Vec3 c212 = new Vec3(x2, y1, z2);
+        Vec3 c221 = new Vec3(x2, y2, z1);
+        Vec3 c222 = new Vec3(x2, y2, z2);
+        if (down) {
+            drawQuad(matrix, builder, sprite, c111, c112, c212, c211, settings);
+        }
+        if (up) {
+            drawQuad(matrix, builder, sprite, c221, c222, c122, c121, settings);
+        }
+        if (north) {
+            drawQuad(matrix, builder, sprite, c121, c221, c211, c111, settings);
+        }
+        if (south) {
+            drawQuad(matrix, builder, sprite, c112, c212, c222, c122, settings);
+        }
+        if (west) {
+            drawQuad(matrix, builder, sprite, c112, c122, c121, c111, settings);
+        }
+        if (east) {
+            drawQuad(matrix, builder, sprite, c211, c221, c222, c212, settings);
+        }
+    }
+
+    /**
+     * Draw a box. The texture is mapped according to unit size and will scale with the size of every face
+     */
+    public static void drawBoxUnit(PoseStack matrixStack, VertexConsumer builder, TextureAtlasSprite sprite,
+                               boolean down, boolean up, boolean north, boolean south, boolean west, boolean east,
+                               float x1, float x2, float y1, float y2, float z1, float z2, RenderSettings settings) {
+        Matrix4f matrix = matrixStack.last().pose();
+        Vec3 c111 = new Vec3(x1, y1, z1);
+        Vec3 c112 = new Vec3(x1, y1, z2);
+        Vec3 c121 = new Vec3(x1, y2, z1);
+        Vec3 c122 = new Vec3(x1, y2, z2);
+        Vec3 c211 = new Vec3(x2, y1, z1);
+        Vec3 c212 = new Vec3(x2, y1, z2);
+        Vec3 c221 = new Vec3(x2, y2, z1);
+        Vec3 c222 = new Vec3(x2, y2, z2);
+        if (down) {
+            drawQuadUnit(matrix, builder, sprite, c111, c112, c212, c211, settings);
+        }
+        if (up) {
+            drawQuadUnit(matrix, builder, sprite, c221, c222, c122, c121, settings);
+        }
+        if (north) {
+            drawQuadUnit(matrix, builder, sprite, c121, c221, c211, c111, settings);
+        }
+        if (south) {
+            drawQuadUnit(matrix, builder, sprite, c112, c212, c222, c122, settings);
+        }
+        if (west) {
+            drawQuadUnit(matrix, builder, sprite, c112, c122, c121, c111, settings);
+        }
+        if (east) {
+            drawQuadUnit(matrix, builder, sprite, c211, c221, c222, c212, settings);
         }
     }
 
     public static void drawQuad(PoseStack poseStack, VertexConsumer buffer, TextureAtlasSprite sprite, Direction side, boolean opposite, float offset, RenderSettings settings) {
         Matrix4f matrix = poseStack.last().pose();
         switch (side) {
-            case DOWN -> drawQuad(matrix, buffer, sprite, new Vec3(0, offset, 1), new Vec3(1, offset, 1), new Vec3(1, offset, 0), new Vec3(0, offset, 0), opposite, settings);
-            case UP -> drawQuad(matrix, buffer, sprite, new Vec3(1, 1 - offset, 1), new Vec3(0, 1 - offset, 1), new Vec3(0, 1 - offset, 0), new Vec3(1, 1 - offset, 0), opposite, settings);
+            case DOWN -> drawQuad(matrix, buffer, sprite,
+                    new Vec3(0, offset, 1),
+                    new Vec3(1, offset, 1),
+                    new Vec3(1, offset, 0),
+                    new Vec3(0, offset, 0), opposite, settings);
+            case UP -> drawQuad(matrix, buffer, sprite,
+                    new Vec3(1, 1 - offset, 1),
+                    new Vec3(0, 1 - offset, 1),
+                    new Vec3(0, 1 - offset, 0),
+                    new Vec3(1, 1 - offset, 0), opposite, settings);
             case NORTH -> drawQuad(matrix, buffer, sprite, new Vec3(0, 0, offset), new Vec3(1, 0, offset), new Vec3(1, 1, offset), new Vec3(0, 1, offset), opposite, settings);
             case SOUTH -> drawQuad(matrix, buffer, sprite, new Vec3(0, 1, 1 - offset), new Vec3(1, 1, 1 - offset), new Vec3(1, 0, 1 - offset), new Vec3(0, 0, 1 - offset), opposite, settings);
             case WEST -> drawQuad(matrix, buffer, sprite, new Vec3(offset, 0, 0), new Vec3(offset, 1, 0), new Vec3(offset, 1, 1), new Vec3(offset, 0, 1), opposite, settings);
@@ -959,13 +1048,6 @@ public class RenderHelper {
                 .uv2(lu, lv)
                 .normal(1, 0, 0)
                 .endVertex();
-    }
-
-    public static void putVertex(Matrix4f matrix, VertexConsumer builder, Position normal,
-                                 double x, double y, double z, float u, float v, TextureAtlasSprite sprite, float r, float g, float b, float a) {
-        Vector4f vector4f = new Vector4f((float)x, (float)y, (float)z, 1.0F);
-        vector4f.transform(matrix);
-        putVertex(builder, normal, vector4f.x(), vector4f.y(), vector4f.z(), u, v, sprite, r, g, b, a);
     }
 
     public static void putVertex(VertexConsumer builder, Position normal,
@@ -1055,5 +1137,4 @@ public class RenderHelper {
     public static void rotateZP(PoseStack stack, float degrees) {
         stack.mulPose(Vector3f.ZP.rotationDegrees(degrees));
     }
-
 }
