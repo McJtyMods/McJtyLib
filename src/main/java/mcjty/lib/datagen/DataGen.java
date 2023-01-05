@@ -7,12 +7,10 @@ import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.ArrayList;
@@ -51,17 +49,7 @@ public class DataGen {
             @Override
             protected void addTables() {
                 for (Dob dob : dobs) {
-                    dob.loot().accept(new ILootFactory() {
-                        @Override
-                        public void simpleTable(Supplier<? extends Block> block) {
-                            addSimpleTable(block.get());
-                        }
-
-                        @Override
-                        public void standardTable(Supplier<? extends Block> block, Supplier<? extends BlockEntityType<?>> be) {
-                            addStandardTable(block.get(), be.get());
-                        }
-                    });
+                    dob.loot().accept(this);
                 }
             }
         });
@@ -71,14 +59,14 @@ public class DataGen {
                 for (Dob dob : dobs) {
                     dob.blockTags().accept(new ITagFactory() {
                         @Override
-                        public void blockTags(Supplier<? extends Block> blockSupplier, TagKey<Block>... tags) {
+                        public void blockTags(Supplier<? extends Block> blockSupplier, List<TagKey> tags) {
                             for (TagKey<Block> tag : tags) {
                                 tag(tag).add(blockSupplier.get());
                             }
                         }
 
                         @Override
-                        public void itemTags(Supplier<? extends Item> itemSupplier, TagKey<Item>... tags) {
+                        public void itemTags(Supplier<? extends Item> itemSupplier, List<TagKey> tags) {
                             // No op
                         }
                     });
@@ -90,14 +78,14 @@ public class DataGen {
             @Override
             protected void addTags() {
                 for (Dob dob : dobs) {
-                    dob.blockTags().accept(new ITagFactory() {
+                    dob.itemTags().accept(new ITagFactory() {
                         @Override
-                        public void blockTags(Supplier<? extends Block> blockSupplier, TagKey<Block>... tags) {
+                        public void blockTags(Supplier<? extends Block> blockSupplier, List<TagKey> tags) {
                             // No op
                         }
 
                         @Override
-                        public void itemTags(Supplier<? extends Item> itemSupplier, TagKey<Item>... tags) {
+                        public void itemTags(Supplier<? extends Item> itemSupplier, List<TagKey> tags) {
                             for (TagKey<Item> tag : tags) {
                                 tag(tag).add(itemSupplier.get());
                             }
@@ -120,27 +108,7 @@ public class DataGen {
             protected void registerModels() {
                 BaseItemModelProvider provider = this;
                 for (Dob dob : dobs) {
-                    dob.item().accept(new IItemFactory() {
-                        @Override
-                        public void parented(Supplier<? extends Block> blockSupplier, String model) {
-                            provider.parentedBlock(blockSupplier.get(), model);
-                        }
-
-                        @Override
-                        public void parented(Supplier<? extends Block> blockSupplier) {
-                            provider.parentedBlock(blockSupplier.get());
-                        }
-
-                        @Override
-                        public void generated(Supplier<? extends Item> itemSupplier, String texture) {
-                            provider.itemGenerated(itemSupplier.get(), texture);
-                        }
-
-                        @Override
-                        public void cubeAll(Supplier<? extends Item> itemSupplier, ResourceLocation texture) {
-                            provider.cubeAll(name(itemSupplier.get()), texture);
-                        }
-                    });
+                    dob.item().accept(provider);
                 }
             }
         });
@@ -148,6 +116,10 @@ public class DataGen {
 
     public static InventoryChangeTrigger.TriggerInstance has(ItemLike item) {
         return inventoryTrigger(ItemPredicate.Builder.item().of(item).build());
+    }
+
+    public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
+        return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
     }
 
     public static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... itemPredicate) {

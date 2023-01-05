@@ -55,6 +55,10 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
 
     protected abstract void addTables();
 
+    public void addLootTable(Block block, LootTable.Builder builder) {
+        lootTables.put(block, builder);
+    }
+
     protected void addItemDropTable(EntityType<?> entityType, ItemLike item) {
         entityLootTables.put(entityType, createItemDropTable(Tools.getId(entityType).getPath(), item));
     }

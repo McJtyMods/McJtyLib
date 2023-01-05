@@ -24,7 +24,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     public static final ResourceLocation RFTOOLSBASE_TOP = new ResourceLocation("rftoolsbase", "block/base/machinetop");
     public static final ResourceLocation RFTOOLSBASE_BOTTOM = new ResourceLocation("rftoolsbase", "block/base/machinebottom");
 
-    protected String name(Block block) {
+    public String name(Block block) {
         return Tools.getId(block).getPath();
     }
 
@@ -181,25 +181,25 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         simpleBlock(block, model);
     }
 
-    protected void singleTextureBlockC(Block block, String modelName, String textureName, Consumer<BlockModelBuilder> consumer) {
+    public void singleTextureBlockC(Block block, String modelName, String textureName, Consumer<BlockModelBuilder> consumer) {
         BlockModelBuilder builder = models().cubeAll(modelName, modLoc(textureName));
         consumer.accept(builder);
         simpleBlock(block, builder);
     }
 
-    protected VariantBlockStateBuilder horizontalOrientedBlock(Block block, ModelFile model) {
+    public VariantBlockStateBuilder horizontalOrientedBlock(Block block, ModelFile model) {
         return horizontalOrientedBlock(block, (blockState, builder) -> builder.modelFile(model));
     }
 
-    protected VariantBlockStateBuilder horizontalOrientedBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model) {
+    public VariantBlockStateBuilder horizontalOrientedBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model) {
         return directionBlock(block, model, BlockStateProperties.HORIZONTAL_FACING);
     }
 
-    protected VariantBlockStateBuilder orientedBlock(Block block, ModelFile model) {
+    public VariantBlockStateBuilder orientedBlock(Block block, ModelFile model) {
         return orientedBlock(block, (blockState, builder) -> builder.modelFile(model));
     }
 
-    protected VariantBlockStateBuilder orientedBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model) {
+    public VariantBlockStateBuilder orientedBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model) {
         return directionBlock(block, model, BlockStateProperties.FACING);
     }
 
