@@ -6,7 +6,10 @@ import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -41,7 +44,27 @@ public class DataGen {
             @Override
             protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
                 for (Dob dob : dobs) {
-                    dob.recipe().accept((builder, pattern) -> build(consumer, builder, pattern));
+                    dob.recipe().accept(new IRecipeFactory() {
+                        @Override
+                        public void shaped(ShapedRecipeBuilder builder, String... pattern) {
+                            build(consumer, builder, pattern);
+                        }
+
+                        @Override
+                        public void shaped(String id, ShapedRecipeBuilder builder, String... pattern) {
+                            build(consumer, new ResourceLocation(modid, id), builder, pattern);
+                        }
+
+                        @Override
+                        public void shapeless(ShapelessRecipeBuilder builder) {
+                            build(consumer, builder);
+                        }
+
+                        @Override
+                        public void shapeless(String id, ShapelessRecipeBuilder builder) {
+                            build(consumer, new ResourceLocation(modid, id), builder);
+                        }
+                    });
                 }
             }
         });

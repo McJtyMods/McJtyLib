@@ -1,16 +1,19 @@
 package mcjty.lib.datagen;
 
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public record Dob(
@@ -145,8 +148,65 @@ public record Dob(
             return this;
         }
 
-        public Builder shaped(ShapedRecipeBuilder builder, String... pattern) {
-            this.recipe = f -> f.shaped(builder, pattern);
+        private ItemLike getItemLike() {
+            if (blockSupplier == null) {
+                return itemSupplier.get();
+            } else {
+                return blockSupplier.get();
+            }
+        }
+
+        public Builder recipe(Consumer<IRecipeFactory> recipe) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                recipe.accept(f);
+            };
+            return this;
+        }
+
+        public Builder shaped(Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder, String... pattern) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(getItemLike())), pattern);
+            };
+            return this;
+        }
+
+        public Builder shaped(Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder, int amount, String... pattern) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(getItemLike(), amount)), pattern);
+            };
+            return this;
+        }
+
+        public Builder shaped(String id, Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder, String... pattern) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(getItemLike())), pattern);
+            };
+            return this;
+        }
+
+        public Builder shapeless(Function<ShapelessRecipeBuilder, ShapelessRecipeBuilder> builder) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shapeless(builder.apply(ShapelessRecipeBuilder.shapeless(getItemLike())));
+            };
+            return this;
+        }
+
+        public Builder shapeless(String id, Function<ShapelessRecipeBuilder, ShapelessRecipeBuilder> builder) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shapeless(id, builder.apply(ShapelessRecipeBuilder.shapeless(getItemLike())));
+            };
             return this;
         }
 

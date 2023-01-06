@@ -176,7 +176,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         }
     }
 
-    protected void singleTextureBlock(Block block, String modelName, String textureName) {
+    public void singleTextureBlock(Block block, String modelName, String textureName) {
         ModelFile model = models().cubeAll(modelName, modLoc(textureName));
         simpleBlock(block, model);
     }
