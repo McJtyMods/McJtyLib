@@ -68,6 +68,11 @@ public record Dob(
             return this;
         }
 
+        public Builder silkTouchLoot(Supplier<Item> lootItem, float min, float max) {
+            this.loot = f -> f.addLootTable(blockSupplier.get(), f.createSilkTouchTable("silk", blockSupplier.get(), lootItem.get(), min, max));
+            return this;
+        }
+
         public Builder blockState(Consumer<BaseBlockStateProvider> factory) {
             this.blockstate = factory;
             return this;
