@@ -1,5 +1,6 @@
 package mcjty.lib.datagen;
 
+import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -166,6 +167,24 @@ public record Dob(
             this.recipe = f -> {
                 orig.accept(f);
                 recipe.accept(f);
+            };
+            return this;
+        }
+
+        public Builder shapedNBT(Function<CopyNBTRecipeBuilder, CopyNBTRecipeBuilder> builder, String... pattern) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shapedNBT(builder.apply(CopyNBTRecipeBuilder.shapedRecipe(getItemLike())), pattern);
+            };
+            return this;
+        }
+
+        public Builder shapedNBT(String id, Function<CopyNBTRecipeBuilder, CopyNBTRecipeBuilder> builder, String... pattern) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shapedNBT(id, builder.apply(CopyNBTRecipeBuilder.shapedRecipe(getItemLike())), pattern);
             };
             return this;
         }

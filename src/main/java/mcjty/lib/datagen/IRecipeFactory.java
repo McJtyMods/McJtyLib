@@ -1,10 +1,14 @@
 package mcjty.lib.datagen;
 
+import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
 
 public interface IRecipeFactory {
+
+    void shapedNBT(CopyNBTRecipeBuilder builder, String... pattern);
+
+    void shapedNBT(String id, CopyNBTRecipeBuilder builder, String... pattern);
 
     void shaped(ShapedRecipeBuilder builder, String... pattern);
 

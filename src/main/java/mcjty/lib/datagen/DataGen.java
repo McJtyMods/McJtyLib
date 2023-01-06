@@ -1,5 +1,6 @@
 package mcjty.lib.datagen;
 
+import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
@@ -45,6 +46,18 @@ public class DataGen {
             protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
                 for (Dob dob : dobs) {
                     dob.recipe().accept(new IRecipeFactory() {
+
+                        @Override
+                        public void shapedNBT(CopyNBTRecipeBuilder builder, String... pattern) {
+                            build(consumer, builder, pattern);
+                        }
+
+                        @Override
+                        public void shapedNBT(String id, CopyNBTRecipeBuilder builder, String... pattern) {
+                            build(consumer, new ResourceLocation(modid, id), builder, pattern);
+
+                        }
+
                         @Override
                         public void shaped(ShapedRecipeBuilder builder, String... pattern) {
                             build(consumer, builder, pattern);
