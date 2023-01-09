@@ -53,6 +53,11 @@ public class DataGen {
                         }
 
                         @Override
+                        public void recipeConsumer(Supplier<Consumer<Consumer<FinishedRecipe>>> consumerSupplier) {
+                            consumerSupplier.get().accept(consumer);
+                        }
+
+                        @Override
                         public void recipe(String id, Supplier<IRecipeBuilder> supplier) {
                             supplier.get().build(consumer, new ResourceLocation(modid, id));
                         }

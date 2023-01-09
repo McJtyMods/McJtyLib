@@ -172,6 +172,15 @@ public record Dob(
             }
         }
 
+        public Builder recipeConsumer(Supplier<Consumer<Consumer<FinishedRecipe>>> consumerSupplier) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.recipeConsumer(consumerSupplier);
+            };
+            return this;
+        }
+
         public Builder recipe(Supplier<IRecipeBuilder> recipe) {
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {

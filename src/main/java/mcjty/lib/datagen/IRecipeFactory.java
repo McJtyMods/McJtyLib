@@ -6,11 +6,14 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public interface IRecipeFactory {
 
     void recipe(Supplier<IRecipeBuilder> supplier);
+
+    void recipeConsumer(Supplier<Consumer<Consumer<FinishedRecipe>>> consumerSupplier);
 
     void recipe(String id, Supplier<IRecipeBuilder> supplier);
 
