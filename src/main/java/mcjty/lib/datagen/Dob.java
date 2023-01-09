@@ -1,11 +1,14 @@
 package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
+import mcjty.lib.crafting.IRecipeBuilder;
+import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -20,6 +23,7 @@ import java.util.function.Supplier;
 public record Dob(
         Supplier<? extends Block> blockSupplier,
         Supplier<? extends Item> itemSupplier,
+        Supplier<? extends EntityType> entitySupplier,
         Consumer<BaseLootTableProvider> loot,
         Consumer<BaseBlockStateProvider> blockstate,
         Consumer<BaseItemModelProvider> item,
@@ -28,20 +32,25 @@ public record Dob(
         Consumer<IRecipeFactory> recipe) {
 
     public static Builder builder(Supplier<? extends Block> blockSupplier, Supplier<? extends Item> itemSupplier) {
-        return new Builder(blockSupplier, itemSupplier);
+        return new Builder(blockSupplier, itemSupplier, null);
     }
 
     public static Builder blockBuilder(Supplier<? extends Block> blockSupplier) {
-        return new Builder(blockSupplier, null);
+        return new Builder(blockSupplier, null, null);
     }
 
     public static Builder itemBuilder(Supplier<? extends Item> itemSupplier) {
-        return new Builder(null, itemSupplier);
+        return new Builder(null, itemSupplier, null);
+    }
+
+    public static Builder entityBuilder(Supplier<? extends EntityType> entitySupplier) {
+        return new Builder(null, null, entitySupplier);
     }
 
     public static class Builder {
         private final Supplier<? extends Block> blockSupplier;
         private final Supplier<? extends Item> itemSupplier;
+        private final Supplier<? extends EntityType> entitySupplier;
         private Consumer<BaseLootTableProvider> loot = p -> { };
         private Consumer<BaseBlockStateProvider> blockstate = p -> { };
         private Consumer<BaseItemModelProvider> item = p -> { };
@@ -49,9 +58,10 @@ public record Dob(
         private Consumer<ITagFactory> itemTags = f -> { };
         private Consumer<IRecipeFactory> recipe = f -> { };
 
-        public Builder(Supplier<? extends Block> blockSupplier, Supplier<? extends Item> itemSupplier) {
+        public Builder(Supplier<? extends Block> blockSupplier, Supplier<? extends Item> itemSupplier, Supplier<? extends EntityType> entitySupplier) {
             this.blockSupplier = blockSupplier;
             this.itemSupplier = itemSupplier;
+            this.entitySupplier = entitySupplier;
         }
 
         public Builder loot(Consumer<BaseLootTableProvider> loot) {
@@ -162,11 +172,20 @@ public record Dob(
             }
         }
 
-        public Builder recipe(Consumer<IRecipeFactory> recipe) {
+        public Builder recipe(Supplier<IRecipeBuilder> recipe) {
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                recipe.accept(f);
+                f.recipe(recipe);
+            };
+            return this;
+        }
+
+        public Builder recipe(String id, Supplier<IRecipeBuilder> recipe) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.recipe(id, recipe);
             };
             return this;
         }
@@ -235,7 +254,7 @@ public record Dob(
         }
 
         public Dob build() {
-            return new Dob(blockSupplier, itemSupplier, loot, blockstate, item, blockTags, itemTags, recipe);
+            return new Dob(blockSupplier, itemSupplier, entitySupplier, loot, blockstate, item, blockTags, itemTags, recipe);
         }
     }
 }

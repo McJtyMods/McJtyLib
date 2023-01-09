@@ -59,22 +59,22 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         lootTables.put(block, builder);
     }
 
-    protected void addItemDropTable(EntityType<?> entityType, ItemLike item) {
+    public void addItemDropTable(EntityType<?> entityType, ItemLike item) {
         entityLootTables.put(entityType, createItemDropTable(Tools.getId(entityType).getPath(), item));
     }
 
-    protected void addChestLootTable(ResourceLocation id, LootTable.Builder builder) {
+    public void addChestLootTable(ResourceLocation id, LootTable.Builder builder) {
         chestLootTables.put(id, builder);
     }
 
-    protected void addItemDropTable(EntityType<?> entityType, ItemLike item,
+    public void addItemDropTable(EntityType<?> entityType, ItemLike item,
                                     float min, float max,
                                     float lmin, float lmax) {
         entityLootTables.put(entityType, createItemDropTable(
                 Tools.getId(entityType).getPath(), item, min, max, lmin, lmax));
     }
 
-    protected LootTable.Builder createItemDropTable(String name, ItemLike item) {
+    public LootTable.Builder createItemDropTable(String name, ItemLike item) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
@@ -82,7 +82,7 @@ public abstract class BaseLootTableProvider extends LootTableProvider {
         return LootTable.lootTable().withPool(builder);
     }
 
-    protected LootTable.Builder createItemDropTable(String name, ItemLike item,
+    public LootTable.Builder createItemDropTable(String name, ItemLike item,
                                                     float min, float max,
                                                     float lmin, float lmax) {
         LootPool.Builder builder = LootPool.lootPool()
