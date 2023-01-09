@@ -214,11 +214,11 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         return builder;
     }
 
-    protected void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thick) {
+    public void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thick) {
         createFrame(dimCellFrame, txtName, thick, true, true);
     }
 
-    protected void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thick, boolean doTop, boolean doBottom) {
+    public void createFrame(BlockModelBuilder dimCellFrame, String txtName, float thick, boolean doTop, boolean doBottom) {
         // Vertical bars
         innerCube(dimCellFrame, txtName, 0f, 0f, 0f, thick, 16f, thick);
         innerCube(dimCellFrame, txtName, 16f - thick, 0f, 0f, 16f, 16f, thick);
@@ -242,7 +242,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         }
     }
 
-    protected void innerCube(BlockModelBuilder builder, String txtName, float fx, float fy, float fz, float tx, float ty, float tz) {
+    public void innerCube(BlockModelBuilder builder, String txtName, float fx, float fy, float fz, float tx, float ty, float tz) {
         builder.element().from(fx, fy, fz).to(tx, ty, tz).allFaces((direction, faceBuilder) -> faceBuilder.texture(txtName)).end();
     }
 }
