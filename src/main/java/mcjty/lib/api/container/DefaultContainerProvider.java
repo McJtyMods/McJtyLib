@@ -16,15 +16,12 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.items.IItemHandler;
-import org.apache.commons.lang3.reflect.FieldUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -101,75 +98,6 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
     public DefaultContainerProvider<C> setupSync(GenericTileEntity te) {
         dataListener(Sync.values(new ResourceLocation(McJtyLib.MODID, "data"), te));
         return this;
-    }
-
-    private void addSyncStringListener(GenericTileEntity te, AtomicInteger idx, Field field) {
-        dataListener(Sync.string(new ResourceLocation(McJtyLib.MODID, "s" + idx.getAndIncrement()), () -> {
-            try {
-                return (String) FieldUtils.readField(field, te, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }, s -> {
-            try {
-                FieldUtils.writeField(field, te, s, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }));
-    }
-
-    private Enum[] getEnumConstants(Class clazz) {
-        List<Enum> fields = Arrays.stream(clazz.getEnumConstants()).map(o -> (Enum) o).collect(Collectors.toList());
-        return fields.toArray(new Enum[0]);
-    }
-
-    private void addSyncBoolListener(GenericTileEntity te, Field field) {
-        shortListener(Sync.bool(() -> {
-            try {
-                return (boolean) FieldUtils.readField(field, te, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }, b -> {
-            try {
-                FieldUtils.writeField(field, te, b, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }));
-    }
-
-    private void addSyncIntegerListener(GenericTileEntity te, Field field) {
-        integerListener(Sync.integer(() -> {
-            try {
-                return (int) FieldUtils.readField(field, te, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }, integer -> {
-            try {
-                FieldUtils.writeField(field, te, integer, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }));
-    }
-
-    private void addSyncShortListener(GenericTileEntity te, Field field) {
-        shortListener(Sync.shortint(() -> {
-            try {
-                return (short) FieldUtils.readField(field, te, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }, integer -> {
-            try {
-                FieldUtils.writeField(field, te, integer, true);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Error accessing field", e);
-            }
-        }));
     }
 
     @Nullable

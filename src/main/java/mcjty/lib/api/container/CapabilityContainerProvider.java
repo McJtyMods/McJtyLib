@@ -8,7 +8,7 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 
 public class CapabilityContainerProvider {
 
-    public static Capability<MenuProvider> CONTAINER_PROVIDER_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
+    public static final Capability<MenuProvider> CONTAINER_PROVIDER_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
     public static void register(RegisterCapabilitiesEvent event) {
         event.register(MenuProvider.class);

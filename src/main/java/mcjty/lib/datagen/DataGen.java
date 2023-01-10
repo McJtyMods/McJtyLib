@@ -2,10 +2,12 @@ package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
+import net.minecraft.Util;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -16,10 +18,12 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -146,6 +150,37 @@ public class DataGen {
             }
         });
 
+        generator.addProvider(event.includeClient(), new LanguageProvider(generator, modid, "en_us") {
+            @Override
+            protected void addTranslations() {
+                for (Dob dob : dobs) {
+                    String name = dob.translatedName();
+                    if (name != null) {
+                        if (dob.blockSupplier() != null) {
+                            this.add(dob.blockSupplier().get(), name);
+                        } else if (dob.itemSupplier() != null) {
+                            this.add(dob.itemSupplier().get(), name);
+                        } else if (dob.entitySupplier() != null) {
+                            this.add(dob.entitySupplier().get(), name);
+                        }
+                    }
+                    Map<String, String> messages = dob.messages();
+                    for (Map.Entry<String, String> entry : messages.entrySet()) {
+                        String key;
+                        if (dob.blockSupplier() != null) {
+                            key = Util.makeDescriptionId("message", Registry.BLOCK.getKey(dob.blockSupplier().get()));
+                        } else if (dob.itemSupplier() != null) {
+                            key = Util.makeDescriptionId("message", Registry.ITEM.getKey(dob.itemSupplier().get()));
+                        } else if (dob.entitySupplier() != null) {
+                            key = Util.makeDescriptionId("message", Registry.ENTITY_TYPE.getKey(dob.entitySupplier().get()));
+                        } else {
+                            throw new RuntimeException("Not supported!");
+                        }
+                        this.add(key + "." + entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+        });
         generator.addProvider(event.includeClient(), new BaseBlockStateProvider(generator, modid, event.getExistingFileHelper()) {
             @Override
             protected void registerStatesAndModels() {

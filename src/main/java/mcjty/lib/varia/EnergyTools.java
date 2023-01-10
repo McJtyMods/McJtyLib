@@ -1,15 +1,13 @@
 package mcjty.lib.varia;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.api.power.IBigPower;
-import mcjty.lib.compat.TeslaCompatibility;
 import mcjty.lib.tileentity.GenericEnergyStorage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.energy.CapabilityEnergy;
 
 import javax.annotation.Nullable;
@@ -24,18 +22,12 @@ public class EnergyTools {
         if (te == null) {
             return false;
         }
-        if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(te, side)) {
-            return true;
-        }
         return te.getCapability(CapabilityEnergy.ENERGY, side).isPresent();
     }
 
     public static boolean isEnergyItem(ItemStack stack) {
         Item item = stack.getItem();
         if (item instanceof IEnergyItem) {
-            return true;
-        }
-        if (McJtyLib.tesla && TeslaCompatibility.isEnergyItem(stack)) {
             return true;
         }
         return stack.getCapability(CapabilityEnergy.ENERGY).isPresent();
@@ -48,9 +40,6 @@ public class EnergyTools {
         if (tileEntity instanceof IBigPower) {
             maxEnergyStored = ((IBigPower) tileEntity).getCapacity();
             energyStored = ((IBigPower) tileEntity).getStoredPower();
-        } else if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(tileEntity, side)) {
-            maxEnergyStored = TeslaCompatibility.getMaxEnergy(tileEntity, side);
-            energyStored = TeslaCompatibility.getEnergy(tileEntity, side);
         } else if (tileEntity != null) {
             return tileEntity.getCapability(CapabilityEnergy.ENERGY, side).map(h -> new EnergyLevel(h.getEnergyStored(), h.getMaxEnergyStored())).orElse(new EnergyLevel(0, 0));
         } else {
@@ -63,10 +52,7 @@ public class EnergyTools {
     public static EnergyLevel getEnergyLevel(BlockEntity tileEntity, @Nullable Direction side) {
         AtomicLong maxEnergyStored = new AtomicLong();
         AtomicLong energyStored = new AtomicLong();
-        if (McJtyLib.tesla && TeslaCompatibility.isEnergyHandler(tileEntity, side)) {
-            maxEnergyStored.set(TeslaCompatibility.getMaxEnergy(tileEntity, side));
-            energyStored.set(TeslaCompatibility.getEnergy(tileEntity, side));
-        } else if (tileEntity != null) {
+        if (tileEntity != null) {
             tileEntity.getCapability(CapabilityEnergy.ENERGY, side).ifPresent(handler -> {
                 maxEnergyStored.set(handler.getMaxEnergyStored());
                 energyStored.set(handler.getEnergyStored());
@@ -79,9 +65,7 @@ public class EnergyTools {
     }
 
     public static long receiveEnergy(BlockEntity tileEntity, Direction from, long maxReceive) {
-        if (McJtyLib.tesla && TeslaCompatibility.isEnergyReceiver(tileEntity, from)) {
-            return TeslaCompatibility.receiveEnergy(tileEntity, from, maxReceive);
-        } else if (tileEntity != null) {
+        if (tileEntity != null) {
             return tileEntity.getCapability(CapabilityEnergy.ENERGY, from).map(handler ->
                     handler.receiveEnergy(unsignedClampToInt(maxReceive), false)).orElse(0);
         }
@@ -92,8 +76,6 @@ public class EnergyTools {
         Item item = stack.getItem();
         if (item instanceof IEnergyItem) {
             return ((IEnergyItem)item).receiveEnergyL(stack, maxReceive, false);
-        } else if (McJtyLib.tesla && TeslaCompatibility.isEnergyItem(stack)) {
-            return TeslaCompatibility.receiveEnergy(stack, maxReceive, false);
         } else {
             return stack.getCapability(CapabilityEnergy.ENERGY).map(handler ->
                     handler.receiveEnergy(unsignedClampToInt(maxReceive), false)).orElse(0);

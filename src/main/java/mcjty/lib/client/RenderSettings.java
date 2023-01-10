@@ -4,52 +4,17 @@ import net.minecraft.client.renderer.RenderType;
 
 import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
 
-public class RenderSettings {
-
-    private final int brightness;
-    private final int r;
-    private final int g;
-    private final int b;
-    private final int a;
-    private final float width;
-    private final RenderType renderType;
+public record RenderSettings(
+    int brightness,
+    int r,
+    int g,
+    int b,
+    int a,
+    float width,
+    RenderType renderType) {
 
     private RenderSettings(Builder builder) {
-        this.brightness = builder.brightness;
-        this.r = builder.r;
-        this.g = builder.g;
-        this.b = builder.b;
-        this.a = builder.a;
-        this.width = builder.width;
-        this.renderType = builder.renderType;
-    }
-
-    public int getBrightness() {
-        return brightness;
-    }
-
-    public int getR() {
-        return r;
-    }
-
-    public int getG() {
-        return g;
-    }
-
-    public int getB() {
-        return b;
-    }
-
-    public int getA() {
-        return a;
-    }
-
-    public float getWidth() {
-        return width;
-    }
-
-    public RenderType getRenderType() {
-        return renderType;
+        this(builder.brightness, builder.r, builder.g, builder.b, builder.a, builder.width, builder.renderType);
     }
 
     public static Builder builder() {

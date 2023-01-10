@@ -1,15 +1,11 @@
 package mcjty.lib.base;
 
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.varia.Logging;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-
-import java.nio.file.Path;
 
 @Mod.EventBusSubscriber(modid = McJtyLib.MODID)
 public class GeneralConfig {
@@ -28,15 +24,11 @@ public class GeneralConfig {
         CLIENT_CONFIG = CLIENT_BUILDER.build();
     }
 
-
-
-
     public static final String CATEGORY_GENERAL = "general";
 
     public static ForgeConfigSpec.IntValue maxInfuse;
 
     public static ForgeConfigSpec.BooleanValue manageOwnership;
-    public static ForgeConfigSpec.BooleanValue tallChunkFriendly;
 
     public static void init(ForgeConfigSpec.Builder SERVER_BUILDER) {
         SERVER_BUILDER.comment("General settings for all mods using mcjtylib").push(CATEGORY_GENERAL);
@@ -45,24 +37,10 @@ public class GeneralConfig {
                 .define("logging", false);
         manageOwnership = SERVER_BUILDER.comment("If true then blocks using mcjtylib will have ownership tagged on them (useful for the rftools security manager)")
                 .define("manageOwnership", true);
-        tallChunkFriendly = SERVER_BUILDER.comment("If true then mods using McJtyLib might try to be as friendly as possible to mods that support very tall chunks (taller then 256). No guarantees however! Set to false for more optimal performance")
-                .define("tallChunkFriendly", false);
         maxInfuse = SERVER_BUILDER.comment("The maximum amount of dimensional shards that can be infused in a single machine")
                 .defineInRange("maxInfuse", 256, 1, Integer.MAX_VALUE);
 
         SERVER_BUILDER.pop();
-    }
-
-
-    public static void loadConfig(ForgeConfigSpec spec, Path path) {
-        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
-                .sync()
-                .autosave()
-                .writingMode(WritingMode.REPLACE)
-                .build();
-
-        configData.load();
-        spec.setConfig(configData);
     }
 
     @SubscribeEvent

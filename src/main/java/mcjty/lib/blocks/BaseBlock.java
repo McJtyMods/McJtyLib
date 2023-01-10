@@ -1,13 +1,11 @@
 package mcjty.lib.blocks;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.builder.BlockBuilder;
 import mcjty.lib.builder.TooltipBuilder;
-import mcjty.lib.compat.CofhApiItemCompatibility;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
@@ -149,8 +147,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
                 case MODE_WRENCH -> WrenchUsage.NORMAL;
                 case MODE_SELECT -> player.isShiftKeyDown() ? WrenchUsage.SNEAK_SELECT : WrenchUsage.SELECT;
             };
-        } else if (McJtyLib.cofhapiitem && CofhApiItemCompatibility.isToolHammer(item)) {
-            return CofhApiItemCompatibility.getWrenchUsage(item, itemStack, player, pos);
         } else if (WrenchChecker.isAWrench(item)) {
             return WrenchUsage.NORMAL;
         }

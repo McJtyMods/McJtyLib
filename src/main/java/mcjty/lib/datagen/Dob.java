@@ -15,7 +15,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -24,6 +26,8 @@ public record Dob(
         Supplier<? extends Block> blockSupplier,
         Supplier<? extends Item> itemSupplier,
         Supplier<? extends EntityType> entitySupplier,
+        String translatedName,
+        Map<String, String> messages,
         Consumer<BaseLootTableProvider> loot,
         Consumer<BaseBlockStateProvider> blockstate,
         Consumer<BaseItemModelProvider> item,
@@ -51,6 +55,8 @@ public record Dob(
         private final Supplier<? extends Block> blockSupplier;
         private final Supplier<? extends Item> itemSupplier;
         private final Supplier<? extends EntityType> entitySupplier;
+        private String translatedName = null;
+        private Map<String, String> messages = new HashMap<>();
         private Consumer<BaseLootTableProvider> loot = p -> { };
         private Consumer<BaseBlockStateProvider> blockstate = p -> { };
         private Consumer<BaseItemModelProvider> item = p -> { };
@@ -62,6 +68,16 @@ public record Dob(
             this.blockSupplier = blockSupplier;
             this.itemSupplier = itemSupplier;
             this.entitySupplier = entitySupplier;
+        }
+
+        public Builder name(String name) {
+            this.translatedName = name;
+            return this;
+        }
+
+        public Builder message(String key, String message) {
+            this.messages.put(key, message);
+            return this;
         }
 
         public Builder loot(Consumer<BaseLootTableProvider> loot) {
@@ -263,7 +279,7 @@ public record Dob(
         }
 
         public Dob build() {
-            return new Dob(blockSupplier, itemSupplier, entitySupplier, loot, blockstate, item, blockTags, itemTags, recipe);
+            return new Dob(blockSupplier, itemSupplier, entitySupplier, translatedName, new HashMap<>(messages), loot, blockstate, item, blockTags, itemTags, recipe);
         }
     }
 }

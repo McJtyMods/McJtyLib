@@ -727,22 +727,22 @@ public class RenderHelper {
     }
 
     public static void renderBillboardQuadBright(PoseStack matrixStack, VertexConsumer builder, float scale, ResourceLocation texture, RenderSettings settings) {
-        int b1 = settings.getBrightness() >> 16 & 65535;
-        int b2 = settings.getBrightness() & 65535;
+        int b1 = settings.brightness() >> 16 & 65535;
+        int b2 = settings.brightness() & 65535;
         TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
         matrixStack.pushPose();
         matrixStack.translate(0.5, 0.5, 0.5);
         RenderHelper.rotateToPlayer(matrixStack);
         Matrix4f matrix = matrixStack.last().pose();
-        builder.vertex(matrix, -scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        builder.vertex(matrix, -scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        builder.vertex(matrix, scale, scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU1(), sprite.getV1()).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        builder.vertex(matrix, scale, -scale, 0.0f).color(settings.getR(), settings.getG(), settings.getB(), settings.getA()).uv(sprite.getU1(), sprite.getV0()).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        builder.vertex(matrix, -scale, -scale, 0.0f).color(settings.r(), settings.g(), settings.b(), settings.a()).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        builder.vertex(matrix, -scale, scale, 0.0f).color(settings.r(), settings.g(), settings.b(), settings.a()).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        builder.vertex(matrix, scale, scale, 0.0f).color(settings.r(), settings.g(), settings.b(), settings.a()).uv(sprite.getU1(), sprite.getV1()).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        builder.vertex(matrix, scale, -scale, 0.0f).color(settings.r(), settings.g(), settings.b(), settings.a()).uv(sprite.getU1(), sprite.getV0()).uv2(b1, b2).normal(1, 0, 0).endVertex();
         matrixStack.popPose();
     }
 
     public static void renderBillboardQuadBright(PoseStack matrixStack, MultiBufferSource buffer, float scale, ResourceLocation texture, RenderSettings settings) {
-        renderBillboardQuadBright(matrixStack, buffer.getBuffer(settings.getRenderType()), scale, texture, settings);
+        renderBillboardQuadBright(matrixStack, buffer.getBuffer(settings.renderType()), scale, texture, settings);
     }
 
     public static void rotateToPlayer(PoseStack matrixStack) {
@@ -837,7 +837,7 @@ public class RenderHelper {
 
         Vec3 normal = PS.cross(SE).normalize();
 
-        Vec3 half = normal.multiply(settings.getWidth(), settings.getWidth(), settings.getWidth());
+        Vec3 half = normal.multiply(settings.width(), settings.width(), settings.width());
         Vec3 p1 = S.add(half);
         Vec3 p2 = S.subtract(half);
         Vec3 p3 = E.add(half);
@@ -876,21 +876,21 @@ public class RenderHelper {
 
     private static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
                                  RenderSettings settings) {
-        int b1 = settings.getBrightness() >> 16 & 65535;
-        int b2 = settings.getBrightness() & 65535;
+        int b1 = settings.brightness() >> 16 & 65535;
+        int b2 = settings.brightness() & 65535;
 
-        vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+        vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+        vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+        vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
     }
 
     private static void drawQuadUnit(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
                                      double u0Par, double u1Par,
                                      double v0Par, double v1Par,
                                      RenderSettings settings) {
-        int b1 = settings.getBrightness() >> 16 & 65535;
-        int b2 = settings.getBrightness() & 65535;
+        int b1 = settings.brightness() >> 16 & 65535;
+        int b2 = settings.brightness() & 65535;
         u0Par = u0Par < 0 ? (1.0 + (u0Par % 1.0)) : u0Par % 1.0;
         u1Par = u1Par < 0 ? (-(u1Par % 1.0)) : (1.0 - (u1Par % 1.0));
         v0Par = v0Par < 0 ? (1.0 + (v0Par % 1.0)) : v0Par % 1.0;
@@ -898,28 +898,28 @@ public class RenderHelper {
         float du = sprite.getU1() - sprite.getU0();
         float dv = sprite.getV1() - sprite.getV0();
 
-        vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0() + (float) (du * u0Par), sprite.getV0() + (float) (dv * v0Par), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1() - (float) (du * u1Par), sprite.getV0() + (float) (dv * v0Par), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1() - (float) (du * u1Par), sprite.getV1() - (float) (dv * v1Par), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-        vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0() + (float) (du * u0Par), sprite.getV1() - (float) (dv * v1Par), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+        vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0() + (float) (du * u0Par), sprite.getV0() + (float) (dv * v0Par), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+        vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1() - (float) (du * u1Par), sprite.getV0() + (float) (dv * v0Par), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+        vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1() - (float) (du * u1Par), sprite.getV1() - (float) (dv * v1Par), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+        vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0() + (float) (du * u0Par), sprite.getV1() - (float) (dv * v1Par), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
     }
 
     private static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
                                  boolean opposite,
                                  RenderSettings settings) {
-        int b1 = settings.getBrightness() >> 16 & 65535;
-        int b2 = settings.getBrightness() & 65535;
+        int b1 = settings.brightness() >> 16 & 65535;
+        int b2 = settings.brightness() & 65535;
 
         if (opposite) {
-            vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+            vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+            vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+            vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
         } else {
-            vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
-            vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.getR(), settings.getG(), settings.getB(), settings.getA());
+            vt(buffer, matrix, (float) p4.x(), (float) p4.y(), (float) p4.z(), sprite.getU0(), sprite.getV1(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+            vt(buffer, matrix, (float) p3.x(), (float) p3.y(), (float) p3.z(), sprite.getU1(), sprite.getV1(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+            vt(buffer, matrix, (float) p2.x(), (float) p2.y(), (float) p2.z(), sprite.getU1(), sprite.getV0(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
+            vt(buffer, matrix, (float) p1.x(), (float) p1.y(), (float) p1.z(), sprite.getU0(), sprite.getV0(), b1, b2, settings.r(), settings.g(), settings.b(), settings.a());
         }
     }
 

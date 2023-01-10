@@ -62,27 +62,27 @@ public class TooltipBuilder {
 
     private void addLines(@Nonnull ItemStack stack, @Nonnull List<Component> tooltip, String prefix, InfoLine[] lines) {
         for (InfoLine line : lines) {
-            if (line.getCondition().test(stack)) {
-                if (line.getRepeatingParameter() != null) {
-                    line.getRepeatingParameter().apply(stack).forEach(s -> {
+            if (line.condition().test(stack)) {
+                if (line.repeatingParameter() != null) {
+                    line.repeatingParameter().apply(stack).forEach(s -> {
                         MutableComponent component;
-                        if (line.getTranslationKey() != null) {
-                            component = stylize(line.getTranslationKey(), line.getStyles());
+                        if (line.translationKey() != null) {
+                            component = stylize(line.translationKey(), line.styles());
                         } else {
-                            component = stylize(prefix + line.getSuffix(), line.getStyles());
+                            component = stylize(prefix + line.suffix(), line.styles());
                         }
                         component.append(ComponentFactory.literal(ChatFormatting.WHITE + s));
                         tooltip.add(component);
                     });
                 } else {
                     MutableComponent component;
-                    if (line.getTranslationKey() != null) {
-                        component = stylize(line.getTranslationKey(), line.getStyles());
+                    if (line.translationKey() != null) {
+                        component = stylize(line.translationKey(), line.styles());
                     } else {
-                        component = stylize(prefix + line.getSuffix(), line.getStyles());
+                        component = stylize(prefix + line.suffix(), line.styles());
                     }
-                    if (line.getInformationGetter() != null) {
-                        String extra = line.getInformationGetter().apply(stack);
+                    if (line.informationGetter() != null) {
+                        String extra = line.informationGetter().apply(stack);
                         if (extra != null) {
                             component.append(ComponentFactory.literal(ChatFormatting.WHITE + extra));
                             tooltip.add(component);

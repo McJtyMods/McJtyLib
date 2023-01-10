@@ -51,8 +51,6 @@ public class ModSetup extends DefaultModSetup {
         McJtyLib.networkHandler = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> "1.0", s -> true, s -> true);
         PacketHandler.registerMessages(McJtyLib.networkHandler);
         MinecraftForge.EVENT_BUS.register(new EventHandler());
-        McJtyLib.tesla = ModList.get().isLoaded("tesla");
-        McJtyLib.cofhapiitem = ModList.get().isLoaded("cofhapi|item");
     }
 
     @Override

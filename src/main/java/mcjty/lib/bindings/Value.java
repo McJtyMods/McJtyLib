@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
- * Declare this as a static field in your GenericTileEntity and annotate with @Val to make this
+ * Declare this as a static field in your GenericTileEntity and annotate with @GuiValue to make this
  * a client <-> gui synced value
  */
 public record Value<T extends GenericTileEntity, V>(Key<V> key,

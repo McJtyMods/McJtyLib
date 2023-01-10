@@ -6,10 +6,10 @@ import net.minecraftforge.fml.ModList;
 public class MainCompatHandler {
 
     public static void registerWaila() {
-        if (ModList.get().isLoaded("waila")) {
+//        if (ModList.get().isLoaded("waila")) {
             // @todo 1.14
 //            WailaCompatibility.register();
-        }
+//        }
     }
 
     public static void registerTOP() {

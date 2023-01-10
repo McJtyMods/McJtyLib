@@ -10,7 +10,7 @@ import java.util.Set;
  * A collection of ranges of a given slot type.
  */
 public class SlotRanges {
-    private TreeRangeSet<Integer> treeRangeSet = TreeRangeSet.create();
+    private final TreeRangeSet<Integer> treeRangeSet = TreeRangeSet.create();
 
     public void addSingle(int index) {
         treeRangeSet.add(Range.singleton(index).canonical(DiscreteDomain.integers()));

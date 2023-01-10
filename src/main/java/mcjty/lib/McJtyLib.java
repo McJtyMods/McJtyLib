@@ -37,8 +37,6 @@ public class McJtyLib {
     public static McJtyLib instance;
 
     public static SimpleChannel networkHandler;
-    public static boolean tesla;
-    public static boolean cofhapiitem;
 
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();

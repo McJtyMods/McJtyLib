@@ -23,30 +23,30 @@ import java.util.function.BiFunction;
 public class DelayedRenderer {
 
     // Renderers per render type
-    private static final Map<RenderType, List<Pair<BlockPos, BiConsumer<PoseStack, VertexConsumer>>>> renders = new HashMap<>();
+    private static final Map<RenderType, List<Pair<BlockPos, BiConsumer<PoseStack, VertexConsumer>>>> RENDERS = new HashMap<>();
 
     // Global renderers
-    private static final Map<BlockPos, TriConsumer<PoseStack, Vec3, RenderType>> delayedRenders = new HashMap<>();
-    private static final Map<BlockPos, BiFunction<Level, BlockPos, Boolean>> renderValidations = new HashMap<>();
+    private static final Map<BlockPos, TriConsumer<PoseStack, Vec3, RenderType>> DELAYED_RENDERS = new HashMap<>();
+    private static final Map<BlockPos, BiFunction<Level, BlockPos, Boolean>> RENDER_VALIDATIONS = new HashMap<>();
 
     public static void render(PoseStack matrixStack) {
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
 
         Set<BlockPos> todelete = new HashSet<>();
-        delayedRenders.forEach((pos, consumer) -> {
-            if (renderValidations.getOrDefault(pos, (level, blockPos) -> false).apply(Minecraft.getInstance().level, pos)) {
+        DELAYED_RENDERS.forEach((pos, consumer) -> {
+            if (RENDER_VALIDATIONS.getOrDefault(pos, (level, blockPos) -> false).apply(Minecraft.getInstance().level, pos)) {
                 consumer.accept(matrixStack, projectedView, null);
             } else {
                 todelete.add(pos);
             }
         });
         for (BlockPos pos : todelete) {
-            delayedRenders.remove(pos);
-            renderValidations.remove(pos);
+            DELAYED_RENDERS.remove(pos);
+            RENDER_VALIDATIONS.remove(pos);
         }
 
-        renders.forEach((type, renderlist) -> {
+        RENDERS.forEach((type, renderlist) -> {
             VertexConsumer consumer = buffer.getBuffer(type);
             renderlist.forEach(r -> {
                 RenderSystem.enableDepthTest();
@@ -59,22 +59,22 @@ public class DelayedRenderer {
             RenderSystem.enableDepthTest();
             buffer.endBatch(type);
         });
-        renders.clear();
+        RENDERS.clear();
 
         buffer.endBatch();
     }
 
     public static void addRender(BlockPos pos, TriConsumer<PoseStack, Vec3, RenderType> renderer, BiFunction<Level, BlockPos, Boolean> validator) {
-        delayedRenders.put(pos, renderer);
-        renderValidations.put(pos, validator);
+        DELAYED_RENDERS.put(pos, renderer);
+        RENDER_VALIDATIONS.put(pos, validator);
     }
 
     public static void removeRender(BlockPos pos) {
-        delayedRenders.remove(pos);
-        renderValidations.remove(pos);
+        DELAYED_RENDERS.remove(pos);
+        RENDER_VALIDATIONS.remove(pos);
     }
 
     public static void addRender(RenderType type, BlockPos pos, BiConsumer<PoseStack, VertexConsumer> renderer) {
-        renders.computeIfAbsent(type, renderType -> new ArrayList<>()).add(Pair.of(pos, renderer));
+        RENDERS.computeIfAbsent(type, renderType -> new ArrayList<>()).add(Pair.of(pos, renderer));
     }
 }
