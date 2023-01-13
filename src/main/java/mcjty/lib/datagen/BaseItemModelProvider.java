@@ -17,7 +17,7 @@ public abstract class BaseItemModelProvider extends ItemModelProvider {
 
 
     public BaseItemModelProvider(DataGenerator generator, String modid, ExistingFileHelper existingFileHelper) {
-        super(generator, modid, existingFileHelper);
+        super(generator.getPackOutput(), modid, existingFileHelper);
     }
 
     public void parentedBlock(Block block) {

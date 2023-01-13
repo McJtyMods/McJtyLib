@@ -3,9 +3,7 @@ package mcjty.lib.client;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import mcjty.lib.base.StyleConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -30,6 +28,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.fluids.FluidStack;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 
@@ -59,21 +60,21 @@ public class RenderHelper {
 
         switch (facing) {
             case DOWN -> {
-                matrixStack.mulPose(Vector3f.XP.rotationDegrees(90.0F));
+                matrixStack.mulPose(Axis.XP.rotationDegrees(90.0F));
             }
             case UP -> {
-                matrixStack.mulPose(Vector3f.XP.rotationDegrees(-90.0F));
+                matrixStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
             }
             case NORTH -> {
-                matrixStack.mulPose(Vector3f.YP.rotationDegrees(-180.0F));
+                matrixStack.mulPose(Axis.YP.rotationDegrees(-180.0F));
             }
             case SOUTH -> {
             }
             case WEST -> {
-                matrixStack.mulPose(Vector3f.YP.rotationDegrees(-90.0F));
+                matrixStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
             }
             case EAST -> {
-                matrixStack.mulPose(Vector3f.YP.rotationDegrees(90.0F));
+                matrixStack.mulPose(Axis.YP.rotationDegrees(90.0F));
             }
         }
 
@@ -118,11 +119,11 @@ public class RenderHelper {
         matrixStack.pushPose();
         matrixStack.translate(xPos + 8, yPos + 16, 50F);
         matrixStack.scale(-scale, scale, scale);
-        matrixStack.mulPose(Vector3f.ZP.rotationDegrees(180F));
-        matrixStack.mulPose(Vector3f.YP.rotationDegrees(135F));
+        matrixStack.mulPose(Axis.ZP.rotationDegrees(180F));
+        matrixStack.mulPose(Axis.YP.rotationDegrees(135F));
         // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
-        matrixStack.mulPose(Vector3f.YN.rotationDegrees(135F));
-        matrixStack.mulPose(Vector3f.YP.rotationDegrees(rot));
+        matrixStack.mulPose(Axis.YN.rotationDegrees(135F));
+        matrixStack.mulPose(Axis.YP.rotationDegrees(rot));
 //        GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.setXRot(0.0F);
@@ -746,7 +747,7 @@ public class RenderHelper {
     }
 
     public static void rotateToPlayer(PoseStack matrixStack) {
-        Quaternion rotation = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
+        Quaternionf rotation = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
         matrixStack.mulPose(rotation);
     }
 
@@ -1192,15 +1193,15 @@ public class RenderHelper {
     }
 
     public static void rotateXP(PoseStack stack, float degrees) {
-        stack.mulPose(Vector3f.XP.rotationDegrees(degrees));
+        stack.mulPose(Axis.XP.rotationDegrees(degrees));
     }
 
     public static void rotateYP(PoseStack stack, float degrees) {
-        stack.mulPose(Vector3f.YP.rotationDegrees(degrees));
+        stack.mulPose(Axis.YP.rotationDegrees(degrees));
     }
 
     public static void rotateZP(PoseStack stack, float degrees) {
-        stack.mulPose(Vector3f.ZP.rotationDegrees(degrees));
+        stack.mulPose(Axis.ZP.rotationDegrees(degrees));
     }
 
     public record Rect(Vec3 v1, Vec3 v2,

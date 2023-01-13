@@ -7,8 +7,9 @@ import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
-import net.minecraft.core.Registry;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -18,10 +19,13 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -47,8 +51,9 @@ public class DataGen {
     public void generate() {
         DataGenerator generator = event.getGenerator();
         generator.addProvider(event.includeServer(), new BaseRecipeProvider(generator) {
+
             @Override
-            protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
+            protected void buildRecipes(Consumer<FinishedRecipe> consumer) {
                 for (Dob dob : dobs) {
                     dob.recipe().accept(new IRecipeFactory() {
                         @Override
@@ -100,17 +105,38 @@ public class DataGen {
                 }
             }
         });
-        generator.addProvider(event.includeServer(), new BaseLootTableProvider(generator) {
+
+        // @todo 1.19.3, probably not right
+        BaseLootTableProvider lootTableProvider = new BaseLootTableProvider();
+        generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
+                List.of(new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
+                    for (Dob dob : dobs) {
+                        if (dob.blockSupplier() != null) {
+                            dob.loot().accept(lootTableProvider);
+                        }
+                    }
+                }, LootContextParamSets.BLOCK))));
+        generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
+                List.of(new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
+                    for (Dob dob : dobs) {
+                        if (dob.entitySupplier() != null) {
+                            dob.loot().accept(lootTableProvider);
+                        }
+                    }
+                }, LootContextParamSets.ENTITY))));
+
+
+//        generator.addProvider(event.includeServer(), new BaseLootTableProvider(generator) {
+//            @Override
+//            protected void addTables() {
+//                for (Dob dob : dobs) {
+//                    dob.loot().accept(this);
+//                }
+//            }
+//        });
+        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(generator, event.getLookupProvider(), modid, event.getExistingFileHelper()) {
             @Override
-            protected void addTables() {
-                for (Dob dob : dobs) {
-                    dob.loot().accept(this);
-                }
-            }
-        });
-        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(generator, modid, event.getExistingFileHelper()) {
-            @Override
-            protected void addTags() {
+            protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {
                     dob.blockTags().accept(new ITagFactory() {
                         @Override
@@ -129,9 +155,9 @@ public class DataGen {
             }
         };
         generator.addProvider(event.includeServer(), blockTags);
-        generator.addProvider(event.includeServer(), new ItemTagsProvider(generator, blockTags, modid, event.getExistingFileHelper()) {
+        generator.addProvider(event.includeServer(), new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), blockTags, modid, event.getExistingFileHelper()) {
             @Override
-            protected void addTags() {
+            protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {
                     dob.itemTags().accept(new ITagFactory() {
                         @Override
@@ -150,7 +176,7 @@ public class DataGen {
             }
         });
 
-        generator.addProvider(event.includeClient(), new LanguageProvider(generator, modid, "en_us") {
+        generator.addProvider(event.includeClient(), new LanguageProvider(generator.getPackOutput(), modid, "en_us") {
             @Override
             protected void addTranslations() {
                 for (Dob dob : dobs) {
@@ -168,11 +194,11 @@ public class DataGen {
                     for (Map.Entry<String, String> entry : messages.entrySet()) {
                         String key;
                         if (dob.blockSupplier() != null) {
-                            key = Util.makeDescriptionId("message", Registry.BLOCK.getKey(dob.blockSupplier().get()));
+                            key = Util.makeDescriptionId("message", ForgeRegistries.BLOCKS.getKey(dob.blockSupplier().get()));
                         } else if (dob.itemSupplier() != null) {
-                            key = Util.makeDescriptionId("message", Registry.ITEM.getKey(dob.itemSupplier().get()));
+                            key = Util.makeDescriptionId("message", ForgeRegistries.ITEMS.getKey(dob.itemSupplier().get()));
                         } else if (dob.entitySupplier() != null) {
-                            key = Util.makeDescriptionId("message", Registry.ENTITY_TYPE.getKey(dob.entitySupplier().get()));
+                            key = Util.makeDescriptionId("message", ForgeRegistries.ENTITY_TYPES.getKey(dob.entitySupplier().get()));
                         } else {
                             throw new RuntimeException("Not supported!");
                         }

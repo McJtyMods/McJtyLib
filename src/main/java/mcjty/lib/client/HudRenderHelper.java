@@ -5,14 +5,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
 import org.apache.commons.lang3.tuple.Pair;
+import org.joml.Math;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,17 +35,17 @@ public class HudRenderHelper {
             matrixStack.translate((float) x + 0.5F, (float) y + 1.75F, (float) z + 0.5F);
         }
 
-        Quaternion quaternion = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        Quaternionf quaternion = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
         switch (hudOrientation) {
-            case HUD_SOUTH -> matrixStack.mulPose(new Quaternion(new Vector3f(0, 1, 0), -getHudAngle(orientation), true));
+            case HUD_SOUTH -> matrixStack.mulPose(new Quaternionf().setAngleAxis(-getHudAngle(orientation), 0, 1, 0));
             case HUD_TOPLAYER_HORIZ -> {
                 // @todo not correct, it just faces camera
                 matrixStack.mulPose(quaternion);
-                matrixStack.mulPose(Quaternion.fromXYZ(0, 3.14159f, 0));
+                matrixStack.mulPose(fromXYZ(0, 3.14159f, 0));
             }
             case HUD_TOPLAYER -> {
                 matrixStack.mulPose(quaternion);
-                matrixStack.mulPose(Quaternion.fromXYZ(0, 3.14159f, 0));
+                matrixStack.mulPose(fromXYZ(0, 3.14159f, 0));
             }
         }
 
@@ -69,6 +70,14 @@ public class HudRenderHelper {
 //        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         matrixStack.popPose();
+    }
+
+    private static Quaternionf fromXYZ(float pX, float pY, float pZ) {
+        Quaternionf quaternion = new Quaternionf(0, 0, 0, 1);
+        quaternion.mul(new Quaternionf((float)Math.sin((double)(pX / 2.0F)), 0.0F, 0.0F, (float)Math.cos((double)(pX / 2.0F))));
+        quaternion.mul(new Quaternionf(0.0F, (float)Math.sin((double)(pY / 2.0F)), 0.0F, (float)Math.cos((double)(pY / 2.0F))));
+        quaternion.mul(new Quaternionf(0.0F, 0.0F, (float)Math.sin((double)(pZ / 2.0F)), (float)Math.cos((double)(pZ / 2.0F))));
+        return quaternion;
     }
 
     public static void renderHud(PoseStack stack, MultiBufferSource buffer, List<String> messages,

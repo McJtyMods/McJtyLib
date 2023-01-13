@@ -29,7 +29,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     }
 
     public BaseBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
-        super(gen, modid, exFileHelper);
+        super(gen.getPackOutput(), modid, exFileHelper);
     }
 
     public void simpleBlockC(Block block, Consumer<BlockModelBuilder> consumer) {

@@ -10,8 +10,8 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Matrix4f;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 
 import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
 import static net.minecraft.client.renderer.LightTexture.FULL_SKY;

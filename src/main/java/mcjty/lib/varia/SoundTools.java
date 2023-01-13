@@ -1,17 +1,26 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.setup.Registration;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.registries.RegistryObject;
 
 public class SoundTools {
 
+    public static SoundEvent createSoundEvent(ResourceLocation id) {
+        return SoundEvent.createVariableRangeEvent(id);
+    }
+
     // Server side: play a sound to all nearby players
     public static void playSound(Level worldObj, SoundEvent soundName, double x, double y, double z, double volume, double pitch) {
-        ClientboundSoundPacket soundEffect = new ClientboundSoundPacket(soundName, SoundSource.BLOCKS, x, y, z, (float) volume, (float) pitch, 0);  // @todo seed parameter?
+        // @todo 1.19.3 is this right?
+        ClientboundSoundPacket soundEffect = new ClientboundSoundPacket(Holder.direct(soundName), SoundSource.BLOCKS, x, y, z, (float) volume, (float) pitch, 0);  // @todo seed parameter?
 
         for (int j = 0; j < worldObj.players().size(); ++j) {
             ServerPlayer player = (ServerPlayer)worldObj.players().get(j);

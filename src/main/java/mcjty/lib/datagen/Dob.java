@@ -3,6 +3,7 @@ package mcjty.lib.datagen;
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -237,7 +238,8 @@ public record Dob(
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(getItemLike())), pattern);
+                // @todo 1.19.3
+                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, getItemLike())), pattern);
             };
             return this;
         }
@@ -246,7 +248,8 @@ public record Dob(
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(getItemLike(), amount)), pattern);
+                // @todo 1.19.3
+                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, getItemLike(), amount)), pattern);
             };
             return this;
         }
@@ -255,7 +258,8 @@ public record Dob(
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(getItemLike())), pattern);
+                // @todo 1.19.3
+                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, getItemLike())), pattern);
             };
             return this;
         }
@@ -264,7 +268,8 @@ public record Dob(
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                f.shapeless(builder.apply(ShapelessRecipeBuilder.shapeless(getItemLike())));
+                // @todo 1.19.3
+                f.shapeless(builder.apply(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, getItemLike())));
             };
             return this;
         }
@@ -273,7 +278,8 @@ public record Dob(
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                f.shapeless(id, builder.apply(ShapelessRecipeBuilder.shapeless(getItemLike())));
+                // @todo 1.19.3
+                f.shapeless(id, builder.apply(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, getItemLike())));
             };
             return this;
         }

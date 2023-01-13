@@ -3,6 +3,7 @@ package mcjty.lib.varia;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -66,11 +67,11 @@ public class Tools {
     }
 
     public static ResourceLocation getId(CommonLevelAccessor level, Biome biome) {
-        return level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
+        return level.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome);
     }
 
     public static ResourceLocation getId(CommonLevelAccessor level, Structure feature) {
-        return level.registryAccess().registryOrThrow(Registry.STRUCTURE_REGISTRY).getKey(feature);
+        return level.registryAccess().registryOrThrow(Registries.STRUCTURE).getKey(feature);
     }
 
     public static String getModid(ItemStack stack) {

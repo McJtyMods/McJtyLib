@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class BaseRecipeProvider extends RecipeProvider {
+public abstract class BaseRecipeProvider extends RecipeProvider {
 
     private final Map<Character, Ingredient> defaultIngredients = new HashMap<>();
     private String group = "";
@@ -92,7 +92,7 @@ public class BaseRecipeProvider extends RecipeProvider {
     }
 
     public BaseRecipeProvider(DataGenerator datagen) {
-        super(datagen);
+        super(datagen.getPackOutput());
         add('d', Items.DIAMOND);
         add('e', Items.EMERALD);
         add('o', Tags.Items.ENDER_PEARLS);

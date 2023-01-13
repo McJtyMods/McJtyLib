@@ -5,9 +5,11 @@ import mcjty.lib.gui.widgets.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -105,17 +107,17 @@ public class TagSelectorWindow {
 
     private java.util.List<String> getTags() {
         if (TYPE_BOTH.equals(type)) {
-            Stream<String> itemStream = Registry.ITEM.getTags().map(pair -> pair.getFirst().location().toString());
-            Stream<String> blockStream = Registry.BLOCK.getTags().map(pair -> pair.getFirst().location().toString());
+            Stream<String> itemStream = ForgeRegistries.ITEMS.tags().stream().map(t -> t.getKey().location().toString());
+            Stream<String> blockStream = ForgeRegistries.BLOCKS.tags().stream().map(t -> t.getKey().location().toString());
             Set<String> tags = itemStream.collect(Collectors.toSet());
             blockStream.forEach(tags::add);
             return tags.stream().sorted().collect(Collectors.toList());
         } else if (TYPE_ITEM.equals(type)) {
-            Stream<String> itemStream = Registry.ITEM.getTags().map(pair -> pair.getFirst().location().toString());
+            Stream<String> itemStream = ForgeRegistries.ITEMS.tags().stream().map(t -> t.getKey().location().toString());
             Set<String> tags = itemStream.collect(Collectors.toSet());
             return tags.stream().sorted().collect(Collectors.toList());
         } else {
-            Stream<String> blockStream = Registry.BLOCK.getTags().map(pair -> pair.getFirst().location().toString());
+            Stream<String> blockStream = ForgeRegistries.BLOCKS.tags().stream().map(t -> t.getKey().location().toString());
             Set<String> tags = blockStream.collect(Collectors.toSet());
             return tags.stream().sorted().collect(Collectors.toList());
         }

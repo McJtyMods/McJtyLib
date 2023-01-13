@@ -1,5 +1,6 @@
 package mcjty.lib.varia;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.resources.ResourceKey;
@@ -44,15 +45,15 @@ public class LevelTools {
 
     public static ServerLevel getLevel(Level world, ResourceLocation id) {
         // Worlds in 1.16 are always loaded
-        return world.getServer().getLevel(ResourceKey.create(Registry.DIMENSION_REGISTRY, id));
+        return world.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, id));
     }
 
     public static ResourceKey<Level> getId(ResourceLocation id) {
-        return ResourceKey.create(Registry.DIMENSION_REGISTRY, id);
+        return ResourceKey.create(Registries.DIMENSION, id);
     }
 
     public static ResourceKey<Level> getId(String id) {
-        return ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(id));
+        return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(id));
     }
 
     /**

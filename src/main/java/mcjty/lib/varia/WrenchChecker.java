@@ -1,6 +1,7 @@
 package mcjty.lib.varia;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -14,7 +15,7 @@ public class WrenchChecker {
     private static Set<ResourceLocation> wrenches;
 
     public static final ResourceLocation WRENCH = new ResourceLocation("forge", "tools/wrench");
-    public static final TagKey<Item> WRENCH_TAG = TagKey.create(Registry.ITEM_REGISTRY, WRENCH);
+    public static final TagKey<Item> WRENCH_TAG = TagKey.create(Registries.ITEM, WRENCH);
 
 
     public static boolean isAWrench(Item item) {

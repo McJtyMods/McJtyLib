@@ -6,6 +6,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
@@ -15,6 +16,11 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
 
     public CopyNBTRecipe(ShapedRecipe recipe) {
         super(recipe);
+    }
+
+    @Override
+    public CraftingBookCategory category() {
+        return CraftingBookCategory.MISC;   // @todo 1.19.3. Is this right?
     }
 
     @Nonnull

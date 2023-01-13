@@ -356,7 +356,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     @Override
     public void removed() {
         super.removed();
-        getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
+        // @todo 1.19.3
+//        getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
     }
 
     @Override

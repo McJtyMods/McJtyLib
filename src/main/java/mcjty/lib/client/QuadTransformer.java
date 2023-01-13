@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
-import com.mojang.math.Matrix4f;
+import org.joml.Matrix4f;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -1,17 +1,25 @@
 package mcjty.lib.datagen;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
 
-public class BaseBlockTagsProvider extends BlockTagsProvider  {
+import java.util.concurrent.CompletableFuture;
 
-    public BaseBlockTagsProvider(DataGenerator pGenerator, String modId, @Nullable ExistingFileHelper existingFileHelper) {
-        super(pGenerator, modId, existingFileHelper);
+public class BaseBlockTagsProvider extends BlockTagsProvider {
+
+    public BaseBlockTagsProvider(DataGenerator pGenerator, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, @Nullable ExistingFileHelper existingFileHelper) {
+        super(pGenerator.getPackOutput(), lookupProvider, modId, existingFileHelper);
+    }
+
+    @Override
+    protected void addTags(HolderLookup.Provider provider) {
+
     }
 
     protected void ironPickaxe(RegistryObject... blocks) {

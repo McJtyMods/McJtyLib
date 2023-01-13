@@ -117,7 +117,8 @@ public class Window {
             int guiTop = (gui.height - dim[1]) / 2;
             toplevel.bounds(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]);
         }
-        Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
+        // @todo 1.19.3
+//        Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
     }
 
     public <T extends Widget<T>> T findChild(String name) {
