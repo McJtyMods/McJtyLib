@@ -23,7 +23,7 @@ public abstract class DefaultModSetup {
 
     protected abstract void setupModCompat();
 
-    protected void createTab(String name, Supplier<ItemStack> stack) {
+    protected void createTab(String modid, String name, Supplier<ItemStack> stack) {
         creativeTab = new CreativeModeTab(name) {
             @Override
             @Nonnull
@@ -44,4 +44,6 @@ public abstract class DefaultModSetup {
     public CreativeModeTab getTab() {
         return creativeTab;
     }
+
+    public <T extends Item> void tab(Supplier<T> supplier) {}
 }

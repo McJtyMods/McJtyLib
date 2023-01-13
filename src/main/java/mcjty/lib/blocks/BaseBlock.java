@@ -19,6 +19,7 @@ import mcjty.lib.varia.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,6 +27,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -49,6 +51,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.List;
 
 public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings, EntityBlock {
@@ -446,4 +449,19 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     public TOPDriver getProbeDriver() {
         return topDriver;
     }
+
+    public List<ItemStack> getItemsForTab() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void fillItemCategory(@Nonnull CreativeModeTab group, @Nonnull NonNullList<ItemStack> items) {
+        List<ItemStack> stacks = getItemsForTab();
+        if (stacks.isEmpty()) {
+             super.fillItemCategory(group, items);
+        } else {
+             items.addAll(stacks);
+        }
+    }
+
 }

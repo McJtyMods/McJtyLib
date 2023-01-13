@@ -1,9 +1,12 @@
 package mcjty.lib.varia;
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -13,6 +16,14 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public class NBTTools {
+
+    public static BlockState readBlockState(CompoundTag tag) {
+        return NbtUtils.readBlockState(tag);
+    }
+
+    public static BlockState readBlockState(Level level, CompoundTag tag) {
+        return NbtUtils.readBlockState(tag);
+    }
 
     public static <T> T getInfoNBT(ItemStack stack, BiFunction<CompoundTag, String, T> getter, String name, T def) {
         CompoundTag tag = stack.getTag();

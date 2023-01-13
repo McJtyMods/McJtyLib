@@ -13,6 +13,14 @@ import java.util.stream.Collectors;
 
 public class TagTools {
 
+    public static TagKey<Item> createItemTagKey(ResourceLocation rl) {
+        return TagKey.create(Registry.ITEM.key(), rl);
+    }
+
+    public static TagKey<Block> createBlockTagKey(ResourceLocation rl) {
+        return TagKey.create(Registry.BLOCK.key(), rl);
+    }
+
     public static Iterable<Holder<Block>> getBlocksForTag(ResourceLocation rl) {
         DefaultedRegistry<Block> registry = Registry.BLOCK;
         return registry.getTagOrEmpty(TagKey.create(registry.key(), rl));
