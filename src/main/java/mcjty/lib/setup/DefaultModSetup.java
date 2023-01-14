@@ -1,5 +1,6 @@
 package mcjty.lib.setup;
 
+import mcjty.lib.api.ITabExpander;
 import mcjty.lib.blocks.BaseBlock;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -44,13 +45,11 @@ public abstract class DefaultModSetup {
                             tabItems.forEach(s -> {
                                 boolean todo = true;
                                 ItemStack st = s.get();
-                                if (st.getItem() instanceof BlockItem blockItem) {
-                                    if (blockItem.getBlock() instanceof BaseBlock baseBlock) {
-                                        List<ItemStack> itemsForTab = baseBlock.getItemsForTab();
-                                        if (!itemsForTab.isEmpty()) {
-                                            todo = false;
-                                            itemsForTab.forEach(output::accept);
-                                        }
+                                if (st.getItem() instanceof ITabExpander expander) {
+                                    List<ItemStack> itemsForTab = expander.getItemsForTab();
+                                    if (!itemsForTab.isEmpty()) {
+                                        todo = false;
+                                        itemsForTab.forEach(output::accept);
                                     }
                                 }
                                 if (todo) {
