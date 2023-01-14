@@ -24,6 +24,7 @@ public class SoundTools {
         return switch (name.toString()) {
             case "minecraft:block.note_block.bell" -> SoundEvents.NOTE_BLOCK_BELL.get();
             case "minecraft:block.note_block.pling" -> SoundEvents.NOTE_BLOCK_PLING.get();
+            default -> SoundEvents.EXPERIENCE_ORB_PICKUP;
         };
     }
 
