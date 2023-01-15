@@ -1,13 +1,12 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.api.ITabExpander;
-import mcjty.lib.blocks.BaseBlock;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -15,6 +14,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -22,7 +22,7 @@ public abstract class DefaultModSetup {
 
     private Logger logger;
     protected CreativeModeTab creativeTab;
-    private List<Supplier<ItemStack>> tabItems;   // Here we collect all tab items
+    private List<Supplier<ItemStack>> tabItems = new ArrayList<>();   // Here we collect all tab items
 
     public void init(FMLCommonSetupEvent e) {
         logger = LogManager.getLogger();
@@ -73,7 +73,9 @@ public abstract class DefaultModSetup {
         return creativeTab;
     }
 
-    public <T extends Item> void tab(Supplier<T> supplier) {
-        tabItems.add(() -> new ItemStack(supplier.get()));
+    public <T extends Item> Supplier<T> tab(Supplier<T> supplier) {
+        Lazy<T> lazyItem = Lazy.of(supplier);
+        tabItems.add(() -> new ItemStack(lazyItem.get()));
+        return lazyItem;
     }
 }

@@ -138,10 +138,10 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:${jei_version}")
     compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:${jei_version}")
     // at runtime, use the full JEI jar for Forge
-    runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
-    implementation fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}") {
-        transitive = false
-    }
+    // runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
+    //implementation fg.deobf("vazkii.patchouli:Patchouli:${patchouli_version}") {
+//        transitive = false
+//    }
     //deobfCompile "mcp.mobius.waila:Hwyla:${waila_version}"
     //deobfCompile "cofh:RedstoneFlux:${redstoneflux_version}"
     //deobfCompile "net.darkhax.tesla:Tesla-1.12.2:1.0.63"
