@@ -45,5 +45,7 @@ public abstract class DefaultModSetup {
         return creativeTab;
     }
 
-    public <T extends Item> void tab(Supplier<T> supplier) {}
+    public <T extends Item> Supplier<T> tab(Supplier<T> supplier) {
+        return supplier;
+    }
 }
