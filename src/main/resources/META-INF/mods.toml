@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[39,)"
+loaderVersion="[44,)"
 license="MIT License https://github.com/McJtyMods/McJtyLib/blob/1.18/LICENCE"
 issueTrackerURL="http://github.com/McJtyMods/McJtyLib/issues"
 displayURL="http://github.com/McJtyMods/McJtyLib/"
@@ -18,6 +18,6 @@ Base mod for all McJty mods
 [[dependencies.mcjtylib]]
     modId="forge"
     mandatory=true
-    versionRange="[39.0.0,)"
+    versionRange="[44.0.0,)"
     ordering="NONE"
     side="BOTH"
