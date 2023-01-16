@@ -1,3 +1,6 @@
+1.19-7.1.0:
+- 1.19.2 version of McJtyLib
+
 1.19-7.0.7:
 - Small fix in BaseBlock.rotate()
 - New mininum/maximum for integerfield

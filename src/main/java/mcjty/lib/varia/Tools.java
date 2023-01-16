@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -24,6 +25,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,6 +34,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class Tools {
+
+    public static DeferredRegister<PlacementModifierType<?>> createPlacementRegistry(String modid) {
+        return DeferredRegister.create(Registry.PLACEMENT_MODIFIER_REGISTRY, modid);
+    }
 
     public static ResourceLocation getId(EntityType<?> entityType) {
         return ForgeRegistries.ENTITY_TYPES.getKey(entityType);
