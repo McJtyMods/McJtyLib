@@ -1,5 +1,6 @@
 package mcjty.lib.blocks;
 
+import mcjty.lib.api.ITabExpander;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.api.smartwrench.SmartWrench;
@@ -54,7 +55,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings, EntityBlock {
+public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings, EntityBlock, ITabExpander {
 
     private final boolean infusable;
     private final BlockEntityType.BlockEntitySupplier<BlockEntity> tileEntitySupplier;
@@ -450,6 +451,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return topDriver;
     }
 
+    @Override
     public List<ItemStack> getItemsForTab() {
         return Collections.emptyList();
     }

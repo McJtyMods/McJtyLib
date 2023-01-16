@@ -5,6 +5,7 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 
@@ -12,6 +13,15 @@ public class SoundTools {
 
     public static SoundEvent createSoundEvent(ResourceLocation id) {
         return new SoundEvent(id);
+    }
+
+    public static SoundEvent findSound(ResourceLocation name) {
+        // @todo not nice. Hardcoded event names. For 1.19.3 compatibility
+        return switch (name.toString()) {
+            case "minecraft:block.note_block.bell" -> SoundEvents.NOTE_BLOCK_BELL;
+            case "minecraft:block.note_block.pling" -> SoundEvents.NOTE_BLOCK_PLING;
+            default -> SoundEvents.EXPERIENCE_ORB_PICKUP;
+        };
     }
 
     // Server side: play a sound to all nearby players
