@@ -68,13 +68,12 @@ public class DataGen {
         });
 
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
-            Map<ResourceLocation, Object> entries = new HashMap<>();
             for (Dob dob : dobs) {
-                entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
-            }
-            if (!entries.isEmpty()) {
-                generator.addProvider(event.includeServer(), new JsonCodecProvider<>(generator, event.getExistingFileHelper(),
-                        modid, JsonOps.INSTANCE, PackType.SERVER_DATA, entry.getValue().directory(), entry.getValue().codec(), entries));
+                Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
+                if (!entries.isEmpty()) {
+                    generator.addProvider(event.includeServer(), new JsonCodecProvider<>(generator, event.getExistingFileHelper(),
+                            modid, JsonOps.INSTANCE, PackType.SERVER_DATA, entry.getValue().directory(), entry.getValue().codec(), entries));
+                }
             }
         }
 
