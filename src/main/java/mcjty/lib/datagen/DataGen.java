@@ -67,6 +67,7 @@ public class DataGen {
             }
         });
 
+
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
             for (Dob dob : dobs) {
                 Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
