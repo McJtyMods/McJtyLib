@@ -1,5 +1,7 @@
 package mcjty.lib.datagen;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.Util;
@@ -14,16 +16,18 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.data.GlobalLootModifierProvider;
+import net.minecraftforge.common.data.JsonCodecProvider;
 import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.data.event.GatherDataEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -32,10 +36,15 @@ public class DataGen {
     private final String modid;
     private final GatherDataEvent event;
     private final List<Dob> dobs = new ArrayList<>();
+    private final Map<String, CodecProvider> codecProviders = new HashMap<>();
 
     public DataGen(String modid, GatherDataEvent event) {
         this.modid = modid;
         this.event = event;
+    }
+
+    public void addCodecProvider(String name, String directory, Codec codec) {
+        codecProviders.put(name, new CodecProvider(directory, codec));
     }
 
     public void add(Dob.Builder... builder) {
@@ -46,6 +55,29 @@ public class DataGen {
 
     public void generate() {
         DataGenerator generator = event.getGenerator();
+
+        generator.addProvider(event.includeServer(), new GlobalLootModifierProvider(generator, modid) {
+            @Override
+            protected void start() {
+                for (Dob dob : dobs) {
+                    for (Map.Entry<String, Supplier<IGlobalLootModifier>> entry : dob.glmSupplier().entrySet()) {
+                        add(entry.getKey(), entry.getValue().get());
+                    }
+                }
+            }
+        });
+
+        for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
+            Map<ResourceLocation, Object> entries = new HashMap<>();
+            for (Dob dob : dobs) {
+                entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
+            }
+            if (!entries.isEmpty()) {
+                generator.addProvider(event.includeServer(), new JsonCodecProvider<>(generator, event.getExistingFileHelper(),
+                        modid, JsonOps.INSTANCE, PackType.SERVER_DATA, entry.getValue().directory(), entry.getValue().codec(), entries));
+            }
+        }
+
         generator.addProvider(event.includeServer(), new BaseRecipeProvider(generator) {
             @Override
             protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
@@ -164,8 +196,8 @@ public class DataGen {
                             this.add(dob.entitySupplier().get(), name);
                         }
                     }
-                    Map<String, String> messages = dob.messages();
-                    for (Map.Entry<String, String> entry : messages.entrySet()) {
+                    Map<String, String> keyedMessages = dob.keyedMessages();
+                    for (Map.Entry<String, String> entry : keyedMessages.entrySet()) {
                         String key;
                         if (dob.blockSupplier() != null) {
                             key = Util.makeDescriptionId("message", Registry.BLOCK.getKey(dob.blockSupplier().get()));
@@ -177,6 +209,10 @@ public class DataGen {
                             throw new RuntimeException("Not supported!");
                         }
                         this.add(key + "." + entry.getKey(), entry.getValue());
+                    }
+                    Map<String, String> messages = dob.messages();
+                    for (Map.Entry<String, String> entry : messages.entrySet()) {
+                        this.add(entry.getKey(), entry.getValue());
                     }
                 }
             }
@@ -212,4 +248,7 @@ public class DataGen {
         return new InventoryChangeTrigger.TriggerInstance(EntityPredicate.Composite.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, MinMaxBounds.Ints.ANY, itemPredicate);
     }
 
+    record CodecProvider(String directory, Codec codec) {
+
+    }
 }
