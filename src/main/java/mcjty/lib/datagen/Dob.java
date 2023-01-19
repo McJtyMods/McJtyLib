@@ -150,6 +150,11 @@ public record Dob(
             return this;
         }
 
+        public Builder handheldItem(String texture) {
+            this.item = f -> f.itemHandheld(itemSupplier.get(), texture);
+            return this;
+        }
+
         public Builder generatedItem(String texture) {
             this.item = f -> f.itemGenerated(itemSupplier.get(), texture);
             return this;
