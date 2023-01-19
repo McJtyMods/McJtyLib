@@ -295,6 +295,15 @@ public record Dob(
             return this;
         }
 
+        public Builder shaped(String id, Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder, int amount, String... pattern) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(getItemLike(), amount)), pattern);
+            };
+            return this;
+        }
+
         public Builder shapeless(Function<ShapelessRecipeBuilder, ShapelessRecipeBuilder> builder) {
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {

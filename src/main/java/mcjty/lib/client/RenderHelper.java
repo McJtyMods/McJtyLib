@@ -1103,7 +1103,7 @@ public class RenderHelper {
                 .endVertex();
     }
 
-    private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int lu, int lv, int r, int g, int b, int a) {
+    public static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int lu, int lv, int r, int g, int b, int a) {
         renderer
                 .vertex(matrix, x, y, z)
                 .color(r, g, b, a)
