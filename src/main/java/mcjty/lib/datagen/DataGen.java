@@ -139,22 +139,23 @@ public class DataGen {
 
         // @todo 1.19.3, probably not right
         BaseLootTableProvider lootTableProvider = new BaseLootTableProvider();
-        generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
-                List.of(new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
+
+        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
                     for (Dob dob : dobs) {
                         if (dob.blockSupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
-                }, LootContextParamSets.BLOCK))));
-        generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
-                List.of(new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
+                }, LootContextParamSets.BLOCK),
+                new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
                     for (Dob dob : dobs) {
                         if (dob.entitySupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
-                }, LootContextParamSets.ENTITY))));
+                }, LootContextParamSets.ENTITY));
+        generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
+                list));
 
 
 //        generator.addProvider(event.includeServer(), new BaseLootTableProvider(generator) {
@@ -221,8 +222,8 @@ public class DataGen {
                             this.add(dob.entitySupplier().get(), name);
                         }
                     }
-                    Map<String, String> messages = dob.messages();
-                    for (Map.Entry<String, String> entry : messages.entrySet()) {
+                    Map<String, String> keyedMessages = dob.keyedMessages();
+                    for (Map.Entry<String, String> entry : keyedMessages.entrySet()) {
                         String key;
                         if (dob.blockSupplier() != null) {
                             key = Util.makeDescriptionId("message", ForgeRegistries.BLOCKS.getKey(dob.blockSupplier().get()));
@@ -234,6 +235,10 @@ public class DataGen {
                             throw new RuntimeException("Not supported!");
                         }
                         this.add(key + "." + entry.getKey(), entry.getValue());
+                    }
+                    Map<String, String> messages = dob.messages();
+                    for (Map.Entry<String, String> entry : messages.entrySet()) {
+                        this.add(entry.getKey(), entry.getValue());
                     }
                 }
             }
