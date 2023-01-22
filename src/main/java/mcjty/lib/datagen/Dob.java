@@ -14,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.registries.RegistryObject;
 
 import java.util.HashMap;
@@ -27,7 +28,10 @@ public record Dob(
         Supplier<? extends Block> blockSupplier,
         Supplier<? extends Item> itemSupplier,
         Supplier<? extends EntityType> entitySupplier,
+        Map<String, Supplier<Map<ResourceLocation, Object>>> codecObjectSupplier,
+        Map<String, Supplier<IGlobalLootModifier>> glmSupplier,
         String translatedName,
+        Map<String, String> keyedMessages,
         Map<String, String> messages,
         Consumer<BaseLootTableProvider> loot,
         Consumer<BaseBlockStateProvider> blockstate,
@@ -35,6 +39,10 @@ public record Dob(
         Consumer<ITagFactory> blockTags,
         Consumer<ITagFactory> itemTags,
         Consumer<IRecipeFactory> recipe) {
+
+    public static Builder builder() {
+        return new Builder(null, null, null);
+    }
 
     public static Builder builder(Supplier<? extends Block> blockSupplier, Supplier<? extends Item> itemSupplier) {
         return new Builder(blockSupplier, itemSupplier, null);
@@ -56,7 +64,10 @@ public record Dob(
         private final Supplier<? extends Block> blockSupplier;
         private final Supplier<? extends Item> itemSupplier;
         private final Supplier<? extends EntityType> entitySupplier;
+        private final Map<String, Supplier<Map<ResourceLocation, Object>>> codecObjectSupplier = new HashMap<>();
+        private final Map<String, Supplier<IGlobalLootModifier>> glmSupplier = new HashMap<>();
         private String translatedName = null;
+        private Map<String, String> keyedMessages = new HashMap<>();
         private Map<String, String> messages = new HashMap<>();
         private Consumer<BaseLootTableProvider> loot = p -> { };
         private Consumer<BaseBlockStateProvider> blockstate = p -> { };
@@ -71,8 +82,32 @@ public record Dob(
             this.entitySupplier = entitySupplier;
         }
 
+        public Builder codecObjectSupplier(String name, Supplier<Map<ResourceLocation, Object>> supplier) {
+            Supplier<Map<ResourceLocation, Object>> oldSupplier = codecObjectSupplier.get(name);
+            if (oldSupplier == null) {
+                codecObjectSupplier.put(name, supplier);
+            } else {
+                codecObjectSupplier.put(name, () -> {
+                    Map<ResourceLocation, Object> old = new HashMap<>(oldSupplier.get());
+                    old.putAll(supplier.get());
+                    return old;
+                });
+            }
+            return this;
+        }
+
+        public Builder glm(String lootName, Supplier<IGlobalLootModifier> modifier) {
+            glmSupplier.put(lootName, modifier);
+            return this;
+        }
+
         public Builder name(String name) {
             this.translatedName = name;
+            return this;
+        }
+
+        public Builder keyedMessage(String key, String message) {
+            this.keyedMessages.put(key, message);
             return this;
         }
 
@@ -113,6 +148,11 @@ public record Dob(
 
         public Builder itemModel(Consumer<BaseItemModelProvider> factory) {
             this.item = factory;
+            return this;
+        }
+
+        public Builder handheldItem(String texture) {
+            this.item = f -> f.itemHandheld(itemSupplier.get(), texture);
             return this;
         }
 
@@ -264,6 +304,15 @@ public record Dob(
             return this;
         }
 
+        public Builder shaped(String id, Function<ShapedRecipeBuilder, ShapedRecipeBuilder> builder, int amount, String... pattern) {
+            final Consumer<IRecipeFactory> orig = this.recipe;
+            this.recipe = f -> {
+                orig.accept(f);
+                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, getItemLike(), amount)), pattern);
+            };
+            return this;
+        }
+
         public Builder shapeless(Function<ShapelessRecipeBuilder, ShapelessRecipeBuilder> builder) {
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
@@ -285,7 +334,10 @@ public record Dob(
         }
 
         public Dob build() {
-            return new Dob(blockSupplier, itemSupplier, entitySupplier, translatedName, new HashMap<>(messages), loot, blockstate, item, blockTags, itemTags, recipe);
+            return new Dob(blockSupplier, itemSupplier, entitySupplier,
+                    new HashMap<>(codecObjectSupplier), new HashMap<>(glmSupplier),
+                    translatedName, new HashMap<>(keyedMessages), new HashMap<>(messages),
+                    loot, blockstate, item, blockTags, itemTags, recipe);
         }
     }
 }

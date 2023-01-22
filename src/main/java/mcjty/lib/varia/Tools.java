@@ -1,8 +1,11 @@
 package mcjty.lib.varia;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -23,20 +26,40 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Tools {
 
     public static DeferredRegister<PlacementModifierType<?>> createPlacementRegistry(String modid) {
         return DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, modid);
+    }
+
+    public static <T> Supplier<IForgeRegistry<T>> makeCustomRegistry(DeferredRegister<T> defferedRegistry, Codec<T> codec) {
+//        return defferedRegistry.makeRegistry(() -> new RegistryBuilder<T>().dataPackRegistry(codec));
+        // Not on 1.19.3
+        return null;
+    }
+
+    public interface IDPRegister {
+        <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec);
+    }
+
+    public static void onDataPackRegistry(IEventBus bus, Consumer<IDPRegister> consumer) {
+        bus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
+            consumer.accept(event::dataPackRegistry);
+        });
     }
 
     public static ResourceLocation getId(EntityType<?> entityType) {

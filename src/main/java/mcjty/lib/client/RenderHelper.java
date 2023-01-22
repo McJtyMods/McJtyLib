@@ -1090,9 +1090,30 @@ public class RenderHelper {
         }
     }
 
+    public static void vt(VertexConsumer renderer, PoseStack stack, float x, float y, float z, float r, float g, float b,
+                          int packedLight) {
+        renderer.vertex(stack.last().pose(), x, y, z).color(r, g, b, 1f).uv2(packedLight).normal(1.0F, 0.0F, 0.0F).endVertex();
+    }
+
+    public static void vt(VertexConsumer renderer, PoseStack stack, float x, float y, float z, float u, float v,
+                          int packedLight) {
+        renderer.vertex(stack.last().pose(), x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(packedLight).normal(1.0F, 0.0F, 0.0F).endVertex();
+    }
+
     private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int packedLight) {
         renderer.vertex(matrix, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(packedLight).normal(1.0F, 0.0F, 0.0F).endVertex();
     }
+
+    public static void vt(VertexConsumer renderer, PoseStack matrix, float x, float y, float z, float u, float v, int lu, int lv, int r, int g, int b, int a) {
+        renderer
+                .vertex(matrix.last().pose(), x, y, z)
+                .color(r, g, b, a)
+                .uv(u, v)
+                .uv2(lu, lv)
+                .normal(1, 0, 0)
+                .endVertex();
+    }
+
 
     private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v) {
         renderer
