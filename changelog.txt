@@ -1,3 +1,6 @@
+1.19-7.1.1:
+- Small updates
+
 1.19-7.1.0:
 - 1.19.2 version of McJtyLib
 
