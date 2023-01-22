@@ -103,4 +103,4 @@ publishing {
 
 
 tasks.curseforge.enabled = project.hasProperty('curseforge_key')
-cfdeps(['the-one-probe'], [], ['1.19.3'])
+cfdeps(['the-one-probe'], [], [])
