@@ -1,8 +1,10 @@
 package mcjty.lib.varia;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -23,20 +25,36 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Tools {
 
     public static DeferredRegister<PlacementModifierType<?>> createPlacementRegistry(String modid) {
         return DeferredRegister.create(Registry.PLACEMENT_MODIFIER_REGISTRY, modid);
+    }
+
+    public static <T> Supplier<IForgeRegistry<T>> makeCustomRegistry(DeferredRegister<T> defferedRegistry, Codec<T> codec) {
+        return defferedRegistry.makeRegistry(() -> new RegistryBuilder<T>().dataPackRegistry(codec));
+    }
+
+    public interface IDPRegister {
+        <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec);
+    }
+
+    public static void onDataPackRegistry(IEventBus bus, Consumer<IDPRegister> consumer) {
+        // Does nothing on 1.19.2
     }
 
     public static ResourceLocation getId(EntityType<?> entityType) {
