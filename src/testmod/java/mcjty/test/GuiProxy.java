@@ -16,7 +16,7 @@ public class GuiProxy implements IGuiHandler {
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof GenericBlock) {
             GenericBlock genericBlock = (GenericBlock) block;
-            TileEntity te = world.getTileEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             return genericBlock.createServerContainer(player, te);
         }
         return null;
@@ -28,7 +28,7 @@ public class GuiProxy implements IGuiHandler {
         Block block = world.getBlockState(pos).getBlock();
         if (block instanceof GenericBlock) {
             GenericBlock genericBlock = (GenericBlock) block;
-            TileEntity te = world.getTileEntity(pos);
+            BlockEntity te = world.getBlockEntity(pos);
             return genericBlock.createClientGui(player, te);
         }
         return null;

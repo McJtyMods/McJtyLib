@@ -175,7 +175,7 @@ public class MultipartBlock {}/* extends Block implements WailaInfoProvider, TOP
 //    public BlockState getExtendedState(BlockState state, IBlockReader world, BlockPos pos) {
 //        IExtendedBlockState extendedBlockState = (IExtendedBlockState) state;
 //
-//        TileEntity te = world.getTileEntity(pos);
+//        BlockEntity te = world.getBlockEntity(pos);
 //        if (te instanceof MultipartTE) {
 //            MultipartTE multipartTE = (MultipartTE) te;
 //            return extendedBlockState.withProperty(PARTS, multipartTE.getParts());
