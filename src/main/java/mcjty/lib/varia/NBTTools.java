@@ -1,15 +1,14 @@
 package mcjty.lib.varia;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
@@ -21,13 +20,7 @@ import java.util.stream.StreamSupport;
 public class NBTTools {
 
     public static BlockState readBlockState(CompoundTag tag) {
-        Level level;
-        if (EffectiveSide.get().isClient()) {
-            level = SafeClientTools.getClientWorld();
-        } else {
-            level = LevelTools.getOverworld();
-        }
-        return NbtUtils.readBlockState(level.holderLookup(Registries.BLOCK), tag);
+        return NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), tag);
     }
 
     public static BlockState readBlockState(Level level, CompoundTag tag) {
