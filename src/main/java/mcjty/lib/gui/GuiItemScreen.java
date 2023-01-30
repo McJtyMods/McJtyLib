@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * This class can be used by items that want to show a GUI.
  * It supports the side window, the window system in general as well as tooltips
  */
-public class GuiItemScreen extends Screen {
+public abstract class GuiItemScreen extends Screen {
     protected SimpleChannel network;
     protected Window window;
     protected int xSize;
@@ -111,4 +111,11 @@ public class GuiItemScreen extends Screen {
         }
     }
 
+    protected abstract void renderInternal(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick);
+
+    @Override
+    public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+        renderInternal(pPoseStack, pMouseX, pMouseY, pPartialTick);
+    }
 }
