@@ -1,3 +1,6 @@
+1.19.3-7.1.4:
+- Fixed a few problems with compatibility between 1.19.2 and 1.19.3
+
 1.19.3-7.1.3:
 - Fixed nbt reading on client for 1.19.3
 
