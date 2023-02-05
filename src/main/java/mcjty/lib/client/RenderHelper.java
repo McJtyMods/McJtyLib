@@ -13,8 +13,11 @@ import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -25,9 +28,11 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.fluids.FluidStack;
 
@@ -52,6 +57,21 @@ public class RenderHelper {
             .alpha(MAX_BRIGHTNESS)
             .build();
 
+
+    public static void renderText(Font font, String text, int x, int y, int color, PoseStack poseStack, MultiBufferSource buffer, int lightmapValue) {
+        font.drawInBatch(text, x, y, color, false, poseStack.last().pose(), buffer, false, 0, lightmapValue);
+    }
+
+    public static void renderModel(BlockRenderDispatcher renderer, PoseStack stack, VertexConsumer buffer, BlockState state, BakedModel model,
+                                   float r, float g, float b, int combinedLight, int combinedOverlay, ModelData modelData, RenderType renderType) {
+        renderer.getModelRenderer().renderModel(stack.last(), buffer, state, model, r, g, b, combinedLight, combinedOverlay, modelData, renderType);
+    }
+
+    public static void line(VertexConsumer builder, PoseStack matrixStack, float x1, float y1, float z1, float x2, float y2, float z2,
+                            float red, float green, float blue, float alpha) {
+        builder.vertex(matrixStack.last().pose(), x1, y1, 0).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrixStack.last().pose(), x2, y2, 0).color(red, green, blue, alpha).endVertex();
+    }
 
     // Adjust the given matrix to the specified direction
     public static void adjustTransformToDirection(PoseStack matrixStack, Direction facing) {

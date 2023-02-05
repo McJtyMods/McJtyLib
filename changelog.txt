@@ -1,3 +1,6 @@
+1.19-7.1.4:
+- Fixed a few problems with compatibility between 1.19.2 and 1.19.3
+
 1.19-7.1.2:
 - Fixed a problem with the obfuscated name of Screen.render() being different between 1.19.2 and 1.19.3
 
