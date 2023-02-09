@@ -13,6 +13,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import javax.annotation.Nonnull;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<ListTag> {
@@ -320,7 +321,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
         private BiPredicate<Integer, ItemStack> insertable = null;
         private BiPredicate<Integer, ItemStack> extractable = (slot, stack) -> true;
         private BiConsumer<Integer, ItemStack> onUpdate = (slot, stack) -> {};
-        private int slotLimit = 64;
+        private Function<Integer, Integer> slotLimit = s -> 64;
 
         public Builder(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
             this.te = te;
@@ -328,6 +329,11 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
         }
 
         public Builder slotLimit(int slotLimit) {
+            this.slotLimit = s -> slotLimit;
+            return this;
+        }
+
+        public Builder slotLimit(Function<Integer, Integer> slotLimit) {
             this.slotLimit = slotLimit;
             return this;
         }
@@ -357,7 +363,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
 
                 @Override
                 public int getSlotLimit(int slot) {
-                    return slotLimit;
+                    return slotLimit.apply(slot);
                 }
 
                 @Override
