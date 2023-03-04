@@ -23,6 +23,7 @@ public abstract class GuiItemScreen extends Screen {
     protected int ySize;
     protected int guiLeft;
     protected int guiTop;
+    private final ManualEntry manual;
 
     private GuiSideWindow sideWindow;
 
@@ -32,6 +33,13 @@ public abstract class GuiItemScreen extends Screen {
         this.xSize = xSize;
         this.ySize = ySize;
         sideWindow = new GuiSideWindow(manualEntry.manual(), manualEntry.entry(), manualEntry.page());
+        this.manual = manualEntry;
+    }
+
+    public void setWindowDimensions(int x, int y) {
+        this.xSize = x;
+        this.ySize = y;
+        sideWindow = new GuiSideWindow(manual.manual(), manual.entry(), manual.page());
     }
 
     @Override

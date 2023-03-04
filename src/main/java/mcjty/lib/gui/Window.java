@@ -56,20 +56,49 @@ public class Window {
 
     private List<FocusEvent> focusEvents = null;
 
+    public Screen getGui() {
+        return gui;
+    }
 
     public Window(Screen gui, AbstractContainerWidget<?> toplevel) {
         this.gui = gui;
         this.toplevel = toplevel;
     }
 
-    public Screen getGui() {
-        return gui;
+    public Window(Screen gui, SimpleChannel wrapper, ResourceLocation guiDescription) {
+        this.gui = gui;
+        final int[] dim = {-1, -1};
+        final int[] sidesize = {0, 0};
+        parseInternal(null, null, wrapper, guiDescription, dim, sidesize);
+
+        if (dim[0] != -1 || dim[1] != -1) {
+            if (gui instanceof GuiItemScreen container) {
+                container.setWindowDimensions(dim[0], dim[1]);
+            }
+            int guiLeft = (gui.width - dim[0]) / 2;
+            int guiTop = (gui.height - dim[1]) / 2;
+            toplevel.bounds(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]);
+        }
     }
 
     public Window(Screen gui, GenericTileEntity tileEntity, SimpleChannel wrapper, ResourceLocation guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
         final int[] sidesize = {0, 0};
+        parseInternal((GenericGuiContainer<?, ?>) gui, tileEntity, wrapper, guiDescription, dim, sidesize);
+
+        if (dim[0] != -1 || dim[1] != -1) {
+            if (gui instanceof GenericGuiContainer container) {
+                container.setWindowDimensions(dim[0], dim[1]);
+            }
+            int guiLeft = (gui.width - dim[0]) / 2;
+            int guiTop = (gui.height - dim[1]) / 2;
+            toplevel.bounds(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]);
+        }
+        Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
+    }
+
+    private void parseInternal(@Nullable GenericGuiContainer<?, ?> gui, @Nullable GenericTileEntity tileEntity, SimpleChannel wrapper, ResourceLocation guiDescription, int[] dim, int[] sidesize) {
         WindowTools.parseAndHandleClient(guiDescription, command -> {
             if ("window".equals(command.getId())) {
                 command.findCommand("size").ifPresent(cmd -> {
@@ -83,10 +112,12 @@ public class Window {
                 command.commands()
                         .filter(cmd -> "event".equals(cmd.getId()))
                         .forEach(cmd -> {
-                            String channel = cmd.getOptionalPar(0, "");
-                            String teCommand = cmd.getOptionalPar(1, "");
-                            event(channel, (source, params) ->
-                                    ((GenericGuiContainer<?,?>) gui).sendServerCommandTyped(wrapper, teCommand, params));
+                            if (gui != null) {
+                                String channel = cmd.getOptionalPar(0, "");
+                                String teCommand = cmd.getOptionalPar(1, "");
+                                event(channel, (source, params) ->
+                                        gui.sendServerCommandTyped(wrapper, teCommand, params));
+                            }
                         });
                 command.findCommand("panel").ifPresent(cmd -> {
                     toplevel = new Panel();
@@ -95,28 +126,24 @@ public class Window {
                 command.commands()
                         .filter(cmd -> "bind".equals(cmd.getId()))
                         .forEach(cmd -> {
-                            String component = cmd.getOptionalPar(0, "");
-                            String value = cmd.getOptionalPar(1, "");
-                            bind(wrapper, component, tileEntity, value);
+                            if (tileEntity != null) {
+                                String component = cmd.getOptionalPar(0, "");
+                                String value = cmd.getOptionalPar(1, "");
+                                bind(wrapper, component, tileEntity, value);
+                            }
                         });
                 command.commands()
                         .filter(cmd -> "action".equals(cmd.getId()))
                         .forEach(cmd -> {
-                            String component = cmd.getOptionalPar(0, "");
-                            String key = cmd.getOptionalPar(1, "");
-                            action(wrapper, component, tileEntity, key);
+                            if (tileEntity != null) {
+                                String component = cmd.getOptionalPar(0, "");
+                                String key = cmd.getOptionalPar(1, "");
+                                action(wrapper, component, tileEntity, key);
+                            }
                         });
             }
         });
 
-        if (dim[0] != -1 || dim[1] != -1) {
-            if (gui instanceof GenericGuiContainer) {
-                ((GenericGuiContainer<?,?>) gui).setWindowDimensions(dim[0], dim[1]);
-            }
-            int guiLeft = (gui.width - dim[0]) / 2;
-            int guiTop = (gui.height - dim[1]) / 2;
-            toplevel.bounds(guiLeft-sidesize[0], guiTop-sidesize[1], dim[0]+sidesize[0], dim[1]+sidesize[1]);
-        }
         Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
     }
 
