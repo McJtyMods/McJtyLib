@@ -112,6 +112,9 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
     }
 
     public P setHorizontalAlignment(HorizontalAlignment horizontalAlignment) {
+        if (horizontalAlignment == null) {
+            throw new RuntimeException("Invalid horizontal alignment!");
+        }
         this.horizontalAlignment = horizontalAlignment;
         return getThis();
     }
@@ -121,6 +124,9 @@ public abstract class AbstractLayout<P extends AbstractLayout<P>> implements Lay
     }
 
     public P setVerticalAlignment(VerticalAlignment verticalAlignment) {
+        if (horizontalAlignment == null) {
+            throw new RuntimeException("Invalid vertical alignment!");
+        }
         this.verticalAlignment = verticalAlignment;
         return getThis();
     }
