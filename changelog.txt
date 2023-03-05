@@ -1,6 +1,7 @@
 Upcoming:
 - New item transparency renderer from XFactHD
 - Better support for item based guis
+- Better error reporting for bad gui files
 
 1.19-7.1.5:
 - New api feature for slot specific slot limit

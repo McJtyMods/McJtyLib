@@ -9,6 +9,7 @@ import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.gui.widgets.Widgets;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -99,6 +100,71 @@ public class Window {
     }
 
     private void parseInternal(@Nullable GenericGuiContainer<?, ?> gui, @Nullable GenericTileEntity tileEntity, SimpleChannel wrapper, ResourceLocation guiDescription, int[] dim, int[] sidesize) {
+        try {
+            WindowTools.parseAndHandleClient(guiDescription, command -> {
+                if ("window".equals(command.getId())) {
+                    command.findCommand("size").ifPresent(cmd -> {
+                        dim[0] = cmd.getOptionalPar(0, -1);
+                        dim[1] = cmd.getOptionalPar(1, -1);
+                    });
+                    command.findCommand("sidesize").ifPresent(cmd -> {
+                        sidesize[0] = cmd.getOptionalPar(0, 0);
+                        sidesize[1] = cmd.getOptionalPar(1, 0);
+                    });
+                    command.commands()
+                            .filter(cmd -> "event".equals(cmd.getId()))
+                            .forEach(cmd -> {
+                                if (gui != null) {
+                                    String channel = cmd.getOptionalPar(0, "");
+                                    String teCommand = cmd.getOptionalPar(1, "");
+                                    event(channel, (source, params) ->
+                                            gui.sendServerCommandTyped(wrapper, teCommand, params));
+                                }
+                            });
+                    command.findCommand("panel").ifPresent(cmd -> {
+                        toplevel = new Panel();
+                        toplevel.readFromGuiCommand(cmd);
+                    });
+                    command.commands()
+                            .filter(cmd -> "bind".equals(cmd.getId()))
+                            .forEach(cmd -> {
+                                if (tileEntity != null) {
+                                    String component = cmd.getOptionalPar(0, "");
+                                    String value = cmd.getOptionalPar(1, "");
+                                    bind(wrapper, component, tileEntity, value);
+                                }
+                            });
+                    command.commands()
+                            .filter(cmd -> "action".equals(cmd.getId()))
+                            .forEach(cmd -> {
+                                if (tileEntity != null) {
+                                    String component = cmd.getOptionalPar(0, "");
+                                    String key = cmd.getOptionalPar(1, "");
+                                    action(wrapper, component, tileEntity, key);
+                                }
+                            });
+                }
+            });
+        } catch (Exception e) {
+            String message = e.getMessage();
+            if (message.length() > 70) {
+                int i = message.lastIndexOf(':');
+                if (i == -1) {
+                    message = message.substring(message.length() - 70);
+                } else {
+                    message = message.substring(i+1);
+                }
+            }
+            toplevel = Widgets.positional()
+                    .desiredWidth(400).desiredHeight(50)
+                    .filledBackground(0xffffffff)
+                    .filledRectThickness(2)
+                    .children(Widgets.label(message)
+                            .hint(5, 5, 390, 40));
+            dim[0] = 400;
+            dim[1] = 50;
+            e.printStackTrace();
+        }
         WindowTools.parseAndHandleClient(guiDescription, command -> {
             if ("window".equals(command.getId())) {
                 command.findCommand("size").ifPresent(cmd -> {
