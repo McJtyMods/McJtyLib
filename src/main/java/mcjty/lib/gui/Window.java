@@ -10,6 +10,7 @@ import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.Widgets;
+import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -121,6 +122,15 @@ public class Window {
                                     event(channel, (source, params) ->
                                             gui.sendServerCommandTyped(wrapper, teCommand, params));
                                 }
+                            });
+                    command.commands()
+                            .filter(cmd -> "cmdevent".equals(cmd.getId()))
+                            .forEach(cmd -> {
+                                String channel = cmd.getOptionalPar(0, "");
+                                String modidCmd = cmd.getOptionalPar(1, "");
+                                ResourceLocation rl = new ResourceLocation(modidCmd);
+                                event(channel, (source, params) ->
+                                        wrapper.sendToServer(new PacketSendServerCommand(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
                             });
                     command.findCommand("panel").ifPresent(cmd -> {
                         toplevel = new Panel();
