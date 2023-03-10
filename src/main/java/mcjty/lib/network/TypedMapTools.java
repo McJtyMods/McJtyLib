@@ -11,6 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class TypedMapTools {
 
@@ -49,171 +51,161 @@ public class TypedMapTools {
         int size = buf.readInt();
         if (size != 0) {
             for (int i = 0 ; i < size ; i++) {
-                String key = buf.readUtf(32767);
-                ArgumentType type = ArgumentType.getType(buf.readByte());
-                switch (type) {
-                    case TYPE_STRING:
-                        args.put(new Key<>(key, Type.STRING), NetworkTools.readStringUTF8(buf));
-                        break;
-                    case TYPE_UUID:
-                        args.put(new Key<>(key, Type.UUID), buf.readUUID());
-                        break;
-                    case TYPE_INTEGER:
-                        args.put(new Key<>(key, Type.INTEGER), buf.readInt());
-                        break;
-                    case TYPE_LONG:
-                        args.put(new Key<>(key, Type.LONG), buf.readLong());
-                        break;
-                    case TYPE_BOOLEAN:
-                        args.put(new Key<>(key, Type.BOOLEAN), buf.readBoolean());
-                        break;
-                    case TYPE_DOUBLE:
-                        args.put(new Key<>(key, Type.DOUBLE), buf.readDouble());
-                        break;
-                    case TYPE_FLOAT:
-                        args.put(new Key<>(key, Type.FLOAT), buf.readFloat());
-                        break;
-                    case TYPE_DIMENSION_TYPE:
-                        if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.DIMENSION_TYPE), LevelTools.getId(buf.readResourceLocation()));
-                        } else {
-                            args.put(new Key<>(key, Type.DIMENSION_TYPE), null);
-                        }
-                        break;
-                    case TYPE_BLOCKPOS:
-                        if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.BLOCKPOS), buf.readBlockPos());
-                        } else {
-                            args.put(new Key<>(key, Type.BLOCKPOS), null);
-                        }
-                        break;
-                    case TYPE_STACK:
-                        if (buf.readBoolean()) {
-                            args.put(new Key<>(key, Type.ITEMSTACK), NetworkTools.readItemStack(buf));
-                        } else {
-                            args.put(new Key<>(key, Type.ITEMSTACK), null);
-                        }
-                        break;
-                    case TYPE_STRING_LIST: {
-                        int s = buf.readInt();
-                        if (s == -1) {
-                            args.put(new Key<>(key, Type.STRING_LIST), null);
-                        } else {
-                            List<String> list = new ArrayList<>(s);
-                            for (int j = 0; j < s; j++) {
-                                list.add(NetworkTools.readStringUTF8(buf));
-                            }
-                            args.put(new Key<>(key, Type.STRING_LIST), list);
-                        }
-                        break;
-                    }
-                    case TYPE_ITEMSTACK_LIST: {
-                        int s = buf.readInt();
-                        if (s == -1) {
-                            args.put(new Key<>(key, Type.ITEMSTACK_LIST), null);
-                        } else {
-                            List<ItemStack> list = new ArrayList<>(s);
-                            for (int j = 0; j < s; j++) {
-                                list.add(NetworkTools.readItemStack(buf));
-                            }
-                            args.put(new Key<>(key, Type.ITEMSTACK_LIST), list);
-                        }
-                        break;
-                    }
-                    case TYPE_POS_LIST: {
-                        int s = buf.readInt();
-                        if (s == -1) {
-                            args.put(new Key<>(key, Type.POS_LIST), null);
-                        } else {
-                            List<BlockPos> list = new ArrayList<>(s);
-                            for (int j = 0; j < s; j++) {
-                                list.add(buf.readBlockPos());
-                            }
-                            args.put(new Key<>(key, Type.POS_LIST), list);
-                        }
-                        break;
-                    }
-                    default:
-                        throw new RuntimeException("Unsupported type for key '" + key + "'!");
-                }
+                readArgument(buf, args::put);
             }
         }
         return args.build();
     }
 
+    public static void readArgument(FriendlyByteBuf buf, BiConsumer<Key, Object> args) {
+        String key = buf.readUtf(32767);
+        ArgumentType type = ArgumentType.getType(buf.readByte());
+        switch (type) {
+            case TYPE_STRING -> args.accept(new Key<>(key, Type.STRING), NetworkTools.readStringUTF8(buf));
+            case TYPE_UUID -> args.accept(new Key<>(key, Type.UUID), buf.readUUID());
+            case TYPE_INTEGER -> args.accept(new Key<>(key, Type.INTEGER), buf.readInt());
+            case TYPE_LONG -> args.accept(new Key<>(key, Type.LONG), buf.readLong());
+            case TYPE_BOOLEAN -> args.accept(new Key<>(key, Type.BOOLEAN), buf.readBoolean());
+            case TYPE_DOUBLE -> args.accept(new Key<>(key, Type.DOUBLE), buf.readDouble());
+            case TYPE_FLOAT -> args.accept(new Key<>(key, Type.FLOAT), buf.readFloat());
+            case TYPE_DIMENSION_TYPE -> {
+                if (buf.readBoolean()) {
+                    args.accept(new Key<>(key, Type.DIMENSION_TYPE), LevelTools.getId(buf.readResourceLocation()));
+                } else {
+                    args.accept(new Key<>(key, Type.DIMENSION_TYPE), null);
+                }
+            }
+            case TYPE_BLOCKPOS -> {
+                if (buf.readBoolean()) {
+                    args.accept(new Key<>(key, Type.BLOCKPOS), buf.readBlockPos());
+                } else {
+                    args.accept(new Key<>(key, Type.BLOCKPOS), null);
+                }
+            }
+            case TYPE_STACK -> {
+                if (buf.readBoolean()) {
+                    args.accept(new Key<>(key, Type.ITEMSTACK), NetworkTools.readItemStack(buf));
+                } else {
+                    args.accept(new Key<>(key, Type.ITEMSTACK), null);
+                }
+            }
+            case TYPE_STRING_LIST -> {
+                int s = buf.readInt();
+                if (s == -1) {
+                    args.accept(new Key<>(key, Type.STRING_LIST), null);
+                } else {
+                    List<String> list = new ArrayList<>(s);
+                    for (int j = 0; j < s; j++) {
+                        list.add(NetworkTools.readStringUTF8(buf));
+                    }
+                    args.accept(new Key<>(key, Type.STRING_LIST), list);
+                }
+            }
+            case TYPE_ITEMSTACK_LIST -> {
+                int s = buf.readInt();
+                if (s == -1) {
+                    args.accept(new Key<>(key, Type.ITEMSTACK_LIST), null);
+                } else {
+                    List<ItemStack> list = new ArrayList<>(s);
+                    for (int j = 0; j < s; j++) {
+                        list.add(NetworkTools.readItemStack(buf));
+                    }
+                    args.accept(new Key<>(key, Type.ITEMSTACK_LIST), list);
+                }
+            }
+            case TYPE_POS_LIST -> {
+                int s = buf.readInt();
+                if (s == -1) {
+                    args.accept(new Key<>(key, Type.POS_LIST), null);
+                } else {
+                    List<BlockPos> list = new ArrayList<>(s);
+                    for (int j = 0; j < s; j++) {
+                        list.add(buf.readBlockPos());
+                    }
+                    args.accept(new Key<>(key, Type.POS_LIST), list);
+                }
+            }
+            default -> throw new RuntimeException("Unsupported type for key '" + key + "'!");
+        }
+    }
+
     public static void writeArguments(FriendlyByteBuf buf, TypedMap args) {
         buf.writeInt(args.size());
-        for (Key<?> key : args.getKeys()) {
-            buf.writeUtf(key.name());
-            ArgumentType argumentType = getArgumentType(key.type());
-            buf.writeByte(argumentType.ordinal());
-            switch (argumentType) {
-                case TYPE_STRING -> NetworkTools.writeStringUTF8(buf, (String) args.get(key));
-                case TYPE_UUID -> buf.writeUUID((UUID) args.get(key));
-                case TYPE_INTEGER -> buf.writeInt((Integer) args.get(key));
-                case TYPE_DIMENSION_TYPE -> {
-                    ResourceKey<Level> type = (ResourceKey<Level>) args.get(key);
-                    if (type != null) {
-                        buf.writeBoolean(true);
-                        buf.writeResourceLocation(type.location());
-                    } else {
-                        buf.writeBoolean(false);
-                    }
+        for (Key key : args.getKeys()) {
+            writeArgument(buf, key, args.get(key));
+        }
+    }
+
+    public static <T> void writeArgument(FriendlyByteBuf buf, Key<T> key, T value) {
+        buf.writeUtf(key.name());
+        ArgumentType argumentType = getArgumentType(key.type());
+        buf.writeByte(argumentType.ordinal());
+        switch (argumentType) {
+            case TYPE_STRING -> NetworkTools.writeStringUTF8(buf, (String) value);
+            case TYPE_UUID -> buf.writeUUID((UUID) value);
+            case TYPE_INTEGER -> buf.writeInt((Integer) value);
+            case TYPE_DIMENSION_TYPE -> {
+                ResourceKey<Level> type = (ResourceKey<Level>) value;
+                if (type != null) {
+                    buf.writeBoolean(true);
+                    buf.writeResourceLocation(type.location());
+                } else {
+                    buf.writeBoolean(false);
                 }
-                case TYPE_BLOCKPOS -> {
-                    BlockPos pos = (BlockPos) args.get(key);
-                    if (pos != null) {
-                        buf.writeBoolean(true);
-                        buf.writeBlockPos(pos);
-                    } else {
-                        buf.writeBoolean(false);
-                    }
+            }
+            case TYPE_BLOCKPOS -> {
+                BlockPos pos = (BlockPos) value;
+                if (pos != null) {
+                    buf.writeBoolean(true);
+                    buf.writeBlockPos(pos);
+                } else {
+                    buf.writeBoolean(false);
                 }
-                case TYPE_BOOLEAN -> buf.writeBoolean((Boolean) args.get(key));
-                case TYPE_DOUBLE -> buf.writeDouble((Double) args.get(key));
-                case TYPE_FLOAT -> buf.writeFloat((Float) args.get(key));
-                case TYPE_STACK -> {
-                    ItemStack stack = (ItemStack) args.get(key);
-                    if (stack != null) {
-                        buf.writeBoolean(true);
-                        NetworkTools.writeItemStack(buf, stack);
-                    } else {
-                        buf.writeBoolean(false);
-                    }
+            }
+            case TYPE_BOOLEAN -> buf.writeBoolean((Boolean) value);
+            case TYPE_DOUBLE -> buf.writeDouble((Double) value);
+            case TYPE_FLOAT -> buf.writeFloat((Float) value);
+            case TYPE_STACK -> {
+                ItemStack stack = (ItemStack) value;
+                if (stack != null) {
+                    buf.writeBoolean(true);
+                    NetworkTools.writeItemStack(buf, stack);
+                } else {
+                    buf.writeBoolean(false);
                 }
-                case TYPE_LONG -> buf.writeLong((Long) args.get(key));
-                case TYPE_STRING_LIST -> {
-                    List<String> list = (List<String>) args.get(key);
-                    if (list != null) {
-                        buf.writeInt(list.size());
-                        for (String s : list) {
-                            NetworkTools.writeStringUTF8(buf, s);
-                        }
-                    } else {
-                        buf.writeInt(-1);
+            }
+            case TYPE_LONG -> buf.writeLong((Long) value);
+            case TYPE_STRING_LIST -> {
+                List<String> list = (List<String>) value;
+                if (list != null) {
+                    buf.writeInt(list.size());
+                    for (String s : list) {
+                        NetworkTools.writeStringUTF8(buf, s);
                     }
+                } else {
+                    buf.writeInt(-1);
                 }
-                case TYPE_ITEMSTACK_LIST -> {
-                    List<ItemStack> list = (List<ItemStack>) args.get(key);
-                    if (list != null) {
-                        buf.writeInt(list.size());
-                        for (ItemStack s : list) {
-                            NetworkTools.writeItemStack(buf, s);
-                        }
-                    } else {
-                        buf.writeInt(-1);
+            }
+            case TYPE_ITEMSTACK_LIST -> {
+                List<ItemStack> list = (List<ItemStack>) value;
+                if (list != null) {
+                    buf.writeInt(list.size());
+                    for (ItemStack s : list) {
+                        NetworkTools.writeItemStack(buf, s);
                     }
+                } else {
+                    buf.writeInt(-1);
                 }
-                case TYPE_POS_LIST -> {
-                    List<BlockPos> list = (List<BlockPos>) args.get(key);
-                    if (list != null) {
-                        buf.writeInt(list.size());
-                        for (BlockPos s : list) {
-                            buf.writeBlockPos(s);
-                        }
-                    } else {
-                        buf.writeInt(-1);
+            }
+            case TYPE_POS_LIST -> {
+                List<BlockPos> list = (List<BlockPos>) value;
+                if (list != null) {
+                    buf.writeInt(list.size());
+                    for (BlockPos s : list) {
+                        buf.writeBlockPos(s);
                     }
+                } else {
+                    buf.writeInt(-1);
                 }
             }
         }
