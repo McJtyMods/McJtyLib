@@ -41,9 +41,14 @@ public class PacketSendServerCommand {
     public void handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context ctx = supplier.get();
         ctx.enqueueWork(() -> {
-            boolean result = McJtyLib.handleCommand(modid, command, ctx.getSender(), arguments);
-            if (!result) {
-                Logging.logError("Error handling command '" + command + "' for mod '" + modid + "'!");
+            try {
+                boolean result = McJtyLib.handleCommand(modid, command, ctx.getSender(), arguments);
+                if (!result) {
+                    Logging.logError("Error handling command '" + command + "' for mod '" + modid + "'!");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         });
         ctx.setPacketHandled(true);
