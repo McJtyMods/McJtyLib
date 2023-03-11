@@ -966,42 +966,52 @@ public class RenderHelper {
                                float x1, float x2, float y1, float y2, float z1, float z2,
                                float r, float g, float b,
                                int packedLightIn) {
+        drawBox(matrixStack, builder, x1, x2, y1, y2, z1, z2, r, g, b, 1.0f, packedLightIn);
+    }
+
+    /**
+     * Draw a box with alpha. No UV mapping
+     */
+    public static void drawBox(PoseStack matrixStack, VertexConsumer builder,
+                               float x1, float x2, float y1, float y2, float z1, float z2,
+                               float r, float g, float b, float a,
+                               int packedLightIn) {
         Matrix4f matrix = matrixStack.last().pose();
         // BACK
-        builder.vertex(matrix, x1, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
 
         // FRONT
-        builder.vertex(matrix, x1, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
 
         // DOWN
-        builder.vertex(matrix, x1, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
 
         // UP
-        builder.vertex(matrix, x1, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
 
         // LEFT
-        builder.vertex(matrix, x1, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
 
         // RIGHT
-        builder.vertex(matrix, x2, y2, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z2).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z1).color(r, g, b, 1f).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
     }
 
     /**
