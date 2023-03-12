@@ -1049,6 +1049,50 @@ public class RenderHelper {
     }
 
     /**
+     * Draw a box. The texture is mapped from 0,0 -> 1,1 on each face regardless of the size of that face
+     */
+    public static void drawBox(PoseStack matrixStack, VertexConsumer builder, TextureAtlasSprite sprite,
+                               float x1, float x2, float y1, float y2, float z1, float z2, RenderSettings settings) {
+        Matrix4f matrix = matrixStack.last().pose();
+        Vec3 c111 = new Vec3(x1, y1, z1);
+        Vec3 c112 = new Vec3(x1, y1, z2);
+        Vec3 c121 = new Vec3(x1, y2, z1);
+        Vec3 c122 = new Vec3(x1, y2, z2);
+        Vec3 c211 = new Vec3(x2, y1, z1);
+        Vec3 c212 = new Vec3(x2, y1, z2);
+        Vec3 c221 = new Vec3(x2, y2, z1);
+        Vec3 c222 = new Vec3(x2, y2, z2);
+        drawQuad(matrix, builder, sprite, c211, c212, c112, c111, settings);
+        drawQuad(matrix, builder, sprite, c121, c122, c222, c221, settings);
+        drawQuad(matrix, builder, sprite, c121, c221, c211, c111, settings);
+        drawQuad(matrix, builder, sprite, c112, c212, c222, c122, settings);
+        drawQuad(matrix, builder, sprite, c112, c122, c121, c111, settings);
+        drawQuad(matrix, builder, sprite, c211, c221, c222, c212, settings);
+    }
+
+    /**
+     * Draw a box. The texture is mapped from 0,0 -> 1,1 on each face regardless of the size of that face
+     */
+    public static void drawBoxInside(PoseStack matrixStack, VertexConsumer builder, TextureAtlasSprite sprite,
+                               float x1, float x2, float y1, float y2, float z1, float z2, RenderSettings settings) {
+        Matrix4f matrix = matrixStack.last().pose();
+        Vec3 c111 = new Vec3(x1, y1, z1);
+        Vec3 c112 = new Vec3(x1, y1, z2);
+        Vec3 c121 = new Vec3(x1, y2, z1);
+        Vec3 c122 = new Vec3(x1, y2, z2);
+        Vec3 c211 = new Vec3(x2, y1, z1);
+        Vec3 c212 = new Vec3(x2, y1, z2);
+        Vec3 c221 = new Vec3(x2, y2, z1);
+        Vec3 c222 = new Vec3(x2, y2, z2);
+        drawQuad(matrix, builder, sprite, c111, c112, c212, c211, settings);
+        drawQuad(matrix, builder, sprite, c221, c222, c122, c121, settings);
+        drawQuad(matrix, builder, sprite, c111, c211, c221, c121, settings);
+        drawQuad(matrix, builder, sprite, c122, c222, c212, c112, settings);
+        drawQuad(matrix, builder, sprite, c111, c121, c122, c112, settings);
+        drawQuad(matrix, builder, sprite, c212, c222, c221, c211, settings);
+    }
+
+    /**
      * Draw a box. The texture is mapped according to unit size and will scale with the size of every face
      */
     public static void drawBoxUnit(PoseStack matrixStack, VertexConsumer builder, TextureAtlasSprite sprite,
