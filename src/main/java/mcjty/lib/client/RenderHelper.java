@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -35,7 +36,6 @@ import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 
@@ -58,6 +58,11 @@ public class RenderHelper {
             .alpha(MAX_BRIGHTNESS)
             .build();
 
+    public static void renderItemGround(PoseStack matrixStack, MultiBufferSource buffer, RenderType renderType, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
+        itemRenderer.render(stack, ItemTransforms.TransformType.GROUND, false, matrixStack, type -> buffer.getBuffer(renderType), brightness, combinedOverlay, ibakedmodel);
+    }
 
     public static void renderText(Font font, String text, int x, int y, int color, PoseStack poseStack, MultiBufferSource buffer, int lightmapValue) {
         font.drawInBatch(text, x, y, color, false, poseStack.last().pose(), buffer, false, 0, lightmapValue);
