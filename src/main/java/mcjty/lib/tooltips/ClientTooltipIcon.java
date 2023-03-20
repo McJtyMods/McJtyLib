@@ -34,16 +34,16 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
     }
 
     @Override
-    public void renderImage(Font font, int offsetX, int offsetY, PoseStack pose, ItemRenderer itemRenderer, int p_174257_) {
+    public void renderImage(Font font, int offsetX, int offsetY, PoseStack poseStack, ItemRenderer itemRenderer) {
         int j = 0;
         // Look through all the ItemStacks and add them to the tooltip at an x/y
         for (Pair<ItemStack, Integer> item : itemStack) {
             int x = offsetX + (Math.floorMod(j, itemsPerLine) * 21);
             int y = offsetY + (Math.floorDiv(j, itemsPerLine) * 20) - 20;
             // Render item
-            itemRenderer.renderAndDecorateItem(item.getLeft(), x, y, p_174257_);
+            itemRenderer.renderAndDecorateItem(poseStack, item.getLeft(), x, y);
             // Render durability and/or cool down bar
-            itemRenderer.renderGuiItemDecorations(font, item.getLeft(), x, y, "");
+            itemRenderer.renderGuiItemDecorations(poseStack, font, item.getLeft(), x, y, "");
             renderItemCount(font, itemRenderer, x, y + 20, item.getLeft().getCount(), item.getRight());
             j++;
         }
@@ -63,7 +63,7 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
         String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString(count);
 
         PoseStack pose = new PoseStack();
-        pose.translate(0, 0, 200D + itemRenderer.blitOffset);
+        pose.translate(0, 0, 200D); // @todo 1.19.4 + itemRenderer.blitOffset);
         drawStringToWidth(font, buffersource, pose, x, y, 18, 0xFFFFFF, s1);
 
         if (errorAmount >= 0) {
@@ -88,7 +88,7 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
             pose.scale((float) width / strWidth, (float) width / strWidth, 1F);
         }
 
-        font.drawInBatch(str, -strWidth, -font.lineHeight, color, true, pose.last().pose(), buffersource, false, 0, RenderHelper.MAX_BRIGHTNESS);
+        font.drawInBatch(str, -strWidth, -font.lineHeight, color, true, pose.last().pose(), buffersource, Font.DisplayMode.NORMAL, 0, RenderHelper.MAX_BRIGHTNESS);
 
         pose.popPose();
     }

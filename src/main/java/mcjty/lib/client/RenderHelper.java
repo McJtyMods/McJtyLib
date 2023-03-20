@@ -24,6 +24,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,8 +36,8 @@ import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
@@ -58,9 +59,14 @@ public class RenderHelper {
             .alpha(MAX_BRIGHTNESS)
             .build();
 
+    public static void renderItemGround(@Nonnull PoseStack poseStack, @Nonnull MultiBufferSource buffer, @Nonnull RenderType renderType, ItemStack stack, int lightmap, int overlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
+        itemRenderer.render(stack, ItemDisplayContext.GROUND, false, poseStack, type -> buffer.getBuffer(renderType), lightmap, overlay, ibakedmodel);
+    }
 
     public static void renderText(Font font, String text, int x, int y, int color, PoseStack poseStack, MultiBufferSource buffer, int lightmapValue) {
-        font.drawInBatch(text, x, y, color, false, poseStack.last().pose(), buffer, false, 0, lightmapValue);
+        font.drawInBatch(text, x, y, color, false, poseStack.last().pose(), buffer, Font.DisplayMode.NORMAL, 0, lightmapValue);
     }
 
     public static void renderModel(BlockRenderDispatcher renderer, PoseStack stack, VertexConsumer buffer, BlockState state, BakedModel model,
@@ -184,8 +190,15 @@ public class RenderHelper {
     }
 
     public static boolean renderObject(PoseStack matrixStack, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
-        itemRender.blitOffset = lvl;
+        matrixStack.pushPose();
+        matrixStack.translate(0, 0, lvl);
+//        itemRender.blitOffset = lvl;
+        boolean b = renderObjectInternal(matrixStack, itemRender, x, y, itm, highlight, lvl);
+        matrixStack.popPose();
+        return b;
+    }
 
+    private static boolean renderObjectInternal(PoseStack matrixStack, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
         if (itm == null) {
             return renderItemStack(matrixStack, itemRender, ItemStack.EMPTY, x, y, "", highlight);
         }
@@ -301,7 +314,7 @@ public class RenderHelper {
             // @todo 1.17 RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240, 240);
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
-            itemRender.renderAndDecorateItem(itm, x, y);
+            itemRender.renderAndDecorateItem(matrixStack, itm, x, y);
 //            itemRender.renderGuiItemDecorations();
             renderGuiItemDecorations(itemRender, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
             matrixStack.popPose();
@@ -317,21 +330,23 @@ public class RenderHelper {
             PoseStack posestack = new PoseStack();
             if (stack.getCount() != 1 || text != null) {
                 String s = text == null ? String.valueOf(stack.getCount()) : text;
-                posestack.translate(0.0D, 0.0D, itemRender.blitOffset + 200.0F);
+                // @todo 1.19.4
+//                posestack.translate(0.0D, 0.0D, itemRender.blitOffset + 200.0F);
+                posestack.translate(0.0D, 0.0D, 200.0F);
                 MultiBufferSource.BufferSource source = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
                 if (scaled >= 2) {
                     posestack.pushPose();
                     posestack.scale(.5f, .5f, .5f);
-                    font.drawInBatch(s, ((x + 19 - 2) * 2 - 1 - font.width(s)), y * 2 + 24, 16777215, true, posestack.last().pose(), source, false, 0, 15728880);
+                    font.drawInBatch(s, ((x + 19 - 2) * 2 - 1 - font.width(s)), y * 2 + 24, 16777215, true, posestack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
                     posestack.popPose();
                 } else if (scaled == 1) {
                     posestack.pushPose();
                     posestack.scale(.75f, .75f, .75f);
-                    font.drawInBatch(s, ((x - 2) * 1.34f + 24 - font.width(s)), y * 1.34f + 14, 16777215, true, posestack.last().pose(), source, false, 0, 15728880);
+                    font.drawInBatch(s, ((x - 2) * 1.34f + 24 - font.width(s)), y * 1.34f + 14, 16777215, true, posestack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
                     posestack.popPose();
                 } else {
-                    font.drawInBatch(s, (x + 19 - 2 - font.width(s)), (y + 6 + 3), 16777215, true, posestack.last().pose(), source, false, 0, 15728880);
+                    font.drawInBatch(s, (x + 19 - 2 - font.width(s)), (y + 6 + 3), 16777215, true, posestack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
                 }
 
                 source.endBatch();
@@ -339,7 +354,7 @@ public class RenderHelper {
 
             if (stack.isBarVisible()) {
                 RenderSystem.disableDepthTest();
-                RenderSystem.disableTexture();
+//                RenderSystem.disableTexture();
                 RenderSystem.disableBlend();
                 Tesselator tesselator = Tesselator.getInstance();
                 BufferBuilder bufferbuilder = tesselator.getBuilder();
@@ -348,7 +363,7 @@ public class RenderHelper {
                 fillRect(bufferbuilder, x + 2, y + 13, 13, 2, 0, 0, 0, 255);
                 fillRect(bufferbuilder, x + 2, y + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
                 RenderSystem.enableBlend();
-                RenderSystem.enableTexture();
+//                RenderSystem.enableTexture();
                 RenderSystem.enableDepthTest();
             }
 
@@ -356,13 +371,13 @@ public class RenderHelper {
             float f = localplayer == null ? 0.0F : localplayer.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getFrameTime());
             if (f > 0.0F) {
                 RenderSystem.disableDepthTest();
-                RenderSystem.disableTexture();
+//                RenderSystem.disableTexture();
                 RenderSystem.enableBlend();
                 RenderSystem.defaultBlendFunc();
                 Tesselator tesselator1 = Tesselator.getInstance();
                 BufferBuilder bufferbuilder1 = tesselator1.getBuilder();
                 fillRect(bufferbuilder1, x, y + Mth.floor(16.0F * (1.0F - f)), 16, Mth.ceil(16.0F * f), 255, 255, 255, 127);
-                RenderSystem.enableTexture();
+//                RenderSystem.enableTexture();
                 RenderSystem.enableDepthTest();
             }
         }
@@ -408,7 +423,7 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-        RenderSystem.disableTexture();
+//        RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         // @todo 1.17 GlStateManager._disableAlphaTest();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -428,7 +443,7 @@ public class RenderHelper {
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
         RenderSystem.disableBlend();
         // @todo 1.17 GlStateManager._enableAlphaTest();
-        RenderSystem.enableTexture();
+//        RenderSystem.enableTexture();
     }
 
     /**
@@ -447,7 +462,7 @@ public class RenderHelper {
         float f5 = (color2 >> 16 & 255) / 255.0F;
         float f6 = (color2 >> 8 & 255) / 255.0F;
         float f7 = (color2 & 255) / 255.0F;
-        RenderSystem.disableTexture();
+//        RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -464,7 +479,7 @@ public class RenderHelper {
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
         RenderSystem.disableBlend();
         // @todo 1.17 GlStateManager._enableAlphaTest();
-        RenderSystem.enableTexture();
+//        RenderSystem.enableTexture();
     }
 
     /**
@@ -530,14 +545,14 @@ public class RenderHelper {
     }
 
     public static void drawColorLogic(int x, int y, int width, int height, int red, int green, int blue, GlStateManager.LogicOp colorLogic) {
-        GlStateManager._disableTexture();
+//        GlStateManager._disableTexture();
         GlStateManager._enableColorLogicOp();
         GlStateManager._logicOp(colorLogic.value);
 
         draw(Tesselator.getInstance().getBuilder(), x, y, width, height, red, green, blue, 255);
 
         GlStateManager._disableColorLogicOp();
-        GlStateManager._enableTexture();
+//        GlStateManager._enableTexture();
     }
 
     /**

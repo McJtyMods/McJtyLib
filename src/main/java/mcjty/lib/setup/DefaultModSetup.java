@@ -41,7 +41,7 @@ public abstract class DefaultModSetup {
             event.registerCreativeModeTab(new ResourceLocation(modid, name), builder -> {
                 builder.title(Component.translatable("itemGroup." + name))
                         .icon(stack::get)
-                        .displayItems((enabledFeatures, output, tab) -> {
+                        .displayItems((enabledFeatures, output) -> {
                             tabItems.forEach(s -> {
                                 boolean todo = true;
                                 ItemStack st = s.get();

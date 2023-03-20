@@ -102,7 +102,7 @@ public class TeleportationTools {
 
     private static void fixOrientation(Entity entity, double newX, double newY, double newZ, Direction facing) {
         if (facing != Direction.DOWN && facing != Direction.UP) {
-            facePosition(entity, newX, newY, newZ, new BlockPos(newX, newY, newZ).relative(facing, 4));
+            facePosition(entity, newX, newY, newZ, new BlockPos((int) newX, (int) newY, (int) newZ).relative(facing, 4));
         }
     }
 

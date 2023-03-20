@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 // Code borrowed from XFactHD
@@ -24,7 +25,7 @@ public final class TransparentItemRenderHelper {
 
     private static final RenderType TRANSLUCENT = RenderType.entityTranslucentCull(TextureAtlas.LOCATION_BLOCKS);
 
-    public static void renderItemWithAlpha(ItemStack stack, int x, int y, int alpha) {
+    public static void renderItemWithAlpha(PoseStack poseStack, ItemStack stack, int x, int y, int alpha) {
         if (stack.isEmpty()) {
             return;
         }
@@ -32,15 +33,16 @@ public final class TransparentItemRenderHelper {
         ItemRenderer renderer = Minecraft.getInstance().getItemRenderer();
 
         BakedModel model = renderer.getModel(stack, null, Minecraft.getInstance().player, 0);
-        renderer.blitOffset += 50;
-        renderItemModelWithAlpha(stack, x, y, alpha, model, renderer);
-        renderer.blitOffset -= 50;
+        poseStack.pushPose();
+        poseStack.translate(0.0D, 0.0D, 50);
+        renderItemModelWithAlpha(poseStack, stack, x, y, alpha, model, renderer);
+        poseStack.popPose();
     }
 
     /**
      * {@link ItemRenderer::renderGuiItem} but with alpha
      */
-    public static void renderItemModelWithAlpha(ItemStack stack, int x, int y, int alpha, BakedModel model, ItemRenderer renderer) {
+    public static void renderItemModelWithAlpha(PoseStack poseStack, ItemStack stack, int x, int y, int alpha, BakedModel model, ItemRenderer renderer) {
         Minecraft.getInstance().getTextureManager().getTexture(TextureAtlas.LOCATION_BLOCKS).setFilter(false, false);
 
         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
@@ -49,9 +51,10 @@ public final class TransparentItemRenderHelper {
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        PoseStack modelViewStack = RenderSystem.getModelViewStack();
+        // @todo 1.19.4 use this or RenderSystem.getModelViewStack()?
+        PoseStack modelViewStack = poseStack;
         modelViewStack.pushPose();
-        modelViewStack.translate(x, y, 100.0F + renderer.blitOffset);
+        modelViewStack.translate(x, y, 100.0F);//@todo 1.19.4 + renderer.blitOffset);
         modelViewStack.translate(8.0D, 8.0D, 0.0D);
         modelViewStack.scale(1.0F, -1.0F, 1.0F);
         modelViewStack.scale(16.0F, 16.0F, 16.0F);
@@ -65,7 +68,7 @@ public final class TransparentItemRenderHelper {
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         renderer.render(
                 stack,
-                ItemTransforms.TransformType.GUI,
+                ItemDisplayContext.GUI,
                 false,
                 new PoseStack(),
                 wrapBuffer(buffer, alpha, alpha < 255),

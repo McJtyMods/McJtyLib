@@ -1,6 +1,7 @@
 package mcjty.lib.crafting;
 
 import mcjty.lib.setup.Registration;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -23,10 +24,9 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
         return CraftingBookCategory.MISC;   // @todo 1.19.3. Is this right?
     }
 
-    @Nonnull
     @Override
-    public ItemStack assemble(@Nonnull CraftingContainer inv) {
-        ItemStack result = getRecipe().assemble(inv);
+    public ItemStack assemble(CraftingContainer inv, RegistryAccess access) {
+        ItemStack result = getRecipe().assemble(inv, access);
         CompoundTag nbt = null;
         for (int i = 0 ; i < inv.getContainerSize() ; i++) {
             ItemStack stack = inv.getItem(i);
@@ -54,6 +54,11 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
             result.setTag(nbt);
         }
         return result;
+    }
+
+    @Override
+    public ItemStack getResultItem(RegistryAccess access) {
+        return ItemStack.EMPTY; // @todo 1.19.4 is this right
     }
 
     @Override

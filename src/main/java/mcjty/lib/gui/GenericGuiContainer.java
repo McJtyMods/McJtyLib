@@ -180,9 +180,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 yy = 4 - topPos;
             }
 
-//            this.zLevel = 300.0F;     // @todo 1.14
-            setBlitOffset(300);
-            this.itemRenderer.blitOffset = 300.0F;
+            // @todo 1.19.4
+//            setBlitOffset(300);
+//            this.itemRenderer.blitOffset = 300.0F;
             int l = -267386864;
             this.fillGradient(matrixStack, xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
             this.fillGradient(matrixStack, xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
@@ -196,12 +196,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
             this.fillGradient(matrixStack, xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
-            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
+//            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
+            matrixStack.translate(0.0D, 0.0D, 300.0f);
 
             renderTextLines(matrixStack, textLines, items, font, xx, yy);
 
-            setBlitOffset(0);
-            this.itemRenderer.blitOffset = 0.0F;
+            // @todo 1.19.4
+//            setBlitOffset(0);
+//            this.itemRenderer.blitOffset = 0.0F;
             RenderSystem.enableDepthTest();
             // @todo 1.17 RenderSystem.enableLighting();
             // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();

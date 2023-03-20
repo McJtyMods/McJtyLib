@@ -109,11 +109,10 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
             int yy = y + bounds.y + offsetY;
-            mc.getItemRenderer().blitOffset = 100;
-            this.window.getGui().setBlitOffset(100);
+            matrixStack.pushPose();
+            matrixStack.translate(0, 0, 100f);
             RenderHelper.renderObject(matrixStack, xx, yy, renderItem, false);
-            mc.getItemRenderer().blitOffset = 0;
-            this.window.getGui().setBlitOffset(0);
+            matrixStack.popPose();
             if (hilightOnHover && isHovering()) {
                 // @todo 1.17 RenderSystem.disableLighting();
                 RenderSystem.disableDepthTest();

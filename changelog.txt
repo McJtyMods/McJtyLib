@@ -2,6 +2,8 @@ Upcoming:
 - New item transparency renderer from XFactHD
 - Better support for item based guis
 - Better error reporting for bad gui files
+- New functions for 1.19.4: RenderHelper.renderItemGround()
+- New GenericArmorItem and GenericArmorMaterial for 1.19.4 abstraction
 
 1.19.3-7.1.5:
 - New api feature for slot specific slot limit

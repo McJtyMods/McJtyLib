@@ -187,7 +187,7 @@ public class DataGen {
             }
         };
         generator.addProvider(event.includeServer(), blockTags);
-        generator.addProvider(event.includeServer(), new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), blockTags, modid, event.getExistingFileHelper()) {
+        generator.addProvider(event.includeServer(), new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), blockTags.contentsGetter(), modid, event.getExistingFileHelper()) {
             @Override
             protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {

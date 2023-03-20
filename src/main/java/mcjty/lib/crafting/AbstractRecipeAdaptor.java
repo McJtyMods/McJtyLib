@@ -1,13 +1,13 @@
 package mcjty.lib.crafting;
 
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
@@ -71,18 +71,6 @@ public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.minec
     @Override
     public boolean matches(@Nonnull CraftingContainer inv, @Nonnull Level worldIn) {
         return recipe.matches(inv, worldIn);
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack assemble(@Nonnull CraftingContainer inv) {
-        return recipe.assemble(inv);
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack getResultItem() {
-        return recipe.getResultItem();
     }
 
     @Override
