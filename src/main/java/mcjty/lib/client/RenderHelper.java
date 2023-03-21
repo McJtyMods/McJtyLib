@@ -64,6 +64,34 @@ public class RenderHelper {
         itemRenderer.render(stack, ItemTransforms.TransformType.GROUND, false, matrixStack, type -> buffer.getBuffer(renderType), brightness, combinedOverlay, ibakedmodel);
     }
 
+    public static void renderItemGround(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
+        itemRenderer.render(stack, ItemTransforms.TransformType.GROUND, false, matrixStack, buffer, brightness, combinedOverlay, ibakedmodel);
+    }
+
+    public static void renderItemGui(PoseStack matrixStack, MultiBufferSource buffer, RenderType renderType, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
+        itemRenderer.render(stack, ItemTransforms.TransformType.GUI, false, matrixStack, type -> buffer.getBuffer(renderType), brightness, combinedOverlay, ibakedmodel);
+    }
+
+    public static void renderItemGui(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
+        itemRenderer.render(stack, ItemTransforms.TransformType.GUI, false, matrixStack, buffer, brightness, combinedOverlay, ibakedmodel);
+    }
+
+    public static void renderAndDecorateItem(PoseStack matrixStack, ItemStack stack, int x, int y) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        itemRenderer.renderAndDecorateItem(stack, x, y);
+    }
+
+    public static void renderStaticFixed(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        itemRenderer.renderStatic(stack, ItemTransforms.TransformType.FIXED, RenderHelper.MAX_BRIGHTNESS, combinedOverlay, matrixStack, buffer, 0); // @todo 1.18 last parameter?
+    }
+
     public static void renderText(Font font, String text, int x, int y, int color, PoseStack poseStack, MultiBufferSource buffer, int lightmapValue) {
         font.drawInBatch(text, x, y, color, false, poseStack.last().pose(), buffer, false, 0, lightmapValue);
     }

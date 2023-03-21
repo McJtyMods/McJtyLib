@@ -7,7 +7,6 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
 public class BaseShapedRecipe extends ShapedRecipe {
@@ -24,9 +23,4 @@ public class BaseShapedRecipe extends ShapedRecipe {
     public ItemStack assemble(CraftingContainer pContainer, RegistryAccess access) {
         return super.assemble(pContainer);
     }
-
-    public static ItemStack assemble(Recipe recipe, CraftingContainer pContainer, RegistryAccess access) {
-        return recipe.assemble(pContainer);
-    }
-
 }
