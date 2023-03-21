@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -59,10 +60,38 @@ public class RenderHelper {
             .alpha(MAX_BRIGHTNESS)
             .build();
 
+    public static void renderItemGround(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
+        itemRenderer.render(stack, ItemDisplayContext.GROUND.GROUND, false, matrixStack, buffer, brightness, combinedOverlay, ibakedmodel);
+    }
+
     public static void renderItemGround(@Nonnull PoseStack poseStack, @Nonnull MultiBufferSource buffer, @Nonnull RenderType renderType, ItemStack stack, int lightmap, int overlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
         itemRenderer.render(stack, ItemDisplayContext.GROUND, false, poseStack, type -> buffer.getBuffer(renderType), lightmap, overlay, ibakedmodel);
+    }
+
+    public static void renderItemGui(PoseStack matrixStack, MultiBufferSource buffer, RenderType renderType, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
+        itemRenderer.render(stack, ItemDisplayContext.GUI, false, matrixStack, type -> buffer.getBuffer(renderType), brightness, combinedOverlay, ibakedmodel);
+    }
+
+    public static void renderItemGui(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
+        itemRenderer.render(stack, ItemDisplayContext.GUI, false, matrixStack, buffer, brightness, combinedOverlay, ibakedmodel);
+    }
+
+    public static void renderAndDecorateItem(PoseStack matrixStack, ItemStack stack, int x, int y) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        itemRenderer.renderAndDecorateItem(matrixStack, stack, x, y);
+    }
+
+    public static void renderStaticFixed(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, RenderHelper.MAX_BRIGHTNESS, combinedOverlay, matrixStack, buffer, null, 0); // @todo 1.18 last parameter?
     }
 
     public static void renderText(Font font, String text, int x, int y, int color, PoseStack poseStack, MultiBufferSource buffer, int lightmapValue) {
