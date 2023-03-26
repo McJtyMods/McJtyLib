@@ -1,3 +1,6 @@
+1.19.4-7.2.1:
+- New SpawnCanceler class
+
 1.19.4-7.2.0:
 - New item transparency renderer from XFactHD
 - Better support for item based guis
