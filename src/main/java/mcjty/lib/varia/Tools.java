@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +42,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Tools {
+
+    public static RegistryAccess getRegistryAccess(Level level) {
+        return level.registryAccess();
+    }
 
     public static DeferredRegister<PlacementModifierType<?>> createPlacementRegistry(String modid) {
         return DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, modid);
