@@ -5,14 +5,15 @@ import net.minecraft.world.Container;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.Level;
 
 public interface BaseRecipe<C extends Container> extends Recipe<C> {
 
-    static ItemStack assemble(Recipe recipe, CraftingContainer pContainer, RegistryAccess access) {
+    static ItemStack assemble(Recipe recipe, CraftingContainer pContainer, Level level) {
         return recipe.assemble(pContainer);
     }
 
-    static ItemStack getResultItem(Recipe recipe, RegistryAccess access) {
+    static ItemStack getResultItem(Recipe recipe, Level level) {
         return recipe.getResultItem();
     }
 

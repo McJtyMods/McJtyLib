@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -40,6 +41,11 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Tools {
+
+    // Get registryAccess from world
+    public static RegistryAccess getRegistryAccess(Level level) {
+        return level.registryAccess();
+    }
 
     public static DeferredRegister<PlacementModifierType<?>> createPlacementRegistry(String modid) {
         return DeferredRegister.create(Registry.PLACEMENT_MODIFIER_REGISTRY, modid);
