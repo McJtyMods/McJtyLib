@@ -1,3 +1,6 @@
+1.19.3-7.2.2:
+- Change api to avoid problem with level.registryAccess() being different between 1.19.2 and 1.19.3/4
+
 1.19.3-7.2.1:
 - New SpawnCanceler class
 
