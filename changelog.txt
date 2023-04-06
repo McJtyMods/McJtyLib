@@ -1,4 +1,4 @@
-Upcoming:
+1.19.4-7.2.3:
 - Fixed a problem with rendering the text on itemstacks
 
 1.19.4-7.2.2:
