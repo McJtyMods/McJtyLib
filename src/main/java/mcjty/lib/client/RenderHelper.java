@@ -361,7 +361,8 @@ public class RenderHelper {
                 String s = text == null ? String.valueOf(stack.getCount()) : text;
                 // @todo 1.19.4
 //                posestack.translate(0.0D, 0.0D, itemRender.blitOffset + 200.0F);
-                posestack.translate(0.0D, 0.0D, 200.0F);
+                posestack.translate(0.0D, 0.0D, 300.0f + 200.0F);
+
                 MultiBufferSource.BufferSource source = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
                 if (scaled >= 2) {
