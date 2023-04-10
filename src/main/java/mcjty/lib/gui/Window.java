@@ -175,51 +175,6 @@ public class Window {
             dim[1] = 50;
             e.printStackTrace();
         }
-        WindowTools.parseAndHandleClient(guiDescription, command -> {
-            if ("window".equals(command.getId())) {
-                command.findCommand("size").ifPresent(cmd -> {
-                    dim[0] = cmd.getOptionalPar(0, -1);
-                    dim[1] = cmd.getOptionalPar(1, -1);
-                });
-                command.findCommand("sidesize").ifPresent(cmd -> {
-                    sidesize[0] = cmd.getOptionalPar(0, 0);
-                    sidesize[1] = cmd.getOptionalPar(1, 0);
-                });
-                command.commands()
-                        .filter(cmd -> "event".equals(cmd.getId()))
-                        .forEach(cmd -> {
-                            if (gui != null) {
-                                String channel = cmd.getOptionalPar(0, "");
-                                String teCommand = cmd.getOptionalPar(1, "");
-                                event(channel, (source, params) ->
-                                        gui.sendServerCommandTyped(wrapper, teCommand, params));
-                            }
-                        });
-                command.findCommand("panel").ifPresent(cmd -> {
-                    toplevel = new Panel();
-                    toplevel.readFromGuiCommand(cmd);
-                });
-                command.commands()
-                        .filter(cmd -> "bind".equals(cmd.getId()))
-                        .forEach(cmd -> {
-                            if (tileEntity != null) {
-                                String component = cmd.getOptionalPar(0, "");
-                                String value = cmd.getOptionalPar(1, "");
-                                bind(wrapper, component, tileEntity, value);
-                            }
-                        });
-                command.commands()
-                        .filter(cmd -> "action".equals(cmd.getId()))
-                        .forEach(cmd -> {
-                            if (tileEntity != null) {
-                                String component = cmd.getOptionalPar(0, "");
-                                String key = cmd.getOptionalPar(1, "");
-                                action(wrapper, component, tileEntity, key);
-                            }
-                        });
-            }
-        });
-
         Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
     }
 
