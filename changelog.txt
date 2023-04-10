@@ -1,4 +1,4 @@
-Upcoming:
+1.19-7.2.3:
 - Fixed a problem with the windows events not being handled correctly
 
 1.19-7.2.2:
