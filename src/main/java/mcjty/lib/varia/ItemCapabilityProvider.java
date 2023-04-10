@@ -1,12 +1,12 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.api.power.IBigPower;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -68,7 +68,7 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower {
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability) {
-        if (capability == CapabilityEnergy.ENERGY) {
+        if (capability == ForgeCapabilities.ENERGY) {
             return energy.cast();
         }
         return LazyOptional.empty();

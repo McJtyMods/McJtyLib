@@ -1,13 +1,13 @@
 package mcjty.lib.container;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -34,7 +34,7 @@ public class InventoryLocator {
         if (te == null) {
             return LazyOptional.empty();
         }
-        return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction.getOpposite()).map(handler -> {
+        return te.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite()).map(handler -> {
             // Remember in inventoryCoordinate (acts as a cache)
             inventoryCoordinate = thisCoordinate.relative(direction);
             inventorySide = direction.getOpposite();
@@ -48,7 +48,7 @@ public class InventoryLocator {
         if (te == null) {
             return LazyOptional.empty();
         }
-        return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, direction);
+        return te.getCapability(ForgeCapabilities.ITEM_HANDLER, direction);
     }
 
 

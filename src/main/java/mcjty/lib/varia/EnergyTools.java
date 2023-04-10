@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,7 +22,7 @@ public class EnergyTools {
         if (te == null) {
             return false;
         }
-        return te.getCapability(CapabilityEnergy.ENERGY, side).isPresent();
+        return te.getCapability(ForgeCapabilities.ENERGY, side).isPresent();
     }
 
     public static boolean isEnergyItem(ItemStack stack) {
@@ -30,7 +30,7 @@ public class EnergyTools {
         if (item instanceof IEnergyItem) {
             return true;
         }
-        return stack.getCapability(CapabilityEnergy.ENERGY).isPresent();
+        return stack.getCapability(ForgeCapabilities.ENERGY).isPresent();
     }
 
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
@@ -41,7 +41,7 @@ public class EnergyTools {
             maxEnergyStored = ((IBigPower) tileEntity).getCapacity();
             energyStored = ((IBigPower) tileEntity).getStoredPower();
         } else if (tileEntity != null) {
-            return tileEntity.getCapability(CapabilityEnergy.ENERGY, side).map(h -> new EnergyLevel(h.getEnergyStored(), h.getMaxEnergyStored())).orElse(new EnergyLevel(0, 0));
+            return tileEntity.getCapability(ForgeCapabilities.ENERGY, side).map(h -> new EnergyLevel(h.getEnergyStored(), h.getMaxEnergyStored())).orElse(new EnergyLevel(0, 0));
         } else {
             maxEnergyStored = 0;
             energyStored = 0;
@@ -53,7 +53,7 @@ public class EnergyTools {
         AtomicLong maxEnergyStored = new AtomicLong();
         AtomicLong energyStored = new AtomicLong();
         if (tileEntity != null) {
-            tileEntity.getCapability(CapabilityEnergy.ENERGY, side).ifPresent(handler -> {
+            tileEntity.getCapability(ForgeCapabilities.ENERGY, side).ifPresent(handler -> {
                 maxEnergyStored.set(handler.getMaxEnergyStored());
                 energyStored.set(handler.getEnergyStored());
             });
@@ -66,7 +66,7 @@ public class EnergyTools {
 
     public static long receiveEnergy(BlockEntity tileEntity, Direction from, long maxReceive) {
         if (tileEntity != null) {
-            return tileEntity.getCapability(CapabilityEnergy.ENERGY, from).map(handler ->
+            return tileEntity.getCapability(ForgeCapabilities.ENERGY, from).map(handler ->
                     handler.receiveEnergy(unsignedClampToInt(maxReceive), false)).orElse(0);
         }
         return 0;
@@ -77,7 +77,7 @@ public class EnergyTools {
         if (item instanceof IEnergyItem) {
             return ((IEnergyItem)item).receiveEnergyL(stack, maxReceive, false);
         } else {
-            return stack.getCapability(CapabilityEnergy.ENERGY).map(handler ->
+            return stack.getCapability(ForgeCapabilities.ENERGY).map(handler ->
                     handler.receiveEnergy(unsignedClampToInt(maxReceive), false)).orElse(0);
         }
     }

@@ -12,7 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
@@ -33,7 +33,7 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
                 .map(handler -> handler.extractItem(slot, amount, false))
                 .orElse(ItemStack.EMPTY);
     }
@@ -46,7 +46,7 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
                 .map(handler -> handler.getStackInSlot(slot))
                 .orElse(ItemStack.EMPTY);
     }

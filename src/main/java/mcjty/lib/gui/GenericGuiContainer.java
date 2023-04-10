@@ -35,7 +35,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
@@ -500,7 +500,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        tileEntity.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> {
+        tileEntity.getCapability(ForgeCapabilities.ENERGY).ifPresent(e -> {
             energyBar.maxValue(((GenericEnergyStorage)e).getCapacity());
             energyBar.value(((GenericEnergyStorage)e).getEnergy());
         });
