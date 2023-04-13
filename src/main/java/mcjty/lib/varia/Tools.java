@@ -29,10 +29,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.*;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -52,7 +49,7 @@ public class Tools {
     }
 
     public static <T> Supplier<IForgeRegistry<T>> makeCustomRegistry(DeferredRegister<T> defferedRegistry, Codec<T> codec) {
-        return defferedRegistry.makeRegistry(() -> new RegistryBuilder<T>().dataPackRegistry(codec));
+        return defferedRegistry.makeRegistry(() -> new RegistryBuilder<T>().dataPackRegistry(codec, codec));
     }
 
     public interface IDPRegister {
