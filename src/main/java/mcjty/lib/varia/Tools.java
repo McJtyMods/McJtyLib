@@ -63,7 +63,12 @@ public class Tools {
 
     public static void onDataPackRegistry(IEventBus bus, Consumer<IDPRegister> consumer) {
         bus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
-            consumer.accept(event::dataPackRegistry);
+            consumer.accept(new IDPRegister() {
+                @Override
+                public <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec) {
+                    event.dataPackRegistry(key, codec, codec);
+                }
+            });
         });
     }
 

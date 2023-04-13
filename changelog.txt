@@ -1,3 +1,6 @@
+1.19.4-7.2.4:
+- Tools.makeCustomRegistry() will now make a registry that is synchronized to the client
+
 1.19.4-7.2.3:
 - Fixed a problem with rendering the text on itemstacks
 
