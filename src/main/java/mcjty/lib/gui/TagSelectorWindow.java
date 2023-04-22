@@ -96,7 +96,7 @@ public class TagSelectorWindow {
     }
 
     private void selectTag(int index, WidgetList list) {
-        if (index < list.getChildCount()) {
+        if (index >= 0 && index < list.getChildCount()) {
             Object t = list.getChild(index).getUserObject();
             tagSetter.accept((String)t);
         }
