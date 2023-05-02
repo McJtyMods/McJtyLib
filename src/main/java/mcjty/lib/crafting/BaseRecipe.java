@@ -14,7 +14,11 @@ public interface BaseRecipe<C extends Container> extends Recipe<C> {
     }
 
     static ItemStack getResultItem(Recipe recipe, Level level) {
-        return recipe.getResultItem(level.registryAccess());
+        if (level == null) {
+            return recipe.getResultItem(null);
+        } else {
+            return recipe.getResultItem(level.registryAccess());
+        }
     }
 
     @Override
