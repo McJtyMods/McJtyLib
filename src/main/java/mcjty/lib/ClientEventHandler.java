@@ -4,7 +4,7 @@ import mcjty.lib.client.DelayedRenderer;
 import mcjty.lib.gui.IKeyReceiver;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.Widget;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -130,8 +130,9 @@ public class ClientEventHandler {
         }
     }
 
+    // @todo 1.20 correct event?
     @SubscribeEvent
-    public void onGameRenderOverlay(RenderLevelLastEvent e) {
+    public void onGameRenderOverlay(RenderLevelStageEvent e) {
         DelayedRenderer.render(e.getPoseStack());
     }
 }

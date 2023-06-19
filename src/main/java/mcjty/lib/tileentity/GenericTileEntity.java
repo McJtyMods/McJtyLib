@@ -35,10 +35,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -288,7 +287,7 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     protected void loadItemHandlerCap(CompoundTag tagCompound) {
-        getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        getCapability(ForgeCapabilities.ITEM_HANDLER)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> {
@@ -302,7 +301,7 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     protected void loadEnergyCap(CompoundTag tagCompound) {
-        getCapability(CapabilityEnergy.ENERGY)
+        getCapability(ForgeCapabilities.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> {
@@ -360,14 +359,14 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     protected void saveItemHandlerCap(CompoundTag tagCompound) {
-        getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        getCapability(ForgeCapabilities.ITEM_HANDLER)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> tagCompound.put("Items", h.serializeNBT()));
     }
 
     protected void saveEnergyCap(CompoundTag tagCompound) {
-        getCapability(CapabilityEnergy.ENERGY)
+        getCapability(ForgeCapabilities.ENERGY)
                 .filter(h -> h instanceof INBTSerializable)
                 .map(h -> (INBTSerializable) h)
                 .ifPresent(h -> tagCompound.put("Energy", h.serializeNBT()));

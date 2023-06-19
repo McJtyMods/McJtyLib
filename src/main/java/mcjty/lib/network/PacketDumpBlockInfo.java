@@ -51,7 +51,7 @@ public class PacketDumpBlockInfo {
             ServerOpListEntry entry = oppedPlayers.get(player.getGameProfile());
             int perm = entry == null ? server.getOperatorUserPermissionLevel() : entry.getLevel();
             if (perm >= 1) {
-                Level world = LevelTools.getLevel(player.level, dimid);
+                Level world = LevelTools.getLevel(player.level(), dimid);
                 String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
                 Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, "### Server side ###");
                 Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, output);

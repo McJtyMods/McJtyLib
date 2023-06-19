@@ -1,10 +1,10 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -158,15 +158,15 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, final int x, final int y) {
+    public void draw(Screen gui, GuiGraphics graphics, final int x, final int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
 
         int bx = x + bounds.x;
         int by = y + bounds.y;
-        RenderHelper.drawThickBeveledBox(matrixStack, bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, StyleConfig.colorEnergyBarTopLeft, StyleConfig.colorEnergyBarBottomRight, 0xff636363);
+        RenderHelper.drawThickBeveledBox(graphics, bx, by, bx + bounds.width - 1, by + bounds.height - 1, 1, StyleConfig.colorEnergyBarTopLeft, StyleConfig.colorEnergyBarBottomRight, 0xff636363);
 
         long currentValue = getValue();
         long maximum = getMaxValue();
@@ -177,14 +177,14 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
                 int w = (int) ((bounds.width-2) * (double) currentValue / maximum);
                 for (int xx = bx+1 ; xx < bx + bounds.width-2 ; xx++) {
                     color = getColor(bx, w, on, xx);
-                    RenderHelper.drawVerticalLine(matrixStack, xx, by+1, by + bounds.height - 2, color);
+                    RenderHelper.drawVerticalLine(graphics, xx, by+1, by + bounds.height - 2, color);
                     on = !on;
                 }
             } else {
                 int h = (int) ((bounds.height-2) * (double) currentValue / maximum);
                 for (int yy = y+1 ; yy < y + bounds.height-2 ; yy++) {
                     color = getColorReversed(y, h, on, yy);
-                    RenderHelper.drawHorizontalLine(matrixStack, bx+1, y + by + bounds.height - yy -2, bx + bounds.width - 2, color);
+                    RenderHelper.drawHorizontalLine(graphics, bx+1, y + by + bounds.height - yy -2, bx + bounds.width - 2, color);
                     on = !on;
                 }
             }
@@ -196,7 +196,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             } else {
                 s = currentValue + "/" + maximum;
             }
-            mc.font.draw(matrixStack, mc.font.plainSubstrByWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.font.lineHeight)/2, getTextColor());
+            graphics.drawString(mc.font, mc.font.plainSubstrByWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.font.lineHeight)/2, getTextColor());
         }
     }
 

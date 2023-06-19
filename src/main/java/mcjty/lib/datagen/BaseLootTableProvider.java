@@ -62,7 +62,7 @@ public class BaseLootTableProvider {
 
     public LootTable.Builder createItemDropTable(String name, ItemLike item) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
+//                .name(name)   @todo 1.20
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item));
         return LootTable.lootTable().withPool(builder);
@@ -72,7 +72,7 @@ public class BaseLootTableProvider {
                                                     float min, float max,
                                                     float lmin, float lmax) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
+//                .name(name)   @todo 1.20
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item)
                         .apply(SetItemCountFunction
@@ -84,7 +84,7 @@ public class BaseLootTableProvider {
 
     public LootTable.Builder createSilkTouchTable(String name, Block block, Item lootItem, float min, float max) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
+                //.name(name)   @todo 1.20
                 .setRolls(ConstantValue.exactly(1))
                 .add(AlternativesEntry.alternatives(
                         LootItem.lootTableItem(block)
@@ -105,7 +105,7 @@ public class BaseLootTableProvider {
 
     protected LootTable.Builder createBlockStateTable(String name, Block block, Property<?> property) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(Tools.getId(block).getPath())
+//                .name(Tools.getId(block).getPath())   // @todo 1.20
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyBlockState.copyState(block).copy(property))
@@ -119,7 +119,7 @@ public class BaseLootTableProvider {
 
     protected LootTable.Builder createStandardTable(String name, Block block, BlockEntityType<?> type) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
+//                .name(name)   // @todo 1.20
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
@@ -139,7 +139,7 @@ public class BaseLootTableProvider {
 
     protected LootTable.Builder createSimpleTable(String name, Block block) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
+//                .name(name)   @todo 1.20
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block));
         return LootTable.lootTable().withPool(builder);
@@ -147,7 +147,7 @@ public class BaseLootTableProvider {
 
     protected LootTable.Builder createSimpleTable(String name, Item item) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
+                //.name(name)   @todo 1.20
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item));
         return LootTable.lootTable().withPool(builder);

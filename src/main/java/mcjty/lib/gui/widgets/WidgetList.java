@@ -1,6 +1,5 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -10,6 +9,7 @@ import mcjty.lib.gui.events.SelectionEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.awt.*;
@@ -161,7 +161,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
@@ -169,7 +169,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         // Use the function above to force reset of the slider in case the contents changed so that it doesn't look weird.
         mouseScrolled(x, y, 0);
 
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
         int xx = x + bounds.x + leftMargin;
         int yy = y + bounds.y + topMargin;
         int top = 0;        // Margin@@@?
@@ -181,25 +181,25 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             child.bounds(0 /*@@@ margin?*/, top, bounds.width, rh);
             boolean hilighted = hilightedRows.contains(i);
             if ((top + rh-1 < bounds.height-3) && drawHorizontalLines) {
-                RenderHelper.drawHorizontalLine(matrixStack, xx + 2, yy + top + rh - 1, xx + bounds.width - 7, StyleConfig.colorListSeparatorLine);
+                RenderHelper.drawHorizontalLine(graphics, xx + 2, yy + top + rh - 1, xx + bounds.width - 7, StyleConfig.colorListSeparatorLine);
             }
             if (!invisibleselection) {
                 if (i == selected && hilighted) {
-                    RenderHelper.drawHorizontalGradientRect(matrixStack, xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedHighlightedGradient1, StyleConfig.colorListSelectedHighlightedGradient2);
+                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedHighlightedGradient1, StyleConfig.colorListSelectedHighlightedGradient2);
                 } else if (i == selected) {
-                    RenderHelper.drawHorizontalGradientRect(matrixStack, xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedGradient1, StyleConfig.colorListSelectedGradient2);        // 0xff515151
+                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedGradient1, StyleConfig.colorListSelectedGradient2);        // 0xff515151
                 } else if (hilighted) {
-                    RenderHelper.drawHorizontalGradientRect(matrixStack, xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListHighlightedGradient1, StyleConfig.colorListHighlightedGradient2);
+                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListHighlightedGradient1, StyleConfig.colorListHighlightedGradient2);
                 }
             }
             if (isEnabledAndVisible()) {
                 child.setWindow(window);
-                child.draw(gui, matrixStack, xx, yy);
+                child.draw(gui, graphics, xx, yy);
             } else {
                 boolean en = child.isEnabled();
                 child.enabled(false);
                 child.setWindow(window);
-                child.draw(gui, matrixStack, xx, yy);
+                child.draw(gui, graphics, xx, yy);
                 child.enabled(en);
             }
             top += rh;
@@ -207,12 +207,12 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void drawPhase2(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void drawPhase2(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
 
-        super.drawPhase2(gui, matrixStack, x, y);
+        super.drawPhase2(gui, graphics, x, y);
         int xx = x + bounds.x + leftMargin;
         int yy = y + bounds.y + topMargin;
         int top = 0;        // Margin@@@?
@@ -222,7 +222,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             Widget<?> child = getChildren().get(i);
             int rh = rowheight == -1 ? child.getDesiredHeight() : rowheight;
             if (isEnabledAndVisible()) {
-                child.drawPhase2(gui, matrixStack, xx, yy);
+                child.drawPhase2(gui, graphics, xx, yy);
             }
             top += rh;
         }}

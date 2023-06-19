@@ -1,11 +1,11 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.layout.LayoutHint;
 import mcjty.lib.gui.layout.PositionalLayout;
 import mcjty.lib.typed.Type;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.ItemStack;
 
@@ -139,13 +139,13 @@ public interface Widget<P extends Widget<P>> {
      * The given coordinates are the absolute coordinates of the parent. This does *not* include
      * the top/left x,y of this widget itself.
      */
-    void draw(Screen gui, PoseStack matrixStack, int x, int y);
+    void draw(Screen gui, GuiGraphics graphics, int x, int y);
 
     /**
      * After the window has been drawn this is called again to give widgets a chance
      * to render additional stuff that has to be rendered on top of the rest
      */
-    void drawPhase2(Screen gui, PoseStack matrixStack, int x, int y);
+    void drawPhase2(Screen gui, GuiGraphics graphics, int x, int y);
 
     /**
      * Handle a mouse click for this widget. This widget does not have to check if the coordinate is

@@ -1,6 +1,5 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -8,6 +7,7 @@ import mcjty.lib.gui.Scrollable;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.SliderEvent;
 import mcjty.lib.typed.Type;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
@@ -77,18 +77,18 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
 
         findScrollable(window);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
 
-        RenderHelper.drawThickBeveledBox(matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorSliderTopLeft, StyleConfig.colorSliderBottomRight, StyleConfig.colorSliderFiller);
+        RenderHelper.drawThickBeveledBox(graphics, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorSliderTopLeft, StyleConfig.colorSliderBottomRight, StyleConfig.colorSliderFiller);
 
         int divider = scrollable.getMaximum() - scrollable.getCountSelected();
 
@@ -96,34 +96,34 @@ public class Slider extends AbstractWidget<Slider> {
             int size = calculateKnobSize(divider, bounds.width);
             int first = calculateKnobOffset(divider, size, bounds.width);
             if (dragging) {
-                RenderHelper.drawBeveledBox(matrixStack, xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobDraggingTopLeft, StyleConfig.colorSliderKnobDraggingBottomRight, StyleConfig.colorSliderKnobDraggingFiller);
+                RenderHelper.drawBeveledBox(graphics, xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobDraggingTopLeft, StyleConfig.colorSliderKnobDraggingBottomRight, StyleConfig.colorSliderKnobDraggingFiller);
             } else if (isHovering()) {
-                RenderHelper.drawBeveledBox(matrixStack, xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobHoveringTopLeft, StyleConfig.colorSliderKnobHoveringBottomRight, StyleConfig.colorSliderKnobHoveringFiller);
+                RenderHelper.drawBeveledBox(graphics, xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobHoveringTopLeft, StyleConfig.colorSliderKnobHoveringBottomRight, StyleConfig.colorSliderKnobHoveringFiller);
             } else {
-                RenderHelper.drawBeveledBox(matrixStack, xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobTopLeft, StyleConfig.colorSliderKnobBottomRight, StyleConfig.colorSliderKnobFiller);
+                RenderHelper.drawBeveledBox(graphics, xx + 1 + first, yy + 2, xx + 1 + first + size - 1, yy + bounds.height - 4, StyleConfig.colorSliderKnobTopLeft, StyleConfig.colorSliderKnobBottomRight, StyleConfig.colorSliderKnobFiller);
             }
             if (size >= 8) {
-                RenderHelper.drawVerticalLine(matrixStack, xx + 1 + first + size / 2 - 1, yy + 3, yy + bounds.height - 6, StyleConfig.colorSliderKnobMarkerLine);
+                RenderHelper.drawVerticalLine(graphics, xx + 1 + first + size / 2 - 1, yy + 3, yy + bounds.height - 6, StyleConfig.colorSliderKnobMarkerLine);
                 if (size >= 10) {
-                    RenderHelper.drawVerticalLine(matrixStack, xx + 1 + first + size / 2 - 2 - 1, yy + 3, yy + bounds.height - 6, StyleConfig.colorSliderKnobMarkerLine);
-                    RenderHelper.drawVerticalLine(matrixStack, xx + 1 + first + size / 2 + 2 - 1, yy + 3, yy + bounds.height - 6, StyleConfig.colorSliderKnobMarkerLine);
+                    RenderHelper.drawVerticalLine(graphics, xx + 1 + first + size / 2 - 2 - 1, yy + 3, yy + bounds.height - 6, StyleConfig.colorSliderKnobMarkerLine);
+                    RenderHelper.drawVerticalLine(graphics, xx + 1 + first + size / 2 + 2 - 1, yy + 3, yy + bounds.height - 6, StyleConfig.colorSliderKnobMarkerLine);
                 }
             }
         } else {
             int size = calculateKnobSize(divider, bounds.height);
             int first = calculateKnobOffset(divider, size, bounds.height);
             if (dragging) {
-                RenderHelper.drawBeveledBox(matrixStack, xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobDraggingTopLeft, StyleConfig.colorSliderKnobDraggingBottomRight, StyleConfig.colorSliderKnobDraggingFiller);
+                RenderHelper.drawBeveledBox(graphics, xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobDraggingTopLeft, StyleConfig.colorSliderKnobDraggingBottomRight, StyleConfig.colorSliderKnobDraggingFiller);
             } else if (isHovering()) {
-                RenderHelper.drawBeveledBox(matrixStack, xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobHoveringTopLeft, StyleConfig.colorSliderKnobHoveringBottomRight, StyleConfig.colorSliderKnobHoveringFiller);
+                RenderHelper.drawBeveledBox(graphics, xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobHoveringTopLeft, StyleConfig.colorSliderKnobHoveringBottomRight, StyleConfig.colorSliderKnobHoveringFiller);
             } else {
-                RenderHelper.drawBeveledBox(matrixStack, xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobTopLeft, StyleConfig.colorSliderKnobBottomRight, StyleConfig.colorSliderKnobFiller);
+                RenderHelper.drawBeveledBox(graphics, xx + 1, yy + 1 + first, xx + bounds.width - 2, yy + 1 + first + size - 1, StyleConfig.colorSliderKnobTopLeft, StyleConfig.colorSliderKnobBottomRight, StyleConfig.colorSliderKnobFiller);
             }
             if (size >= 8) {
-                RenderHelper.drawHorizontalLine(matrixStack, xx + 3, yy + 1 + first + size / 2 - 1, xx + bounds.width - 4, StyleConfig.colorSliderKnobMarkerLine);
+                RenderHelper.drawHorizontalLine(graphics, xx + 3, yy + 1 + first + size / 2 - 1, xx + bounds.width - 4, StyleConfig.colorSliderKnobMarkerLine);
                 if (size >= 10) {
-                    RenderHelper.drawHorizontalLine(matrixStack, xx + 3, yy + 1 + first + size / 2 - 2 - 1, xx + bounds.width - 4, StyleConfig.colorSliderKnobMarkerLine);
-                    RenderHelper.drawHorizontalLine(matrixStack, xx + 3, yy + 1 + first + size / 2 + 2 - 1, xx + bounds.width - 4, StyleConfig.colorSliderKnobMarkerLine);
+                    RenderHelper.drawHorizontalLine(graphics, xx + 3, yy + 1 + first + size / 2 - 2 - 1, xx + bounds.width - 4, StyleConfig.colorSliderKnobMarkerLine);
+                    RenderHelper.drawHorizontalLine(graphics, xx + 3, yy + 1 + first + size / 2 + 2 - 1, xx + bounds.width - 4, StyleConfig.colorSliderKnobMarkerLine);
                 }
             }
         }

@@ -9,6 +9,7 @@ import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.typed.Type;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.Tools;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -97,21 +98,22 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
         if (showLabel) {
-            drawBackground(gui, matrixStack, x, y, bounds.height, bounds.height);
+            drawBackground(gui, graphics, x, y, bounds.height, bounds.height);
         } else {
-            super.draw(gui, matrixStack, x, y);
+            super.draw(gui, graphics, x, y);
         }
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
             int yy = y + bounds.y + offsetY;
+            PoseStack matrixStack = graphics.pose();
             matrixStack.pushPose();
             matrixStack.translate(0, 0, 100f);
-            RenderHelper.renderObject(matrixStack, xx, yy, renderItem, false);
+            RenderHelper.renderObject(graphics, xx, yy, renderItem, false);
             matrixStack.popPose();
             if (hilightOnHover && isHovering()) {
                 // @todo 1.17 RenderSystem.disableLighting();
@@ -138,7 +140,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 }
                 int h = mc.font.lineHeight;
                 int dy = (bounds.height - h)/2;
-                mc.font.draw(matrixStack, name, xx+20, yy + dy, getLabelColor());
+                graphics.drawString(mc.font, name, xx+20, yy + dy, getLabelColor());
             }
         }
     }

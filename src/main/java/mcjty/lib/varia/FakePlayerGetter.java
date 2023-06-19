@@ -46,7 +46,7 @@ public class FakePlayerGetter {
             }
             ServerLevel serverLevel = (ServerLevel) te.getLevel();
             harvester = FakePlayerFactory.get(serverLevel, new GameProfile(owner, getName()));
-            harvester.setLevel(serverLevel);
+//            harvester.setLevel(serverLevel);      // @todo 1.20
             BlockPos worldPosition = te.getBlockPos();
             harvester.setPos(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
         }

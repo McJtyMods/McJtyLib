@@ -7,13 +7,13 @@ import com.mojang.math.Axis;
 import mcjty.lib.base.StyleConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -84,9 +84,11 @@ public class RenderHelper {
         itemRenderer.render(stack, ItemDisplayContext.GUI, false, matrixStack, buffer, brightness, combinedOverlay, ibakedmodel);
     }
 
-    public static void renderAndDecorateItem(PoseStack matrixStack, ItemStack stack, int x, int y) {
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        itemRenderer.renderAndDecorateItem(matrixStack, stack, x, y);
+    public static void renderAndDecorateItem(GuiGraphics graphics, ItemStack stack, int x, int y) {
+        graphics.renderItem(stack, x, y, x * y * 31);
+        graphics.renderItemDecorations(Minecraft.getInstance().font, stack, x, y, null);
+//        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+//        itemRenderer.renderAndDecorateItem(matrixStack, stack, x, y);
     }
 
     public static void renderStaticFixed(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
@@ -166,7 +168,8 @@ public class RenderHelper {
         }
     }
 
-    private static void renderEntity(PoseStack matrixStack, Entity entity, int xPos, int yPos, float scale) {
+    private static void renderEntity(GuiGraphics graphics, Entity entity, int xPos, int yPos, float scale) {
+        PoseStack matrixStack = graphics.pose();
         matrixStack.pushPose();
         RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         // @todo 1.17 GlStateManager._enableRescaleNormal();
@@ -209,47 +212,48 @@ public class RenderHelper {
         matrixStack.popPose();
     }
 
-    public static boolean renderObject(PoseStack matrixStack, int x, int y, Object itm, boolean highlight) {
+    public static boolean renderObject(GuiGraphics graphics, int x, int y, Object itm, boolean highlight) {
         if (itm instanceof Entity) {
-            renderEntity(matrixStack, (Entity) itm, x, y, 10F);
+            renderEntity(graphics, (Entity) itm, x, y, 10F);
             return true;
         }
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        return renderObject(matrixStack, itemRenderer, x, y, itm, highlight, 100);
+        return renderObject(graphics, itemRenderer, x, y, itm, highlight, 100);
     }
 
-    public static boolean renderObject(PoseStack matrixStack, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
+    public static boolean renderObject(GuiGraphics graphics, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
+        PoseStack matrixStack = graphics.pose();
         matrixStack.pushPose();
         matrixStack.translate(0, 0, lvl);
 //        itemRender.blitOffset = lvl;
-        boolean b = renderObjectInternal(matrixStack, itemRender, x, y, itm, highlight, lvl);
+        boolean b = renderObjectInternal(graphics, itemRender, x, y, itm, highlight, lvl);
         matrixStack.popPose();
         return b;
     }
 
-    private static boolean renderObjectInternal(PoseStack matrixStack, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
+    private static boolean renderObjectInternal(GuiGraphics graphics, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
         if (itm == null) {
-            return renderItemStack(matrixStack, itemRender, ItemStack.EMPTY, x, y, "", highlight);
+            return renderItemStack(graphics, itemRender, ItemStack.EMPTY, x, y, "", highlight);
         }
         if (itm instanceof Item) {
-            return renderItemStack(matrixStack, itemRender, new ItemStack((Item) itm, 1), x, y, "", highlight);
+            return renderItemStack(graphics, itemRender, new ItemStack((Item) itm, 1), x, y, "", highlight);
         }
         if (itm instanceof Block) {
-            return renderItemStack(matrixStack, itemRender, new ItemStack((Block) itm, 1), x, y, "", highlight);
+            return renderItemStack(graphics, itemRender, new ItemStack((Block) itm, 1), x, y, "", highlight);
         }
         if (itm instanceof ItemStack) {
-            return renderItemStackWithCount(matrixStack, itemRender, (ItemStack) itm, x, y, highlight);
+            return renderItemStackWithCount(graphics, itemRender, (ItemStack) itm, x, y, highlight);
         }
         if (itm instanceof FluidStack) {
             return renderFluidStack((FluidStack) itm, x, y, highlight);
         }
         if (itm instanceof TextureAtlasSprite) {
-            return renderIcon(matrixStack, itemRender, (TextureAtlasSprite) itm, x, y, highlight);
+            return renderIcon(graphics, itemRender, (TextureAtlasSprite) itm, x, y, highlight);
         }
-        return renderItemStack(matrixStack, itemRender, ItemStack.EMPTY, x, y, "", highlight);
+        return renderItemStack(graphics, itemRender, ItemStack.EMPTY, x, y, "", highlight);
     }
 
-    private static boolean renderIcon(PoseStack matrixStack, ItemRenderer itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
+    private static boolean renderIcon(GuiGraphics graphics, ItemRenderer itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
         //itemRender.draw(xo, yo, itm, 16, 16); //TODO: Make
         return true;
     }
@@ -305,7 +309,7 @@ public class RenderHelper {
     }
 
 
-    public static boolean renderItemStackWithCount(PoseStack matrixStack, ItemRenderer itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
+    public static boolean renderItemStackWithCount(GuiGraphics graphics, ItemRenderer itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
         int size = itm.getCount();
         String amount;
         if (size <= 1) {
@@ -320,10 +324,10 @@ public class RenderHelper {
             amount = String.valueOf(size / 1000000000) + "g";
         }
 
-        return renderItemStack(matrixStack, itemRender, itm, xo, yo, amount, highlight);
+        return renderItemStack(graphics, itemRender, itm, xo, yo, amount, highlight);
     }
 
-    public static boolean renderItemStack(PoseStack matrixStack, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
+    public static boolean renderItemStack(GuiGraphics graphics, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
         RenderSystem.setShaderColor(1F, 1F, 1F, 1f);
 
         boolean rc = false;
@@ -331,6 +335,7 @@ public class RenderHelper {
             // @todo 1.17 RenderSystem.disableLighting();
             drawVerticalGradientRect(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
         }
+        PoseStack matrixStack = graphics.pose();
         if (!itm.isEmpty() && itm.getItem() != null) {
             rc = true;
             matrixStack.pushPose();
@@ -343,8 +348,10 @@ public class RenderHelper {
             // @todo 1.17 RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240, 240);
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
-            itemRender.renderAndDecorateItem(matrixStack, itm, x, y);
-//            itemRender.renderGuiItemDecorations();
+            graphics.renderItem(itm, x, y, x * y * 31);
+            graphics.renderItemDecorations(Minecraft.getInstance().font, itm, x, y, null);
+//            itemRender.renderAndDecorateItem(matrixStack, itm, x, y);
+
             renderGuiItemDecorations(itemRender, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
             matrixStack.popPose();
             // @todo 1.17 RenderSystem.disableRescaleNormal();
@@ -480,7 +487,7 @@ public class RenderHelper {
      * Draws a rectangle with a horizontal gradient between the specified colors.
      * x2 and y2 are not included.
      */
-    public static void drawHorizontalGradientRect(PoseStack matrixStack, int x1, int y1, int x2, int y2, int color1, int color2) {
+    public static void drawHorizontalGradientRect(int x1, int y1, int x2, int y2, int color1, int color2) {
 //        this.zLevel = 300.0F;
         float zLevel = 0.0f;
 
@@ -516,7 +523,7 @@ public class RenderHelper {
      * Draws a rectangle with a horizontal gradient between the specified colors.
      * x2 and y2 are not included.
      */
-    public static void drawHorizontalGradientRect(PoseStack matrixStack, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color1, int color2, int lightmap) {
+    public static void drawHorizontalGradientRect(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color1, int color2, int lightmap) {
 //        this.zLevel = 300.0F;
         float zLevel = 0.0f;
 
@@ -531,47 +538,47 @@ public class RenderHelper {
 
         VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.QUADS_NOTEXTURE);
 
-        Matrix4f positionMatrix = matrixStack.last().pose();
+        Matrix4f positionMatrix = graphics.pose().last().pose();
         builder.vertex(positionMatrix, x1, y1, zLevel).color(f1, f2, f3, f).uv2(lightmap).endVertex();
         builder.vertex(positionMatrix, x1, y2, zLevel).color(f1, f2, f3, f).uv2(lightmap).endVertex();
         builder.vertex(positionMatrix, x2, y2, zLevel).color(f5, f6, f7, f4).uv2(lightmap).endVertex();
         builder.vertex(positionMatrix, x2, y1, zLevel).color(f5, f6, f7, f4).uv2(lightmap).endVertex();
     }
 
-    public static void drawHorizontalLine(PoseStack matrixStack, int x1, int y1, int x2, int color) {
-        GuiComponent.fill(matrixStack, x1, y1, x2, y1 + 1, color);
+    public static void drawHorizontalLine(GuiGraphics graphics, int x1, int y1, int x2, int color) {
+        graphics.fill(x1, y1, x2, y1 + 1, color);
     }
 
-    public static void drawVerticalLine(PoseStack matrixStack, int x1, int y1, int y2, int color) {
-        GuiComponent.fill(matrixStack, x1, y1, x1 + 1, y2, color);
+    public static void drawVerticalLine(GuiGraphics graphics, int x1, int y1, int y2, int color) {
+        graphics.fill(x1, y1, x1 + 1, y2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
-    public static void drawLeftTriangle(PoseStack matrixStack, int x, int y, int color) {
-        drawVerticalLine(matrixStack, x, y, y, color);
-        drawVerticalLine(matrixStack, x + 1, y - 1, y + 1, color);
-        drawVerticalLine(matrixStack, x + 2, y - 2, y + 2, color);
+    public static void drawLeftTriangle(GuiGraphics graphics, int x, int y, int color) {
+        drawVerticalLine(graphics, x, y, y, color);
+        drawVerticalLine(graphics, x + 1, y - 1, y + 1, color);
+        drawVerticalLine(graphics, x + 2, y - 2, y + 2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the right point
-    public static void drawRightTriangle(PoseStack matrixStack, int x, int y, int color) {
-        drawVerticalLine(matrixStack, x, y, y, color);
-        drawVerticalLine(matrixStack, x - 1, y - 1, y + 1, color);
-        drawVerticalLine(matrixStack, x - 2, y - 2, y + 2, color);
+    public static void drawRightTriangle(GuiGraphics graphics, int x, int y, int color) {
+        drawVerticalLine(graphics, x, y, y, color);
+        drawVerticalLine(graphics, x - 1, y - 1, y + 1, color);
+        drawVerticalLine(graphics, x - 2, y - 2, y + 2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the top point
-    public static void drawUpTriangle(PoseStack matrixStack, int x, int y, int color) {
-        drawHorizontalLine(matrixStack, x, y, x, color);
-        drawHorizontalLine(matrixStack, x - 1, y + 1, x + 1, color);
-        drawHorizontalLine(matrixStack, x - 2, y + 2, x + 2, color);
+    public static void drawUpTriangle(GuiGraphics graphics, int x, int y, int color) {
+        drawHorizontalLine(graphics, x, y, x, color);
+        drawHorizontalLine(graphics, x - 1, y + 1, x + 1, color);
+        drawHorizontalLine(graphics, x - 2, y + 2, x + 2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the bottom point
-    public static void drawDownTriangle(PoseStack matrixStack, int x, int y, int color) {
-        drawHorizontalLine(matrixStack, x, y, x, color);
-        drawHorizontalLine(matrixStack, x - 1, y - 1, x + 1, color);
-        drawHorizontalLine(matrixStack, x - 2, y - 2, x + 2, color);
+    public static void drawDownTriangle(GuiGraphics graphics, int x, int y, int color) {
+        drawHorizontalLine(graphics, x, y, x, color);
+        drawHorizontalLine(graphics, x - 1, y - 1, x + 1, color);
+        drawHorizontalLine(graphics, x - 2, y - 2, x + 2, color);
     }
 
     public static void drawColorLogic(int x, int y, int width, int height, int red, int green, int blue, GlStateManager.LogicOp colorLogic) {
@@ -588,133 +595,133 @@ public class RenderHelper {
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawThickButtonBox(PoseStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        GuiComponent.fill(matrixStack, x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
-        drawHorizontalLine(matrixStack, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawHorizontalLine(matrixStack, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(matrixStack, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(matrixStack, x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+    public static void drawThickButtonBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        graphics.fill(x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
+        drawHorizontalLine(graphics, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(graphics, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(graphics, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(graphics, x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
 
-        drawHorizontalLine(matrixStack, x1 + 1, y1 + 1, x2 - 1, bright);
-        drawHorizontalLine(matrixStack, x1 + 2, y1 + 2, x2 - 2, bright);
-        drawVerticalLine(matrixStack, x1 + 1, y1 + 2, y2 - 2, bright);
-        drawVerticalLine(matrixStack, x1 + 2, y1 + 3, y2 - 3, bright);
+        drawHorizontalLine(graphics, x1 + 1, y1 + 1, x2 - 1, bright);
+        drawHorizontalLine(graphics, x1 + 2, y1 + 2, x2 - 2, bright);
+        drawVerticalLine(graphics, x1 + 1, y1 + 2, y2 - 2, bright);
+        drawVerticalLine(graphics, x1 + 2, y1 + 3, y2 - 3, bright);
 
-        drawHorizontalLine(matrixStack, x1 + 3, y2 - 3, x2 - 2, dark);
-        drawHorizontalLine(matrixStack, x1 + 2, y2 - 2, x2 - 1, dark);
-        drawVerticalLine(matrixStack, x2 - 2, y1 + 2, y2 - 2, dark);
-        drawVerticalLine(matrixStack, x2 - 3, y1 + 3, y2 - 3, dark);
+        drawHorizontalLine(graphics, x1 + 3, y2 - 3, x2 - 2, dark);
+        drawHorizontalLine(graphics, x1 + 2, y2 - 2, x2 - 1, dark);
+        drawVerticalLine(graphics, x2 - 2, y1 + 2, y2 - 2, dark);
+        drawVerticalLine(graphics, x2 - 3, y1 + 3, y2 - 3, dark);
     }
 
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawThinButtonBox(PoseStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        GuiComponent.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
-        drawHorizontalLine(matrixStack, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawHorizontalLine(matrixStack, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(matrixStack, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(matrixStack, x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+    public static void drawThinButtonBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
+        drawHorizontalLine(graphics, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(graphics, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(graphics, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(graphics, x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
 
-        drawHorizontalLine(matrixStack, x1 + 1, y1 + 1, x2 - 2, bright);
-        drawVerticalLine(matrixStack, x1 + 1, y1 + 2, y2 - 3, bright);
+        drawHorizontalLine(graphics, x1 + 1, y1 + 1, x2 - 2, bright);
+        drawVerticalLine(graphics, x1 + 1, y1 + 2, y2 - 3, bright);
 
-        drawHorizontalLine(matrixStack, x1 + 1, y2 - 2, x2 - 1, dark);
-        drawVerticalLine(matrixStack, x2 - 2, y1 + 1, y2 - 2, dark);
+        drawHorizontalLine(graphics, x1 + 1, y2 - 2, x2 - 1, dark);
+        drawVerticalLine(graphics, x2 - 2, y1 + 1, y2 - 2, dark);
     }
 
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawThinButtonBoxGradient(PoseStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
+    public static void drawThinButtonBoxGradient(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
         drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
-        drawHorizontalLine(matrixStack, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawHorizontalLine(matrixStack, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(matrixStack, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
-        drawVerticalLine(matrixStack, x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(graphics, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawHorizontalLine(graphics, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(graphics, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
+        drawVerticalLine(graphics, x2 - 1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
 
-        drawHorizontalLine(matrixStack, x1 + 1, y1 + 1, x2 - 2, bright);
-        drawVerticalLine(matrixStack, x1 + 1, y1 + 2, y2 - 3, bright);
+        drawHorizontalLine(graphics, x1 + 1, y1 + 1, x2 - 2, bright);
+        drawVerticalLine(graphics, x1 + 1, y1 + 2, y2 - 3, bright);
 
-        drawHorizontalLine(matrixStack, x1 + 1, y2 - 2, x2 - 1, dark);
-        drawVerticalLine(matrixStack, x2 - 2, y1 + 1, y2 - 2, dark);
+        drawHorizontalLine(graphics, x1 + 1, y2 - 2, x2 - 1, dark);
+        drawVerticalLine(graphics, x2 - 2, y1 + 1, y2 - 2, dark);
     }
 
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawFlatButtonBox(PoseStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
-        drawBeveledBox(matrixStack, x1, y1, x2, y2, bright, dark, average);
+    public static void drawFlatButtonBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+        drawBeveledBox(graphics, x1, y1, x2, y2, bright, dark, average);
     }
 
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawFlatButtonBox(PoseStack matrixStack, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int bright, int average, int dark, int lightmap) {
-        drawBeveledBox(matrixStack, buffer, x1, y1, x2, y2, bright, dark, average, lightmap);
+    public static void drawFlatButtonBox(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int bright, int average, int dark, int lightmap) {
+        drawBeveledBox(graphics, buffer, x1, y1, x2, y2, bright, dark, average, lightmap);
     }
 
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawFlatButtonBoxGradient(PoseStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
+    public static void drawFlatButtonBoxGradient(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
         drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
-        drawHorizontalLine(matrixStack, x1, y1, x2 - 1, bright);
-        drawVerticalLine(matrixStack, x1, y1, y2 - 1, bright);
-        drawVerticalLine(matrixStack, x2 - 1, y1, y2 - 1, dark);
-        drawHorizontalLine(matrixStack, x1, y2 - 1, x2, dark);
+        drawHorizontalLine(graphics, x1, y1, x2 - 1, bright);
+        drawVerticalLine(graphics, x1, y1, y2 - 1, bright);
+        drawVerticalLine(graphics, x2 - 1, y1, y2 - 1, dark);
+        drawHorizontalLine(graphics, x1, y2 - 1, x2, dark);
     }
 
     /**
      * Draw a beveled box. x2 and y2 are not included.
      */
-    public static void drawBeveledBox(PoseStack matrixStack, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
+    public static void drawBeveledBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            GuiComponent.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
-        drawHorizontalLine(matrixStack, x1, y1, x2 - 1, topleftcolor);
-        drawVerticalLine(matrixStack, x1, y1, y2 - 1, topleftcolor);
-        drawVerticalLine(matrixStack, x2 - 1, y1, y2 - 1, botrightcolor);
-        drawHorizontalLine(matrixStack, x1, y2 - 1, x2, botrightcolor);
+        drawHorizontalLine(graphics, x1, y1, x2 - 1, topleftcolor);
+        drawVerticalLine(graphics, x1, y1, y2 - 1, topleftcolor);
+        drawVerticalLine(graphics, x2 - 1, y1, y2 - 1, botrightcolor);
+        drawHorizontalLine(graphics, x1, y2 - 1, x2, botrightcolor);
     }
 
     /**
      * Draw a beveled box. x2 and y2 are not included. Use this version for GUI's
      */
-    public static void drawBeveledBox(PoseStack matrixStack, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor, int lightmap) {
+    public static void drawBeveledBox(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor, int lightmap) {
         if (fillcolor != -1) {
-            fill(matrixStack, buffer, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor, lightmap);
+            fill(graphics, buffer, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor, lightmap);
         }
-        fill(matrixStack, buffer, x1, y1, x2 - 1, y1 + 1, topleftcolor, lightmap);
-        fill(matrixStack, buffer, x1, y1, x1 + 1, y2 - 1, topleftcolor, lightmap);
-        fill(matrixStack, buffer, x2 - 1, y1, x2 - 1 + 1, y2 - 1, botrightcolor, lightmap);
-        fill(matrixStack, buffer, x1, y2 - 1, x2, y2 - 1 + 1, botrightcolor, lightmap);
+        fill(graphics, buffer, x1, y1, x2 - 1, y1 + 1, topleftcolor, lightmap);
+        fill(graphics, buffer, x1, y1, x1 + 1, y2 - 1, topleftcolor, lightmap);
+        fill(graphics, buffer, x2 - 1, y1, x2 - 1 + 1, y2 - 1, botrightcolor, lightmap);
+        fill(graphics, buffer, x1, y2 - 1, x2, y2 - 1 + 1, botrightcolor, lightmap);
     }
 
     /**
      * Draw a thick beveled box. x2 and y2 are not included. Use this version for batched rendering
      */
-    public static void drawThickBeveledBox(PoseStack matrixStack, int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
+    public static void drawThickBeveledBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
-            GuiComponent.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
+            graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
-        GuiComponent.fill(matrixStack, x1, y1, x2 - 1, y1 + thickness, topleftcolor);
-        GuiComponent.fill(matrixStack, x1, y1, x1 + thickness, y2 - 1, topleftcolor);
-        GuiComponent.fill(matrixStack, x2 - thickness, y1, x2, y2 - 1, botrightcolor);
-        GuiComponent.fill(matrixStack, x1, y2 - thickness, x2, y2, botrightcolor);
+        graphics.fill(x1, y1, x2 - 1, y1 + thickness, topleftcolor);
+        graphics.fill(x1, y1, x1 + thickness, y2 - 1, topleftcolor);
+        graphics.fill(x2 - thickness, y1, x2, y2 - 1, botrightcolor);
+        graphics.fill(x1, y2 - thickness, x2, y2, botrightcolor);
     }
 
     /**
      * Draw a beveled box. x2 and y2 are not included.
      */
-    public static void drawFlatBox(PoseStack matrixStack, int x1, int y1, int x2, int y2, int border, int fill) {
+    public static void drawFlatBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int border, int fill) {
         if (fill != -1) {
-            GuiComponent.fill(matrixStack, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
+            graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
         }
-        drawHorizontalLine(matrixStack, x1, y1, x2 - 1, border);
-        drawVerticalLine(matrixStack, x1, y1, y2 - 1, border);
-        drawVerticalLine(matrixStack, x2 - 1, y1, y2 - 1, border);
-        drawHorizontalLine(matrixStack, x1, y2 - 1, x2, border);
+        drawHorizontalLine(graphics, x1, y1, x2 - 1, border);
+        drawVerticalLine(graphics, x1, y1, y2 - 1, border);
+        drawVerticalLine(graphics, x2 - 1, y1, y2 - 1, border);
+        drawHorizontalLine(graphics, x1, y2 - 1, x2, border);
     }
 
     public static void drawTexturedModalRect(PoseStack poseStack, VertexConsumer builder, int x, int y, int textureX, int textureY, int width, int height, int totw, int toth, float parentU, float parentV) {
@@ -807,18 +814,19 @@ public class RenderHelper {
         matrixStack.popPose();
     }
 
-    public static void renderBillboardQuadBright(PoseStack matrixStack, MultiBufferSource buffer, float scale, ResourceLocation texture, RenderSettings settings) {
-        renderBillboardQuadBright(matrixStack, buffer.getBuffer(settings.renderType()), scale, texture, settings);
+    public static void renderBillboardQuadBright(PoseStack poseStack, MultiBufferSource buffer, float scale, ResourceLocation texture, RenderSettings settings) {
+        renderBillboardQuadBright(poseStack, buffer.getBuffer(settings.renderType()), scale, texture, settings);
     }
 
-    public static void rotateToPlayer(PoseStack matrixStack) {
+    public static void rotateToPlayer(PoseStack poseStack) {
         Quaternionf rotation = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
-        matrixStack.mulPose(rotation);
+        poseStack.mulPose(rotation);
     }
 
-    public static int renderText(PoseStack matrixStack, int x, int y, String txt) {
+    public static int renderText(GuiGraphics graphics, int x, int y, String txt) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1f);
 
+        PoseStack matrixStack = graphics.pose();
         matrixStack.pushPose();
         matrixStack.translate(0.0F, 0.0F, 32.0F);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -831,7 +839,7 @@ public class RenderHelper {
         GlStateManager._disableBlend();
         Minecraft mc = Minecraft.getInstance();
         int width = mc.font.width(txt);
-        mc.font.drawShadow(matrixStack, txt, x, y, 16777215);
+        mc.font.drawInBatch(txt, x, y, 0xffffff, true, matrixStack.last().pose(), graphics.bufferSource(), Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
         // @todo 1.17 GlStateManager._enableLighting();
         GlStateManager._enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower
@@ -846,9 +854,10 @@ public class RenderHelper {
         return width;
     }
 
-    public static int renderText(PoseStack matrixStack, int x, int y, String txt, int color) {
+    public static int renderText(GuiGraphics graphics, int x, int y, String txt, int color) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0f);
 
+        PoseStack matrixStack = graphics.pose();
         matrixStack.pushPose();
         matrixStack.translate(0.0F, 0.0F, 32.0F);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -861,7 +870,7 @@ public class RenderHelper {
         GlStateManager._disableBlend();
         Minecraft mc = Minecraft.getInstance();
         int width = mc.font.width(txt);
-        mc.font.draw(matrixStack, txt, x, y, color);
+        graphics.drawString(mc.font, txt, x, y, color);
         // @todo 1.17 GlStateManager._enableLighting();
         GlStateManager._enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower
@@ -1298,9 +1307,9 @@ public class RenderHelper {
         buffer.vertex(matrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
     }
 
-    public static void fill(PoseStack matrixStack, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color,
+    public static void fill(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color,
                             int lightmap) {
-        Matrix4f positionMatrix = matrixStack.last().pose();
+        Matrix4f positionMatrix = graphics.pose().last().pose();
         int swapper;
         if (x1 < x2) {
             swapper = x1;

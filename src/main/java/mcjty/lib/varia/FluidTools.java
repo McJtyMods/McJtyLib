@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.FluidUtil;
@@ -108,7 +107,6 @@ public class FluidTools {
     public static FluidStack pickupFluidBlock(Level world, BlockPos pos, @Nonnull Predicate<FluidStack> action, @Nonnull Runnable clearBlock) {
         BlockState blockstate = world.getBlockState(pos);
         FluidState fluidstate = world.getFluidState(pos);
-        Material material = blockstate.getMaterial();
         Fluid fluid = fluidstate.getType();
 
         if (blockstate.getBlock() instanceof LiquidBlock) {
@@ -124,7 +122,7 @@ public class FluidTools {
                 return FluidUtil.getFluidContained(fluidBucket).map(f -> new FluidStack(f, FluidType.BUCKET_VOLUME)).orElse(FluidStack.EMPTY);
             }
             return stack;
-        } else if (material == Material.WATER_PLANT || material == Material.REPLACEABLE_WATER_PLANT) {
+        } else if (blockstate.getBlock() instanceof BucketPickup) { // @todo 1.20 right?
             FluidStack stack = new FluidStack(Fluids.WATER, FluidType.BUCKET_VOLUME);
             if (action.test(stack)) {
                 BlockEntity tileentity = blockstate.getBlock() instanceof EntityBlock ? world.getBlockEntity(pos) : null;

@@ -1,12 +1,12 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
@@ -166,25 +166,25 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         if (withBorder) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;
 
             if (isEnabled()) {
                 if (currentChoice == highlightedChoice) {
-                    drawStyledBoxSelected(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                    drawStyledBoxSelected(window, graphics, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
                 } else if (isHovering()) {
-                    drawStyledBoxHovering(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                    drawStyledBoxHovering(window, graphics, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
                 } else {
-                    drawStyledBoxNormal(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                    drawStyledBoxNormal(window, graphics, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
                 }
             } else {
-                drawStyledBoxDisabled(window, matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
+                drawStyledBoxDisabled(window, graphics, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1);
             }
         }
 
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
     }
 
 

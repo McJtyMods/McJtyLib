@@ -359,7 +359,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 itemstack1 = slot.getItem();
 
                 if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem() && (par1ItemStack.getDamageValue() == itemstack1.getDamageValue())
-                        && ItemStack.tagMatches(par1ItemStack, itemstack1) && slot.mayPlace(par1ItemStack)) {
+                        && ItemStack.isSameItemSameTags(par1ItemStack, itemstack1) && slot.mayPlace(par1ItemStack)) {
 
                     int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();
                     int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getMaxStackSize());

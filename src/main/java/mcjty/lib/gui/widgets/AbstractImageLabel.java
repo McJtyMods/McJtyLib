@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ImageEvent;
@@ -9,7 +8,7 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -106,18 +105,17 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
 
         if (image != null) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.setShaderTexture(0, image);
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            GuiComponent.blit(matrixStack, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
+            graphics.blit(image, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
         }
     }
 

@@ -2,10 +2,9 @@ package mcjty.lib.varia;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
@@ -18,7 +17,7 @@ public class CapabilityTools {
             return LazyOptional.empty();
         }
         try {
-            return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+            return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER);
         } catch (RuntimeException e) {
             reportWrongBlock(tileEntity, e);
             return LazyOptional.empty();
@@ -31,7 +30,7 @@ public class CapabilityTools {
             return LazyOptional.empty();
         }
         try {
-            return tileEntity.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+            return tileEntity.getCapability(ForgeCapabilities.FLUID_HANDLER);
         } catch (RuntimeException e) {
             reportWrongBlock(tileEntity, e);
             return LazyOptional.empty();

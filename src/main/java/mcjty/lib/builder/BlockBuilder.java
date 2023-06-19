@@ -4,14 +4,15 @@ import mcjty.lib.compat.theoneprobe.McJtyLibTOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.gui.ManualEntry;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.MapColor;
 
 public class BlockBuilder {
 
-    public static final BlockBehaviour.Properties STANDARD_IRON = BlockBehaviour.Properties.of(Material.METAL)
+    public static final BlockBehaviour.Properties STANDARD_IRON = BlockBehaviour.Properties.of()
+            .mapColor(MapColor.METAL)
             .strength(2.0f)
             .requiresCorrectToolForDrops()
             .sound(SoundType.METAL);

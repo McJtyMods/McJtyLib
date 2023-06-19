@@ -1,11 +1,11 @@
 package mcjty.lib.varia;
 
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -22,11 +22,11 @@ public class InventoryTools {
             return 0;
         }
 
-        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(IItemHandler::getSlots).orElse(0);
+        return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).map(IItemHandler::getSlots).orElse(0);
     }
 
     public static boolean isInventory(BlockEntity te) {
-        return te != null && te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent();
+        return te != null && te.getCapability(ForgeCapabilities.ITEM_HANDLER).isPresent();
     }
 
     /**
@@ -36,7 +36,7 @@ public class InventoryTools {
         Stream.Builder<ItemStack> builder = Stream.builder();
 
         if (tileEntity != null) {
-            tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
+            tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack itemStack = handler.getStackInSlot(i);
                     if (!itemStack.isEmpty() && predicate.test(itemStack)) {
@@ -54,7 +54,7 @@ public class InventoryTools {
     @Nonnull
     public static ItemStack getFirstMatchingItem(BlockEntity tileEntity, Predicate<ItemStack> predicate) {
         if (tileEntity != null) {
-            return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(handler -> {
+            return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).map(handler -> {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack itemStack = handler.getStackInSlot(i);
                     if (!itemStack.isEmpty() && predicate.test(itemStack)) {
@@ -77,7 +77,7 @@ public class InventoryTools {
         BlockEntity te = world.getBlockEntity(direction == null ? pos : pos.relative(direction));
         if (te != null) {
             Direction opposite = direction == null ? null : direction.getOpposite();
-            return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, opposite)
+            return te.getCapability(ForgeCapabilities.ITEM_HANDLER, opposite)
                     .map(handler -> ItemHandlerHelper.insertItem(handler, s, false))
                     .orElse(ItemStack.EMPTY);
         }
@@ -85,9 +85,8 @@ public class InventoryTools {
     }
 
     public static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
-        // @todo 1.14
-//        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (!result.getHasSubtypes() || result.getItemDamage() == itemstack1.getItemDamage()) && ItemStack.areItemStackTagsEqual(result, itemstack1);
-        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (result.getDamageValue() == itemstack1.getDamageValue()) && ItemStack.tagMatches(result, itemstack1);
+        // @todo 1.20 isSameItemSameTags?
+        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (result.getDamageValue() == itemstack1.getDamageValue()) && ItemStack.isSameItemSameTags(result, itemstack1);
     }
 
     @Nonnull

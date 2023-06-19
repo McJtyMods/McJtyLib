@@ -1,9 +1,9 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
@@ -28,13 +28,13 @@ public class IconRender extends AbstractWidget<IconRender> {
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
         if (icon != null) {
-            RenderHelper.renderObject(matrixStack, x + bounds.x, y + bounds.y, icon, false);
+            RenderHelper.renderObject(graphics, x + bounds.x, y + bounds.y, icon, false);
         }
     }
 

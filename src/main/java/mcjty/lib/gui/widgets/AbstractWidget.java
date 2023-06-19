@@ -1,7 +1,6 @@
 package mcjty.lib.gui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -13,7 +12,7 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -122,11 +121,11 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         }
     }
 
-    protected void drawBox(PoseStack matrixStack, int xx, int yy, int color) {
-        GuiComponent.fill(matrixStack, xx, yy, xx, yy + bounds.height, color);
-        GuiComponent.fill(matrixStack, xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
-        GuiComponent.fill(matrixStack, xx, yy, xx + bounds.width, yy, color);
-        GuiComponent.fill(matrixStack, xx, yy + bounds.height, xx + bounds.width, yy + bounds.height, color);
+    protected void drawBox(GuiGraphics graphics, int xx, int yy, int color) {
+        graphics.fill(xx, yy, xx, yy + bounds.height, color);
+        graphics.fill(xx + bounds.width, yy, xx + bounds.width, yy + bounds.height, color);
+        graphics.fill(xx, yy, xx + bounds.width, yy, color);
+        graphics.fill(xx, yy + bounds.height, xx + bounds.width, yy + bounds.height, color);
     }
 
     @Override
@@ -325,7 +324,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         }
     }
 
-    protected void drawBackground(Screen gui, PoseStack matrixStack, int x, int y, int w, int h) {
+    protected void drawBackground(Screen gui, GuiGraphics graphics, int x, int y, int w, int h) {
         if (!visible) {
             return;
         }
@@ -334,78 +333,75 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         if (background1 != null) {
-            RenderSystem.setShaderTexture(0, background1);
             if (background2 == null) {
-                gui.blit(matrixStack, xx, yy, 0, 0, w, h);
+                graphics.blit(background1, xx, yy, 0, 0, w, h);
             } else {
                 if (background2Horizontal) {
-                    gui.blit(matrixStack, xx, yy, 0, 0, backgroundOffset, h);
-                    RenderSystem.setShaderTexture(0, background2);
-                    gui.blit(matrixStack, xx + backgroundOffset, yy, 0, 0, w - backgroundOffset, h);
+                    graphics.blit(background1, xx, yy, 0, 0, backgroundOffset, h);
+                    graphics.blit(background2, xx + backgroundOffset, yy, 0, 0, w - backgroundOffset, h);
                 } else {
-                    gui.blit(matrixStack, xx, yy, 0, 0, w, backgroundOffset);
-                    RenderSystem.setShaderTexture(0, background2);
-                    gui.blit(matrixStack, xx, yy + backgroundOffset, 0, 0, w, h - backgroundOffset);
+                    graphics.blit(background1, xx, yy, 0, 0, w, backgroundOffset);
+                    graphics.blit(background2, xx, yy + backgroundOffset, 0, 0, w, h - backgroundOffset);
                 }
             }
         } else if (filledRectThickness > 0) {
-            RenderHelper.drawThickBeveledBox(matrixStack, xx, yy, xx + w - 1, yy + h - 1, filledRectThickness, StyleConfig.colorBackgroundBevelBright, StyleConfig.colorBackgroundBevelDark, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
+            RenderHelper.drawThickBeveledBox(graphics, xx, yy, xx + w - 1, yy + h - 1, filledRectThickness, StyleConfig.colorBackgroundBevelBright, StyleConfig.colorBackgroundBevelDark, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
         } else if (filledRectThickness < 0) {
-            RenderHelper.drawThickBeveledBox(matrixStack, xx, yy, xx + w - 1, yy + h - 1, -filledRectThickness, StyleConfig.colorBackgroundBevelDark, StyleConfig.colorBackgroundBevelBright, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
+            RenderHelper.drawThickBeveledBox(graphics, xx, yy, xx + w - 1, yy + h - 1, -filledRectThickness, StyleConfig.colorBackgroundBevelDark, StyleConfig.colorBackgroundBevelBright, filledBackground == -1 ? StyleConfig.colorBackgroundFiller : filledBackground);
         } else if (filledBackground != -1) {
-            RenderHelper.drawHorizontalGradientRect(matrixStack, xx, yy, xx + w - 1, yy + h - 1, filledBackground, filledBackground2 == -1 ? filledBackground : filledBackground2);
+            RenderHelper.drawHorizontalGradientRect(xx, yy, xx + w - 1, yy + h - 1, filledBackground, filledBackground2 == -1 ? filledBackground : filledBackground2);
         }
     }
 
-    protected void drawBackground(Screen gui, PoseStack matrixStack, int x, int y) {
+    protected void drawBackground(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
-        drawBackground(gui, matrixStack, x, y, bounds.width, bounds.height);
+        drawBackground(gui, graphics, x, y, bounds.width, bounds.height);
     }
 
-    protected void drawStyledBoxNormal(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2) {
-        drawStyledBox(window, matrixStack, x1, y1, x2, y2,
+    protected void drawStyledBoxNormal(Window window, GuiGraphics graphics, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, graphics, x1, y1, x2, y2,
                 StyleConfig.colorButtonBorderTopLeft, StyleConfig.colorButtonFiller, StyleConfig.colorButtonFillerGradient1, StyleConfig.colorButtonFillerGradient2, StyleConfig.colorButtonBorderBottomRight);
     }
 
-    protected void drawStyledBoxNormal(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2, int averageOverride) {
-        drawStyledBox(window, matrixStack, x1, y1, x2, y2,
+    protected void drawStyledBoxNormal(Window window, GuiGraphics graphics, int x1, int y1, int x2, int y2, int averageOverride) {
+        drawStyledBox(window, graphics, x1, y1, x2, y2,
                 StyleConfig.colorButtonBorderTopLeft, averageOverride, averageOverride, averageOverride, StyleConfig.colorButtonBorderBottomRight);
     }
 
-    protected void drawStyledBoxSelected(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2) {
-        drawStyledBox(window, matrixStack, x1, y1, x2, y2,
+    protected void drawStyledBoxSelected(Window window, GuiGraphics graphics, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, graphics, x1, y1, x2, y2,
                 StyleConfig.colorButtonSelectedBorderTopLeft, StyleConfig.colorButtonSelectedFiller, StyleConfig.colorButtonSelectedFillerGradient1, StyleConfig.colorButtonSelectedFillerGradient2, StyleConfig.colorButtonSelectedBorderBottomRight);
     }
 
-    protected void drawStyledBoxHovering(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2) {
-        drawStyledBox(window, matrixStack, x1, y1, x2, y2,
+    protected void drawStyledBoxHovering(Window window, GuiGraphics graphics, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, graphics, x1, y1, x2, y2,
                 StyleConfig.colorButtonHoveringBorderTopLeft, StyleConfig.colorButtonHoveringFiller, StyleConfig.colorButtonHoveringFillerGradient1, StyleConfig.colorButtonHoveringFillerGradient2, StyleConfig.colorButtonHoveringBorderBottomRight);
     }
 
-    protected void drawStyledBoxDisabled(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2) {
-        drawStyledBox(window, matrixStack, x1, y1, x2, y2,
+    protected void drawStyledBoxDisabled(Window window, GuiGraphics graphics, int x1, int y1, int x2, int y2) {
+        drawStyledBox(window, graphics, x1, y1, x2, y2,
                 StyleConfig.colorButtonDisabledBorderTopLeft, StyleConfig.colorButtonDisabledFiller, StyleConfig.colorButtonDisabledFillerGradient1, StyleConfig.colorButtonDisabledFillerGradient2, StyleConfig.colorButtonDisabledBorderBottomRight);
     }
 
-    private void drawStyledBox(Window window, PoseStack matrixStack, int x1, int y1, int x2, int y2, int bright, int average, int average1, int average2, int dark) {
+    private void drawStyledBox(Window window, GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average, int average1, int average2, int dark) {
         switch (window.getCurrentStyle()) {
-            case STYLE_BEVEL -> RenderHelper.drawThinButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
-            case STYLE_BEVEL_GRADIENT -> RenderHelper.drawThinButtonBoxGradient(matrixStack, x1, y1, x2, y2, bright, average1, average2, dark);
-            case STYLE_FLAT -> RenderHelper.drawFlatButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
-            case STYLE_FLAT_GRADIENT -> RenderHelper.drawFlatButtonBoxGradient(matrixStack, x1, y1, x2, y2, bright, average1, average2, dark);
-            case STYLE_THICK -> RenderHelper.drawThickButtonBox(matrixStack, x1, y1, x2, y2, bright, average, dark);
+            case STYLE_BEVEL -> RenderHelper.drawThinButtonBox(graphics, x1, y1, x2, y2, bright, average, dark);
+            case STYLE_BEVEL_GRADIENT -> RenderHelper.drawThinButtonBoxGradient(graphics, x1, y1, x2, y2, bright, average1, average2, dark);
+            case STYLE_FLAT -> RenderHelper.drawFlatButtonBox(graphics, x1, y1, x2, y2, bright, average, dark);
+            case STYLE_FLAT_GRADIENT -> RenderHelper.drawFlatButtonBoxGradient(graphics, x1, y1, x2, y2, bright, average1, average2, dark);
+            case STYLE_THICK -> RenderHelper.drawThickButtonBox(graphics, x1, y1, x2, y2, bright, average, dark);
         }
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
-        drawBackground(gui, matrixStack, x, y);
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+        drawBackground(gui, graphics, x, y);
     }
 
     @Override
-    public void drawPhase2(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void drawPhase2(Screen gui, GuiGraphics graphics, int x, int y) {
 
     }
 

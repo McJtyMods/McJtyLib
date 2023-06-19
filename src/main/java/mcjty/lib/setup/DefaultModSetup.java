@@ -7,7 +7,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -37,27 +37,28 @@ public abstract class DefaultModSetup {
      */
     protected void createTab(String modid, String name, Supplier<ItemStack> stack) {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        bus.addListener((CreativeModeTabEvent.Register event) -> {
-            event.registerCreativeModeTab(new ResourceLocation(modid, name), builder -> {
-                builder.title(Component.translatable("itemGroup." + name))
-                        .icon(stack::get)
-                        .displayItems((enabledFeatures, output) -> {
-                            tabItems.forEach(s -> {
-                                boolean todo = true;
-                                ItemStack st = s.get();
-                                if (st.getItem() instanceof ITabExpander expander) {
-                                    List<ItemStack> itemsForTab = expander.getItemsForTab();
-                                    if (!itemsForTab.isEmpty()) {
-                                        todo = false;
-                                        itemsForTab.forEach(output::accept);
-                                    }
-                                }
-                                if (todo) {
-                                    output.accept(st);
-                                }
-                            });
-                        });
-            });
+        bus.addListener((BuildCreativeModeTabContentsEvent event) -> {
+            // @todo 1.20
+//            event.registerCreativeModeTab(new ResourceLocation(modid, name), builder -> {
+//                builder.title(Component.translatable("itemGroup." + name))
+//                        .icon(stack::get)
+//                        .displayItems((enabledFeatures, output) -> {
+//                            tabItems.forEach(s -> {
+//                                boolean todo = true;
+//                                ItemStack st = s.get();
+//                                if (st.getItem() instanceof ITabExpander expander) {
+//                                    List<ItemStack> itemsForTab = expander.getItemsForTab();
+//                                    if (!itemsForTab.isEmpty()) {
+//                                        todo = false;
+//                                        itemsForTab.forEach(output::accept);
+//                                    }
+//                                }
+//                                if (todo) {
+//                                    output.accept(st);
+//                                }
+//                            });
+//                        });
+//            });
         });
     }
 

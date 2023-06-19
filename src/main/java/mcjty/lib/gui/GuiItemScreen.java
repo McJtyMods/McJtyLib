@@ -1,8 +1,9 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.client.GuiTools;
 import mcjty.lib.varia.ComponentFactory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
@@ -95,10 +96,10 @@ public abstract class GuiItemScreen extends Screen {
         return rc;
     }
 
-    public void drawWindow(PoseStack matrixStack) {
-        this.renderBackground(matrixStack);
-        window.draw(matrixStack);
-        sideWindow.getWindow().draw(matrixStack);
+    public void drawWindow(GuiGraphics graphics) {
+        this.renderBackground(graphics);
+        window.draw(graphics);
+        sideWindow.getWindow().draw(graphics);
         List<String> tooltips = window.getTooltips();
         if (tooltips != null) {
             int x = GuiTools.getRelativeX(this);
@@ -106,7 +107,7 @@ public abstract class GuiItemScreen extends Screen {
             // @todo check on 1.16
             List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
             List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
-            renderTooltip(matrixStack, processors, x-guiLeft, y-guiTop);
+            graphics.renderTooltip(Minecraft.getInstance().font, processors, x-guiLeft, y-guiTop);
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
@@ -115,15 +116,15 @@ public abstract class GuiItemScreen extends Screen {
             // @todo check on 1.16
             List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
             List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
-            renderTooltip(matrixStack, processors, x - guiLeft, y - guiTop);
+            graphics.renderTooltip(Minecraft.getInstance().font, processors, x - guiLeft, y - guiTop);
         }
     }
 
-    protected abstract void renderInternal(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick);
+    protected abstract void renderInternal(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick);
 
     @Override
-    public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-        renderInternal(pPoseStack, pMouseX, pMouseY, pPartialTick);
+    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+        renderInternal(graphics, pMouseX, pMouseY, pPartialTick);
     }
 }

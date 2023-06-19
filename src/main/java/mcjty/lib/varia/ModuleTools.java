@@ -8,7 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 public class ModuleTools {
@@ -89,7 +89,7 @@ public class ModuleTools {
         if (te == null) {
             return false;
         }
-        return te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).map(inventory -> {
+        return te.getCapability(ForgeCapabilities.ITEM_HANDLER).map(inventory -> {
             for (int i = start; i <= stop; i++) {
                 if (inventory.getStackInSlot(i).isEmpty()) {
                     ItemStack copy = heldItem.copy();

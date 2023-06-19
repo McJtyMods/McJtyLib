@@ -1,9 +1,9 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.*;
 import mcjty.lib.typed.Type;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 
 public class Panel extends AbstractContainerWidget<Panel> {
@@ -31,11 +31,11 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
 //        drawBox(xx, yy, 0xffff0000);
@@ -48,20 +48,20 @@ public class Panel extends AbstractContainerWidget<Panel> {
 
         for (Widget<?> child : getChildren()) {
             child.setWindow(window);
-            child.draw(gui, matrixStack, xx, yy);
+            child.draw(gui, graphics, xx, yy);
         }
     }
 
     @Override
-    public void drawPhase2(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void drawPhase2(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
-        super.drawPhase2(gui, matrixStack, x, y);
+        super.drawPhase2(gui, graphics, x, y);
         int xx = x + bounds.x;
         int yy = y + bounds.y;
         for (Widget<?> child : getChildren()) {
-            child.drawPhase2(gui, matrixStack, xx, yy);
+            child.drawPhase2(gui, graphics, xx, yy);
         }
     }
 

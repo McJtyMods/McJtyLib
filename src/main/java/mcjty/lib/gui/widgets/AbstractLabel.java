@@ -7,6 +7,7 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
 import mcjty.lib.typed.Type;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
@@ -133,25 +134,24 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
-        drawOffset(gui, matrixStack, x, y, 0, 0);
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+        drawOffset(gui, graphics, x, y, 0, 0);
     }
 
-    public void drawOffset(Screen gui, PoseStack matrixStack, int x, int y, int offsetx, int offsety) {
+    public void drawOffset(Screen gui, GuiGraphics graphics, int x, int y, int offsetx, int offsety) {
         if (!visible) {
             return;
         }
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
 
         int dx = calculateHorizontalOffset() + offsetx + txtDx;
         int dy = calculateVerticalOffset() + offsety + txtDy;
 
         if (image != null) {
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.setShaderTexture(0, image);
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;
-            gui.blit(matrixStack, xx, yy, u, v, iw, ih);
+            graphics.blit(image, xx, yy, u, v, iw, ih);
         }
 
         int col = getColor();
@@ -160,9 +160,9 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         }
 
         if (text == null) {
-            mc.font.draw(matrixStack, "", x+dx+bounds.x, y+dy+bounds.y, col);
+            graphics.drawString(mc.font, "", x+dx+bounds.x, y+dy+bounds.y, col);
         } else {
-            mc.font.draw(matrixStack, mc.font.plainSubstrByWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
+            graphics.drawString(mc.font, mc.font.plainSubstrByWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
         }
     }
 

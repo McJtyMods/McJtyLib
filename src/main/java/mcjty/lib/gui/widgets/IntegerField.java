@@ -2,7 +2,6 @@ package mcjty.lib.gui.widgets;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -13,7 +12,7 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
@@ -338,8 +337,8 @@ public class IntegerField extends AbstractWidget<IntegerField> {
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
-        super.draw(gui, matrixStack, x, y);
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+        super.draw(gui, graphics, x, y);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -353,16 +352,16 @@ public class IntegerField extends AbstractWidget<IntegerField> {
             col = StyleConfig.colorTextFieldHoveringFiller;
         }
 
-        RenderHelper.drawThickBeveledBox(matrixStack, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
+        RenderHelper.drawThickBeveledBox(graphics, xx, yy, xx + bounds.width - 1, yy + bounds.height - 1, 1, StyleConfig.colorTextFieldTopLeft, StyleConfig.colorTextFieldBottomRight, col);
 
         String renderedText = mc.font.plainSubstrByWidth(this.text.substring(startOffset), bounds.width - 10);
         int textX = x + 5 + bounds.x;
         int textY = y + calculateVerticalOffset() + bounds.y;
         if (isEnabled()) {
             if (isEditable()) {
-                mc.font.draw(matrixStack, renderedText, textX, textY, 0xff000000);
+                graphics.drawString(mc.font, renderedText, textX, textY, 0xff000000);
             } else {
-                mc.font.draw(matrixStack, renderedText, textX, textY, 0xff333333);
+                graphics.drawString(mc.font, renderedText, textX, textY, 0xff333333);
             }
 
             if (isRegionSelected()) {
@@ -379,12 +378,12 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                 RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.font.lineHeight, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
             }
         } else {
-            mc.font.draw(matrixStack, renderedText, textX, textY, 0xffa0a0a0);
+            graphics.drawString(mc.font, renderedText, textX, textY, 0xffa0a0a0);
         }
 
         if (window.getTextFocus() == this) {
             int w = mc.font.width(this.text.substring(startOffset, cursor));
-            GuiComponent.fill(matrixStack, xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
+            graphics.fill(xx + 5 + w, yy + 2, xx + 5 + w + 1, yy + bounds.height - 3, StyleConfig.colorTextFieldCursor);
         }
     }
 

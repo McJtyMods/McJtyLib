@@ -64,7 +64,7 @@ public class PacketServerCommandTyped {
             if (dimensionId == null) {
                 world = playerEntity.getCommandSenderWorld();
             } else {
-                world = LevelTools.getLevel(playerEntity.level, dimensionId);
+                world = LevelTools.getLevel(playerEntity.level(), dimensionId);
             }
             if (world == null) {
                 return;

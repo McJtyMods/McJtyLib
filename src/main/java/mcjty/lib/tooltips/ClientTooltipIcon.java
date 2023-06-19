@@ -3,11 +3,11 @@ package mcjty.lib.tooltips;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import mcjty.lib.client.RenderHelper;
-import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.tuple.Pair;
@@ -34,22 +34,23 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
     }
 
     @Override
-    public void renderImage(Font font, int offsetX, int offsetY, PoseStack poseStack, ItemRenderer itemRenderer) {
+    public void renderImage(Font font, int offsetX, int offsetY, GuiGraphics graphics) {
         int j = 0;
         // Look through all the ItemStacks and add them to the tooltip at an x/y
         for (Pair<ItemStack, Integer> item : itemStack) {
             int x = offsetX + (Math.floorMod(j, itemsPerLine) * 21);
             int y = offsetY + (Math.floorDiv(j, itemsPerLine) * 20) - 20;
             // Render item
-            itemRenderer.renderAndDecorateItem(poseStack, item.getLeft(), x, y);
+            graphics.renderItem(item.getLeft(), x, y, x * y * 31);
             // Render durability and/or cool down bar
-            itemRenderer.renderGuiItemDecorations(poseStack, font, item.getLeft(), x, y, "");
-            renderItemCount(font, itemRenderer, x, y + 20, item.getLeft().getCount(), item.getRight());
+            graphics.renderItemDecorations(Minecraft.getInstance().font, item.getLeft(), x, y, "");
+
+            renderItemCount(font, x, y + 20, item.getLeft().getCount(), item.getRight());
             j++;
         }
     }
 
-    private static void renderItemCount(Font font, ItemRenderer itemRenderer, int x, int y, int count, int errorAmount) {
+    private static void renderItemCount(Font font, int x, int y, int count, int errorAmount) {
         if (errorAmount == ITooltipExtras.NOAMOUNT) {
             return;
         }

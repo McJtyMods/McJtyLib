@@ -125,7 +125,7 @@ public class PositionalDataSyncer {
         ChunkPos cp = new ChunkPos(blockPos);
         Map<PositionalDataKey, Runnable> runnableMap = watchHandlers.get(cp);
         if (runnableMap != null) {
-            GlobalPos pos = GlobalPos.of(player.level.dimension(), blockPos);
+            GlobalPos pos = GlobalPos.of(player.level().dimension(), blockPos);
             for (Map.Entry<PositionalDataKey, Runnable> entry : runnableMap.entrySet()) {
                 if (pos.equals(entry.getKey().pos())) {
                     entry.getValue().run();

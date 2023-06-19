@@ -1,6 +1,6 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -10,11 +10,11 @@ public abstract class BaseScreen extends Screen {
         super(pTitle);
     }
 
-    protected abstract void renderInternal(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick);
+    protected abstract void renderInternal(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick);
 
     @Override
-    public void render(PoseStack pPoseStack, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
-        renderInternal(pPoseStack, pMouseX, pMouseY, pPartialTick);
+    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+        renderInternal(graphics, pMouseX, pMouseY, pPartialTick);
     }
 }

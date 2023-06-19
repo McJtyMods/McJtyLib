@@ -6,6 +6,7 @@ import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.client.GuiTools;
 import mcjty.lib.tileentity.GenericTileEntity;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
@@ -92,11 +93,11 @@ public class WindowManager {
         modalWindows.forEach(window -> window.syncBindings(te));
     }
 
-    public void draw(PoseStack matrixStack) {
+    public void draw(GuiGraphics graphics) {
         mouseWheel = 0;// @todo 1.14 Mouse.getDWheel();
-        windows.forEach(window -> window.draw(matrixStack));
-        modalWindows.forEach(window -> window.draw(matrixStack));
-        iconManager.draw(gui, matrixStack);
+        windows.forEach(window -> window.draw(graphics));
+        modalWindows.forEach(window -> window.draw(graphics));
+        iconManager.draw(gui, graphics);
     }
 
     private Stream<Window> getInteractableWindows() {
@@ -118,7 +119,7 @@ public class WindowManager {
         return modalWindows.stream();
     }
 
-    public void drawTooltips(PoseStack matrixStack) {
+    public void drawTooltips(GuiGraphics graphics) {
         int x = GuiTools.getRelativeX(gui);
         int y = GuiTools.getRelativeY(gui);
 
@@ -126,7 +127,7 @@ public class WindowManager {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 GenericGuiContainer<?,?> gui = (GenericGuiContainer<?,?>) this.gui;
-                gui.drawHoveringText(matrixStack, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().font);
+                gui.drawHoveringText(graphics, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().font);
             }
         });
         com.mojang.blaze3d.platform.Lighting.setupForFlatItems();

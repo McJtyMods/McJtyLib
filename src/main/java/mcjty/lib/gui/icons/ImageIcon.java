@@ -1,7 +1,7 @@
 package mcjty.lib.gui.icons;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 
@@ -113,13 +113,12 @@ public class ImageIcon implements IIcon, Cloneable {
     }
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, image);
-        gui.blit(matrixStack, x, y, u, v, width, height);
+        graphics.blit(image, x, y, u, v, width, height);
         if (overlays != null) {
             for (IIcon icon : overlays) {
-                icon.draw(gui, matrixStack, x, y);
+                icon.draw(gui, graphics, x, y);
             }
         }
     }

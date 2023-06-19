@@ -1,6 +1,5 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
@@ -10,6 +9,7 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
@@ -138,11 +138,11 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     @Override
-    public void draw(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
-        super.draw(gui, matrixStack, x, y);
+        super.draw(gui, graphics, x, y);
 
         int xx = x + bounds.x;
         int yy = y + bounds.y;
@@ -150,26 +150,26 @@ public class IconHolder extends AbstractWidget<IconHolder> {
         if (border > 0) {
             if (borderColor != null) {
                 if ((!selectable) || window.getTextFocus() != this) {
-                    RenderHelper.drawFlatBox(matrixStack, xx, yy, xx + bounds.width, yy + bounds.height, borderColor, -1);
+                    RenderHelper.drawFlatBox(graphics, xx, yy, xx + bounds.width, yy + bounds.height, borderColor, -1);
                 }
             }
         }
 
         if (icon != null) {
-            icon.draw(gui, matrixStack, xx + border, yy + border);
+            icon.draw(gui, graphics, xx + border, yy + border);
         }
     }
 
     @Override
-    public void drawPhase2(Screen gui, PoseStack matrixStack, int x, int y) {
+    public void drawPhase2(Screen gui, GuiGraphics graphics, int x, int y) {
         if (!visible) {
             return;
         }
-        super.drawPhase2(gui, matrixStack, x, y);
+        super.drawPhase2(gui, graphics, x, y);
         if (border > 0 && selectable && selectedBorderColor != null && window.getTextFocus() == this) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            RenderHelper.drawFlatBox(matrixStack, xx, yy, xx + bounds.width, yy + bounds.height, selectedBorderColor, -1);
+            RenderHelper.drawFlatBox(graphics, xx, yy, xx + bounds.width, yy + bounds.height, selectedBorderColor, -1);
         }
     }
 

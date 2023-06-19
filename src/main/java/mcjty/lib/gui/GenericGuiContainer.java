@@ -20,8 +20,10 @@ import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
 import mcjty.lib.varia.Tools;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -35,7 +37,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
@@ -117,12 +119,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void renderLabels(@Nonnull PoseStack matrixStack, int p_230451_2_, int p_230451_3_) {
-        getWindowManager().drawTooltips(matrixStack);
+    protected void renderLabels(@Nonnull GuiGraphics graphics, int p_230451_2_, int p_230451_3_) {
+        getWindowManager().drawTooltips(graphics);
     }
 
-    public void drawHoveringText(PoseStack matrixStack, List<String> textLines, List<ItemStack> items, int x, int y, Font font) {
+    public void drawHoveringText(GuiGraphics graphics, List<String> textLines, List<ItemStack> items, int x, int y, Font font) {
         if (!textLines.isEmpty()) {
+            PoseStack matrixStack = graphics.pose();
             matrixStack.pushPose();
             // @todo 1.17 RenderSystem.disableRescaleNormal();
             // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
@@ -184,22 +187,22 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 //            setBlitOffset(300);
 //            this.itemRenderer.blitOffset = 300.0F;
             int l = -267386864;
-            this.fillGradient(matrixStack, xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
-            this.fillGradient(matrixStack, xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
-            this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy + k + 3, l, l);
-            this.fillGradient(matrixStack, xx - 4, yy - 3, xx - 3, yy + k + 3, l, l);
-            this.fillGradient(matrixStack, xx + i + 3, yy - 3, xx + i + 4, yy + k + 3, l, l);
+            graphics.fillGradient(xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
+            graphics.fillGradient(xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
+            graphics.fillGradient(xx - 3, yy - 3, xx + i + 3, yy + k + 3, l, l);
+            graphics.fillGradient(xx - 4, yy - 3, xx - 3, yy + k + 3, l, l);
+            graphics.fillGradient(xx + i + 3, yy - 3, xx + i + 4, yy + k + 3, l, l);
             int i1 = 1347420415;
             int j1 = (i1 & 16711422) >> 1 | i1 & -16777216;
-            this.fillGradient(matrixStack, xx - 3, yy - 3 + 1, xx - 3 + 1, yy + k + 3 - 1, i1, j1);
-            this.fillGradient(matrixStack, xx + i + 2, yy - 3 + 1, xx + i + 3, yy + k + 3 - 1, i1, j1);
-            this.fillGradient(matrixStack, xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
-            this.fillGradient(matrixStack, xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
+            graphics.fillGradient(xx - 3, yy - 3 + 1, xx - 3 + 1, yy + k + 3 - 1, i1, j1);
+            graphics.fillGradient(xx + i + 2, yy - 3 + 1, xx + i + 3, yy + k + 3 - 1, i1, j1);
+            graphics.fillGradient(xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
+            graphics.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
 //            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
             matrixStack.translate(0.0D, 0.0D, 300.0f);
 
-            renderTextLines(matrixStack, textLines, items, font, xx, yy);
+            renderTextLines(graphics, textLines, items, font, xx, yy);
 
             // @todo 1.19.4
 //            setBlitOffset(0);
@@ -212,7 +215,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
-    private void renderTextLines(PoseStack matrixStack, List<String> textLines, List<ItemStack> items, Font font, int xx, int yy) {
+    private void renderTextLines(GuiGraphics graphics, List<String> textLines, List<ItemStack> items, Font font, int xx, int yy) {
         for (int i = 0; i < textLines.size(); ++i) {
             String s1 = textLines.get(i);
             if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
@@ -221,10 +224,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 boolean lineHasItemStacks = false;
                 for (Object o : list) {
                     if (o instanceof String s2) {
-                        font.drawShadow(matrixStack, s2, curx, yy, -1);
+                        font.drawInBatch(s2, curx, yy, 0xffffff, true, graphics.pose().last().pose(), graphics.bufferSource(), Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         curx += font.width(s2);
                     } else {
-                        RenderHelper.renderObject(matrixStack, curx + 1, yy, o, false);
+                        RenderHelper.renderObject(graphics, curx + 1, yy, o, false);
                         curx += 20;
                         lineHasItemStacks = true;
                     }
@@ -233,7 +236,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                     yy += 8;
                 }
             } else {
-                font.drawShadow(matrixStack, s1, xx, yy, -1);
+                font.drawInBatch(s1, xx, yy, 0xffffff, true, graphics.pose().last().pose(), graphics.bufferSource(), Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
             }
 
             if (i == 0) {
@@ -245,34 +248,35 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void renderBg(@Nonnull PoseStack matrixStack, float partialTicks, int x, int y) {
-        drawWindow(matrixStack);
+    protected void renderBg(@Nonnull GuiGraphics graphics, float partialTicks, int x, int y) {
+        drawWindow(graphics);
     }
 
-    protected void drawWindow(PoseStack matrixStack) {
+    protected void drawWindow(GuiGraphics graphics) {
         if (window == null) {
             return;
         }
-        renderBackground(matrixStack);
+        renderBackground(graphics);
         getWindowManager().syncBindings(tileEntity);
-        getWindowManager().draw(matrixStack);
+        getWindowManager().draw(graphics);
     }
 
     @Override
-    public void render(@Nonnull PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
         if (window == null) {
             return;
         }
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrixStack, mouseX, mouseY);
-        drawStackTooltips(matrixStack, mouseX, mouseY);
+        super.render(graphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(graphics, mouseX, mouseY);
+        drawStackTooltips(graphics, mouseX, mouseY);
     }
 
+
     @Override
-    public void renderSlot(@Nonnull PoseStack matrixStack, @Nonnull Slot slot) {
+    public void renderSlot(@Nonnull GuiGraphics graphics, @Nonnull Slot slot) {
         // Prevent slots from being rendered if they are (partially) covered by a modal window
         if (!isPartiallyCoveredByModalWindow(slot)) {
-            super.renderSlot(matrixStack, slot);
+            super.renderSlot(graphics, slot);
         }
     }
 
@@ -308,7 +312,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     /**
      * Draw tooltips for itemstacks that are in BlockRender widgets
      */
-    protected void drawStackTooltips(PoseStack matrixStack, int mouseX, int mouseY) {
+    protected void drawStackTooltips(GuiGraphics graphics, int mouseX, int mouseY) {
         int x = GuiTools.getRelativeX(window.getGui());
         int y = GuiTools.getRelativeY(window.getGui());
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
@@ -325,7 +329,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 itemStack = ItemStack.EMPTY;
             }
             if (!itemStack.isEmpty()) {
-                customRenderToolTip(matrixStack, blockRender, itemStack, mouseX, mouseY);
+                customRenderToolTip(graphics, blockRender, itemStack, mouseX, mouseY);
             }
         }
     }
@@ -334,7 +338,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         return oldList;
     }
 
-    protected void customRenderToolTip(PoseStack matrixStack, BlockRender blockRender, ItemStack stack, int x, int y) {
+    protected void customRenderToolTip(GuiGraphics graphics, BlockRender blockRender, ItemStack stack, int x, int y) {
         List<Component> list;
         //noinspection ConstantConditions
         if (stack.getItem() == null) {
@@ -347,7 +351,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
         list = addCustomLines(list, blockRender, stack);
 
-        renderTooltip(matrixStack, list, Optional.empty(), x, y, stack);
+        // @todo 1.20 is this right?
+        graphics.renderTooltip(this.getMinecraft().font, list, Optional.empty(), stack, x, y);
     }
 
     @Override
@@ -503,7 +508,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        tileEntity.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> {
+        tileEntity.getCapability(ForgeCapabilities.ENERGY).ifPresent(e -> {
             energyBar.maxValue(((GenericEnergyStorage)e).getCapacity());
             energyBar.value(((GenericEnergyStorage)e).getEnergy());
         });

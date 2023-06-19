@@ -5,19 +5,17 @@ import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 public enum CapType {
-    ITEMS(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY),
-    ITEMS_AUTOMATION(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY),
+    ITEMS(ForgeCapabilities.ITEM_HANDLER),
+    ITEMS_AUTOMATION(ForgeCapabilities.ITEM_HANDLER),
     CONTAINER(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY),
-    ENERGY(CapabilityEnergy.ENERGY),
+    ENERGY(ForgeCapabilities.ENERGY),
     INFUSABLE(CapabilityInfusable.INFUSABLE_CAPABILITY),
     MODULE(CapabilityModuleSupport.MODULE_CAPABILITY),
     POWER_INFO(CapabilityPowerInformation.POWER_INFORMATION_CAPABILITY),
-    FLUIDS(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY);
+    FLUIDS(ForgeCapabilities.FLUID_HANDLER);
 
     private final Capability capability;
 

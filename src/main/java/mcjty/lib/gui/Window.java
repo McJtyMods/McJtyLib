@@ -21,6 +21,7 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -337,7 +338,7 @@ public class Window {
         bindings.entrySet().forEach(entry -> entry.getKey().setGenericValue(entry.getValue().apply(te)));
     }
 
-    public void draw(PoseStack matrixStack) {
+    public void draw(GuiGraphics graphics) {
         int x = getRelativeX();
         int y = getRelativeY();
 
@@ -365,8 +366,8 @@ public class Window {
         currentStyle = McJtyLib.getPreferencesProperties(gui.getMinecraft().player).map(PreferencesProperties::getStyle).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
 
         toplevel.setWindow(this);
-        toplevel.draw(gui, matrixStack, 0, 0);
-        toplevel.drawPhase2(gui, matrixStack, 0, 0);
+        toplevel.draw(gui, graphics, 0, 0);
+        toplevel.drawPhase2(gui, graphics, 0, 0);
     }
 
     public GuiStyle getCurrentStyle() {
