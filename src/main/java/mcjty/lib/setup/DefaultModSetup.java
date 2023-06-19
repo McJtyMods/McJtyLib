@@ -1,8 +1,6 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.api.ITabExpander;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,32 +31,22 @@ public abstract class DefaultModSetup {
     protected abstract void setupModCompat();
 
     /**
-     * Call this in the ModSetup constructor
+     * Call this from within the creative tab registry object
      */
-    protected void createTab(String modid, String name, Supplier<ItemStack> stack) {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        bus.addListener((BuildCreativeModeTabContentsEvent event) -> {
-            // @todo 1.20
-//            event.registerCreativeModeTab(new ResourceLocation(modid, name), builder -> {
-//                builder.title(Component.translatable("itemGroup." + name))
-//                        .icon(stack::get)
-//                        .displayItems((enabledFeatures, output) -> {
-//                            tabItems.forEach(s -> {
-//                                boolean todo = true;
-//                                ItemStack st = s.get();
-//                                if (st.getItem() instanceof ITabExpander expander) {
-//                                    List<ItemStack> itemsForTab = expander.getItemsForTab();
-//                                    if (!itemsForTab.isEmpty()) {
-//                                        todo = false;
-//                                        itemsForTab.forEach(output::accept);
-//                                    }
-//                                }
-//                                if (todo) {
-//                                    output.accept(st);
-//                                }
-//                            });
-//                        });
-//            });
+    public void populateTab(CreativeModeTab.Output output) {
+        tabItems.forEach(s -> {
+            boolean todo = true;
+            ItemStack st = s.get();
+            if (st.getItem() instanceof ITabExpander expander) {
+                List<ItemStack> itemsForTab = expander.getItemsForTab();
+                if (!itemsForTab.isEmpty()) {
+                    todo = false;
+                    itemsForTab.forEach(output::accept);
+                }
+            }
+            if (todo) {
+                output.accept(st);
+            }
         });
     }
 
