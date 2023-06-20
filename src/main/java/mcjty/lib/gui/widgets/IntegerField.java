@@ -359,9 +359,9 @@ public class IntegerField extends AbstractWidget<IntegerField> {
         int textY = y + calculateVerticalOffset() + bounds.y;
         if (isEnabled()) {
             if (isEditable()) {
-                graphics.drawString(mc.font, renderedText, textX, textY, 0xff000000);
+                graphics.drawString(mc.font, renderedText, textX, textY, 0xff000000, false);
             } else {
-                graphics.drawString(mc.font, renderedText, textX, textY, 0xff333333);
+                graphics.drawString(mc.font, renderedText, textX, textY, 0xff333333, false);
             }
 
             if (isRegionSelected()) {
@@ -378,7 +378,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                 RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.font.lineHeight, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
             }
         } else {
-            graphics.drawString(mc.font, renderedText, textX, textY, 0xffa0a0a0);
+            graphics.drawString(mc.font, renderedText, textX, textY, 0xffa0a0a0, false);
         }
 
         if (window.getTextFocus() == this) {

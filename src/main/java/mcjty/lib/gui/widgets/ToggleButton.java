@@ -80,7 +80,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
             if (checkMarker) {
                 RenderHelper.drawBeveledBox(graphics, xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
                 if (pressed) {
-                    graphics.drawString(mc.font, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal);
+                    graphics.drawString(mc.font, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal, false);
                 }
             }
         } else {
@@ -88,7 +88,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
             if (checkMarker) {
                 RenderHelper.drawBeveledBox(graphics, xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
                 if (pressed) {
-                    graphics.drawString(mc.font, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled);
+                    graphics.drawString(mc.font, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled, false);
                 }
             }
         }

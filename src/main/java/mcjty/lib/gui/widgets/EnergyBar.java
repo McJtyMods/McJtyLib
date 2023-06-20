@@ -196,7 +196,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             } else {
                 s = currentValue + "/" + maximum;
             }
-            graphics.drawString(mc.font, mc.font.plainSubstrByWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.font.lineHeight)/2, getTextColor());
+            graphics.drawString(mc.font, mc.font.plainSubstrByWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.font.lineHeight)/2, getTextColor(), false);
         }
     }
 

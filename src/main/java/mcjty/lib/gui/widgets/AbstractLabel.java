@@ -160,9 +160,9 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         }
 
         if (text == null) {
-            graphics.drawString(mc.font, "", x+dx+bounds.x, y+dy+bounds.y, col);
+            graphics.drawString(mc.font, "", x+dx+bounds.x, y+dy+bounds.y, col, false);
         } else {
-            graphics.drawString(mc.font, mc.font.plainSubstrByWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col);
+            graphics.drawString(mc.font, mc.font.plainSubstrByWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col, false);
         }
     }
 

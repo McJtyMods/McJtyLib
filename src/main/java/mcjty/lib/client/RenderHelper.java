@@ -870,7 +870,7 @@ public class RenderHelper {
         GlStateManager._disableBlend();
         Minecraft mc = Minecraft.getInstance();
         int width = mc.font.width(txt);
-        graphics.drawString(mc.font, txt, x, y, color);
+        graphics.drawString(mc.font, txt, x, y, color, false);
         // @todo 1.17 GlStateManager._enableLighting();
         GlStateManager._enableDepthTest();
         // Fixes opaque cooldown overlay a bit lower

@@ -140,7 +140,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 }
                 int h = mc.font.lineHeight;
                 int dy = (bounds.height - h)/2;
-                graphics.drawString(mc.font, name, xx+20, yy + dy, getLabelColor());
+                graphics.drawString(mc.font, name, xx+20, yy + dy, getLabelColor(), false);
             }
         }
     }
