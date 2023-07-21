@@ -349,7 +349,7 @@ public class RenderHelper {
 //            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
 
             graphics.renderItem(itm, x, y, x * y * 31);
-            graphics.renderItemDecorations(Minecraft.getInstance().font, itm, x, y, null);
+//            graphics.renderItemDecorations(Minecraft.getInstance().font, itm, x, y, null);
 //            itemRender.renderAndDecorateItem(matrixStack, itm, x, y);
 
             renderGuiItemDecorations(itemRender, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
@@ -368,7 +368,7 @@ public class RenderHelper {
                 String s = text == null ? String.valueOf(stack.getCount()) : text;
                 // @todo 1.19.4
 //                posestack.translate(0.0D, 0.0D, itemRender.blitOffset + 200.0F);
-                posestack.translate(0.0D, 0.0D, 300.0f + 200.0F);
+                posestack.translate(0.0D, 0.0D, 180.0f + 200.0F);
 
                 MultiBufferSource.BufferSource source = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
