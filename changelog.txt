@@ -1,5 +1,6 @@
 Upcoming:
 - Fixed a bug with rendering labels on itemstacks. Affected for example the RFTools Storage scanner
+- Fixed several recipes (storage modules, powercells, ...)
 
 1.20-8.0.0:
 - Port to 1.20
