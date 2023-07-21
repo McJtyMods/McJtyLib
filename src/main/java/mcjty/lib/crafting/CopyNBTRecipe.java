@@ -58,7 +58,7 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
 
     @Override
     public ItemStack getResultItem(RegistryAccess access) {
-        return ItemStack.EMPTY; // @todo 1.19.4 is this right
+        return getRecipe().getResultItem(access);
     }
 
     @Override
