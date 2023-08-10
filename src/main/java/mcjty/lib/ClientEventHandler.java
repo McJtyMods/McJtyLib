@@ -133,6 +133,8 @@ public class ClientEventHandler {
     // @todo 1.20 correct event?
     @SubscribeEvent
     public void onGameRenderOverlay(RenderLevelStageEvent e) {
-        DelayedRenderer.render(e.getPoseStack());
+        if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_SOLID_BLOCKS) {
+            DelayedRenderer.render(e.getPoseStack());
+        }
     }
 }
