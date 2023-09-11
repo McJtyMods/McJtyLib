@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed patchouli integration
+
 1.20-8.0.2:
 - Fixed a bug with rendering (affected the mover for example)
 
