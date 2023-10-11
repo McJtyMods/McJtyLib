@@ -20,7 +20,6 @@ import mcjty.lib.varia.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -210,7 +209,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     protected boolean wrenchSneak(Level world, BlockPos pos, Player player) {
-        // @todo
         breakAndRemember(world, player, pos);
         return true;
     }
@@ -334,7 +332,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        // @todo 1.18 figure out a way to only return a ticker client/server if needed
         return BaseBlock::runTick;
     }
 
@@ -452,18 +449,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @Override
     public List<ItemStack> getItemsForTab() {
-        // @todo 1.19.3
         return Collections.emptyList();
     }
-
-    //    @Override
-//    public void fillItemCategory(@Nonnull CreativeModeTab group, @Nonnull NonNullList<ItemStack> items) {
-//        List<ItemStack> stacks = getItemsForTab();
-//        if (stacks.isEmpty()) {
-//             super.fillItemCategory(group, items);
-//        } else {
-//             items.addAll(stacks);
-//        }
-//    }
-
 }

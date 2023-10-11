@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem with the hud renderer having wrong orientation
+
 1.20-8.0.3:
 - Fixed patchouli integration
 

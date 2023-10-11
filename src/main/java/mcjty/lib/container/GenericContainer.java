@@ -501,7 +501,6 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             }
             return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> Objects.requireNonNull(h.createMenu(windowId, inv, inv.player))).orElseThrow(RuntimeException::new);
         });
-//        containerType.setRegistryName(registryName); @todo 1.19
         return containerType;
     }
 

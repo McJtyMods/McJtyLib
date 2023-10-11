@@ -95,9 +95,9 @@ public class HudRenderHelper {
 
         if (orientation != null) {
             f3 = switch (orientation) {
-                case NORTH -> 180.0F;
-                case WEST -> 90.0F;
-                case EAST -> -90.0F;
+                case NORTH -> (float)Math.PI;
+                case WEST -> (float)Math.PI / 2.0f;
+                case EAST -> -(float)Math.PI / 2.0f;
                 default -> 0.0f;
             };
         }
@@ -128,7 +128,7 @@ public class HudRenderHelper {
                     String prefix = "";
                     if (!stack.isEmpty()) {
                         matrixStack.pushPose();
-                        matrixStack.translate(14f, currenty +4f, 0);
+                        matrixStack.translate(14f, currenty + 4f, 0);
                         matrixStack.scale(10, -10, 16);
 //                        matrixStack.translate(0, 0, -150);
                         // @todo 1.15 this needs more work! we ignore 'currenty'!
