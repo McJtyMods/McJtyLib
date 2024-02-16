@@ -56,7 +56,7 @@ public class DumpBlockNBT {
         Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, "### Client side ###");
         Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, output);
         if (network != null) {
-            network.sendToServer(new PacketDumpBlockInfo(world, pos, verbose));
+            network.sendToServer(PacketDumpBlockInfo.create(world, pos, verbose));
         }
     }
 
@@ -76,7 +76,7 @@ public class DumpBlockNBT {
         Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, "### Client side ###");
         Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, output);
         if (network != null) {
-            network.sendToServer(new PacketDumpBlockInfo(player.getCommandSenderWorld(), ((BlockHitResult) result).getBlockPos(), verbose));
+            network.sendToServer(PacketDumpBlockInfo.create(player.getCommandSenderWorld(), ((BlockHitResult) result).getBlockPos(), verbose));
         }
     }
 }

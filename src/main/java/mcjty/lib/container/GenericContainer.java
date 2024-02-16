@@ -460,7 +460,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 ByteBuf newbuf = Unpooled.buffer();
                 FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
                 data.toBytes(buffer);
-                PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
+                PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
                 McJtyLib.networkHandler.sendTo(packet, serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             }
         }
@@ -485,7 +485,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                     ByteBuf newbuf = Unpooled.buffer();
                     FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
                     data.toBytes(buffer);
-                    PacketContainerDataToClient packet = new PacketContainerDataToClient(data.getId(), buffer);
+                    PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
                     McJtyLib.networkHandler.sendTo(packet, serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                 }
             }

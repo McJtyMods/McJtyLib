@@ -1,48 +1,48 @@
 package mcjty.lib.network;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.compat.patchouli.PatchouliCompatibility;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Open the manual
  */
-public class PacketOpenManual {
+public record PacketOpenManual(ResourceLocation manual, ResourceLocation entry, Integer page) implements CustomPacketPayload {
 
-    private final ResourceLocation manual;
-    private final ResourceLocation entry;
-    private final int page;
+    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "openmanual");
 
-    public PacketOpenManual(FriendlyByteBuf buf) {
-        manual = buf.readResourceLocation();
-        entry = buf.readResourceLocation();
-        page = buf.readInt();
+    public static PacketOpenManual create(FriendlyByteBuf buf) {
+        ResourceLocation manual = buf.readResourceLocation();
+        ResourceLocation entry = buf.readResourceLocation();
+        Integer page = buf.readInt();
+        return new PacketOpenManual(manual, entry, page);
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    public static Object create(ResourceLocation manual, ResourceLocation entry, int page) {
+        return new PacketOpenManual(manual, entry, page);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeResourceLocation(manual);
         buf.writeResourceLocation(entry);
         buf.writeInt(page);
     }
 
-    public PacketOpenManual(ResourceLocation manual, ResourceLocation entry, int page) {
-        this.manual = manual;
-        this.entry = entry;
-        this.page = page;
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> handle(this, ctx.get()));
-        ctx.get().setPacketHandled(true);
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> handle(this, ctx));
     }
 
-    private static void handle(PacketOpenManual message, NetworkEvent.Context ctx) {
-        ServerPlayer playerEntity = ctx.getSender();
-        PatchouliCompatibility.openBookEntry(playerEntity, message.manual, message.entry, message.page);
+    private static void handle(PacketOpenManual message, PlayPayloadContext ctx) {
+        ctx.player().ifPresent(player -> {
+            PatchouliCompatibility.openBookEntry((ServerPlayer) player, message.manual, message.entry, message.page);
+        });
     }
 }

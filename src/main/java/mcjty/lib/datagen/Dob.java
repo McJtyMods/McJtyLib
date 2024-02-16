@@ -126,7 +126,7 @@ public record Dob(
             return this;
         }
 
-        public Builder standardLoot(@SuppressWarnings("rawtypes") RegistryObject be) {
+        public Builder standardLoot(@SuppressWarnings("rawtypes") Supplier be) {
             this.loot = f -> f.addStandardTable(blockSupplier.get(), (BlockEntityType<?>) be.get());
             return this;
         }

@@ -1,8 +1,10 @@
 package mcjty.lib.network;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.debugtools.DumpBlockNBT;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.LevelTools;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.MinecraftServer;
@@ -18,45 +20,47 @@ import java.util.function.Supplier;
 /**
  * Debug packet to dump block info
  */
-public class PacketDumpBlockInfo {
+public record PacketDumpBlockInfo(ResourceKey<Level> dimid, BlockPos pos, Boolean verbose) implements CustomPacketPayload {
 
-    private final ResourceKey<Level> dimid;
-    private final BlockPos pos;
-    private final boolean verbose;
+    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "dumpblockinfo");
 
-    public void toBytes(FriendlyByteBuf buf) {
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeResourceLocation(dimid.location());
         buf.writeBlockPos(pos);
         buf.writeBoolean(verbose);
     }
 
-    public PacketDumpBlockInfo(FriendlyByteBuf buf) {
-        dimid = LevelTools.getId(buf.readResourceLocation());
-        pos = buf.readBlockPos();
-        verbose = buf.readBoolean();
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public PacketDumpBlockInfo(Level world, BlockPos pos, boolean verbose) {
-        this.dimid = world.dimension();
-        this.pos = pos;
-        this.verbose = verbose;
+    public static PacketDumpBlockInfo create(FriendlyByteBuf buf) {
+        ResourceKey<Level> dimid = LevelTools.getId(buf.readResourceLocation());
+        BlockPos pos = buf.readBlockPos();
+        boolean verbose = buf.readBoolean();
+        return new PacketDumpBlockInfo(dimid, pos, verbose);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
-            ServerPlayer player = ctx.getSender();
-            MinecraftServer server = player.getCommandSenderWorld().getServer();
-            ServerOpList oppedPlayers = server.getPlayerList().getOps();
-            ServerOpListEntry entry = oppedPlayers.get(player.getGameProfile());
-            int perm = entry == null ? server.getOperatorUserPermissionLevel() : entry.getLevel();
-            if (perm >= 1) {
-                Level world = LevelTools.getLevel(player.level(), dimid);
-                String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
-                Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, "### Server side ###");
-                Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, output);
-            }
+    public static PacketDumpBlockInfo create(Level world, BlockPos pos, boolean verbose) {
+        return new PacketDumpBlockInfo(world.dimension(), pos, verbose);
+    }
+
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
+            ctx.player().ifPresent(player -> {
+                MinecraftServer server = player.getCommandSenderWorld().getServer();
+                ServerOpList oppedPlayers = server.getPlayerList().getOps();
+                ServerOpListEntry entry = oppedPlayers.get(player.getGameProfile());
+                int perm = entry == null ? server.getOperatorUserPermissionLevel() : entry.getLevel();
+                if (perm >= 1) {
+                    Level world = LevelTools.getLevel(player.level(), dimid);
+                    String output = DumpBlockNBT.dumpBlockNBT(world, pos, verbose);
+                    Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, "### Server side ###");
+                    Logging.getLogger().log(org.apache.logging.log4j.Level.INFO, output);
+                }
+            });
         });
-        ctx.setPacketHandled(true);
     }
 }

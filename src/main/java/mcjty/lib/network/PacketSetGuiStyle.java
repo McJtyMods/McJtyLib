@@ -2,6 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -10,30 +11,35 @@ import java.util.function.Supplier;
 /**
  * Change the GUI style.
  */
-public class PacketSetGuiStyle {
+public record PacketSetGuiStyle(String style) implements CustomPacketPayload {
 
-    // Package visible for unit tests
-    private final String style;
+    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "setguistyle");
 
-    public PacketSetGuiStyle(FriendlyByteBuf buf) {
-        style = buf.readUtf(32767);
+    public static PacketSetGuiStyle create(FriendlyByteBuf buf) {
+        return new PacketSetGuiStyle(buf.readUtf(32767));
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    public static PacketSetGuiStyle create(String style) {
+        return new PacketSetGuiStyle(style);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeUtf(style);
     }
 
-    public PacketSetGuiStyle(String style) {
-        this.style = style;
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> handle(this, ctx.get()));
-        ctx.get().setPacketHandled(true);
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> handle(this, ctx));
     }
 
-    private static void handle(PacketSetGuiStyle message, NetworkEvent.Context ctx) {
-        ServerPlayer playerEntity = ctx.getSender();
-        McJtyLib.getPreferencesProperties(playerEntity).ifPresent(p -> p.setStyle(message.style));
+    private static void handle(PacketSetGuiStyle message, PlayPayloadContext ctx) {
+        ctx.player().ifPresent(player -> {
+            McJtyLib.getPreferencesProperties(player).ifPresent(p -> p.setStyle(message.style));
+        });
     }
 }

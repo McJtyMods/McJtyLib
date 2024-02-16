@@ -34,7 +34,7 @@ public class PreferencesProperties {
     }
 
     private void syncToClient(ServerPlayer player) {
-        McJtyLib.networkHandler.sendTo(new PacketSendPreferencesToClient(buffStyle, buffX, buffY, style), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        McJtyLib.networkHandler.sendTo(PacketSendPreferencesToClient.create(buffStyle, buffX, buffY, style), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         dirty = false;
     }
 

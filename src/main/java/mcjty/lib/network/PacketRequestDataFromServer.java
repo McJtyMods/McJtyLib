@@ -1,41 +1,47 @@
 package mcjty.lib.network;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.blockcommands.ICommand;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.simple.SimpleChannel;
-
-import java.util.function.Supplier;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
  * a tile entity on the server that has a ResultCommand annotated with @ServerCommand
  */
-public class PacketRequestDataFromServer {
-    protected BlockPos pos;
-    private final ResourceKey<Level> type;
-    protected String command;
-    protected TypedMap params;
-    private final boolean dummy;
+public record PacketRequestDataFromServer(ResourceKey<Level> type, BlockPos pos, String command, TypedMap params, boolean dummy) implements CustomPacketPayload {
 
-    public PacketRequestDataFromServer(FriendlyByteBuf buf) {
-        pos = buf.readBlockPos();
-        type = LevelTools.getId(buf.readResourceLocation());
-        command = buf.readUtf(32767);
-        params = TypedMapTools.readArguments(buf);
-        dummy = buf.readBoolean();
+    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "requestdatafromserver");
+
+    public static PacketRequestDataFromServer create(FriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        ResourceKey<Level> type = LevelTools.getId(buf.readResourceLocation());
+        String command = buf.readUtf(32767);
+        TypedMap params = TypedMapTools.readArguments(buf);
+        boolean dummy = buf.readBoolean();
+        return new PacketRequestDataFromServer(type, pos, command, params, dummy);
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    public static PacketRequestDataFromServer create(ResourceKey<Level> type, BlockPos pos, String command, TypedMap params, boolean dummy) {
+        return new PacketRequestDataFromServer(type, pos, command, params, dummy);
+    }
+
+    public static PacketRequestDataFromServer create(ResourceKey<Level> type, BlockPos pos, ICommand command, TypedMap params, boolean dummy) {
+        return new PacketRequestDataFromServer(type, pos, command.name(), params, dummy);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
         buf.writeResourceLocation(type.location());
         buf.writeUtf(command);
@@ -43,39 +49,34 @@ public class PacketRequestDataFromServer {
         buf.writeBoolean(dummy);
     }
 
-    public PacketRequestDataFromServer(ResourceKey<Level> type, BlockPos pos, String command, TypedMap params, boolean dummy) {
-        this.type = type;
-        this.pos = pos;
-        this.command = command;
-        this.params = params;
-        this.dummy = dummy;
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public PacketRequestDataFromServer(ResourceKey<Level> type, BlockPos pos, ICommand command, TypedMap params, boolean dummy) {
-        this.type = type;
-        this.pos = pos;
-        this.command = command.name();
-        this.params = params;
-        this.dummy = dummy;
-    }
-
-    public void handle(SimpleChannel channel, Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
-            Level world = LevelTools.getLevel(ctx.getSender().getCommandSenderWorld(), type);
-            if (world.hasChunkAt(pos)) {
-                if (world.getBlockEntity(pos) instanceof GenericTileEntity generic) {
-                    TypedMap result = generic.executeServerCommandWR(command, ctx.getSender(), params);
-                    if (result != null) {
-                        PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
-                        channel.sendTo(msg, ctx.getSender().connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-                        return;
+    public void handle(SimpleChannel channel, PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
+            ctx.player().ifPresent(player -> {
+                Level world = LevelTools.getLevel(player.getCommandSenderWorld(), type);
+                if (world.hasChunkAt(pos)) {
+                    if (world.getBlockEntity(pos) instanceof GenericTileEntity generic) {
+                        TypedMap result = generic.executeServerCommandWR(command, player, params);
+                        if (result != null) {
+                            PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
+                            channel.sendTo(msg, ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                            return;
+                        }
                     }
-                }
 
-                Logging.log("Command " + command + " was not handled!");
-            }
+                    Logging.log("Command " + command + " was not handled!");
+                }
+            });
         });
-        ctx.setPacketHandled(true);
     }
+
+    public static void register(SimpleChannel net, int id) {
+        net.registerMessage(id, PacketRequestDataFromServer.class, PacketRequestDataFromServer::write, PacketRequestDataFromServer::create, new ChannelBoundHandler<>(net,
+                (packet, channel, contextSupplier) -> packet.handle(channel, new PlayPayloadContext(contextSupplier))));
+    }
+
 }

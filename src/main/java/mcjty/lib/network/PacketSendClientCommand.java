@@ -1,20 +1,17 @@
 package mcjty.lib.network;
 
+import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.resources.ResourceLocation;
 
-import javax.annotation.Nonnull;
-import java.util.function.Supplier;
+public record PacketSendClientCommand(String modid, String command, TypedMap arguments) implements CustomPacketPayload {
 
-@SuppressWarnings("ALL")
-public class PacketSendClientCommand {
+    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "sendclientcommand");
 
-    // Package visible for unit tests
-    String modid;
-    String command;
-    TypedMap arguments;
-
+    public static PacketSendClientCommand create(String modid, String cmdFlashEndergenic, TypedMap build) {
+        return new PacketSendClientCommand(modid, cmdFlashEndergenic, build);
+    }
 
     public String getModid() {
         return modid;
@@ -28,29 +25,28 @@ public class PacketSendClientCommand {
         return arguments;
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeUtf(modid);
         buf.writeUtf(command);
         TypedMapTools.writeArguments(buf, arguments);
     }
 
-    public PacketSendClientCommand(FriendlyByteBuf buf) {
-        modid = buf.readUtf(32767);
-        command = buf.readUtf(32767);
-        arguments = TypedMapTools.readArguments(buf);
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public PacketSendClientCommand(String modid, String command, @Nonnull TypedMap arguments) {
-        this.modid = modid;
-        this.command = command;
-        this.arguments = arguments;
+    public static PacketSendClientCommand create(FriendlyByteBuf buf) {
+        String modid = buf.readUtf(32767);
+        String command = buf.readUtf(32767);
+        TypedMap arguments = TypedMapTools.readArguments(buf);
+        return new PacketSendClientCommand(modid, command, arguments);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
             ClientCommandHandlerHelper.handle(this);
         });
-        ctx.setPacketHandled(true);
     }
 }

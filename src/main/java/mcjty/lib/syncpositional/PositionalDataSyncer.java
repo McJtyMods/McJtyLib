@@ -111,7 +111,7 @@ public class PositionalDataSyncer {
                 McJtyLib.networkHandler.send(PacketDistributor.TRACKING_CHUNK.with(() -> {
                     ServerLevel level = server.getLevel(pos.dimension());
                     return (LevelChunk)(level.getChunk(pos.pos()));
-                }), new PacketSendPositionalDataToClients(pos, entry.getValue()));
+                }), PacketSendPositionalDataToClients.create(pos, entry.getValue()));
             }
             syncTodo.clear();
         }

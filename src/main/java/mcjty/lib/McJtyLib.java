@@ -19,6 +19,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -45,17 +46,19 @@ public class McJtyLib {
     public static final PositionalDataSyncer SYNCER = new PositionalDataSyncer();
 
     public McJtyLib() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        Dist dist = FMLEnvironment.dist;
+
         instance = this;
         // Register the setup method for modloading
         Registration.init();
         FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            IEventBus modbus = FMLJavaModLoadingContext.get().getModEventBus();
-            modbus.addListener(ClientSetup::init);
-            modbus.addListener(ClientSetup::registerKeyBinds);
-            modbus.addListener(ClientSetup::registerClientComponentTooltips);
-//            modbus.addListener(MultipartModelLoader::register);
-        });
+        if (dist.isClient()) {
+            bus.addListener(ClientSetup::init);
+            bus.addListener(ClientSetup::registerKeyBinds);
+            bus.addListener(ClientSetup::registerClientComponentTooltips);
+//            bus.addListener(MultipartModelLoader::register);
+        }
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);

@@ -52,7 +52,7 @@ public class DumpItemNBT {
         Logging.getLogger().log(Level.INFO, "### Client side ###");
         Logging.getLogger().log(Level.INFO, output);
         if (network != null) {
-            network.sendToServer(new PacketDumpItemInfo(verbose));
+            network.sendToServer(PacketDumpItemInfo.create(verbose));
         }
     }
 }

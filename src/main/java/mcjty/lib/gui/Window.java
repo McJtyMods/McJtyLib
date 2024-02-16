@@ -131,7 +131,7 @@ public class Window {
                                 String modidCmd = cmd.getOptionalPar(1, "");
                                 ResourceLocation rl = new ResourceLocation(modidCmd);
                                 event(channel, (source, params) ->
-                                        wrapper.sendToServer(new PacketSendServerCommand(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
+                                        wrapper.sendToServer(PacketSendServerCommand.create(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
                             });
                     command.findCommand("panel").ifPresent(cmd -> {
                         toplevel = new Panel();
@@ -458,7 +458,7 @@ public class Window {
 
     private <T extends GenericTileEntity> void initializeAction(SimpleChannel network, String componentName, String command, T te) {
         event(componentName, (source, params) -> {
-            network.sendToServer(new PacketServerCommandTyped(te.getBlockPos(), te.getDimension(), command, params));
+            network.sendToServer(PacketServerCommandTyped.create(te.getBlockPos(), te.getDimension(), command, params));
         });
     }
 

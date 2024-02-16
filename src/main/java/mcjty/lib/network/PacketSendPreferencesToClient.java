@@ -1,37 +1,39 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 
-import java.util.function.Supplier;
+public record PacketSendPreferencesToClient(BuffStyle buffStyle, Integer buffX, Integer buffY, GuiStyle style) implements CustomPacketPayload {
 
-public class PacketSendPreferencesToClient {
-    private final BuffStyle buffStyle;
-    private final int buffX;
-    private final int buffY;
-    private final GuiStyle style;
+    public final static ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "sendpreferences");
 
-    public PacketSendPreferencesToClient(ByteBuf buf) {
-        buffStyle = BuffStyle.values()[buf.readInt()];
-        buffX = buf.readInt();
-        buffY = buf.readInt();
-        style = GuiStyle.values()[buf.readInt()];
+    public static PacketSendPreferencesToClient create(ByteBuf buf) {
+        BuffStyle buffStyle = BuffStyle.values()[buf.readInt()];
+        int buffX = buf.readInt();
+        int buffY = buf.readInt();
+        GuiStyle style = GuiStyle.values()[buf.readInt()];
+        return new PacketSendPreferencesToClient(buffStyle, buffX, buffY, style);
     }
 
-    public void toBytes(ByteBuf buf) {
+    public static PacketSendPreferencesToClient create(BuffStyle buffStyle, int buffX, int buffY, GuiStyle style) {
+        return new PacketSendPreferencesToClient(buffStyle, buffX, buffY, style);
+    }
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeInt(buffStyle.ordinal());
         buf.writeInt(buffX);
         buf.writeInt(buffY);
         buf.writeInt(style.ordinal());
     }
 
-    public PacketSendPreferencesToClient(BuffStyle buffStyle, int buffX, int buffY, GuiStyle style) {
-        this.buffStyle = buffStyle;
-        this.buffX = buffX;
-        this.buffY = buffY;
-        this.style = style;
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
     public BuffStyle getBuffStyle() {
@@ -50,12 +52,10 @@ public class PacketSendPreferencesToClient {
         return style;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
             SendPreferencesToClientHelper.setPreferences(this);
         });
-        ctx.setPacketHandled(true);
     }
 
 }

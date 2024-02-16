@@ -8,34 +8,32 @@ import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Packet to send back the list to the client. This requires
  * that the command is registered to McJtyLib.registerListCommandInfo
  */
-public class PacketSendResultToClient {
+public record PacketSendResultToClient(BlockPos pos, String command, List list) implements CustomPacketPayload {
 
-    private final BlockPos pos;
-    private final List list;
-    private final String command;
+    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "sendresulttoclient");
 
-    public PacketSendResultToClient(FriendlyByteBuf buf) {
-        pos = buf.readBlockPos();
-        command = buf.readUtf(32767);
+    public static PacketSendResultToClient create(FriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        String command = buf.readUtf(32767);
         CommandInfo<?> info = McJtyLib.getCommandInfo(command);
         if (info == null) {
             throw new IllegalStateException("Command '" + command + "' is not registered!");
         }
         Function<FriendlyByteBuf, ?> deserializer = info.deserializer();
         int size = buf.readInt();
+        List list;
         if (size != -1) {
             list = new ArrayList<>(size);
             for (int i = 0 ; i < size ; i++) {
@@ -44,15 +42,15 @@ public class PacketSendResultToClient {
         } else {
             list = null;
         }
+        return new PacketSendResultToClient(pos, command, list);
     }
 
-    public PacketSendResultToClient(BlockPos pos, String command, List list) {
-        this.pos = pos;
-        this.command = command;
-        this.list = new ArrayList<>(list);
+    public static PacketSendResultToClient create(BlockPos pos, String command, List list) {
+        return new PacketSendResultToClient(pos, command, new ArrayList(list));
     }
 
-    public void toBytes(FriendlyByteBuf buf) {
+    @Override
+    public void write(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
         buf.writeUtf(command);
         CommandInfo<?> info = McJtyLib.getCommandInfo(command);
@@ -73,9 +71,13 @@ public class PacketSendResultToClient {
         }
     }
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
-        ctx.enqueueWork(() -> {
+    @Override
+    public ResourceLocation id() {
+        return ID;
+    }
+
+    public void handle(PlayPayloadContext ctx) {
+        ctx.workHandler().submitAsync(() -> {
             BlockEntity te = SafeClientTools.getClientWorld().getBlockEntity(pos);
             if (te instanceof GenericTileEntity generic) {
                 generic.handleListFromServer(command, SafeClientTools.getClientPlayer(), TypedMap.EMPTY, list);
@@ -83,7 +85,6 @@ public class PacketSendResultToClient {
                 Logging.logError("Can't handle command '" + command + "'!");
             }
         });
-        ctx.setPacketHandled(true);
     }
 
 }

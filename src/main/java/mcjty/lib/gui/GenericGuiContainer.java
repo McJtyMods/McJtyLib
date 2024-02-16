@@ -472,23 +472,23 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public void sendServerCommandTyped(SimpleChannel network, String command, TypedMap params) {
-        network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
+        network.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
     }
 
     public void sendServerCommandTyped(SimpleChannel network, Command<?> command, TypedMap params) {
-        network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), tileEntity.getDimension(), command.name(), params));
+        network.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command.name(), params));
     }
 
     public void sendServerCommandTyped(SimpleChannel network, ResourceKey<Level> dimensionId, String command, TypedMap params) {
-        network.sendToServer(new PacketServerCommandTyped(tileEntity.getBlockPos(), dimensionId, command, params));
+        network.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), dimensionId, command, params));
     }
 
     public void sendServerCommand(SimpleChannel network, String modid, String command, @Nonnull TypedMap arguments) {
-        network.sendToServer(new PacketSendServerCommand(modid, command, arguments));
+        network.sendToServer(PacketSendServerCommand.create(modid, command, arguments));
     }
 
     public void sendServerCommand(SimpleChannel network, String modid, String command) {
-        network.sendToServer(new PacketSendServerCommand(modid, command, TypedMap.EMPTY));
+        network.sendToServer(PacketSendServerCommand.create(modid, command, TypedMap.EMPTY));
     }
 
     // Register a container/gui on the client side

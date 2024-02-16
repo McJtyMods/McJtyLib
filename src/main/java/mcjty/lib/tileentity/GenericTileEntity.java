@@ -526,7 +526,7 @@ public class GenericTileEntity extends BlockEntity {
      * Call this client-side to this TE to request data from the server
      */
     public void requestDataFromServer(SimpleChannel channel, ICommand command, @Nonnull TypedMap params) {
-        channel.sendToServer(new PacketRequestDataFromServer(getDimension(), worldPosition, command.name(), params, false));
+        channel.sendToServer(PacketRequestDataFromServer.create(getDimension(), worldPosition, command.name(), params, false));
     }
 
     /**

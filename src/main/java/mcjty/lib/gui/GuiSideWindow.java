@@ -52,7 +52,7 @@ public class GuiSideWindow {
 
     private void help(Minecraft mc) {
         if (manual != null) {
-            McJtyLib.networkHandler.sendToServer(new PacketOpenManual(manual, manualNode, page));
+            McJtyLib.networkHandler.sendToServer(PacketOpenManual.create(manual, manualNode, page));
         }
     }
 
@@ -66,7 +66,7 @@ public class GuiSideWindow {
             next = 0;
         }
         style = GuiStyle.values()[next];
-        network.sendToServer(new PacketSetGuiStyle(style.getStyle()));
+        network.sendToServer(PacketSetGuiStyle.create(style.getStyle()));
 
         setStyleTooltip();
     }

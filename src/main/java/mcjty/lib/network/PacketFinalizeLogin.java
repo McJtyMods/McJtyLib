@@ -1,26 +1,32 @@
 package mcjty.lib.network;
 
+import mcjty.lib.McJtyLib;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * This is sent from the server to the client after the login has occured so that packets that implement
  * IClientServerDelayed can be sent
  */
-public class PacketFinalizeLogin {
+public record PacketFinalizeLogin() implements CustomPacketPayload {
 
-    public void toBytes(FriendlyByteBuf buf) {
+    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "finalize_login");
+
+    @Override
+    public void write(FriendlyByteBuf buf) {
     }
 
-    public PacketFinalizeLogin(FriendlyByteBuf buf) {
+    @Override
+    public ResourceLocation id() {
+        return ID;
     }
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
-        NetworkEvent.Context ctx = supplier.get();
+    public static PacketFinalizeLogin create(FriendlyByteBuf buf) {
+        return new PacketFinalizeLogin();
+    }
+
+    public void handle(PlayPayloadContext ctx) {
         finalizeClientLogin();
-        ctx.setPacketHandled(true);
     }
 
     private void finalizeClientLogin() {
