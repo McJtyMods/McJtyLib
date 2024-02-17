@@ -1,6 +1,7 @@
 package mcjty.lib.modules;
 
 import mcjty.lib.datagen.DataGen;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
@@ -23,8 +24,8 @@ public class Modules {
         modules.forEach(m -> m.initClient(event));
     }
 
-    public void initConfig() {
-        modules.forEach(IModule::initConfig);
+    public void initConfig(IEventBus bus) {
+        modules.forEach(iModule -> iModule.initConfig(bus));
     }
 
     public void datagen(DataGen dataGen) {

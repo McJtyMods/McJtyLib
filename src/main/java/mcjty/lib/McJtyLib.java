@@ -14,7 +14,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -51,7 +50,7 @@ public class McJtyLib {
 
         instance = this;
         // Register the setup method for modloading
-        Registration.init();
+        Registration.init(bus);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
         if (dist.isClient()) {
             bus.addListener(ClientSetup::init);
