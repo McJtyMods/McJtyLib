@@ -8,7 +8,9 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -86,6 +88,14 @@ public class Tools {
 
     public static Fluid getFluid(ResourceLocation id) {
         return ForgeRegistries.FLUIDS.getValue(id);
+    }
+
+    public static MobEffect getEffect(ResourceLocation id) {
+        return ForgeRegistries.MOB_EFFECTS.getValue(id);
+    }
+
+    public static SoundEvent getSound(ResourceLocation resourceLocation) {
+        return ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation);
     }
 
     public static ResourceLocation getId(EntityType<?> entityType) {

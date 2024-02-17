@@ -10,10 +10,8 @@ import java.util.function.Supplier;
 public class DeferredBlocks {
 
     private final DeferredRegister<Block> register;
-    private final String modid;
 
     private DeferredBlocks(String modid) {
-        this.modid = modid;
         register = DeferredRegister.create(ForgeRegistries.BLOCKS, modid);
     }
 
