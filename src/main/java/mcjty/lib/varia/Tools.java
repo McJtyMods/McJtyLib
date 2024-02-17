@@ -72,6 +72,22 @@ public class Tools {
         });
     }
 
+    public static Block getBlock(ResourceLocation id) {
+        return ForgeRegistries.BLOCKS.getValue(id);
+    }
+
+    public static Item getItem(ResourceLocation id) {
+        return ForgeRegistries.ITEMS.getValue(id);
+    }
+
+    public static EntityType<?> getEntity(ResourceLocation id) {
+        return ForgeRegistries.ENTITY_TYPES.getValue(id);
+    }
+
+    public static Fluid getFluid(ResourceLocation id) {
+        return ForgeRegistries.FLUIDS.getValue(id);
+    }
+
     public static ResourceLocation getId(EntityType<?> entityType) {
         return ForgeRegistries.ENTITY_TYPES.getKey(entityType);
     }

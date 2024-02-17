@@ -2,7 +2,6 @@ package mcjty.lib.varia;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import mcjty.lib.gui.GuiParser;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
@@ -14,7 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,7 +63,7 @@ public class ItemStackTools {
 
     public static ItemStack guiCommandToItemStack(GuiParser.GuiCommand obj) {
         String itemName = obj.getOptionalPar(0, "minecraft:stick");
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
+        Item item = Tools.getItem(new ResourceLocation(itemName));
         int amount = obj.getOptionalPar(1, 1);
         ItemStack stack = new ItemStack(item, amount);
         obj.findCommand("tag").ifPresent(cmd -> {

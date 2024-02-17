@@ -10,7 +10,6 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -130,7 +129,7 @@ public class JSonTools {
 
     public static ItemStack jsonToItemStack(JsonObject obj) {
         String itemName = obj.get("item").getAsString();
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
+        Item item = Tools.getItem(new ResourceLocation(itemName));
         // @todo error checking
         int amount = 1;
         if (obj.has("amount")) {
