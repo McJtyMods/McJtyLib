@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+// For compatibility with NeoForge
 public class PlayPayloadContext {
 
     private final Supplier<NetworkEvent.Context> supplier;

@@ -7,7 +7,6 @@ import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.ClientSetup;
 import mcjty.lib.setup.ModSetup;
 import mcjty.lib.setup.Registration;
-import mcjty.lib.syncpositional.PositionalDataSyncer;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -41,8 +40,6 @@ public class McJtyLib {
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
     private static final Map<String, CommandInfo> commandInfos = new HashMap<>();
-
-    public static final PositionalDataSyncer SYNCER = new PositionalDataSyncer();
 
     public McJtyLib() {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();

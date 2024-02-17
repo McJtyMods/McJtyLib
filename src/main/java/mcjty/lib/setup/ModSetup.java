@@ -61,18 +61,6 @@ public class ModSetup extends DefaultModSetup {
     public static class EventHandler {
 
         @SubscribeEvent
-        public void onWorldTick(TickEvent.LevelTickEvent event) {
-            if (event.phase == TickEvent.Phase.START && event.level.dimension() == Level.OVERWORLD) {
-                McJtyLib.SYNCER.sendOutData(event.level.getServer());
-            }
-        }
-
-        @SubscribeEvent
-        public void onChunkWatch(ChunkWatchEvent.Watch event) {
-            McJtyLib.SYNCER.startWatching(event.getPlayer());
-        }
-
-        @SubscribeEvent
         public void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
             if (event.phase == TickEvent.Phase.START && !event.player.getCommandSenderWorld().isClientSide) {
                 McJtyLib.getPreferencesProperties(event.player).ifPresent(handler -> handler.tick((ServerPlayer) event.player));

@@ -1,6 +1,5 @@
 package mcjty.lib.network;
 
-import mcjty.lib.syncpositional.PacketSendPositionalDataToClients;
 import mcjty.lib.typed.TypedMap;
 import net.minecraftforge.network.simple.SimpleChannel;
 
@@ -29,7 +28,6 @@ public class PacketHandler {
         channel.registerMessage(startIndex++, PacketSetGuiStyle.class, PacketSetGuiStyle::write, PacketSetGuiStyle::create, wrap(PacketSetGuiStyle::handle));
         channel.registerMessage(startIndex++, PacketOpenManual.class, PacketOpenManual::write, PacketOpenManual::create, wrap(PacketOpenManual::handle));
         channel.registerMessage(startIndex++, PacketContainerDataToClient.class, PacketContainerDataToClient::write, PacketContainerDataToClient::create, wrap(PacketContainerDataToClient::handle));
-        channel.registerMessage(startIndex++, PacketSendPositionalDataToClients.class, PacketSendPositionalDataToClients::write, PacketSendPositionalDataToClients::create, wrap(PacketSendPositionalDataToClients::handle));
         channel.registerMessage(startIndex++, PacketSendResultToClient.class, PacketSendResultToClient::write, PacketSendResultToClient::create, wrap(PacketSendResultToClient::handle));
     }
 
