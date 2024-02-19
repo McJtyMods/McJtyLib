@@ -4,10 +4,9 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.PacketSendPreferencesToClient;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
 
@@ -34,7 +33,7 @@ public class PreferencesProperties {
     }
 
     private void syncToClient(ServerPlayer player) {
-        McJtyLib.networkHandler.sendTo(PacketSendPreferencesToClient.create(buffStyle, buffX, buffY, style), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        McJtyLib.sendToPlayer(PacketSendPreferencesToClient.create(buffStyle, buffX, buffY, style), player);
         dirty = false;
     }
 

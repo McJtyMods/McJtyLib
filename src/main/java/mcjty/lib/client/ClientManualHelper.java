@@ -10,7 +10,7 @@ public class ClientManualHelper {
         if (TooltipRender.lastUsedTooltipItem != null) {
             ManualEntry entry = TooltipRender.lastUsedTooltipItem.getManualEntry();
             if (entry.manual() != null) {
-                McJtyLib.networkHandler.sendToServer(PacketOpenManual.create(entry.manual(), entry.entry(), entry.page()));
+                McJtyLib.sendToServer(PacketOpenManual.create(entry.manual(), entry.entry(), entry.page()));
             }
         }
     }

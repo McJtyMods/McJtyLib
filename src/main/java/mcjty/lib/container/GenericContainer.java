@@ -28,7 +28,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.SlotItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
-import net.minecraftforge.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -461,7 +460,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
                 data.toBytes(buffer);
                 PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
-                McJtyLib.networkHandler.sendTo(packet, serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                McJtyLib.sendToPlayer(packet, serverPlayer);
             }
         }
     }
@@ -486,7 +485,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                     FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
                     data.toBytes(buffer);
                     PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
-                    McJtyLib.networkHandler.sendTo(packet, serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                    McJtyLib.sendToPlayer(packet, serverPlayer);
                 }
             }
         }

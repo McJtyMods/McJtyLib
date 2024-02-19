@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
  * It supports the side window, the window system in general as well as tooltips
  */
 public abstract class GuiItemScreen extends Screen {
-    protected SimpleChannel network;
     protected Window window;
     protected int xSize;
     protected int ySize;
@@ -28,9 +26,8 @@ public abstract class GuiItemScreen extends Screen {
 
     private GuiSideWindow sideWindow;
 
-    public GuiItemScreen(SimpleChannel network, int xSize, int ySize, ManualEntry manualEntry) {
+    public GuiItemScreen(int xSize, int ySize, ManualEntry manualEntry) {
         super(ComponentFactory.literal("todo")); // @todo 1.14
-        this.network = network;
         this.xSize = xSize;
         this.ySize = ySize;
         sideWindow = new GuiSideWindow(manualEntry.manual(), manualEntry.entry(), manualEntry.page());

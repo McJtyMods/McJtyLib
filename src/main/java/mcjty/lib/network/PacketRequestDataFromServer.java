@@ -10,10 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.simple.SimpleChannel;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
@@ -54,7 +51,7 @@ public record PacketRequestDataFromServer(ResourceKey<Level> type, BlockPos pos,
         return ID;
     }
 
-    public void handle(SimpleChannel channel, PlayPayloadContext ctx) {
+    public void handle(PlayPayloadContext ctx) {
         ctx.workHandler().submitAsync(() -> {
             ctx.player().ifPresent(player -> {
                 Level world = LevelTools.getLevel(player.getCommandSenderWorld(), type);
@@ -63,7 +60,7 @@ public record PacketRequestDataFromServer(ResourceKey<Level> type, BlockPos pos,
                         TypedMap result = generic.executeServerCommandWR(command, player, params);
                         if (result != null) {
                             PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
-                            channel.sendTo(msg, ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                            McJtyLib.sendToPlayer(msg, player);
                             return;
                         }
                     }
@@ -73,10 +70,4 @@ public record PacketRequestDataFromServer(ResourceKey<Level> type, BlockPos pos,
             });
         });
     }
-
-    public static void register(SimpleChannel net, int id) {
-        net.registerMessage(id, PacketRequestDataFromServer.class, PacketRequestDataFromServer::write, PacketRequestDataFromServer::create, new ChannelBoundHandler<>(net,
-                (packet, channel, contextSupplier) -> packet.handle(channel, new PlayPayloadContext(contextSupplier))));
-    }
-
 }

@@ -12,10 +12,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkDirection;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -72,7 +70,7 @@ public record PacketGetListFromServer(ResourceKey<Level> dimension, BlockPos pos
                         }
                         Class type = info.type();
                         List list = generic.executeServerCommandList(command, player, params, type);
-                        McJtyLib.networkHandler.sendTo(new PacketSendResultToClient(pos, command, list), ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                        McJtyLib.sendToPlayer(new PacketSendResultToClient(pos, command, list), player);
                     } else {
                         Logging.logError("Command '" + command + "' not handled!");
                     }

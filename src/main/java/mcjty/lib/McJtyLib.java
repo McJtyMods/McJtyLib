@@ -9,6 +9,7 @@ import mcjty.lib.setup.ModSetup;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LazyOptional;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -101,5 +103,13 @@ public class McJtyLib {
 
     public static LazyOptional<PreferencesProperties> getPreferencesProperties(Player player) {
         return player.getCapability(ModSetup.PREFERENCES_CAPABILITY);
+    }
+
+    public static void sendToServer(Object msg) {
+        networkHandler.sendToServer(msg);
+    }
+
+    public static <T> void sendToPlayer(T packet, Player player) {
+        networkHandler.sendTo(packet, ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 }

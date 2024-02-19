@@ -16,15 +16,5 @@ public class Registration {
         RECIPE_SERIALIZERS.register(bus);
     }
 
-//    @ObjectHolder(McJtyLib.MODID + ":generic")
-//    public static MenuType GENERIC_CONTAINER_TYPE;
-//    @ObjectHolder(McJtyLib.MODID + ":multipart")
-//    public static MultipartBlock MULTIPART_BLOCK;
-//    @ObjectHolder(McJtyLib.MODID + ":multipart")
-//    public static MultipartItemBlock MULTIPART_ITEMBLOCK;
-
     public static RegistryObject<CopyNBTRecipeSerializer> COPYNBT_SERIALIZER = RECIPE_SERIALIZERS.register("copy_nbt", CopyNBTRecipeSerializer::new);
-
-//    @ObjectHolder(McJtyLib.MODID + ":multipart")
-//    public static BlockEntityType<?> TYPE_MULTIPART;
 }

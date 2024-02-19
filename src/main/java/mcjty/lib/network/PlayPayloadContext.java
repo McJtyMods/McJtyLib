@@ -1,5 +1,6 @@
 package mcjty.lib.network;
 
+import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -21,7 +22,11 @@ public class PlayPayloadContext {
     }
 
     public Optional<Player> player() {
-        return Optional.ofNullable(supplier.get().getSender());
+        Player sender = supplier.get().getSender();
+        if (sender == null) {
+            sender = SafeClientTools.getClientPlayer();
+        }
+        return Optional.ofNullable(sender);
     }
 
     public static <T extends CustomPacketPayload> BiConsumer<T, Supplier<NetworkEvent.Context>> wrap(BiConsumer<T, PlayPayloadContext> handler) {

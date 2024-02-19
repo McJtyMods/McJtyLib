@@ -7,7 +7,6 @@ import mcjty.lib.container.AutomationFilterItemHander;
 import mcjty.lib.container.GenericItemHandler;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
-import mcjty.lib.network.PacketRequestDataFromServer;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -38,7 +37,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.network.simple.SimpleChannel;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -520,13 +518,6 @@ public class GenericTileEntity extends BlockEntity {
     /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
     public ResourceKey<Level> getDimension() {
         return level.dimension();
-    }
-
-    /**
-     * Call this client-side to this TE to request data from the server
-     */
-    public void requestDataFromServer(SimpleChannel channel, ICommand command, @Nonnull TypedMap params) {
-        channel.sendToServer(PacketRequestDataFromServer.create(getDimension(), worldPosition, command.name(), params, false));
     }
 
     /**

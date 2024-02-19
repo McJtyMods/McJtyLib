@@ -1,6 +1,5 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.IRunnable;
@@ -27,7 +26,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.simple.SimpleChannel;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
@@ -68,11 +66,11 @@ public class Window {
         this.toplevel = toplevel;
     }
 
-    public Window(Screen gui, SimpleChannel wrapper, ResourceLocation guiDescription) {
+    public Window(Screen gui, ResourceLocation guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
         final int[] sidesize = {0, 0};
-        parseInternal(null, null, wrapper, guiDescription, dim, sidesize);
+        parseInternal(null, null, guiDescription, dim, sidesize);
 
         if (dim[0] != -1 || dim[1] != -1) {
             if (gui instanceof GuiItemScreen container) {
@@ -84,11 +82,11 @@ public class Window {
         }
     }
 
-    public Window(Screen gui, GenericTileEntity tileEntity, SimpleChannel wrapper, ResourceLocation guiDescription) {
+    public Window(Screen gui, GenericTileEntity tileEntity, ResourceLocation guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
         final int[] sidesize = {0, 0};
-        parseInternal((GenericGuiContainer<?, ?>) gui, tileEntity, wrapper, guiDescription, dim, sidesize);
+        parseInternal((GenericGuiContainer<?, ?>) gui, tileEntity, guiDescription, dim, sidesize);
 
         if (dim[0] != -1 || dim[1] != -1) {
             if (gui instanceof GenericGuiContainer container) {
@@ -102,7 +100,7 @@ public class Window {
 //        Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
     }
 
-    private void parseInternal(@Nullable GenericGuiContainer<?, ?> gui, @Nullable GenericTileEntity tileEntity, SimpleChannel wrapper, ResourceLocation guiDescription, int[] dim, int[] sidesize) {
+    private void parseInternal(@Nullable GenericGuiContainer<?, ?> gui, @Nullable GenericTileEntity tileEntity, ResourceLocation guiDescription, int[] dim, int[] sidesize) {
         try {
             WindowTools.parseAndHandleClient(guiDescription, command -> {
                 if ("window".equals(command.getId())) {
@@ -121,7 +119,7 @@ public class Window {
                                     String channel = cmd.getOptionalPar(0, "");
                                     String teCommand = cmd.getOptionalPar(1, "");
                                     event(channel, (source, params) ->
-                                            gui.sendServerCommandTyped(wrapper, teCommand, params));
+                                            gui.sendServerCommandTyped(teCommand, params));
                                 }
                             });
                     command.commands()
@@ -131,7 +129,7 @@ public class Window {
                                 String modidCmd = cmd.getOptionalPar(1, "");
                                 ResourceLocation rl = new ResourceLocation(modidCmd);
                                 event(channel, (source, params) ->
-                                        wrapper.sendToServer(PacketSendServerCommand.create(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
+                                        McJtyLib.sendToServer(PacketSendServerCommand.create(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
                             });
                     command.findCommand("panel").ifPresent(cmd -> {
                         toplevel = new Panel();
@@ -143,7 +141,7 @@ public class Window {
                                 if (tileEntity != null) {
                                     String component = cmd.getOptionalPar(0, "");
                                     String value = cmd.getOptionalPar(1, "");
-                                    bind(wrapper, component, tileEntity, value);
+                                    bind(component, tileEntity, value);
                                 }
                             });
                     command.commands()
@@ -152,7 +150,7 @@ public class Window {
                                 if (tileEntity != null) {
                                     String component = cmd.getOptionalPar(0, "");
                                     String key = cmd.getOptionalPar(1, "");
-                                    action(wrapper, component, tileEntity, key);
+                                    action(component, tileEntity, key);
                                 }
                             });
                 }
@@ -441,14 +439,14 @@ public class Window {
         channelEvents.get(channel).add(event);
         return this;
     }
-    public <T extends GenericTileEntity> Window action(SimpleChannel network, String componentName, T te, Command<?> command) {
-        return action(network, componentName, te, command.name());
+    public <T extends GenericTileEntity> Window action(String componentName, T te, Command<?> command) {
+        return action(componentName, te, command.name());
     }
 
-    public <T extends GenericTileEntity> Window action(SimpleChannel network, String componentName, T te, String keyName) {
+    public <T extends GenericTileEntity> Window action(String componentName, T te, String keyName) {
         IRunnable<?> serverCommand = te.findServerCommand(keyName);
         if (serverCommand != null) {
-            initializeAction(network, componentName, keyName, te);
+            initializeAction(componentName, keyName, te);
             return this;
         }
 
@@ -456,22 +454,22 @@ public class Window {
         return this;
     }
 
-    private <T extends GenericTileEntity> void initializeAction(SimpleChannel network, String componentName, String command, T te) {
+    private <T extends GenericTileEntity> void initializeAction(String componentName, String command, T te) {
         event(componentName, (source, params) -> {
-            network.sendToServer(PacketServerCommandTyped.create(te.getBlockPos(), te.getDimension(), command, params));
+            McJtyLib.sendToServer(PacketServerCommandTyped.create(te.getBlockPos(), te.getDimension(), command, params));
         });
     }
 
-    public void sendServerCommand(SimpleChannel network, Command<?> action, @Nonnull TypedMap params) {
+    public void sendServerCommand(Command<?> action, @Nonnull TypedMap params) {
         GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
-        guiContainer.sendServerCommandTyped(network, action, params);
+        guiContainer.sendServerCommandTyped(action, params);
     }
 
-    public <T extends GenericTileEntity> Window bind(SimpleChannel network, String componentName, T te, String keyName) {
+    public <T extends GenericTileEntity> Window bind(String componentName, T te, String keyName) {
         Map<String, ValueHolder<?, ?>> valueMap = te.getValueMap();
         if (valueMap.containsKey(keyName)) {
             ValueHolder<?, ?> value = valueMap.get(keyName);
-            initializeBinding(network, te.getDimension(), componentName, te, value);
+            initializeBinding(te.getDimension(), componentName, te, value);
             return this;
         }
 
@@ -479,7 +477,7 @@ public class Window {
         return this;
     }
 
-    private <T extends GenericTileEntity, V> void initializeBinding(SimpleChannel network, @Nonnull ResourceKey<Level> dimensionType, String componentName,
+    private <T extends GenericTileEntity, V> void initializeBinding(@Nonnull ResourceKey<Level> dimensionType, String componentName,
                                                                     T te, ValueHolder value) {
         V v = (V) value.getter().apply(te);
         Widget<?> component = findChild(componentName);
@@ -500,7 +498,7 @@ public class Window {
             value.setter().accept(te, converted);
 
             GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
-            guiContainer.sendServerCommandTyped(network, dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING.name(),
+            guiContainer.sendServerCommandTyped(dimensionType, GenericTileEntity.COMMAND_SYNC_BINDING.name(),
                     TypedMap.builder()
                             .put(value.key(), converted)
                             .build());

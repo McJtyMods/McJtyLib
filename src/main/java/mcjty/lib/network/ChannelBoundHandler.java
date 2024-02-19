@@ -7,6 +7,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+// @todo NeoForge
 public class ChannelBoundHandler<T> implements BiConsumer<T, Supplier<NetworkEvent.Context>> {
     private final SimpleChannel channel;
     private final TriConsumer<T, SimpleChannel, Supplier<NetworkEvent.Context>> innerHandler;

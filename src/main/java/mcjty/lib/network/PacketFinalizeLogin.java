@@ -30,7 +30,6 @@ public record PacketFinalizeLogin() implements CustomPacketPayload {
     }
 
     private void finalizeClientLogin() {
-        PacketHandler.connected = true;
     }
 
 }

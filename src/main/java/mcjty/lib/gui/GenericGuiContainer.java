@@ -2,6 +2,7 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import mcjty.lib.McJtyLib;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.client.GuiTools;
@@ -38,7 +39,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.network.simple.SimpleChannel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -464,31 +464,31 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     /**
      * Set a 'Value' and make sure it gets communicated to the server
      */
-    public <T> void setValue(SimpleChannel channel, Value<?, T> value, T v) {
-        sendServerCommandTyped(channel, tileEntity.getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.name(),
+    public <T> void setValue(Value<?, T> value, T v) {
+        sendServerCommandTyped(tileEntity.getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.name(),
                 TypedMap.builder()
                         .put(value.key(), v)
                         .build());
     }
 
-    public void sendServerCommandTyped(SimpleChannel network, String command, TypedMap params) {
-        network.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
+    public void sendServerCommandTyped(String command, TypedMap params) {
+        McJtyLib.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
     }
 
-    public void sendServerCommandTyped(SimpleChannel network, Command<?> command, TypedMap params) {
-        network.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command.name(), params));
+    public void sendServerCommandTyped(Command<?> command, TypedMap params) {
+        McJtyLib.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command.name(), params));
     }
 
-    public void sendServerCommandTyped(SimpleChannel network, ResourceKey<Level> dimensionId, String command, TypedMap params) {
-        network.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), dimensionId, command, params));
+    public void sendServerCommandTyped(ResourceKey<Level> dimensionId, String command, TypedMap params) {
+        McJtyLib.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), dimensionId, command, params));
     }
 
-    public void sendServerCommand(SimpleChannel network, String modid, String command, @Nonnull TypedMap arguments) {
-        network.sendToServer(PacketSendServerCommand.create(modid, command, arguments));
+    public void sendServerCommand(String modid, String command, @Nonnull TypedMap arguments) {
+        McJtyLib.sendToServer(PacketSendServerCommand.create(modid, command, arguments));
     }
 
-    public void sendServerCommand(SimpleChannel network, String modid, String command) {
-        network.sendToServer(PacketSendServerCommand.create(modid, command, TypedMap.EMPTY));
+    public void sendServerCommand(String modid, String command) {
+        McJtyLib.sendToServer(PacketSendServerCommand.create(modid, command, TypedMap.EMPTY));
     }
 
     // Register a container/gui on the client side

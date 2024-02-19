@@ -9,7 +9,6 @@ import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.simple.SimpleChannel;
 
 import static mcjty.lib.gui.widgets.Widgets.button;
 import static mcjty.lib.gui.widgets.Widgets.positional;
@@ -41,7 +40,7 @@ public class GuiSideWindow {
                 .tooltips("Open manual")
                 .event(() -> help(mc));
         guiButton = button(1, 19, 16, 16, "s")
-                .event(() -> changeStyle(McJtyLib.networkHandler));
+                .event(() -> changeStyle());
         setStyleTooltip();
         Panel sidePanel = positional().children(guiButton, helpButton);
         int sideLeft = guiLeft + xSize;
@@ -52,7 +51,7 @@ public class GuiSideWindow {
 
     private void help(Minecraft mc) {
         if (manual != null) {
-            McJtyLib.networkHandler.sendToServer(PacketOpenManual.create(manual, manualNode, page));
+            McJtyLib.sendToServer(PacketOpenManual.create(manual, manualNode, page));
         }
     }
 
@@ -60,13 +59,13 @@ public class GuiSideWindow {
         guiButton.tooltips("Gui style:", style.getStyle());
     }
 
-    private void changeStyle(SimpleChannel network) {
+    private void changeStyle() {
         int next = style.ordinal() + 1;
         if (next >= GuiStyle.values().length) {
             next = 0;
         }
         style = GuiStyle.values()[next];
-        network.sendToServer(PacketSetGuiStyle.create(style.getStyle()));
+        McJtyLib.sendToServer(PacketSetGuiStyle.create(style.getStyle()));
 
         setStyleTooltip();
     }
