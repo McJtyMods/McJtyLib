@@ -5,7 +5,7 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
-import mcjty.lib.network.PacketHandler;
+import mcjty.lib.network.Networking;
 import mcjty.lib.preferences.PreferencesDispatcher;
 import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.resources.ResourceLocation;
@@ -22,7 +22,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.network.NetworkRegistry;
 
 import static mcjty.lib.McJtyLib.MODID;
 
@@ -46,8 +45,7 @@ public class ModSetup extends DefaultModSetup {
     @Override
     public void init(FMLCommonSetupEvent e) {
         super.init(e);
-        McJtyLib.networkHandler = NetworkRegistry.newSimpleChannel(new ResourceLocation(MODID, MODID), () -> "1.0", s -> true, s -> true);
-        PacketHandler.registerMessages(McJtyLib.networkHandler);
+        Networking.registerMessages();
         MinecraftForge.EVENT_BUS.register(new EventHandler());
     }
 

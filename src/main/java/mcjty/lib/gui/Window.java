@@ -9,6 +9,7 @@ import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.Widgets;
+import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.preferences.PreferencesProperties;
@@ -129,7 +130,7 @@ public class Window {
                                 String modidCmd = cmd.getOptionalPar(1, "");
                                 ResourceLocation rl = new ResourceLocation(modidCmd);
                                 event(channel, (source, params) ->
-                                        McJtyLib.sendToServer(PacketSendServerCommand.create(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
+                                        Networking.sendToServer(PacketSendServerCommand.create(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
                             });
                     command.findCommand("panel").ifPresent(cmd -> {
                         toplevel = new Panel();
@@ -456,7 +457,7 @@ public class Window {
 
     private <T extends GenericTileEntity> void initializeAction(String componentName, String command, T te) {
         event(componentName, (source, params) -> {
-            McJtyLib.sendToServer(PacketServerCommandTyped.create(te.getBlockPos(), te.getDimension(), command, params));
+            Networking.sendToServer(PacketServerCommandTyped.create(te.getBlockPos(), te.getDimension(), command, params));
         });
     }
 

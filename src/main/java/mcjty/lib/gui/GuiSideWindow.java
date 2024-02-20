@@ -3,6 +3,7 @@ package mcjty.lib.gui;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Panel;
+import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketOpenManual;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesProperties;
@@ -51,7 +52,7 @@ public class GuiSideWindow {
 
     private void help(Minecraft mc) {
         if (manual != null) {
-            McJtyLib.sendToServer(PacketOpenManual.create(manual, manualNode, page));
+            Networking.sendToServer(PacketOpenManual.create(manual, manualNode, page));
         }
     }
 
@@ -65,7 +66,7 @@ public class GuiSideWindow {
             next = 0;
         }
         style = GuiStyle.values()[next];
-        McJtyLib.sendToServer(PacketSetGuiStyle.create(style.getStyle()));
+        Networking.sendToServer(PacketSetGuiStyle.create(style.getStyle()));
 
         setStyleTooltip();
     }

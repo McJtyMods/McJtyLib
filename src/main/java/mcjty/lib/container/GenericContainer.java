@@ -3,10 +3,10 @@ package mcjty.lib.container;
 import com.google.common.collect.Range;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.api.container.IGenericContainer;
+import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketContainerDataToClient;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LevelTools;
@@ -460,7 +460,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
                 data.toBytes(buffer);
                 PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
-                McJtyLib.sendToPlayer(packet, serverPlayer);
+                Networking.sendToPlayer(packet, serverPlayer);
             }
         }
     }
@@ -485,7 +485,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                     FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
                     data.toBytes(buffer);
                     PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
-                    McJtyLib.sendToPlayer(packet, serverPlayer);
+                    Networking.sendToPlayer(packet, serverPlayer);
                 }
             }
         }

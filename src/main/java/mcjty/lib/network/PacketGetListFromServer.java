@@ -70,7 +70,7 @@ public record PacketGetListFromServer(ResourceKey<Level> dimension, BlockPos pos
                         }
                         Class type = info.type();
                         List list = generic.executeServerCommandList(command, player, params, type);
-                        McJtyLib.sendToPlayer(new PacketSendResultToClient(pos, command, list), player);
+                        Networking.sendToPlayer(new PacketSendResultToClient(pos, command, list), player);
                     } else {
                         Logging.logError("Command '" + command + "' not handled!");
                     }

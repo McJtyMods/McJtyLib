@@ -22,14 +22,14 @@ public record PacketServerCommandTyped(BlockPos pos, ResourceKey<Level> dimensio
 
     public static PacketServerCommandTyped create(FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
-        String command = buf.readUtf(32767);
-        TypedMap params = TypedMapTools.readArguments(buf);
         ResourceKey<Level> dimensionId;
         if (buf.readBoolean()) {
             dimensionId = LevelTools.getId(buf.readResourceLocation());
         } else {
             dimensionId = null;
         }
+        String command = buf.readUtf(32767);
+        TypedMap params = TypedMapTools.readArguments(buf);
         return new PacketServerCommandTyped(pos, dimensionId, command, params);
     }
 
@@ -40,14 +40,14 @@ public record PacketServerCommandTyped(BlockPos pos, ResourceKey<Level> dimensio
     @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeBlockPos(pos);
-        buf.writeUtf(command);
-        TypedMapTools.writeArguments(buf, params);
         if (dimensionId != null) {
             buf.writeBoolean(true);
             buf.writeResourceLocation(dimensionId.location());
         } else {
             buf.writeBoolean(false);
         }
+        buf.writeUtf(command);
+        TypedMapTools.writeArguments(buf, params);
     }
 
     @Override

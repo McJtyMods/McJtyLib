@@ -60,7 +60,7 @@ public record PacketRequestDataFromServer(ResourceKey<Level> type, BlockPos pos,
                         TypedMap result = generic.executeServerCommandWR(command, player, params);
                         if (result != null) {
                             PacketDataFromServer msg = new PacketDataFromServer(dummy ? null : pos, command, result);
-                            McJtyLib.sendToPlayer(msg, player);
+                            Networking.sendToPlayer(msg, player);
                             return;
                         }
                     }

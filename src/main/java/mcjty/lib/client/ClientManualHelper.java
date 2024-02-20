@@ -1,7 +1,7 @@
 package mcjty.lib.client;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.ManualEntry;
+import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketOpenManual;
 import mcjty.lib.tooltips.TooltipRender;
 
@@ -10,7 +10,7 @@ public class ClientManualHelper {
         if (TooltipRender.lastUsedTooltipItem != null) {
             ManualEntry entry = TooltipRender.lastUsedTooltipItem.getManualEntry();
             if (entry.manual() != null) {
-                McJtyLib.sendToServer(PacketOpenManual.create(entry.manual(), entry.entry(), entry.page()));
+                Networking.sendToServer(PacketOpenManual.create(entry.manual(), entry.entry(), entry.page()));
             }
         }
     }

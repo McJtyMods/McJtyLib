@@ -1,8 +1,8 @@
 package mcjty.lib.preferences;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
+import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,7 +33,7 @@ public class PreferencesProperties {
     }
 
     private void syncToClient(ServerPlayer player) {
-        McJtyLib.sendToPlayer(PacketSendPreferencesToClient.create(buffStyle, buffX, buffY, style), player);
+        Networking.sendToPlayer(PacketSendPreferencesToClient.create(buffStyle, buffX, buffY, style), player);
         dirty = false;
     }
 

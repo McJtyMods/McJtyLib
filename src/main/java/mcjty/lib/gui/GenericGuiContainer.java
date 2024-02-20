@@ -2,7 +2,6 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import mcjty.lib.McJtyLib;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.client.GuiTools;
@@ -11,6 +10,7 @@ import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.EnergyBar;
 import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericEnergyStorage;
@@ -472,23 +472,23 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public void sendServerCommandTyped(String command, TypedMap params) {
-        McJtyLib.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
+        Networking.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
     }
 
     public void sendServerCommandTyped(Command<?> command, TypedMap params) {
-        McJtyLib.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command.name(), params));
+        Networking.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command.name(), params));
     }
 
     public void sendServerCommandTyped(ResourceKey<Level> dimensionId, String command, TypedMap params) {
-        McJtyLib.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), dimensionId, command, params));
+        Networking.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), dimensionId, command, params));
     }
 
     public void sendServerCommand(String modid, String command, @Nonnull TypedMap arguments) {
-        McJtyLib.sendToServer(PacketSendServerCommand.create(modid, command, arguments));
+        Networking.sendToServer(PacketSendServerCommand.create(modid, command, arguments));
     }
 
     public void sendServerCommand(String modid, String command) {
-        McJtyLib.sendToServer(PacketSendServerCommand.create(modid, command, TypedMap.EMPTY));
+        Networking.sendToServer(PacketSendServerCommand.create(modid, command, TypedMap.EMPTY));
     }
 
     // Register a container/gui on the client side
