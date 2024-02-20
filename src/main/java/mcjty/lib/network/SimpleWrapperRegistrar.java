@@ -40,12 +40,12 @@ public class SimpleWrapperRegistrar implements IPayloadRegistrar {
         handler.accept(new IHandlerGetter<T>() {
             @Override
             public void client(BiConsumer<T, PlayPayloadContext> handle) {
-                channel.registerMessage(id(), clazz, (t, buf) -> ((T)t).write(buf), create, PlayPayloadContext.wrap(handle));
+                getChannel().registerMessage(id(), clazz, (t, buf) -> ((T)t).write(buf), create, PlayPayloadContext.wrap(handle));
             }
 
             @Override
             public void server(BiConsumer<T, PlayPayloadContext> handle) {
-                channel.registerMessage(id(), clazz, (t, buf) -> ((T)t).write(buf), create, PlayPayloadContext.wrap(handle));
+                getChannel().registerMessage(id(), clazz, (t, buf) -> ((T)t).write(buf), create, PlayPayloadContext.wrap(handle));
             }
         });
     }

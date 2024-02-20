@@ -36,6 +36,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.common.util.LazyOptional;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -94,6 +95,8 @@ public class GenericTileEntity extends BlockEntity {
                 LazyOptional lazy;
                 if (instance instanceof LazyOptional) {
                     lazy = (LazyOptional) instance;
+                } else if (instance instanceof Lazy<?>) {
+                    lazy = LazyOptional.of(() -> ((Lazy<?>) instance).get());
                 } else if (annotation.type() == CapType.ITEMS_AUTOMATION) {
                     lazy = LazyOptional.of(() -> new AutomationFilterItemHander((GenericItemHandler) instance));
                 } else {
