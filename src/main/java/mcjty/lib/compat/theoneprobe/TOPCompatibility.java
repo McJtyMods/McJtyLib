@@ -6,7 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.InterModComms;
+import net.neoforged.neoforge.fml.InterModComms;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;

@@ -1,16 +1,11 @@
 package mcjty.lib.api.infusable;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import mcjty.lib.McJtyLib;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 public class CapabilityInfusable {
-
-    public static final Capability<IInfusable> INFUSABLE_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
-
-    public static void register(RegisterCapabilitiesEvent event) {
-        event.register(IInfusable.class);
-    }
-
+    public static final BlockCapability<IInfusable, @Nullable Direction> INFUSABLE_CAPABILITY = BlockCapability.createSided(new ResourceLocation(McJtyLib.MODID, "infusable"), IInfusable.class);
 }

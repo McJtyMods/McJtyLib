@@ -13,9 +13,9 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.event.RenderTooltipEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.client.event.RenderTooltipEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.eventbus.api.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;

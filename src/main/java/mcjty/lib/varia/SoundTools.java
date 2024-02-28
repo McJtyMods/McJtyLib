@@ -10,7 +10,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.RegistryObject;
 
 public class SoundTools {
 

@@ -23,11 +23,11 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.items.SlotItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -492,7 +492,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     public static MenuType<AbstractContainerMenu> createContainerType(String registryName) {
-        MenuType<AbstractContainerMenu> containerType = IForgeMenuType.create((windowId, inv, data) -> {
+        MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
             BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
             if (te == null) {
@@ -504,7 +504,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     public static <T extends AbstractContainerMenu> MenuType<T> createContainerType() {
-        MenuType<AbstractContainerMenu> containerType = IForgeMenuType.create((windowId, inv, data) -> {
+        MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
             BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
             if (te == null) {
@@ -518,7 +518,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     public static <T extends GenericContainer, E extends GenericTileEntity> MenuType<T> createRemoteContainerType(
             BiFunction<ResourceKey<Level>, BlockPos, E> dummyTEFactory,
             ContainerSupplier<T, E> containerFactory, int slots) {
-        return IForgeMenuType.create((windowId, inv, data) -> {
+        return IMenuTypeExtension.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
 
             E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()), pos);

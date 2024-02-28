@@ -2,8 +2,8 @@ package mcjty.lib.container;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.ListTag;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 

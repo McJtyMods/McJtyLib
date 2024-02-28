@@ -9,7 +9,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.registries.ForgeRegistries;
 
 import java.util.Collections;
 import java.util.HashSet;

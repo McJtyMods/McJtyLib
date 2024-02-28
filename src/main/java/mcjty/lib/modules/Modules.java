@@ -1,9 +1,9 @@
 package mcjty.lib.modules;
 
 import mcjty.lib.datagen.DataGen;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.eventbus.api.IEventBus;
+import net.neoforged.neoforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import java.util.ArrayList;
 import java.util.List;

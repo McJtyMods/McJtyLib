@@ -5,7 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ForgeConfigSpec;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

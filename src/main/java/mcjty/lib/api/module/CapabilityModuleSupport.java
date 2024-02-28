@@ -1,16 +1,11 @@
 package mcjty.lib.api.module;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import mcjty.lib.McJtyLib;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 public class CapabilityModuleSupport {
-
-    public static final Capability<IModuleSupport> MODULE_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
-
-    public static void register(RegisterCapabilitiesEvent event) {
-        event.register(IModuleSupport.class);
-    }
-
+    public static final BlockCapability<IModuleSupport, @Nullable Direction> MODULE_CAPABILITY = BlockCapability.createSided(new ResourceLocation(McJtyLib.MODID, "module_support"), IModuleSupport.class);
 }

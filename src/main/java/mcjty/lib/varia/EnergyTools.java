@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicLong;

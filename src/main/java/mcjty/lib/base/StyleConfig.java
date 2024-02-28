@@ -1,6 +1,6 @@
 package mcjty.lib.base;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ForgeConfigSpec;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -5,10 +5,10 @@ import mcjty.lib.keys.KeyBindings;
 import mcjty.lib.keys.KeyInputHandler;
 import mcjty.lib.tooltips.ClientTooltipIcon;
 import mcjty.lib.tooltips.TooltipRender;
-import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.common.MinecraftForge;
+import net.neoforged.neoforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class ClientSetup {
 

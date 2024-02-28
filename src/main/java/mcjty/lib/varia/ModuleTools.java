@@ -8,8 +8,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 public class ModuleTools {
 

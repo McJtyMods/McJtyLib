@@ -2,7 +2,7 @@ package mcjty.lib.network;
 
 import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;

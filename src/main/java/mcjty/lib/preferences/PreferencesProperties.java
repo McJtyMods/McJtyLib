@@ -6,7 +6,7 @@ import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.capabilities.RegisterCapabilitiesEvent;
 
 import javax.annotation.Nonnull;
 

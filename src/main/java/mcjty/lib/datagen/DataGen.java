@@ -20,12 +20,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraftforge.common.data.GlobalLootModifierProvider;
-import net.minecraftforge.common.data.JsonCodecProvider;
-import net.minecraftforge.common.data.LanguageProvider;
-import net.minecraftforge.common.loot.IGlobalLootModifier;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.common.data.GlobalLootModifierProvider;
+import net.neoforged.neoforge.common.data.JsonCodecProvider;
+import net.neoforged.neoforge.common.data.LanguageProvider;
+import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.registries.ForgeRegistries;
 
 import java.util.*;
 import java.util.function.Consumer;

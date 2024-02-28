@@ -2,8 +2,8 @@ package mcjty.lib.client;
 
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.eventbus.api.IEventBus;
 
 import java.util.Map;
 import java.util.function.Consumer;

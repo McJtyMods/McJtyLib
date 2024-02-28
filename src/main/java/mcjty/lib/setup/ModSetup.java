@@ -12,16 +12,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.capabilities.CapabilityManager;
+import net.neoforged.neoforge.common.capabilities.CapabilityToken;
+import net.neoforged.neoforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.event.AttachCapabilitiesEvent;
+import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.fml.ModList;
+import net.neoforged.neoforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 import static mcjty.lib.McJtyLib.MODID;
 

@@ -3,7 +3,7 @@ package mcjty.lib.api.container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 

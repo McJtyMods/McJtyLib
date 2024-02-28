@@ -2,10 +2,10 @@ package mcjty.lib.base;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.varia.Logging;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.eventbus.api.SubscribeEvent;
+import net.neoforged.neoforge.fml.common.Mod;
+import net.neoforged.neoforge.fml.event.config.ModConfigEvent;
 
 @Mod.EventBusSubscriber(modid = McJtyLib.MODID)
 public class GeneralConfig {

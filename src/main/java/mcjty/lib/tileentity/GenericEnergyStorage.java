@@ -4,8 +4,8 @@ import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.varia.EnergyTools;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.world.inventory.DataSlot;
-import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<LongTag> {
 

@@ -9,7 +9,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.util.ITeleporter;
+import net.neoforged.neoforge.common.util.ITeleporter;
 
 import javax.annotation.Nullable;
 import java.util.Objects;

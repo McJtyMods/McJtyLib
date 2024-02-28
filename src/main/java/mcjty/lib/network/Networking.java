@@ -3,8 +3,8 @@ package mcjty.lib.network;
 import mcjty.lib.McJtyLib;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.NetworkDirection;
+import net.neoforged.neoforge.network.simple.SimpleChannel;
 
 public class Networking {
 

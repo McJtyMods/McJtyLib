@@ -2,10 +2,10 @@ package mcjty.lib.varia;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 

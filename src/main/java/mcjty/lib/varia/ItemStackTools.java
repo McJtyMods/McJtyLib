@@ -11,8 +11,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

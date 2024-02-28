@@ -5,9 +5,9 @@ import mcjty.lib.varia.TriConsumer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 

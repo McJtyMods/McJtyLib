@@ -4,8 +4,8 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
 
 public enum CapType {
     ITEMS(ForgeCapabilities.ITEM_HANDLER),

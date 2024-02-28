@@ -6,7 +6,7 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import java.util.ArrayList;
 import java.util.List;

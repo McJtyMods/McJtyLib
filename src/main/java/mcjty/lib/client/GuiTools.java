@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkHooks;
+import net.neoforged.neoforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

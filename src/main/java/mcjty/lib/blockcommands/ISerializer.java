@@ -3,7 +3,7 @@ package mcjty.lib.blockcommands;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.function.BiConsumer;
 import java.util.function.Function;

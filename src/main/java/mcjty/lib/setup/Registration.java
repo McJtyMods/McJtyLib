@@ -4,9 +4,9 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.crafting.CopyNBTRecipeSerializer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.eventbus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.RegistryObject;
 
 public class Registration {
 

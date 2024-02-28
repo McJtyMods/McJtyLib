@@ -11,7 +11,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.stream.Stream;
 

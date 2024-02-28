@@ -1,17 +1,12 @@
 package mcjty.lib.api.container;
 
+import mcjty.lib.McJtyLib;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 public class CapabilityContainerProvider {
-
-    public static final Capability<MenuProvider> CONTAINER_PROVIDER_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
-
-    public static void register(RegisterCapabilitiesEvent event) {
-        event.register(MenuProvider.class);
-    }
-
+    public static final BlockCapability<MenuProvider, @Nullable Direction> CONTAINER_PROVIDER_CAPABILITY = BlockCapability.createSided(new ResourceLocation(McJtyLib.MODID, "container_provider"), MenuProvider.class);
 }

@@ -1,16 +1,11 @@
 package mcjty.lib.api.information;
 
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import mcjty.lib.McJtyLib;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 public class CapabilityPowerInformation {
-
-    public static final Capability<IPowerInformation> POWER_INFORMATION_CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
-
-    public static void register(RegisterCapabilitiesEvent event) {
-        event.register(IPowerInformation.class);
-    }
-
+    public static final BlockCapability<IPowerInformation, @Nullable Direction> POWER_INFORMATION_CAPABILITY = BlockCapability.createSided(new ResourceLocation(McJtyLib.MODID, "power_information"), IPowerInformation.class);
 }

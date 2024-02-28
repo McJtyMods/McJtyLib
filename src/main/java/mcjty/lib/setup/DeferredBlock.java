@@ -2,7 +2,7 @@ package mcjty.lib.setup;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 

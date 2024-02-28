@@ -14,8 +14,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.loot.IGlobalLootModifier;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
+import net.neoforged.neoforge.registries.RegistryObject;
 
 import java.util.HashMap;
 import java.util.List;
