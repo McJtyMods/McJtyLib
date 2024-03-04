@@ -2,17 +2,9 @@ package mcjty.lib.gui;
 
 import mcjty.lib.gui.events.DefaultSelectionEvent;
 import mcjty.lib.gui.widgets.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -107,17 +99,18 @@ public class TagSelectorWindow {
 
     private java.util.List<String> getTags() {
         if (TYPE_BOTH.equals(type)) {
-            Stream<String> itemStream = ForgeRegistries.ITEMS.tags().stream().map(t -> t.getKey().location().toString());
-            Stream<String> blockStream = ForgeRegistries.BLOCKS.tags().stream().map(t -> t.getKey().location().toString());
+
+            Stream<String> itemStream = BuiltInRegistries.ITEM.getTags().map(t -> t.getFirst().location().toString());
+            Stream<String> blockStream = BuiltInRegistries.BLOCK.getTags().map(t -> t.getFirst().location().toString());
             Set<String> tags = itemStream.collect(Collectors.toSet());
             blockStream.forEach(tags::add);
             return tags.stream().sorted().collect(Collectors.toList());
         } else if (TYPE_ITEM.equals(type)) {
-            Stream<String> itemStream = ForgeRegistries.ITEMS.tags().stream().map(t -> t.getKey().location().toString());
+            Stream<String> itemStream = BuiltInRegistries.ITEM.getTags().map(t -> t.getFirst().location().toString());
             Set<String> tags = itemStream.collect(Collectors.toSet());
             return tags.stream().sorted().collect(Collectors.toList());
         } else {
-            Stream<String> blockStream = ForgeRegistries.BLOCKS.tags().stream().map(t -> t.getKey().location().toString());
+            Stream<String> blockStream = BuiltInRegistries.BLOCK.getTags().map(t -> t.getFirst().location().toString());
             Set<String> tags = blockStream.collect(Collectors.toSet());
             return tags.stream().sorted().collect(Collectors.toList());
         }

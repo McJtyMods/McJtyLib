@@ -4,26 +4,26 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
 
 public enum CapType {
-    ITEMS(ForgeCapabilities.ITEM_HANDLER),
-    ITEMS_AUTOMATION(ForgeCapabilities.ITEM_HANDLER),
+    ITEMS(Capabilities.ItemHandler.BLOCK),
+    ITEMS_AUTOMATION(Capabilities.ItemHandler.BLOCK),
     CONTAINER(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY),
-    ENERGY(ForgeCapabilities.ENERGY),
+    ENERGY(Capabilities.EnergyStorage.BLOCK),
     INFUSABLE(CapabilityInfusable.INFUSABLE_CAPABILITY),
     MODULE(CapabilityModuleSupport.MODULE_CAPABILITY),
     POWER_INFO(CapabilityPowerInformation.POWER_INFORMATION_CAPABILITY),
-    FLUIDS(ForgeCapabilities.FLUID_HANDLER);
+    FLUIDS(Capabilities.FluidHandler.BLOCK);
 
-    private final Capability capability;
+    private final BlockCapability capability;
 
-    CapType(Capability capability) {
+    CapType(BlockCapability capability) {
         this.capability = capability;
     }
 
-    public Capability getCapability() {
+    public BlockCapability getCapability() {
         return capability;
     }
 }

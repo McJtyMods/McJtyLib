@@ -1,6 +1,6 @@
 package mcjty.lib.base;
 
-import net.neoforged.neoforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,9 +92,9 @@ public class StyleConfig {
     public static int colorButtonHoveringFillerGradient1 = 0xff8d92ad;
     public static int colorButtonHoveringFillerGradient2 = 0xffbabfda;
 
-    private static Map<String, ForgeConfigSpec.ConfigValue<String>> colorConfigValues = new HashMap<>();
+    private static Map<String, ModConfigSpec.ConfigValue<String>> colorConfigValues = new HashMap<>();
 
-    public static void init(ForgeConfigSpec.Builder CLIENT_BUILDER) {
+    public static void init(ModConfigSpec.Builder CLIENT_BUILDER) {
         CLIENT_BUILDER.comment("Style settings for all mods using mcjtylib").push(CATEGORY_STYLE);
 
         initSetting(CLIENT_BUILDER, "colorSliderTopLeft", colorSliderTopLeft, "Color: slider top left border");
@@ -182,8 +182,8 @@ public class StyleConfig {
         CLIENT_BUILDER.pop();
     }
 
-    private static void initSetting(ForgeConfigSpec.Builder CLIENT_BUILDER, String settingName, int setting, String comment) {
-        ForgeConfigSpec.ConfigValue<String> value = CLIENT_BUILDER.comment(comment)
+    private static void initSetting(ModConfigSpec.Builder CLIENT_BUILDER, String settingName, int setting, String comment) {
+        ModConfigSpec.ConfigValue<String> value = CLIENT_BUILDER.comment(comment)
                 .define(settingName, Integer.toHexString(setting & 0xffffff));
         colorConfigValues.put(settingName, value);
     }

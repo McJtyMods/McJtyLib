@@ -6,9 +6,15 @@ import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+
+import static mcjty.lib.setup.ModSetup.PREFERENCES_CAPABILITY;
 
 public class PreferencesProperties {
 
@@ -114,6 +120,11 @@ public class PreferencesProperties {
     }
 
     public static void register(RegisterCapabilitiesEvent event) {
-        event.register(PreferencesProperties.class);
+        event.registerEntity(PREFERENCES_CAPABILITY, EntityType.PLAYER, new ICapabilityProvider<>() {
+            @Override
+            public @Nullable PreferencesProperties getCapability(Player o, Void unused) {
+                return new PreferencesProperties();
+            }
+        });
     }
 }

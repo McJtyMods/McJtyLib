@@ -13,7 +13,6 @@ import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
-import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.ComponentFactory;
@@ -38,7 +37,8 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -249,14 +249,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     @Override
     protected void renderBg(@Nonnull GuiGraphics graphics, float partialTicks, int x, int y) {
-        drawWindow(graphics);
+        drawWindow(graphics, partialTicks, x, y);
     }
 
-    protected void drawWindow(GuiGraphics graphics) {
+    protected void drawWindow(GuiGraphics graphics, float partialTicks, int x, int y) {
         if (window == null) {
             return;
         }
-        renderBackground(graphics);
+        renderBackground(graphics, x, y, partialTicks); // @todo NEO is this correct?
         getWindowManager().syncBindings(tileEntity);
         getWindowManager().draw(graphics);
     }
@@ -508,9 +508,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        tileEntity.getCapability(ForgeCapabilities.ENERGY).ifPresent(e -> {
-            energyBar.maxValue(((GenericEnergyStorage)e).getCapacity());
-            energyBar.value(((GenericEnergyStorage)e).getEnergy());
-        });
+        IEnergyStorage power = tileEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, tileEntity.getBlockPos(), null);
+        if (power != null) {
+            energyBar.maxValue(power.getMaxEnergyStored());
+            energyBar.value(power.getEnergyStored());
+        }
     }
 }

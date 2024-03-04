@@ -5,7 +5,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.network.chat.Style;
 import net.minecraft.ChatFormatting;
-import net.neoforged.neoforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,7 +19,7 @@ public class Logging {
     private final Logger logger;
 
     public static boolean debugMode = false;
-    public static ForgeConfigSpec.BooleanValue doLogging;
+    public static ModConfigSpec.BooleanValue doLogging;
 
     private Logging() {
         logger = LogManager.getLogger(McJtyLib.MODID);

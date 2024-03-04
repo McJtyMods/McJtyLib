@@ -33,11 +33,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.common.util.Lazy;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -62,67 +59,72 @@ public class GenericTileEntity extends BlockEntity {
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for the annotations and replaces itself with
     // a function that does the actual testing
-    private BiFunction<Capability, Direction, LazyOptional> capSetup;
-    private final List<LazyOptional> lazyOptsToClean = new ArrayList<>();
+    // @todo NEO
+//    private BiFunction<Capability, Direction, LazyOptional> capSetup;
+//    private final List<LazyOptional> lazyOptsToClean = new ArrayList<>();
 
     public GenericTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         // Setup code to find the capability annotations and in that code we
         // replace 'capSetup' with the actual code to execute the annotations
-        capSetup = (cap,dir) -> {
-            List<Pair<Field, Cap>> list = getAnnotationHolder().capabilityList;
-            capSetup = generateCapTests(list, 0);
-            return capSetup.apply(cap, dir);
-        };
+        // @todo NEO
+//        capSetup = (cap,dir) -> {
+//            List<Pair<Field, Cap>> list = getAnnotationHolder().capabilityList;
+//            capSetup = generateCapTests(list, 0);
+//            return capSetup.apply(cap, dir);
+//        };
         // Make sure the annotation holder exists
         getAnnotationHolder();
     }
 
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-//        lazyOptsToClean.forEach(LazyOptional::invalidate);
-//        lazyOptsToClean.clear();
-    }
+    // @todo NEO
+//    @Override
+//    public void invalidateCaps() {
+//        super.invalidateCaps();
+////        lazyOptsToClean.forEach(LazyOptional::invalidate);
+////        lazyOptsToClean.clear();
+//    }
 
-    private BiFunction<Capability, Direction, LazyOptional> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
-        if (index >= caps.size()) {
-            return super::getCapability;
-        } else {
-            try {
-                Cap annotation = caps.get(index).getRight();
-                Object instance = FieldUtils.readField(caps.get(index).getLeft(), this, true);
-                LazyOptional lazy;
-                if (instance instanceof LazyOptional) {
-                    lazy = (LazyOptional) instance;
-                } else if (instance instanceof Lazy<?>) {
-                    lazy = LazyOptional.of(() -> ((Lazy<?>) instance).get());
-                } else if (annotation.type() == CapType.ITEMS_AUTOMATION) {
-                    lazy = LazyOptional.of(() -> new AutomationFilterItemHander((GenericItemHandler) instance));
-                } else {
-                    lazy = LazyOptional.of(() -> instance);
-                }
-                lazyOptsToClean.add(lazy);
-                BiFunction<Capability, Direction, LazyOptional> tail = generateCapTests(caps, index + 1);
-                Capability desiredCapability = annotation.type().getCapability();
-                return (cap, dir) -> {
-                    if (cap == desiredCapability) {
-                        return lazy;
-                    } else {
-                        return tail.apply(cap, dir);
-                    }
-                };
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
+    // @todo NEO
+//    private BiFunction<Capability, Direction, LazyOptional> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
+//        if (index >= caps.size()) {
+//            return super::getCapability;
+//        } else {
+//            try {
+//                Cap annotation = caps.get(index).getRight();
+//                Object instance = FieldUtils.readField(caps.get(index).getLeft(), this, true);
+//                LazyOptional lazy;
+//                if (instance instanceof LazyOptional) {
+//                    lazy = (LazyOptional) instance;
+//                } else if (instance instanceof Lazy<?>) {
+//                    lazy = LazyOptional.of(() -> ((Lazy<?>) instance).get());
+//                } else if (annotation.type() == CapType.ITEMS_AUTOMATION) {
+//                    lazy = LazyOptional.of(() -> new AutomationFilterItemHander((GenericItemHandler) instance));
+//                } else {
+//                    lazy = LazyOptional.of(() -> instance);
+//                }
+//                lazyOptsToClean.add(lazy);
+//                BiFunction<Capability, Direction, LazyOptional> tail = generateCapTests(caps, index + 1);
+//                Capability desiredCapability = annotation.type().getCapability();
+//                return (cap, dir) -> {
+//                    if (cap == desiredCapability) {
+//                        return lazy;
+//                    } else {
+//                        return tail.apply(cap, dir);
+//                    }
+//                };
+//            } catch (IllegalAccessException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//    }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return capSetup.apply(cap, side);
-    }
+    // @todo NEO
+//    @Nonnull
+//    @Override
+//    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+//        return capSetup.apply(cap, side);
+//    }
 
     public void markDirtyClient() {
         setChanged();
@@ -281,35 +283,38 @@ public class GenericTileEntity extends BlockEntity {
     protected void loadCaps(CompoundTag tagCompound) {
         if (tagCompound.contains("Info")) {
             CompoundTag infoTag = tagCompound.getCompound("Info");
-            getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
+            // @todo NEO
+//            getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
         }
         loadItemHandlerCap(tagCompound);
         loadEnergyCap(tagCompound);
     }
 
     protected void loadItemHandlerCap(CompoundTag tagCompound) {
-        getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .filter(h -> h instanceof INBTSerializable)
-                .map(h -> (INBTSerializable) h)
-                .ifPresent(h -> {
-                    // For compatibility with loot tables we check McItems first
-                    if (tagCompound.contains("McItems")) {
-                        h.deserializeNBT(tagCompound.getList("McItems", Tag.TAG_COMPOUND));
-                    } else {
-                        h.deserializeNBT(tagCompound.getList("Items", Tag.TAG_COMPOUND));
-                    }
-                });
+        // @todo NEO
+//        getCapability(ForgeCapabilities.ITEM_HANDLER)
+//                .filter(h -> h instanceof INBTSerializable)
+//                .map(h -> (INBTSerializable) h)
+//                .ifPresent(h -> {
+//                    // For compatibility with loot tables we check McItems first
+//                    if (tagCompound.contains("McItems")) {
+//                        h.deserializeNBT(tagCompound.getList("McItems", Tag.TAG_COMPOUND));
+//                    } else {
+//                        h.deserializeNBT(tagCompound.getList("Items", Tag.TAG_COMPOUND));
+//                    }
+//                });
     }
 
     protected void loadEnergyCap(CompoundTag tagCompound) {
-        getCapability(ForgeCapabilities.ENERGY)
-                .filter(h -> h instanceof INBTSerializable)
-                .map(h -> (INBTSerializable) h)
-                .ifPresent(h -> {
-                    if (tagCompound.contains("Energy")) {
-                        h.deserializeNBT(tagCompound.get("Energy"));
-                    }
-                });
+        // @todo NEO
+//        getCapability(ForgeCapabilities.ENERGY)
+//                .filter(h -> h instanceof INBTSerializable)
+//                .map(h -> (INBTSerializable) h)
+//                .ifPresent(h -> {
+//                    if (tagCompound.contains("Energy")) {
+//                        h.deserializeNBT(tagCompound.get("Energy"));
+//                    }
+//                });
     }
 
     protected void loadInfo(CompoundTag tagCompound) {

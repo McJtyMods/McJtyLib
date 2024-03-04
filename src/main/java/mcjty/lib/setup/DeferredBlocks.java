@@ -1,7 +1,7 @@
 package mcjty.lib.setup;
 
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.eventbus.api.IEventBus;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.ForgeRegistries;
 

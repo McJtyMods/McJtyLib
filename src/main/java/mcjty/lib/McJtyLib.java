@@ -10,14 +10,12 @@ import mcjty.lib.setup.Registration;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.api.distmarker.Dist;
-import net.neoforged.neoforge.common.util.LazyOptional;
-import net.neoforged.neoforge.eventbus.api.IEventBus;
-import net.neoforged.neoforge.fml.ModLoadingContext;
-import net.neoforged.neoforge.fml.common.Mod;
-import net.neoforged.neoforge.fml.config.ModConfig;
-import net.neoforged.neoforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.neoforged.neoforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -38,14 +36,12 @@ public class McJtyLib {
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
     private static final Map<String, CommandInfo> commandInfos = new HashMap<>();
 
-    public McJtyLib() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        Dist dist = FMLEnvironment.dist;
+    public McJtyLib(IEventBus bus, Dist dist) {
 
         instance = this;
         // Register the setup method for modloading
         Registration.init(bus);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(setup::init);
+        bus.addListener(setup::init);
         if (dist.isClient()) {
             bus.addListener(ClientSetup::init);
             bus.addListener(ClientSetup::registerKeyBinds);
@@ -96,7 +92,7 @@ public class McJtyLib {
         return command.execute(player, arguments);
     }
 
-    public static LazyOptional<PreferencesProperties> getPreferencesProperties(Player player) {
+    public static PreferencesProperties getPreferencesProperties(Player player) {
         return player.getCapability(ModSetup.PREFERENCES_CAPABILITY);
     }
 }

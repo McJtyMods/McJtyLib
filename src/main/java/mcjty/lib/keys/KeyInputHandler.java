@@ -2,7 +2,7 @@ package mcjty.lib.keys;
 
 import mcjty.lib.client.ClientManualHelper;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 public class KeyInputHandler {
 
