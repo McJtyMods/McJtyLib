@@ -24,7 +24,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
     private List<String> choiceList = new ArrayList<>();
     private Map<String,List<String>> tooltipMap = new HashMap<>();
     private String currentChoice = null;
-    private List<ChoiceEvent> choiceEvents = null;
+    private List<ChoiceEvent<String>> choiceEvents = null;
 
     public ChoiceLabel() {
         text("");
@@ -120,7 +120,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
         return null;
     }
 
-    public ChoiceLabel event(ChoiceEvent event) {
+    public ChoiceLabel event(ChoiceEvent<String> event) {
         if (choiceEvents == null) {
             choiceEvents = new ArrayList<>();
         }
@@ -128,7 +128,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
         return this;
     }
 
-    public void removeChoiceEvent(ChoiceEvent event) {
+    public void removeChoiceEvent(ChoiceEvent<String> event) {
         if (choiceEvents != null) {
             choiceEvents.remove(event);
         }
@@ -142,7 +142,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
             .build());
 
         if (choiceEvents != null) {
-            for (ChoiceEvent event : choiceEvents) {
+            for (ChoiceEvent<String> event : choiceEvents) {
                 event.choiceChanged(choice);
             }
         }
