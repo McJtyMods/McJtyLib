@@ -136,6 +136,7 @@ public class TextField extends AbstractWidget<TextField> {
 //                window.setTextFocus(null);
                 return false;
             } else if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+                fireTextEnterEvents(text);
                 return false;
             } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
                 if (isRegionSelected()) {
