@@ -1,5 +1,5 @@
 package mcjty.lib.gui.events;
 
-public interface ChoiceEvent {
-    void choiceChanged(String newChoice);
+public interface ChoiceEvent<T> {
+    void choiceChanged(T newChoice);
 }

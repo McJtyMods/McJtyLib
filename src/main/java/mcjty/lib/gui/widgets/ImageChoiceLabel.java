@@ -34,7 +34,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     private int highlightedChoice = -1;     // If this choice is selected we 'highlight' it (only in combination with withBorder=true)
 
     private int currentChoice = -1;
-    private List<ChoiceEvent> choiceEvents = null;
+    private List<ChoiceEvent<String>> choiceEvents = null;
 
     public boolean isWithBorder() {
         return withBorder;
@@ -138,7 +138,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         return choiceList.get(currentChoice).choice();
     }
 
-    public ImageChoiceLabel event(ChoiceEvent event) {
+    public ImageChoiceLabel event(ChoiceEvent<String> event) {
         if (choiceEvents == null) {
             choiceEvents = new ArrayList<>();
         }
@@ -146,7 +146,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         return this;
     }
 
-    public void removeChoiceEvent(ChoiceEvent event) {
+    public void removeChoiceEvent(ChoiceEvent<String> event) {
         if (choiceEvents != null) {
             choiceEvents.remove(event);
         }
@@ -159,7 +159,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
                 .put(PARAM_CHOICE_IDX, currentChoice)
                 .build());
         if (choiceEvents != null) {
-            for (ChoiceEvent event : choiceEvents) {
+            for (ChoiceEvent<String> event : choiceEvents) {
                 event.choiceChanged(choice);
             }
         }
