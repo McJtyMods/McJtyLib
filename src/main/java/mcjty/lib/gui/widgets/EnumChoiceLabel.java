@@ -160,7 +160,6 @@ public class EnumChoiceLabel extends AbstractLabel<EnumChoiceLabel>  {
 
     @Override
     public void readFromGuiCommand(GuiParser.GuiCommand command) {
-        System.out.println("readFromGuiCommand");
         super.readFromGuiCommand(command);
         command.findCommand("choices").ifPresent(cmd -> {
             cmd.commands().forEach(choiceCmd -> {
@@ -177,7 +176,6 @@ public class EnumChoiceLabel extends AbstractLabel<EnumChoiceLabel>  {
 
     @Override
     public void fillGuiCommand(GuiParser.GuiCommand command) {
-        System.out.println("fillGuiCommand");
         super.fillGuiCommand(command);
         command.removeParameter(1); // We don't need the name as set by the label
         GuiParser.GuiCommand choicesCmd = new GuiParser.GuiCommand("choices");
