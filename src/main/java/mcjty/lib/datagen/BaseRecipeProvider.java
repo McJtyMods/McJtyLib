@@ -2,7 +2,7 @@ package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
@@ -48,7 +48,7 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         return this;
     }
 
-    private void buildIntern(Consumer<FinishedRecipe> consumer,
+    private void buildIntern(RecipeOutput consumer,
                              Consumer<String> lineConsumer, BiConsumer<Character, Ingredient> ingredientConsumer, String... lines) {
         Set<Character> characters = new HashSet<>();
         for (String line : lines) {
@@ -63,30 +63,30 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         }
     }
 
-    protected void build(Consumer<FinishedRecipe> consumer, IRecipeBuilder<?> builder, String... lines) {
+    protected void build(RecipeOutput consumer, IRecipeBuilder<?> builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::define, lines);
         builder.setGroup(group).build(consumer);
     }
 
-    protected void build(Consumer<FinishedRecipe> consumer, ShapedRecipeBuilder builder, String... lines) {
+    protected void build(RecipeOutput consumer, ShapedRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::pattern, builder::define, lines);
         builder.group(group).save(consumer);
     }
 
-    protected void build(Consumer<FinishedRecipe> consumer, ShapelessRecipeBuilder builder) {
+    protected void build(RecipeOutput consumer, ShapelessRecipeBuilder builder) {
         builder.group(group).save(consumer);
     }
 
-    protected void build(Consumer<FinishedRecipe> consumer, ResourceLocation id, ShapelessRecipeBuilder builder) {
+    protected void build(RecipeOutput consumer, ResourceLocation id, ShapelessRecipeBuilder builder) {
         builder.group(group).save(consumer, id);
     }
 
-    protected void build(Consumer<FinishedRecipe> consumer, ResourceLocation id, IRecipeBuilder<?> builder, String... lines) {
+    protected void build(RecipeOutput consumer, ResourceLocation id, IRecipeBuilder<?> builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::define, lines);
         builder.setGroup(group).build(consumer, id);
     }
 
-    protected void build(Consumer<FinishedRecipe> consumer, ResourceLocation id, ShapedRecipeBuilder builder, String... lines) {
+    protected void build(RecipeOutput consumer, ResourceLocation id, ShapedRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::pattern, builder::define, lines);
         builder.group(group).save(consumer, id);
     }

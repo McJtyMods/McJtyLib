@@ -1,17 +1,18 @@
 package mcjty.lib.network;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 public record PacketSendPreferencesToClient(BuffStyle buffStyle, Integer buffX, Integer buffY, GuiStyle style) implements CustomPacketPayload {
 
     public final static ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "sendpreferences");
 
-    public static PacketSendPreferencesToClient create(ByteBuf buf) {
+    public static PacketSendPreferencesToClient create(FriendlyByteBuf buf) {
         BuffStyle buffStyle = BuffStyle.values()[buf.readInt()];
         int buffX = buf.readInt();
         int buffY = buf.readInt();

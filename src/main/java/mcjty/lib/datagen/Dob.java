@@ -2,11 +2,11 @@ package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -59,6 +59,18 @@ public record Dob(
 
     public static Builder entityBuilder(Supplier<? extends EntityType> entitySupplier) {
         return new Builder(null, null, entitySupplier);
+    }
+
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(MinMaxBounds.Ints ints, ItemLike item) {
+        return RecipeProvider.has(ints, item);
+    }
+
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item) {
+        return RecipeProvider.has(item);
+    }
+
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(TagKey<Item> item) {
+        return RecipeProvider.has(item);
     }
 
     public static class Builder {

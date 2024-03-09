@@ -4,6 +4,7 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 public record PacketSendClientCommand(String modid, String command, TypedMap arguments) implements CustomPacketPayload {
 

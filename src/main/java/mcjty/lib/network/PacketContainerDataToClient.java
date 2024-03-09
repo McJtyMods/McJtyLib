@@ -9,6 +9,7 @@ import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 public record PacketContainerDataToClient(ResourceLocation containerId, FriendlyByteBuf buffer) implements CustomPacketPayload {
 

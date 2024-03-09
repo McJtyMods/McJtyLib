@@ -11,6 +11,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to

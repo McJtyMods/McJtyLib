@@ -1,12 +1,11 @@
 package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 /**
  * Change the GUI style.
@@ -39,7 +38,10 @@ public record PacketSetGuiStyle(String style) implements CustomPacketPayload {
 
     private static void handle(PacketSetGuiStyle message, PlayPayloadContext ctx) {
         ctx.player().ifPresent(player -> {
-            McJtyLib.getPreferencesProperties(player).ifPresent(p -> p.setStyle(message.style));
+            PreferencesProperties v = McJtyLib.getPreferencesProperties(player);
+            if (v != null) {
+                v.setStyle(message.style);
+            }
         });
     }
 }

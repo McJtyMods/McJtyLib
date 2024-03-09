@@ -11,6 +11,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 /**
  * This packet is used (typically by PacketRequestDataFromServer) to send back a data to the client.

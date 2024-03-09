@@ -5,6 +5,7 @@ import mcjty.lib.compat.patchouli.PatchouliCompatibility;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 /**
  * Open the manual

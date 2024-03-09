@@ -6,17 +6,14 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementRewards;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTriggerInstance;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
-import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import org.apache.logging.log4j.LogManager;
@@ -29,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static mcjty.lib.setup.Registration.COPYNBT_SERIALIZER;
-import static mezz.jei.api.ingredients.subtypes.UidContext.Recipe;
 
 public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder> {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -85,7 +81,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
         }
     }
 
-    public CopyNBTRecipeBuilder unlockedBy(String name, CriterionTriggerInstance criterionIn) {
+    public CopyNBTRecipeBuilder unlockedBy(String name, Criterion<? extends CriterionTriggerInstance> criterionIn) {
         this.advancementBuilder.addCriterion(name, criterionIn);
         return this;
     }
@@ -114,10 +110,12 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
     @Override
     public void build(RecipeOutput consumerIn, ResourceLocation id) {
         this.validate(id);
-        this.advancementBuilder.parent(new ResourceLocation("recipes/root")).addCriterion("has_the_recipe",
-                new RecipeUnlockedTrigger.TriggerInstance(ContextAwarePredicate.ANY /* @todo 1.16, is this right? */, id)).rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
+        // @todo NEO
+//        this.advancementBuilder.parent(new ResourceLocation("recipes/root")).addCriterion("has_the_recipe",
+//                new RecipeUnlockedTrigger.TriggerInstance(Optional.empty(), id)).rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
         String folder = ""; // @todo 1.19.3 this.result.getItemCategory().getRecipeFolderName();
-        consumerIn.accept(new ResourceLocation(id.getNamespace(), "recipes/" + folder + "/" + id.getPath()), new Result(id, this.result, this.count, this.group == null ? "" : this.group, this.pattern, this.key, this.advancementBuilder);
+        Result r = new Result(id, this.result, this.count, this.group == null ? "" : this.group, this.pattern, this.key, this.advancementBuilder, new ResourceLocation("recipes/root"));
+        consumerIn.accept(new ResourceLocation(id.getNamespace(), "recipes/" + folder + "/" + id.getPath()), r, null);// @todo NEO advancement holder
     }
 
     private void validate(ResourceLocation id) {
