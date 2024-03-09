@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -64,9 +63,12 @@ public class GuiTools {
                     @Nullable
                     @Override
                     public AbstractContainerMenu createMenu(int id, @Nonnull Inventory inventory, @Nonnull Player player) {
-                        return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY)
-                                .map(h -> h.createMenu(id, inventory, player))
-                                .orElse(null);
+                        MenuProvider h = te.getLevel().getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY, te.getBlockPos(), null);
+                        if (h != null) {
+                            return h.createMenu(id, inventory, player);
+                        } else {
+                            return null;
+                        }
                     }
                 });
     }

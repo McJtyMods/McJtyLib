@@ -1,15 +1,19 @@
 package mcjty.lib.datagen;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.Util;
-import net.minecraft.advancements.critereon.*;
+import net.minecraft.advancements.critereon.ContextAwarePredicate;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.data.tags.ItemTagsProvider;
@@ -25,9 +29,9 @@ import net.neoforged.neoforge.common.data.JsonCodecProvider;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -70,10 +74,16 @@ public class DataGen {
 
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
             for (Dob dob : dobs) {
-                Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
+//                Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
+                HolderLookup.Provider provider = dob.holderLookupSupplier().get(entry.getKey());
                 if (!entries.isEmpty()) {
-                    generator.addProvider(event.includeServer(), new JsonCodecProvider<>(generator.getPackOutput(), event.getExistingFileHelper(),
-                            modid, JsonOps.INSTANCE, PackType.SERVER_DATA, entry.getValue().directory(), entry.getValue().codec(), entries));
+                    generator.addProvider(event.includeServer(), new JsonCodecProvider<>(generator.getPackOutput(), PackOutput.Target.DATA_PACK, entry.getValue().directory(),
+                            PackType.SERVER_DATA, entry.getValue().codec(), CompletableFuture.completedFuture(provider), modid, event.getExistingFileHelper()) {
+                        @Override
+                        protected void gather() {
+
+                        }
+                    });
                 }
             }
         }
@@ -81,7 +91,7 @@ public class DataGen {
         generator.addProvider(event.includeServer(), new BaseRecipeProvider(generator) {
 
             @Override
-            protected void buildRecipes(Consumer<FinishedRecipe> consumer) {
+            protected void buildRecipes(RecipeOutput consumer) {
                 for (Dob dob : dobs) {
                     dob.recipe().accept(new IRecipeFactory() {
                         @Override
@@ -223,11 +233,11 @@ public class DataGen {
                     for (Map.Entry<String, String> entry : keyedMessages.entrySet()) {
                         String key;
                         if (dob.blockSupplier() != null) {
-                            key = Util.makeDescriptionId("message", ForgeRegistries.BLOCKS.getKey(dob.blockSupplier().get()));
+                            key = Util.makeDescriptionId("message", BuiltInRegistries.BLOCK.getKey(dob.blockSupplier().get()));
                         } else if (dob.itemSupplier() != null) {
-                            key = Util.makeDescriptionId("message", ForgeRegistries.ITEMS.getKey(dob.itemSupplier().get()));
+                            key = Util.makeDescriptionId("message", BuiltInRegistries.ITEM.getKey(dob.itemSupplier().get()));
                         } else if (dob.entitySupplier() != null) {
-                            key = Util.makeDescriptionId("message", ForgeRegistries.ENTITY_TYPES.getKey(dob.entitySupplier().get()));
+                            key = Util.makeDescriptionId("message", BuiltInRegistries.ENTITY_TYPE.getKey(dob.entitySupplier().get()));
                         } else {
                             throw new RuntimeException("Not supported!");
                         }

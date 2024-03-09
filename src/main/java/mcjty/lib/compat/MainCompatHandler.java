@@ -1,7 +1,7 @@
 package mcjty.lib.compat;
 
 import mcjty.lib.compat.theoneprobe.TOPCompatibility;
-import net.neoforged.neoforge.fml.ModList;
+import net.neoforged.fml.ModList;
 
 public class MainCompatHandler {
 

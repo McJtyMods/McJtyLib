@@ -491,17 +491,17 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         }
     }
 
-    public static MenuType<AbstractContainerMenu> createContainerType(String registryName) {
-        MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {
-            BlockPos pos = data.readBlockPos();
-            BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
-            if (te == null) {
-                throw new IllegalStateException("Something went wrong getting the GUI");
-            }
-            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> Objects.requireNonNull(h.createMenu(windowId, inv, inv.player))).orElseThrow(RuntimeException::new);
-        });
-        return containerType;
-    }
+//    public static MenuType<AbstractContainerMenu> createContainerType(String registryName) {
+//        MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {
+//            BlockPos pos = data.readBlockPos();
+//            BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
+//            if (te == null) {
+//                throw new IllegalStateException("Something went wrong getting the GUI");
+//            }
+//            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> Objects.requireNonNull(h.createMenu(windowId, inv, inv.player))).orElseThrow(RuntimeException::new);
+//        });
+//        return containerType;
+//    }
 
     public static <T extends AbstractContainerMenu> MenuType<T> createContainerType() {
         MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {

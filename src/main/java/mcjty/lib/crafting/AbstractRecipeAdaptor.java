@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
 
-public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingContainer> {
+public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.neoforged.neoforge.common.crafting.IShapedRecipe<CraftingContainer> {
 
     private final ShapedRecipe recipe;
 

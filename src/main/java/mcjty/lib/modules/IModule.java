@@ -2,7 +2,7 @@ package mcjty.lib.modules;
 
 import mcjty.lib.datagen.DataGen;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public interface IModule {

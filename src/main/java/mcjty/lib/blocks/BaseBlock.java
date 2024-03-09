@@ -22,9 +22,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -46,7 +46,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.network.NetworkHooks;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -239,16 +238,18 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             return false;
         }
 
-        return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> {
+        MenuProvider h = world.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY, new BlockPos(x, y, z), null);
+        if (h != null) {
             if (world.isClientSide) {
                 return true;
             }
             if (checkAccess(world, player, te)) {
                 return true;
             }
-            NetworkHooks.openScreen((ServerPlayer) player, h, te.getBlockPos());
+            player.openMenu(h, te.getBlockPos());
             return true;
-        }).orElse(false);
+        }
+        return false;
     }
 
 

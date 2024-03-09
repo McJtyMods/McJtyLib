@@ -1,17 +1,16 @@
 package mcjty.lib.container;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * This inventory locator serves as a cache and a way to quickly items in an adjacent
@@ -23,32 +22,26 @@ public class InventoryLocator {
     private Direction inventorySide = null;
 
     @Nonnull
-    private LazyOptional<IItemHandler> getItemHandlerAtDirection(Level worldObj, BlockPos thisCoordinate, Direction direction) {
+    private IItemHandler getItemHandlerAtDirection(Level worldObj, BlockPos thisCoordinate, Direction direction) {
         if (direction == null) {
             if (inventoryCoordinate != null) {
                 return getItemHandlerAtCoordinate(worldObj, inventoryCoordinate, inventorySide);
             }
-            return LazyOptional.empty();
+            return null;
         }
-        BlockEntity te = worldObj.getBlockEntity(thisCoordinate);
-        if (te == null) {
-            return LazyOptional.empty();
-        }
-        return te.getCapability(ForgeCapabilities.ITEM_HANDLER, direction.getOpposite()).map(handler -> {
+        if (worldObj.getCapability(Capabilities.ItemHandler.BLOCK, thisCoordinate, direction.getOpposite()) != null) {
             // Remember in inventoryCoordinate (acts as a cache)
             inventoryCoordinate = thisCoordinate.relative(direction);
             inventorySide = direction.getOpposite();
             return getItemHandlerAtCoordinate(worldObj, inventoryCoordinate, inventorySide);
-        }).orElse(LazyOptional.empty());
+        } else {
+            return null;
+        }
     }
 
-    @Nonnull
-    private LazyOptional<IItemHandler> getItemHandlerAtCoordinate(Level worldObj, BlockPos c, Direction direction) {
-        BlockEntity te = worldObj.getBlockEntity(c);
-        if (te == null) {
-            return LazyOptional.empty();
-        }
-        return te.getCapability(ForgeCapabilities.ITEM_HANDLER, direction);
+    @Nullable
+    private IItemHandler getItemHandlerAtCoordinate(Level worldObj, BlockPos c, Direction direction) {
+        return worldObj.getCapability(Capabilities.ItemHandler.BLOCK, c, direction);
     }
 
 
@@ -57,8 +50,10 @@ public class InventoryLocator {
             if (stack.isEmpty()) {
                 break;
             }
-            ItemStack finalStack = stack;
-            stack = getItemHandlerAtDirection(worldObj, thisCoordinate, dir).map(handler -> ItemHandlerHelper.insertItem(handler, finalStack, false)).orElse(stack);
+            IItemHandler itemHandler = getItemHandlerAtDirection(worldObj, thisCoordinate, dir);
+            if (itemHandler != null) {
+                stack = ItemHandlerHelper.insertItem(itemHandler, stack, false);
+            }
         }
 
         if (!stack.isEmpty()) {

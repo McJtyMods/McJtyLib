@@ -31,7 +31,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fml.ModList;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.ForgeRegistries;
@@ -79,11 +79,11 @@ public class Tools {
     }
 
     public static Item getItem(ResourceLocation id) {
-        return ForgeRegistries.ITEMS.getValue(id);
+        return BuiltInRegistries.ITEM.getValue(id);
     }
 
     public static EntityType<?> getEntity(ResourceLocation id) {
-        return ForgeRegistries.ENTITY_TYPES.getValue(id);
+        return BuiltInRegistries.ENTITY_TYPE.getValue(id);
     }
 
     public static Fluid getFluid(ResourceLocation id) {
@@ -99,15 +99,15 @@ public class Tools {
     }
 
     public static ResourceLocation getId(EntityType<?> entityType) {
-        return ForgeRegistries.ENTITY_TYPES.getKey(entityType);
+        return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
     }
 
     public static ResourceLocation getId(ItemStack item) {
-        return ForgeRegistries.ITEMS.getKey(item.getItem());
+        return BuiltInRegistries.ITEM.getKey(item.getItem());
     }
 
     public static ResourceLocation getId(Item item) {
-        return ForgeRegistries.ITEMS.getKey(item);
+        return BuiltInRegistries.ITEM.getKey(item);
     }
 
     public static ResourceLocation getId(BlockState block) {

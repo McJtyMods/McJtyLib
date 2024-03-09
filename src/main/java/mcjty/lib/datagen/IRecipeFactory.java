@@ -2,7 +2,7 @@ package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 
@@ -13,7 +13,7 @@ public interface IRecipeFactory {
 
     void recipe(Supplier<IRecipeBuilder> supplier);
 
-    void recipeConsumer(Supplier<Consumer<Consumer<FinishedRecipe>>> consumerSupplier);
+    void recipeConsumer(Supplier<Consumer<RecipeOutput>> consumerSupplier);
 
     void recipe(String id, Supplier<IRecipeBuilder> supplier);
 

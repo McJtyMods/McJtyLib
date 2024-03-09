@@ -4,9 +4,9 @@ import mcjty.lib.client.DelayedRenderer;
 import mcjty.lib.gui.IKeyReceiver;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.Widget;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.neoforge.eventbus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 
 public class ClientEventHandler {
@@ -38,7 +38,8 @@ public class ClientEventHandler {
                 if (manager != null) {
                     if (manager.getModalWindows().findFirst().isPresent()) {
                         // There is a modal window. Eat this event and send it directly to the window
-                        if (container.mouseScrolledFromEvent(event.getMouseX(), event.getMouseY(), event.getScrollDelta())) {
+                        // @todo NEO DeltaX?
+                        if (container.mouseScrolledFromEvent(event.getMouseX(), event.getMouseY(), event.getScrollDeltaX())) {
                             event.setCanceled(true);
                         }
                     }
