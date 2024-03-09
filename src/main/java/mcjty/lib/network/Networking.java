@@ -1,16 +1,19 @@
 package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
 import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 
 public class Networking {
 
     private static IPayloadRegistrar registrar;
 
-    public static void registerMessages() {
-        registrar = registrar(McJtyLib.MODID)
+    public static void registerMessages(RegisterPayloadHandlerEvent event) {
+        registrar = event.registrar(McJtyLib.MODID)
                 .versioned("1.0")
                 .optional();
 
@@ -33,19 +36,11 @@ public class Networking {
         registrar.play(PacketFinalizeLogin.ID, PacketFinalizeLogin::create, handler -> handler.client(PacketFinalizeLogin::handle));
     }
 
-    public static void sendToServer(Object msg) {
-        registrar.getChannel().sendToServer(msg);
+    public static void sendToServer(CustomPacketPayload msg) {
+        PacketDistributor.SERVER.with(null).send(msg);
     }
 
-    public static SimpleChannel getChannel() {
-        return registrar.getChannel();
-    }
-
-    public static <T> void sendToPlayer(T packet, Player player) {
-        registrar.getChannel().sendTo(packet, ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-    }
-
-    public static IPayloadRegistrar registrar(String modid) {
-        return new SimpleWrapperRegistrar(modid);
+    public static <T extends CustomPacketPayload> void sendToPlayer(T packet, Player player) {
+        PacketDistributor.PLAYER.with((ServerPlayer) player).send(packet);
     }
 }

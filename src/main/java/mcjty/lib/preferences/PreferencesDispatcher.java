@@ -3,8 +3,9 @@ package mcjty.lib.preferences;
 import mcjty.lib.setup.ModSetup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
+//import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.common.util.LazyOptional;
 
@@ -14,10 +15,15 @@ import javax.annotation.Nullable;
 public class PreferencesDispatcher implements ICapabilityProvider, INBTSerializable<CompoundTag> {
 
     private final PreferencesProperties properties = createProperties();
-    private final LazyOptional<PreferencesProperties> propertiesCap = LazyOptional.of(() -> properties);
 
     private <T> PreferencesProperties createProperties() {
         return new PreferencesProperties();
+    }
+
+    @Nullable
+    @Override
+    public Object getCapability(Object o, Object o2) {
+        return null;
     }
 
     @Nonnull

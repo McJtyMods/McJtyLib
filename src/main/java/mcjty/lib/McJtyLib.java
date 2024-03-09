@@ -3,6 +3,7 @@ package mcjty.lib;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.network.IServerCommand;
+import mcjty.lib.network.Networking;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.setup.ClientSetup;
 import mcjty.lib.setup.ModSetup;
@@ -15,7 +16,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
@@ -42,6 +42,8 @@ public class McJtyLib {
         // Register the setup method for modloading
         Registration.init(bus);
         bus.addListener(setup::init);
+        bus.addListener(Networking::registerMessages);
+        
         if (dist.isClient()) {
             bus.addListener(ClientSetup::init);
             bus.addListener(ClientSetup::registerKeyBinds);

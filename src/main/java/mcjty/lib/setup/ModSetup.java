@@ -35,7 +35,6 @@ public class ModSetup extends DefaultModSetup {
     @Override
     public void init(FMLCommonSetupEvent e) {
         super.init(e);
-        Networking.registerMessages();
         NeoForge.EVENT_BUS.register(new EventHandler());
     }
 
