@@ -6,17 +6,11 @@ import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendPreferencesToClient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 
-import static mcjty.lib.setup.ModSetup.PREFERENCES_CAPABILITY;
-
-public class PreferencesProperties {
+public class PreferencesProperties implements INBTSerializable<CompoundTag>  {
 
     private static final int DEFAULT_BUFFX = -20;
     private static final int DEFAULT_BUFFY = -20;
@@ -36,6 +30,18 @@ public class PreferencesProperties {
         if (dirty) {
             syncToClient(player);
         }
+    }
+
+    @Override
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = new CompoundTag();
+        saveNBTData(tag);
+        return tag;
+    }
+
+    @Override
+    public void deserializeNBT(CompoundTag compoundTag) {
+        loadNBTData(compoundTag);
     }
 
     private void syncToClient(ServerPlayer player) {
@@ -117,14 +123,5 @@ public class PreferencesProperties {
 
     public int getBuffY() {
         return buffY;
-    }
-
-    public static void register(RegisterCapabilitiesEvent event) {
-        event.registerEntity(PREFERENCES_CAPABILITY, EntityType.PLAYER, new ICapabilityProvider<>() {
-            @Override
-            public @Nullable PreferencesProperties getCapability(Player o, Void unused) {
-                return new PreferencesProperties();
-            }
-        });
     }
 }

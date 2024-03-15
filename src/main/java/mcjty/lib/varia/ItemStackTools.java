@@ -11,8 +11,9 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,9 +33,12 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .map(handler -> handler.extractItem(slot, amount, false))
-                .orElse(ItemStack.EMPTY);
+        IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+        if (handler != null) {
+            return handler.extractItem(slot, amount, false);
+        } else {
+            return ItemStack.EMPTY;
+        }
     }
 
     /**

@@ -4,6 +4,10 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
+import net.minecraft.network.protocol.common.ServerboundClientInformationPacket;
+import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
+import net.minecraft.network.protocol.common.ServerboundKeepAlivePacket;
+import net.minecraft.network.protocol.common.ServerboundResourcePackPacket;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -74,6 +78,7 @@ public class FakePlayerConnection extends ServerGamePacketListenerImpl {
     @Override
     public void handleResourcePackResponse(@Nonnull ServerboundResourcePackPacket packetIn) {
     }
+
 
     @Override
     public void handleChat(@Nonnull ServerboundChatPacket packetIn) {

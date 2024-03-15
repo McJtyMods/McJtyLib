@@ -3,21 +3,19 @@ package mcjty.lib.varia;
 import mcjty.lib.api.power.IBigPower;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower {
 
     private final ItemStack itemStack;
     private final IEnergyItem item;
 
-    private final LazyOptional<IEnergyStorage> energy = LazyOptional.of(this::createEnergyStorage);
+    private final Lazy<IEnergyStorage> energy = Lazy.of(this::createEnergyStorage);
 
     @Nonnull
     private <T> IEnergyStorage createEnergyStorage() {
@@ -59,21 +57,27 @@ public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower {
         this.item = item;
     }
 
-    @Nonnull
+    @Nullable
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        return getCapability(cap);
+    public Object getCapability(Object o, Object o2) {
+        return null;
     }
 
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability) {
-        if (capability == ForgeCapabilities.ENERGY) {
-            return energy.cast();
-        }
-        return LazyOptional.empty();
-    }
-
+    //    @Nonnull
+//    @Override
+//    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+//        return getCapability(cap);
+//    }
+//
+//    @Nonnull
+//    @Override
+//    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability) {
+//        if (capability == ForgeCapabilities.ENERGY) {
+//            return energy.cast();
+//        }
+//        return LazyOptional.empty();
+//    }
+//
     @Override
     public long getStoredPower() {
         return item.getEnergyStoredL(itemStack);

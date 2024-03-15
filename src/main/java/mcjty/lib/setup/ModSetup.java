@@ -16,11 +16,7 @@ import static mcjty.lib.McJtyLib.MODID;
 
 public class ModSetup extends DefaultModSetup {
 
-    public static final ResourceLocation PREFERENCES_CAPABILITY_KEY = new ResourceLocation(MODID, "preferences");
-
     public static boolean patchouli = false;
-
-    public static EntityCapability<PreferencesProperties, Void> PREFERENCES_CAPABILITY = EntityCapability.createVoid(PREFERENCES_CAPABILITY_KEY, PreferencesProperties.class);
 
     // @todo NEO
 //    @SubscribeEvent

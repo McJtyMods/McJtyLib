@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -34,8 +35,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.ForgeRegistries;
-import net.neoforged.neoforge.registries.IForgeRegistry;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
@@ -51,12 +50,6 @@ public class Tools {
 
     public static DeferredRegister<PlacementModifierType<?>> createPlacementRegistry(String modid) {
         return DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, modid);
-    }
-
-    public static <T> Supplier<IForgeRegistry<T>> makeCustomRegistry(DeferredRegister<T> defferedRegistry, Codec<T> codec) {
-//        return defferedRegistry.makeRegistry(() -> new RegistryBuilder<T>().dataPackRegistry(codec));
-        // Not on 1.19.3
-        return null;
     }
 
     public interface IDPRegister {
@@ -75,27 +68,27 @@ public class Tools {
     }
 
     public static Block getBlock(ResourceLocation id) {
-        return ForgeRegistries.BLOCKS.getValue(id);
+        return BuiltInRegistries.BLOCK.get(id);
     }
 
     public static Item getItem(ResourceLocation id) {
-        return BuiltInRegistries.ITEM.getValue(id);
+        return BuiltInRegistries.ITEM.get(id);
     }
 
     public static EntityType<?> getEntity(ResourceLocation id) {
-        return BuiltInRegistries.ENTITY_TYPE.getValue(id);
+        return BuiltInRegistries.ENTITY_TYPE.get(id);
     }
 
     public static Fluid getFluid(ResourceLocation id) {
-        return ForgeRegistries.FLUIDS.getValue(id);
+        return BuiltInRegistries.FLUID.get(id);
     }
 
     public static MobEffect getEffect(ResourceLocation id) {
-        return ForgeRegistries.MOB_EFFECTS.getValue(id);
+        return BuiltInRegistries.MOB_EFFECT.get(id);
     }
 
     public static SoundEvent getSound(ResourceLocation resourceLocation) {
-        return ForgeRegistries.SOUND_EVENTS.getValue(resourceLocation);
+        return BuiltInRegistries.SOUND_EVENT.get(resourceLocation);
     }
 
     public static ResourceLocation getId(EntityType<?> entityType) {
@@ -111,23 +104,23 @@ public class Tools {
     }
 
     public static ResourceLocation getId(BlockState block) {
-        return ForgeRegistries.BLOCKS.getKey(block.getBlock());
+        return BuiltInRegistries.BLOCK.getKey(block.getBlock());
     }
 
     public static ResourceLocation getId(Block block) {
-        return ForgeRegistries.BLOCKS.getKey(block);
+        return BuiltInRegistries.BLOCK.getKey(block);
     }
 
     public static ResourceLocation getId(FluidStack fluid) {
-        return ForgeRegistries.FLUIDS.getKey(fluid.getFluid());
+        return BuiltInRegistries.FLUID.getKey(fluid.getFluid());
     }
 
     public static ResourceLocation getId(FluidState fluid) {
-        return ForgeRegistries.FLUIDS.getKey(fluid.getType());
+        return BuiltInRegistries.FLUID.getKey(fluid.getType());
     }
 
     public static ResourceLocation getId(Fluid fluid) {
-        return ForgeRegistries.FLUIDS.getKey(fluid);
+        return BuiltInRegistries.FLUID.getKey(fluid);
     }
 
     public static ResourceLocation getId(CommonLevelAccessor level, Biome biome) {
@@ -147,7 +140,7 @@ public class Tools {
     }
 
     public static String getModName(Fluid entry) {
-        ResourceLocation registryName = ForgeRegistries.FLUIDS.getKey(entry);
+        ResourceLocation registryName = BuiltInRegistries.FLUID.getKey(entry);
         String modId = registryName == null ? "minecraft" : registryName.getNamespace();
         return ModList.get().getModContainerById(modId)
                 .map(mod -> mod.getModInfo().getDisplayName())
@@ -155,7 +148,7 @@ public class Tools {
     }
 
     public static String getModName(Block entry) {
-        ResourceLocation registryName = ForgeRegistries.BLOCKS.getKey(entry);
+        ResourceLocation registryName = BuiltInRegistries.BLOCK.getKey(entry);
         String modId = registryName == null ? "minecraft" : registryName.getNamespace();
         return ModList.get().getModContainerById(modId)
                 .map(mod -> mod.getModInfo().getDisplayName())

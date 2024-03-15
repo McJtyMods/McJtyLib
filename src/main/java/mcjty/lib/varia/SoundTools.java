@@ -10,7 +10,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.registries.RegistryObject;
 
 public class SoundTools {
 
@@ -22,8 +21,8 @@ public class SoundTools {
     public static SoundEvent findSound(ResourceLocation name) {
         // @todo not nice. Hardcoded event names. For 1.19.3 compatibility
         return switch (name.toString()) {
-            case "minecraft:block.note_block.bell" -> SoundEvents.NOTE_BLOCK_BELL.get();
-            case "minecraft:block.note_block.pling" -> SoundEvents.NOTE_BLOCK_PLING.get();
+            case "minecraft:block.note_block.bell" -> SoundEvents.NOTE_BLOCK_BELL.value();
+            case "minecraft:block.note_block.pling" -> SoundEvents.NOTE_BLOCK_PLING.value();
             default -> SoundEvents.EXPERIENCE_ORB_PICKUP;
         };
     }
