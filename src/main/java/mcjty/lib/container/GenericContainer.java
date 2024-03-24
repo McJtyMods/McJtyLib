@@ -17,6 +17,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
@@ -510,7 +511,11 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
-            return te.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY).map(h -> Objects.requireNonNull(h.createMenu(windowId, inv, inv.player))).orElseThrow(RuntimeException::new);
+            MenuProvider capability = te.getLevel().getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY, pos, null);
+            if (capability == null) {
+                throw new IllegalStateException("Something went wrong getting the GUI");
+            }
+            return capability.createMenu(windowId, inv, inv.player);
         });
         return (MenuType<T>) containerType;
     }

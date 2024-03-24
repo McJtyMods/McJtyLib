@@ -49,9 +49,12 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .map(handler -> handler.getStackInSlot(slot))
-                .orElse(ItemStack.EMPTY);
+        IItemHandler h = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+        if (h != null) {
+            return h.getStackInSlot(slot);
+        } else {
+            return ItemStack.EMPTY;
+        }
     }
 
     public static GuiParser.GuiCommand itemStackToGuiCommand(String name, ItemStack item) {

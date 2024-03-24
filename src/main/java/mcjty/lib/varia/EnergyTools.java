@@ -8,7 +8,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicLong;
@@ -22,7 +23,7 @@ public class EnergyTools {
         if (te == null) {
             return false;
         }
-        return te.getCapability(ForgeCapabilities.ENERGY, side).isPresent();
+        return te.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, te.getBlockPos(), side) != null;
     }
 
     public static boolean isEnergyItem(ItemStack stack) {
@@ -30,7 +31,7 @@ public class EnergyTools {
         if (item instanceof IEnergyItem) {
             return true;
         }
-        return stack.getCapability(ForgeCapabilities.ENERGY).isPresent();
+        return stack.getCapability(Capabilities.EnergyStorage.ITEM) != null;
     }
 
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
@@ -41,7 +42,14 @@ public class EnergyTools {
             maxEnergyStored = ((IBigPower) tileEntity).getCapacity();
             energyStored = ((IBigPower) tileEntity).getStoredPower();
         } else if (tileEntity != null) {
-            return tileEntity.getCapability(ForgeCapabilities.ENERGY, side).map(h -> new EnergyLevel(h.getEnergyStored(), h.getMaxEnergyStored())).orElse(new EnergyLevel(0, 0));
+            IEnergyStorage capability = tileEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, tileEntity.getBlockPos(), side);
+            if (capability == null) {
+                maxEnergyStored = 0;
+                energyStored = 0;
+            } else {
+                maxEnergyStored = capability.getMaxEnergyStored();
+                energyStored = capability.getEnergyStored();
+            }
         } else {
             maxEnergyStored = 0;
             energyStored = 0;

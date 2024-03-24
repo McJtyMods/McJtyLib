@@ -1,6 +1,7 @@
 package mcjty.lib.tileentity;
 
 import mcjty.lib.api.infusable.CapabilityInfusable;
+import mcjty.lib.api.infusable.IInfusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
@@ -33,8 +34,11 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.common.util.Lazy;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -359,23 +363,27 @@ public class GenericTileEntity extends BlockEntity {
 
     protected void saveCaps(CompoundTag tagCompound) {
         CompoundTag infoTag = getOrCreateInfo(tagCompound);
-        getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> infoTag.putInt("infused", h.getInfused()));
+        IInfusable capability = level.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY, worldPosition, null);
+        if (capability != null) {
+            infoTag.putInt("infused", capability.getInfused());
+        }
         saveItemHandlerCap(tagCompound);
         saveEnergyCap(tagCompound);
     }
 
     protected void saveItemHandlerCap(CompoundTag tagCompound) {
-        getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .filter(h -> h instanceof INBTSerializable)
-                .map(h -> (INBTSerializable) h)
-                .ifPresent(h -> tagCompound.put("Items", h.serializeNBT()));
+        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, worldPosition, null);
+        if (handler instanceof INBTSerializable s) {
+            CompoundTag items = new CompoundTag();
+            tagCompound.put("Items", s.serializeNBT());
+        }
     }
 
     protected void saveEnergyCap(CompoundTag tagCompound) {
-        getCapability(ForgeCapabilities.ENERGY)
-                .filter(h -> h instanceof INBTSerializable)
-                .map(h -> (INBTSerializable) h)
-                .ifPresent(h -> tagCompound.put("Energy", h.serializeNBT()));
+        IEnergyStorage capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, worldPosition, null);
+        if (capability instanceof INBTSerializable h) {
+            tagCompound.put("Energy", h.serializeNBT());
+        }
     }
 
     protected void saveInfo(CompoundTag tagCompound) {

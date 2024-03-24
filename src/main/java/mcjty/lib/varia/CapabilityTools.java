@@ -2,39 +2,36 @@ package mcjty.lib.varia;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class CapabilityTools {
 
-    @Nonnull
-    public static LazyOptional<IItemHandler> getItemCapabilitySafe(BlockEntity tileEntity) {
-        if (tileEntity == null) {
-            return LazyOptional.empty();
+    @Nullable
+    public static IItemHandler getItemCapabilitySafe(BlockEntity tileEntity) {
+        if (tileEntity != null) {
+            try {
+                return tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+            } catch (RuntimeException e) {
+                reportWrongBlock(tileEntity, e);
+            }
         }
-        try {
-            return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER);
-        } catch (RuntimeException e) {
-            reportWrongBlock(tileEntity, e);
-            return LazyOptional.empty();
-        }
+        return null;
     }
 
-    @Nonnull
-    public static LazyOptional<IFluidHandler> getFluidCapabilitySafe(BlockEntity tileEntity) {
-        if (tileEntity == null) {
-            return LazyOptional.empty();
+    @Nullable
+    public static IFluidHandler getFluidCapabilitySafe(BlockEntity tileEntity) {
+        if (tileEntity != null) {
+            try {
+                return tileEntity.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, tileEntity.getBlockPos(), null);
+            } catch (RuntimeException e) {
+                reportWrongBlock(tileEntity, e);
+            }
         }
-        try {
-            return tileEntity.getCapability(ForgeCapabilities.FLUID_HANDLER);
-        } catch (RuntimeException e) {
-            reportWrongBlock(tileEntity, e);
-            return LazyOptional.empty();
-        }
+        return null;
     }
 
     private static void reportWrongBlock(BlockEntity tileEntity, Exception e) {

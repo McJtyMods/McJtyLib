@@ -5,7 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
@@ -22,11 +22,16 @@ public class InventoryTools {
             return 0;
         }
 
-        return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).map(IItemHandler::getSlots).orElse(0);
+        IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+        if (handler != null) {
+            return handler.getSlots();
+        } else {
+            return 0;
+        }
     }
 
     public static boolean isInventory(BlockEntity te) {
-        return te != null && te.getCapability(ForgeCapabilities.ITEM_HANDLER).isPresent();
+        return te != null && te.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, te.getBlockPos(), null) != null;
     }
 
     /**
@@ -36,14 +41,15 @@ public class InventoryTools {
         Stream.Builder<ItemStack> builder = Stream.builder();
 
         if (tileEntity != null) {
-            tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handler -> {
+            IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+            if (handler != null) {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack itemStack = handler.getStackInSlot(i);
                     if (!itemStack.isEmpty() && predicate.test(itemStack)) {
                         builder.add(itemStack);
                     }
                 }
-            });
+            }
         }
         return builder.build();
     }
@@ -54,7 +60,8 @@ public class InventoryTools {
     @Nonnull
     public static ItemStack getFirstMatchingItem(BlockEntity tileEntity, Predicate<ItemStack> predicate) {
         if (tileEntity != null) {
-            return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).map(handler -> {
+            IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+            if (handler != null) {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack itemStack = handler.getStackInSlot(i);
                     if (!itemStack.isEmpty() && predicate.test(itemStack)) {
@@ -62,7 +69,7 @@ public class InventoryTools {
                     }
                 }
                 return ItemStack.EMPTY;
-            }).orElse(ItemStack.EMPTY);
+            }
         }
         return ItemStack.EMPTY;
     }
@@ -77,9 +84,12 @@ public class InventoryTools {
         BlockEntity te = world.getBlockEntity(direction == null ? pos : pos.relative(direction));
         if (te != null) {
             Direction opposite = direction == null ? null : direction.getOpposite();
-            return te.getCapability(ForgeCapabilities.ITEM_HANDLER, opposite)
-                    .map(handler -> ItemHandlerHelper.insertItem(handler, s, false))
-                    .orElse(ItemStack.EMPTY);
+            IItemHandler handler = te.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, te.getBlockPos(), opposite);
+            if (handler != null) {
+                return ItemHandlerHelper.insertItem(handler, s, false);
+            } else {
+                return ItemStack.EMPTY;
+            }
         }
         return s;
     }
