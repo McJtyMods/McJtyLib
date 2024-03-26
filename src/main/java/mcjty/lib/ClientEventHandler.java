@@ -83,7 +83,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onGuiInput(ScreenEvent.CharacterTyped event) {
+    public void onGuiInput(ScreenEvent.CharacterTyped.Pre event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 Widget<?> focus;
@@ -102,7 +102,7 @@ public class ClientEventHandler {
     }
 
     @SubscribeEvent
-    public void onKeyboardInput(ScreenEvent.KeyPressed event) {
+    public void onKeyboardInput(ScreenEvent.KeyPressed.Pre event) {
         if (event.getScreen() instanceof IKeyReceiver container) {
             if (container.getWindow() != null) {
                 Widget<?> focus;

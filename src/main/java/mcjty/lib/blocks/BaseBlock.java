@@ -3,6 +3,7 @@ package mcjty.lib.blocks;
 import mcjty.lib.api.ITabExpander;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.module.CapabilityModuleSupport;
+import mcjty.lib.api.module.IModuleSupport;
 import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.builder.BlockBuilder;
@@ -184,12 +185,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         if (!heldItem.isEmpty()) {
             BlockEntity te = world.getBlockEntity(pos);
             if (te != null) {
-                return te.getCapability(CapabilityModuleSupport.MODULE_CAPABILITY).map(h -> {
+                IModuleSupport h = world.getCapability(CapabilityModuleSupport.MODULE_CAPABILITY, pos, null);
+                if (h != null) {
                     if (h.isModule(heldItem)) {
                         return ModuleTools.installModule(player, heldItem, hand, pos, h.getFirstSlot(), h.getLastSlot());
                     }
-                    return false;
-                }).orElse(false);
+                }
             }
         }
         return false;

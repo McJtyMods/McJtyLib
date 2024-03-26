@@ -91,7 +91,7 @@ public class GuiTools {
 
         CompoundTag written = te.saveWithoutMetadata();
 
-        NetworkHooks.openScreen((ServerPlayer) player, provider.apply(te), buf -> {
+        player.openMenu(provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
             buf.writeResourceLocation(world.dimension().location());
             buf.writeNbt(written);

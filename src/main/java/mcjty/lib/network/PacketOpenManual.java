@@ -22,7 +22,7 @@ public record PacketOpenManual(ResourceLocation manual, ResourceLocation entry, 
         return new PacketOpenManual(manual, entry, page);
     }
 
-    public static Object create(ResourceLocation manual, ResourceLocation entry, int page) {
+    public static PacketOpenManual create(ResourceLocation manual, ResourceLocation entry, int page) {
         return new PacketOpenManual(manual, entry, page);
     }
 

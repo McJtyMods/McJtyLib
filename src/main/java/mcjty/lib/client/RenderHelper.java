@@ -185,7 +185,8 @@ public class RenderHelper {
 //        GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.setXRot(0.0F);
-        matrixStack.translate(0.0F, (float) entity.getMyRidingOffset(), 0.0F);
+        // @todo NeoForge, is getFirstPassenger correct?
+        matrixStack.translate(0.0F, (float) entity.getMyRidingOffset(entity.getFirstPassenger()), 0.0F);
         // @todo 1.15
 //        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
 //        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
