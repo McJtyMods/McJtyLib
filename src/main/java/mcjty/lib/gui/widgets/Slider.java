@@ -199,16 +199,16 @@ public class Slider extends AbstractWidget<Slider> {
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double amount) {
+    public boolean mouseScrolled(double x, double y, double dx, double dy) {
         int first = scrollable.getFirstSelected();
 
         int divider = scrollable.getMaximum() - scrollable.getCountSelected();
         if (divider <= 0) {
             first = 0;
         } else {
-            if (amount > 0) {
+            if (dx > 0) {
                 first -= 3;
-            } else if (amount < 0) {
+            } else if (dx < 0) {
                 first += 3;
             }
         }

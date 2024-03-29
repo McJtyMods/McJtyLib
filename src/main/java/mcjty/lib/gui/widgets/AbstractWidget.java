@@ -419,7 +419,7 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double amount) {
+    public boolean mouseScrolled(double x, double y, double dx, double dy) {
         return false;
     }
 

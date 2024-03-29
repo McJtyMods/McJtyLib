@@ -73,11 +73,12 @@ public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.neofo
         return recipe.matches(inv, worldIn);
     }
 
-    @Override
-    @Nonnull
-    public ResourceLocation getId() {
-        return recipe.getId();
-    }
+    // @todo NEO
+//    @Override
+//    @Nonnull
+//    public ResourceLocation getId() {
+//        return recipe.getId();
+//    }
 
     @Override
     @Nonnull

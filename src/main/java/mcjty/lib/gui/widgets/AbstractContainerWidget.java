@@ -37,13 +37,13 @@ public abstract class AbstractContainerWidget<P extends AbstractContainerWidget<
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double amount) {
+    public boolean mouseScrolled(double x, double y, double dx, double dy) {
         x -= bounds.x;
         y -= bounds.y;
 
         for (Widget<?> child : children) {
             if (child.in(x, y) && child.isVisible()) {
-                if (child.mouseScrolled(x, y, amount)) {
+                if (child.mouseScrolled(x, y, dx, dy)) {
                     return true;
                 }
             }

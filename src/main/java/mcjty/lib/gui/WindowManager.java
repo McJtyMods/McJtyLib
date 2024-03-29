@@ -28,7 +28,8 @@ public class WindowManager {
 
     // If -1 it is not this window manager that manages the mousewheel but
     // the window itself
-    private int mouseWheel = -1;
+    private int mouseWheelX = -1;
+    private int mouseWheelY = -1;
 
     public WindowManager(Screen gui) {
         this.gui = gui;
@@ -84,8 +85,12 @@ public class WindowManager {
         }
     }
 
-    public int getMouseWheel() {
-        return mouseWheel;
+    public int getMouseWheelX() {
+        return mouseWheelX;
+    }
+
+    public int getMouseWheelY() {
+        return mouseWheelY;
     }
 
     public <T extends GenericTileEntity> void syncBindings(T te) {
@@ -94,7 +99,8 @@ public class WindowManager {
     }
 
     public void draw(GuiGraphics graphics) {
-        mouseWheel = 0;// @todo 1.14 Mouse.getDWheel();
+        mouseWheelX = 0;// @todo 1.14 Mouse.getDWheel();
+        mouseWheelY = 0;// @todo 1.14 Mouse.getDWheel();
         windows.forEach(window -> window.draw(graphics));
         modalWindows.forEach(window -> window.draw(graphics));
         iconManager.draw(gui, graphics);
@@ -154,8 +160,8 @@ public class WindowManager {
         getInteractableWindows().forEach(w -> w.mouseDragged(x, y, button));
     }
 
-    public void mouseScrolled(double x, double y, double amount) {
-        getInteractableWindows().forEach(w -> w.mouseScrolled(x, y, amount));
+    public void mouseScrolled(double x, double y, double dx, double dy) {
+        getInteractableWindows().forEach(w -> w.mouseScrolled(x, y, dx, dy));
     }
 
     public void mouseReleased(double x, double y, int state) {

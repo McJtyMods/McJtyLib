@@ -8,14 +8,19 @@ import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -140,8 +145,9 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
                 throw new IllegalStateException("Ingredients are defined but not used in pattern for recipe " + id);
             } else if (this.pattern.size() == 1 && this.pattern.get(0).length() == 1) {
                 throw new IllegalStateException("Shaped recipe " + id + " only takes in a single item - should it be a shapeless recipe instead?");
-            } else if (this.advancementBuilder.getCriteria().isEmpty()) {
-                throw new IllegalStateException("No way of obtaining recipe " + id);
+                // @todo NEO
+//            } else if (this.advancementBuilder.getCriteria().isEmpty()) {
+//                throw new IllegalStateException("No way of obtaining recipe " + id);
             }
         }
     }
@@ -168,7 +174,8 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
         }
 
 
-        @Override
+        // @todo NEO
+//        @Override
         public void serializeRecipeData(@Nonnull JsonObject json) {
             if (!this.group.isEmpty()) {
                 json.addProperty("group", this.group);
@@ -183,9 +190,10 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
             json.add("pattern", jsonarray);
             JsonObject jsonobject = new JsonObject();
 
-            for(Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {
-                jsonobject.add(String.valueOf(entry.getKey()), entry.getValue().toJson());
-            }
+            // @todo NEO
+//            for(Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {
+//                jsonobject.add(String.valueOf(entry.getKey()), entry.getValue().toJson());
+//            }
 
             json.add("key", jsonobject);
             JsonObject jsonobject1 = new JsonObject();
@@ -197,38 +205,78 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
             json.add("result", jsonobject1);
         }
 
+        // @todo NEO
         @Override
-        @Nonnull
-        public RecipeSerializer<?> getType() {
-            return COPYNBT_SERIALIZER.get();
+        public boolean matches(Container container, Level level) {
+            return false;
         }
+
+        // @todo NEO
+        @Override
+        public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+            return null;
+        }
+
+        // @todo NEO
+        @Override
+        public boolean canCraftInDimensions(int i, int i1) {
+            return false;
+        }
+
+        // @todo NEO
+        @Override
+        public ItemStack getResultItem(RegistryAccess registryAccess) {
+            return null;
+        }
+
+        // @todo NEO
+        @Override
+        public RecipeSerializer<?> getSerializer() {
+            return null;
+        }
+
+        // @todo NEO
+        @Override
+        public RecipeType<?> getType() {
+            return null;
+        }
+
+        // @todo NEO
+//        @Override
+//        @Nonnull
+//        public RecipeSerializer<?> getType() {
+//            return COPYNBT_SERIALIZER.get();
+//        }
 
         /**
          * Gets the ID for the recipe.
          */
-        @Override
-        @Nonnull
-        public ResourceLocation getId() {
-            return this.id;
-        }
+        // @todo NEO
+//        @Override
+//        @Nonnull
+//        public ResourceLocation getId() {
+//            return this.id;
+//        }
 
         /**
          * Gets the JSON for the advancement that unlocks this recipe. Null if there is no advancement.
          */
-        @Override
-        @Nullable
-        public JsonObject serializeAdvancement() {
-            return this.advancementBuilder.serializeToJson();
-        }
+        // @todo NEO
+//        @Override
+//        @Nullable
+//        public JsonObject serializeAdvancement() {
+//            return this.advancementBuilder.serializeToJson();
+//        }
 
         /**
          * Gets the ID for the advancement associated with this recipe. Should not be null if {@link #getAdvancementJson}
          * is non-null.
          */
-        @Override
-        @Nullable
-        public ResourceLocation getAdvancementId() {
-            return this.advancementId;
-        }
+        // @todo NEO
+//        @Override
+//        @Nullable
+//        public ResourceLocation getAdvancementId() {
+//            return this.advancementId;
+//        }
     }
 }

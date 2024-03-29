@@ -167,7 +167,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
         }
 
         // Use the function above to force reset of the slider in case the contents changed so that it doesn't look weird.
-        mouseScrolled(x, y, 0);
+        mouseScrolled(x, y, 0, 0);
 
         super.draw(gui, graphics, x, y);
         int xx = x + bounds.x + leftMargin;
@@ -334,14 +334,14 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double amount) {
+    public boolean mouseScrolled(double x, double y, double dx, double dy) {
         int divider = getMaximum() - getCountSelected();
         if (divider <= 0) {
             first = 0;
         } else {
-            if (amount > 0) {
+            if (dx > 0) {
                 first -= 3;
-            } else if (amount < 0) {
+            } else if (dx < 0) {
                 first += 3;
             }
         }

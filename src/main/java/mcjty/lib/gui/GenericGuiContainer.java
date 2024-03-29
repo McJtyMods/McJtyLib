@@ -386,10 +386,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double amount) {
-        boolean rc = super.mouseScrolled(x, y, amount);
+    public boolean mouseScrolled(double x, double y, double dx, double dy) {
+        boolean rc = super.mouseScrolled(x, y, dx, dy);
         if (window != null) {
-            getWindowManager().mouseScrolled(x, y, amount);
+            getWindowManager().mouseScrolled(x, y, dx, dy);
         }
         return false;
     }
@@ -436,9 +436,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public boolean mouseScrolledFromEvent(double x, double y, double amount) {
+    public boolean mouseScrolledFromEvent(double x, double y, double dx, double dy) {
         WindowManager manager = getWindow().getWindowManager();
-        manager.mouseScrolled(x, y, amount);
+        manager.mouseScrolled(x, y, dx, dy);
         return true;
     }
 

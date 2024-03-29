@@ -35,7 +35,8 @@ public class GuiSideWindow {
     }
 
     public void initGui(final Minecraft mc, Screen gui, int guiLeft, int guiTop, int xSize, int ySize) {
-        style = McJtyLib.getPreferencesProperties(mc.player).map(PreferencesProperties::getStyle).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
+        PreferencesProperties properties = McJtyLib.getPreferencesProperties(mc.player);
+        style = properties != null ? properties.getStyle() : GuiStyle.STYLE_FLAT_GRADIENT;
 
         Button helpButton = button(1, 1, 16, 16, "?")
                 .tooltips("Open manual")

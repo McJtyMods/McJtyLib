@@ -268,9 +268,9 @@ public class Window {
         toplevel.mouseMove(x, y);
     }
 
-    public void mouseScrolled(double x, double y, double amount) {
+    public void mouseScrolled(double x, double y, double dx, double dy) {
         toplevel.setWindow(this);
-        toplevel.mouseScrolled(x, y, amount);
+        toplevel.mouseScrolled(x, y, dx, dy);
     }
 
     public void mouseReleased(double x, double y, int button) {
@@ -349,20 +349,26 @@ public class Window {
             hover.hovering(true);
         }
 
-        int dwheel;
+        int dwheelX, dwheelY;
         if (windowManager == null) {
-            dwheel = 0;// @todo 1.14 Mouse.getDWheel();
+            dwheelX = 0;// @todo 1.14 Mouse.getDWheel();
+            dwheelY = 0;// @todo 1.14 Mouse.getDWheel();
         } else {
-            dwheel = windowManager.getMouseWheel();
-            if (dwheel == -1) {
-                dwheel = 0; // @todo 1.14 Mouse.getDWheel();
+            dwheelX = windowManager.getMouseWheelX();
+            if (dwheelX == -1) {
+                dwheelX = 0; // @todo 1.14 Mouse.getDWheel();
+            }
+            dwheelY = windowManager.getMouseWheelY();
+            if (dwheelY == -1) {
+                dwheelY = 0; // @todo 1.14 Mouse.getDWheel();
             }
         }
-        if (dwheel != 0) {
+        if (dwheelX != 0 || dwheelY != 0) {
             toplevel.setWindow(this);
-            toplevel.mouseScrolled(x, y, dwheel);
+            toplevel.mouseScrolled(x, y, dwheelX, dwheelY);
         }
-        currentStyle = McJtyLib.getPreferencesProperties(gui.getMinecraft().player).map(PreferencesProperties::getStyle).orElse(GuiStyle.STYLE_FLAT_GRADIENT);
+        PreferencesProperties preferencesProperties = McJtyLib.getPreferencesProperties(gui.getMinecraft().player);
+        currentStyle = preferencesProperties != null ? preferencesProperties.getStyle() : GuiStyle.STYLE_FLAT_GRADIENT;
 
         toplevel.setWindow(this);
         toplevel.draw(gui, graphics, 0, 0);

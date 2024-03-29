@@ -168,7 +168,7 @@ public interface Widget<P extends Widget<P>> {
      * Handle mousewheel.
      * @return true if handled
      */
-    boolean mouseScrolled(double x, double y, double amount);
+    boolean mouseScrolled(double x, double y, double dx, double dy);
 
     /**
      * Handle a keyboard event.

@@ -70,10 +70,10 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double amount) {
-        boolean rc = super.mouseScrolled(x, y, amount);
-        window.mouseScrolled(x, y, amount);
-        sideWindow.getWindow().mouseScrolled(x, y, amount);
+    public boolean mouseScrolled(double x, double y, double dx, double dy) {
+        boolean rc = super.mouseScrolled(x, y, dx, dy);
+        window.mouseScrolled(x, y, dx, dy);
+        sideWindow.getWindow().mouseScrolled(x, y, dx, dy);
         return rc;
     }
 
@@ -93,8 +93,8 @@ public abstract class GuiItemScreen extends Screen {
         return rc;
     }
 
-    public void drawWindow(GuiGraphics graphics) {
-        this.renderBackground(graphics);
+    public void drawWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(graphics, mouseX, mouseY, partialTicks);
         window.draw(graphics);
         sideWindow.getWindow().draw(graphics);
         List<String> tooltips = window.getTooltips();

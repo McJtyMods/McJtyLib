@@ -14,7 +14,7 @@ public interface IKeyReceiver {
     // This is called only if there is a global window open
     boolean mouseClickedFromEvent(double x, double y, int button);
     boolean mouseReleasedFromEvent(double x, double y, int button);
-    boolean mouseScrolledFromEvent(double x, double y, double amount);
+    boolean mouseScrolledFromEvent(double x, double y, double dx, double dy);
 
     void charTypedFromEvent(char codePoint);
 }
