@@ -61,10 +61,11 @@ public class EnergyTools {
         AtomicLong maxEnergyStored = new AtomicLong();
         AtomicLong energyStored = new AtomicLong();
         if (tileEntity != null) {
-            tileEntity.getCapability(ForgeCapabilities.ENERGY, side).ifPresent(handler -> {
+            IEnergyStorage handler = tileEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, tileEntity.getBlockPos(), side);
+            if (handler != null) {
                 maxEnergyStored.set(handler.getMaxEnergyStored());
                 energyStored.set(handler.getEnergyStored());
-            });
+            }
         } else {
             maxEnergyStored.set(0);
             energyStored.set(0);
@@ -74,8 +75,8 @@ public class EnergyTools {
 
     public static long receiveEnergy(BlockEntity tileEntity, Direction from, long maxReceive) {
         if (tileEntity != null) {
-            return tileEntity.getCapability(ForgeCapabilities.ENERGY, from).map(handler ->
-                    handler.receiveEnergy(unsignedClampToInt(maxReceive), false)).orElse(0);
+            IEnergyStorage handler = tileEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, tileEntity.getBlockPos(), from);
+            return handler != null ? handler.receiveEnergy(unsignedClampToInt(maxReceive), false) : 0;
         }
         return 0;
     }

@@ -95,6 +95,6 @@ public class McJtyLib {
     }
 
     public static PreferencesProperties getPreferencesProperties(Player player) {
-        return player.getCapability(ModSetup.PREFERENCES_CAPABILITY);
+        return player.getData(Registration.PREFERENCES_PROPERTIES);
     }
 }

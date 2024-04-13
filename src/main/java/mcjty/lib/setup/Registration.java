@@ -23,7 +23,7 @@ public class Registration {
     }
 
     public static Supplier<CopyNBTRecipeSerializer> COPYNBT_SERIALIZER = RECIPE_SERIALIZERS.register("copy_nbt", CopyNBTRecipeSerializer::new);
-    private static final Supplier<AttachmentType<PreferencesProperties>> PREFERENCES_PROPERTIES = ATTACHMENT_TYPES.register(
+    public static final Supplier<AttachmentType<PreferencesProperties>> PREFERENCES_PROPERTIES = ATTACHMENT_TYPES.register(
             "preferences_properties", () -> AttachmentType.serializable(PreferencesProperties::new).build());
 
 }
