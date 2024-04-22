@@ -1,5 +1,6 @@
 Upcoming:
 - Fixed a problem with the hud renderer having wrong orientation
+- Various changes by Dertiende for the upcoming XNet release
 
 1.20-8.0.3:
 - Fixed patchouli integration
