@@ -1,4 +1,4 @@
-Upcoming:
+1.19-7.2.6:
 - Various changes by Dertiende for the upcoming XNet release
 
 1.19-7.2.5:
