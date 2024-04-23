@@ -1,6 +1,7 @@
 1.20-8.0.4:
 - Fixed a problem with the hud renderer having wrong orientation
 - Various changes by Dertiende for the upcoming XNet release
+- Many changes to make porting to 1.20.4 Neo easier
 
 1.20-8.0.3:
 - Fixed patchouli integration
