@@ -6,6 +6,7 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.events.BlockRenderEvent;
+import mcjty.lib.gui.events.ItemStackDraggedEvent;
 import mcjty.lib.typed.Type;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.Tools;
@@ -36,6 +37,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     private boolean showLabel = DEFAULT_SHOW_LABEL;
     private Integer labelColor = null;
     private List<BlockRenderEvent> selectionEvents = null;
+    private List<ItemStackDraggedEvent> draggedEvents = null;
 
     public Object getRenderItem() {
         return renderItem;
@@ -166,9 +168,26 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         return this;
     }
 
+    public BlockRender event(ItemStackDraggedEvent event) {
+        if (draggedEvents == null) {
+            draggedEvents = new ArrayList<>();
+        }
+        draggedEvents.add(event);
+        return this;
+    }
+
     public void removeSelectionEvent(BlockRenderEvent event) {
         if (selectionEvents != null) {
             selectionEvents.remove(event);
+        }
+    }
+
+    public void fireDraggedEvents(ItemStack itemStack) {
+        fireChannelEvents("itemdragged");
+        if (draggedEvents != null) {
+            for (ItemStackDraggedEvent event : draggedEvents) {
+                event.setItemStack(itemStack);
+            }
         }
     }
 
