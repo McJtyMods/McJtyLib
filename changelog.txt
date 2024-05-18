@@ -1,3 +1,6 @@
+1.20-8.0.5:
+- Some changes for XNet by Dertiende
+
 1.20-8.0.4:
 - Fixed a problem with the hud renderer having wrong orientation
 - Various changes by Dertiende for the upcoming XNet release
