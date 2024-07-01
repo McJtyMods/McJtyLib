@@ -171,7 +171,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
         }
 
         ImageLabel colors = new ImageLabel()
-                .image(new ResourceLocation(McJtyLib.MODID, "textures/gui/colorpicker.png"), 0, 0)
+                .image(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "textures/gui/colorpicker.png"), 0, 0)
                 .setTextureDimensions(128, 128)
                 .hint(105, 5, 128, 128);
 

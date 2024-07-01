@@ -10,7 +10,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.EntityCapability;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import static mcjty.lib.McJtyLib.MODID;
 
@@ -42,11 +42,11 @@ public class ModSetup extends DefaultModSetup {
     public static class EventHandler {
 
         @SubscribeEvent
-        public void onPlayerTickEvent(TickEvent.PlayerTickEvent event) {
-            if (event.phase == TickEvent.Phase.START && !event.player.getCommandSenderWorld().isClientSide) {
-                PreferencesProperties properties = McJtyLib.getPreferencesProperties(event.player);
+        public void onPlayerTickEvent(PlayerTickEvent.Pre event) {
+            if (!event.getEntity().getCommandSenderWorld().isClientSide) {
+                PreferencesProperties properties = McJtyLib.getPreferencesProperties(event.getEntity());
                 if (properties != null) {
-                    properties.tick((ServerPlayer) event.player);
+                    properties.tick((ServerPlayer) event.getEntity());
                 }
             }
         }

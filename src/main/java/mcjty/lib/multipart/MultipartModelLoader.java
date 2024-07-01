@@ -4,7 +4,7 @@ public class MultipartModelLoader {} /*implements IGeometryLoader<MultipartModel
 
 
     public static void register(ModelRegistryEvent event) {
-        ModelLoaderRegistry.registerLoader(new ResourceLocation(McJtyLib.MODID, "multipartloader"), new MultipartModelLoader());
+        ModelLoaderRegistry.registerLoader(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "multipartloader"), new MultipartModelLoader());
     }
 
     @Override

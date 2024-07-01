@@ -96,7 +96,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
      * get properly propagated to the client when that client has this container open
      */
     public DefaultContainerProvider<C> setupSync(GenericTileEntity te) {
-        dataListener(Sync.values(new ResourceLocation(McJtyLib.MODID, "data"), te));
+        dataListener(Sync.values(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "data"), te));
         return this;
     }
 

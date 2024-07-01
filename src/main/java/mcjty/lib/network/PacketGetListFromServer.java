@@ -26,7 +26,7 @@ import java.util.List;
  */
 public record PacketGetListFromServer(ResourceKey<Level> dimension, BlockPos pos, String command, TypedMap params) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "getlistfromserver");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "getlistfromserver");
 
     public static PacketGetListFromServer create(FriendlyByteBuf buf) {
         ResourceKey<Level> dimension = LevelTools.getId(buf.readResourceLocation());

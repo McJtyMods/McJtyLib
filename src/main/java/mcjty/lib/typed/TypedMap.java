@@ -1,5 +1,10 @@
 package mcjty.lib.typed;
 
+import mcjty.lib.network.PacketSendClientCommand;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +12,12 @@ import java.util.Optional;
 import java.util.Set;
 
 public record TypedMap(Map<Key<?>, Object> map) {
+
+    public static final StreamCodec<FriendlyByteBuf, TypedMap> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, PacketSendClientCommand::modid,
+            ByteBufCodecs.STRING_UTF8, PacketSendClientCommand::command,
+            TypedMap.STREAM_CODEC,
+            TypedMap::new);
 
     public static final TypedMap EMPTY = TypedMap.builder().build();
 

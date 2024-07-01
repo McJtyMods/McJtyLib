@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
  */
 public record PacketOpenManual(ResourceLocation manual, ResourceLocation entry, Integer page) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "openmanual");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "openmanual");
 
     public static PacketOpenManual create(FriendlyByteBuf buf) {
         ResourceLocation manual = buf.readResourceLocation();

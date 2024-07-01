@@ -7,5 +7,5 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.Nullable;
 
 public class CapabilityInfusable {
-    public static final BlockCapability<IInfusable, @Nullable Direction> INFUSABLE_CAPABILITY = BlockCapability.createSided(new ResourceLocation(McJtyLib.MODID, "infusable"), IInfusable.class);
+    public static final BlockCapability<IInfusable, @Nullable Direction> INFUSABLE_CAPABILITY = BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "infusable"), IInfusable.class);
 }

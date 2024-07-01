@@ -20,7 +20,7 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
  */
 public record PacketServerCommandTyped(BlockPos pos, ResourceKey<Level> dimensionId, String command, TypedMap params) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "servercommandtyped");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "servercommandtyped");
 
     public static PacketServerCommandTyped create(FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();

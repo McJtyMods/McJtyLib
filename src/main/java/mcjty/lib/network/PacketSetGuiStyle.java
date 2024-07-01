@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
  */
 public record PacketSetGuiStyle(String style) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "setguistyle");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "setguistyle");
 
     public static PacketSetGuiStyle create(FriendlyByteBuf buf) {
         return new PacketSetGuiStyle(buf.readUtf(32767));

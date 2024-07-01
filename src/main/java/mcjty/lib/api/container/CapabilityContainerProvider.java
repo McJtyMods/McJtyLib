@@ -8,5 +8,5 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.Nullable;
 
 public class CapabilityContainerProvider {
-    public static final BlockCapability<MenuProvider, @Nullable Direction> CONTAINER_PROVIDER_CAPABILITY = BlockCapability.createSided(new ResourceLocation(McJtyLib.MODID, "container_provider"), MenuProvider.class);
+    public static final BlockCapability<MenuProvider, @Nullable Direction> CONTAINER_PROVIDER_CAPABILITY = BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "container_provider"), MenuProvider.class);
 }

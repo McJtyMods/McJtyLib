@@ -43,6 +43,8 @@ public class McJtyLib {
         Registration.init(bus);
         bus.addListener(setup::init);
         bus.addListener(Networking::registerMessages);
+        bus.addListener(GeneralConfig::onLoad);
+        bus.addListener(GeneralConfig::onFileChange);
         
         if (dist.isClient()) {
             bus.addListener(ClientSetup::init);

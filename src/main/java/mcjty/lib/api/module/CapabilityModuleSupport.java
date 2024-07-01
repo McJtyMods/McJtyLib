@@ -7,5 +7,5 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.Nullable;
 
 public class CapabilityModuleSupport {
-    public static final BlockCapability<IModuleSupport, @Nullable Direction> MODULE_CAPABILITY = BlockCapability.createSided(new ResourceLocation(McJtyLib.MODID, "module_support"), IModuleSupport.class);
+    public static final BlockCapability<IModuleSupport, @Nullable Direction> MODULE_CAPABILITY = BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "module_support"), IModuleSupport.class);
 }

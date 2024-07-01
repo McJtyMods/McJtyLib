@@ -4,37 +4,32 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record PacketSendPreferencesToClient(BuffStyle buffStyle, Integer buffX, Integer buffY, GuiStyle style) implements CustomPacketPayload {
 
-    public final static ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "sendpreferences");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "sendpreferences");
+    public static final CustomPacketPayload.Type<PacketSendPreferencesToClient> TYPE = new Type<>(ID);
 
-    public static PacketSendPreferencesToClient create(FriendlyByteBuf buf) {
-        BuffStyle buffStyle = BuffStyle.values()[buf.readInt()];
-        int buffX = buf.readInt();
-        int buffY = buf.readInt();
-        GuiStyle style = GuiStyle.values()[buf.readInt()];
-        return new PacketSendPreferencesToClient(buffStyle, buffX, buffY, style);
-    }
+    public static final StreamCodec<FriendlyByteBuf, PacketSendPreferencesToClient> CODEC = StreamCodec.composite(
+            BuffStyle.CODEC, PacketSendPreferencesToClient::buffStyle,
+            ByteBufCodecs.INT, PacketSendPreferencesToClient::buffX,
+            ByteBufCodecs.INT, PacketSendPreferencesToClient::buffY,
+            GuiStyle.CODEC, PacketSendPreferencesToClient::style,
+            PacketSendPreferencesToClient::new
+    );
 
     public static PacketSendPreferencesToClient create(BuffStyle buffStyle, int buffX, int buffY, GuiStyle style) {
         return new PacketSendPreferencesToClient(buffStyle, buffX, buffY, style);
     }
 
     @Override
-    public void write(FriendlyByteBuf buf) {
-        buf.writeInt(buffStyle.ordinal());
-        buf.writeInt(buffX);
-        buf.writeInt(buffY);
-        buf.writeInt(style.ordinal());
-    }
-
-    @Override
-    public ResourceLocation id() {
-        return ID;
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     public BuffStyle getBuffStyle() {
@@ -53,8 +48,8 @@ public record PacketSendPreferencesToClient(BuffStyle buffStyle, Integer buffX, 
         return style;
     }
 
-    public void handle(PlayPayloadContext ctx) {
-        ctx.workHandler().submitAsync(() -> {
+    public void handle(IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
             SendPreferencesToClientHelper.setPreferences(this);
         });
     }

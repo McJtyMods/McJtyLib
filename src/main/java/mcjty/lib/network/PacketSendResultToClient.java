@@ -24,7 +24,7 @@ import java.util.function.Function;
  */
 public record PacketSendResultToClient(BlockPos pos, String command, List list) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "sendresulttoclient");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "sendresulttoclient");
 
     public static PacketSendResultToClient create(FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();

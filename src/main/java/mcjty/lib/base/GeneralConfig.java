@@ -7,7 +7,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-@Mod.EventBusSubscriber(modid = McJtyLib.MODID)
 public class GeneralConfig {
 
     private static final ModConfigSpec.Builder SERVER_BUILDER = new ModConfigSpec.Builder();
@@ -43,12 +42,10 @@ public class GeneralConfig {
         SERVER_BUILDER.pop();
     }
 
-    @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading configEvent) {
         StyleConfig.updateColors();
     }
 
-    @SubscribeEvent
     public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
         StyleConfig.updateColors();
     }

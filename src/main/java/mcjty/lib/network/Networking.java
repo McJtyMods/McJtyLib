@@ -5,35 +5,33 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
-import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class Networking {
 
-    private static IPayloadRegistrar registrar;
-
-    public static void registerMessages(RegisterPayloadHandlerEvent event) {
-        registrar = event.registrar(McJtyLib.MODID)
+    public static void registerMessages(RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar(McJtyLib.MODID)
                 .versioned("1.0")
                 .optional();
 
-        registrar.play(PacketSendPreferencesToClient.ID, PacketSendPreferencesToClient::create, handler -> handler.server(PacketSendPreferencesToClient::handle));
-        registrar.play(PacketSetGuiStyle.ID, PacketSetGuiStyle::create, handler -> handler.server(PacketSetGuiStyle::handle));
-        registrar.play(PacketOpenManual.ID, PacketOpenManual::create, handler -> handler.server(PacketOpenManual::handle));
-        registrar.play(PacketContainerDataToClient.ID, PacketContainerDataToClient::create, handler -> handler.server(PacketContainerDataToClient::handle));
-        registrar.play(PacketSendResultToClient.ID, PacketSendResultToClient::create, handler -> handler.server(PacketSendResultToClient::handle));
+        registrar.playToClient(PacketSendPreferencesToClient.TYPE, PacketSendPreferencesToClient.CODEC, PacketSendPreferencesToClient::handle);
+        registrar.playToServer(PacketSetGuiStyle.TYPE, PacketSetGuiStyle.CODEC, PacketSetGuiStyle::handle);
+        registrar.playToClient(PacketOpenManual.TYPE, PacketOpenManual.CODEC, PacketOpenManual::handle);
+        registrar.playToClient(PacketContainerDataToClient.TYPE, PacketContainerDataToClient.CODEC, PacketContainerDataToClient::handle);
+        registrar.playToClient(PacketSendResultToClient.TYPE, PacketSendResultToClient.CODEC, PacketSendResultToClient::handle);
 
 
         // Server side
-        registrar.play(PacketGetListFromServer.ID, PacketGetListFromServer::create, handler -> handler.server(PacketGetListFromServer::handle));
-        registrar.play(PacketServerCommandTyped.ID, PacketServerCommandTyped::create, handler -> handler.server(PacketServerCommandTyped::handle));
-        registrar.play(PacketSendServerCommand.ID, PacketSendServerCommand::create, handler -> handler.server(PacketSendServerCommand::handle));
-        registrar.play(PacketRequestDataFromServer.ID, PacketRequestDataFromServer::create, handler -> handler.server(PacketRequestDataFromServer::handle));
+        registrar.playToServer(PacketGetListFromServer.TYPE, PacketGetListFromServer.CODEC, PacketGetListFromServer::handle);
+        registrar.playToServer(PacketServerCommandTyped.TYPE, PacketServerCommandTyped.CODEC, PacketServerCommandTyped::handle);
+        registrar.playToServer(PacketSendServerCommand.TYPE, PacketSendServerCommand.CODEC, PacketSendServerCommand::handle);
+        registrar.playToServer(PacketRequestDataFromServer.TYPE, PacketRequestDataFromServer.CODEC, PacketRequestDataFromServer::handle);
 
         // Client side
-        registrar.play(PacketSendClientCommand.ID, PacketSendClientCommand::create, handler -> handler.client(PacketSendClientCommand::handle));
-        registrar.play(PacketDataFromServer.ID, PacketDataFromServer::create, handler -> handler.client(PacketDataFromServer::handle));
-        registrar.play(PacketFinalizeLogin.ID, PacketFinalizeLogin::create, handler -> handler.client(PacketFinalizeLogin::handle));
+        registrar.playToClient(PacketSendClientCommand.TYPE, PacketSendClientCommand.CODEC, PacketSendClientCommand::handle);
+        registrar.playToClient(PacketDataFromServer.TYPE, PacketDataFromServer.CODEC, PacketDataFromServer::handle);
+        registrar.playToClient(PacketFinalizeLogin.TYPE, PacketFinalizeLogin.CODEC, PacketFinalizeLogin::handle);
     }
 
     public static void sendToServer(CustomPacketPayload msg) {

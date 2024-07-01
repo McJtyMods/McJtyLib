@@ -12,7 +12,7 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
  */
 public record PacketFinalizeLogin() implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "finalize_login");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "finalize_login");
 
     @Override
     public void write(FriendlyByteBuf buf) {

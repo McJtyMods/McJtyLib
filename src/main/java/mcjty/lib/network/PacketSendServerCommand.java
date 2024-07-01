@@ -14,7 +14,7 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
  */
 public record PacketSendServerCommand(String modid, String command, TypedMap arguments) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "sendservercommand");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "sendservercommand");
 
     @Override
     public void write(FriendlyByteBuf buf) {

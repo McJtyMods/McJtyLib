@@ -8,18 +8,27 @@ import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 /**
  * This packet is used (typically by PacketRequestDataFromServer) to send back a data to the client.
  */
 public record PacketDataFromServer(BlockPos pos, String command, TypedMap result) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = new ResourceLocation(McJtyLib.MODID, "datafromserver");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "datafromserver");
+    public static final CustomPacketPayload.Type<PacketDataFromServer> TYPE = new Type<>(ID);
+
+    public static final StreamCodec<FriendlyByteBuf, PacketDataFromServer> CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC, PacketDataFromServer::pos,
+            nullable ByteBufCodecs.STRING_UTF8, PacketDataFromServer::command,   // @todo nullable!!!
+            TypedMap.STREAM_CODEC, PacketDataFromServer::result,
+            PacketDataFromServer::new
+    );
 
     @Override
     public void write(FriendlyByteBuf buf) {

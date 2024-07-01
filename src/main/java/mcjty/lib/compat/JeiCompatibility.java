@@ -20,7 +20,7 @@ public class JeiCompatibility implements IModPlugin {
     @Nonnull
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(McJtyLib.MODID, "mcjtylib");
+        return ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "mcjtylib");
     }
 
     @Override

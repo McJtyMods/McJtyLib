@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MultipartBakedModel extends AbstractDynamicBakedModel {
 
-    public static final ModelResourceLocation MODEL = new ModelResourceLocation(new ResourceLocation(McJtyLib.MODID, "multipart"), "multipart");
+    public static final ModelResourceLocation MODEL = new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "multipart"), "multipart");
 
     @Override
     public boolean usesBlockLight() {
