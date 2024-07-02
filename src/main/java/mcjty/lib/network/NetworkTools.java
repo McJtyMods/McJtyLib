@@ -2,6 +2,7 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Logging;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
@@ -64,17 +65,20 @@ public class NetworkTools {
     }
 
     /// This function supports itemstacks with more then 64 items.
-    public static ItemStack readItemStack(FriendlyByteBuf buf) {
+    public static ItemStack readItemStack(RegistryFriendlyByteBuf buf) {
         CompoundTag nbt = buf.readNbt();
-        ItemStack stack = ItemStack.of(nbt);
+        ItemStack stack = ItemStack.parse(buf.registryAccess(), nbt).orElse(ItemStack.EMPTY);
+        if (stack.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
         stack.setCount(buf.readInt());
         return stack;
     }
 
     /// This function supports itemstacks with more then 64 items.
-    public static void writeItemStack(FriendlyByteBuf buf, ItemStack itemStack) {
+    public static void writeItemStack(RegistryFriendlyByteBuf buf, ItemStack itemStack) {
         CompoundTag nbt = new CompoundTag();
-        itemStack.save(nbt);
+        itemStack.save(buf.registryAccess(), nbt);
         try {
             buf.writeNbt(nbt);
             buf.writeInt(itemStack.getCount());

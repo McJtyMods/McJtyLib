@@ -1,13 +1,14 @@
 package mcjty.lib.typed;
 
-import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.network.NetworkTools;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.varia.LevelTools;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
@@ -57,7 +58,7 @@ public final class Type<V> {
             return null;
         }
     });
-    public static final Type<ItemStack> ITEMSTACK = create(ItemStack.class, (v, buf) -> buf.writeItem(v), FriendlyByteBuf::readItem);
+    public static final Type<ItemStack> ITEMSTACK = create(ItemStack.class, (v, buf) -> NetworkTools.writeItemStack(buf, v), NetworkTools::readItemStack);
     public static final Type<ResourceKey<Level>> DIMENSION_TYPE = create(ResourceKey.class, (v, buf) -> buf.writeResourceLocation(v.location()), buf -> LevelTools.getId(buf.readResourceLocation()));
 
     public static final Type<List<String>> STRING_LIST = create(List.class, (v, buf) -> NetworkTools.writeStringList(buf, v), NetworkTools::readStringList);
@@ -65,17 +66,17 @@ public final class Type<V> {
     public static final Type<List<BlockPos>> POS_LIST = create(List.class, (v, buf) -> NetworkTools.writeBlockPosList(buf, v), NetworkTools::readBlockPosList);
 
     @Nonnull private final Class<V> type;
-    @Nullable private final BiConsumer<V, FriendlyByteBuf> serializer;
-    @Nullable private final Function<FriendlyByteBuf, V> deserializer;
+    @Nullable private final BiConsumer<V, RegistryFriendlyByteBuf> serializer;
+    @Nullable private final Function<RegistryFriendlyByteBuf, V> deserializer;
 
-    private Type(@Nonnull final Class<V> type, @Nullable BiConsumer<V, FriendlyByteBuf> serializer, @Nullable Function<FriendlyByteBuf, V> deserializer) {
+    private Type(@Nonnull final Class<V> type, @Nullable BiConsumer<V, RegistryFriendlyByteBuf> serializer, @Nullable Function<RegistryFriendlyByteBuf, V> deserializer) {
         this.type = type;
         this.serializer = serializer;
         this.deserializer = deserializer;
     }
 
     @Nonnull
-    public static <V> Type<V> create(@Nonnull final Class<? super V> type, BiConsumer<V, FriendlyByteBuf> serializer, Function<FriendlyByteBuf, V> deserializer) {
+    public static <V> Type<V> create(@Nonnull final Class<? super V> type, BiConsumer<V, RegistryFriendlyByteBuf> serializer, Function<RegistryFriendlyByteBuf, V> deserializer) {
         return new Type<>((Class<V>) type, serializer, deserializer);
     }
 
@@ -89,22 +90,22 @@ public final class Type<V> {
         return type;
     }
 
-    public void serialize(FriendlyByteBuf buf, Object value) {
+    public void serialize(RegistryFriendlyByteBuf buf, Object value) {
         serializer.accept((V) value, buf);
     }
 
-    public <T extends GenericTileEntity> void deserialize(FriendlyByteBuf buf, ValueHolder<T, V> value, T te) {
+    public <T extends GenericTileEntity> void deserialize(RegistryFriendlyByteBuf buf, ValueHolder<T, V> value, T te) {
         V v = deserializer.apply(buf);
         value.setter().accept(te, v);
     }
 
     @Nullable
-    public BiConsumer<V, FriendlyByteBuf> getSerializer() {
+    public BiConsumer<V, RegistryFriendlyByteBuf> getSerializer() {
         return serializer;
     }
 
     @Nullable
-    public Function<FriendlyByteBuf, V> getDeserializer() {
+    public Function<RegistryFriendlyByteBuf, V> getDeserializer() {
         return deserializer;
     }
 

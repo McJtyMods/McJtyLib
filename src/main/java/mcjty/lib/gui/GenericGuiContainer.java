@@ -346,7 +346,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             list = new ArrayList<>();
         } else {
             TooltipFlag flag = this.getMinecraft().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
-            list = stack.getTooltipLines(this.getMinecraft().player, flag);
+            list = stack.getTooltipLines(Item.TooltipContext.of(this.getMinecraft().level), this.getMinecraft().player, flag);
         }
 
         list = addCustomLines(list, blockRender, stack);

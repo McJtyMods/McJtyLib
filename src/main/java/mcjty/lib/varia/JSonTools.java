@@ -129,7 +129,7 @@ public class JSonTools {
 
     public static ItemStack jsonToItemStack(JsonObject obj) {
         String itemName = obj.get("item").getAsString();
-        Item item = Tools.getItem(new ResourceLocation(itemName));
+        Item item = Tools.getItem(ResourceLocation.parse(itemName));
         // @todo error checking
         int amount = 1;
         if (obj.has("amount")) {

@@ -107,7 +107,7 @@ public class DataGen {
 
                         @Override
                         public void recipe(String id, Supplier<IRecipeBuilder> supplier) {
-                            supplier.get().build(consumer, new ResourceLocation(modid, id));
+                            supplier.get().build(consumer, ResourceLocation.parse(modid, id));
                         }
 
                         @Override
@@ -117,7 +117,7 @@ public class DataGen {
 
                         @Override
                         public void shapedNBT(String id, CopyNBTRecipeBuilder builder, String... pattern) {
-                            build(consumer, new ResourceLocation(modid, id), builder, pattern);
+                            build(consumer, ResourceLocation.parse(modid, id), builder, pattern);
 
                         }
 
@@ -128,7 +128,7 @@ public class DataGen {
 
                         @Override
                         public void shaped(String id, ShapedRecipeBuilder builder, String... pattern) {
-                            build(consumer, new ResourceLocation(modid, id), builder, pattern);
+                            build(consumer, ResourceLocation.parse(modid, id), builder, pattern);
                         }
 
                         @Override
@@ -138,7 +138,7 @@ public class DataGen {
 
                         @Override
                         public void shapeless(String id, ShapelessRecipeBuilder builder) {
-                            build(consumer, new ResourceLocation(modid, id), builder);
+                            build(consumer, ResourceLocation.parse(modid, id), builder);
                         }
                     });
                 }

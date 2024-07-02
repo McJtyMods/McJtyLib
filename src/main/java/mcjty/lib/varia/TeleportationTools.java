@@ -9,7 +9,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.util.ITeleporter;
+import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -41,17 +42,8 @@ public class TeleportationTools {
             McJtyLib.setup.getLogger().error("Something went wrong teleporting to dimension " + dimension.location().getPath());
             return;
         }
-        player.changeDimension(world, new ITeleporter() {
-            @Override
-            public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                entity = repositionEntity.apply(false);
-//                entity.changeDimension(destWorld);
-//                world.addDuringPortalTeleport((ServerPlayer) entity);
-//                entity.moveTo(x, y, z);
-                entity.teleportTo(x, y, z);
-                return entity;
-            }
-        });
+        DimensionTransition transition = new DimensionTransition(world, new Vec3(x, y, z), new Vec3(0, 0, 0), 0, 0, DimensionTransition.DO_NOTHING);
+        player.changeDimension(transition);
     }
 
     private static void facePosition(Entity entity, double newX, double newY, double newZ, BlockPos dest) {

@@ -70,7 +70,7 @@ public class ItemStackTools {
 
     public static ItemStack guiCommandToItemStack(GuiParser.GuiCommand obj) {
         String itemName = obj.getOptionalPar(0, "minecraft:stick");
-        Item item = Tools.getItem(new ResourceLocation(itemName));
+        Item item = Tools.getItem(ResourceLocation.parse(itemName));
         int amount = obj.getOptionalPar(1, 1);
         ItemStack stack = new ItemStack(item, amount);
         obj.findCommand("tag").ifPresent(cmd -> {
@@ -138,11 +138,11 @@ public class ItemStackTools {
             commonTags.add(Tags.Items.ORES_QUARTZ);
             commonTags.add(Tags.Items.ORES_IRON);
             commonTags.add(Tags.Items.ORES_LAPIS);
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "ores/copper")));
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "ores/tin")));
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "ores/silver")));
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "ores/manganese")));
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "ores/platinum")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/copper")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/tin")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/silver")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/manganese")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/platinum")));
 
             commonTags.add(Tags.Items.STORAGE_BLOCKS_COAL);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_DIAMOND);
@@ -152,11 +152,11 @@ public class ItemStackTools {
             commonTags.add(Tags.Items.STORAGE_BLOCKS_QUARTZ);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_IRON);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_LAPIS);
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "storage_blocks/copper")));
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "storage_blocks/tin")));
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "storage_blocks/silver")));
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "storage_blocks/manganese")));
-            commonTags.add(TagKey.create(Registries.ITEM, new ResourceLocation("forge", "storage_blocks/platinum")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/copper")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/tin")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/silver")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/manganese")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/platinum")));
         }
     }
 }

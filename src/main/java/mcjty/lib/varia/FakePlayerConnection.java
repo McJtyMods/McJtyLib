@@ -122,10 +122,6 @@ public class FakePlayerConnection extends ServerGamePacketListenerImpl {
     }
 
     @Override
-    public void handleBlockEntityTagQuery(@Nonnull ServerboundBlockEntityTagQuery packetIn) {
-    }
-
-    @Override
     public void handleSetCarriedItem(@Nonnull ServerboundSetCarriedItemPacket packetIn) {
     }
 
@@ -139,10 +135,6 @@ public class FakePlayerConnection extends ServerGamePacketListenerImpl {
 
     @Override
     public void handlePlayerAction(@Nonnull ServerboundPlayerActionPacket packetIn) {
-    }
-
-    @Override
-    public void handleEntityTagQuery(@Nonnull ServerboundEntityTagQuery packetIn) {
     }
 
     @Override

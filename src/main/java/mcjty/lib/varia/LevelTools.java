@@ -53,7 +53,7 @@ public class LevelTools {
     }
 
     public static ResourceKey<Level> getId(String id) {
-        return ResourceKey.create(Registries.DIMENSION, new ResourceLocation(id));
+        return ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(id));
     }
 
     /**

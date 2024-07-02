@@ -24,9 +24,9 @@ public class TestGui extends GenericGuiContainer<TestTileEntity> {
 
     public static int ICONSIZE = 20;
 
-    private static final ResourceLocation mainBackground = new ResourceLocation(TestMod.MODID, "textures/gui/testgui.png");
-    private static final ResourceLocation sideBackground = new ResourceLocation(TestMod.MODID, "textures/gui/sidegui.png");
-    private static final ResourceLocation icons = new ResourceLocation(TestMod.MODID, "textures/gui/icons.png");
+    private static final ResourceLocation mainBackground = ResourceLocation.parse(TestMod.MODID, "textures/gui/testgui.png");
+    private static final ResourceLocation sideBackground = ResourceLocation.parse(TestMod.MODID, "textures/gui/sidegui.png");
+    private static final ResourceLocation icons = ResourceLocation.parse(TestMod.MODID, "textures/gui/icons.png");
 
     private Window sideWindow;
     private IconManager iconManager;

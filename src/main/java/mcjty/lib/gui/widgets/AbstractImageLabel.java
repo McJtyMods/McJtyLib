@@ -153,7 +153,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     @Override
     public void readFromGuiCommand(GuiParser.GuiCommand command) {
         super.readFromGuiCommand(command);
-        command.findCommand("image").ifPresent(cmd -> image = new ResourceLocation(cmd.getOptionalPar(0, "")));
+        command.findCommand("image").ifPresent(cmd -> image = ResourceLocation.parse(cmd.getOptionalPar(0, "")));
         command.findCommand("dim").ifPresent(cmd -> {
             u = cmd.getOptionalPar(0, 0);
             v = cmd.getOptionalPar(1, 0);

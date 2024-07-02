@@ -1,10 +1,11 @@
 package mcjty.lib.network;
 
 import mcjty.lib.McJtyLib;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * This is sent from the server to the client after the login has occured so that packets that implement
@@ -13,25 +14,21 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 public record PacketFinalizeLogin() implements CustomPacketPayload {
 
     public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "finalize_login");
+    public static final CustomPacketPayload.Type<PacketFinalizeLogin> TYPE = new Type<>(ID);
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketFinalizeLogin> CODEC = StreamCodec.unit(
+            new PacketFinalizeLogin()
+    );
 
     @Override
-    public void write(FriendlyByteBuf buf) {
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    @Override
-    public ResourceLocation id() {
-        return ID;
-    }
-
-    public static PacketFinalizeLogin create(FriendlyByteBuf buf) {
-        return new PacketFinalizeLogin();
-    }
-
-    public void handle(PlayPayloadContext ctx) {
+    public void handle(IPayloadContext ctx) {
         finalizeClientLogin();
     }
 
     private void finalizeClientLogin() {
     }
-
 }

@@ -4,6 +4,7 @@ import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendPreferencesToClient;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -33,14 +34,14 @@ public class PreferencesProperties implements INBTSerializable<CompoundTag>  {
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
         saveNBTData(tag);
         return tag;
     }
 
     @Override
-    public void deserializeNBT(CompoundTag compoundTag) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag compoundTag) {
         loadNBTData(compoundTag);
     }
 

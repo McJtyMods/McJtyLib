@@ -4,19 +4,14 @@ import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.infusable.IInfusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
-import mcjty.lib.container.AutomationFilterItemHander;
-import mcjty.lib.container.GenericItemHandler;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.RedstoneMode;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
@@ -36,18 +31,16 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 public class GenericTileEntity extends BlockEntity {
 
@@ -233,12 +226,12 @@ public class GenericTileEntity extends BlockEntity {
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         CompoundTag nbtTag = new CompoundTag();
         this.saveClientDataToNBT(nbtTag);
-        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity) -> {return nbtTag;});
+        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity, RegistryAccess access) -> nbtTag);
     }
 
     @Override
-    public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket packet) {
-        loadClientDataFromNBT(packet.getTag());
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider lookupProvider) {
+        loadClientDataFromNBT(pkt.getTag());
     }
 
 //    public void setInfused(int infused) {
@@ -258,10 +251,9 @@ public class GenericTileEntity extends BlockEntity {
         return !isRemoved() && player.distanceToSqr(new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(new Vec3(0.5D, 0.5D, 0.5D))) <= 64D;
     }
 
-    @Nonnull
     @Override
-    public CompoundTag getUpdateTag() {
-        CompoundTag updateTag = super.getUpdateTag();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag updateTag = super.getUpdateTag(registries);
         saveClientDataToNBT(updateTag);
         return updateTag;
     }
@@ -279,7 +271,7 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tagCompound) {
+    protected void loadAdditional(CompoundTag tagCompound, HolderLookup.Provider pRegistries) {
         loadCaps(tagCompound);
         loadInfo(tagCompound);
     }
@@ -356,33 +348,34 @@ public class GenericTileEntity extends BlockEntity {
         return data;
     }
 
-    public void saveAdditional(@Nonnull CompoundTag tagCompound) {
-        saveCaps(tagCompound);
+    @Override
+    protected void saveAdditional(CompoundTag tagCompound, HolderLookup.Provider provider) {
+        saveCaps(tagCompound, provider);
         saveInfo(tagCompound);
     }
 
-    protected void saveCaps(CompoundTag tagCompound) {
+    protected void saveCaps(CompoundTag tagCompound, HolderLookup.Provider provider) {
         CompoundTag infoTag = getOrCreateInfo(tagCompound);
         IInfusable capability = level.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY, worldPosition, null);
         if (capability != null) {
             infoTag.putInt("infused", capability.getInfused());
         }
-        saveItemHandlerCap(tagCompound);
-        saveEnergyCap(tagCompound);
+        saveItemHandlerCap(tagCompound, provider);
+        saveEnergyCap(tagCompound, provider);
     }
 
-    protected void saveItemHandlerCap(CompoundTag tagCompound) {
+    protected void saveItemHandlerCap(CompoundTag tagCompound, HolderLookup.Provider provider) {
         IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, worldPosition, null);
         if (handler instanceof INBTSerializable s) {
             CompoundTag items = new CompoundTag();
-            tagCompound.put("Items", s.serializeNBT());
+            tagCompound.put("Items", s.serializeNBT(provider));
         }
     }
 
-    protected void saveEnergyCap(CompoundTag tagCompound) {
+    protected void saveEnergyCap(CompoundTag tagCompound, HolderLookup.Provider provider) {
         IEnergyStorage capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, worldPosition, null);
         if (capability instanceof INBTSerializable h) {
-            tagCompound.put("Energy", h.serializeNBT());
+            tagCompound.put("Energy", h.serializeNBT(provider));
         }
     }
 

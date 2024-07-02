@@ -230,11 +230,11 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         if (value == null) {
             renderItem(null);
         } else {
-            Item item = Tools.getItem(new ResourceLocation(value.toString()));
+            Item item = Tools.getItem(ResourceLocation.parse(value.toString()));
             if (item != null) {
                 renderItem(new ItemStack(item));
             } else {
-                Block block = Tools.getBlock(new ResourceLocation(value.toString()));
+                Block block = Tools.getBlock(ResourceLocation.parse(value.toString()));
                 if (block != null) {
                     renderItem(new ItemStack(block));
                 } else {

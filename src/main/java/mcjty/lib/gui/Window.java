@@ -128,9 +128,12 @@ public class Window {
                             .forEach(cmd -> {
                                 String channel = cmd.getOptionalPar(0, "");
                                 String modidCmd = cmd.getOptionalPar(1, "");
-                                ResourceLocation rl = new ResourceLocation(modidCmd);
+                                ResourceLocation rl = ResourceLocation.parse(modidCmd);
                                 event(channel, (source, params) ->
-                                        Networking.sendToServer(PacketSendServerCommand.create(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
+                                {
+                                    // @todo 1.21 What to do here?
+//                                        Networking.sendToServer(PacketSendServerCommand.create(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY)));
+                                });
                             });
                     command.findCommand("panel").ifPresent(cmd -> {
                         toplevel = new Panel();
@@ -463,7 +466,8 @@ public class Window {
 
     private <T extends GenericTileEntity> void initializeAction(String componentName, String command, T te) {
         event(componentName, (source, params) -> {
-            Networking.sendToServer(PacketServerCommandTyped.create(te.getBlockPos(), te.getDimension(), command, params));
+            // @todo 1.21 what to do here?
+//            Networking.sendToServer(PacketServerCommandTyped.create(te.getBlockPos(), te.getDimension(), command, params));
         });
     }
 

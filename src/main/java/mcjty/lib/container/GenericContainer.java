@@ -359,7 +359,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 itemstack1 = slot.getItem();
 
                 if (!itemstack1.isEmpty() && itemstack1.getItem() == par1ItemStack.getItem() && (par1ItemStack.getDamageValue() == itemstack1.getDamageValue())
-                        && ItemStack.isSameItemSameTags(par1ItemStack, itemstack1) && slot.mayPlace(par1ItemStack)) {
+                        && ItemStack.isSameItemSameComponents(par1ItemStack, itemstack1) && slot.mayPlace(par1ItemStack)) {
 
                     int mergedSize = itemstack1.getCount() + par1ItemStack.getCount();
                     int maxStackSize = Math.min(par1ItemStack.getMaxStackSize(), slot.getMaxStackSize());
@@ -528,7 +528,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
             E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()), pos);
             CompoundTag compound = data.readNbt();
-            te.load(compound);
+            te.loadCustomOnly(compound, null);  // @todo 1.21 THIS IS NOT CORRECT! NEED A RegistryHolder.Provider
 
             T container = containerFactory.create(windowId, pos, te, inv.player);
             container.setupInventories(new ItemStackHandler(slots), inv);

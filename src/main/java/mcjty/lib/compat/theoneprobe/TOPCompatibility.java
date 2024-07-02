@@ -38,7 +38,7 @@ public class TOPCompatibility {
             probe.registerProvider(new IProbeInfoProvider() {
                 @Override
                 public ResourceLocation getID() {
-                    return new ResourceLocation("mcjtylib:default");
+                    return ResourceLocation.parse("mcjtylib:default");
                 }
 
                 @Override

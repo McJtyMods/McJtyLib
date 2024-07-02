@@ -508,8 +508,8 @@ public abstract class AbstractWidget<P extends AbstractWidget<P>> implements Wid
                 cmd.getOptionalPar(2, 40),
                 cmd.getOptionalPar(3, 40)
         ));
-        command.findCommand("bg1").ifPresent(cmd -> background1 = new ResourceLocation(cmd.getOptionalPar(0, "")));
-        command.findCommand("bg2").ifPresent(cmd -> background2 = new ResourceLocation(cmd.getOptionalPar(0, "")));
+        command.findCommand("bg1").ifPresent(cmd -> background1 = ResourceLocation.parse(cmd.getOptionalPar(0, "")));
+        command.findCommand("bg2").ifPresent(cmd -> background2 = ResourceLocation.parse(cmd.getOptionalPar(0, "")));
         background2Horizontal = GuiParser.get(command, "bghoriz", DEFAULT_BACKGROUND_HORIZONTAL);
         backgroundOffset = GuiParser.get(command, "bgoffset", DEFAULT_BACKGROUND_OFFSET);
         filledRectThickness = GuiParser.get(command, "bgthickness", DEFAULT_FILLED_RECT_THICKNESS);

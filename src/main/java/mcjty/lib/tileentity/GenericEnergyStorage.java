@@ -2,6 +2,7 @@ package mcjty.lib.tileentity;
 
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.varia.EnergyTools;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.world.inventory.DataSlot;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -85,12 +86,12 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
     }
 
     @Override
-    public LongTag serializeNBT() {
+    public LongTag serializeNBT(HolderLookup.Provider provider) {
         return LongTag.valueOf(energy);
     }
 
     @Override
-    public void deserializeNBT(LongTag nbt) {
+    public void deserializeNBT(HolderLookup.Provider provider, LongTag nbt) {
         energy = nbt.getAsLong();
     }
 

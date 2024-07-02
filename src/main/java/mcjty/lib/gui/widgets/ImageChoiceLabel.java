@@ -199,7 +199,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
                                     .map(Object::toString)
                                     .collect(Collectors.toList()))
                             .orElse(Collections.emptyList());
-                    ResourceLocation image = new ResourceLocation(GuiParser.get(choiceCmd, "image", ""));
+                    ResourceLocation image = ResourceLocation.parse(GuiParser.get(choiceCmd, "image", ""));
                     int u = GuiParser.getIndexed(choiceCmd, "uv", 0, 0);
                     int v = GuiParser.getIndexed(choiceCmd, "uv", 1, 0);
                     ChoiceEntry entry = new ChoiceEntry(choice, tooltips, image, u, v);

@@ -13,7 +13,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import org.apache.commons.lang3.tuple.Pair;
@@ -36,7 +36,7 @@ public class McJtyLib {
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
     private static final Map<String, CommandInfo> commandInfos = new HashMap<>();
 
-    public McJtyLib(IEventBus bus, Dist dist) {
+    public McJtyLib(ModContainer container, IEventBus bus, Dist dist) {
 
         instance = this;
         // Register the setup method for modloading
@@ -53,8 +53,8 @@ public class McJtyLib {
 //            bus.addListener(MultipartModelLoader::register);
         }
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
+        container.registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
+        container.registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
     }
 
     /**
