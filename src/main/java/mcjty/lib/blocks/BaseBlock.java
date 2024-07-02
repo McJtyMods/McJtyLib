@@ -84,11 +84,11 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     @Override
-    public void appendHoverText(@Nonnull ItemStack stack, @Nullable BlockGetter world, @Nonnull List<Component> tooltip, @Nonnull TooltipFlag advanced) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
         intAddInformation(stack, tooltip);
 
         if (tooltipBuilder.isActive()) {
-            tooltipBuilder.makeTooltip(Tools.getId(this), stack, tooltip, advanced);
+            tooltipBuilder.makeTooltip(Tools.getId(this), stack, tooltip, flags);
         }
     }
 
