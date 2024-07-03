@@ -89,7 +89,7 @@ public class GuiTools {
             return false;
         }
 
-        CompoundTag written = te.saveWithoutMetadata();
+        CompoundTag written = te.saveWithoutMetadata(world.registryAccess());
 
         player.openMenu(provider.apply(te), buf -> {
             buf.writeBlockPos(pos);

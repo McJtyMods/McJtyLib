@@ -52,20 +52,20 @@ public class RenderGlowEffect {
         int b1 = FULL_SKY;
         int b2 = FULL_BLOCK;
         Quad quad = QUADS[side];
-        buffer.vertex(offs.x + quad.v1.x * mult + offset, offs.y + quad.v1.y * mult + offset, offs.z + quad.v1.z * mult + offset).uv(0, 0).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.vertex(offs.x + quad.v2.x * mult + offset, offs.y + quad.v2.y * mult + offset, offs.z + quad.v2.z * mult + offset).uv(0, 1).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.vertex(offs.x + quad.v3.x * mult + offset, offs.y + quad.v3.y * mult + offset, offs.z + quad.v3.z * mult + offset).uv(1, 1).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
-        buffer.vertex(offs.x + quad.v4.x * mult + offset, offs.y + quad.v4.y * mult + offset, offs.z + quad.v4.z * mult + offset).uv(1, 0).uv2(b1, b2).color(255, 255, 255, 128).endVertex();
+        buffer.addVertex((float) (offs.x + quad.v1.x * mult + offset), (float) (offs.y + quad.v1.y * mult + offset), (float) (offs.z + quad.v1.z * mult + offset)).setUv(0, 0).setUv2(b1, b2).setColor(255, 255, 255, 128);
+        buffer.addVertex((float) (offs.x + quad.v2.x * mult + offset), (float) (offs.y + quad.v2.y * mult + offset), (float) (offs.z + quad.v2.z * mult + offset)).setUv(0, 1).setUv2(b1, b2).setColor(255, 255, 255, 128);
+        buffer.addVertex((float) (offs.x + quad.v3.x * mult + offset), (float) (offs.y + quad.v3.y * mult + offset), (float) (offs.z + quad.v3.z * mult + offset)).setUv(1, 1).setUv2(b1, b2).setColor(255, 255, 255, 128);
+        buffer.addVertex((float) (offs.x + quad.v4.x * mult + offset), (float) (offs.y + quad.v4.y * mult + offset), (float) (offs.z + quad.v4.z * mult + offset)).setUv(1, 0).setUv2(b1, b2).setColor(255, 255, 255, 128);
     }
 
     public static void addSideFullTexture(Matrix4f positionMatrix, VertexConsumer buffer, TextureAtlasSprite sprite, int side, float mult, float offset) {
         int b1 = FULL_SKY;
         int b2 = FULL_BLOCK;
         Quad quad = QUADS[side];
-        buffer.vertex(positionMatrix, quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(positionMatrix, quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(positionMatrix, quad.v3.x * mult + offset, quad.v3.y * mult + offset, quad.v3.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU1(), sprite.getV1()).uv2(b1, b2).normal(1,0,0).endVertex();
-        buffer.vertex(positionMatrix, quad.v4.x * mult + offset, quad.v4.y * mult + offset, quad.v4.z * mult + offset).color(255, 255, 255, 128).uv(sprite.getU1(), sprite.getV0()).uv2(b1, b2).normal(1,0,0).endVertex();
+        buffer.addVertex(positionMatrix, quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).setColor(255, 255, 255, 128).setUv(sprite.getU0(), sprite.getV0()).setUv2(b1, b2).setNormal(1,0,0);
+        buffer.addVertex(positionMatrix, quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).setColor(255, 255, 255, 128).setUv(sprite.getU0(), sprite.getV1()).setUv2(b1, b2).setNormal(1,0,0);
+        buffer.addVertex(positionMatrix, quad.v3.x * mult + offset, quad.v3.y * mult + offset, quad.v3.z * mult + offset).setColor(255, 255, 255, 128).setUv(sprite.getU1(), sprite.getV1()).setUv2(b1, b2).setNormal(1,0,0);
+        buffer.addVertex(positionMatrix, quad.v4.x * mult + offset, quad.v4.y * mult + offset, quad.v4.z * mult + offset).setColor(255, 255, 255, 128).setUv(sprite.getU1(), sprite.getV0()).setUv2(b1, b2).setNormal(1,0,0);
     }
 
     private record Vt(float x, float y, float z) {

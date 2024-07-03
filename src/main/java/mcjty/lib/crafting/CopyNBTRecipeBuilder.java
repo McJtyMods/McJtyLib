@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -16,9 +17,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
@@ -120,7 +119,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
 //                new RecipeUnlockedTrigger.TriggerInstance(Optional.empty(), id)).rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
         String folder = ""; // @todo 1.19.3 this.result.getItemCategory().getRecipeFolderName();
         Result r = new Result(id, this.result, this.count, this.group == null ? "" : this.group, this.pattern, this.key, this.advancementBuilder, ResourceLocation.parse("recipes/root"));
-        consumerIn.accept(ResourceLocation.parse(id.getNamespace(), "recipes/" + folder + "/" + id.getPath()), r, null);// @todo NEO advancement holder
+        consumerIn.accept(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "recipes/" + folder + "/" + id.getPath()), r, null);// @todo NEO advancement holder
     }
 
     private void validate(ResourceLocation id) {
@@ -207,13 +206,14 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
 
         // @todo NEO
         @Override
-        public boolean matches(Container container, Level level) {
+        public boolean matches(RecipeInput recipeInput, Level level) {
             return false;
         }
 
         // @todo NEO
+
         @Override
-        public ItemStack assemble(Container container, RegistryAccess registryAccess) {
+        public ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
             return null;
         }
 
@@ -225,7 +225,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
 
         // @todo NEO
         @Override
-        public ItemStack getResultItem(RegistryAccess registryAccess) {
+        public ItemStack getResultItem(HolderLookup.Provider provider) {
             return null;
         }
 

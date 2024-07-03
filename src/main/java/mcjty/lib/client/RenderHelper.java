@@ -107,8 +107,8 @@ public class RenderHelper {
 
     public static void line(VertexConsumer builder, PoseStack matrixStack, float x1, float y1, float z1, float x2, float y2, float z2,
                             float red, float green, float blue, float alpha) {
-        builder.vertex(matrixStack.last().pose(), x1, y1, 0).color(red, green, blue, alpha).endVertex();
-        builder.vertex(matrixStack.last().pose(), x2, y2, 0).color(red, green, blue, alpha).endVertex();
+        builder.addVertex(matrixStack.last().pose(), x1, y1, 0).setColor(red, green, blue, alpha);
+        builder.addVertex(matrixStack.last().pose(), x2, y2, 0).setColor(red, green, blue, alpha);
     }
 
     // Adjust the given matrix to the specified direction
@@ -186,7 +186,8 @@ public class RenderHelper {
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.setXRot(0.0F);
         // @todo NeoForge, is getFirstPassenger correct?
-        matrixStack.translate(0.0F, (float) entity.getMyRidingOffset(entity.getFirstPassenger()), 0.0F);
+        Vec3 rp = entity.getPassengerRidingPosition(entity.getFirstPassenger());
+        matrixStack.translate(rp.x, rp.y, rp.z);
         // @todo 1.15
 //        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
 //        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
@@ -291,13 +292,12 @@ public class RenderHelper {
         float vMax = textureSprite.getV1();
 
         Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder vertexBuffer = tessellator.getBuilder();
-        vertexBuffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        vertexBuffer.vertex(xCoord, yCoord + 16, zLevel).uv(uMin, vMax).endVertex();
-        vertexBuffer.vertex(xCoord + 16, yCoord + 16, zLevel).uv(uMax, vMax).endVertex();
-        vertexBuffer.vertex(xCoord + 16, yCoord, zLevel).uv(uMax, vMin).endVertex();
-        vertexBuffer.vertex(xCoord, yCoord, zLevel).uv(uMin, vMin).endVertex();
-        tessellator.end();
+        BufferBuilder vertexBuffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        vertexBuffer.addVertex((float) xCoord, (float) (yCoord + 16), (float) zLevel).setUv(uMin, vMax);
+        vertexBuffer.addVertex((float) (xCoord + 16), (float) (yCoord + 16), (float) zLevel).setUv(uMax, vMax);
+        vertexBuffer.addVertex((float) (xCoord + 16), (float) yCoord, (float) zLevel).setUv(uMax, vMin);
+        vertexBuffer.addVertex((float) xCoord, (float) yCoord, (float) zLevel).setUv(uMin, vMin);
+        BufferUploader.drawWithShader(vertexBuffer.buildOrThrow());
     }
 
 
@@ -318,11 +318,11 @@ public class RenderHelper {
         } else if (size < 100000) {
             amount = String.valueOf(size);
         } else if (size < 1000000) {
-            amount = String.valueOf(size / 1000) + "k";
+            amount = size / 1000 + "k";
         } else if (size < 1000000000) {
-            amount = String.valueOf(size / 1000000) + "m";
+            amount = size / 1000000 + "m";
         } else {
-            amount = String.valueOf(size / 1000000000) + "g";
+            amount = size / 1000000000 + "g";
         }
 
         return renderItemStack(graphics, itemRender, itm, xo, yo, amount, highlight);
@@ -371,7 +371,7 @@ public class RenderHelper {
 //                posestack.translate(0.0D, 0.0D, itemRender.blitOffset + 200.0F);
                 posestack.translate(0.0D, 0.0D, 180.0f + 200.0F);
 
-                MultiBufferSource.BufferSource source = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+                MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
 
                 if (scaled >= 2) {
                     posestack.pushPose();
@@ -395,53 +395,50 @@ public class RenderHelper {
 //                RenderSystem.disableTexture();
                 RenderSystem.disableBlend();
                 Tesselator tesselator = Tesselator.getInstance();
-                BufferBuilder bufferbuilder = tesselator.getBuilder();
                 int i = stack.getBarWidth();
                 int j = stack.getBarColor();
-                fillRect(bufferbuilder, x + 2, y + 13, 13, 2, 0, 0, 0, 255);
-                fillRect(bufferbuilder, x + 2, y + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
+                fillRect(x + 2, y + 13, 13, 2, 0, 0, 0, 255);
+                fillRect(x + 2, y + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
                 RenderSystem.enableBlend();
 //                RenderSystem.enableTexture();
                 RenderSystem.enableDepthTest();
             }
 
             LocalPlayer localplayer = Minecraft.getInstance().player;
-            float f = localplayer == null ? 0.0F : localplayer.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getFrameTime());
+            float f = localplayer == null ? 0.0F : localplayer.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false));
             if (f > 0.0F) {
                 RenderSystem.disableDepthTest();
 //                RenderSystem.disableTexture();
                 RenderSystem.enableBlend();
                 RenderSystem.defaultBlendFunc();
-                Tesselator tesselator1 = Tesselator.getInstance();
-                BufferBuilder bufferbuilder1 = tesselator1.getBuilder();
-                fillRect(bufferbuilder1, x, y + Mth.floor(16.0F * (1.0F - f)), 16, Mth.ceil(16.0F * f), 255, 255, 255, 127);
+                fillRect(x, y + Mth.floor(16.0F * (1.0F - f)), 16, Mth.ceil(16.0F * f), 255, 255, 255, 127);
 //                RenderSystem.enableTexture();
                 RenderSystem.enableDepthTest();
             }
         }
     }
 
-    private static void fillRect(BufferBuilder pRenderer, int pX, int pY, int pWidth, int pHeight, int pRed, int pGreen, int pBlue, int pAlpha) {
+    private static void fillRect(int pX, int pY, int pWidth, int pHeight, int pRed, int pGreen, int pBlue, int pAlpha) {
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        pRenderer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        pRenderer.vertex(pX + 0, pY + 0, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
-        pRenderer.vertex(pX + 0, pY + pHeight, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
-        pRenderer.vertex(pX + pWidth, pY + pHeight, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
-        pRenderer.vertex(pX + pWidth, pY + 0, 0.0D).color(pRed, pGreen, pBlue, pAlpha).endVertex();
-        BufferUploader.drawWithShader(pRenderer.end());
+        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        builder.addVertex(pX + 0, pY + 0, 0.0F).setColor(pRed, pGreen, pBlue, pAlpha);
+        builder.addVertex(pX + 0, pY + pHeight, 0.0F).setColor(pRed, pGreen, pBlue, pAlpha);
+        builder.addVertex(pX + pWidth, pY + pHeight, 0.0F).setColor(pRed, pGreen, pBlue, pAlpha);
+        builder.addVertex(pX + pWidth, pY + 0, 0.0F).setColor(pRed, pGreen, pBlue, pAlpha);
+        BufferUploader.drawWithShader(builder.buildOrThrow());
     }
 
 
     /**
      * Draw with the WorldRenderer
      */
-    private static void draw(BufferBuilder renderer, int x, int y, int width, int height, int red, int green, int blue, int alpha) {
-        renderer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        renderer.vertex((x + 0), (y + 0), 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.vertex((x + 0), (y + height), 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.vertex((x + width), (y + height), 0.0D).color(red, green, blue, alpha).endVertex();
-        renderer.vertex((x + width), (y + 0), 0.0D).color(red, green, blue, alpha).endVertex();
-        Tesselator.getInstance().end();
+    private static void draw(int x, int y, int width, int height, int red, int green, int blue, int alpha) {
+        BufferBuilder renderer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        renderer.addVertex((x + 0), (y + 0), 0.0F).setColor(red, green, blue, alpha);
+        renderer.addVertex((x + 0), (y + height), 0.0F).setColor(red, green, blue, alpha);
+        renderer.addVertex((x + width), (y + height), 0.0F).setColor(red, green, blue, alpha);
+        renderer.addVertex((x + width), (y + 0), 0.0F).setColor(red, green, blue, alpha);
+        BufferUploader.drawWithShader(renderer.buildOrThrow());
     }
 
 
@@ -470,13 +467,12 @@ public class RenderHelper {
 
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_SMOOTH);
         Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(x2, y1, zLevel).color(f1, f2, f3, f).endVertex();
-        buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
-        buffer.vertex(x1, y2, zLevel).color(f5, f6, f7, f4).endVertex();
-        buffer.vertex(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
-        tessellator.end();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.addVertex(x2, y1, zLevel).setColor(f1, f2, f3, f);
+        buffer.addVertex(x1, y1, zLevel).setColor(f1, f2, f3, f);
+        buffer.addVertex(x1, y2, zLevel).setColor(f5, f6, f7, f4);
+        buffer.addVertex(x2, y2, zLevel).setColor(f5, f6, f7, f4);
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
 
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
         RenderSystem.disableBlend();
@@ -507,13 +503,12 @@ public class RenderHelper {
 
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_SMOOTH);
         Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.vertex(x1, y1, zLevel).color(f1, f2, f3, f).endVertex();
-        buffer.vertex(x1, y2, zLevel).color(f1, f2, f3, f).endVertex();
-        buffer.vertex(x2, y2, zLevel).color(f5, f6, f7, f4).endVertex();
-        buffer.vertex(x2, y1, zLevel).color(f5, f6, f7, f4).endVertex();
-        tessellator.end();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        buffer.addVertex(x1, y1, zLevel).setColor(f1, f2, f3, f);
+        buffer.addVertex(x1, y2, zLevel).setColor(f1, f2, f3, f);
+        buffer.addVertex(x2, y2, zLevel).setColor(f5, f6, f7, f4);
+        buffer.addVertex(x2, y1, zLevel).setColor(f5, f6, f7, f4);
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
         // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
         RenderSystem.disableBlend();
         // @todo 1.17 GlStateManager._enableAlphaTest();
@@ -540,10 +535,10 @@ public class RenderHelper {
         VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.QUADS_NOTEXTURE);
 
         Matrix4f positionMatrix = graphics.pose().last().pose();
-        builder.vertex(positionMatrix, x1, y1, zLevel).color(f1, f2, f3, f).uv2(lightmap).endVertex();
-        builder.vertex(positionMatrix, x1, y2, zLevel).color(f1, f2, f3, f).uv2(lightmap).endVertex();
-        builder.vertex(positionMatrix, x2, y2, zLevel).color(f5, f6, f7, f4).uv2(lightmap).endVertex();
-        builder.vertex(positionMatrix, x2, y1, zLevel).color(f5, f6, f7, f4).uv2(lightmap).endVertex();
+        builder.addVertex(positionMatrix, x1, y1, zLevel).setColor(f1, f2, f3, f).setLight(lightmap);
+        builder.addVertex(positionMatrix, x1, y2, zLevel).setColor(f1, f2, f3, f).setLight(lightmap);
+        builder.addVertex(positionMatrix, x2, y2, zLevel).setColor(f5, f6, f7, f4).setLight(lightmap);
+        builder.addVertex(positionMatrix, x2, y1, zLevel).setColor(f5, f6, f7, f4).setLight(lightmap);
     }
 
     public static void drawHorizontalLine(GuiGraphics graphics, int x1, int y1, int x2, int color) {
@@ -587,7 +582,7 @@ public class RenderHelper {
         GlStateManager._enableColorLogicOp();
         GlStateManager._logicOp(colorLogic.value);
 
-        draw(Tesselator.getInstance().getBuilder(), x, y, width, height, red, green, blue, 255);
+        draw(x, y, width, height, red, green, blue, 255);
 
         GlStateManager._disableColorLogicOp();
 //        GlStateManager._enableTexture();
@@ -730,10 +725,10 @@ public class RenderHelper {
         float f = 1.0f / totw;
         float f1 = 1.0f / toth;
         float zLevel = 50;
-        builder.vertex(matrix, (x + 0), (y + height), zLevel).uv(parentU + ((textureX + 0) * f), parentV + ((textureY + height) * f1)).endVertex();
-        builder.vertex(matrix, (x + width), (y + height), zLevel).uv(parentU + ((textureX + width) * f), parentV + ((textureY + height) * f1)).endVertex();
-        builder.vertex(matrix, (x + width), (y + 0), zLevel).uv(parentU + ((textureX + width) * f), parentV + ((textureY + 0) * f1)).endVertex();
-        builder.vertex(matrix, (x + 0), (y + 0), zLevel).uv(parentU + ((textureX + 0) * f), parentV + ((textureY + 0) * f1)).endVertex();
+        builder.addVertex(matrix, (x + 0), (y + height), zLevel).setUv(parentU + ((textureX + 0) * f), parentV + ((textureY + height) * f1));
+        builder.addVertex(matrix, (x + width), (y + height), zLevel).setUv(parentU + ((textureX + width) * f), parentV + ((textureY + height) * f1));
+        builder.addVertex(matrix, (x + width), (y + 0), zLevel).setUv(parentU + ((textureX + width) * f), parentV + ((textureY + 0) * f1));
+        builder.addVertex(matrix, (x + 0), (y + 0), zLevel).setUv(parentU + ((textureX + 0) * f), parentV + ((textureY + 0) * f1));
     }
 
 
@@ -746,13 +741,12 @@ public class RenderHelper {
         float f = (1 / 256.0f);
         float f1 = (1 / 256.0f);
         Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.getBuilder();
-        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        buffer.vertex(matrix, (x + 0), (y + height), zLevel).uv(((u + 0) * f), ((v + height) * f1)).endVertex();
-        buffer.vertex(matrix, (x + width), (y + height), zLevel).uv(((u + width) * f), ((v + height) * f1)).endVertex();
-        buffer.vertex(matrix, (x + width), (y + 0), zLevel).uv(((u + width) * f), ((v + 0) * f1)).endVertex();
-        buffer.vertex(matrix, (x + 0), (y + 0), zLevel).uv(((u + 0) * f), ((v + 0) * f1)).endVertex();
-        tessellator.end();
+        BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        buffer.addVertex(matrix, (x + 0), (y + height), zLevel).setUv(((u + 0) * f), ((v + height) * f1));
+        buffer.addVertex(matrix, (x + width), (y + height), zLevel).setUv(((u + width) * f), ((v + height) * f1));
+        buffer.addVertex(matrix, (x + width), (y + 0), zLevel).setUv(((u + width) * f), ((v + 0) * f1));
+        buffer.addVertex(matrix, (x + 0), (y + 0), zLevel).setUv(((u + 0) * f), ((v + 0) * f1));
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
     }
 
     /**
@@ -774,25 +768,25 @@ public class RenderHelper {
         float um = (u0 + u1) / 2f;
         float vm = (v0 + v1) / 2f;
 
-        buffer.vertex(matrix, -scale, -scale, 0.0f).color(255, 255, 255, 255).uv(u0, v0).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, -scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u0, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, 0.0f, -scale, 0.0f).color(255, 255, 255, 255).uv(um, v0).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.addVertex(matrix, -scale, -scale, 0.0f).setColor(255, 255, 255, 255).setUv(u0, v0).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, -scale, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(u0, vm).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, 0.0f, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(um, vm).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, 0.0f, -scale, 0.0f).setColor(255, 255, 255, 255).setUv(um, v0).setUv2(b1, b2).setNormal(1, 0, 0);
 
-        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, 0.0f, scale, 0.0f).color(255, 255, 255, 255).uv(um, v1).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, scale, scale, 0.0f).color(255, 255, 255, 255).uv(u1, v1).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u1, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.addVertex(matrix, 0.0f, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(um, vm).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, 0.0f, scale, 0.0f).setColor(255, 255, 255, 255).setUv(um, v1).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, scale, scale, 0.0f).setColor(255, 255, 255, 255).setUv(u1, v1).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, scale, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(u1, vm).setUv2(b1, b2).setNormal(1, 0, 0);
 
-        buffer.vertex(matrix, 0.0f, -scale, 0.0f).color(255, 255, 255, 255).uv(um, v0).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u1, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, scale, -scale, 0.0f).color(255, 255, 255, 255).uv(u1, v0).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.addVertex(matrix, 0.0f, -scale, 0.0f).setColor(255, 255, 255, 255).setUv(um, v0).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, 0.0f, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(um, vm).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, scale, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(u1, vm).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, scale, -scale, 0.0f).setColor(255, 255, 255, 255).setUv(u1, v0).setUv2(b1, b2).setNormal(1, 0, 0);
 
-        buffer.vertex(matrix, -scale, 0.0f, 0.0f).color(255, 255, 255, 255).uv(u0, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, -scale, scale, 0.0f).color(255, 255, 255, 255).uv(u0, v1).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, 0.0f, scale, 0.0f).color(255, 255, 255, 255).uv(um, v1).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        buffer.vertex(matrix, 0.0f, 0.0f, 0.0f).color(255, 255, 255, 255).uv(um, vm).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        buffer.addVertex(matrix, -scale, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(u0, vm).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, -scale, scale, 0.0f).setColor(255, 255, 255, 255).setUv(u0, v1).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, 0.0f, scale, 0.0f).setColor(255, 255, 255, 255).setUv(um, v1).setUv2(b1, b2).setNormal(1, 0, 0);
+        buffer.addVertex(matrix, 0.0f, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(um, vm).setUv2(b1, b2).setNormal(1, 0, 0);
         matrixStack.popPose();
     }
 
@@ -808,10 +802,10 @@ public class RenderHelper {
         matrixStack.translate(0.5, 0.5, 0.5);
         RenderHelper.rotateToPlayer(matrixStack);
         Matrix4f matrix = matrixStack.last().pose();
-        builder.vertex(matrix, -scale, -scale, 0.0f).color(settings.r(), settings.g(), settings.b(), settings.a()).uv(sprite.getU0(), sprite.getV0()).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        builder.vertex(matrix, -scale, scale, 0.0f).color(settings.r(), settings.g(), settings.b(), settings.a()).uv(sprite.getU0(), sprite.getV1()).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        builder.vertex(matrix, scale, scale, 0.0f).color(settings.r(), settings.g(), settings.b(), settings.a()).uv(sprite.getU1(), sprite.getV1()).uv2(b1, b2).normal(1, 0, 0).endVertex();
-        builder.vertex(matrix, scale, -scale, 0.0f).color(settings.r(), settings.g(), settings.b(), settings.a()).uv(sprite.getU1(), sprite.getV0()).uv2(b1, b2).normal(1, 0, 0).endVertex();
+        builder.addVertex(matrix, -scale, -scale, 0.0f).setColor(settings.r(), settings.g(), settings.b(), settings.a()).setUv(sprite.getU0(), sprite.getV0()).setUv2(b1, b2).setNormal(1, 0, 0);
+        builder.addVertex(matrix, -scale, scale, 0.0f).setColor(settings.r(), settings.g(), settings.b(), settings.a()).setUv(sprite.getU0(), sprite.getV1()).setUv2(b1, b2).setNormal(1, 0, 0);
+        builder.addVertex(matrix, scale, scale, 0.0f).setColor(settings.r(), settings.g(), settings.b(), settings.a()).setUv(sprite.getU1(), sprite.getV1()).setUv2(b1, b2).setNormal(1, 0, 0);
+        builder.addVertex(matrix, scale, -scale, 0.0f).setColor(settings.r(), settings.g(), settings.b(), settings.a()).setUv(sprite.getU1(), sprite.getV0()).setUv2(b1, b2).setNormal(1, 0, 0);
         matrixStack.popPose();
     }
 
@@ -944,10 +938,10 @@ public class RenderHelper {
         float g = (color >> 8 & 255) / 255.0F;
         float b = (color & 255) / 255.0F;
 
-        builder.vertex(matrix, x1, y2, z).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y1, z).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.addVertex(matrix, x1, y2, z).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y2, z).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y1, z).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x1, y1, z).setColor(r, g, b, a).setLight(packedLightIn);
     }
 
     private static void drawQuad(Matrix4f matrix, VertexConsumer buffer, TextureAtlasSprite sprite, Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4,
@@ -1004,14 +998,14 @@ public class RenderHelper {
      */
     public static void renderRect(PoseStack poseStack, VertexConsumer buffer, Rect rect, BlockPos p, float r, float g, float b, float a) {
         Matrix4f matrix = poseStack.last().pose();
-        buffer.vertex(matrix, (float) (p.getX() + rect.v1.x), (float) (p.getY() + rect.v1.y), (float) (p.getZ() + rect.v1.z)).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, (float) (p.getX() + rect.v2.x), (float) (p.getY() + rect.v2.y), (float) (p.getZ() + rect.v2.z)).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, (float) (p.getX() + rect.v2.x), (float) (p.getY() + rect.v2.y), (float) (p.getZ() + rect.v2.z)).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, (float) (p.getX() + rect.v3.x), (float) (p.getY() + rect.v3.y), (float) (p.getZ() + rect.v3.z)).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, (float) (p.getX() + rect.v3.x), (float) (p.getY() + rect.v3.y), (float) (p.getZ() + rect.v3.z)).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, (float) (p.getX() + rect.v4.x), (float) (p.getY() + rect.v4.y), (float) (p.getZ() + rect.v4.z)).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, (float) (p.getX() + rect.v4.x), (float) (p.getY() + rect.v4.y), (float) (p.getZ() + rect.v4.z)).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, (float) (p.getX() + rect.v1.x), (float) (p.getY() + rect.v1.y), (float) (p.getZ() + rect.v1.z)).color(r, g, b, a).endVertex();
+        buffer.addVertex(matrix, (float) (p.getX() + rect.v1.x), (float) (p.getY() + rect.v1.y), (float) (p.getZ() + rect.v1.z)).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) (p.getX() + rect.v2.x), (float) (p.getY() + rect.v2.y), (float) (p.getZ() + rect.v2.z)).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) (p.getX() + rect.v2.x), (float) (p.getY() + rect.v2.y), (float) (p.getZ() + rect.v2.z)).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) (p.getX() + rect.v3.x), (float) (p.getY() + rect.v3.y), (float) (p.getZ() + rect.v3.z)).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) (p.getX() + rect.v3.x), (float) (p.getY() + rect.v3.y), (float) (p.getZ() + rect.v3.z)).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) (p.getX() + rect.v4.x), (float) (p.getY() + rect.v4.y), (float) (p.getZ() + rect.v4.z)).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) (p.getX() + rect.v4.x), (float) (p.getY() + rect.v4.y), (float) (p.getZ() + rect.v4.z)).setColor(r, g, b, a);
+        buffer.addVertex(matrix, (float) (p.getX() + rect.v1.x), (float) (p.getY() + rect.v1.y), (float) (p.getZ() + rect.v1.z)).setColor(r, g, b, a);
     }
 
     /**
@@ -1033,40 +1027,40 @@ public class RenderHelper {
                                int packedLightIn) {
         Matrix4f matrix = matrixStack.last().pose();
         // BACK
-        builder.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setLight(packedLightIn);
 
         // FRONT
-        builder.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setLight(packedLightIn);
 
         // DOWN
-        builder.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setLight(packedLightIn);
 
         // UP
-        builder.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a).setLight(packedLightIn);
 
         // LEFT
-        builder.vertex(matrix, x1, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x1, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.addVertex(matrix, x1, y1, z1).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x1, y1, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x1, y2, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x1, y2, z1).setColor(r, g, b, a).setLight(packedLightIn);
 
         // RIGHT
-        builder.vertex(matrix, x2, y2, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y2, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z2).color(r, g, b, a).uv2(packedLightIn).endVertex();
-        builder.vertex(matrix, x2, y1, z1).color(r, g, b, a).uv2(packedLightIn).endVertex();
+        builder.addVertex(matrix, x2, y2, z1).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y2, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y1, z2).setColor(r, g, b, a).setLight(packedLightIn);
+        builder.addVertex(matrix, x2, y1, z1).setColor(r, g, b, a).setLight(packedLightIn);
     }
 
     /**
@@ -1221,47 +1215,47 @@ public class RenderHelper {
 
     public static void vt(VertexConsumer renderer, PoseStack stack, float x, float y, float z, float r, float g, float b,
                           int packedLight) {
-        renderer.vertex(stack.last().pose(), x, y, z).color(r, g, b, 1f).uv2(packedLight).normal(1.0F, 0.0F, 0.0F).endVertex();
+        renderer.addVertex(stack.last().pose(), x, y, z).setColor(r, g, b, 1f).setLight(packedLight).setNormal(1.0F, 0.0F, 0.0F);
     }
 
     public static void vt(VertexConsumer renderer, PoseStack stack, float x, float y, float z, float u, float v,
                           int packedLight) {
-        renderer.vertex(stack.last().pose(), x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(packedLight).normal(1.0F, 0.0F, 0.0F).endVertex();
+        renderer.addVertex(stack.last().pose(), x, y, z).setColor(1f, 1f, 1f, 1f).setUv(u, v).setLight(packedLight).setNormal(1.0F, 0.0F, 0.0F);
     }
 
     private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int packedLight) {
-        renderer.vertex(matrix, x, y, z).color(1f, 1f, 1f, 1f).uv(u, v).uv2(packedLight).normal(1.0F, 0.0F, 0.0F).endVertex();
+        renderer.addVertex(matrix, x, y, z).setColor(1f, 1f, 1f, 1f).setUv(u, v).setLight(packedLight).setNormal(1.0F, 0.0F, 0.0F);
     }
 
     public static void vt(VertexConsumer renderer, PoseStack matrix, float x, float y, float z, float u, float v, int lu, int lv, int r, int g, int b, int a) {
         renderer
-                .vertex(matrix.last().pose(), x, y, z)
-                .color(r, g, b, a)
-                .uv(u, v)
-                .uv2(lu, lv)
-                .normal(1, 0, 0)
-                .endVertex();
+                .addVertex(matrix.last().pose(), x, y, z)
+                .setColor(r, g, b, a)
+                .setUv(u, v)
+                .setUv2(lu, lv)
+                .setNormal(1, 0, 0)
+                ;
     }
 
 
     private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v) {
         renderer
-                .vertex(matrix, x, y, z)
-                .color(1.0f, 1.0f, 1.0f, 1.0f)
-                .uv(u, v)
-                .uv2(MAX_BRIGHTNESS)
-                .normal(1, 0, 0)
-                .endVertex();
+                .addVertex(matrix, x, y, z)
+                .setColor(1.0f, 1.0f, 1.0f, 1.0f)
+                .setUv(u, v)
+                .setLight(MAX_BRIGHTNESS)
+                .setNormal(1, 0, 0)
+                ;
     }
 
     private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v, int lu, int lv, int r, int g, int b, int a) {
         renderer
-                .vertex(matrix, x, y, z)
-                .color(r, g, b, a)
-                .uv(u, v)
-                .uv2(lu, lv)
-                .normal(1, 0, 0)
-                .endVertex();
+                .addVertex(matrix, x, y, z)
+                .setColor(r, g, b, a)
+                .setUv(u, v)
+                .setUv2(lu, lv)
+                .setNormal(1, 0, 0)
+                ;
     }
 
     public static void putVertex(VertexConsumer builder, Position normal,
@@ -1269,43 +1263,43 @@ public class RenderHelper {
                                  TextureAtlasSprite sprite, float r, float g, float b, float a) {
         float iu = sprite.getU(u);
         float iv = sprite.getV(v);
-        builder.vertex(x, y, z)
-                .uv(iu, iv)
-                .uv2(0, 0)
-                .color(r, g, b, a)
-                .normal((float) normal.x(), (float) normal.y(), (float) normal.z())
-                .endVertex();
+        builder.addVertex((float) x, (float) y, (float) z)
+                .setUv(iu, iv)
+                .setUv2(0, 0)
+                .setColor(r, g, b, a)
+                .setNormal((float) normal.x(), (float) normal.y(), (float) normal.z())
+                ;
     }
 
     public static void renderHighLightedBlocksOutline(PoseStack poseStack, VertexConsumer buffer, float mx, float my, float mz, float r, float g, float b, float a) {
         Matrix4f matrix = poseStack.last().pose();
-        buffer.vertex(matrix, mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.addVertex(matrix, mx, my, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my + 1, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my + 1, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my + 1, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my + 1, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my + 1, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my + 1, mz).setColor(r, g, b, a);
 
-        buffer.vertex(matrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my + 1, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.addVertex(matrix, mx, my + 1, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my + 1, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my + 1, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my + 1, mz).setColor(r, g, b, a);
 
-        buffer.vertex(matrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my, mz).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my + 1, mz).color(r, g, b, a).endVertex();
+        buffer.addVertex(matrix, mx + 1, my, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my, mz).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my + 1, mz).setColor(r, g, b, a);
 
-        buffer.vertex(matrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx + 1, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my, mz + 1).color(r, g, b, a).endVertex();
-        buffer.vertex(matrix, mx, my + 1, mz + 1).color(r, g, b, a).endVertex();
+        buffer.addVertex(matrix, mx, my, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx + 1, my, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my, mz + 1).setColor(r, g, b, a);
+        buffer.addVertex(matrix, mx, my + 1, mz + 1).setColor(r, g, b, a);
     }
 
     public static void fill(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color,
@@ -1333,10 +1327,10 @@ public class RenderHelper {
 //        RenderSystem.disableTexture();
 //        RenderSystem.defaultBlendFunc();
 //        builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        builder.vertex(positionMatrix, x1, y2, -1F).color(r, g, b, a).uv2(lightmap).endVertex();
-        builder.vertex(positionMatrix, x2, y2, -1F).color(r, g, b, a).uv2(lightmap).endVertex();
-        builder.vertex(positionMatrix, x2, y1, -1F).color(r, g, b, a).uv2(lightmap).endVertex();
-        builder.vertex(positionMatrix, x1, y1, -1F).color(r, g, b, a).uv2(lightmap).endVertex();
+        builder.addVertex(positionMatrix, x1, y2, -1F).setColor(r, g, b, a).setLight(lightmap);
+        builder.addVertex(positionMatrix, x2, y2, -1F).setColor(r, g, b, a).setLight(lightmap);
+        builder.addVertex(positionMatrix, x2, y1, -1F).setColor(r, g, b, a).setLight(lightmap);
+        builder.addVertex(positionMatrix, x1, y1, -1F).setColor(r, g, b, a).setLight(lightmap);
 //        builder.finishDrawing();
 //        RenderSystem.enableTexture();
 //        RenderSystem.disableBlend();

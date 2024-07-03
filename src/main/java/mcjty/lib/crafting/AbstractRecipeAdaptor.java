@@ -4,15 +4,12 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
 
-public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.neoforged.neoforge.common.crafting.IShapedRecipe<CraftingContainer> {
+public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.neoforged.neoforge.common.crafting.IShapedRecipe<CraftingInput> {
 
     private final ShapedRecipe recipe;
 
@@ -27,7 +24,7 @@ public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.neofo
 
     @Override
     @Nonnull
-    public NonNullList<ItemStack> getRemainingItems(@Nonnull CraftingContainer inv) {
+    public NonNullList<ItemStack> getRemainingItems(@Nonnull CraftingInput inv) {
         return recipe.getRemainingItems(inv);
     }
 
@@ -59,18 +56,18 @@ public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.neofo
     }
 
     @Override
-    public int getRecipeWidth() {
-        return recipe.getRecipeWidth();
-    }
-
-    @Override
-    public int getRecipeHeight() {
-        return recipe.getRecipeHeight();
-    }
-
-    @Override
-    public boolean matches(@Nonnull CraftingContainer inv, @Nonnull Level worldIn) {
+    public boolean matches(@Nonnull CraftingInput inv, @Nonnull Level worldIn) {
         return recipe.matches(inv, worldIn);
+    }
+
+    @Override
+    public int getWidth() {
+        return recipe.getWidth();
+    }
+
+    @Override
+    public int getHeight() {
+        return recipe.getHeight();
     }
 
     // @todo NEO

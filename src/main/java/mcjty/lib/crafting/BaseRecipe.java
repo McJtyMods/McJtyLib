@@ -1,15 +1,14 @@
 package mcjty.lib.crafting;
 
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.Container;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.level.Level;
 
-public interface BaseRecipe<C extends Container> extends Recipe<C> {
+public interface BaseRecipe<C extends RecipeInput> extends Recipe<C> {
 
-    static ItemStack assemble(Recipe recipe, CraftingContainer pContainer, Level level) {
+    static ItemStack assemble(Recipe recipe, RecipeInput pContainer, Level level) {
         return recipe.assemble(pContainer, level.registryAccess());
     }
 
@@ -22,8 +21,8 @@ public interface BaseRecipe<C extends Container> extends Recipe<C> {
     }
 
     @Override
-    ItemStack assemble(C container, RegistryAccess access);
+    ItemStack assemble(C c, HolderLookup.Provider provider);
 
     @Override
-    ItemStack getResultItem(RegistryAccess access);
+    ItemStack getResultItem(HolderLookup.Provider provider);
 }

@@ -6,9 +6,13 @@ import mcjty.lib.varia.Tools;
 import net.minecraft.advancements.critereon.EnchantmentPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -20,6 +24,7 @@ import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
 import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.*;
+import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceWithEnchantedBonusCondition;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -29,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class BaseLootTableProvider {
 
@@ -53,10 +59,10 @@ public class BaseLootTableProvider {
         chestLootTables.put(id, builder);
     }
 
-    public void addItemDropTable(EntityType<?> entityType, ItemLike item,
-                                    float min, float max,
-                                    float lmin, float lmax) {
-        entityLootTables.put(entityType, createItemDropTable(
+    public void addItemDropTable(HolderLookup.Provider provider, EntityType<?> entityType, ItemLike item,
+                                 float min, float max,
+                                 float lmin, float lmax) {
+        entityLootTables.put(entityType, createItemDropTable(provider,
                 Tools.getId(entityType).getPath(), item, min, max, lmin, lmax));
     }
 
@@ -68,7 +74,7 @@ public class BaseLootTableProvider {
         return LootTable.lootTable().withPool(builder);
     }
 
-    public LootTable.Builder createItemDropTable(String name, ItemLike item,
+    public LootTable.Builder createItemDropTable(HolderLookup.Provider provider, String name, ItemLike item,
                                                     float min, float max,
                                                     float lmin, float lmax) {
         LootPool.Builder builder = LootPool.lootPool()
@@ -77,12 +83,15 @@ public class BaseLootTableProvider {
                 .add(LootItem.lootTableItem(item)
                         .apply(SetItemCountFunction
                                 .setCount(UniformGenerator.between(min, max)))
-                        .apply(LootingEnchantFunction
-                                .lootingMultiplier(UniformGenerator.between(lmin, lmax))));
+                        .apply(EnchantedCountIncreaseFunction
+                                .lootingMultiplier(provider, UniformGenerator.between(lmin, lmax))));
         return LootTable.lootTable().withPool(builder);
     }
 
-    public LootTable.Builder createSilkTouchTable(String name, Block block, Item lootItem, float min, float max) {
+    public LootTable.Builder createSilkTouchTable(HolderLookup.Provider provider, String name, Block block, Item lootItem, float min, float max) {
+        Optional<Holder.Reference<Enchantment>> silkTouch = provider.lookup(Registries.ENCHANTMENT).get().get(Enchantments.SILK_TOUCH);
+        Optional<Holder.Reference<Enchantment>> fortune = provider.lookup(Registries.ENCHANTMENT).get().get(Enchantments.FORTUNE);
+        EnchantmentPredicate enchantmentPredicate = new EnchantmentPredicate(silkTouch.get(), MinMaxBounds.Ints.atLeast(1));
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
@@ -92,7 +101,7 @@ public class BaseLootTableProvider {
                                         .hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.Ints.atLeast(1))))),
                         LootItem.lootTableItem(lootItem)
                                 .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
-                                .apply(ApplyBonusCount.addUniformBonusCount(Enchantments.BLOCK_FORTUNE, 1))
+                                .apply(ApplyBonusCount.addUniformBonusCount(fortune.get(), 1))
                                 .apply(ApplyExplosionDecay.explosionDecay())
                         )
                 );

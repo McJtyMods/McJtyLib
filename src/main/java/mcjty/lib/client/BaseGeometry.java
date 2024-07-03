@@ -20,7 +20,7 @@ public abstract class BaseGeometry<T extends IUnbakedGeometry<T>> implements IUn
     public abstract Collection<Material> getMaterials();
 
     @Override
-    public BakedModel bake(IGeometryBakingContext iGeometryBakingContext, ModelBaker modelBaker, Function<Material, TextureAtlasSprite> function, ModelState modelState, ItemOverrides itemOverrides, ResourceLocation resourceLocation) {
+    public BakedModel bake(IGeometryBakingContext context, ModelBaker modelBaker, Function<Material, TextureAtlasSprite> function, ModelState modelState, ItemOverrides itemOverrides) {
         return bake();
     }
 }

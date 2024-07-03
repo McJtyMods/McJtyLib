@@ -1,12 +1,9 @@
 package mcjty.lib.crafting;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 
@@ -27,7 +24,7 @@ public class BaseShapedRecipe extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer pContainer, RegistryAccess access) {
-        return super.assemble(pContainer, access);
+    public ItemStack assemble(CraftingInput pInput, HolderLookup.Provider pRegistries) {
+        return super.assemble(pInput, pRegistries);
     }
 }

@@ -20,9 +20,9 @@ import static net.neoforged.neoforge.client.model.generators.ModelProvider.BLOCK
 
 public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
-    public static final ResourceLocation RFTOOLSBASE_SIDE = ResourceLocation.parse("rftoolsbase", "block/base/machineside");
-    public static final ResourceLocation RFTOOLSBASE_TOP = ResourceLocation.parse("rftoolsbase", "block/base/machinetop");
-    public static final ResourceLocation RFTOOLSBASE_BOTTOM = ResourceLocation.parse("rftoolsbase", "block/base/machinebottom");
+    public static final ResourceLocation RFTOOLSBASE_SIDE = ResourceLocation.fromNamespaceAndPath("rftoolsbase", "block/base/machineside");
+    public static final ResourceLocation RFTOOLSBASE_TOP = ResourceLocation.fromNamespaceAndPath("rftoolsbase", "block/base/machinetop");
+    public static final ResourceLocation RFTOOLSBASE_BOTTOM = ResourceLocation.fromNamespaceAndPath("rftoolsbase", "block/base/machinebottom");
 
     public String name(Block block) {
         return Tools.getId(block).getPath();
@@ -67,7 +67,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 .face(Direction.NORTH).cullface(Direction.NORTH).texture("#side").end()
                 .face(Direction.SOUTH).cullface(Direction.SOUTH).texture("#side").end()
                 .end()
-                .texture("side", ResourceLocation.parse("rftoolsbase", "block/base/machineside"))
+                .texture("side", ResourceLocation.fromNamespaceAndPath("rftoolsbase", "block/base/machineside"))
                 .texture("down", RFTOOLSBASE_BOTTOM)
                 .texture("up", texture)
                 .texture("particle", texture);

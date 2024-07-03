@@ -17,7 +17,9 @@ import java.util.List;
  */
 public class QuadTransformer {
     private static void processVertices(Matrix4f transform, VertexFormat fmt, int positionIndex, int[] inData, int[] outData) {
-        int positionOffset = fmt.getOffset(positionIndex);
+        // @todo 1.21
+        int positionOffset = 0; // @WRONG
+//        int positionOffset = fmt.getOffset(positionIndex);
         int stride = fmt.getVertexSize() / 4;
         for (int i = 0; i < 4; i++) {
             int offset = positionOffset + i * stride;
@@ -42,10 +44,10 @@ public class QuadTransformer {
     private static int findPositionIndex(VertexFormat fmt) {
         int positionIndex;
         VertexFormatElement positionElement = null;
-        ImmutableList<VertexFormatElement> list = fmt.getElements().asList();
+        List<VertexFormatElement> list = fmt.getElements();
         for (positionIndex = 0; positionIndex < list.size(); positionIndex++) {
             VertexFormatElement el = list.get(positionIndex);
-            if (el.getUsage() == VertexFormatElement.Usage.POSITION) {
+            if (el.usage() == VertexFormatElement.Usage.POSITION) {
                 positionElement = el;
                 break;
             }
@@ -53,10 +55,10 @@ public class QuadTransformer {
         if (positionIndex == list.size() || positionElement == null) {
             throw new RuntimeException("WAT? Position not found");
         }
-        if (positionElement.getType() != VertexFormatElement.Type.FLOAT) {
+        if (positionElement.type() != VertexFormatElement.Type.FLOAT) {
             throw new RuntimeException("WAT? Position not FLOAT");
         }
-        if (positionElement.getByteSize() < 3) {
+        if (positionElement.byteSize() < 3) {
             throw new RuntimeException("WAT? Position not 3D");
         }
         return positionIndex;

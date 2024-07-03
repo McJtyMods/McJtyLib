@@ -9,6 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -16,6 +17,8 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 // Code borrowed from XFactHD
 public final class TransparentItemRenderHelper {
@@ -94,49 +97,100 @@ public final class TransparentItemRenderHelper {
 
 
     public record GhostVertexConsumer(VertexConsumer wrapped, int alpha) implements VertexConsumer {
+
         @Override
-        public VertexConsumer vertex(double x, double y, double z) {
-            return wrapped.vertex(x, y, z);
+        public VertexConsumer addVertex(float x, float y, float z) {
+            return wrapped.addVertex(x, y, z);
         }
 
         @Override
-        public VertexConsumer color(int red, int green, int blue, int alpha) {
-            return wrapped.color(red, green, blue, (alpha * this.alpha) / 0xFF);
+        public VertexConsumer setColor(int red, int green, int blue, int alpha) {
+            return wrapped.setColor(red, green, blue, (alpha * this.alpha) / 0xFF);
         }
 
         @Override
-        public VertexConsumer uv(float u, float v) {
-            return wrapped.uv(u, v);
+        public VertexConsumer setUv(float u, float v) {
+            return wrapped.setUv(u, v);
         }
 
         @Override
-        public VertexConsumer overlayCoords(int u, int v) {
-            return wrapped.overlayCoords(u, v);
+        public VertexConsumer setOverlay(int u) {
+            return wrapped.setOverlay(u);
         }
 
         @Override
-        public VertexConsumer uv2(int u, int v) {
-            return wrapped.uv2(u, v);
+        public VertexConsumer setUv2(int u, int v) {
+            return wrapped.setUv2(u, v);
         }
 
         @Override
-        public VertexConsumer normal(float x, float y, float z) {
-            return wrapped.normal(x, y, z);
+        public VertexConsumer setNormal(float x, float y, float z) {
+            return wrapped.setNormal(x, y, z);
         }
 
         @Override
-        public void endVertex() {
-            wrapped.endVertex();
+        public VertexConsumer setUv1(int i, int i1) {
+            return wrapped.setUv1(i, i1);
         }
 
         @Override
-        public void defaultColor(int r, int g, int b, int a) {
-            wrapped.defaultColor(r, g, b, a);
+        public void addVertex(float pX, float pY, float pZ, int pColor, float pU, float pV, int pPackedOverlay, int pPackedLight, float pNormalX, float pNormalY, float pNormalZ) {
+            wrapped.addVertex(pX, pY, pZ, pColor, pU, pV, pPackedOverlay, pPackedLight, pNormalX, pNormalY, pNormalZ);
         }
 
         @Override
-        public void unsetDefaultColor() {
-            wrapped.unsetDefaultColor();
+        public VertexConsumer setColor(float pRed, float pGreen, float pBlue, float pAlpha) {
+            return wrapped.setColor(pRed, pGreen, pBlue, pAlpha);
+        }
+
+        @Override
+        public VertexConsumer setColor(int pColor) {
+            return wrapped.setColor(pColor);
+        }
+
+        @Override
+        public VertexConsumer setWhiteAlpha(int pAlpha) {
+            return wrapped.setWhiteAlpha(pAlpha);
+        }
+
+        @Override
+        public VertexConsumer setLight(int pPackedLight) {
+            return wrapped.setLight(pPackedLight);
+        }
+
+        @Override
+        public void putBulkData(PoseStack.Pose pPose, BakedQuad pQuad, float pRed, float pGreen, float pBlue, float pAlpha, int pPackedLight, int pPackedOverlay) {
+            wrapped.putBulkData(pPose, pQuad, pRed, pGreen, pBlue, pAlpha, pPackedLight, pPackedOverlay);
+        }
+
+        @Override
+        public void putBulkData(PoseStack.Pose pPose, BakedQuad pQuad, float[] pBrightness, float pRed, float pGreen, float pBlue, float pAlpha, int[] pLightmap, int pPackedOverlay, boolean p_331268_) {
+            wrapped.putBulkData(pPose, pQuad, pBrightness, pRed, pGreen, pBlue, pAlpha, pLightmap, pPackedOverlay, p_331268_);
+        }
+
+        @Override
+        public VertexConsumer addVertex(Vector3f pPos) {
+            return wrapped.addVertex(pPos);
+        }
+
+        @Override
+        public VertexConsumer addVertex(PoseStack.Pose pPose, Vector3f pPos) {
+            return wrapped.addVertex(pPose, pPos);
+        }
+
+        @Override
+        public VertexConsumer addVertex(PoseStack.Pose pPose, float pX, float pY, float pZ) {
+            return wrapped.addVertex(pPose, pX, pY, pZ);
+        }
+
+        @Override
+        public VertexConsumer addVertex(Matrix4f pPose, float pX, float pY, float pZ) {
+            return wrapped.addVertex(pPose, pX, pY, pZ);
+        }
+
+        @Override
+        public VertexConsumer setNormal(PoseStack.Pose pPose, float pNormalX, float pNormalY, float pNormalZ) {
+            return wrapped.setNormal(pPose, pNormalX, pNormalY, pNormalZ);
         }
     }
 }

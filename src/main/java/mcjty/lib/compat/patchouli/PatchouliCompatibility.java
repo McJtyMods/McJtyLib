@@ -20,7 +20,8 @@ public class PatchouliCompatibility {
 
     public static void openBookEntry(ServerPlayer player, ResourceLocation id, ResourceLocation entry, int page) {
         if (ModSetup.patchouli) {
-            PatchouliAPI.get().openBookEntry(player, id, entry, page);
+            // @todo 1.21
+//            PatchouliAPI.get().openBookEntry(player, id, entry, page);
         } else {
             player.sendSystemMessage(ComponentFactory.literal(ChatFormatting.RED + "Patchouli is missing! No manual present"));
         }

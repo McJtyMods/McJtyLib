@@ -1,24 +1,39 @@
 package mcjty.lib.crafting;
 
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
-
-import javax.annotation.Nonnull;
 
 public class CopyNBTRecipeSerializer implements RecipeSerializer<CopyNBTRecipe> {
 
     private final ShapedRecipe.Serializer serializer = new ShapedRecipe.Serializer();
 
+    private final static StreamCodec<RegistryFriendlyByteBuf, CopyNBTRecipe> STREAM_CODEC = StreamCodec.of(
+            (buf, copyNBTRecipe) -> {
+                ShapedRecipe recipe = copyNBTRecipe.getRecipe();
+                ShapedRecipe.STREAM_CODEC.encode(buf, recipe);
+            },
+            buf -> {
+                Recipe<?> recipe = ShapedRecipe.STREAM_CODEC.decode(buf);
+                ShapedRecipe sr = (ShapedRecipe) recipe;
+                return new CopyNBTRecipe(sr);
+            }
+    );
+
     // @todo NEO
     @Override
-    public Codec<CopyNBTRecipe> codec() {
+    public MapCodec<CopyNBTRecipe> codec() {
         return null;
     }
 
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, CopyNBTRecipe> streamCodec() {
+        return STREAM_CODEC;
+    }
 
     // @todo NEO
 //    @Override
@@ -27,15 +42,4 @@ public class CopyNBTRecipeSerializer implements RecipeSerializer<CopyNBTRecipe> 
 //        ShapedRecipe recipe = serializer.fromJson(recipeId, json);
 //        return new CopyNBTRecipe(recipe);
 //    }
-
-    @Override
-    public CopyNBTRecipe fromNetwork(@Nonnull FriendlyByteBuf buffer) {
-        ShapedRecipe recipe = serializer.fromNetwork(buffer);
-        return new CopyNBTRecipe(recipe);
-    }
-
-    @Override
-    public void toNetwork(@Nonnull FriendlyByteBuf buffer, CopyNBTRecipe recipe) {
-        serializer.toNetwork(buffer, recipe.getRecipe());
-    }
 }
