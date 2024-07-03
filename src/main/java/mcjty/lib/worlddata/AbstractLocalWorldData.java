@@ -30,7 +30,8 @@ public abstract class AbstractLocalWorldData<T extends AbstractLocalWorldData<T>
             throw new RuntimeException("Don't access this client-side!");
         }
         DimensionDataStorage storage = ((ServerLevel)world).getDataStorage();
-        return storage.computeIfAbsent(loader, supplier, name);
+        // @todo 1.21 Use BiFunction for loader?
+        return storage.computeIfAbsent(new Factory<>(supplier, (tag, provider) -> loader.apply(tag)), name);
     }
 
 }

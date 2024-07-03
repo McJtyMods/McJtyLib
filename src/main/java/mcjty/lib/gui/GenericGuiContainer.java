@@ -499,7 +499,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             BlockEntity te = SafeClientTools.getClientWorld().getBlockEntity(container.getPos());
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid tile entity!");
         };
-        MenuScreens.register(type, factory);
+        // @todo 1.21 USE EVENT
+//        MenuScreens.register(type, factory);
     }
 
     @FunctionalInterface

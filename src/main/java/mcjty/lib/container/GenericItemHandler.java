@@ -2,6 +2,7 @@ package mcjty.lib.container;
 
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.ItemStackList;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +10,7 @@ import net.minecraft.nbt.ListTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
+import org.jetbrains.annotations.UnknownNullability;
 
 import javax.annotation.Nonnull;
 import java.util.function.BiConsumer;
@@ -104,7 +106,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
                 return stack;
             }
 
-            if (!ItemHandlerHelper.canItemStacksStack(stack, stackInSlot)) {
+            if (!ItemStack.isSameItemSameComponents(stack, stackInSlot)) {
                 return stack;
             }
 
@@ -292,12 +294,12 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     }
 
     @Override
-    public ListTag serializeNBT() {
+    public ListTag serializeNBT(HolderLookup.Provider provider) {
         ListTag bufferTagList = new ListTag();
         for (ItemStack stack : stacks) {
             CompoundTag compoundNBT = new CompoundTag();
             if (!stack.isEmpty()) {
-                stack.save(compoundNBT);
+                stack.save(provider, compoundNBT);
             }
             bufferTagList.add(compoundNBT);
         }
@@ -305,11 +307,11 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     }
 
     @Override
-    public void deserializeNBT(ListTag nbt) {
+    public void deserializeNBT(HolderLookup.Provider provider, ListTag nbt) {
         for (int i = 0; i < nbt.size(); i++) {
             CompoundTag compoundNBT = nbt.getCompound(i);
             if (i < stacks.size()) {
-                stacks.set(i, ItemStack.of(compoundNBT));
+                stacks.set(i, ItemStack.parse(provider, compoundNBT).orElse(ItemStack.EMPTY));
             }
         }
     }

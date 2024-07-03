@@ -30,7 +30,7 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
             throw new RuntimeException("Don't access this client-side!");
         }
         DimensionDataStorage storage = LevelTools.getOverworld(world).getDataStorage();
-        return storage.computeIfAbsent(loader, supplier, name);
+        return storage.computeIfAbsent(new Factory<>(supplier, (tag, provider) -> loader.apply(tag)), name);
     }
 
 }

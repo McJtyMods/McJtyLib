@@ -1,5 +1,6 @@
 package mcjty.lib.container;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.ListTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -74,12 +75,12 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTS
     }
 
     @Override
-    public ListTag serializeNBT() {
-        return wrapped.serializeNBT();
+    public ListTag serializeNBT(HolderLookup.Provider provider) {
+        return wrapped.serializeNBT(provider);
     }
 
     @Override
-    public void deserializeNBT(ListTag nbt) {
-        wrapped.deserializeNBT(nbt);
+    public void deserializeNBT(HolderLookup.Provider provider, ListTag nbt) {
+        wrapped.deserializeNBT(provider, nbt);
     }
 }

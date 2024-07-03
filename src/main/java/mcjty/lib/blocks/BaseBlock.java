@@ -2,8 +2,11 @@ package mcjty.lib.blocks;
 
 import mcjty.lib.api.ITabExpander;
 import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.api.infusable.ItemInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.api.module.IModuleSupport;
+import mcjty.lib.api.power.ItemEnergy;
+import mcjty.lib.api.security.ItemSecurity;
 import mcjty.lib.api.smartwrench.SmartWrench;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.builder.BlockBuilder;
@@ -14,6 +17,7 @@ import mcjty.lib.compat.waila.WailaInfoProvider;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tileentity.TickingTileEntity;
 import mcjty.lib.tooltips.ITooltipSettings;
@@ -32,7 +36,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -93,40 +96,35 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     private void intAddInformation(ItemStack itemStack, List<Component> list) {
-        CompoundTag tagCompound = itemStack.getTag();
-        if (tagCompound != null) {
-            if (tagCompound.contains("Energy")) {
-                long energy = tagCompound.getLong("Energy");
-                list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Energy: " + energy + " rf"));
-            }
-            if (isInfusable()) {
-                int infused = getInfused(itemStack);
-                int pct = infused * 100 / GeneralConfig.maxInfuse.get();
-                list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Infused: " + pct + "%"));
-            }
-
-            if (GeneralConfig.manageOwnership.get() && tagCompound.contains("owner")) {
-                String owner = tagCompound.getString("owner");
-                int securityChannel = -1;
-                if (tagCompound.contains("secChannel")) {
-                    securityChannel = tagCompound.getInt("secChannel");
-                }
-
-                if (securityChannel == -1) {
-                    list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Owned by: " + owner));
-                } else {
-                    list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")"));
-                }
-
-                if (!tagCompound.contains("idM")) {
-                    list.add(ComponentFactory.literal(ChatFormatting.RED + "Warning! Ownership not correctly set! Please place block again!"));
-                }
+        ItemEnergy itemEnergy = itemStack.get(Registration.ITEM_ENERGY);
+        if (itemEnergy != null) {
+            list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Energy: " + itemEnergy.energy() + " rf"));
+        }
+        ItemInfusable itemInfusable = itemStack.get(Registration.ITEM_INFUSABLE);
+        if (itemInfusable != null) {
+            int infused = itemInfusable.infused();
+            int pct = infused * 100 / GeneralConfig.maxInfuse.get();
+            list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Infused: " + pct + "%"));
+        }
+        ItemSecurity itemSecurity = itemStack.get(Registration.ITEM_SECURITY);
+        if (itemSecurity != null) {
+            String owner = itemSecurity.owner();
+            int securityChannel = itemSecurity.channel();
+            if (securityChannel == -1) {
+                list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Owned by: " + owner));
+            } else {
+                list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Owned by: " + owner + " (channel " + securityChannel + ")"));
             }
         }
     }
 
     public static int getInfused(ItemStack itemStack) {
-        return NBTTools.getInfoNBT(itemStack, CompoundTag::getInt, "infused", 0);
+        ItemInfusable itemInfusable = itemStack.get(Registration.ITEM_INFUSABLE);
+        if (itemInfusable != null) {
+            return itemInfusable.infused();
+        } else {
+            return 0;
+        }
     }
 
     // This if this block was activated with a wrench
@@ -155,10 +153,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         return wrenchUsed;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    @Nonnull
-    public InteractionResult use(@Nonnull BlockState state, Level world, @Nonnull BlockPos pos, @Nonnull Player player, @Nonnull InteractionHand hand, @Nonnull BlockHitResult result) {
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult result) {
+        InteractionHand hand = player.getUsedItemHand();
         BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof GenericTileEntity genTileEntity) {
             InteractionResult resultType = genTileEntity.onBlockActivated(state, player, hand, result);

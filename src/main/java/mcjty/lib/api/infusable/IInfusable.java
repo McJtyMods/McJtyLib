@@ -19,4 +19,5 @@ public interface IInfusable {
     default float getInfusedFactor() {
         return ((float) getInfused()) / GeneralConfig.maxInfuse.get();
     }
+
 }
