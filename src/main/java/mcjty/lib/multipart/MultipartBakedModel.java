@@ -80,7 +80,7 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
     @Nonnull
     @Override
     public TextureAtlasSprite getParticleIcon() {
-        return getTexture(ResourceLocation.parse("minecraft", "missingno"));  // @todo 1.15
+        return getTexture(ResourceLocation.fromNamespaceAndPath("minecraft", "missingno"));  // @todo 1.15
     }
 
     @Nonnull

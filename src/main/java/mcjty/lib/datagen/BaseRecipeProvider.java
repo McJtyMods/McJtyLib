@@ -1,6 +1,7 @@
 package mcjty.lib.datagen;
 
 import mcjty.lib.crafting.IRecipeBuilder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
@@ -20,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -91,8 +93,8 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         builder.group(group).save(consumer, id);
     }
 
-    public BaseRecipeProvider(DataGenerator datagen) {
-        super(datagen.getPackOutput());
+    public BaseRecipeProvider(DataGenerator datagen, CompletableFuture<HolderLookup.Provider> provider) {
+        super(datagen.getPackOutput(), provider);
         add('d', Items.DIAMOND);
         add('e', Items.EMERALD);
         add('o', Tags.Items.ENDER_PEARLS);
@@ -107,7 +109,7 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         add('b', Items.BUCKET);
         add('T', Items.REDSTONE_TORCH);
         add('D', Blocks.DIRT);
-        add('G', Tags.Items.GLASS);
+        add('G', Tags.Items.GLASS_BLOCKS);
         add('O', Blocks.OBSIDIAN);
     }
 }

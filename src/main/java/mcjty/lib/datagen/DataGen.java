@@ -60,7 +60,7 @@ public class DataGen {
     public void generate() {
         DataGenerator generator = event.getGenerator();
 
-        generator.addProvider(event.includeServer(), new GlobalLootModifierProvider(generator.getPackOutput(), modid) {
+        generator.addProvider(event.includeServer(), new GlobalLootModifierProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
             @Override
             protected void start() {
                 for (Dob dob : dobs) {
@@ -89,7 +89,7 @@ public class DataGen {
             }
         }
 
-        generator.addProvider(event.includeServer(), new BaseRecipeProvider(generator) {
+        generator.addProvider(event.includeServer(), new BaseRecipeProvider(generator, event.getLookupProvider()) {
 
             @Override
             protected void buildRecipes(RecipeOutput consumer) {
@@ -107,7 +107,7 @@ public class DataGen {
 
                         @Override
                         public void recipe(String id, Supplier<IRecipeBuilder> supplier) {
-                            supplier.get().build(consumer, ResourceLocation.parse(modid, id));
+                            supplier.get().build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id));
                         }
 
                         @Override
@@ -117,7 +117,7 @@ public class DataGen {
 
                         @Override
                         public void shapedNBT(String id, CopyNBTRecipeBuilder builder, String... pattern) {
-                            build(consumer, ResourceLocation.parse(modid, id), builder, pattern);
+                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder, pattern);
 
                         }
 
@@ -128,7 +128,7 @@ public class DataGen {
 
                         @Override
                         public void shaped(String id, ShapedRecipeBuilder builder, String... pattern) {
-                            build(consumer, ResourceLocation.parse(modid, id), builder, pattern);
+                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder, pattern);
                         }
 
                         @Override
@@ -138,7 +138,7 @@ public class DataGen {
 
                         @Override
                         public void shapeless(String id, ShapelessRecipeBuilder builder) {
-                            build(consumer, ResourceLocation.parse(modid, id), builder);
+                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder);
                         }
                     });
                 }
@@ -163,7 +163,7 @@ public class DataGen {
                     }
                 }, LootContextParamSets.ENTITY));
         generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
-                list));
+                list, event.getLookupProvider()));
 
 
 //        generator.addProvider(event.includeServer(), new BaseLootTableProvider(generator) {

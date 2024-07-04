@@ -1,5 +1,6 @@
 package mcjty.lib.items;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
@@ -7,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class GenericArmorItem extends ArmorItem {
 
-    public GenericArmorItem(ArmorMaterial material, EquipmentSlot slot, Properties properties) {
+    public GenericArmorItem(Holder<ArmorMaterial> material, EquipmentSlot slot, Properties properties) {
         super(material, convert(slot), properties);
     }
 

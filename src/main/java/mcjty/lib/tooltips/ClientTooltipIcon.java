@@ -59,20 +59,20 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
             return;
         }
 
-        MultiBufferSource.BufferSource buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
 
         String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString(count);
 
         PoseStack pose = new PoseStack();
         pose.translate(0, 0, 200D); // @todo 1.19.4 + itemRenderer.blitOffset);
-        drawStringToWidth(font, buffersource, pose, x, y, 18, 0xFFFFFF, s1);
+        drawStringToWidth(font, source, pose, x, y, 18, 0xFFFFFF, s1);
 
         if (errorAmount >= 0) {
             String s2 = "(" + Integer.toString(errorAmount) + ")";
-            drawStringToWidth(font, buffersource, pose, x + 8, y + 17, 18, 0xFFFF0000, s2);
+            drawStringToWidth(font, source, pose, x + 8, y + 17, 18, 0xFFFF0000, s2);
         }
 
-        buffersource.endBatch();
+        source.endBatch();
     }
 
     /**

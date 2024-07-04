@@ -3,9 +3,7 @@ package mcjty.lib.datagen;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import mcjty.lib.varia.Tools;
-import net.minecraft.advancements.critereon.EnchantmentPredicate;
-import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
@@ -33,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -91,14 +90,14 @@ public class BaseLootTableProvider {
     public LootTable.Builder createSilkTouchTable(HolderLookup.Provider provider, String name, Block block, Item lootItem, float min, float max) {
         Optional<Holder.Reference<Enchantment>> silkTouch = provider.lookup(Registries.ENCHANTMENT).get().get(Enchantments.SILK_TOUCH);
         Optional<Holder.Reference<Enchantment>> fortune = provider.lookup(Registries.ENCHANTMENT).get().get(Enchantments.FORTUNE);
-        EnchantmentPredicate enchantmentPredicate = new EnchantmentPredicate(silkTouch.get(), MinMaxBounds.Ints.atLeast(1));
+        EnchantmentPredicate silkTouchPredicate = new EnchantmentPredicate(silkTouch.get(), MinMaxBounds.Ints.atLeast(1));
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(AlternativesEntry.alternatives(
                         LootItem.lootTableItem(block)
                                 .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
-                                        .hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.Ints.atLeast(1))))),
+                                        .withSubPredicate(ItemSubPredicates.ENCHANTMENTS, ItemEnchantmentsPredicate.enchantments(List.of(silkTouchPredicate))))),
                         LootItem.lootTableItem(lootItem)
                                 .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
                                 .apply(ApplyBonusCount.addUniformBonusCount(fortune.get(), 1))
