@@ -148,14 +148,14 @@ public class DataGen {
         // @todo 1.19.3, probably not right
         BaseLootTableProvider lootTableProvider = new BaseLootTableProvider();
 
-        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
+        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(provider -> biConsumer -> {
                     for (Dob dob : dobs) {
                         if (dob.blockSupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
                 }, LootContextParamSets.BLOCK),
-                new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
+                new LootTableProvider.SubProviderEntry(provider -> biConsumer -> {
                     for (Dob dob : dobs) {
                         if (dob.entitySupplier() != null) {
                             dob.loot().accept(lootTableProvider);

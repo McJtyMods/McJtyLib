@@ -22,7 +22,7 @@ public class DumpBlockNBT {
         jsonObject.add("block", new JsonPrimitive(Tools.getId(block).toString()));
         if (te != null) {
             jsonObject.add("teClass", new JsonPrimitive(te.getClass().getCanonicalName()));
-            CompoundTag tag = te.saveWithoutMetadata();
+            CompoundTag tag = te.saveWithoutMetadata(world.registryAccess());
             if (verbose) {
                 String nbtJson = tag.toString();
                 JsonParser parser = new JsonParser();

@@ -8,9 +8,9 @@ import net.minecraft.client.Minecraft;
 public class ClientCommandHandlerHelper {
 
     static void handle(PacketSendClientCommand message) {
-        String modid = message.getModid();
-        String command = message.getCommand();
-        TypedMap arguments = message.getArguments();
+        String modid = message.modid();
+        String command = message.command();
+        TypedMap arguments = message.arguments();
         handleClientCommand(modid, command, arguments);
     }
 

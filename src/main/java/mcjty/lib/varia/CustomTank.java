@@ -1,5 +1,6 @@
 package mcjty.lib.varia;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
@@ -45,14 +46,14 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         return fluid.getAmount();
     }
 
-    public CustomTank readFromNBT(CompoundTag nbt) {
-        FluidStack fluid = FluidStack.loadFluidStackFromNBT(nbt);
+    public CustomTank readFromNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        FluidStack fluid = FluidStack.parse(provider, nbt).orElse(FluidStack.EMPTY);
         setFluid(fluid);
         return this;
     }
 
-    public CompoundTag writeToNBT(CompoundTag nbt) {
-        fluid.writeToNBT(nbt);
+    public CompoundTag writeToNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        fluid.save(provider, nbt);
         return nbt;
     }
 
@@ -93,7 +94,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         }
         if (fluid.isEmpty()) {
             onContentsChanged();
-            fluid = new FluidStack(resource, Math.min(capacity, resource.getAmount()));
+            fluid = new FluidStack(resource.getFluidHolder(), Math.min(capacity, resource.getAmount()), resource.getComponentsPatch());
             return fluid.getAmount();
         }
         if (!fluid.isFluidEqual(resource)) {
@@ -128,7 +129,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         if (fluid.getAmount() < drained) {
             drained = fluid.getAmount();
         }
-        FluidStack stack = new FluidStack(fluid, drained);
+        FluidStack stack = new FluidStack(fluid.getFluidHolder(), drained, fluid.getComponentsPatch());
         if (action.execute()) {
             onContentsChanged();
             fluid.shrink(drained);

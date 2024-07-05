@@ -13,7 +13,7 @@ public enum GuiStyle {
 
     private final String style;
 
-    public static final StreamCodec<FriendlyByteBuf, GuiStyle> CODEC = NeoForgeStreamCodecs.enumCodec(GuiStyle.class);
+    public static final StreamCodec<FriendlyByteBuf, GuiStyle> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(GuiStyle.class);
 
     GuiStyle(String style) {
         this.style = style;

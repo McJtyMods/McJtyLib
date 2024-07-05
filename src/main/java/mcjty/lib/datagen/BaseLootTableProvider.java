@@ -2,10 +2,13 @@ package mcjty.lib.datagen;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import mcjty.lib.api.power.ItemEnergy;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Tools;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -74,8 +77,8 @@ public class BaseLootTableProvider {
     }
 
     public LootTable.Builder createItemDropTable(HolderLookup.Provider provider, String name, ItemLike item,
-                                                    float min, float max,
-                                                    float lmin, float lmax) {
+                                                 float min, float max,
+                                                 float lmin, float lmax) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
@@ -95,13 +98,13 @@ public class BaseLootTableProvider {
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(AlternativesEntry.alternatives(
-                        LootItem.lootTableItem(block)
-                                .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
-                                        .withSubPredicate(ItemSubPredicates.ENCHANTMENTS, ItemEnchantmentsPredicate.enchantments(List.of(silkTouchPredicate))))),
-                        LootItem.lootTableItem(lootItem)
-                                .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
-                                .apply(ApplyBonusCount.addUniformBonusCount(fortune.get(), 1))
-                                .apply(ApplyExplosionDecay.explosionDecay())
+                                LootItem.lootTableItem(block)
+                                        .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
+                                                .withSubPredicate(ItemSubPredicates.ENCHANTMENTS, ItemEnchantmentsPredicate.enchantments(List.of(silkTouchPredicate))))),
+                                LootItem.lootTableItem(lootItem)
+                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
+                                        .apply(ApplyBonusCount.addUniformBonusCount(fortune.get(), 1))
+                                        .apply(ApplyExplosionDecay.explosionDecay())
                         )
                 );
         return LootTable.lootTable().withPool(builder);
@@ -125,18 +128,17 @@ public class BaseLootTableProvider {
         lootTables.put(block, createStandardTable(Tools.getId(block).getPath(), block, type));
     }
 
+
     protected LootTable.Builder createStandardTable(String name, Block block, BlockEntityType<?> type) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-                        .apply(CopyNbtFunction.copyData(ContextNbtProvider.BLOCK_ENTITY)
-                                .copy("Info", "BlockEntityTag.Info", CopyNbtFunction.MergeStrategy.REPLACE)
-                                .copy("Items", "BlockEntityTag.McItems", CopyNbtFunction.MergeStrategy.REPLACE)
-                                .copy("Energy", "BlockEntityTag.Energy", CopyNbtFunction.MergeStrategy.REPLACE))
-                        .apply(SetContainerContents.setContents(type)
-                                .withEntry(DynamicLoot.dynamicEntry(ResourceLocation.parse("minecraft", "contents"))))
+                        .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+                                .include(Registration.ITEM_ENERGY.get())
+//                                .include(Registration.INFO.get()) @todo 1.21: how to do generic info?
+                                .include(DataComponents.CONTAINER))
                 );
         return LootTable.lootTable().withPool(builder);
     }

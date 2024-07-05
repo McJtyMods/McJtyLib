@@ -58,12 +58,12 @@ public interface ISerializer<T> {
     public static class ItemStackSerializer implements ISerializer<ItemStack> {
         @Override
         public Function<RegistryFriendlyByteBuf, ItemStack> getDeserializer() {
-            return buf -> NetworkTools.readItemStack(buf);
+            return NetworkTools::readItemStack;
         }
 
         @Override
         public BiConsumer<RegistryFriendlyByteBuf, ItemStack> getSerializer() {
-            return (buf, item) -> NetworkTools.writeItemStack(buf, item);
+            return NetworkTools::writeItemStack;
         }
     }
 

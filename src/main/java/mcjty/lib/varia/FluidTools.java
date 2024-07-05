@@ -118,8 +118,8 @@ public class FluidTools {
         } else if (blockstate.getBlock() instanceof BucketPickup && fluid != Fluids.EMPTY) {
             FluidStack stack = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
             if (action.test(stack)) {
-                ItemStack fluidBucket = ((BucketPickup) blockstate.getBlock()).pickupBlock(world, pos, blockstate);
-                return FluidUtil.getFluidContained(fluidBucket).map(f -> new FluidStack(f, FluidType.BUCKET_VOLUME)).orElse(FluidStack.EMPTY);
+                ItemStack fluidBucket = ((BucketPickup) blockstate.getBlock()).pickupBlock(null, world, pos, blockstate);
+                return FluidUtil.getFluidContained(fluidBucket).map(f -> new FluidStack(f.getFluidHolder(), FluidType.BUCKET_VOLUME, f.getComponentsPatch())).orElse(FluidStack.EMPTY);
             }
             return stack;
         } else if (blockstate.getBlock() instanceof BucketPickup) { // @todo 1.20 right?

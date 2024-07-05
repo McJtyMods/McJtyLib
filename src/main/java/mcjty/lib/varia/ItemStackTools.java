@@ -61,10 +61,11 @@ public class ItemStackTools {
         GuiParser.GuiCommand object = new GuiParser.GuiCommand(name);
         object.parameter(Tools.getId(item).toString());
         object.parameter(item.getCount());
-        if (item.hasTag()) {
-            String string = item.getTag().toString();
-            object.command(new GuiParser.GuiCommand("tag").parameter(string));
-        }
+        // @todo 1.21 FIX ME
+//        if (item.hasTag()) {
+//            String string = item.getTag().toString();
+//            object.command(new GuiParser.GuiCommand("tag").parameter(string));
+//        }
         return object;
     }
 
@@ -73,14 +74,15 @@ public class ItemStackTools {
         Item item = Tools.getItem(ResourceLocation.parse(itemName));
         int amount = obj.getOptionalPar(1, 1);
         ItemStack stack = new ItemStack(item, amount);
-        obj.findCommand("tag").ifPresent(cmd -> {
-            try {
-                CompoundTag nbt = TagParser.parseTag(cmd.getOptionalPar(0, ""));
-                stack.setTag(nbt);
-            } catch (CommandSyntaxException e) {
-                Logging.logError("Error", e);
-            }
-        });
+        // @todo 1.21 FIX ME
+//        obj.findCommand("tag").ifPresent(cmd -> {
+//            try {
+//                CompoundTag nbt = TagParser.parseTag(cmd.getOptionalPar(0, ""));
+//                stack.setTag(nbt);
+//            } catch (CommandSyntaxException e) {
+//                Logging.logError("Error", e);
+//            }
+//        });
         return stack;
     }
 
@@ -119,16 +121,16 @@ public class ItemStackTools {
             commonTags.add(ItemTags.STAIRS);
             commonTags.add(ItemTags.DIRT);
             commonTags.add(Tags.Items.CROPS);
-            commonTags.add(Tags.Items.GLASS);
+            commonTags.add(Tags.Items.GLASS_BLOCKS);
             commonTags.add(Tags.Items.GLASS_PANES);
             commonTags.add(Tags.Items.CHESTS);
-            commonTags.add(Tags.Items.COBBLESTONE);
-            commonTags.add(Tags.Items.NETHERRACK);
-            commonTags.add(Tags.Items.OBSIDIAN);
-            commonTags.add(Tags.Items.GRAVEL);
-            commonTags.add(Tags.Items.SANDSTONE);
+            commonTags.add(Tags.Items.COBBLESTONES);
+            commonTags.add(Tags.Items.NETHERRACKS);
+            commonTags.add(Tags.Items.OBSIDIANS);
+            commonTags.add(Tags.Items.GRAVELS);
+            commonTags.add(Tags.Items.SANDS);
             commonTags.add(Tags.Items.END_STONES);
-            commonTags.add(Tags.Items.STONE);
+            commonTags.add(Tags.Items.STONES);
 
             commonTags.add(Tags.Items.ORES_COAL);
             commonTags.add(Tags.Items.ORES_DIAMOND);
@@ -138,25 +140,24 @@ public class ItemStackTools {
             commonTags.add(Tags.Items.ORES_QUARTZ);
             commonTags.add(Tags.Items.ORES_IRON);
             commonTags.add(Tags.Items.ORES_LAPIS);
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/copper")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/tin")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/silver")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/manganese")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "ores/platinum")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/copper")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/tin")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/silver")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/manganese")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/platinum")));
 
             commonTags.add(Tags.Items.STORAGE_BLOCKS_COAL);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_DIAMOND);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_EMERALD);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_GOLD);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_REDSTONE);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_QUARTZ);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_IRON);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_LAPIS);
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/copper")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/tin")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/silver")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/manganese")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.parse("forge", "storage_blocks/platinum")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/copper")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/tin")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/silver")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/manganese")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/platinum")));
         }
     }
 }

@@ -16,10 +16,10 @@ public record PacketSendPreferencesToClient(BuffStyle buffStyle, Integer buffX, 
     public static final CustomPacketPayload.Type<PacketSendPreferencesToClient> TYPE = new Type<>(ID);
 
     public static final StreamCodec<FriendlyByteBuf, PacketSendPreferencesToClient> CODEC = StreamCodec.composite(
-            BuffStyle.CODEC, PacketSendPreferencesToClient::buffStyle,
+            BuffStyle.STREAM_CODEC, PacketSendPreferencesToClient::buffStyle,
             ByteBufCodecs.INT, PacketSendPreferencesToClient::buffX,
             ByteBufCodecs.INT, PacketSendPreferencesToClient::buffY,
-            GuiStyle.CODEC, PacketSendPreferencesToClient::style,
+            GuiStyle.STREAM_CODEC, PacketSendPreferencesToClient::style,
             PacketSendPreferencesToClient::new
     );
 

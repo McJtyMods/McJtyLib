@@ -16,21 +16,22 @@ public class DumpItemNBT {
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.add("item", new JsonPrimitive(Tools.getId(item).toString()));
-        if (item.hasTag()) {
-            CompoundTag tag = item.getTag();
-            if (verbose) {
-                String nbtJson = tag.toString();
-                JsonParser parser = new JsonParser();
-                JsonElement element = parser.parse(nbtJson);
-                jsonObject.add("nbt", element);
-            } else {
-                JsonArray array = new JsonArray();
-                for (String key : tag.getAllKeys()) {
-                    array.add(new JsonPrimitive(key));
-                }
-                jsonObject.add("nbt", array);
-            }
-        }
+        // @todo 1.21
+//        if (item.hasTag()) {
+//            CompoundTag tag = item.getTag();
+//            if (verbose) {
+//                String nbtJson = tag.toString();
+//                JsonParser parser = new JsonParser();
+//                JsonElement element = parser.parse(nbtJson);
+//                jsonObject.add("nbt", element);
+//            } else {
+//                JsonArray array = new JsonArray();
+//                for (String key : tag.getAllKeys()) {
+//                    array.add(new JsonPrimitive(key));
+//                }
+//                jsonObject.add("nbt", array);
+//            }
+//        }
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(jsonObject);

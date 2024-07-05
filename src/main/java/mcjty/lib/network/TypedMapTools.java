@@ -4,6 +4,7 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.LevelTools;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
@@ -46,7 +47,7 @@ public class TypedMapTools {
         return typeToIndex.get(type);
     }
 
-    public static TypedMap readArguments(FriendlyByteBuf buf) {
+    public static TypedMap readArguments(RegistryFriendlyByteBuf buf) {
         TypedMap.Builder args = TypedMap.builder();
         int size = buf.readInt();
         if (size != 0) {
@@ -57,7 +58,7 @@ public class TypedMapTools {
         return args.build();
     }
 
-    public static void readArgument(FriendlyByteBuf buf, BiConsumer<Key, Object> args) {
+    public static void readArgument(RegistryFriendlyByteBuf buf, BiConsumer<Key, Object> args) {
         String key = buf.readUtf(32767);
         ArgumentType type = ArgumentType.getType(buf.readByte());
         switch (type) {
@@ -129,14 +130,14 @@ public class TypedMapTools {
         }
     }
 
-    public static void writeArguments(FriendlyByteBuf buf, TypedMap args) {
+    public static void writeArguments(RegistryFriendlyByteBuf buf, TypedMap args) {
         buf.writeInt(args.size());
         for (Key key : args.getKeys()) {
             writeArgument(buf, key, args.get(key));
         }
     }
 
-    public static <T> void writeArgument(FriendlyByteBuf buf, Key<T> key, T value) {
+    public static <T> void writeArgument(RegistryFriendlyByteBuf buf, Key<T> key, T value) {
         buf.writeUtf(key.name());
         ArgumentType argumentType = getArgumentType(key.type());
         buf.writeByte(argumentType.ordinal());

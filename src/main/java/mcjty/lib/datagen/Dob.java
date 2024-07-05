@@ -151,8 +151,8 @@ public record Dob(
             return this;
         }
 
-        public Builder silkTouchLoot(Supplier<Item> lootItem, float min, float max) {
-            this.loot = f -> f.addLootTable(blockSupplier.get(), f.createSilkTouchTable("silk", blockSupplier.get(), lootItem.get(), min, max));
+        public Builder silkTouchLoot(HolderLookup.Provider provider, Supplier<Item> lootItem, float min, float max) {
+            this.loot = f -> f.addLootTable(blockSupplier.get(), f.createSilkTouchTable(provider, "silk", blockSupplier.get(), lootItem.get(), min, max));
             return this;
         }
 

@@ -13,7 +13,7 @@ public enum BuffStyle {
 
     private final String name;
 
-    public static final StreamCodec<FriendlyByteBuf, BuffStyle> CODEC = NeoForgeStreamCodecs.enumCodec(BuffStyle.class);
+    public static final StreamCodec<FriendlyByteBuf, BuffStyle> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(BuffStyle.class);
 
     BuffStyle(String name) {
         this.name = name;

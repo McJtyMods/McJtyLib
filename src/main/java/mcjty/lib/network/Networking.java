@@ -35,10 +35,10 @@ public class Networking {
     }
 
     public static void sendToServer(CustomPacketPayload msg) {
-        PacketDistributor.SERVER.with(null).send(msg);
+        PacketDistributor.sendToServer(msg);
     }
 
     public static <T extends CustomPacketPayload> void sendToPlayer(T packet, Player player) {
-        PacketDistributor.PLAYER.with((ServerPlayer) player).send(packet);
+        PacketDistributor.sendToPlayer((ServerPlayer) player, packet);
     }
 }

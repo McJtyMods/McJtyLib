@@ -96,7 +96,7 @@ public class InventoryTools {
 
     public static boolean isItemStackConsideredEqual(ItemStack result, ItemStack itemstack1) {
         // @todo 1.20 isSameItemSameTags?
-        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (result.getDamageValue() == itemstack1.getDamageValue()) && ItemStack.isSameItemSameTags(result, itemstack1);
+        return !itemstack1.isEmpty() && itemstack1.getItem() == result.getItem() && (result.getDamageValue() == itemstack1.getDamageValue()) && ItemStack.isSameItemSameComponents(result, itemstack1);
     }
 
     @Nonnull

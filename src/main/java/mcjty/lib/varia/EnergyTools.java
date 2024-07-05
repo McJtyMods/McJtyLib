@@ -86,8 +86,12 @@ public class EnergyTools {
         if (item instanceof IEnergyItem) {
             return ((IEnergyItem)item).receiveEnergyL(stack, maxReceive, false);
         } else {
-            return stack.getCapability(ForgeCapabilities.ENERGY).map(handler ->
-                    handler.receiveEnergy(unsignedClampToInt(maxReceive), false)).orElse(0);
+            IEnergyStorage capability = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            if (capability != null) {
+                return capability.receiveEnergy(unsignedClampToInt(maxReceive), false);
+            } else {
+                return 0;
+            }
         }
     }
 

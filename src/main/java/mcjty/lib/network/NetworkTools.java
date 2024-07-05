@@ -2,6 +2,7 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Logging;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
@@ -16,16 +17,16 @@ import java.util.List;
 
 public class NetworkTools {
 
-    public static FluidStack readFluidStack(ByteBuf dataIn) {
+    public static FluidStack readFluidStack(RegistryFriendlyByteBuf dataIn) {
         FriendlyByteBuf buf = new FriendlyByteBuf(dataIn);
         CompoundTag nbt = buf.readNbt();
-        return FluidStack.loadFluidStackFromNBT(nbt);
+        return FluidStack.parse(dataIn.registryAccess(), nbt).orElse(FluidStack.EMPTY);
     }
 
-    public static void writeFluidStack(ByteBuf dataOut, FluidStack fluidStack) {
+    public static void writeFluidStack(RegistryFriendlyByteBuf dataOut, FluidStack fluidStack) {
         FriendlyByteBuf buf = new FriendlyByteBuf(dataOut);
         CompoundTag nbt = new CompoundTag();
-        fluidStack.writeToNBT(nbt);
+        fluidStack.save(dataOut.registryAccess(), nbt);
         try {
             buf.writeNbt(nbt);
         } catch (RuntimeException e) {
@@ -116,19 +117,19 @@ public class NetworkTools {
     }
 
     @Nonnull
-    public static List<ItemStack> readItemStackList(FriendlyByteBuf buf) {
+    public static List<ItemStack> readItemStackList(RegistryFriendlyByteBuf buf) {
         int size = buf.readInt();
         List<ItemStack> outputs = new ArrayList<>(size);
         for (int i = 0 ; i < size ; i++) {
-            outputs.add(buf.readItem());
+            outputs.add(readItemStack(buf));
         }
         return outputs;
     }
 
-    public static void writeItemStackList(FriendlyByteBuf buf, @Nonnull List<ItemStack> outputs) {
+    public static void writeItemStackList(RegistryFriendlyByteBuf buf, @Nonnull List<ItemStack> outputs) {
         buf.writeInt(outputs.size());
         for (ItemStack output : outputs) {
-            buf.writeItem(output);
+            writeItemStack(buf, output);
         }
     }
 
