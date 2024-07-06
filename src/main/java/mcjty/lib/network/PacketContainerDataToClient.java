@@ -6,33 +6,40 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.varia.SafeClientTools;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record PacketContainerDataToClient(ResourceLocation containerId, FriendlyByteBuf buffer) implements CustomPacketPayload {
+public record PacketContainerDataToClient(ResourceLocation containerId, RegistryFriendlyByteBuf buffer) implements CustomPacketPayload {
 
     public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "containerdata");
     public static final CustomPacketPayload.Type<PacketContainerDataToClient> TYPE = new Type<>(ID);
 
-    public static final StreamCodec<FriendlyByteBuf, PacketContainerDataToClient> CODEC = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC, PacketContainerDataToClient::containerId,
-            NeoForgeStreamCodecs.UNBOUNDED_BYTE_ARRAY, i -> i.buffer().array(),
-            PacketContainerDataToClient::new
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketContainerDataToClient> CODEC = StreamCodec.of(
+            (buf, packet) -> {
+                buf.writeResourceLocation(packet.containerId);
+                buf.writeBytes(packet.buffer().array());
+            },
+            buf -> {
+                ResourceLocation containerId = buf.readResourceLocation();
+                int l = buf.readInt();
+                ByteBuf newbuf = Unpooled.buffer(l);
+                byte[] bytes = new byte[l];
+                buf.readBytes(bytes);
+                newbuf.writeBytes(bytes);
+                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, buf.registryAccess(), ConnectionType.OTHER);
+                return new PacketContainerDataToClient(containerId, buffer);
+            }
     );
 
-    private PacketContainerDataToClient(ResourceLocation containerId, byte[] buf) {
-        this(containerId, createBuffer(buf));
-    }
-
-    private static FriendlyByteBuf createBuffer(byte[] buf) {
+    private static RegistryFriendlyByteBuf createBuffer(RegistryAccess provider, byte[] buf) {
         ByteBuf newbuf = Unpooled.buffer();
-        FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
+        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, provider, ConnectionType.OTHER);
         buffer.writeBytes(buf);
         return buffer;
     }
@@ -42,11 +49,11 @@ public record PacketContainerDataToClient(ResourceLocation containerId, Friendly
         return TYPE;
     }
 
-    public static PacketContainerDataToClient create(ResourceLocation id, FriendlyByteBuf buffer) {
+    public static PacketContainerDataToClient create(ResourceLocation id, RegistryFriendlyByteBuf buffer) {
         return new PacketContainerDataToClient(id, buffer);
     }
 
-    public static PacketContainerDataToClient create(FriendlyByteBuf buf) {
+    public static PacketContainerDataToClient create(RegistryFriendlyByteBuf buf) {
         ResourceLocation containerId = buf.readResourceLocation();
         int l = buf.readInt();
 
@@ -54,7 +61,7 @@ public record PacketContainerDataToClient(ResourceLocation containerId, Friendly
         byte[] bytes = new byte[l];
         buf.readBytes(bytes);
         newbuf.writeBytes(bytes);
-        FriendlyByteBuf  buffer = new FriendlyByteBuf(newbuf);
+        RegistryFriendlyByteBuf  buffer = new RegistryFriendlyByteBuf(newbuf, buf.registryAccess(), ConnectionType.OTHER);
         return new PacketContainerDataToClient(containerId, buffer);
     }
 

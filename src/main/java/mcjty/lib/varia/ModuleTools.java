@@ -1,82 +1,65 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.api.modules.ItemModule;
+import mcjty.lib.setup.Registration;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class ModuleTools {
 
     public static boolean hasModuleTarget(ItemStack stack) {
-        if (!stack.hasTag()) {
-            return false;
-        }
-        return stack.getTag().contains("monitorx");
+        return stack.get(Registration.ITEM_MODULE) != null;
     }
 
     public static void setPositionInModule(ItemStack stack, ResourceKey<Level> dimension, BlockPos pos, String name) {
-        CompoundTag tag = stack.getOrCreateTag();
-        if (dimension != null) {
-            tag.putString("monitordim", dimension.location().toString());
-        }
-        if (name != null) {
-            tag.putString("monitorname", name);
-        }
-        tag.putInt("monitorx", pos.getX());
-        tag.putInt("monitory", pos.getY());
-        tag.putInt("monitorz", pos.getZ());
+        stack.set(Registration.ITEM_MODULE, new ItemModule(GlobalPos.of(dimension, pos), name));
     }
 
     public static void clearPositionInModule(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
-        tag.remove("monitordim");
-        tag.remove("monitorx");
-        tag.remove("monitory");
-        tag.remove("monitorz");
-        tag.remove("monitorname");
+        stack.remove(Registration.ITEM_MODULE);
     }
 
+    @Nonnull
     public static BlockPos getPositionFromModule(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
-        int monitorx = tag.getInt("monitorx");
-        int monitory = tag.getInt("monitory");
-        int monitorz = tag.getInt("monitorz");
-        return new BlockPos(monitorx, monitory, monitorz);
+        ItemModule module = stack.get(Registration.ITEM_MODULE);
+        if (module != null) {
+            return module.pos().pos();
+        } else {
+            return BlockPos.ZERO;
+        }
     }
 
+    @Nullable
     public static ResourceKey<Level> getDimensionFromModule(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
-        if (tag.contains("monitordim")) {
-            return LevelTools.getId(tag.getString("monitordim"));
+        ItemModule module = stack.get(Registration.ITEM_MODULE);
+        if (module != null) {
+            return module.pos().dimension();
         } else {
             return null;
         }
     }
 
     public static String getTargetString(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
-        if (tag != null) {
-            if (tag.contains("monitorx")) {
-                int monitorx = tag.getInt("monitorx");
-                int monitory = tag.getInt("monitory");
-                int monitorz = tag.getInt("monitorz");
-                String monitorname = tag.getString("monitorname");
-                String monitordim = tag.getString("monitordim");
-                if (!monitordim.isEmpty()) {
-                    return monitorname + " (at " + monitorx + "," + monitory + "," + monitorz + ", " + monitordim + ")";
-                } else {
-                    return monitorname + " (at " + monitorx + "," + monitory + "," + monitorz + ")";
-                }
-            }
+        ItemModule module = stack.get(Registration.ITEM_MODULE);
+        if (module != null) {
+            String name = module.name();
+            GlobalPos pos = module.pos();
+            return name + " (at " + pos.pos().getX() + "," + pos.pos().getY() + "," + pos.pos().getZ() + ", " + pos.dimension().location() + ")";
+        } else {
+            return "<unset>";
         }
-        return "<unset>";
     }
 
     /**

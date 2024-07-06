@@ -14,6 +14,7 @@ import mcjty.lib.varia.Logging;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,6 +30,7 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -458,7 +460,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         if (player instanceof ServerPlayer serverPlayer) {
             for (IContainerDataListener data : containerData.values()) {
                 ByteBuf newbuf = Unpooled.buffer();
-                FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
+                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
                 data.toBytes(buffer);
                 PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
@@ -483,7 +485,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             for (IContainerDataListener data : containerData.values()) {
                 if (data.isDirtyAndClear()) {
                     ByteBuf newbuf = Unpooled.buffer();
-                    FriendlyByteBuf buffer = new FriendlyByteBuf(newbuf);
+                    RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
                     data.toBytes(buffer);
                     PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
                     Networking.sendToPlayer(packet, serverPlayer);

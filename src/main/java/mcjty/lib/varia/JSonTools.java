@@ -4,11 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
+import com.mojang.serialization.JsonOps;
 import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
@@ -114,36 +110,11 @@ public class JSonTools {
         }
     }
 
-    public static JsonObject itemStackToJson(ItemStack item) {
-        JsonObject object = new JsonObject();
-        object.add("item", new JsonPrimitive(Tools.getId(item).toString()));
-        if (item.getCount() != 1) {
-            object.add("amount", new JsonPrimitive(item.getCount()));
-        }
-        if (item.hasTag()) {
-            String string = item.getTag().toString();
-            object.add("nbt", new JsonPrimitive(string));
-        }
-        return object;
+    public static JsonElement itemStackToJson(ItemStack item) {
+        return ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, item).result().orElseThrow(RuntimeException::new);
     }
 
     public static ItemStack jsonToItemStack(JsonObject obj) {
-        String itemName = obj.get("item").getAsString();
-        Item item = Tools.getItem(ResourceLocation.parse(itemName));
-        // @todo error checking
-        int amount = 1;
-        if (obj.has("amount")) {
-            amount = obj.get("amount").getAsInt();
-        }
-        ItemStack stack = new ItemStack(item, amount);
-        if (obj.has("nbt")) {
-            try {
-                CompoundTag nbt = TagParser.parseTag(obj.get("nbt").getAsString());
-                stack.setTag(nbt);
-            } catch (CommandSyntaxException e) {
-                Logging.logError("Parsing error", e);
-            }
-        }
-        return stack;
+        return ItemStack.CODEC.parse(JsonOps.INSTANCE, obj).result().orElseThrow(RuntimeException::new);
     }
 }

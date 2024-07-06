@@ -4,7 +4,7 @@ import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.tileentity.ValueHolder;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.resources.ResourceLocation;
 
@@ -55,7 +55,7 @@ public class Sync {
             }
 
             @Override
-            public void toBytes(FriendlyByteBuf buf) {
+            public void toBytes(RegistryFriendlyByteBuf buf) {
                 for (ValueHolder value : te.getValueMap().values()) {
                     Object v = value.getter().apply(te);
                     value.key().type().serialize(buf, v);
@@ -63,7 +63,7 @@ public class Sync {
             }
 
             @Override
-            public void readBuf(FriendlyByteBuf buf) {
+            public void readBuf(RegistryFriendlyByteBuf buf) {
                 for (ValueHolder value : te.getValueMap().values()) {
                     value.key().type().deserialize(buf, value, te);
                 }
@@ -96,12 +96,12 @@ public class Sync {
             }
 
             @Override
-            public void toBytes(FriendlyByteBuf buf) {
+            public void toBytes(RegistryFriendlyByteBuf buf) {
                 buf.writeUtf(getter.get());
             }
 
             @Override
-            public void readBuf(FriendlyByteBuf buf) {
+            public void readBuf(RegistryFriendlyByteBuf buf) {
                 setter.accept(buf.readUtf(32767));
             }
         };
@@ -132,12 +132,12 @@ public class Sync {
             }
 
             @Override
-            public void toBytes(FriendlyByteBuf buf) {
+            public void toBytes(RegistryFriendlyByteBuf buf) {
                 buf.writeFloat(getter.get());
             }
 
             @Override
-            public void readBuf(FriendlyByteBuf buf) {
+            public void readBuf(RegistryFriendlyByteBuf buf) {
                 setter.accept(buf.readFloat());
             }
         };

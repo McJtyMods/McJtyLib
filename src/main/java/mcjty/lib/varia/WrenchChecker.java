@@ -13,7 +13,7 @@ public class WrenchChecker {
 
     private static Set<ResourceLocation> wrenches;
 
-    public static final ResourceLocation WRENCH = ResourceLocation.parse("forge", "tools/wrench");
+    public static final ResourceLocation WRENCH = ResourceLocation.fromNamespaceAndPath("forge", "tools/wrench");
     public static final TagKey<Item> WRENCH_TAG = TagKey.create(Registries.ITEM, WRENCH);
 
 
@@ -22,7 +22,7 @@ public class WrenchChecker {
             wrenches = Stream.of(
                     "rftoolsbase:smartwrench",
                     "rftoolsbase:smartwrench_select"
-            ).map(ResourceLocation::new).collect(Collectors.toSet());
+            ).map(ResourceLocation::parse).collect(Collectors.toSet());
         }
         if (wrenches.contains(Tools.getId(item))) {
             return true;

@@ -5,10 +5,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.infusable.ItemInfusable;
+import mcjty.lib.api.modules.ItemModule;
 import mcjty.lib.api.power.ItemEnergy;
 import mcjty.lib.api.security.ItemSecurity;
 import mcjty.lib.crafting.CopyNBTRecipeSerializer;
 import mcjty.lib.preferences.PreferencesProperties;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -66,6 +69,17 @@ public class Registration {
             ByteBufCodecs.INT, ItemSecurity::channel,
             ItemSecurity::new);
 
+    public static final Codec<ItemModule> ITEM_MODULE_CODEC = RecordCodecBuilder.create(instance ->
+            instance.group(
+                    GlobalPos.CODEC.fieldOf("pos").forGetter(ItemModule::pos),
+                    Codec.STRING.fieldOf("name").forGetter(ItemModule::name)
+            ).apply(instance, ItemModule::new));
+
+    public static final StreamCodec<ByteBuf, ItemModule> ITEM_MODULE_STREAM_CODEC = StreamCodec.composite(
+            GlobalPos.STREAM_CODEC, ItemModule::pos,
+            ByteBufCodecs.STRING_UTF8, ItemModule::name,
+            ItemModule::new);
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemInfusable>> ITEM_INFUSABLE = REGISTRAR.registerComponentType(
             "infusable",
             builder -> builder
@@ -83,5 +97,11 @@ public class Registration {
             builder -> builder
                     .persistent(ITEM_SECURITY_CODEC)
                     .networkSynchronized(ITEM_SECURITY_STREAM_CODEC)
+    );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemModule>> ITEM_MODULE = REGISTRAR.registerComponentType(
+            "item_module",
+            builder -> builder
+                    .persistent(ITEM_MODULE_CODEC)
+                    .networkSynchronized(ITEM_MODULE_STREAM_CODEC)
     );
 }

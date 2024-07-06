@@ -1,6 +1,6 @@
 package mcjty.lib.api.container;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -15,8 +15,8 @@ public interface IContainerDataListener {
     boolean isDirtyAndClear();
 
     /// Write data to buffer
-    void toBytes(FriendlyByteBuf buf);
+    void toBytes(RegistryFriendlyByteBuf buf);
 
     /// Read data from buffer
-    void readBuf(FriendlyByteBuf buf);
+    void readBuf(RegistryFriendlyByteBuf buf);
 }
