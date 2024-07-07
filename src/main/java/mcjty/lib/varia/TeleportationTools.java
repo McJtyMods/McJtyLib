@@ -14,7 +14,6 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.function.Function;
 
 public class TeleportationTools {
 
@@ -46,7 +45,9 @@ public class TeleportationTools {
         player.changeDimension(transition);
     }
 
-    private static void facePosition(Entity entity, double newX, double newY, double newZ, BlockPos dest) {
+    private record Rot(float yaw, float pitch) {}
+
+    private static Rot facePosition(Entity entity, double newX, double newY, double newZ, BlockPos dest) {
         double d0 = dest.getX() - newX;
         double d1 = dest.getY() - (newY + entity.getEyeHeight());
         double d2 = dest.getZ() - newZ;
@@ -54,8 +55,10 @@ public class TeleportationTools {
         double d3 = Mth.sqrt((float)(d0 * d0 + d2 * d2));
         float f = (float) (Mth.atan2(d2, d0) * (180D / Math.PI)) - 90.0F;
         float f1 = (float) (-(Mth.atan2(d1, d3) * (180D / Math.PI)));
-        entity.setXRot(updateRotation(entity.getXRot(), f1));
-        entity.setYRot(updateRotation(entity.getYRot(), f));
+        f1 = updateRotation(entity.getXRot(), f1);
+        f = updateRotation(entity.getYRot(), f);
+        return new Rot(f, f1);
+
     }
 
     private static float updateRotation(float angle, float targetAngle) {
@@ -78,23 +81,18 @@ public class TeleportationTools {
             ((ServerLevel) destWorld).tickNonPassenger(entity);
             return entity;
         } else {
-            return entity.changeDimension((ServerLevel) destWorld, new ITeleporter() {
-                @Override
-                public Entity placeEntity(Entity entity, ServerLevel currentWorld, ServerLevel destWorld, float yaw, Function<Boolean, Entity> repositionEntity) {
-                    entity = repositionEntity.apply(false);
-                    if (facing != null) {
-                        fixOrientation(entity, newX, newY, newZ, facing);
-                    }
-                    entity.teleportTo(newX, newY, newZ);
-                    return entity;
-                }
-            });
+            var rot = fixOrientation(entity, newX, newY, newZ, facing);
+            DimensionTransition transition = new DimensionTransition((ServerLevel) destWorld, new Vec3(newX, newY, newZ), Vec3.ZERO,
+                    rot.yaw(), rot.pitch(), DimensionTransition.DO_NOTHING);    // @todo 1.21 check?
+            return entity.changeDimension(transition);
         }
     }
 
-    private static void fixOrientation(Entity entity, double newX, double newY, double newZ, Direction facing) {
+    private static Rot fixOrientation(Entity entity, double newX, double newY, double newZ, Direction facing) {
         if (facing != Direction.DOWN && facing != Direction.UP) {
-            facePosition(entity, newX, newY, newZ, new BlockPos((int) newX, (int) newY, (int) newZ).relative(facing, 4));
+            return facePosition(entity, newX, newY, newZ, new BlockPos((int) newX, (int) newY, (int) newZ).relative(facing, 4));
+        } else {
+            return new Rot(entity.getYRot(), entity.getXRot());
         }
     }
 

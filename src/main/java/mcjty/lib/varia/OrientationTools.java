@@ -80,7 +80,7 @@ public class OrientationTools {
 
     public static Direction determineOrientation(int x, int y, int z, LivingEntity entity) {
         if (Mth.abs((float) entity.getX() - x) < 2.0F && Mth.abs((float) entity.getZ() - z) < 2.0F) {
-            double d0 = entity.getY() + 1.82D - entity.getMyRidingOffset();
+            double d0 = entity.getY() + 1.82D - entity.getPassengerRidingPosition(entity).y;    // @todo 1.21 check
 
             if (d0 - y > 2.0D) {
                 return Direction.UP;
