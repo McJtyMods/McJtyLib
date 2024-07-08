@@ -3,7 +3,6 @@ package mcjty.lib.network;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.CodecTools;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.core.BlockPos;
@@ -32,7 +31,7 @@ public record PacketServerCommandTyped(BlockPos pos, ResourceKey<Level> dimensio
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketServerCommandTyped> CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC, PacketServerCommandTyped::pos,
-            CodecTools.optionalResourceKeyStreamCodec(Registries.DIMENSION), v -> Optional.ofNullable(v.dimensionId()),
+            ResourceKey.streamCodec(Registries.DIMENSION).apply(ByteBufCodecs::optional), s -> Optional.ofNullable(s.dimensionId),
             ByteBufCodecs.STRING_UTF8, PacketServerCommandTyped::command,
             TypedMap.STREAM_CODEC, PacketServerCommandTyped::params,
             PacketServerCommandTyped::new

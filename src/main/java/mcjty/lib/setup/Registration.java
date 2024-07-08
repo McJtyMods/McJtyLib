@@ -10,7 +10,6 @@ import mcjty.lib.api.power.ItemEnergy;
 import mcjty.lib.api.security.ItemSecurity;
 import mcjty.lib.crafting.CopyNBTRecipeSerializer;
 import mcjty.lib.preferences.PreferencesProperties;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;

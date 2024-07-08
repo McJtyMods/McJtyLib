@@ -4,7 +4,6 @@ import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.CodecTools;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.core.BlockPos;
@@ -27,7 +26,7 @@ public record PacketDataFromServer(BlockPos pos, String command, TypedMap result
     public static final CustomPacketPayload.Type<PacketDataFromServer> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketDataFromServer> CODEC = StreamCodec.composite(
-            CodecTools.OPTIONAL_BLOCKPOS, p -> Optional.ofNullable(p.pos()),
+            BlockPos.STREAM_CODEC.apply(ByteBufCodecs::optional), s -> Optional.ofNullable(s.pos),
             ByteBufCodecs.STRING_UTF8, PacketDataFromServer::command,
             TypedMap.STREAM_CODEC, PacketDataFromServer::result,
             (pos, command, result) -> new PacketDataFromServer(pos.orElse(null), command, result)
