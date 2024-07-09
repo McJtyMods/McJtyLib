@@ -1,5 +1,6 @@
 package mcjty.lib.tileentity;
 
+import io.netty.buffer.ByteBuf;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.infusable.IInfusable;
 import mcjty.lib.base.GeneralConfig;
@@ -13,6 +14,7 @@ import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
@@ -29,6 +31,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -36,10 +39,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class GenericTileEntity extends BlockEntity {
@@ -49,6 +49,7 @@ public class GenericTileEntity extends BlockEntity {
     private String ownerName = "";
     private UUID ownerUUID = null;
     private int securityChannel = -1;
+    private Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> attachments = new HashMap<>();
 
     protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
     protected int powerLevel = 0;
@@ -72,6 +73,10 @@ public class GenericTileEntity extends BlockEntity {
 //        };
         // Make sure the annotation holder exists
         getAnnotationHolder();
+    }
+
+    protected <T> void registerAttachment(AttachmentType<T> type, StreamCodec<? extends ByteBuf, T> codec) {
+        attachments.put(type, codec);
     }
 
     // @todo NEO
