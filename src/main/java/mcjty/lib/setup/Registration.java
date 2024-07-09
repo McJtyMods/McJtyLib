@@ -33,6 +33,7 @@ public class Registration {
     public static void init(IEventBus bus) {
         RECIPE_SERIALIZERS.register(bus);
         ATTACHMENT_TYPES.register(bus);
+        REGISTRAR.register(bus);
     }
 
     public static Supplier<CopyNBTRecipeSerializer> COPYNBT_SERIALIZER = RECIPE_SERIALIZERS.register("copy_nbt", CopyNBTRecipeSerializer::new);
