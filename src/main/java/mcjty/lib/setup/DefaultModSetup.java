@@ -59,6 +59,10 @@ public abstract class DefaultModSetup {
         return creativeTab;
     }
 
+    public void addTabItem(Supplier<ItemStack> item) {
+        tabItems.add(item);
+    }
+
     public <T extends Item> Supplier<T> tab(Supplier<T> supplier) {
         Lazy<T> lazyItem = Lazy.of(supplier);
         tabItems.add(() -> new ItemStack(lazyItem.get()));

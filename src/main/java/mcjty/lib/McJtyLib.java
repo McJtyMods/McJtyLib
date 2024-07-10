@@ -11,14 +11,20 @@ import mcjty.lib.setup.Registration;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -50,6 +56,7 @@ public class McJtyLib {
             bus.addListener(ClientSetup::init);
             bus.addListener(ClientSetup::registerKeyBinds);
             bus.addListener(ClientSetup::registerClientComponentTooltips);
+            bus.addListener(this::onRegisterCapabilities);
 //            bus.addListener(MultipartModelLoader::register);
         }
 
@@ -98,5 +105,15 @@ public class McJtyLib {
 
     public static PreferencesProperties getPreferencesProperties(Player player) {
         return player.getData(Registration.PREFERENCES_PROPERTIES);
+    }
+
+    public record CapEntry(BlockCapability bc, IBlockCapabilityProvider provider, Block... blocks) {}
+
+    public List<CapEntry> entries = new ArrayList<>();
+
+    public void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
+        for (CapEntry entry : entries) {
+            event.registerBlock(entry.bc(), entry.provider(), entry.blocks());
+        }
     }
 }

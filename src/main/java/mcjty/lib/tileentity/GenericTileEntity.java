@@ -5,6 +5,8 @@ import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.infusable.IInfusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
+import mcjty.lib.container.AutomationFilterItemHander;
+import mcjty.lib.container.GenericItemHandler;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.typed.Key;
@@ -32,15 +34,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 public class GenericTileEntity extends BlockEntity {
 
@@ -58,8 +66,8 @@ public class GenericTileEntity extends BlockEntity {
     // constructor) set to be a function that looks for the annotations and replaces itself with
     // a function that does the actual testing
     // @todo NEO
-//    private BiFunction<Capability, Direction, LazyOptional> capSetup;
-//    private final List<LazyOptional> lazyOptsToClean = new ArrayList<>();
+    private BiFunction<BlockCapability, Direction, Object> capSetup;
+    private final List<Lazy<?>> lazyOptsToClean = new ArrayList<>();
 
     public GenericTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -72,7 +80,7 @@ public class GenericTileEntity extends BlockEntity {
 //            return capSetup.apply(cap, dir);
 //        };
         // Make sure the annotation holder exists
-        getAnnotationHolder();
+//        getAnnotationHolder();
     }
 
     protected <T> void registerAttachment(AttachmentType<T> type, StreamCodec<? extends ByteBuf, T> codec) {
@@ -88,38 +96,36 @@ public class GenericTileEntity extends BlockEntity {
 //    }
 
     // @todo NEO
-//    private BiFunction<Capability, Direction, LazyOptional> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
-//        if (index >= caps.size()) {
-//            return super::getCapability;
-//        } else {
-//            try {
-//                Cap annotation = caps.get(index).getRight();
-//                Object instance = FieldUtils.readField(caps.get(index).getLeft(), this, true);
-//                LazyOptional lazy;
-//                if (instance instanceof LazyOptional) {
-//                    lazy = (LazyOptional) instance;
-//                } else if (instance instanceof Lazy<?>) {
-//                    lazy = LazyOptional.of(() -> ((Lazy<?>) instance).get());
-//                } else if (annotation.type() == CapType.ITEMS_AUTOMATION) {
-//                    lazy = LazyOptional.of(() -> new AutomationFilterItemHander((GenericItemHandler) instance));
-//                } else {
-//                    lazy = LazyOptional.of(() -> instance);
-//                }
-//                lazyOptsToClean.add(lazy);
-//                BiFunction<Capability, Direction, LazyOptional> tail = generateCapTests(caps, index + 1);
-//                Capability desiredCapability = annotation.type().getCapability();
-//                return (cap, dir) -> {
-//                    if (cap == desiredCapability) {
-//                        return lazy;
-//                    } else {
-//                        return tail.apply(cap, dir);
-//                    }
-//                };
-//            } catch (IllegalAccessException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//    }
+    private BiFunction<BlockCapability, Direction, Object> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
+        if (index >= caps.size()) {
+            return null;    // @todo 1.21
+        } else {
+            try {
+                Cap annotation = caps.get(index).getRight();
+                Object instance = FieldUtils.readField(caps.get(index).getLeft(), this, true);
+                Lazy<?> lazy;
+                if (instance instanceof Lazy<?>) {
+                    lazy = Lazy.of(() -> ((Lazy<?>) instance).get());
+                } else if (annotation.type() == CapType.ITEMS_AUTOMATION) {
+                    lazy = Lazy.of(() -> new AutomationFilterItemHander((GenericItemHandler) instance));
+                } else {
+                    lazy = Lazy.of(() -> instance);
+                }
+                lazyOptsToClean.add(lazy);
+                BiFunction<BlockCapability, Direction, Object> tail = generateCapTests(caps, index + 1);
+                BlockCapability desiredCapability = annotation.type().getCapability();
+                return (cap, dir) -> {
+                    if (cap == desiredCapability) {
+                        return lazy;
+                    } else {
+                        return tail.apply(cap, dir);
+                    }
+                };
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     // @todo NEO
 //    @Nonnull
@@ -529,7 +535,7 @@ public class GenericTileEntity extends BlockEntity {
         return null;
     }
 
-    /// Override this function if you have a tile entity that needs to be opened remotely and thus has to 'fake' the real dimension
+    /// Override this function if you have a be entity that needs to be opened remotely and thus has to 'fake' the real dimension
     public ResourceKey<Level> getDimension() {
         return level.dimension();
     }
@@ -615,7 +621,8 @@ public class GenericTileEntity extends BlockEntity {
     private AnnotationHolder getAnnotationHolder() {
         AnnotationHolder holder = AnnotationHolder.annotations.get(getType());
         if (holder == null) {
-            holder = AnnotationTools.createAnnotationHolder(getType(), getClass());
+            // @todo 1.21 This is not correct
+            holder = AnnotationTools.createAnnotationHolder(getClass());
         }
         return holder;
     }

@@ -16,7 +16,7 @@ import java.util.Map;
 class AnnotationHolder {
 
     // This is static but that is not a big problem since when a new world loads this remains valid
-    static final Map<BlockEntityType, AnnotationHolder> annotations = new HashMap<>();
+    static final Map<Class<? extends GenericTileEntity>, AnnotationHolder> annotations = new HashMap<>();
 
     final Map<String, IRunnable<?>> serverCommands = new HashMap<>();
     final Map<String, IRunnableWithResult<?>> serverCommandsWithResult = new HashMap<>();

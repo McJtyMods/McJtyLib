@@ -20,10 +20,10 @@ import java.util.Arrays;
 
 public class AnnotationTools {
 
-    static AnnotationHolder createAnnotationHolder(BlockEntityType ttype, Class<? extends GenericTileEntity> clazz) {
+    public static AnnotationHolder createAnnotationHolder(Class<? extends GenericTileEntity> clazz) {
         AnnotationHolder holder;
         holder = new AnnotationHolder();
-        AnnotationHolder.annotations.put(ttype, holder);
+        AnnotationHolder.annotations.put(clazz, holder);
         scanServerCommands(clazz, holder);
         scanGuiValues(clazz, holder);
         scanCaps(clazz, holder);

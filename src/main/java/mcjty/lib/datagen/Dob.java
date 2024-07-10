@@ -1,5 +1,6 @@
 package mcjty.lib.datagen;
 
+import mcjty.lib.blocks.RBlock;
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.advancements.Criterion;
@@ -47,6 +48,10 @@ public record Dob(
 
     public static Builder builder(Supplier<? extends Block> blockSupplier, Supplier<? extends Item> itemSupplier) {
         return new Builder(blockSupplier, itemSupplier, null);
+    }
+
+    public static Builder blockBuilder(RBlock<?,?,?> blockSupplier) {
+        return new Builder(blockSupplier.block(), null, null);
     }
 
     public static Builder blockBuilder(Supplier<? extends Block> blockSupplier) {

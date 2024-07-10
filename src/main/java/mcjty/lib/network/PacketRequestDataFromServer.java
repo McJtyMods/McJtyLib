@@ -20,7 +20,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
- * a tile entity on the server that has a ResultCommand annotated with @ServerCommand
+ * a be entity on the server that has a ResultCommand annotated with @ServerCommand
  */
 public record PacketRequestDataFromServer(ResourceKey<Level> level, BlockPos pos, String command, TypedMap params, boolean dummy) implements CustomPacketPayload {
 

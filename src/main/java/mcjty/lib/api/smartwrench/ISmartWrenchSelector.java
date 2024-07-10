@@ -6,7 +6,7 @@ import net.minecraft.core.BlockPos;
 public interface ISmartWrenchSelector {
 
     /**
-     * This is only called server side. Select a block for this tile entity.
+     * This is only called server side. Select a block for this be entity.
      */
     void selectBlock(Player player, BlockPos pos);
 }

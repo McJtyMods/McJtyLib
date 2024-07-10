@@ -21,7 +21,7 @@ import java.util.Optional;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
- * a tile entity on the server side that implements CommandHandler. This will call 'execute()' on
+ * a be entity on the server side that implements CommandHandler. This will call 'execute()' on
  * that command handler.
  */
 public record PacketServerCommandTyped(BlockPos pos, ResourceKey<Level> dimensionId, String command, TypedMap params) implements CustomPacketPayload {

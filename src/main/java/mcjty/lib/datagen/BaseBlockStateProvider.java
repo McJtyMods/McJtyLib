@@ -1,6 +1,7 @@
 package mcjty.lib.datagen;
 
 import mcjty.lib.blocks.LogicSlabBlock;
+import mcjty.lib.blocks.RBlock;
 import mcjty.lib.varia.Tools;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
@@ -15,6 +16,7 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static net.neoforged.neoforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
 
@@ -197,6 +199,14 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
     public VariantBlockStateBuilder orientedBlock(Block block, ModelFile model) {
         return orientedBlock(block, (blockState, builder) -> builder.modelFile(model));
+    }
+
+    public VariantBlockStateBuilder orientedBlock(Supplier<? extends Block> block, ModelFile model) {
+        return orientedBlock(block.get(), (blockState, builder) -> builder.modelFile(model));
+    }
+
+    public VariantBlockStateBuilder orientedBlock(RBlock<?,?,?> block, ModelFile model) {
+        return orientedBlock(block.block().get(), (blockState, builder) -> builder.modelFile(model));
     }
 
     public VariantBlockStateBuilder orientedBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model) {

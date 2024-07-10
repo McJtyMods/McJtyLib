@@ -41,7 +41,7 @@ public record PacketDataFromServer(BlockPos pos, String command, TypedMap result
         ctx.enqueueWork(() -> {
             BlockEntity te;
             if (pos == null) {
-                // We are working from a tablet. Find the tile entity through the open container
+                // We are working from a tablet. Find the be entity through the open container
                 GenericContainer container = getOpenContainer();
                 if (container == null) {
                     Logging.log("Container is missing!");
