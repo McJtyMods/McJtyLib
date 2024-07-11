@@ -9,7 +9,7 @@ import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
 
-public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.neoforged.neoforge.common.crafting.IShapedRecipe<CraftingInput> {
+public abstract class AbstractRecipeAdaptor implements CraftingRecipe /*, Recipe<CraftingInput>*/ {
 
     private final ShapedRecipe recipe;
 
@@ -60,15 +60,16 @@ public abstract class AbstractRecipeAdaptor implements CraftingRecipe, net.neofo
         return recipe.matches(inv, worldIn);
     }
 
-    @Override
-    public int getWidth() {
-        return recipe.getWidth();
-    }
 
-    @Override
-    public int getHeight() {
-        return recipe.getHeight();
-    }
+//    @Override
+//    public int getWidth() {
+//        return recipe.getWidth();
+//    }
+//
+//    @Override
+//    public int getHeight() {
+//        return recipe.getHeight();
+//    }
 
     // @todo NEO
 //    @Override

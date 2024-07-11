@@ -619,11 +619,11 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     private AnnotationHolder getAnnotationHolder() {
-        AnnotationHolder holder = AnnotationHolder.annotations.get(getType());
-        if (holder == null) {
-            // @todo 1.21 This is not correct
-            holder = AnnotationTools.createAnnotationHolder(getClass());
-        }
+        AnnotationHolder holder = AnnotationHolder.annotations.get(getClass());
+//        if (holder == null) {
+//            // @todo 1.21 This is not correct
+//            holder = AnnotationTools.createAnnotationHolder(getClass());
+//        }
         return holder;
     }
 

@@ -2,6 +2,7 @@ package mcjty.lib.blocks;
 
 import mcjty.lib.setup.DeferredBlocks;
 import mcjty.lib.setup.DeferredItems;
+import mcjty.lib.tileentity.AnnotationHolder;
 import mcjty.lib.tileentity.AnnotationTools;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.core.registries.Registries;
@@ -17,6 +18,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -26,6 +29,8 @@ public class RBlockRegistry {
     private final DeferredItems ITEMS;
     private final DeferredRegister<BlockEntityType<?>> TILES;
     private final Consumer<Supplier<ItemStack>> tab;
+
+    private final Map<Class<? extends GenericTileEntity>, AnnotationHolder> holders = new HashMap<>();
 
     public RBlockRegistry(String modid, Consumer<Supplier<ItemStack>> tab) {
         BLOCKS = DeferredBlocks.create(modid);
@@ -40,6 +45,10 @@ public class RBlockRegistry {
         TILES.register(bus);
     }
 
+    public Map<Class<? extends GenericTileEntity>, AnnotationHolder> getHolders() {
+        return holders;
+    }
+
     public <B extends BaseBlock, I extends BlockItem, E extends GenericTileEntity> RBlock<B, I, E> registerBlock(
             String name,
             Class<E> clazz,
@@ -50,7 +59,8 @@ public class RBlockRegistry {
         DeferredItem<I> item = ITEMS.register(name, () -> itemSupplier.apply(block));
         DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> BlockEntityType.Builder.of(tileSupplier, block.get()).build(null));
         tab.accept(() -> new ItemStack(item.get()));
-        AnnotationTools.createAnnotationHolder(clazz);
+        AnnotationHolder holder = AnnotationTools.createAnnotationHolder(clazz, block);
+        holders.put(clazz, holder);
         return new RBlock<>(block, item, tile);
     }
 
