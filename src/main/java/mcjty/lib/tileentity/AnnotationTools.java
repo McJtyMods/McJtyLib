@@ -29,19 +29,19 @@ import java.util.Arrays;
 
 public class AnnotationTools {
 
-    public static AnnotationHolder createAnnotationHolder(Class<? extends GenericTileEntity> clazz, DeferredBlock<?> block) {
+    public static AnnotationHolder createAnnotationHolder(Class<? extends GenericTileEntity> clazz) {
         AnnotationHolder holder;
         holder = new AnnotationHolder();
         AnnotationHolder.annotations.put(clazz, holder);
         scanServerCommands(clazz, holder);
         scanGuiValues(clazz, holder);
-        scanCaps(clazz, holder, block);
+        scanCaps(clazz, holder);
 
         holder.valueMap.put(GenericTileEntity.VALUE_RSMODE.name(), new ValueHolder<>(GenericTileEntity.VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
         return holder;
     }
 
-    private static void scanCaps(Class<? extends GenericTileEntity> clazz, AnnotationHolder holder, DeferredBlock<?> block) {
+    private static void scanCaps(Class<? extends GenericTileEntity> clazz, AnnotationHolder holder) {
         Field[] caps = FieldUtils.getFieldsWithAnnotation(clazz, Cap.class);
         for (Field cap : caps) {
             Cap annotation = cap.getAnnotation(Cap.class);
