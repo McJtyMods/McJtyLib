@@ -8,40 +8,33 @@ import mcjty.lib.container.AutomationFilterItemHander;
 import mcjty.lib.container.GenericItemHandler;
 import mcjty.lib.typed.Type;
 import mcjty.lib.varia.NamedEnum;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
-import net.neoforged.neoforge.common.util.Lazy;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.function.Function;
 
 public class AnnotationTools {
 
-    public static AnnotationHolder createAnnotationHolder(Class<? extends GenericTileEntity> clazz) {
+    public static AnnotationHolder createAnnotationHolder(Class<? extends GenericTileEntity> clazz, DeferredBlock<?> block) {
         AnnotationHolder holder;
         holder = new AnnotationHolder();
         AnnotationHolder.annotations.put(clazz, holder);
         scanServerCommands(clazz, holder);
         scanGuiValues(clazz, holder);
-        scanCaps(clazz, holder);
+        scanCaps(clazz, holder, block);
 
         holder.valueMap.put(GenericTileEntity.VALUE_RSMODE.name(), new ValueHolder<>(GenericTileEntity.VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
         return holder;
     }
 
-    private static void scanCaps(Class<? extends GenericTileEntity> clazz, AnnotationHolder holder) {
+    private static void scanCaps(Class<? extends GenericTileEntity> clazz, AnnotationHolder holder, DeferredBlock<?> block) {
         Field[] caps = FieldUtils.getFieldsWithAnnotation(clazz, Cap.class);
         for (Field cap : caps) {
             Cap annotation = cap.getAnnotation(Cap.class);
@@ -52,22 +45,15 @@ public class AnnotationTools {
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
-            Object finalInstance = instance;
-            Lazy<?> lazy;
-            if (instance instanceof Lazy<?>) {
-                lazy = Lazy.of(() -> ((Lazy<?>) finalInstance).get());
-            } else if (type == CapType.ITEMS_AUTOMATION) {
-                lazy = Lazy.of(() -> new AutomationFilterItemHander((GenericItemHandler) finalInstance));
+            Function<? super GenericTileEntity, Object> function;
+            if (type == CapType.ITEMS_AUTOMATION) {
+                Object finalInstance = instance;
+                function = te -> new AutomationFilterItemHander((GenericItemHandler) (((Function<? super GenericTileEntity, Object>) finalInstance).apply(te)));
             } else {
-                lazy = Lazy.of(() -> finalInstance);
+                function = (Function<? super GenericTileEntity, Object>) instance;
             }
 
-            holder.caps.add(new AnnotationHolder.CapHolder<>(type.getCapability(), new IBlockCapabilityProvider<Object, Object>() {
-                @Override
-                public @Nullable Object getCapability(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, Object context) {
-                    return lazy.get();
-                }
-            }, block));
+            holder.caps.add(new AnnotationHolder.CapHolder<>(type.getCapability(), function, block));
         }
     }
 

@@ -256,7 +256,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         if (window == null) {
             return;
         }
-        renderBackground(graphics, x, y, partialTicks); // @todo NEO is this correct?
+//        renderBackground(graphics, x, y, partialTicks); // @todo NEO is this correct?
         getWindowManager().syncBindings(tileEntity);
         getWindowManager().draw(graphics);
     }

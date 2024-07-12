@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 public class AnnotationHolder {
 
@@ -31,7 +32,7 @@ public class AnnotationHolder {
 //    final List<Pair<Field, Cap>> capabilityList = new ArrayList<>();
     final List<CapHolder> caps = new ArrayList<>();
 
-    public record CapHolder<B, C>(BlockCapability<B, C> capability, IBlockCapabilityProvider<B, C> provider, DeferredBlock<?> block) {}
+    public record CapHolder<B, C>(BlockCapability<B, C> capability, Function<? super GenericTileEntity, Object> function, DeferredBlock<?> block) {}
 
     public int getCapSize() {
         return caps.size();
