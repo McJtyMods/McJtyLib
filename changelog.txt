@@ -1,4 +1,4 @@
-Upcoming:
+1.19-7.2.8:
 - Fixed a problem with the wrench not properly rotating blocks anymore
 
 1.19-7.2.7:
