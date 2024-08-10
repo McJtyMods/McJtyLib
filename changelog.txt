@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a problem with the wrench not properly rotating blocks anymore
+
 1.20-8.0.5:
 - Some changes for XNet by Dertiende
 
