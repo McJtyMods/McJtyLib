@@ -202,10 +202,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity instanceof GenericTileEntity genTileEntity) {
             if (!genTileEntity.wrenchUse(world, pos, side, player)) {
-                rotate(world.getBlockState(pos), world, pos, Rotation.CLOCKWISE_90);
+                BlockState state = rotate(world.getBlockState(pos), world, pos, Rotation.CLOCKWISE_90);
+                world.setBlock(pos, state, Block.UPDATE_ALL);
             }
         } else {
-            rotate(world.getBlockState(pos), world, pos, Rotation.CLOCKWISE_90);
+            BlockState state = rotate(world.getBlockState(pos), world, pos, Rotation.CLOCKWISE_90);
+            world.setBlock(pos, state, Block.UPDATE_ALL);
         }
         return true;
     }
