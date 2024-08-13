@@ -38,6 +38,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
@@ -493,14 +494,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     // Register a container/gui on the client side
     public static <C extends GenericContainer, S extends GenericGuiContainer<T,C>, T extends GenericTileEntity> void register(
+            RegisterMenuScreensEvent event,
             MenuType<C> type,
             GuiSupplier<C, S, T> guiSupplier) {
         MenuScreens.ScreenConstructor<C, S> factory = (container, inventory, title) -> {
             BlockEntity te = SafeClientTools.getClientWorld().getBlockEntity(container.getPos());
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid be entity!");
         };
-        // @todo 1.21 USE EVENT
-//        MenuScreens.register(type, factory);
+        event.register(type, factory);
     }
 
     @FunctionalInterface
