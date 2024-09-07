@@ -5,10 +5,8 @@ import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.Util;
 import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.ContextAwarePredicate;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
@@ -33,6 +31,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -149,19 +148,27 @@ public class DataGen {
         // @todo 1.19.3, probably not right
         BaseLootTableProvider lootTableProvider = new BaseLootTableProvider();
 
-        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(provider -> biConsumer -> {
+        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(provider -> builder -> {
                     for (Dob dob : dobs) {
                         if (dob.blockSupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
+                    lootTableProvider.generate(builder, LootContextParamSets.BLOCK);
                 }, LootContextParamSets.BLOCK),
-                new LootTableProvider.SubProviderEntry(provider -> biConsumer -> {
+                new LootTableProvider.SubProviderEntry(provider -> builder -> {
+                    for (Dob dob : dobs) {
+                        dob.loot().accept(lootTableProvider);
+                    }
+                    lootTableProvider.generate(builder, LootContextParamSets.CHEST);
+                }, LootContextParamSets.CHEST),
+                new LootTableProvider.SubProviderEntry(provider -> builder -> {
                     for (Dob dob : dobs) {
                         if (dob.entitySupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
+                    lootTableProvider.generate(builder, LootContextParamSets.ENTITY);
                 }, LootContextParamSets.ENTITY));
         generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
                 list, event.getLookupProvider()));

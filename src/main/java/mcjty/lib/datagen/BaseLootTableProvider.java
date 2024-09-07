@@ -2,7 +2,6 @@ package mcjty.lib.datagen;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import mcjty.lib.api.power.ItemEnergy;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Tools;
 import net.minecraft.advancements.critereon.*;
@@ -10,6 +9,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -22,12 +22,11 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
-import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.*;
-import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceWithEnchantedBonusCondition;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
-import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 public class BaseLootTableProvider {
 
@@ -47,7 +47,6 @@ public class BaseLootTableProvider {
     protected final Map<ResourceLocation, LootTable.Builder> chestLootTables = new HashMap<>();
 
     protected final Map<Block, LootTable.Builder> lootTables = new HashMap<>();
-
 
     public void addLootTable(Block block, LootTable.Builder builder) {
         lootTables.put(block, builder);
@@ -163,25 +162,29 @@ public class BaseLootTableProvider {
         return LootTable.lootTable().withPool(builder);
     }
 
-    // @todo 1.19.3
-//    @Override
-//    public void run(CachedOutput cache) {
-//        addTables();
-//
+    public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> builder, LootContextParamSet paramSet) {
 //        Map<ResourceLocation, LootTable> tables = new HashMap<>();
-//        for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
+        if (paramSet == LootContextParamSets.BLOCK) {
+            for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
+                builder.accept(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK));
 //            tables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK).build());
-//        }
-//        for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
+            }
+        }
+        if (paramSet == LootContextParamSets.ENTITY) {
+            for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
+                builder.accept(entry.getKey().getDefaultLootTable(), entry.getValue().setParamSet(LootContextParamSets.ENTITY));
 //            tables.put(entry.getKey().getDefaultLootTable(), entry.getValue().setParamSet(LootContextParamSets.ENTITY).build());
-//        }
-//        for (Map.Entry<ResourceLocation, LootTable.Builder> entry : chestLootTables.entrySet()) {
-//            ResourceLocation id = entry.getKey();
+            }
+        }
+        if (paramSet == LootContextParamSets.CHEST) {
+            for (Map.Entry<ResourceLocation, LootTable.Builder> entry : chestLootTables.entrySet()) {
+                ResourceLocation id = entry.getKey();
+                ResourceKey<LootTable> key = ResourceKey.create(Registries.LOOT_TABLE, id.withPrefix("chests/"));
+                builder.accept(key, entry.getValue().setParamSet(LootContextParamSets.CHEST));
 //            tables.put(id, entry.getValue().setParamSet(LootContextParamSets.CHEST).build());
-//        }
-//
-//        writeTables(cache, tables);
-//    }
+            }
+        }
+    }
 
 //    private void writeTables(CachedOutput cache, Map<ResourceLocation, LootTable> tables) {
 //        Path outputFolder = this.generator.getOutputFolder();
