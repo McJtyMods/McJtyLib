@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import mcjty.lib.crafting.CopyNBTRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
+import mcjty.lib.varia.Tools;
 import net.minecraft.Util;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.HolderLookup;
@@ -137,19 +138,27 @@ public class DataGen {
         // @todo 1.19.3, probably not right
         BaseLootTableProvider lootTableProvider = new BaseLootTableProvider();
 
-        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
+        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(() -> builder -> {
                     for (Dob dob : dobs) {
                         if (dob.blockSupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
+                    lootTableProvider.generate(builder, LootContextParamSets.BLOCK);
                 }, LootContextParamSets.BLOCK),
+                new LootTableProvider.SubProviderEntry(() -> builder -> {
+                    for (Dob dob : dobs) {
+                        dob.loot().accept(lootTableProvider);
+                    }
+                    lootTableProvider.generate(builder, LootContextParamSets.CHEST);
+                }, LootContextParamSets.CHEST),
                 new LootTableProvider.SubProviderEntry(() -> biConsumer -> {
                     for (Dob dob : dobs) {
                         if (dob.entitySupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
+                    lootTableProvider.generate(biConsumer, LootContextParamSets.ENTITY);
                 }, LootContextParamSets.ENTITY));
         generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
                 list));

@@ -20,6 +20,8 @@ import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
 import net.minecraft.world.level.storage.loot.entries.DynamicLoot;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.*;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.nbt.ContextNbtProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -29,6 +31,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class BaseLootTableProvider {
 
@@ -39,7 +42,6 @@ public class BaseLootTableProvider {
     protected final Map<ResourceLocation, LootTable.Builder> chestLootTables = new HashMap<>();
 
     protected final Map<Block, LootTable.Builder> lootTables = new HashMap<>();
-
 
     public void addLootTable(Block block, LootTable.Builder builder) {
         lootTables.put(block, builder);
@@ -153,25 +155,28 @@ public class BaseLootTableProvider {
         return LootTable.lootTable().withPool(builder);
     }
 
-    // @todo 1.19.3
-//    @Override
-//    public void run(CachedOutput cache) {
-//        addTables();
-//
+    public void generate(BiConsumer<ResourceLocation, LootTable.Builder> builder, LootContextParamSet paramSet) {
 //        Map<ResourceLocation, LootTable> tables = new HashMap<>();
-//        for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
+        if (paramSet == LootContextParamSets.BLOCK) {
+            for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
+                builder.accept(Tools.getId(entry.getKey()), entry.getValue().setParamSet(LootContextParamSets.BLOCK));
 //            tables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK).build());
-//        }
-//        for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
+            }
+        }
+        if (paramSet == LootContextParamSets.ENTITY) {
+            for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
+                builder.accept(Tools.getId(entry.getKey()), entry.getValue().setParamSet(LootContextParamSets.ENTITY));
 //            tables.put(entry.getKey().getDefaultLootTable(), entry.getValue().setParamSet(LootContextParamSets.ENTITY).build());
-//        }
-//        for (Map.Entry<ResourceLocation, LootTable.Builder> entry : chestLootTables.entrySet()) {
-//            ResourceLocation id = entry.getKey();
+            }
+        }
+        if (paramSet == LootContextParamSets.CHEST) {
+            for (Map.Entry<ResourceLocation, LootTable.Builder> entry : chestLootTables.entrySet()) {
+                ResourceLocation id = entry.getKey();
+                builder.accept(id, entry.getValue().setParamSet(LootContextParamSets.CHEST));
 //            tables.put(id, entry.getValue().setParamSet(LootContextParamSets.CHEST).build());
-//        }
-//
-//        writeTables(cache, tables);
-//    }
+            }
+        }
+    }
 
 //    private void writeTables(CachedOutput cache, Map<ResourceLocation, LootTable> tables) {
 //        Path outputFolder = this.generator.getOutputFolder();
