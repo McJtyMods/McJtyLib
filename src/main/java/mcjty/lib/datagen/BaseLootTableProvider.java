@@ -159,13 +159,13 @@ public class BaseLootTableProvider {
 //        Map<ResourceLocation, LootTable> tables = new HashMap<>();
         if (paramSet == LootContextParamSets.BLOCK) {
             for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
-                builder.accept(Tools.getId(entry.getKey()), entry.getValue().setParamSet(LootContextParamSets.BLOCK));
+                builder.accept(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK));
 //            tables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK).build());
             }
         }
         if (paramSet == LootContextParamSets.ENTITY) {
             for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
-                builder.accept(Tools.getId(entry.getKey()), entry.getValue().setParamSet(LootContextParamSets.ENTITY));
+                builder.accept(entry.getKey().getDefaultLootTable(), entry.getValue().setParamSet(LootContextParamSets.ENTITY));
 //            tables.put(entry.getKey().getDefaultLootTable(), entry.getValue().setParamSet(LootContextParamSets.ENTITY).build());
             }
         }
