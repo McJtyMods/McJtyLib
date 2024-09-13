@@ -283,7 +283,8 @@ public class GenericTileEntity extends BlockEntity {
 
     @Override
     protected void loadAdditional(CompoundTag tagCompound, HolderLookup.Provider pRegistries) {
-        loadCaps(tagCompound);
+        super.loadAdditional(tagCompound, pRegistries);
+//        loadCaps(tagCompound);
         loadInfo(tagCompound);
     }
 
@@ -361,7 +362,8 @@ public class GenericTileEntity extends BlockEntity {
 
     @Override
     protected void saveAdditional(CompoundTag tagCompound, HolderLookup.Provider provider) {
-        saveCaps(tagCompound, provider);
+        super.saveAdditional(tagCompound, provider);
+//        saveCaps(tagCompound, provider);
         saveInfo(tagCompound);
     }
 
