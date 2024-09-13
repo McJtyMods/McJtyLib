@@ -235,17 +235,31 @@ public class GenericTileEntity extends BlockEntity {
     @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        CompoundTag nbtTag = new CompoundTag();
-        this.saveClientDataToNBT(nbtTag);
-        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity, RegistryAccess access) -> nbtTag);
+        CompoundTag tag = new CompoundTag();
+        this.saveClientDataToNBT(tag);
+        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity, RegistryAccess access) -> tag);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        CompoundTag tag = super.getUpdateTag(registries);
+        saveClientDataToNBT(tag);
+        return tag;
     }
 
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider lookupProvider) {
-        loadClientDataFromNBT(pkt.getTag());
+        CompoundTag tag = pkt.getTag();
+        loadClientDataFromNBT(tag);
     }
 
-//    public void setInfused(int infused) {
+    @Override
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
+        super.handleUpdateTag(tag, lookupProvider);
+        loadClientDataFromNBT(tag);
+    }
+
+    //    public void setInfused(int infused) {
 //        this.infused = infused;
 //        markDirtyClient();
 //    }
@@ -260,13 +274,6 @@ public class GenericTileEntity extends BlockEntity {
 
     public boolean canPlayerAccess(Player player) {
         return !isRemoved() && player.distanceToSqr(new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(new Vec3(0.5D, 0.5D, 0.5D))) <= 64D;
-    }
-
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag updateTag = super.getUpdateTag(registries);
-        saveClientDataToNBT(updateTag);
-        return updateTag;
     }
 
     /**
