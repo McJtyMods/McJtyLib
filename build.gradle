@@ -41,7 +41,9 @@ subsystems {
     }
 }
 
+
 task apiJar(type: Jar) {
+    archiveClassifier = "api"
     from(sourceSets.main.output) {
         include "mcjty/mcjtylib/api/**"
     }
