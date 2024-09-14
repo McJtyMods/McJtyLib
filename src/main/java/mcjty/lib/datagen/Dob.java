@@ -7,6 +7,7 @@ import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -151,8 +152,8 @@ public record Dob(
             return this;
         }
 
-        public Builder standardLoot(@SuppressWarnings("rawtypes") Supplier be) {
-            this.loot = f -> f.addStandardTable(blockSupplier.get(), (BlockEntityType<?>) be.get());
+        public Builder standardLoot(DataComponentType<?>... types) {
+            this.loot = f -> f.addStandardTable(blockSupplier.get(), types);
             return this;
         }
 

@@ -7,6 +7,7 @@ import mcjty.lib.varia.Tools;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -123,21 +124,24 @@ public class BaseLootTableProvider {
         return LootTable.lootTable().withPool(builder);
     }
 
-    protected void addStandardTable(Block block, BlockEntityType<?> type) {
-        lootTables.put(block, createStandardTable(Tools.getId(block).getPath(), block, type));
+    protected void addStandardTable(Block block, DataComponentType<?>... types) {
+        lootTables.put(block, createStandardTable(Tools.getId(block).getPath(), block, types));
     }
 
 
-    protected LootTable.Builder createStandardTable(String name, Block block, BlockEntityType<?> type) {
+    protected LootTable.Builder createStandardTable(String name, Block block, DataComponentType<?>... types) {
+        CopyComponentsFunction.Builder copyBuilder = CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+                .include(Registration.ITEM_ENERGY.get())
+                .include(DataComponents.CONTAINER);
+        for (DataComponentType<?> type : types) {
+            copyBuilder.include(type);
+        }
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
-                        .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
-                                .include(Registration.ITEM_ENERGY.get())
-//                                .include(Registration.INFO.get()) @todo 1.21: how to do generic info?
-                                .include(DataComponents.CONTAINER))
+                        .apply(copyBuilder)
                 );
         return LootTable.lootTable().withPool(builder);
     }
