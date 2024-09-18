@@ -26,4 +26,8 @@ public class DeferredItems {
     public static DeferredItems create(String modid) {
         return new DeferredItems(modid);
     }
+
+    public DeferredRegister.Items getRegister() {
+        return register;
+    }
 }
