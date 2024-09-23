@@ -70,8 +70,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         windowManager = null;
     }
 
-    public GenericTileEntity getTE() {
-        return menu instanceof GenericContainer container ? container.getTe() : null;
+    public <T extends GenericTileEntity> T getTE() {
+        return menu instanceof GenericContainer container ? (T)container.getTe() : null;
     }
 
     // Mostly for JEI: get a list of all bounds additional to the main window. That includes modal windows, the side window, ...
