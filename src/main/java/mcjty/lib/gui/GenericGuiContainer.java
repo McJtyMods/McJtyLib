@@ -56,7 +56,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     protected Window window;
     private WindowManager windowManager;
-    protected final T tileEntity;
 
     private final GuiSideWindow sideWindow;
 
@@ -65,11 +64,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         this.imageHeight = y;
     }
 
-    public GenericGuiContainer(T tileEntity, C container, Inventory inventory, ManualEntry manualEntry) {
-        super(container, inventory, ComponentFactory.literal("test"));   // @todo
-        this.tileEntity = tileEntity;
+    public GenericGuiContainer(C container, Inventory inventory, Component title, ManualEntry manualEntry) {
+        super(container, inventory, title);
         sideWindow = new GuiSideWindow(manualEntry.manual(), manualEntry.entry(), manualEntry.page());
         windowManager = null;
+    }
+
+    public GenericTileEntity getTE() {
+        return menu instanceof GenericContainer container ? container.getTe() : null;
     }
 
     // Mostly for JEI: get a list of all bounds additional to the main window. That includes modal windows, the side window, ...
@@ -258,7 +260,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             return;
         }
 //        renderBackground(graphics, x, y, partialTicks); // @todo NEO is this correct?
-        getWindowManager().syncBindings(tileEntity);
+        GenericTileEntity te = getTE();
+        if (te != null) {
+            getWindowManager().syncBindings(te);
+        }
         getWindowManager().draw(graphics);
     }
 
@@ -466,22 +471,22 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
      * Set a 'Value' and make sure it gets communicated to the server
      */
     public <T> void setValue(Value<?, T> value, T v) {
-        sendServerCommandTyped(tileEntity.getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.name(),
+        sendServerCommandTyped(getTE().getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.name(),
                 TypedMap.builder()
                         .put(value.key(), v)
                         .build());
     }
 
     public void sendServerCommandTyped(String command, TypedMap params) {
-        Networking.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command, params));
+        Networking.sendToServer(PacketServerCommandTyped.create(getTE().getBlockPos(), getTE().getDimension(), command, params));
     }
 
     public void sendServerCommandTyped(Command<?> command, TypedMap params) {
-        Networking.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), tileEntity.getDimension(), command.name(), params));
+        Networking.sendToServer(PacketServerCommandTyped.create(getTE().getBlockPos(), getTE().getDimension(), command.name(), params));
     }
 
     public void sendServerCommandTyped(ResourceKey<Level> dimensionId, String command, TypedMap params) {
-        Networking.sendToServer(PacketServerCommandTyped.create(tileEntity.getBlockPos(), dimensionId, command, params));
+        Networking.sendToServer(PacketServerCommandTyped.create(getTE().getBlockPos(), dimensionId, command, params));
     }
 
     public void sendServerCommand(String modid, String command, @Nonnull TypedMap arguments) {
@@ -510,7 +515,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        IEnergyStorage power = tileEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, tileEntity.getBlockPos(), null);
+        IEnergyStorage power = getTE().getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, getTE().getBlockPos(), null);
         if (power != null) {
             energyBar.maxValue(power.getMaxEnergyStored());
             energyBar.value(power.getEnergyStored());
