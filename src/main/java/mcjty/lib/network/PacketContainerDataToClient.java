@@ -23,7 +23,9 @@ public record PacketContainerDataToClient(ResourceLocation containerId, Registry
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketContainerDataToClient> CODEC = StreamCodec.of(
             (buf, packet) -> {
                 buf.writeResourceLocation(packet.containerId);
-                buf.writeBytes(packet.buffer().array());
+                byte[] array = packet.buffer().array();
+                buf.writeInt(array.length);
+                buf.writeBytes(array);
             },
             buf -> {
                 ResourceLocation containerId = buf.readResourceLocation();
