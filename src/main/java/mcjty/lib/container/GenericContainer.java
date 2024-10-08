@@ -7,14 +7,19 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.network.Networking;
+import mcjty.lib.network.PacketAttachmentDataToClient;
 import mcjty.lib.network.PacketContainerDataToClient;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,12 +30,14 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.connection.ConnectionType;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,6 +52,7 @@ import java.util.function.Supplier;
 public class GenericContainer extends AbstractContainerMenu implements IGenericContainer {
     protected final Map<String,IItemHandler> inventories = new HashMap<>();
     private final Map<ResourceLocation, IContainerDataListener> containerData = new HashMap<>();
+    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> dataListeners = new HashMap<>();
     private final ContainerFactory factory;
     protected final BlockPos pos;
     protected final GenericTileEntity te;
@@ -145,6 +153,11 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     @Override
     public void addContainerDataListener(IContainerDataListener data) {
         this.containerData.put(data.getId(), data);
+    }
+
+    @Override
+    public void addDataListener(AttachmentType<?> type, StreamCodec<? extends ByteBuf, ?> codec) {
+        this.dataListeners.put(type, codec);
     }
 
     public void addInventory(String name, @Nullable IItemHandler inventory) {
@@ -465,7 +478,37 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
             }
+            dataListeners.forEach((type, codec) -> {
+                ByteBuf newbuf = Unpooled.buffer();
+                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
+                encode(buffer, type, codec);
+                PacketAttachmentDataToClient packet = PacketAttachmentDataToClient.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type), buffer);
+                Networking.sendToPlayer(packet, serverPlayer);
+            });
         }
+    }
+
+    public void receiveData(ResourceLocation containerId, RegistryFriendlyByteBuf buffer) {
+        AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.get(containerId);
+        if (type == null) {
+            Logging.log("Unknown container id: " + containerId);
+            return;
+        }
+        StreamCodec codec = dataListeners.get(type);
+        if (codec == null) {
+            Logging.log("No codec for container id: " + containerId);
+            return;
+        }
+        decode(buffer, type, codec);
+    }
+
+    private void encode(RegistryFriendlyByteBuf buffer, AttachmentType type, StreamCodec codec) {
+        codec.encode(buffer, te.getData(type));
+    }
+
+    private void decode(RegistryFriendlyByteBuf buffer, AttachmentType type, StreamCodec codec) {
+        Object data = codec.decode(buffer);
+        te.setData(type, data);
     }
 
     public void forceBroadcast() {

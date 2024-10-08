@@ -1,5 +1,6 @@
 package mcjty.lib.api.container;
 
+import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.container.GenericContainer;
@@ -7,7 +8,9 @@ import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.Sync;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,13 +18,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -35,6 +37,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
     private final List<DataSlot> integerListeners = new ArrayList<>();
     private final List<DataSlot> shortListeners = new ArrayList<>();
     private final List<IContainerDataListener> containerDataListeners = new ArrayList<>();
+    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> dataListeners = new HashMap<>();
 
     /**
      * Conveniance method to make a supplier for an empty container (ContainerFactory.EMPTY).
@@ -91,6 +94,11 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
         return this;
     }
 
+    public <T> DefaultContainerProvider<C> data(Supplier<AttachmentType<T>> type, StreamCodec<? extends ByteBuf, T> codec) {
+        dataListeners.put(type.get(), codec);
+        return this;
+    }
+
     /**
      * Setup listeners to make sure that all fields annotated with @GuiValue
      * get properly propagated to the client when that client has this container open
@@ -119,6 +127,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
         for (IContainerDataListener dataListener : containerDataListeners) {
             container.addContainerDataListener(dataListener);
         }
+        dataListeners.forEach(container::addDataListener);
 
         if (container instanceof GenericContainer) {
             ((GenericContainer) container).forceBroadcast();
