@@ -387,7 +387,6 @@ public class GenericTileEntity extends BlockEntity {
     protected void saveItemHandlerCap(CompoundTag tagCompound, HolderLookup.Provider provider) {
         IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, worldPosition, null);
         if (handler instanceof INBTSerializable s) {
-            CompoundTag items = new CompoundTag();
             tagCompound.put("Items", s.serializeNBT(provider));
         }
     }

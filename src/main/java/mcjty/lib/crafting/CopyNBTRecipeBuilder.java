@@ -114,12 +114,12 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
     @Override
     public void build(RecipeOutput consumerIn, ResourceLocation id) {
         this.validate(id);
-        // @todo NEO
+        // @todo 1.21 NEO
 //        this.advancementBuilder.parent(ResourceLocation.parse("recipes/root")).addCriterion("has_the_recipe",
 //                new RecipeUnlockedTrigger.TriggerInstance(Optional.empty(), id)).rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
         String folder = ""; // @todo 1.19.3 this.result.getItemCategory().getRecipeFolderName();
         Result r = new Result(id, this.result, this.count, this.group == null ? "" : this.group, this.pattern, this.key, this.advancementBuilder, ResourceLocation.parse("recipes/root"));
-        consumerIn.accept(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "recipes/" + folder + "/" + id.getPath()), r, null);// @todo NEO advancement holder
+        consumerIn.accept(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "recipe/" + folder + "/" + id.getPath()), r, null);// @todo NEO advancement holder
     }
 
     private void validate(ResourceLocation id) {

@@ -12,7 +12,7 @@ public class CopyNBTRecipeSerializer implements RecipeSerializer<CopyNBTRecipe> 
 
     private final ShapedRecipe.Serializer serializer = new ShapedRecipe.Serializer();
 
-    private final static StreamCodec<RegistryFriendlyByteBuf, CopyNBTRecipe> STREAM_CODEC = StreamCodec.of(
+    private static final StreamCodec<RegistryFriendlyByteBuf, CopyNBTRecipe> STREAM_CODEC = StreamCodec.of(
             (buf, copyNBTRecipe) -> {
                 ShapedRecipe recipe = copyNBTRecipe.getRecipe();
                 ShapedRecipe.STREAM_CODEC.encode(buf, recipe);
