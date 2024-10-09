@@ -11,7 +11,9 @@ import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
@@ -114,12 +116,13 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
     @Override
     public void build(RecipeOutput consumerIn, ResourceLocation id) {
         this.validate(id);
+        ShapedRecipeBuilder builder = new ShapedRecipeBuilder(RecipeCategory.MISC, this.result, this.count);
         // @todo 1.21 NEO
 //        this.advancementBuilder.parent(ResourceLocation.parse("recipes/root")).addCriterion("has_the_recipe",
 //                new RecipeUnlockedTrigger.TriggerInstance(Optional.empty(), id)).rewards(AdvancementRewards.Builder.recipe(id)).requirements(RequirementsStrategy.OR);
         String folder = ""; // @todo 1.19.3 this.result.getItemCategory().getRecipeFolderName();
         Result r = new Result(id, this.result, this.count, this.group == null ? "" : this.group, this.pattern, this.key, this.advancementBuilder, ResourceLocation.parse("recipes/root"));
-        consumerIn.accept(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "recipe/" + folder + "/" + id.getPath()), r, null);// @todo NEO advancement holder
+        consumerIn.accept(ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "recipe/" + folder + "/" + id.getPath()), r, null);// @todo 1.21 advancement holder
     }
 
     private void validate(ResourceLocation id) {
@@ -144,7 +147,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
                 throw new IllegalStateException("Ingredients are defined but not used in pattern for recipe " + id);
             } else if (this.pattern.size() == 1 && this.pattern.get(0).length() == 1) {
                 throw new IllegalStateException("Shaped recipe " + id + " only takes in a single item - should it be a shapeless recipe instead?");
-                // @todo NEO
+                // @todo 1.21
 //            } else if (this.advancementBuilder.getCriteria().isEmpty()) {
 //                throw new IllegalStateException("No way of obtaining recipe " + id);
             }
@@ -173,7 +176,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
         }
 
 
-        // @todo NEO
+        // @todo 1.21
 //        @Override
         public void serializeRecipeData(@Nonnull JsonObject json) {
             if (!this.group.isEmpty()) {
@@ -189,7 +192,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
             json.add("pattern", jsonarray);
             JsonObject jsonobject = new JsonObject();
 
-            // @todo NEO
+            // @todo 1.21
 //            for(Map.Entry<Character, Ingredient> entry : this.key.entrySet()) {
 //                jsonobject.add(String.valueOf(entry.getKey()), entry.getValue().toJson());
 //            }
@@ -204,44 +207,44 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
             json.add("result", jsonobject1);
         }
 
-        // @todo NEO
+        // @todo 1.21
         @Override
         public boolean matches(RecipeInput recipeInput, Level level) {
             return false;
         }
 
-        // @todo NEO
+        // @todo 1.21
 
         @Override
         public ItemStack assemble(RecipeInput recipeInput, HolderLookup.Provider provider) {
             return null;
         }
 
-        // @todo NEO
+        // @todo 1.21
         @Override
         public boolean canCraftInDimensions(int i, int i1) {
             return false;
         }
 
-        // @todo NEO
+        // @todo 1.21
         @Override
         public ItemStack getResultItem(HolderLookup.Provider provider) {
             return null;
         }
 
-        // @todo NEO
+        // @todo 1.21
         @Override
         public RecipeSerializer<?> getSerializer() {
             return null;
         }
 
-        // @todo NEO
+        // @todo 1.21
         @Override
         public RecipeType<?> getType() {
             return null;
         }
 
-        // @todo NEO
+        // @todo 1.21
 //        @Override
 //        @Nonnull
 //        public RecipeSerializer<?> getType() {
@@ -251,7 +254,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
         /**
          * Gets the ID for the recipe.
          */
-        // @todo NEO
+        // @todo 1.21
 //        @Override
 //        @Nonnull
 //        public ResourceLocation getId() {
@@ -261,7 +264,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
         /**
          * Gets the JSON for the advancement that unlocks this recipe. Null if there is no advancement.
          */
-        // @todo NEO
+        // @todo 1.21
 //        @Override
 //        @Nullable
 //        public JsonObject serializeAdvancement() {
@@ -272,7 +275,7 @@ public class CopyNBTRecipeBuilder implements IRecipeBuilder<CopyNBTRecipeBuilder
          * Gets the ID for the advancement associated with this recipe. Should not be null if {@link #getAdvancementJson}
          * is non-null.
          */
-        // @todo NEO
+        // @todo 1.21
 //        @Override
 //        @Nullable
 //        public ResourceLocation getAdvancementId() {

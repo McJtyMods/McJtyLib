@@ -107,7 +107,7 @@ public record Dob(
             return this;
         }
 
-        // @todo NEO?
+        // @todo 1.21?
 //        public Builder codecObjectSupplier(String name, Supplier<Map<ResourceLocation, Object>> supplier) {
 //            Supplier<Map<ResourceLocation, Object>> oldSupplier = codecObjectSupplier.get(name);
 //            if (oldSupplier == null) {

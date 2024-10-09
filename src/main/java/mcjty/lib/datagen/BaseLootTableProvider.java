@@ -8,7 +8,6 @@ import net.minecraft.advancements.critereon.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -18,7 +17,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -132,7 +130,7 @@ public class BaseLootTableProvider {
     protected LootTable.Builder createStandardTable(String name, Block block, DataComponentType<?>... types) {
         CopyComponentsFunction.Builder copyBuilder = CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
                 .include(Registration.ITEM_ENERGY.get())
-                .include(DataComponents.CONTAINER);
+                .include(Registration.ITEM_INVENTORY.get());
         for (DataComponentType<?> type : types) {
             copyBuilder.include(type);
         }

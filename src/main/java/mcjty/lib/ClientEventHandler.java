@@ -38,7 +38,7 @@ public class ClientEventHandler {
                 if (manager != null) {
                     if (manager.getModalWindows().findFirst().isPresent()) {
                         // There is a modal window. Eat this event and send it directly to the window
-                        // @todo NEO DeltaX?
+                        // @todo 1.21 DeltaX?
                         if (container.mouseScrolledFromEvent(event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY())) {
                             event.setCanceled(true);
                         }

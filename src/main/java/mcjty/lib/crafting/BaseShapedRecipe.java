@@ -9,7 +9,7 @@ import net.minecraft.world.item.crafting.ShapedRecipePattern;
 
 public class BaseShapedRecipe extends ShapedRecipe {
 
-    // @todo NEO
+    // @todo 1.21
 //    public BaseShapedRecipe(ResourceLocation id, String group, int width, int height, NonNullList<Ingredient> list, ItemStack stack) {
 //        super(id, group, CraftingBookCategory.MISC, width, height, list, stack);
 //    }

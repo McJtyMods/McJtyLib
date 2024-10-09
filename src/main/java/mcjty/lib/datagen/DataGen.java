@@ -74,7 +74,7 @@ public class DataGen {
 
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
             for (Dob dob : dobs) {
-                // @todo NEO
+                // @todo 1.21
 //                Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
                 HolderLookup.Provider provider = dob.holderLookupSupplier().get(entry.getKey());
 //                if (!entries.isEmpty()) {

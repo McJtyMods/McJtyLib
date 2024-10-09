@@ -25,7 +25,6 @@ import mcjty.lib.varia.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -83,7 +82,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public static void setInfused(ItemStack stack, int infused) {
-        NBTTools.setInfoNBT(stack, CompoundTag::putInt, "infused", infused);
+        stack.set(Registration.ITEM_INFUSABLE, new ItemInfusable(infused));
     }
 
     @Override

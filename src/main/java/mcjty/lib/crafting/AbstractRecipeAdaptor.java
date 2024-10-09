@@ -71,7 +71,7 @@ public abstract class AbstractRecipeAdaptor implements CraftingRecipe /*, Recipe
 //        return recipe.getHeight();
 //    }
 
-    // @todo NEO
+    // @todo 1.21
 //    @Override
 //    @Nonnull
 //    public ResourceLocation getId() {

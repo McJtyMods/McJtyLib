@@ -1,19 +1,19 @@
 package mcjty.lib.tileentity;
 
 import io.netty.buffer.ByteBuf;
-import mcjty.lib.api.infusable.CapabilityInfusable;
-import mcjty.lib.api.infusable.IInfusable;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
 import mcjty.lib.container.GenericItemHandler;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.RedstoneMode;
 import net.minecraft.core.*;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.codec.StreamCodec;
@@ -35,11 +35,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.common.util.Lazy;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.items.IItemHandler;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -54,18 +50,14 @@ public class GenericTileEntity extends BlockEntity {
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
-    private String ownerName = "";
-    private UUID ownerUUID = null;
-    private int securityChannel = -1;
-    private Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> attachments = new HashMap<>();
+    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> attachments = new HashMap<>();
 
-    protected RedstoneMode rsMode = RedstoneMode.REDSTONE_IGNORED;
-    protected int powerLevel = 0;
+    protected byte powerLevel;
 
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for the annotations and replaces itself with
     // a function that does the actual testing
-    // @todo NEO
+    // @todo 1.21
     private BiFunction<BlockCapability, Direction, Object> capSetup;
     private final List<Lazy<?>> lazyOptsToClean = new ArrayList<>();
 
@@ -73,7 +65,7 @@ public class GenericTileEntity extends BlockEntity {
         super(type, pos, state);
         // Setup code to find the capability annotations and in that code we
         // replace 'capSetup' with the actual code to execute the annotations
-        // @todo NEO
+        // @todo 1.21
 //        capSetup = (cap,dir) -> {
 //            List<Pair<Field, Cap>> list = getAnnotationHolder().capabilityList;
 //            capSetup = generateCapTests(list, 0);
@@ -87,15 +79,7 @@ public class GenericTileEntity extends BlockEntity {
         attachments.put(type, codec);
     }
 
-    // @todo NEO
-//    @Override
-//    public void invalidateCaps() {
-//        super.invalidateCaps();
-////        lazyOptsToClean.forEach(LazyOptional::invalidate);
-////        lazyOptsToClean.clear();
-//    }
-
-    // @todo NEO
+    // @todo 1.21
     private BiFunction<BlockCapability, Direction, Object> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
         if (index >= caps.size()) {
             return null;    // @todo 1.21
@@ -126,13 +110,6 @@ public class GenericTileEntity extends BlockEntity {
             }
         }
     }
-
-    // @todo NEO
-//    @Nonnull
-//    @Override
-//    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-//        return capSetup.apply(cap, side);
-//    }
 
     public void markDirtyClient() {
         setChanged();
@@ -186,8 +163,8 @@ public class GenericTileEntity extends BlockEntity {
 
 
     public void setPowerInput(int powered) {
-        if (powerLevel != powered) {
-            powerLevel = powered;
+        if (this.powerLevel != powered) {
+            this.powerLevel = (byte) powered;
             setChanged();
         }
     }
@@ -197,11 +174,12 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     public RedstoneMode getRSMode() {
-        return rsMode;
+        return getData(Registration.BASE_BE_DATA).rsMode();
     }
 
     public void setRSMode(RedstoneMode redstoneMode) {
-        this.rsMode = redstoneMode;
+        BaseBEData data = getData(Registration.BASE_BE_DATA).withRedstoneMode(redstoneMode);
+        setData(Registration.BASE_BE_DATA, data);
         markDirtyClient();
     }
 
@@ -210,16 +188,17 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     public int getRSModeInt() {
-        return rsMode.ordinal();
+        return getRSMode().ordinal();
     }
 
     // Use redstone mode and input power to decide if this is enabled or not
     public boolean isMachineEnabled() {
-        if (rsMode != RedstoneMode.REDSTONE_IGNORED) {
-            boolean rs = powerLevel > 0;
-            if (rsMode == RedstoneMode.REDSTONE_OFFREQUIRED && rs) {
+        BaseBEData data = getData(Registration.BASE_BE_DATA);
+        if (data.rsMode() != RedstoneMode.REDSTONE_IGNORED) {
+            boolean rs = this.powerLevel > 0;
+            if (data.rsMode() == RedstoneMode.REDSTONE_OFFREQUIRED && rs) {
                 return false;
-            } else if (rsMode == RedstoneMode.REDSTONE_ONREQUIRED && !rs) {
+            } else if (data.rsMode() == RedstoneMode.REDSTONE_ONREQUIRED && !rs) {
                 return false;
             }
         }
@@ -276,6 +255,18 @@ public class GenericTileEntity extends BlockEntity {
         return !isRemoved() && player.distanceToSqr(new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(new Vec3(0.5D, 0.5D, 0.5D))) <= 64D;
     }
 
+    @Override
+    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.saveAdditional(tag, provider);
+        tag.putByte("power", powerLevel);
+    }
+
+    @Override
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
+        super.loadAdditional(tag, provider);
+        powerLevel = tag.getByte("power");
+    }
+
     /**
      * Override to write only the data you need on the client
      */
@@ -289,131 +280,17 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tagCompound, HolderLookup.Provider pRegistries) {
-        super.loadAdditional(tagCompound, pRegistries);
-//        loadCaps(tagCompound);
-        loadInfo(tagCompound);
-    }
-
-    protected void loadCaps(CompoundTag tagCompound) {
-        if (tagCompound.contains("Info")) {
-            CompoundTag infoTag = tagCompound.getCompound("Info");
-            // @todo NEO
-//            getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY).ifPresent(h -> h.setInfused(infoTag.getInt("infused")));
-        }
-        loadItemHandlerCap(tagCompound);
-        loadEnergyCap(tagCompound);
-    }
-
-    protected void loadItemHandlerCap(CompoundTag tagCompound) {
-        // @todo NEO
-//        getCapability(ForgeCapabilities.ITEM_HANDLER)
-//                .filter(h -> h instanceof INBTSerializable)
-//                .map(h -> (INBTSerializable) h)
-//                .ifPresent(h -> {
-//                    // For compatibility with loot tables we check McItems first
-//                    if (tagCompound.contains("McItems")) {
-//                        h.deserializeNBT(tagCompound.getList("McItems", Tag.TAG_COMPOUND));
-//                    } else {
-//                        h.deserializeNBT(tagCompound.getList("Items", Tag.TAG_COMPOUND));
-//                    }
-//                });
-    }
-
-    protected void loadEnergyCap(CompoundTag tagCompound) {
-        // @todo NEO
-//        getCapability(ForgeCapabilities.ENERGY)
-//                .filter(h -> h instanceof INBTSerializable)
-//                .map(h -> (INBTSerializable) h)
-//                .ifPresent(h -> {
-//                    if (tagCompound.contains("Energy")) {
-//                        h.deserializeNBT(tagCompound.get("Energy"));
-//                    }
-//                });
-    }
-
-    protected void loadInfo(CompoundTag tagCompound) {
-        if (tagCompound.contains("Info")) {
-            CompoundTag infoTag = tagCompound.getCompound("Info");
-            if (infoTag.contains("powered")) {
-                powerLevel = infoTag.getByte("powered");
-            }
-            loadRSMode(infoTag);
-            if (infoTag.contains("owner")) {
-                ownerName = infoTag.getString("owner");
-            }
-            if (infoTag.hasUUID("ownerId")) {
-                ownerUUID = infoTag.getUUID("ownerId");
-            }
-            if (infoTag.contains("secChannel")) {
-                securityChannel = infoTag.getInt("secChannel");
-            }
-        }
-    }
-
-    protected void loadRSMode(CompoundTag infoTag) {
-        if (needsRedstoneMode() && infoTag.contains("rsMode")) {
-            int m = infoTag.getByte("rsMode");
-            rsMode = RedstoneMode.values()[m];
-        }
-    }
-
-    protected CompoundTag getOrCreateInfo(CompoundTag tagCompound) {
-        if (tagCompound.contains("Info")) {
-            return tagCompound.getCompound("Info");
-        }
-        CompoundTag data = new CompoundTag();
-        tagCompound.put("Info", data);
-        return data;
+    protected void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        components.set(Registration.ITEM_BASE_BE_DATA, getData(Registration.BASE_BE_DATA));
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tagCompound, HolderLookup.Provider provider) {
-        super.saveAdditional(tagCompound, provider);
-//        saveCaps(tagCompound, provider);
-        saveInfo(tagCompound);
-    }
-
-    protected void saveCaps(CompoundTag tagCompound, HolderLookup.Provider provider) {
-        CompoundTag infoTag = getOrCreateInfo(tagCompound);
-        IInfusable capability = level.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY, worldPosition, null);
-        if (capability != null) {
-            infoTag.putInt("infused", capability.getInfused());
-        }
-        saveItemHandlerCap(tagCompound, provider);
-        saveEnergyCap(tagCompound, provider);
-    }
-
-    protected void saveItemHandlerCap(CompoundTag tagCompound, HolderLookup.Provider provider) {
-        IItemHandler handler = level.getCapability(Capabilities.ItemHandler.BLOCK, worldPosition, null);
-        if (handler instanceof INBTSerializable s) {
-            tagCompound.put("Items", s.serializeNBT(provider));
-        }
-    }
-
-    protected void saveEnergyCap(CompoundTag tagCompound, HolderLookup.Provider provider) {
-        IEnergyStorage capability = level.getCapability(Capabilities.EnergyStorage.BLOCK, worldPosition, null);
-        if (capability instanceof INBTSerializable h) {
-            tagCompound.put("Energy", h.serializeNBT(provider));
-        }
-    }
-
-    protected void saveInfo(CompoundTag tagCompound) {
-        CompoundTag infoTag = getOrCreateInfo(tagCompound);
-        infoTag.putByte("powered", (byte) powerLevel);
-        saveRSMode(infoTag);
-        infoTag.putString("owner", ownerName);
-        if (ownerUUID != null) {
-            infoTag.putUUID("ownerId", ownerUUID);
-        }
-        if (securityChannel != -1) {
-            infoTag.putInt("secChannel", securityChannel);
-        }
-    }
-
-    protected void saveRSMode(CompoundTag infoTag) {
-        if (needsRedstoneMode()) {
-            infoTag.putByte("rsMode", (byte) rsMode.ordinal());
+    protected void applyImplicitComponents(DataComponentInput input) {
+        super.applyImplicitComponents(input);
+        BaseBEData data = input.get(Registration.ITEM_BASE_BE_DATA);
+        if (data != null) {
+            setData(Registration.BASE_BE_DATA, data);
         }
     }
 
@@ -422,12 +299,13 @@ public class GenericTileEntity extends BlockEntity {
             return false;
         }
 
-        if (ownerUUID != null) {
+        BaseBEData data = getData(Registration.BASE_BE_DATA);
+        if (data.owner() != null) {
             // Already has an owner.
             return false;
         }
-        ownerUUID = player.getGameProfile().getId();
-        ownerName = player.getName().getString() /* was getFormattedText() */;
+        data = data.withOwner(player.getGameProfile().getId(), player.getName().getString());
+        setData(Registration.BASE_BE_DATA, data);
         markDirtyClient();
 
         return true;
@@ -437,27 +315,30 @@ public class GenericTileEntity extends BlockEntity {
         if (!GeneralConfig.manageOwnership.get()) {
             return;
         }
-        ownerUUID = null;
-        ownerName = "";
-        securityChannel = -1;
+        BaseBEData data = getData(Registration.BASE_BE_DATA);
+        data = data.withOwner(null, "");
+        data = data.withSecurityChannel(-1);
+        setData(Registration.BASE_BE_DATA, data);
         markDirtyClient();
     }
 
     public void setSecurityChannel(int id) {
-        securityChannel = id;
+        BaseBEData data = getData(Registration.BASE_BE_DATA);
+        data = data.withSecurityChannel(id);
+        setData(Registration.BASE_BE_DATA, data);
         markDirtyClient();
     }
 
     public int getSecurityChannel() {
-        return securityChannel;
+        return getData(Registration.BASE_BE_DATA).securityChannel();
     }
 
     public String getOwnerName() {
-        return ownerName;
+        return getData(Registration.BASE_BE_DATA).ownerName();
     }
 
     public UUID getOwnerUUID() {
-        return ownerUUID;
+        return getData(Registration.BASE_BE_DATA).owner();
     }
 
     public boolean checkAccess(Player player) {

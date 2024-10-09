@@ -1,18 +1,21 @@
 package mcjty.lib.container;
 
+import mcjty.lib.api.container.ItemInventory;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.ItemStackList;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-import org.jetbrains.annotations.UnknownNullability;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -73,6 +76,31 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
         this.containerFactory = factory;
         stacks = ItemStackList.create(containerFactory.getContainerSlots());
     }
+
+    public void applyImplicitComponents(ItemInventory inventory) {
+        if (inventory != null) {
+            setStacks(inventory.items());
+        }
+    }
+
+    public void collectImplicitComponents(DataComponentMap.Builder builder) {
+        builder.set(Registration.ITEM_INVENTORY, new ItemInventory(getStacks()));
+    }
+
+    public ItemStackList getStacks() {
+        return stacks;
+    }
+
+    public void setStacks(List<ItemStack> items) {
+        for (int i = 0; i < stacks.size(); i++) {
+            if (i < items.size()) {
+                stacks.set(i, items.get(i));
+            } else {
+                stacks.set(i, ItemStack.EMPTY);
+            }
+        }
+    }
+
 
     @Override
     public int getSlots() {
@@ -313,6 +341,16 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
             if (i < stacks.size()) {
                 stacks.set(i, ItemStack.parse(provider, compoundNBT).orElse(ItemStack.EMPTY));
             }
+        }
+    }
+
+    public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
+        tag.put(tagName, serializeNBT(provider));
+    }
+
+    public void load(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
+        if (tag.contains(tagName)) {
+            deserializeNBT(provider, tag.getList(tagName, Tag.TAG_COMPOUND));
         }
     }
 

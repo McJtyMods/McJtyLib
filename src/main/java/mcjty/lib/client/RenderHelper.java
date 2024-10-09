@@ -185,7 +185,7 @@ public class RenderHelper {
 //        GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
 //        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
         entity.setXRot(0.0F);
-        // @todo NeoForge, is getFirstPassenger correct?
+        // @todo 1.21Forge, is getFirstPassenger correct?
         Vec3 rp = entity.getPassengerRidingPosition(entity.getFirstPassenger());
         matrixStack.translate(rp.x, rp.y, rp.z);
         // @todo 1.15

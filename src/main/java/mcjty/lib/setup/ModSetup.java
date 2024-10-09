@@ -18,7 +18,7 @@ public class ModSetup extends DefaultModSetup {
 
     public static boolean patchouli = false;
 
-    // @todo NEO
+    // @todo 1.21
 //    @SubscribeEvent
 //    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
 //        CapabilityContainerProvider.register(event);
@@ -51,7 +51,7 @@ public class ModSetup extends DefaultModSetup {
             }
         }
 
-        // @todo NEO
+        // @todo 1.21
 //        @SubscribeEvent
 //        public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
 //            if (event.getObject() instanceof Player) {

@@ -1,7 +1,7 @@
 package mcjty.lib.crafting;
 
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.crafting.Recipe;
@@ -10,7 +10,9 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 
 public class CopyNBTRecipeSerializer implements RecipeSerializer<CopyNBTRecipe> {
 
-    private final ShapedRecipe.Serializer serializer = new ShapedRecipe.Serializer();
+    private static final MapCodec<CopyNBTRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+            ShapedRecipe.CODEC.fieldOf("recipe").forGetter(CopyNBTRecipe::getRecipe)
+    ).apply(instance, recipe -> new CopyNBTRecipe((ShapedRecipe) recipe)));
 
     private static final StreamCodec<RegistryFriendlyByteBuf, CopyNBTRecipe> STREAM_CODEC = StreamCodec.of(
             (buf, copyNBTRecipe) -> {
@@ -24,22 +26,13 @@ public class CopyNBTRecipeSerializer implements RecipeSerializer<CopyNBTRecipe> 
             }
     );
 
-    // @todo NEO
     @Override
     public MapCodec<CopyNBTRecipe> codec() {
-        return null;
+        return CODEC;
     }
 
     @Override
     public StreamCodec<RegistryFriendlyByteBuf, CopyNBTRecipe> streamCodec() {
         return STREAM_CODEC;
     }
-
-    // @todo NEO
-//    @Override
-//    @Nonnull
-//    public CopyNBTRecipe fromJson(@Nonnull ResourceLocation recipeId, @Nonnull JsonObject json) {
-//        ShapedRecipe recipe = serializer.fromJson(recipeId, json);
-//        return new CopyNBTRecipe(recipe);
-//    }
 }

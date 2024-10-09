@@ -7,12 +7,12 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 // Used as a data component for items that can store energy
-public record ItemEnergy(int energy) {
+public record ItemEnergy(long energy) {
     public static final Codec<ItemEnergy> ITEM_ENERGY_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.INT.fieldOf("energy").forGetter(ItemEnergy::energy)
+                    Codec.LONG.fieldOf("energy").forGetter(ItemEnergy::energy)
             ).apply(instance, ItemEnergy::new));
     public static final StreamCodec<ByteBuf, ItemEnergy> ITEM_ENERGY_STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, ItemEnergy::energy,
+            ByteBufCodecs.VAR_LONG, ItemEnergy::energy,
             ItemEnergy::new);
 }

@@ -1,8 +1,12 @@
 package mcjty.lib.tileentity;
 
 import mcjty.lib.api.container.IGenericContainer;
+import mcjty.lib.api.power.ItemEnergy;
+import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.EnergyTools;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.world.inventory.DataSlot;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -59,6 +63,16 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
 
     public long getCapacity() {
         return capacity;
+    }
+
+    public void applyImplicitComponents(ItemEnergy energy) {
+        if (energy != null) {
+            setEnergy(energy.energy());
+        }
+    }
+
+    public void collectImplicitComponents(DataComponentMap.Builder builder) {
+        builder.set(Registration.ITEM_ENERGY, new ItemEnergy(getEnergy()));
     }
 
     public void setEnergy(long s) {
@@ -139,5 +153,15 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
                 setEnergy(orig);
             }
         });
+    }
+
+    public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
+        tag.put(tagName, serializeNBT(provider));
+    }
+
+    public void load(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
+        if (tag.contains(tagName)) {
+            deserializeNBT(provider, (LongTag) tag.get(tagName));
+        }
     }
 }
