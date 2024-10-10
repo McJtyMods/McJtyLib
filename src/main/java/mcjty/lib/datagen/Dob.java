@@ -1,7 +1,7 @@
 package mcjty.lib.datagen;
 
 import mcjty.lib.blocks.RBlock;
-import mcjty.lib.crafting.CopyNBTRecipeBuilder;
+import mcjty.lib.crafting.CopyComponentsRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
@@ -16,7 +16,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 
 import java.util.HashMap;
@@ -282,20 +281,20 @@ public record Dob(
             return this;
         }
 
-        public Builder shapedNBT(Function<CopyNBTRecipeBuilder, CopyNBTRecipeBuilder> builder, String... pattern) {
+        public Builder shapedComponentPreserve(Function<CopyComponentsRecipeBuilder, CopyComponentsRecipeBuilder> builder, String... pattern) {
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                f.shapedNBT(builder.apply(CopyNBTRecipeBuilder.shapedRecipe(getItemLike())), pattern);
+                f.shapedNBT(builder.apply(CopyComponentsRecipeBuilder.shapedRecipe(getItemLike())), pattern);
             };
             return this;
         }
 
-        public Builder shapedNBT(String id, Function<CopyNBTRecipeBuilder, CopyNBTRecipeBuilder> builder, String... pattern) {
+        public Builder shapedComponentPreserve(String id, Function<CopyComponentsRecipeBuilder, CopyComponentsRecipeBuilder> builder, String... pattern) {
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                f.shapedNBT(id, builder.apply(CopyNBTRecipeBuilder.shapedRecipe(getItemLike())), pattern);
+                f.shapedNBT(id, builder.apply(CopyComponentsRecipeBuilder.shapedRecipe(getItemLike())), pattern);
             };
             return this;
         }

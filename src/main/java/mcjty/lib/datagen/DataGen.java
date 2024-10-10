@@ -1,7 +1,7 @@
 package mcjty.lib.datagen;
 
 import com.mojang.serialization.Codec;
-import mcjty.lib.crafting.CopyNBTRecipeBuilder;
+import mcjty.lib.crafting.CopyComponentsRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.Util;
 import net.minecraft.advancements.Criterion;
@@ -31,7 +31,6 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -111,12 +110,12 @@ public class DataGen {
                         }
 
                         @Override
-                        public void shapedNBT(CopyNBTRecipeBuilder builder, String... pattern) {
+                        public void shapedNBT(CopyComponentsRecipeBuilder builder, String... pattern) {
                             build(consumer, builder, pattern);
                         }
 
                         @Override
-                        public void shapedNBT(String id, CopyNBTRecipeBuilder builder, String... pattern) {
+                        public void shapedNBT(String id, CopyComponentsRecipeBuilder builder, String... pattern) {
                             build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder, pattern);
 
                         }

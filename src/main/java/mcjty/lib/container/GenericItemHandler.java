@@ -3,29 +3,28 @@ package mcjty.lib.container;
 import mcjty.lib.api.container.ItemInventory;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
-import mcjty.lib.varia.ItemStackList;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<ListTag> {
+public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
 
     private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
-    private final ItemStackList stacks;
+    private final ItemStackHandler stacks;
 
     public static BiPredicate<Integer, ItemStack> slot(int s) {
         return (slot, stack) -> slot == s;
@@ -74,7 +73,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     public GenericItemHandler(GenericTileEntity te, ContainerFactory factory) {
         this.tileEntity = te;
         this.containerFactory = factory;
-        stacks = ItemStackList.create(containerFactory.getContainerSlots());
+        stacks = new ItemStackHandler(containerFactory.getContainerSlots());
     }
 
     public void applyImplicitComponents(ItemInventory inventory) {
@@ -84,19 +83,23 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     }
 
     public void collectImplicitComponents(DataComponentMap.Builder builder) {
-        builder.set(Registration.ITEM_INVENTORY, new ItemInventory(getStacks()));
+        List<ItemStack> stacks = new ArrayList<>();
+        for (int i = 0; i < getSlots(); i++) {
+            stacks.add(getStackInSlot(i));
+        }
+        builder.set(Registration.ITEM_INVENTORY, new ItemInventory(stacks));
     }
 
-    public ItemStackList getStacks() {
+    public ItemStackHandler getStacks() {
         return stacks;
     }
 
     public void setStacks(List<ItemStack> items) {
-        for (int i = 0; i < stacks.size(); i++) {
+        for (int i = 0; i < stacks.getSlots(); i++) {
             if (i < items.size()) {
-                stacks.set(i, items.get(i));
+                stacks.setStackInSlot(i, items.get(i));
             } else {
-                stacks.set(i, ItemStack.EMPTY);
+                stacks.setStackInSlot(i, ItemStack.EMPTY);
             }
         }
     }
@@ -104,16 +107,16 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
 
     @Override
     public int getSlots() {
-        return stacks.size();
+        return stacks.getSlots();
     }
 
     @Nonnull
     @Override
     public ItemStack getStackInSlot(int slot) {
-        if (slot >= stacks.size()) {
+        if (slot >= stacks.getSlots()) {
             return ItemStack.EMPTY;
         }
-        return stacks.get(slot);
+        return stacks.getStackInSlot(slot);
     }
 
     @Nonnull
@@ -197,7 +200,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     }
 
     public void setInventorySlotContents(int stackLimit, int index, ItemStack stack) {
-        if (index >= stacks.size()) {
+        if (index >= stacks.getSlots()) {
             return;
         }
 
@@ -207,18 +210,18 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
                 if (index < 9) {
                     stack1.setCount(1);
                 }
-                stacks.set(index, stack1);
+                stacks.setStackInSlot(index, stack1);
             } else {
-                stacks.set(index, ItemStack.EMPTY);
+                stacks.setStackInSlot(index, ItemStack.EMPTY);
             }
         } else if (containerFactory.isGhostOutputSlot(index)) {
             if (!stack.isEmpty()) {
-                stacks.set(index, stack.copy());
+                stacks.setStackInSlot(index, stack.copy());
             } else {
-                stacks.set(index, ItemStack.EMPTY);
+                stacks.setStackInSlot(index, ItemStack.EMPTY);
             }
         } else {
-            stacks.set(index, stack);
+            stacks.setStackInSlot(index, stack);
             if (!stack.isEmpty() && stack.getCount() > stackLimit) {
                 stack.setCount(Math.max(stackLimit, 0));
             }
@@ -262,29 +265,29 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     }
 
     public ItemStack decrStackSize(int index, int amount) {
-        if (index >= stacks.size()) {
+        if (index >= stacks.getSlots()) {
             return ItemStack.EMPTY;
         }
 
         if (containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index)) {
-            ItemStack old = stacks.get(index);
-            stacks.set(index, ItemStack.EMPTY);
+            ItemStack old = stacks.getStackInSlot(index);
+            stacks.setStackInSlot(index, ItemStack.EMPTY);
             if (old.isEmpty()) {
                 return ItemStack.EMPTY;
             }
             old.setCount(0);
             return old;
         } else {
-            if (!stacks.get(index).isEmpty()) {
-                if (stacks.get(index).getCount() <= amount) {
-                    ItemStack old = stacks.get(index);
-                    stacks.set(index, ItemStack.EMPTY);
+            if (!stacks.getStackInSlot(index).isEmpty()) {
+                if (stacks.getStackInSlot(index).getCount() <= amount) {
+                    ItemStack old = stacks.getStackInSlot(index);
+                    stacks.setStackInSlot(index, ItemStack.EMPTY);
                     tileEntity.setChanged();
                     return old;
                 }
-                ItemStack its = stacks.get(index).split(amount);
-                if (stacks.get(index).isEmpty()) {
-                    stacks.set(index, ItemStack.EMPTY);
+                ItemStack its = stacks.getStackInSlot(index).split(amount);
+                if (stacks.getStackInSlot(index).isEmpty()) {
+                    stacks.setStackInSlot(index, ItemStack.EMPTY);
                 }
                 tileEntity.setChanged();
                 return its;
@@ -295,7 +298,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
 
     @Override
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
-        stacks.set(slot, stack);
+        stacks.setStackInSlot(slot, stack);
         onUpdate(slot, stack);
     }
 
@@ -322,26 +325,13 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     }
 
     @Override
-    public ListTag serializeNBT(HolderLookup.Provider provider) {
-        ListTag bufferTagList = new ListTag();
-        for (ItemStack stack : stacks) {
-            CompoundTag compoundNBT = new CompoundTag();
-            if (!stack.isEmpty()) {
-                stack.save(provider, compoundNBT);
-            }
-            bufferTagList.add(compoundNBT);
-        }
-        return bufferTagList;
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        return stacks.serializeNBT(provider);
     }
 
     @Override
-    public void deserializeNBT(HolderLookup.Provider provider, ListTag nbt) {
-        for (int i = 0; i < nbt.size(); i++) {
-            CompoundTag compoundNBT = nbt.getCompound(i);
-            if (i < stacks.size()) {
-                stacks.set(i, ItemStack.parse(provider, compoundNBT).orElse(ItemStack.EMPTY));
-            }
-        }
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        stacks.deserializeNBT(provider, nbt);
     }
 
     public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
@@ -350,7 +340,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
 
     public void load(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
         if (tag.contains(tagName)) {
-            deserializeNBT(provider, tag.getList(tagName, Tag.TAG_COMPOUND));
+            deserializeNBT(provider, tag.getCompound(tagName));
         }
     }
 

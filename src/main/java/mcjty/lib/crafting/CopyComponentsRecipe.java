@@ -2,10 +2,8 @@ package mcjty.lib.crafting;
 
 import mcjty.lib.setup.Registration;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -15,9 +13,9 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 
 import javax.annotation.Nonnull;
 
-public class CopyNBTRecipe extends AbstractRecipeAdaptor {
+public class CopyComponentsRecipe extends AbstractRecipeAdaptor {
 
-    public CopyNBTRecipe(ShapedRecipe recipe) {
+    public CopyComponentsRecipe(ShapedRecipe recipe) {
         super(recipe);
     }
 
@@ -33,30 +31,24 @@ public class CopyNBTRecipe extends AbstractRecipeAdaptor {
         for (int i = 0 ; i < inv.size() ; i++) {
             ItemStack stack = inv.getItem(i);
 
-            INBTPreservingIngredient inbt = null;
-            if (stack.getItem() instanceof INBTPreservingIngredient ingredient) {
+            IComponentsToPreserve inbt = null;
+            if (stack.getItem() instanceof IComponentsToPreserve ingredient) {
                 inbt = ingredient;
             } else if (stack.getItem() instanceof BlockItem blockItem) {
-                if (blockItem.getBlock() instanceof INBTPreservingIngredient ingredient) {
+                if (blockItem.getBlock() instanceof IComponentsToPreserve ingredient) {
                     inbt = ingredient;
                 }
             }
 
-            // @todo 1.21
-//            if (inbt != null && stack.getTag() != null) {
-//                nbt = new CompoundTag();
-//                for (String tag : inbt.getTagsToPreserve()) {
-//                    Tag value = stack.getTag().get(tag);
-//                    if (value != null) {
-//                        nbt.put(tag, value);
-//                    }
-//                }
-//            }
+            if (inbt != null) {
+                for (DataComponentType type : inbt.getComponentsToPreserve()) {
+                    Object o = stack.get(type);
+                    if (o != null) {
+                        result.set(type, o);
+                    }
+                }
+            }
         }
-        // @todo 1.21
-//        if (nbt != null) {
-//            result.setTag(nbt);
-//        }
         return result;
     }
 

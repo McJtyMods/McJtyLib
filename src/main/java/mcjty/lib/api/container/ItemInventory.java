@@ -12,9 +12,9 @@ import java.util.List;
 public record ItemInventory(List<ItemStack> items) {
     public static final Codec<ItemInventory> ITEM_INVENTORY_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.list(ItemStack.CODEC).fieldOf("items").forGetter(ItemInventory::items)
+                    Codec.list(ItemStack.OPTIONAL_CODEC).fieldOf("items").forGetter(ItemInventory::items)
             ).apply(instance, ItemInventory::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemInventory> ITEM_INVENTORY_STREAM_CODEC = StreamCodec.composite(
-            ItemStack.LIST_STREAM_CODEC, ItemInventory::items,
+            ItemStack.OPTIONAL_LIST_STREAM_CODEC, ItemInventory::items,
             ItemInventory::new);
 }

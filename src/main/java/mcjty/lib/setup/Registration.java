@@ -6,7 +6,7 @@ import mcjty.lib.api.infusable.ItemInfusable;
 import mcjty.lib.api.modules.ItemModule;
 import mcjty.lib.api.power.ItemEnergy;
 import mcjty.lib.api.security.ItemSecurity;
-import mcjty.lib.crafting.CopyNBTRecipeSerializer;
+import mcjty.lib.crafting.CopyComponentsRecipeSerializer;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.BaseBEData;
 import mcjty.lib.varia.RedstoneMode;
@@ -33,7 +33,7 @@ public class Registration {
         REGISTRAR.register(bus);
     }
 
-    public static Supplier<CopyNBTRecipeSerializer> COPYNBT_SERIALIZER = RECIPE_SERIALIZERS.register("copy_nbt", CopyNBTRecipeSerializer::new);
+    public static Supplier<CopyComponentsRecipeSerializer> COPYNBT_SERIALIZER = RECIPE_SERIALIZERS.register("copy_components", CopyComponentsRecipeSerializer::new);
     public static final Supplier<AttachmentType<PreferencesProperties>> PREFERENCES_PROPERTIES = ATTACHMENT_TYPES.register(
             "preferences_properties", () -> AttachmentType.serializable(PreferencesProperties::new).build());
 
