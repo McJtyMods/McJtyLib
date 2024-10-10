@@ -13,12 +13,8 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -55,25 +51,25 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> dataListeners = new HashMap<>();
     private final ContainerFactory factory;
     protected final BlockPos pos;
-    protected final GenericTileEntity te;
+    protected final GenericTileEntity be;
     private final List<DataSlot> intReferenceHolders = new ArrayList<>();
     private boolean doForce = true;
     private final Player player;
 
-    public GenericContainer(@Nullable MenuType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity te, @Nonnull Player player) {
+    public GenericContainer(@Nullable MenuType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity be, @Nonnull Player player) {
         super(type, id);
         this.factory = factory;
         this.pos = pos;
-        this.te = te;
+        this.be = be;
         this.player = player;
     }
 
-    public GenericContainer(@Nonnull Supplier<MenuType<GenericContainer>> type, int id, @Nonnull Supplier<ContainerFactory> factory, @Nullable GenericTileEntity te,
+    public GenericContainer(@Nonnull Supplier<MenuType<GenericContainer>> type, int id, @Nonnull Supplier<ContainerFactory> factory, @Nullable GenericTileEntity be,
                             @Nonnull Player player) {
         super(type.get(), id);
         this.factory = factory.get();
-        this.pos = te.getBlockPos();
-        this.te = te;
+        this.pos = be.getBlockPos();
+        this.be = be;
         this.player = player;
     }
 
@@ -82,8 +78,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         return this;
     }
 
-    public GenericTileEntity getTe() {
-        return te;
+    public GenericTileEntity getBe() {
+        return be;
     }
 
     public Player getPlayer() {
@@ -176,7 +172,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
     @Override
     public boolean stillValid(@Nonnull Player player) {
-        if (te == null || te.canPlayerAccess(player)) {
+        if (be == null || be.canPlayerAccess(player)) {
             return true;
         }
         return false;
@@ -237,10 +233,10 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 }
             };
         } else if (slotType == SlotType.SLOT_CRAFTRESULT) {
-            slot = new CraftingSlot(playerEntity, inventory, te, index, x, y)
+            slot = new CraftingSlot(playerEntity, inventory, be, index, x, y)
                     .onCraft(slotFactory.slotDefinition().getOnCraft());
         } else {
-            slot = new BaseSlot(inventory, te, index, x, y);
+            slot = new BaseSlot(inventory, be, index, x, y);
         }
         return slot;
     }
@@ -503,12 +499,12 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     private void encode(RegistryFriendlyByteBuf buffer, AttachmentType type, StreamCodec codec) {
-        codec.encode(buffer, te.getData(type));
+        codec.encode(buffer, be.getData(type));
     }
 
     private void decode(RegistryFriendlyByteBuf buffer, AttachmentType type, StreamCodec codec) {
         Object data = codec.decode(buffer);
-        te.setData(type, data);
+        be.setData(type, data);
     }
 
     public void forceBroadcast() {

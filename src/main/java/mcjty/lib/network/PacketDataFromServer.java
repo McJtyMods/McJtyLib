@@ -47,7 +47,7 @@ public record PacketDataFromServer(BlockPos pos, String command, TypedMap result
                     Logging.log("Container is missing!");
                     return;
                 }
-                te = container.getTe();
+                te = container.getBe();
             } else {
                 te = SafeClientTools.getClientWorld().getBlockEntity(pos);
             }

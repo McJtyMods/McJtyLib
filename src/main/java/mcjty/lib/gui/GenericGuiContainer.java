@@ -15,7 +15,6 @@ import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
-import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
 import mcjty.lib.varia.Tools;
@@ -70,8 +69,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         windowManager = null;
     }
 
-    public <T extends GenericTileEntity> T getTE() {
-        return menu instanceof GenericContainer container ? (T)container.getTe() : null;
+    public <T extends GenericTileEntity> T getBE() {
+        return menu instanceof GenericContainer container ? (T)container.getBe() : null;
     }
 
     // Mostly for JEI: get a list of all bounds additional to the main window. That includes modal windows, the side window, ...
@@ -260,7 +259,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             return;
         }
 //        renderBackground(graphics, x, y, partialTicks); // @todo 1.21 is this correct?
-        GenericTileEntity te = getTE();
+        GenericTileEntity te = getBE();
         if (te != null) {
             getWindowManager().syncBindings(te);
         }
@@ -471,22 +470,22 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
      * Set a 'Value' and make sure it gets communicated to the server
      */
     public <T> void setValue(Value<?, T> value, T v) {
-        sendServerCommandTyped(getTE().getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.name(),
+        sendServerCommandTyped(getBE().getDimension(), GenericTileEntity.COMMAND_SYNC_BINDING.name(),
                 TypedMap.builder()
                         .put(value.key(), v)
                         .build());
     }
 
     public void sendServerCommandTyped(String command, TypedMap params) {
-        Networking.sendToServer(PacketServerCommandTyped.create(getTE().getBlockPos(), getTE().getDimension(), command, params));
+        Networking.sendToServer(PacketServerCommandTyped.create(getBE().getBlockPos(), getBE().getDimension(), command, params));
     }
 
     public void sendServerCommandTyped(Command<?> command, TypedMap params) {
-        Networking.sendToServer(PacketServerCommandTyped.create(getTE().getBlockPos(), getTE().getDimension(), command.name(), params));
+        Networking.sendToServer(PacketServerCommandTyped.create(getBE().getBlockPos(), getBE().getDimension(), command.name(), params));
     }
 
     public void sendServerCommandTyped(ResourceKey<Level> dimensionId, String command, TypedMap params) {
-        Networking.sendToServer(PacketServerCommandTyped.create(getTE().getBlockPos(), dimensionId, command, params));
+        Networking.sendToServer(PacketServerCommandTyped.create(getBE().getBlockPos(), dimensionId, command, params));
     }
 
     public void sendServerCommand(String modid, String command, @Nonnull TypedMap arguments) {
@@ -515,7 +514,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        IEnergyStorage power = getTE().getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, getTE().getBlockPos(), null);
+        IEnergyStorage power = getBE().getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, getBE().getBlockPos(), null);
         if (power != null) {
             energyBar.maxValue(power.getMaxEnergyStored());
             energyBar.value(power.getEnergyStored());
