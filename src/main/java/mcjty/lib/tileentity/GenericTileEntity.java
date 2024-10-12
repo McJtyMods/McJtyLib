@@ -215,27 +215,27 @@ public class GenericTileEntity extends BlockEntity {
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         CompoundTag tag = new CompoundTag();
-        this.saveClientDataToNBT(tag);
+        this.saveClientDataToNBT(tag, level.registryAccess());
         return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity, RegistryAccess access) -> tag);
     }
 
     @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        saveClientDataToNBT(tag);
+    public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
+        CompoundTag tag = super.getUpdateTag(provider);
+        saveClientDataToNBT(tag, provider);
         return tag;
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider lookupProvider) {
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider provider) {
         CompoundTag tag = pkt.getTag();
-        loadClientDataFromNBT(tag);
+        loadClientDataFromNBT(tag, provider);
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
-        super.handleUpdateTag(tag, lookupProvider);
-        loadClientDataFromNBT(tag);
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider provider) {
+        super.handleUpdateTag(tag, provider);
+        loadClientDataFromNBT(tag, provider);
     }
 
     //    public void setInfused(int infused) {
@@ -270,13 +270,13 @@ public class GenericTileEntity extends BlockEntity {
     /**
      * Override to write only the data you need on the client
      */
-    public void saveClientDataToNBT(CompoundTag tagCompound) {
+    public void saveClientDataToNBT(CompoundTag tagCompound, HolderLookup.Provider provider) {
     }
 
     /**
      * Override to read only the data you need on the client
      */
-    public void loadClientDataFromNBT(CompoundTag tagCompound) {
+    public void loadClientDataFromNBT(CompoundTag tagCompound, HolderLookup.Provider provider) {
     }
 
     @Override
