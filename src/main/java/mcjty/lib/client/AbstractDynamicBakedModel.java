@@ -38,9 +38,9 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
         builder.setSprite(sprite);
         builder.setDirection(Direction.getNearest(normal.x, normal.y, normal.z));
         RenderHelper.putVertex(builder, normal, v1.x, v1.y, v1.z, 0, 0, sprite, r, g, b, a);
-        RenderHelper.putVertex(builder, normal, v2.x, v2.y, v2.z, 0, 16, sprite, r, g, b, a);
-        RenderHelper.putVertex(builder, normal, v3.x, v3.y, v3.z, 16, 16, sprite, r, g, b, a);
-        RenderHelper.putVertex(builder, normal, v4.x, v4.y, v4.z, 16, 0, sprite, r, g, b, a);
+        RenderHelper.putVertex(builder, normal, v2.x, v2.y, v2.z, 0, 1, sprite, r, g, b, a);
+        RenderHelper.putVertex(builder, normal, v3.x, v3.y, v3.z, 1, 1, sprite, r, g, b, a);
+        RenderHelper.putVertex(builder, normal, v4.x, v4.y, v4.z, 1, 0, sprite, r, g, b, a);
         return builder.bakeQuad();
     }
 
@@ -52,9 +52,9 @@ public abstract class AbstractDynamicBakedModel implements IDynamicBakedModel {
         builder.setSprite(sprite);
         builder.setDirection(Direction.getNearest(normal.x, normal.y, normal.z));
         RenderHelper.putVertex(builder, normal, v1.x, v1.y, v1.z, 0, 0, sprite, hilight, hilight, hilight, hilight);
-        RenderHelper.putVertex(builder, normal, v2.x, v2.y, v2.z, 0, 16, sprite, hilight, hilight, hilight, hilight);
-        RenderHelper.putVertex(builder, normal, v3.x, v3.y, v3.z, 16, 16, sprite, hilight, hilight, hilight, hilight);
-        RenderHelper.putVertex(builder, normal, v4.x, v4.y, v4.z, 16, 0, sprite, hilight, hilight, hilight, hilight);
+        RenderHelper.putVertex(builder, normal, v2.x, v2.y, v2.z, 0, 1, sprite, hilight, hilight, hilight, hilight);
+        RenderHelper.putVertex(builder, normal, v3.x, v3.y, v3.z, 1, 1, sprite, hilight, hilight, hilight, hilight);
+        RenderHelper.putVertex(builder, normal, v4.x, v4.y, v4.z, 1, 0, sprite, hilight, hilight, hilight, hilight);
         return builder.bakeQuad();
     }
 
