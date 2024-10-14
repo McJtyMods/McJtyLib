@@ -1,6 +1,5 @@
 package mcjty.lib.tileentity;
 
-import io.netty.buffer.ByteBuf;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
@@ -16,7 +15,6 @@ import net.minecraft.core.*;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.InteractionHand;
@@ -33,7 +31,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.common.util.Lazy;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -50,7 +47,7 @@ public class GenericTileEntity extends BlockEntity {
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
-    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> attachments = new HashMap<>();
+//    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> attachments = new HashMap<>();
 
     protected byte powerLevel;
 
@@ -75,9 +72,9 @@ public class GenericTileEntity extends BlockEntity {
 //        getAnnotationHolder();
     }
 
-    protected <T> void registerAttachment(AttachmentType<T> type, StreamCodec<? extends ByteBuf, T> codec) {
-        attachments.put(type, codec);
-    }
+//    protected <T> void registerAttachment(AttachmentType<T> type, StreamCodec<? extends ByteBuf, T> codec) {
+//        attachments.put(type, codec);
+//    }
 
     // @todo 1.21
     private BiFunction<BlockCapability, Direction, Object> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
@@ -300,8 +297,8 @@ public class GenericTileEntity extends BlockEntity {
         }
 
         BaseBEData data = getData(Registration.BASE_BE_DATA);
-        if (data.owner() != null) {
-            // Already has an owner.
+        if (data.ownerUUID() != null) {
+            // Already has an ownerUUID.
             return false;
         }
         data = data.withOwner(player.getGameProfile().getId(), player.getName().getString());
@@ -338,7 +335,7 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     public UUID getOwnerUUID() {
-        return getData(Registration.BASE_BE_DATA).owner();
+        return getData(Registration.BASE_BE_DATA).ownerUUID();
     }
 
     public boolean checkAccess(Player player) {

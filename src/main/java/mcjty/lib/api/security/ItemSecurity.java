@@ -9,7 +9,7 @@ import net.minecraft.network.codec.StreamCodec;
 public record ItemSecurity(String owner, int channel) {
     public static final Codec<ItemSecurity> ITEM_SECURITY_CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.STRING.fieldOf("owner").forGetter(ItemSecurity::owner),
+                    Codec.STRING.fieldOf("ownerUUID").forGetter(ItemSecurity::owner),
                     Codec.INT.fieldOf("channel").forGetter(ItemSecurity::channel)
             ).apply(instance, ItemSecurity::new));
     public static final StreamCodec<ByteBuf, ItemSecurity> ITEM_SECURITY_STREAM_CODEC = StreamCodec.composite(
