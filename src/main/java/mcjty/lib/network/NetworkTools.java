@@ -2,12 +2,11 @@ package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.varia.Logging;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
@@ -65,27 +64,17 @@ public class NetworkTools {
         return list;
     }
 
-    /// This function supports itemstacks with more then 64 items.
+    /// This function supports itemstacks with more than 64 items.
     public static ItemStack readItemStack(RegistryFriendlyByteBuf buf) {
-        CompoundTag nbt = buf.readNbt();
-        ItemStack stack = ItemStack.parse(buf.registryAccess(), nbt).orElse(ItemStack.EMPTY);
-        if (stack.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
+        ItemStack stack = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
         stack.setCount(buf.readInt());
         return stack;
     }
 
-    /// This function supports itemstacks with more then 64 items.
+    /// This function supports itemstacks with more than 64 items.
     public static void writeItemStack(RegistryFriendlyByteBuf buf, ItemStack itemStack) {
-        CompoundTag nbt = new CompoundTag();
-        itemStack.save(buf.registryAccess(), nbt);
-        try {
-            buf.writeNbt(nbt);
-            buf.writeInt(itemStack.getCount());
-        } catch (Exception e) {
-            Logging.logError("Error", e);
-        }
+        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, itemStack);
+        buf.writeInt(itemStack.getCount());
     }
 
 
