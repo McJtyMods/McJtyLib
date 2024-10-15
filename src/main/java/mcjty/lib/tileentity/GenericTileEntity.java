@@ -69,7 +69,11 @@ public class GenericTileEntity extends BlockEntity {
 //            return capSetup.apply(cap, dir);
 //        };
         // Make sure the annotation holder exists
-//        getAnnotationHolder();
+        AnnotationHolder holder = getAnnotationHolder();
+        if (holder == null) {
+            // If the holder wasn't created yet we create it here but not for capabilities
+            AnnotationTools.createAnnotationHolder(getClass(), null);
+        }
     }
 
 //    protected <T> void registerAttachment(AttachmentType<T> type, StreamCodec<? extends ByteBuf, T> codec) {
@@ -505,11 +509,7 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     private AnnotationHolder getAnnotationHolder() {
-        AnnotationHolder holder = AnnotationHolder.annotations.get(getClass());
-//        if (holder == null) {
-//            holder = AnnotationTools.createAnnotationHolder(getClass());
-//        }
-        return holder;
+        return AnnotationHolder.annotations.get(getClass());
     }
 
     @ServerCommand

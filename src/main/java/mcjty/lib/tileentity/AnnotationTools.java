@@ -15,6 +15,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -22,15 +23,17 @@ import java.util.function.Function;
 
 public class AnnotationTools {
 
-    public static AnnotationHolder createAnnotationHolder(Class<? extends GenericTileEntity> clazz, DeferredBlock<?> block) {
+    public static AnnotationHolder createAnnotationHolder(Class<? extends GenericTileEntity> clazz, @Nullable DeferredBlock<?> block) {
         AnnotationHolder holder;
         holder = new AnnotationHolder();
         AnnotationHolder.annotations.put(clazz, holder);
         scanServerCommands(clazz, holder);
         scanGuiValues(clazz, holder);
-        scanCaps(clazz, holder, block);
 
-        holder.valueMap.put(GenericTileEntity.VALUE_RSMODE.name(), new ValueHolder<>(GenericTileEntity.VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
+        if (block != null) {
+            scanCaps(clazz, holder, block);
+            holder.valueMap.put(GenericTileEntity.VALUE_RSMODE.name(), new ValueHolder<>(GenericTileEntity.VALUE_RSMODE, GenericTileEntity::getRSModeInt, GenericTileEntity::setRSModeInt));
+        }
         return holder;
     }
 
