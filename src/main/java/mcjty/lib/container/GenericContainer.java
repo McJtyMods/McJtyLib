@@ -484,6 +484,10 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         }
     }
 
+    public <O> StreamCodec<RegistryFriendlyByteBuf, O> getStreamCodecForType(AttachmentType<O> type) {
+        return (StreamCodec<RegistryFriendlyByteBuf, O>) dataListeners.get(type);
+    }
+
     public void receiveData(ResourceLocation containerId, RegistryFriendlyByteBuf buffer) {
         AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.get(containerId);
         if (type == null) {

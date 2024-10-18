@@ -1,8 +1,11 @@
 package mcjty.lib.gui;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.IRunnable;
+import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
@@ -10,6 +13,7 @@ import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.Widgets;
 import mcjty.lib.network.Networking;
+import mcjty.lib.network.PacketAttachmentDataToServer;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.preferences.PreferencesProperties;
@@ -23,10 +27,15 @@ import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.network.connection.ConnectionType;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
@@ -471,6 +480,24 @@ public class Window {
     public void sendServerCommand(Command<?> action, @Nonnull TypedMap params) {
         GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
         guiContainer.sendServerCommandTyped(action, params);
+    }
+
+    public <T extends GenericTileEntity, O> Window bindData(String componentName, T te, AttachmentType<O> type,
+                                                         Function<O, O> setter) {
+        event(componentName, (source, params) -> {
+            O data = te.getData(type);
+            O newValue = setter.apply(data);
+            te.setData(type, newValue);
+            ResourceLocation id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
+            GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
+            GenericContainer menu = (GenericContainer) guiContainer.getMenu();
+            StreamCodec<RegistryFriendlyByteBuf, O> codec = menu.getStreamCodecForType(type);
+            ByteBuf newbuf = Unpooled.buffer();
+            RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, te.getLevel().registryAccess(), ConnectionType.OTHER);
+            codec.encode(buffer, newValue);
+            Networking.sendToServer(PacketAttachmentDataToServer.create(id, buffer));
+        });
+        return this;
     }
 
     public <T extends GenericTileEntity> Window bind(String componentName, T te, String keyName) {

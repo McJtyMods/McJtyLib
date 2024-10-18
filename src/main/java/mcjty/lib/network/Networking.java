@@ -24,6 +24,7 @@ public class Networking {
 
 
         // Server side
+        registrar.playToServer(PacketAttachmentDataToServer.TYPE, PacketAttachmentDataToServer.CODEC, PacketAttachmentDataToServer::handle);
         registrar.playToServer(PacketGetListFromServer.TYPE, PacketGetListFromServer.CODEC, PacketGetListFromServer::handle);
         registrar.playToServer(PacketServerCommandTyped.TYPE, PacketServerCommandTyped.CODEC, PacketServerCommandTyped::handle);
         registrar.playToServer(PacketSendServerCommand.TYPE, PacketSendServerCommand.CODEC, PacketSendServerCommand::handle);

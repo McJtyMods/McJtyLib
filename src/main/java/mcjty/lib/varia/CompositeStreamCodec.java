@@ -72,6 +72,7 @@ public class CompositeStreamCodec {
                 codec11.encode(o, getter11.apply(c));
                 codec12.encode(o, getter12.apply(c));
                 codec13.encode(o, getter13.apply(c));
+                codec14.encode(o, getter14.apply(c));
             }
         };
     }
