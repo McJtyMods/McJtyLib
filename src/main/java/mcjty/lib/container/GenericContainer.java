@@ -7,7 +7,7 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.IContainerDataListener;
 import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.network.Networking;
-import mcjty.lib.network.PacketAttachmentDataToClient;
+import mcjty.lib.network.PacketAttachmentData;
 import mcjty.lib.network.PacketContainerDataToClient;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LevelTools;
@@ -34,6 +34,7 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -42,19 +43,22 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static mcjty.lib.api.container.DefaultContainerProvider.correctType;
+
 /**
  * Generic container support
  */
 public class GenericContainer extends AbstractContainerMenu implements IGenericContainer {
     protected final Map<String,IItemHandler> inventories = new HashMap<>();
     private final Map<ResourceLocation, IContainerDataListener> containerData = new HashMap<>();
-    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> dataListeners = new HashMap<>();
+    private final List<Pair<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>>> dataListeners = new ArrayList<>();
     private final ContainerFactory factory;
     protected final BlockPos pos;
     protected final GenericTileEntity be;
     private final List<DataSlot> intReferenceHolders = new ArrayList<>();
     private boolean doForce = true;
     private final Player player;
+    private final Map<AttachmentType<?>, Object> attachmentData = new HashMap<>();
 
     public GenericContainer(@Nullable MenuType<?> type, int id, ContainerFactory factory, BlockPos pos, @Nullable GenericTileEntity be, @Nonnull Player player) {
         super(type, id);
@@ -84,6 +88,10 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
     public Player getPlayer() {
         return player;
+    }
+
+    public <T> T getAttachmentData(AttachmentType<T> type) {
+        return (T) attachmentData.get(type);
     }
 
     @Nonnull
@@ -153,7 +161,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
     @Override
     public void addDataListener(AttachmentType<?> type, StreamCodec<? extends ByteBuf, ?> codec) {
-        this.dataListeners.put(type, codec);
+        this.dataListeners.add(Pair.of(type, codec));
     }
 
     public void addInventory(String name, @Nullable IItemHandler inventory) {
@@ -474,18 +482,24 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
             }
-            dataListeners.forEach((type, codec) -> {
+            dataListeners.forEach(pair -> {
                 ByteBuf newbuf = Unpooled.buffer();
                 RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
-                encode(buffer, type, codec);
-                PacketAttachmentDataToClient packet = PacketAttachmentDataToClient.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type), buffer);
+                encode(buffer, pair.getLeft(), pair.getRight());
+                PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.getLeft()), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
             });
         }
     }
 
     public <O> StreamCodec<RegistryFriendlyByteBuf, O> getStreamCodecForType(AttachmentType<O> type) {
-        return (StreamCodec<RegistryFriendlyByteBuf, O>) dataListeners.get(type);
+        // @todo 1.21 BAD PERFORMANCE
+        for (Pair<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> dataListener : dataListeners) {
+            if (dataListener.getLeft() == type) {
+                return (StreamCodec<RegistryFriendlyByteBuf, O>) dataListener.getRight();
+            }
+        }
+        return null;
     }
 
     public void receiveData(ResourceLocation containerId, RegistryFriendlyByteBuf buffer) {
@@ -494,12 +508,13 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             Logging.log("Unknown container id: " + containerId);
             return;
         }
-        StreamCodec codec = dataListeners.get(type);
+        StreamCodec codec = getStreamCodecForType(type);
         if (codec == null) {
             Logging.log("No codec for container id: " + containerId);
             return;
         }
         decode(buffer, type, codec);
+        attachmentData.put(type, be.getData(type));
     }
 
     private void encode(RegistryFriendlyByteBuf buffer, AttachmentType type, StreamCodec codec) {
@@ -507,8 +522,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     private void decode(RegistryFriendlyByteBuf buffer, AttachmentType type, StreamCodec codec) {
-        Object data = codec.decode(buffer);
-        be.setData(type, data);
+        be.setData(type, codec.decode(buffer));
     }
 
     public void forceBroadcast() {
@@ -560,9 +574,20 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             if (capability == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
-            return capability.createMenu(windowId, inv, inv.player);
+            AbstractContainerMenu menu = capability.createMenu(windowId, inv, inv.player);
+            if (menu instanceof GenericContainer gc) {
+                gc.readExtraData(data);
+            }
+            return menu;
         });
         return (MenuType<T>) containerType;
+    }
+
+    private void readExtraData(RegistryFriendlyByteBuf buf) {
+        dataListeners.forEach(pair -> {
+            Object decoded = correctType(pair).getRight().decode(buf);
+            attachmentData.put(correctType(pair).getLeft(), decoded);
+        });
     }
 
     public static <T extends GenericContainer, E extends GenericTileEntity> MenuType<T> createRemoteContainerType(

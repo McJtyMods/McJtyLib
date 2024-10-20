@@ -19,12 +19,11 @@ public class Networking {
         registrar.playToServer(PacketSetGuiStyle.TYPE, PacketSetGuiStyle.CODEC, PacketSetGuiStyle::handle);
         registrar.playToClient(PacketOpenManual.TYPE, PacketOpenManual.CODEC, PacketOpenManual::handle);
         registrar.playToClient(PacketContainerDataToClient.TYPE, PacketContainerDataToClient.CODEC, PacketContainerDataToClient::handle);
-        registrar.playToClient(PacketAttachmentDataToClient.TYPE, PacketAttachmentDataToClient.CODEC, PacketAttachmentDataToClient::handle);
         registrar.playToClient(PacketSendResultToClient.TYPE, PacketSendResultToClient.CODEC, PacketSendResultToClient::handle);
 
+        registrar.playBidirectional(PacketAttachmentData.TYPE, PacketAttachmentData.CODEC, PacketAttachmentData::handle);
 
         // Server side
-        registrar.playToServer(PacketAttachmentDataToServer.TYPE, PacketAttachmentDataToServer.CODEC, PacketAttachmentDataToServer::handle);
         registrar.playToServer(PacketGetListFromServer.TYPE, PacketGetListFromServer.CODEC, PacketGetListFromServer::handle);
         registrar.playToServer(PacketServerCommandTyped.TYPE, PacketServerCommandTyped.CODEC, PacketServerCommandTyped::handle);
         registrar.playToServer(PacketSendServerCommand.TYPE, PacketSendServerCommand.CODEC, PacketSendServerCommand::handle);

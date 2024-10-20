@@ -2,6 +2,7 @@ package mcjty.lib.blocks;
 
 import mcjty.lib.api.ITabExpander;
 import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.api.container.DefaultContainerProvider;
 import mcjty.lib.api.infusable.ItemInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
 import mcjty.lib.api.module.IModuleSupport;
@@ -245,7 +246,12 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             if (checkAccess(world, player, te)) {
                 return true;
             }
-            player.openMenu(h, te.getBlockPos());
+            player.openMenu(h, buf -> {
+                buf.writeBlockPos(te.getBlockPos());
+                if (h instanceof DefaultContainerProvider<?> provider) {
+                    provider.writeExtraData(buf, te);
+                }
+            });
             return true;
         }
         return false;

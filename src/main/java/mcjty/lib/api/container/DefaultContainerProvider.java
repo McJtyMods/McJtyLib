@@ -8,6 +8,7 @@ import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.Sync;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
@@ -17,8 +18,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +41,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
     private final List<DataSlot> integerListeners = new ArrayList<>();
     private final List<DataSlot> shortListeners = new ArrayList<>();
     private final List<IContainerDataListener> containerDataListeners = new ArrayList<>();
-    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> dataListeners = new HashMap<>();
+    private final List<Pair<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>>> dataListeners = new ArrayList<>();
 
     /**
      * Conveniance method to make a supplier for an empty container (ContainerFactory.EMPTY).
@@ -96,7 +99,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
     }
 
     public <T> DefaultContainerProvider<C> data(Supplier<AttachmentType<T>> type, StreamCodec<? extends ByteBuf, T> codec) {
-        dataListeners.put(type.get(), codec);
+        dataListeners.add(Pair.of(type.get(), codec));
         return this;
     }
 
@@ -128,12 +131,22 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
         for (IContainerDataListener dataListener : containerDataListeners) {
             container.addContainerDataListener(dataListener);
         }
-        dataListeners.forEach(container::addDataListener);
+        dataListeners.forEach(pair -> container.addDataListener(pair.getLeft(), pair.getRight()));
 
         if (container instanceof GenericContainer) {
             ((GenericContainer) container).forceBroadcast();
         }
 
         return container.getAsContainer();
+    }
+
+    public void writeExtraData(RegistryFriendlyByteBuf buf, BlockEntity te) {
+        dataListeners.forEach(pair -> {
+            correctType(pair).getRight().encode(buf, te.getData(correctType(pair).getLeft()));
+        });
+    }
+
+    public static <T> Pair<AttachmentType<T>, StreamCodec<RegistryFriendlyByteBuf, T>> correctType(Pair pair) {
+        return (Pair<AttachmentType<T>, StreamCodec<RegistryFriendlyByteBuf, T>>) pair;
     }
 }

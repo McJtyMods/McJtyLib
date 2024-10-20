@@ -12,10 +12,7 @@ import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.Widgets;
-import mcjty.lib.network.Networking;
-import mcjty.lib.network.PacketAttachmentDataToServer;
-import mcjty.lib.network.PacketSendServerCommand;
-import mcjty.lib.network.PacketServerCommandTyped;
+import mcjty.lib.network.*;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tileentity.ValueHolder;
@@ -484,6 +481,15 @@ public class Window {
 
     public <T extends GenericTileEntity, O> Window bindData(String componentName, T te, AttachmentType<O> type,
                                                          Function<O, O> setter) {
+//        Object v = getter.apply(te.getData(type));
+//        Widget<?> component = findChild(componentName);
+//
+//        if (component == null) {
+//            Logging.message(Minecraft.getInstance().player, "Could not find component '" + componentName + "'!");
+//            return this;
+//        }
+//        component.setGenericValue(v);
+
         event(componentName, (source, params) -> {
             O data = te.getData(type);
             O newValue = setter.apply(data);
@@ -495,7 +501,7 @@ public class Window {
             ByteBuf newbuf = Unpooled.buffer();
             RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, te.getLevel().registryAccess(), ConnectionType.OTHER);
             codec.encode(buffer, newValue);
-            Networking.sendToServer(PacketAttachmentDataToServer.create(id, buffer));
+            Networking.sendToServer(PacketAttachmentData.create(id, buffer));
         });
         return this;
     }
