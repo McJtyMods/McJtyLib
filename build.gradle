@@ -30,7 +30,7 @@ jars()
 dependencies {
     mc()
     top()
-    //patchouli()
+    patchouli()
     jei()
 }
 

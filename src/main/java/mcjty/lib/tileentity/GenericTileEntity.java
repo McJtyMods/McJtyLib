@@ -2,8 +2,6 @@ package mcjty.lib.tileentity;
 
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
-import mcjty.lib.container.AutomationFilterItemHander;
-import mcjty.lib.container.GenericItemHandler;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
 import mcjty.lib.setup.Registration;
@@ -33,12 +31,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.common.util.Lazy;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -60,55 +55,11 @@ public class GenericTileEntity extends BlockEntity {
 
     public GenericTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        // Setup code to find the capability annotations and in that code we
-        // replace 'capSetup' with the actual code to execute the annotations
-        // @todo 1.21
-//        capSetup = (cap,dir) -> {
-//            List<Pair<Field, Cap>> list = getAnnotationHolder().capabilityList;
-//            capSetup = generateCapTests(list, 0);
-//            return capSetup.apply(cap, dir);
-//        };
         // Make sure the annotation holder exists
         AnnotationHolder holder = getAnnotationHolder();
         if (holder == null) {
             // If the holder wasn't created yet we create it here but not for capabilities
             AnnotationTools.createAnnotationHolder(getClass(), null);
-        }
-    }
-
-//    protected <T> void registerAttachment(AttachmentType<T> type, StreamCodec<? extends ByteBuf, T> codec) {
-//        attachments.put(type, codec);
-//    }
-
-    // @todo 1.21
-    private BiFunction<BlockCapability, Direction, Object> generateCapTests(List<Pair<Field, Cap>> caps, int index) {
-        if (index >= caps.size()) {
-            return null;    // @todo 1.21
-        } else {
-            try {
-                Cap annotation = caps.get(index).getRight();
-                Object instance = FieldUtils.readField(caps.get(index).getLeft(), this, true);
-                Lazy<?> lazy;
-                if (instance instanceof Lazy<?>) {
-                    lazy = Lazy.of(() -> ((Lazy<?>) instance).get());
-                } else if (annotation.type() == CapType.ITEMS_AUTOMATION) {
-                    lazy = Lazy.of(() -> new AutomationFilterItemHander((GenericItemHandler) instance));
-                } else {
-                    lazy = Lazy.of(() -> instance);
-                }
-                lazyOptsToClean.add(lazy);
-                BiFunction<BlockCapability, Direction, Object> tail = generateCapTests(caps, index + 1);
-                BlockCapability desiredCapability = annotation.type().getCapability();
-                return (cap, dir) -> {
-                    if (cap == desiredCapability) {
-                        return lazy;
-                    } else {
-                        return tail.apply(cap, dir);
-                    }
-                };
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 
