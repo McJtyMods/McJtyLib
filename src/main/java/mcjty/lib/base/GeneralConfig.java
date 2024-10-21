@@ -1,9 +1,6 @@
 package mcjty.lib.base;
 
-import mcjty.lib.McJtyLib;
 import mcjty.lib.varia.Logging;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -43,7 +40,9 @@ public class GeneralConfig {
     }
 
     public static void onLoad(final ModConfigEvent.Loading configEvent) {
-        StyleConfig.updateColors();
+        if (configEvent.getConfig().getSpec() == CLIENT_CONFIG) {
+            StyleConfig.updateColors();
+        }
     }
 
     public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
