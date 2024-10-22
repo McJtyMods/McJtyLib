@@ -22,10 +22,10 @@ public record BaseBEData(String ownerName, UUID ownerUUID, int securityChannel, 
 
     public static final StreamCodec<FriendlyByteBuf, BaseBEData> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, BaseBEData::ownerName,
-            UUIDUtil.STREAM_CODEC, BaseBEData::ownerUUID,
+            ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC), s -> Optional.ofNullable(s.ownerUUID),
             ByteBufCodecs.INT, BaseBEData::securityChannel,
             RedstoneMode.STREAM_CODEC, BaseBEData::rsMode,
-            BaseBEData::new
+            (ownerName, uuid, channel, redstoneMode) -> new BaseBEData(ownerName, uuid.orElse(null), channel, redstoneMode)
     );
 
     public BaseBEData withRedstoneMode(RedstoneMode mode) {
