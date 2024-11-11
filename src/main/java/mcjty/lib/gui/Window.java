@@ -506,6 +506,17 @@ public class Window {
         return this;
     }
 
+    public <T> void syncDataToServer(AttachmentType<T> type, GenericTileEntity be) {
+        GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
+        GenericContainer menu = (GenericContainer) guiContainer.getMenu();
+        StreamCodec<RegistryFriendlyByteBuf, T> codec = menu.getStreamCodecForType(type);
+        ByteBuf newbuf = Unpooled.buffer();
+        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, be.getLevel().registryAccess(), ConnectionType.OTHER);
+        T data = be.getData(type);
+        codec.encode(buffer, data);
+        Networking.sendToServer(PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type), buffer));
+    }
+
     public <T extends GenericTileEntity> Window bind(String componentName, T te, String keyName) {
         Map<String, ValueHolder<?, ?>> valueMap = te.getValueMap();
         if (valueMap.containsKey(keyName)) {
