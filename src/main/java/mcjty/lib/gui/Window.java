@@ -153,6 +153,20 @@ public class Window {
                                 }
                             });
                     command.commands()
+                            .filter(cmd -> "binddata".equals(cmd.getId()))
+                            .forEach(cmd -> {
+                                if (tileEntity != null) {
+                                    String component = cmd.getOptionalPar(0, "");
+                                    String attachmentKey = cmd.getOptionalPar(1, "");
+                                    AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.get(ResourceLocation.parse(attachmentKey));
+                                    if (type == null) {
+                                        Logging.logError("Could not find attachment type '" + attachmentKey + "'!");
+                                        return;
+                                    }
+                                    bindData(component, tileEntity, type, o -> o);
+                                }
+                            });
+                    command.commands()
                             .filter(cmd -> "action".equals(cmd.getId()))
                             .forEach(cmd -> {
                                 if (tileEntity != null) {
