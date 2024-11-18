@@ -1,5 +1,6 @@
 package mcjty.lib.api.container;
 
+import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,13 +13,15 @@ import javax.annotation.Nullable;
 
 public interface IGenericContainer {
 
+    record DataListener<B extends ByteBuf, T>(AttachmentType<T> type, StreamCodec<B, T> streamCodec, Codec<T> codec) {}
+
     void addShortListener(DataSlot holder);
 
     void addIntegerListener(DataSlot holder);
 
     void addContainerDataListener(IContainerDataListener dataListener);
 
-    void addDataListener(AttachmentType<?> type, StreamCodec<? extends ByteBuf, ?> codec);
+    void addDataListener(DataListener<?, ?> dataListener);
 
     void setupInventories(@Nullable IItemHandler itemHandler, Inventory inventory);
 

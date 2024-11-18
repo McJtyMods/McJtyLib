@@ -1,5 +1,6 @@
 package mcjty.lib.api.container;
 
+import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.ContainerFactory;
@@ -21,14 +22,11 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -41,7 +39,8 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
     private final List<DataSlot> integerListeners = new ArrayList<>();
     private final List<DataSlot> shortListeners = new ArrayList<>();
     private final List<IContainerDataListener> containerDataListeners = new ArrayList<>();
-    private final List<Pair<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>>> dataListeners = new ArrayList<>();
+
+    private final List<IGenericContainer.DataListener<?, ?>> dataListeners = new ArrayList<>();
 
     /**
      * Conveniance method to make a supplier for an empty container (ContainerFactory.EMPTY).
@@ -98,8 +97,8 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
         return this;
     }
 
-    public <T> DefaultContainerProvider<C> data(Supplier<AttachmentType<T>> type, StreamCodec<? extends ByteBuf, T> codec) {
-        dataListeners.add(Pair.of(type.get(), codec));
+    public <T> DefaultContainerProvider<C> data(Supplier<AttachmentType<T>> type, StreamCodec<? extends ByteBuf, T> streamCodec, Codec<T> codec) {
+        dataListeners.add(new IGenericContainer.DataListener<>(type.get(), streamCodec, codec));
         return this;
     }
 
@@ -131,7 +130,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
         for (IContainerDataListener dataListener : containerDataListeners) {
             container.addContainerDataListener(dataListener);
         }
-        dataListeners.forEach(pair -> container.addDataListener(pair.getLeft(), pair.getRight()));
+        dataListeners.forEach(container::addDataListener);
 
         if (container instanceof GenericContainer) {
             ((GenericContainer) container).forceBroadcast();
@@ -142,11 +141,11 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
 
     public void writeExtraData(RegistryFriendlyByteBuf buf, BlockEntity te) {
         dataListeners.forEach(pair -> {
-            correctType(pair).getRight().encode(buf, te.getData(correctType(pair).getLeft()));
+            correctType(pair).streamCodec().encode(buf, te.getData(correctType(pair).type()));
         });
     }
 
-    public static <T> Pair<AttachmentType<T>, StreamCodec<RegistryFriendlyByteBuf, T>> correctType(Pair pair) {
-        return (Pair<AttachmentType<T>, StreamCodec<RegistryFriendlyByteBuf, T>>) pair;
+    public static <T> IGenericContainer.DataListener<RegistryFriendlyByteBuf, T> correctType(IGenericContainer.DataListener dl) {
+        return (IGenericContainer.DataListener<RegistryFriendlyByteBuf, T>) dl;
     }
 }

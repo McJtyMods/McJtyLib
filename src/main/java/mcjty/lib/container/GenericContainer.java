@@ -1,6 +1,7 @@
 package mcjty.lib.container;
 
 import com.google.common.collect.Range;
+import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import mcjty.lib.api.container.CapabilityContainerProvider;
@@ -27,14 +28,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
-import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -51,7 +51,7 @@ import static mcjty.lib.api.container.DefaultContainerProvider.correctType;
 public class GenericContainer extends AbstractContainerMenu implements IGenericContainer {
     protected final Map<String,IItemHandler> inventories = new HashMap<>();
     private final Map<ResourceLocation, IContainerDataListener> containerData = new HashMap<>();
-    private final List<Pair<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>>> dataListeners = new ArrayList<>();
+    private final List<DataListener<?, ?>> dataListeners = new ArrayList<>();
     private final ContainerFactory factory;
     protected final BlockPos pos;
     protected final GenericTileEntity be;
@@ -160,8 +160,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     @Override
-    public void addDataListener(AttachmentType<?> type, StreamCodec<? extends ByteBuf, ?> codec) {
-        this.dataListeners.add(Pair.of(type, codec));
+    public void addDataListener(DataListener<?, ?> dataListener) {
+        this.dataListeners.add(dataListener);
     }
 
     public void addInventory(String name, @Nullable IItemHandler inventory) {
@@ -485,8 +485,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             dataListeners.forEach(pair -> {
                 ByteBuf newbuf = Unpooled.buffer();
                 RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
-                encode(buffer, pair.getLeft(), pair.getRight());
-                PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.getLeft()), buffer);
+                encode(buffer, pair.type(), pair.streamCodec());
+                PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.type()), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
             });
         }
@@ -494,9 +494,19 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
     public <O> StreamCodec<RegistryFriendlyByteBuf, O> getStreamCodecForType(AttachmentType<O> type) {
         // @todo 1.21 BAD PERFORMANCE
-        for (Pair<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> dataListener : dataListeners) {
-            if (dataListener.getLeft() == type) {
-                return (StreamCodec<RegistryFriendlyByteBuf, O>) dataListener.getRight();
+        for (DataListener<?, ?> dataListener : dataListeners) {
+            if (dataListener.type() == type) {
+                return (StreamCodec<RegistryFriendlyByteBuf, O>) dataListener.streamCodec();
+            }
+        }
+        return null;
+    }
+
+    public <O> Codec<O> getCodecForType(AttachmentType<O> type) {
+        // @todo 1.21 BAD PERFORMANCE
+        for (DataListener<?, ?> dataListener : dataListeners) {
+            if (dataListener.type() == type) {
+                return (Codec<O>) dataListener.codec();
             }
         }
         return null;
@@ -585,8 +595,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
     private void readExtraData(RegistryFriendlyByteBuf buf) {
         dataListeners.forEach(pair -> {
-            Object decoded = correctType(pair).getRight().decode(buf);
-            attachmentData.put(correctType(pair).getLeft(), decoded);
+            Object decoded = correctType(pair).streamCodec().decode(buf);
+            attachmentData.put(correctType(pair).type(), decoded);
         });
     }
 

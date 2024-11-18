@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import mcjty.lib.McJtyLib;
@@ -20,6 +21,7 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
+import mcjty.lib.varia.NamedCodec;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -495,26 +497,39 @@ public class Window {
 
     public <T extends GenericTileEntity, O> Window bindData(String componentName, T te, AttachmentType<O> type,
                                                          Function<O, O> setter) {
-//        Object v = getter.apply(te.getData(type));
-//        Widget<?> component = findChild(componentName);
-//
-//        if (component == null) {
-//            Logging.message(Minecraft.getInstance().player, "Could not find component '" + componentName + "'!");
-//            return this;
-//        }
-//        component.setGenericValue(v);
+        GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
+        GenericContainer menu = (GenericContainer) guiContainer.getMenu();
+
+        Codec<O> codec = menu.getCodecForType(type);
+        if (codec == null) {
+            Logging.message(Minecraft.getInstance().player, "Could not find codec for type '" + type + "'!");
+            return this;
+        }
+        Widget<?> component = findChild(componentName);
+
+        if (component == null) {
+            Logging.message(Minecraft.getInstance().player, "Could not find component '" + componentName + "'!");
+            return this;
+        }
+        NamedCodec namedCodec = NamedCodec.map(codec, te.getData(type));
+        component.setGenericValue(namedCodec.get(componentName));
 
         event(componentName, (source, params) -> {
             O data = te.getData(type);
-            O newValue = setter.apply(data);
+            NamedCodec ncOut = NamedCodec.map(codec, te.getData(type));
+            xxx
+            O newValue = ncOut.set(componentName, component.getGenericValue());
+//            O newValue = setter.apply(data);
             te.setData(type, newValue);
             ResourceLocation id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
-            GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
-            GenericContainer menu = (GenericContainer) guiContainer.getMenu();
-            StreamCodec<RegistryFriendlyByteBuf, O> codec = menu.getStreamCodecForType(type);
+            StreamCodec<RegistryFriendlyByteBuf, O> streamCodec = menu.getStreamCodecForType(type);
+            if (streamCodec == null) {
+                Logging.message(Minecraft.getInstance().player, "Could not find stream codec for type '" + id + "'!");
+                return;
+            }
             ByteBuf newbuf = Unpooled.buffer();
             RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, te.getLevel().registryAccess(), ConnectionType.OTHER);
-            codec.encode(buffer, newValue);
+            streamCodec.encode(buffer, newValue);
             Networking.sendToServer(PacketAttachmentData.create(id, buffer));
         });
         return this;
