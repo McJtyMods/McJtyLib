@@ -29,6 +29,9 @@ public class NamedCodec<T> {
     }
 
     private void scanTagForRead(Tag tag, String key, Map<String, Object> map) {
+        if (tag == null) {
+            return;
+        }
         switch (tag.getId()) {
             case Tag.TAG_COMPOUND -> {
                 for (String k : ((CompoundTag) tag).getAllKeys()) {
@@ -46,6 +49,9 @@ public class NamedCodec<T> {
     }
 
     private boolean scanTagForWrite(Tag tag, String key, String name, Object v) {
+        if (tag == null) {
+            return false;
+        }
         switch (tag.getId()) {
             case Tag.TAG_COMPOUND -> {
                 for (String k : ((CompoundTag) tag).getAllKeys()) {

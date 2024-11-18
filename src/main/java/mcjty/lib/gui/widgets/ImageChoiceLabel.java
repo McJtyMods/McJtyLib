@@ -240,7 +240,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
             setCurrentChoice((Integer) value);
         } else if (value instanceof Boolean) {
             setCurrentChoice(((Boolean) value) ? 1 : 0);
-        } else {
+        } else if (value != null) {
             setCurrentChoice(value.toString());
         }
     }

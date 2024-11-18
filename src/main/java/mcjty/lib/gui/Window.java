@@ -159,13 +159,14 @@ public class Window {
                             .forEach(cmd -> {
                                 if (tileEntity != null) {
                                     String component = cmd.getOptionalPar(0, "");
-                                    String attachmentKey = cmd.getOptionalPar(1, "");
+                                    String attributeName = cmd.getOptionalPar(1, "");
+                                    String attachmentKey = cmd.getOptionalPar(2, "");
                                     AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.get(ResourceLocation.parse(attachmentKey));
                                     if (type == null) {
                                         Logging.logError("Could not find attachment type '" + attachmentKey + "'!");
                                         return;
                                     }
-                                    bindData(component, tileEntity, type, o -> o);
+                                    bindData(component, attributeName, tileEntity, type);
                                 }
                             });
                     command.commands()
@@ -495,8 +496,7 @@ public class Window {
         guiContainer.sendServerCommandTyped(action, params);
     }
 
-    public <T extends GenericTileEntity, O> Window bindData(String componentName, T te, AttachmentType<O> type,
-                                                         Function<O, O> setter) {
+    public <T extends GenericTileEntity, O> Window bindData(String componentName, String attributeName, T te, AttachmentType<O> type) {
         GenericGuiContainer<?, ?> guiContainer = (GenericGuiContainer<?, ?>) this.gui;
         GenericContainer menu = (GenericContainer) guiContainer.getMenu();
 
@@ -511,14 +511,14 @@ public class Window {
             Logging.message(Minecraft.getInstance().player, "Could not find component '" + componentName + "'!");
             return this;
         }
-        NamedCodec namedCodec = NamedCodec.map(codec, te.getData(type));
-        component.setGenericValue(namedCodec.get(componentName));
+        NamedCodec ncIn = NamedCodec.map(codec, te.getData(type));
+        component.setGenericValue(ncIn.get(attributeName));
 
         event(componentName, (source, params) -> {
             O data = te.getData(type);
-            NamedCodec ncOut = NamedCodec.map(codec, te.getData(type));
-            xxx
-            O newValue = ncOut.set(componentName, component.getGenericValue());
+            NamedCodec<O> ncOut = NamedCodec.map(codec, data);
+            Object genericValue = component.getGenericValue(Type.OBJECT);
+            O newValue = ncOut.set(attributeName, genericValue);
 //            O newValue = setter.apply(data);
             te.setData(type, newValue);
             ResourceLocation id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);

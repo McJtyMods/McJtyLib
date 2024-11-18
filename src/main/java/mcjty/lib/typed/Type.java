@@ -24,6 +24,7 @@ import java.util.function.Function;
 public final class Type<V> {
 
     // Basic
+    public static final Type<Object> OBJECT = create(Object.class, (v, buf) -> {}, buf -> null);
     public static final Type<Integer> INTEGER = create(Integer.class, (v, buf) -> buf.writeInt(v), FriendlyByteBuf::readInt);
     public static final Type<Float> FLOAT = create(Float.class, (v, buf) -> buf.writeFloat(v), FriendlyByteBuf::readFloat);
     public static final Type<Double> DOUBLE = create(Double.class, (v, buf) -> buf.writeDouble(v), FriendlyByteBuf::readDouble);
