@@ -41,6 +41,6 @@ public enum RedstoneMode implements StringRepresentable {
 
     @Override
     public String getSerializedName() {
-        return name();
+        return getDescription();
     }
 }
