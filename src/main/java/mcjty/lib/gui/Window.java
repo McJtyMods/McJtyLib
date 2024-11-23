@@ -512,14 +512,18 @@ public class Window {
             return this;
         }
         NamedCodec ncIn = NamedCodec.map(codec, te.getData(type));
-        component.setGenericValue(ncIn.get(attributeName));
+        Object value = ncIn.get(attributeName);
+        component.setGenericValue(value);
+        bindings.put(component, (Function<T, Object>) t -> {
+            NamedCodec ncIn2 = NamedCodec.map(codec, te.getData(type));
+            return ncIn2.get(attributeName);
+        });
 
         event(componentName, (source, params) -> {
             O data = te.getData(type);
             NamedCodec<O> ncOut = NamedCodec.map(codec, data);
             Object genericValue = component.getGenericValue(Type.OBJECT);
             O newValue = ncOut.set(attributeName, genericValue);
-//            O newValue = setter.apply(data);
             te.setData(type, newValue);
             ResourceLocation id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
             StreamCodec<RegistryFriendlyByteBuf, O> streamCodec = menu.getStreamCodecForType(type);

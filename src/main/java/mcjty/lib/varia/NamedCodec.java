@@ -3,10 +3,7 @@ package mcjty.lib.varia;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,72 +32,62 @@ public class NamedCodec<T> {
         switch (tag.getId()) {
             case Tag.TAG_COMPOUND -> {
                 for (String k : ((CompoundTag) tag).getAllKeys()) {
-                    scanTagForRead(((CompoundTag) tag).get(key), k, map);
+                    scanTagForRead(((CompoundTag) tag).get(k), k, map);
                 }
             }
             case Tag.TAG_STRING -> map.put(key, tag.getAsString());
             case Tag.TAG_INT -> map.put(key, ((IntTag) tag).getAsInt());
-            case Tag.TAG_BYTE -> map.put(key, ((IntTag) tag).getAsByte());
-            case Tag.TAG_SHORT -> map.put(key, ((IntTag) tag).getAsShort());
-            case Tag.TAG_LONG -> map.put(key, ((IntTag) tag).getAsLong());
-            case Tag.TAG_FLOAT -> map.put(key, ((IntTag) tag).getAsFloat());
-            case Tag.TAG_DOUBLE -> map.put(key, ((IntTag) tag).getAsDouble());
+            case Tag.TAG_BYTE -> map.put(key, ((ByteTag) tag).getAsByte());
+            case Tag.TAG_SHORT -> map.put(key, ((ShortTag) tag).getAsShort());
+            case Tag.TAG_LONG -> map.put(key, ((LongTag) tag).getAsLong());
+            case Tag.TAG_FLOAT -> map.put(key, ((FloatTag) tag).getAsFloat());
+            case Tag.TAG_DOUBLE -> map.put(key, ((DoubleTag) tag).getAsDouble());
         }
     }
 
-    private boolean scanTagForWrite(Tag tag, String key, String name, Object v) {
-        if (tag == null) {
-            return false;
+    private boolean scanTagForWrite(CompoundTag parent, String key, Object v) {
+        if (parent.contains(key)) {
+            // Easy case, we have a key in our 'parent' already
+            Tag tag = parent.get(key);
+            switch (tag.getId()) {
+                case Tag.TAG_STRING -> {
+                    parent.putString(key, v.toString());
+                    return true;
+                }
+                case Tag.TAG_INT -> {
+                    parent.putInt(key, convertToInt(v));
+                    return true;
+                }
+                case Tag.TAG_BYTE -> {
+                    parent.putByte(key, convertToByte(v));
+                    return true;
+                }
+                case Tag.TAG_SHORT -> {
+                    parent.putShort(key, convertToShort(v));
+                    return true;
+                }
+                case Tag.TAG_LONG -> {
+                    parent.putLong(key, convertToLong(v));
+                    return true;
+                }
+                case Tag.TAG_FLOAT -> {
+                    parent.putFloat(key, convertToFloat(v));
+                    return true;
+                }
+                case Tag.TAG_DOUBLE -> {
+                    parent.putDouble(key, convertToDouble(v));
+                    return true;
+                }
+            }
         }
-        switch (tag.getId()) {
-            case Tag.TAG_COMPOUND -> {
-                for (String k : ((CompoundTag) tag).getAllKeys()) {
-                    boolean rc = scanTagForWrite(((CompoundTag) tag).get(key), k, name, v);
-                    if (rc) {
+        // There was none, we need to look for other compound tags
+        for (String k : parent.getAllKeys()) {
+            Tag tag = parent.get(k);
+            switch (tag.getId()) {
+                case Tag.TAG_COMPOUND -> {
+                    if (scanTagForWrite((CompoundTag) tag, key, v)) {
                         return true;
                     }
-                }
-            }
-            case Tag.TAG_STRING -> {
-                if (key.equals(name)) {
-                    ((CompoundTag) tag).putString(key, (String) v);
-                    return true;
-                }
-            }
-            case Tag.TAG_INT -> {
-                if (key.equals(name)) {
-                    ((CompoundTag) tag).putInt(key, (Integer) v);
-                    return true;
-                }
-            }
-            case Tag.TAG_BYTE -> {
-                if (key.equals(name)) {
-                    ((CompoundTag) tag).putByte(key, (Byte) v);
-                    return true;
-                }
-            }
-            case Tag.TAG_SHORT -> {
-                if (key.equals(name)) {
-                    ((CompoundTag) tag).putShort(key, (Short) v);
-                    return true;
-                }
-            }
-            case Tag.TAG_LONG -> {
-                if (key.equals(name)) {
-                    ((CompoundTag) tag).putLong(key, (Long) v);
-                    return true;
-                }
-            }
-            case Tag.TAG_FLOAT -> {
-                if (key.equals(name)) {
-                    ((CompoundTag) tag).putFloat(key, (Float) v);
-                    return true;
-                }
-            }
-            case Tag.TAG_DOUBLE -> {
-                if (key.equals(name)) {
-                    ((CompoundTag) tag).putDouble(key, (Double) v);
-                    return true;
                 }
             }
         }
@@ -118,8 +105,164 @@ public class NamedCodec<T> {
     public T set(String name, Object v) {
         DataResult<Tag> result = codec.encodeStart(NbtOps.INSTANCE, value);
         Tag tag = result.getOrThrow();
-        scanTagForWrite(tag, "", name, v);
+        scanTagForWrite((CompoundTag) tag, name, v);
         Pair<T, Tag> resultOut = codec.decode(NbtOps.INSTANCE, tag).getOrThrow();
         return resultOut.getFirst();
+    }
+
+    private byte convertToByte(Object v) {
+        if (v instanceof Byte) {
+            return (Byte) v;
+        } else if (v instanceof Integer) {
+            return ((Integer) v).byteValue();
+        } else if (v instanceof Long) {
+            return ((Long) v).byteValue();
+        } else if (v instanceof Short) {
+            return ((Short) v).byteValue();
+        } else if (v instanceof Float) {
+            return ((Float) v).byteValue();
+        } else if (v instanceof Double) {
+            return ((Double) v).byteValue();
+        } else if (v instanceof Boolean) {
+            return (byte) (((Boolean) v) ? 1 : 0);
+        } else if (v instanceof String) {
+            try {
+                return Byte.parseByte((String) v);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Cannot convert " + v + " to byte");
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + v + " to byte");
+        }
+    }
+
+    private int convertToInt(Object v) {
+        if (v instanceof Byte) {
+            return (Byte) v;
+        } else if (v instanceof Integer) {
+            return (Integer) v;
+        } else if (v instanceof Long) {
+            return ((Long) v).intValue();
+        } else if (v instanceof Short) {
+            return (Short) v;
+        } else if (v instanceof Float) {
+            return (int) (float) v;
+        } else if (v instanceof Double) {
+            return (int) (double) v;
+        } else if (v instanceof Boolean) {
+            return ((Boolean) v) ? 1 : 0;
+        } else if (v instanceof String) {
+            try {
+                return Integer.parseInt((String) v);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Cannot convert " + v + " to int");
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + v + " to int");
+        }
+    }
+
+    private short convertToShort(Object v) {
+        if (v instanceof Byte) {
+            return (Byte) v;
+        } else if (v instanceof Integer) {
+            return ((Integer) v).shortValue();
+        } else if (v instanceof Long) {
+            return ((Long) v).shortValue();
+        } else if (v instanceof Short) {
+            return (Short) v;
+        } else if (v instanceof Float) {
+            return (short) (float) v;
+        } else if (v instanceof Double) {
+            return (short) (double) v;
+        } else if (v instanceof Boolean) {
+            return (short) (((Boolean) v) ? 1 : 0);
+        } else if (v instanceof String) {
+            try {
+                return Short.parseShort((String) v);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Cannot convert " + v + " to short");
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + v + " to short");
+        }
+    }
+
+    private long convertToLong(Object v) {
+        if (v instanceof Byte) {
+            return (Byte) v;
+        } else if (v instanceof Integer) {
+            return (Integer) v;
+        } else if (v instanceof Long) {
+            return (Long) v;
+        } else if (v instanceof Short) {
+            return (Short) v;
+        } else if (v instanceof Float) {
+            return (long) (float) v;
+        } else if (v instanceof Double) {
+            return (long) (double) v;
+        } else if (v instanceof Boolean) {
+            return ((Boolean) v) ? 1 : 0;
+        } else if (v instanceof String) {
+            try {
+                return Long.parseLong((String) v);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Cannot convert " + v + " to long");
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + v + " to long");
+        }
+    }
+
+    private float convertToFloat(Object v) {
+        if (v instanceof Byte) {
+            return (Byte) v;
+        } else if (v instanceof Integer) {
+            return (Integer) v;
+        } else if (v instanceof Long) {
+            return (Long) v;
+        } else if (v instanceof Short) {
+            return (Short) v;
+        } else if (v instanceof Float) {
+            return (Float) v;
+        } else if (v instanceof Double) {
+            return (float) (double) v;
+        } else if (v instanceof Boolean) {
+            return ((Boolean) v) ? 1 : 0;
+        } else if (v instanceof String) {
+            try {
+                return Float.parseFloat((String) v);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Cannot convert " + v + " to float");
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + v + " to float");
+        }
+    }
+
+    private double convertToDouble(Object v) {
+        if (v instanceof Byte) {
+            return (Byte) v;
+        } else if (v instanceof Integer) {
+            return (Integer) v;
+        } else if (v instanceof Long) {
+            return (Long) v;
+        } else if (v instanceof Short) {
+            return (Short) v;
+        } else if (v instanceof Float) {
+            return (Float) v;
+        } else if (v instanceof Double) {
+            return (Double) v;
+        } else if (v instanceof Boolean) {
+            return ((Boolean) v) ? 1 : 0;
+        } else if (v instanceof String) {
+            try {
+                return Double.parseDouble((String) v);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Cannot convert " + v + " to double");
+            }
+        } else {
+            throw new IllegalArgumentException("Cannot convert " + v + " to double");
+        }
     }
 }
