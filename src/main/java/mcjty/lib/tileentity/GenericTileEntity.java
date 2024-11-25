@@ -29,6 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.common.util.Lazy;
 
@@ -95,6 +96,10 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     public void onPartAdded(PartSlot slot, BlockState state, BlockEntity multipartTile) {
+    }
+
+    public void onDataChanged(AttachmentType<?> type, Object oldData, Object newData) {
+
     }
 
     public InteractionResult onBlockActivated(BlockState state, Player player, InteractionHand hand, BlockHitResult result) {

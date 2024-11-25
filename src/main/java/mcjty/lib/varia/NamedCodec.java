@@ -3,6 +3,7 @@ package mcjty.lib.varia;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import mcjty.lib.typed.Type;
 import net.minecraft.nbt.*;
 
 import java.util.HashMap;
@@ -265,4 +266,49 @@ public class NamedCodec<T> {
             throw new IllegalArgumentException("Cannot convert " + v + " to double");
         }
     }
+
+    public Type<?> getType(String attributeName) {
+        DataResult<Tag> result = codec.encodeStart(NbtOps.INSTANCE, value);
+        Tag tag = result.getOrThrow();
+        return scanTagForType((CompoundTag) tag, attributeName);
+    }
+
+    private Type<?> scanTagForType(CompoundTag tag, String key) {
+        if (tag == null) {
+            return Type.OBJECT;
+        }
+        if (tag.contains(key)) {
+            // Easy case, we have a key in our 'parent' already
+            Tag subTag = tag.get(key);
+            switch (subTag.getId()) {
+                case Tag.TAG_STRING -> {
+                    return Type.STRING;
+                }
+                case Tag.TAG_INT, Tag.TAG_BYTE, Tag.TAG_SHORT -> {
+                    return Type.INTEGER;
+                }
+                case Tag.TAG_LONG -> {
+                    return Type.LONG;
+                }
+                case Tag.TAG_FLOAT -> {
+                    return Type.FLOAT;
+                }
+                case Tag.TAG_DOUBLE -> {
+                    return Type.DOUBLE;
+                }
+            }
+        }
+
+        // There was none, we need to look for other compound tags
+        for (String k : tag.getAllKeys()) {
+            Tag subTag = tag.get(k);
+            switch (subTag.getId()) {
+                case Tag.TAG_COMPOUND -> {
+                    return scanTagForType((CompoundTag) subTag, key);
+                }
+            }
+        }
+        return Type.OBJECT;
+    }
+
 }

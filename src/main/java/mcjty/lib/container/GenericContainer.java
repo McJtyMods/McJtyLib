@@ -485,7 +485,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             dataListeners.forEach(pair -> {
                 ByteBuf newbuf = Unpooled.buffer();
                 RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
-                encode(buffer, pair.type(), pair.streamCodec());
+                ((StreamCodec) pair.streamCodec()).encode(buffer, be.getData((AttachmentType) pair.type()));
                 PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.type()), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
             });
@@ -523,16 +523,11 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             Logging.log("No codec for container id: " + containerId);
             return;
         }
-        decode(buffer, type, codec);
+        Object oldData = be.getData(type);
+        Object newData = codec.decode(buffer);
+        be.setData((AttachmentType) type, newData);
+        be.onDataChanged(type, oldData, newData);
         attachmentData.put(type, be.getData(type));
-    }
-
-    private void encode(RegistryFriendlyByteBuf buffer, AttachmentType type, StreamCodec codec) {
-        codec.encode(buffer, be.getData(type));
-    }
-
-    private void decode(RegistryFriendlyByteBuf buffer, AttachmentType type, StreamCodec codec) {
-        be.setData(type, codec.decode(buffer));
     }
 
     public void forceBroadcast() {

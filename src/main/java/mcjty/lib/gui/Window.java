@@ -522,7 +522,8 @@ public class Window {
         event(componentName, (source, params) -> {
             O data = te.getData(type);
             NamedCodec<O> ncOut = NamedCodec.map(codec, data);
-            Object genericValue = component.getGenericValue(Type.OBJECT);
+            Type<?> attributeType = ncOut.getType(attributeName);
+            Object genericValue = component.getGenericValue(attributeType);
             O newValue = ncOut.set(attributeName, genericValue);
             te.setData(type, newValue);
             ResourceLocation id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
