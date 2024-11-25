@@ -13,7 +13,10 @@ import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.gui.widgets.Widgets;
-import mcjty.lib.network.*;
+import mcjty.lib.network.Networking;
+import mcjty.lib.network.PacketAttachmentData;
+import mcjty.lib.network.PacketSendServerCommand;
+import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.preferences.PreferencesProperties;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tileentity.ValueHolder;
@@ -511,20 +514,16 @@ public class Window {
             Logging.message(Minecraft.getInstance().player, "Could not find component '" + componentName + "'!");
             return this;
         }
-        NamedCodec ncIn = NamedCodec.map(codec, te.getData(type));
-        Object value = ncIn.get(attributeName);
+        Object value = NamedCodec.get(codec, te.getData(type), attributeName);
         component.setGenericValue(value);
-        bindings.put(component, (Function<T, Object>) t -> {
-            NamedCodec ncIn2 = NamedCodec.map(codec, te.getData(type));
-            return ncIn2.get(attributeName);
-        });
+        bindings.put(component, (Function<T, Object>) t -> NamedCodec.get(codec, te.getData(type), attributeName));
 
         event(componentName, (source, params) -> {
             O data = te.getData(type);
             NamedCodec<O> ncOut = NamedCodec.map(codec, data);
             Type<?> attributeType = ncOut.getType(attributeName);
-            Object genericValue = component.getGenericValue(attributeType);
-            O newValue = ncOut.set(attributeName, genericValue);
+            Object oldValue = component.getGenericValue(attributeType);
+            O newValue = ncOut.set(attributeName, oldValue);
             te.setData(type, newValue);
             ResourceLocation id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
             StreamCodec<RegistryFriendlyByteBuf, O> streamCodec = menu.getStreamCodecForType(type);

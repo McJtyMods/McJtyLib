@@ -26,73 +26,8 @@ public class NamedCodec<T> {
         return new NamedCodec<>(codec, value);
     }
 
-    private void scanTagForRead(Tag tag, String key, Map<String, Object> map) {
-        if (tag == null) {
-            return;
-        }
-        switch (tag.getId()) {
-            case Tag.TAG_COMPOUND -> {
-                for (String k : ((CompoundTag) tag).getAllKeys()) {
-                    scanTagForRead(((CompoundTag) tag).get(k), k, map);
-                }
-            }
-            case Tag.TAG_STRING -> map.put(key, tag.getAsString());
-            case Tag.TAG_INT -> map.put(key, ((IntTag) tag).getAsInt());
-            case Tag.TAG_BYTE -> map.put(key, ((ByteTag) tag).getAsByte());
-            case Tag.TAG_SHORT -> map.put(key, ((ShortTag) tag).getAsShort());
-            case Tag.TAG_LONG -> map.put(key, ((LongTag) tag).getAsLong());
-            case Tag.TAG_FLOAT -> map.put(key, ((FloatTag) tag).getAsFloat());
-            case Tag.TAG_DOUBLE -> map.put(key, ((DoubleTag) tag).getAsDouble());
-        }
-    }
-
-    private boolean scanTagForWrite(CompoundTag parent, String key, Object v) {
-        if (parent.contains(key)) {
-            // Easy case, we have a key in our 'parent' already
-            Tag tag = parent.get(key);
-            switch (tag.getId()) {
-                case Tag.TAG_STRING -> {
-                    parent.putString(key, v.toString());
-                    return true;
-                }
-                case Tag.TAG_INT -> {
-                    parent.putInt(key, convertToInt(v));
-                    return true;
-                }
-                case Tag.TAG_BYTE -> {
-                    parent.putByte(key, convertToByte(v));
-                    return true;
-                }
-                case Tag.TAG_SHORT -> {
-                    parent.putShort(key, convertToShort(v));
-                    return true;
-                }
-                case Tag.TAG_LONG -> {
-                    parent.putLong(key, convertToLong(v));
-                    return true;
-                }
-                case Tag.TAG_FLOAT -> {
-                    parent.putFloat(key, convertToFloat(v));
-                    return true;
-                }
-                case Tag.TAG_DOUBLE -> {
-                    parent.putDouble(key, convertToDouble(v));
-                    return true;
-                }
-            }
-        }
-        // There was none, we need to look for other compound tags
-        for (String k : parent.getAllKeys()) {
-            Tag tag = parent.get(k);
-            switch (tag.getId()) {
-                case Tag.TAG_COMPOUND -> {
-                    if (scanTagForWrite((CompoundTag) tag, key, v)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+    public static <T> Object get(Codec<T> codec, T value, String name) {
+        return map(codec, value).get(name);
     }
 
     public Object get(String name) {
@@ -311,4 +246,72 @@ public class NamedCodec<T> {
         return Type.OBJECT;
     }
 
+    private void scanTagForRead(Tag tag, String key, Map<String, Object> map) {
+        if (tag == null) {
+            return;
+        }
+        switch (tag.getId()) {
+            case Tag.TAG_COMPOUND -> {
+                for (String k : ((CompoundTag) tag).getAllKeys()) {
+                    scanTagForRead(((CompoundTag) tag).get(k), k, map);
+                }
+            }
+            case Tag.TAG_STRING -> map.put(key, tag.getAsString());
+            case Tag.TAG_INT -> map.put(key, ((IntTag) tag).getAsInt());
+            case Tag.TAG_BYTE -> map.put(key, ((ByteTag) tag).getAsByte());
+            case Tag.TAG_SHORT -> map.put(key, ((ShortTag) tag).getAsShort());
+            case Tag.TAG_LONG -> map.put(key, ((LongTag) tag).getAsLong());
+            case Tag.TAG_FLOAT -> map.put(key, ((FloatTag) tag).getAsFloat());
+            case Tag.TAG_DOUBLE -> map.put(key, ((DoubleTag) tag).getAsDouble());
+        }
+    }
+
+    private boolean scanTagForWrite(CompoundTag parent, String key, Object v) {
+        if (parent.contains(key)) {
+            // Easy case, we have a key in our 'parent' already
+            Tag tag = parent.get(key);
+            switch (tag.getId()) {
+                case Tag.TAG_STRING -> {
+                    parent.putString(key, v.toString());
+                    return true;
+                }
+                case Tag.TAG_INT -> {
+                    parent.putInt(key, convertToInt(v));
+                    return true;
+                }
+                case Tag.TAG_BYTE -> {
+                    parent.putByte(key, convertToByte(v));
+                    return true;
+                }
+                case Tag.TAG_SHORT -> {
+                    parent.putShort(key, convertToShort(v));
+                    return true;
+                }
+                case Tag.TAG_LONG -> {
+                    parent.putLong(key, convertToLong(v));
+                    return true;
+                }
+                case Tag.TAG_FLOAT -> {
+                    parent.putFloat(key, convertToFloat(v));
+                    return true;
+                }
+                case Tag.TAG_DOUBLE -> {
+                    parent.putDouble(key, convertToDouble(v));
+                    return true;
+                }
+            }
+        }
+        // There was none, we need to look for other compound tags
+        for (String k : parent.getAllKeys()) {
+            Tag tag = parent.get(k);
+            switch (tag.getId()) {
+                case Tag.TAG_COMPOUND -> {
+                    if (scanTagForWrite((CompoundTag) tag, key, v)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
