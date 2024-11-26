@@ -514,7 +514,8 @@ public class Window {
             Logging.message(Minecraft.getInstance().player, "Could not find component '" + componentName + "'!");
             return this;
         }
-        Object value = NamedCodec.get(codec, te.getData(type), attributeName);
+        O dt = te.getData(type);
+        Object value = NamedCodec.get(codec, dt, attributeName);
         component.setGenericValue(value);
         bindings.put(component, (Function<T, Object>) t -> NamedCodec.get(codec, te.getData(type), attributeName));
 
