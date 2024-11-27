@@ -236,10 +236,10 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
 
     @Override
     public <T> void setGenericValue(T value) {
-        if (value instanceof Integer) {
-            setCurrentChoice((Integer) value);
-        } else if (value instanceof Boolean) {
-            setCurrentChoice(((Boolean) value) ? 1 : 0);
+        if (value instanceof Number number) {
+            setCurrentChoice(number.intValue());
+        } else if (value instanceof Boolean bool) {
+            setCurrentChoice(bool ? 1 : 0);
         } else if (value != null) {
             setCurrentChoice(value.toString());
         }

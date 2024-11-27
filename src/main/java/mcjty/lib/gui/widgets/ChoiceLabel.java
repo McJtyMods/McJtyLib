@@ -190,12 +190,12 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
 
     @Override
     public <T> void setGenericValue(T value) {
-        if (value instanceof Integer) {
-            choice(choiceList.get((Integer) value));
-        } else if (value instanceof Boolean) {
-            choice(choiceList.get(((Boolean) value) ? 1 : 0));
-        } else if (value instanceof String) {
-            choice((String) value);
+        if (value instanceof Number number) {
+            choice(choiceList.get(number.intValue()));
+        } else if (value instanceof Boolean bool) {
+            choice(choiceList.get(bool ? 1 : 0));
+        } else if (value instanceof String str) {
+            choice(str);
         } else {
             super.setGenericValue(value);
         }
