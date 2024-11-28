@@ -18,7 +18,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -30,7 +32,7 @@ public class RBlockRegistry {
     private final DeferredRegister<BlockEntityType<?>> TILES;
     private final Consumer<Supplier<ItemStack>> tab;
 
-    private final Map<Class<? extends GenericTileEntity>, AnnotationHolder> holders = new HashMap<>();
+    private final List<AnnotationHolder> holders = new ArrayList<>();
 
     public RBlockRegistry(String modid, Consumer<Supplier<ItemStack>> tab) {
         BLOCKS = DeferredBlocks.create(modid);
@@ -45,7 +47,7 @@ public class RBlockRegistry {
         TILES.register(bus);
     }
 
-    public Map<Class<? extends GenericTileEntity>, AnnotationHolder> getHolders() {
+    public List<AnnotationHolder> getHolders() {
         return holders;
     }
 
@@ -60,7 +62,7 @@ public class RBlockRegistry {
         DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> BlockEntityType.Builder.of(tileSupplier, block.get()).build(null));
         tab.accept(() -> new ItemStack(item.get()));
         AnnotationHolder holder = AnnotationTools.createAnnotationHolder(clazz, block);
-        holders.put(clazz, holder);
+        holders.add(holder);
         return new RBlock<>(block, item, tile);
     }
 

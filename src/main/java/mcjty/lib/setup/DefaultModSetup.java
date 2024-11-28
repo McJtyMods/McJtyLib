@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -83,8 +82,7 @@ public abstract class DefaultModSetup {
 
     public Consumer<RegisterCapabilitiesEvent> getBlockCapabilityRegistrar(RBlockRegistry registry) {
         return event -> {
-            for (Map.Entry<Class<? extends GenericTileEntity>, AnnotationHolder> entry : registry.getHolders().entrySet()) {
-                AnnotationHolder holder = entry.getValue();
+            for (AnnotationHolder holder : registry.getHolders()) {
                 for (int i = 0; i < holder.getCapSize(); i++) {
                     var hd = holder.getCapHolder(i);
                     var bc = hd.capability();
