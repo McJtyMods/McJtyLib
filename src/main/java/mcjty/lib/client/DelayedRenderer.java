@@ -61,7 +61,7 @@ public class DelayedRenderer {
         });
         RENDERS.clear();
 
-        buffer.endBatch();
+        buffer.endLastBatch();
     }
 
     public static void addRender(BlockPos pos, TriConsumer<PoseStack, Vec3, RenderType> renderer, BiFunction<Level, BlockPos, Boolean> validator) {
