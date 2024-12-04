@@ -66,9 +66,30 @@ public class RBlockRegistry {
         return new RBlock<>(block, item, tile);
     }
 
+    // Version of registerBlock for WIP stuff. Doesn't appear in the creative tab or JEI
+    public <B extends BaseBlock, I extends BlockItem, E extends GenericTileEntity> RBlock<B, I, E> registerBlockWIP(
+            String name,
+            Class<E> clazz,
+            Supplier<B> blockSupplier,
+            Function<Supplier<? extends Block>, I> itemSupplier,
+            BlockEntityType.BlockEntitySupplier<E> tileSupplier) {
+        DeferredBlock<B> block = BLOCKS.register(name, blockSupplier);
+        DeferredItem<I> item = ITEMS.register(name, () -> itemSupplier.apply(block));
+        DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> BlockEntityType.Builder.of(tileSupplier, block.get()).build(null));
+        AnnotationHolder holder = AnnotationTools.createAnnotationHolder(clazz, block);
+        holders.add(holder);
+        return new RBlock<>(block, item, tile);
+    }
+
     public <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> itemSupplier) {
         DeferredItem<T> item = ITEMS.register(name, itemSupplier);
         tab.accept(() -> new ItemStack(item.get()));
+        return item;
+    }
+
+    // Version of registerItem for WIP stuff. Doesn't appear in the creative tab or JEI
+    public <T extends Item> DeferredItem<T> registerItemWIP(String name, Supplier<T> itemSupplier) {
+        DeferredItem<T> item = ITEMS.register(name, itemSupplier);
         return item;
     }
 }
