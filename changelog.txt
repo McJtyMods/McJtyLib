@@ -1,3 +1,6 @@
+Upcoming:
+- Small NBT recipe fix
+
 1.21-9.0.5:
 - Various updates
 

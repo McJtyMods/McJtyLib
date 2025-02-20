@@ -83,7 +83,6 @@ public class CopyComponentsRecipeBuilder implements IRecipeBuilder<CopyComponent
 
     @Override
     public void build(RecipeOutput consumerIn, String save) {
-        Advancement.Builder advancementBuilder = this.advancementBuilder;
         builder.save(new RecipeOutput() {
             @Override
             public Advancement.Builder advancement() {
