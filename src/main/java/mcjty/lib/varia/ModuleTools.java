@@ -56,6 +56,14 @@ public class ModuleTools {
         if (module != null) {
             String name = module.name();
             GlobalPos pos = module.pos();
+            return getTargetString(name, pos);
+        } else {
+            return "<unset>";
+        }
+    }
+
+    public static String getTargetString(String name, GlobalPos pos) {
+        if (BlockPosTools.INVALID != pos.pos()) {
             return name + " (at " + pos.pos().getX() + "," + pos.pos().getY() + "," + pos.pos().getZ() + ", " + pos.dimension().location() + ")";
         } else {
             return "<unset>";
