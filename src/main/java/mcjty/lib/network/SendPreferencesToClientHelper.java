@@ -13,6 +13,7 @@ public class SendPreferencesToClientHelper {
         if (properties != null) {
             properties.setBuffXY(prefs.getBuffStyle(), prefs.getBuffX(), prefs.getBuffY());
             properties.setStyle(prefs.getStyle().getStyle());
+            McJtyLib.setPreferencesProperties(player, properties);
         }
     }
 }

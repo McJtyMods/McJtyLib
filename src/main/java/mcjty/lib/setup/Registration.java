@@ -25,7 +25,7 @@ public class Registration {
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, McJtyLib.MODID);
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, McJtyLib.MODID);
-    public static final DeferredRegister.DataComponents REGISTRAR = DeferredRegister.createDataComponents(McJtyLib.MODID);
+    public static final DeferredRegister.DataComponents REGISTRAR = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, McJtyLib.MODID);
 
     public static void init(IEventBus bus) {
         RECIPE_SERIALIZERS.register(bus);
@@ -35,7 +35,9 @@ public class Registration {
 
     public static Supplier<CopyComponentsRecipeSerializer> COPYNBT_SERIALIZER = RECIPE_SERIALIZERS.register("copy_components", CopyComponentsRecipeSerializer::new);
     public static final Supplier<AttachmentType<PreferencesProperties>> PREFERENCES_PROPERTIES = ATTACHMENT_TYPES.register(
-            "preferences_properties", () -> AttachmentType.serializable(PreferencesProperties::new).build());
+            "preferences_properties", () -> AttachmentType.builder(PreferencesProperties::new)
+                    .serialize(PreferencesProperties.CODEC)
+                    .build());
 
     public static final Supplier<AttachmentType<BaseBEData>> BASE_BE_DATA = ATTACHMENT_TYPES.register(
             "base_be_data", () -> AttachmentType.builder(() -> new BaseBEData("", null, -1, RedstoneMode.REDSTONE_IGNORED))

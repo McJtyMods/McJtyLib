@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
@@ -13,6 +14,7 @@ public enum GuiStyle {
 
     private final String style;
 
+    public static final Codec<GuiStyle> CODEC = Codec.STRING.xmap(GuiStyle::getStyle, GuiStyle::name);
     public static final StreamCodec<FriendlyByteBuf, GuiStyle> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(GuiStyle.class);
 
     GuiStyle(String style) {

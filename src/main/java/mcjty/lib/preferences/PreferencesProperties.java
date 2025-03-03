@@ -1,17 +1,16 @@
 package mcjty.lib.preferences;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import mcjty.lib.gui.BuffStyle;
 import mcjty.lib.gui.GuiStyle;
 import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendPreferencesToClient;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 
-public class PreferencesProperties implements INBTSerializable<CompoundTag>  {
+public class PreferencesProperties {
 
     private static final int DEFAULT_BUFFX = -20;
     private static final int DEFAULT_BUFFY = -20;
@@ -22,7 +21,21 @@ public class PreferencesProperties implements INBTSerializable<CompoundTag>  {
     private BuffStyle buffStyle = BuffStyle.BOTRIGHT;
     private GuiStyle style = DEFAULT_STYLE;
 
+    public static final Codec<PreferencesProperties> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            BuffStyle.CODEC.fieldOf("buffStyle").forGetter(PreferencesProperties::getBuffStyle),
+            Codec.INT.fieldOf("buffX").forGetter(PreferencesProperties::getBuffX),
+            Codec.INT.fieldOf("buffY").forGetter(PreferencesProperties::getBuffY),
+            GuiStyle.CODEC.fieldOf("style").forGetter(PreferencesProperties::getStyle)
+    ).apply(instance, PreferencesProperties::new));
+
     private boolean dirty = true;
+
+    public PreferencesProperties(BuffStyle buffStyle, int buffX, int buffY, GuiStyle style) {
+        this.buffStyle = buffStyle;
+        this.buffX = buffX;
+        this.buffY = buffY;
+        this.style = style;
+    }
 
     public PreferencesProperties() {
     }
@@ -33,46 +46,9 @@ public class PreferencesProperties implements INBTSerializable<CompoundTag>  {
         }
     }
 
-    @Override
-    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        CompoundTag tag = new CompoundTag();
-        saveNBTData(tag);
-        return tag;
-    }
-
-    @Override
-    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag compoundTag) {
-        loadNBTData(compoundTag);
-    }
-
     private void syncToClient(ServerPlayer player) {
         Networking.sendToPlayer(PacketSendPreferencesToClient.create(buffStyle, buffX, buffY, style), player);
         dirty = false;
-    }
-
-    public void saveNBTData(CompoundTag compound) {
-        compound.putString("buffStyle", buffStyle.getName());
-        compound.putInt("buffX", buffX);
-        compound.putInt("buffY", buffY);
-        compound.putString("style", style.getStyle());
-    }
-
-    public void loadNBTData(CompoundTag compound) {
-        buffStyle = BuffStyle.getStyle(compound.getString("buffStyle"));
-        if (buffStyle == null) {
-            buffStyle = BuffStyle.BOTRIGHT;
-            buffX = DEFAULT_BUFFX;
-            buffY = DEFAULT_BUFFY;
-        } else {
-            buffX = compound.getInt("buffX");
-            buffY = compound.getInt("buffY");
-        }
-        String s = compound.getString("style");
-        style = GuiStyle.getStyle(s);
-        if (style == null) {
-            style = DEFAULT_STYLE;
-        }
-        dirty = true;
     }
 
     public void reset() {

@@ -99,4 +99,8 @@ public class McJtyLib {
     public static PreferencesProperties getPreferencesProperties(Player player) {
         return player.getData(Registration.PREFERENCES_PROPERTIES);
     }
+
+    public static void setPreferencesProperties(Player player, PreferencesProperties properties) {
+        player.setData(Registration.PREFERENCES_PROPERTIES, properties);
+    }
 }

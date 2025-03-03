@@ -1,5 +1,6 @@
 Upcoming:
 - Small NBT recipe fix
+- Various module API changes
 
 1.21-9.0.5:
 - Various updates

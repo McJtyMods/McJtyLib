@@ -40,6 +40,7 @@ public record PacketSetGuiStyle(String style) implements CustomPacketPayload {
         PreferencesProperties v = McJtyLib.getPreferencesProperties(player);
         if (v != null) {
             v.setStyle(message.style);
+            McJtyLib.setPreferencesProperties(player, v);
         }
     }
 }
