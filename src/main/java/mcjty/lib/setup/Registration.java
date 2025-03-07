@@ -2,6 +2,7 @@ package mcjty.lib.setup;
 
 import mcjty.lib.McJtyLib;
 import mcjty.lib.api.container.ItemInventory;
+import mcjty.lib.api.fluids.ItemFluids;
 import mcjty.lib.api.infusable.ItemInfusable;
 import mcjty.lib.api.modules.ItemModule;
 import mcjty.lib.api.power.ItemEnergy;
@@ -67,6 +68,12 @@ public class Registration {
             builder -> builder
                     .persistent(ItemInventory.ITEM_INVENTORY_CODEC)
                     .networkSynchronized(ItemInventory.ITEM_INVENTORY_STREAM_CODEC)
+    );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemFluids>> ITEM_FLUIDS = REGISTRAR.registerComponentType(
+            "item_fluids",
+            builder -> builder
+                    .persistent(ItemFluids.ITEM_FLUIDS_CODEC)
+                    .networkSynchronized(ItemFluids.ITEM_FLUIDS_STREAM_CODEC)
     );
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemSecurity>> ITEM_SECURITY = REGISTRAR.registerComponentType(
             "item_security",

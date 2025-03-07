@@ -1,6 +1,10 @@
 package mcjty.lib.varia;
 
+import mcjty.lib.api.container.ItemInventory;
+import mcjty.lib.api.fluids.ItemFluids;
+import mcjty.lib.setup.Registration;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
@@ -9,6 +13,9 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import javax.annotation.Nonnull;
 
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomTank implements IFluidHandler, IFluidTank {
 
@@ -46,16 +53,32 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         return fluid.getAmount();
     }
 
-    public CustomTank readFromNBT(HolderLookup.Provider provider, CompoundTag nbt) {
-        FluidStack fluid = FluidStack.parse(provider, nbt).orElse(FluidStack.EMPTY);
-        setFluid(fluid);
-        return this;
+    public void load(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
+        if (tag.contains(tagName)) {
+            CompoundTag nbt = tag.getCompound(tagName);
+            FluidStack fluid = FluidStack.parse(provider, nbt).orElse(FluidStack.EMPTY);
+            setFluid(fluid);
+        }
     }
 
-    public CompoundTag writeToNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+    public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
+        CompoundTag nbt = new CompoundTag();
         fluid.save(provider, nbt);
-        return nbt;
+        tag.put(tagName, nbt);
     }
+
+    public void applyImplicitComponents(ItemFluids itemFluids) {
+        if (itemFluids != null && !itemFluids.fluids().isEmpty()) {
+            fluid = itemFluids.fluids().get(0);
+        }
+    }
+
+    public void collectImplicitComponents(DataComponentMap.Builder builder) {
+        List<FluidStack> fluidStacks = new ArrayList<>();
+        fluidStacks.add(fluid);
+        builder.set(Registration.ITEM_FLUIDS, new ItemFluids(fluidStacks));
+    }
+
 
     @Override
     public int getTanks() {
