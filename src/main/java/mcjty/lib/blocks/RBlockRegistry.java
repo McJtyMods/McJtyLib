@@ -10,7 +10,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -18,10 +17,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -55,12 +53,17 @@ public class RBlockRegistry {
             String name,
             Class<E> clazz,
             Supplier<B> blockSupplier,
-            Function<Supplier<? extends Block>, I> itemSupplier,
+            @Nullable Function<Supplier<? extends Block>, I> itemSupplier,
             BlockEntityType.BlockEntitySupplier<E> tileSupplier) {
         DeferredBlock<B> block = BLOCKS.register(name, blockSupplier);
-        DeferredItem<I> item = ITEMS.register(name, () -> itemSupplier.apply(block));
+        DeferredItem<I> item;
+        if (itemSupplier != null) {
+            item = ITEMS.register(name, () -> itemSupplier.apply(block));
+            tab.accept(() -> new ItemStack(item.get()));
+        } else {
+            item = null;
+        }
         DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> BlockEntityType.Builder.of(tileSupplier, block.get()).build(null));
-        tab.accept(() -> new ItemStack(item.get()));
         AnnotationHolder holder = AnnotationTools.createAnnotationHolder(clazz, block);
         holders.add(holder);
         return new RBlock<>(block, item, tile);
