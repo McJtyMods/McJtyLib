@@ -485,7 +485,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             dataListeners.forEach(pair -> {
                 ByteBuf newbuf = Unpooled.buffer();
                 RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
-                ((StreamCodec) pair.streamCodec()).encode(buffer, be.getData((AttachmentType) pair.type()));
+                Object data = be.getData((AttachmentType) pair.type());
+                ((StreamCodec) pair.streamCodec()).encode(buffer, data);
                 PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.type()), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
             });
