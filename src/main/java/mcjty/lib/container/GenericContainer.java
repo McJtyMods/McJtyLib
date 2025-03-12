@@ -52,6 +52,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     protected final Map<String,IItemHandler> inventories = new HashMap<>();
     private final Map<ResourceLocation, IContainerDataListener> containerData = new HashMap<>();
     private final List<DataListener<?, ?>> dataListeners = new ArrayList<>();
+    private final Map<AttachmentType<?>, Object> previousData = new HashMap<>();
     private final ContainerFactory factory;
     protected final BlockPos pos;
     protected final GenericTileEntity be;
@@ -486,6 +487,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 ByteBuf newbuf = Unpooled.buffer();
                 RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
                 Object data = be.getData((AttachmentType) pair.type());
+                previousData.put(pair.type(), data);
                 ((StreamCodec) pair.streamCodec()).encode(buffer, data);
                 PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.type()), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
@@ -554,6 +556,18 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                     Networking.sendToPlayer(packet, serverPlayer);
                 }
             }
+            dataListeners.forEach(pair -> {
+                Object data = be.getData((AttachmentType) pair.type());
+                Object oldData = previousData.get(pair.type());
+                if (!Objects.equals(data, oldData)) {
+                    previousData.put(pair.type(), data);
+                    ByteBuf newbuf = Unpooled.buffer();
+                    RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
+                    ((StreamCodec) pair.streamCodec()).encode(buffer, data);
+                    PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.type()), buffer);
+                    Networking.sendToPlayer(packet, serverPlayer);
+                }
+            });
         }
     }
 
