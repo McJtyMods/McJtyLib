@@ -8,6 +8,10 @@ public class BlockPosTools {
 
     public static final BlockPos INVALID = new BlockPos(-1, -1000, -1);
 
+    public static boolean isValid(BlockPos pos) {
+        return pos != null && pos.getY() != -1000;
+    }
+
     public static BlockPos read(CompoundTag tagCompound, String tagName) {
         int[] array = tagCompound.getIntArray(tagName);
         if (array.length == 0) {
