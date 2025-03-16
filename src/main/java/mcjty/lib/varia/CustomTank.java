@@ -1,6 +1,5 @@
 package mcjty.lib.varia;
 
-import mcjty.lib.api.container.ItemInventory;
 import mcjty.lib.api.fluids.ItemFluids;
 import mcjty.lib.setup.Registration;
 import net.minecraft.core.HolderLookup;
@@ -11,9 +10,6 @@ import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
-
-import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,9 +58,11 @@ public class CustomTank implements IFluidHandler, IFluidTank {
     }
 
     public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
-        CompoundTag nbt = new CompoundTag();
-        fluid.save(provider, nbt);
-        tag.put(tagName, nbt);
+        if (!fluid.isEmpty()) {
+            CompoundTag nbt = new CompoundTag();
+            fluid.save(provider, nbt);
+            tag.put(tagName, nbt);
+        }
     }
 
     public void applyImplicitComponents(ItemFluids itemFluids) {
