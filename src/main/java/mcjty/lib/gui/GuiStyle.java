@@ -14,7 +14,7 @@ public enum GuiStyle {
 
     private final String style;
 
-    public static final Codec<GuiStyle> CODEC = Codec.STRING.xmap(GuiStyle::getStyle, GuiStyle::name);
+    public static final Codec<GuiStyle> CODEC = Codec.STRING.xmap(GuiStyle::getStyleByName, GuiStyle::name);
     public static final StreamCodec<FriendlyByteBuf, GuiStyle> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(GuiStyle.class);
 
     GuiStyle(String style) {
@@ -23,6 +23,15 @@ public enum GuiStyle {
 
     public String getStyle() {
         return style;
+    }
+
+    public static GuiStyle getStyleByName(String name) {
+        for (GuiStyle style : values()) {
+            if (style.name().equals(name)) {
+                return style;
+            }
+        }
+        return null;
     }
 
     public static GuiStyle getStyle(String name) {

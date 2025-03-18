@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a bug serializing player preferences
+
 1.21-9.0.6:
 - Small NBT recipe fix
 - Various module API changes
