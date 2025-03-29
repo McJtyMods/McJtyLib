@@ -121,7 +121,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void renderLabels(@Nonnull GuiGraphics graphics, int p_230451_2_, int p_230451_3_) {
+    protected void renderLabels(@Nonnull GuiGraphics graphics, int mouseX, int mouseY) {
         getWindowManager().drawTooltips(graphics);
     }
 
