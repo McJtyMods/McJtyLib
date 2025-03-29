@@ -185,6 +185,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 yy = 4 - topPos;
             }
 
+            matrixStack.translate(0.0D, 0.0D, 600.0f);
             // @todo 1.19.4
 //            setBlitOffset(300);
 //            this.itemRenderer.blitOffset = 300.0F;
@@ -202,7 +203,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             graphics.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
 //            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
-            matrixStack.translate(0.0D, 0.0D, 300.0f);
 
             renderTextLines(graphics, textLines, items, font, xx, yy);
 

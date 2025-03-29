@@ -1,3 +1,6 @@
+Upcoming:
+- Tooltips now appear in front of stuff
+
 1.21-9.0.7:
 - Fixed a bug serializing player preferences
 
