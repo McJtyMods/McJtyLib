@@ -104,6 +104,27 @@ public interface StandardCodecs {
         }
     };
 
+    StreamCodec<FriendlyByteBuf, int[]> INT_ARRAY = new StreamCodec<>() {
+        public int[] decode(FriendlyByteBuf buffer) {
+            int cnt = buffer.readVarInt();
+            if (cnt <= 0) {
+                return new int[0];
+            } else {
+                int[] value = new int[cnt];
+                for (int i = 0; i < cnt; i++) {
+                    value[i] = buffer.readInt();
+                }
+                return value;
+            }
+        }
+        public void encode(FriendlyByteBuf buffer, int[] value) {
+            buffer.writeVarInt(value.length);
+            for (int v : value) {
+                buffer.writeInt(v);
+            }
+        }
+    };
+
     StreamCodec<FriendlyByteBuf, Vector3f> VECTOR3F = new StreamCodec<>() {
         public Vector3f decode(FriendlyByteBuf buf) {
             return buf.readVector3f();
