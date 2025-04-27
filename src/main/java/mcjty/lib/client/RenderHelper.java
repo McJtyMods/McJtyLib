@@ -686,6 +686,20 @@ public class RenderHelper {
     }
 
     /**
+     * Draw a rotated box
+     */
+    public static void drawRotatedIcon(GuiGraphics graphics, int centerX, int centerY, int size, double angle, ResourceLocation texture, int u, int v, int w, int h) {
+        PoseStack poseStack = graphics.pose();
+        poseStack.pushPose();
+        poseStack.translate(centerX, centerY, 0);
+        poseStack.mulPose(Axis.ZP.rotationDegrees((float) angle));
+        poseStack.translate(-centerX, -centerY, 0);
+        RenderSystem.setShaderTexture(0, texture);
+        drawTexturedModalRect(poseStack, centerX - size / 2, centerY - size / 2, u, v, w, h);
+        poseStack.popPose();
+    }
+
+    /**
      * Draw a beveled box. x2 and y2 are not included. Use this version for GUI's
      */
     public static void drawBeveledBox(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor, int lightmap) {
