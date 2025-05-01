@@ -549,8 +549,16 @@ public class RenderHelper {
         graphics.fill(x1, y1, x2, y1 + 1, color);
     }
 
+    public static void drawHorizontalLine(BatchQuadGuiRenderer batch, int x1, int y1, int x2, int color) {
+        batch.quad(color, x1, y1, x2, y1 + 1);
+    }
+
     public static void drawVerticalLine(GuiGraphics graphics, int x1, int y1, int y2, int color) {
         graphics.fill(x1, y1, x1 + 1, y2, color);
+    }
+
+    public static void drawVerticalLine(BatchQuadGuiRenderer batch, int x1, int y1, int y2, int color) {
+        batch.quad(color, x1, y1, x1 + 1, y2);
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
@@ -683,6 +691,19 @@ public class RenderHelper {
         drawVerticalLine(graphics, x1, y1, y2 - 1, topleftcolor);
         drawVerticalLine(graphics, x2 - 1, y1, y2 - 1, botrightcolor);
         drawHorizontalLine(graphics, x1, y2 - 1, x2, botrightcolor);
+    }
+
+    /**
+     * Draw a beveled box. x2 and y2 are not included.
+     */
+    public static void drawBeveledBox(BatchQuadGuiRenderer batch, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
+        if (fillcolor != -1) {
+            batch.quad(fillcolor, x1 + 1, y1 + 1, x2 - 1, y2 - 1);
+        }
+        drawHorizontalLine(batch, x1, y1, x2 - 1, topleftcolor);
+        drawVerticalLine(batch, x1, y1, y2 - 1, topleftcolor);
+        drawVerticalLine(batch, x2 - 1, y1, y2 - 1, botrightcolor);
+        drawHorizontalLine(batch, x1, y2 - 1, x2, botrightcolor);
     }
 
     /**
