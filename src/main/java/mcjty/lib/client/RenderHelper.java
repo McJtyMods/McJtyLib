@@ -521,7 +521,7 @@ public class RenderHelper {
      */
     public static void drawHorizontalGradientRect(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color1, int color2, int lightmap) {
 //        this.zLevel = 300.0F;
-        float zLevel = 0.0f;
+        float zLevel = -0.5f;
 
         float f = (color1 >> 24 & 255) / 255.0F;
         float f1 = (color1 >> 16 & 255) / 255.0F;

@@ -80,7 +80,7 @@ public class CustomRenderTypes extends RenderType {
                     .createCompositeState(false));
 
     public static final RenderType QUADS_NOTEXTURE = create("quads_notexture",
-            DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, VertexFormat.Mode.QUADS, 2097152, true, false,
+            DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, VertexFormat.Mode.QUADS, 2097152, false, false,
             CompositeState.builder()
                     .setTextureState(NO_TEXTURE)
                     .setShaderState(POSITION_COLOR_LIGHTMAP_SHADER)

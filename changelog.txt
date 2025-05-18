@@ -1,3 +1,6 @@
+Upcoming:
+- Fix in the no texture custom render type
+
 1.21-9.0.8:
 - Tooltips now appear in front of stuff
 
