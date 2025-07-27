@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed rendering for the endergenic HUD and the Not Enough Wands light
+
 1.21-9.0.10:
 - Changes for the upcoming RFTools Storage release
 

@@ -814,8 +814,9 @@ public class RenderHelper {
     }
 
     public static void rotateToPlayer(PoseStack poseStack) {
-        Quaternionf rotation = Minecraft.getInstance().gameRenderer.getMainCamera().rotation();
-        poseStack.mulPose(rotation);
+        Quaternionf cameraRotation = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        poseStack.mulPose(cameraRotation);
+        poseStack.mulPose(new Quaternionf().rotateY((float) Math.PI));  // Flip to face the camera
     }
 
     public static int renderText(GuiGraphics graphics, int x, int y, String txt) {
