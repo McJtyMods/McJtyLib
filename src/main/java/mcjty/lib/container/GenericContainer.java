@@ -618,7 +618,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
             E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()), pos);
             CompoundTag compound = data.readNbt();
-            te.loadCustomOnly(compound, null);  // @todo 1.21 THIS IS NOT CORRECT! NEED A RegistryHolder.Provider
+            te.loadCustomOnly(compound, LevelTools.getOverworld().registryAccess());
 
             T container = containerFactory.create(windowId, pos, te, inv.player);
             container.setupInventories(new ItemStackHandler(slots), inv);
