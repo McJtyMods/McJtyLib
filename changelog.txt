@@ -1,4 +1,4 @@
-Upcoming:
+1.21-9.0.11:
 - Fixed rendering for the endergenic HUD and the Not Enough Wands light
 
 1.21-9.0.10:
