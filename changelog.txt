@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a server side crash when opening the storage scanner through the tablet
+
 1.21-9.0.11:
 - Fixed rendering for the endergenic HUD and the Not Enough Wands light
 

@@ -14,6 +14,7 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.LevelTools;
 import mcjty.lib.varia.Logging;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -618,7 +619,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
             E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()), pos);
             CompoundTag compound = data.readNbt();
-            te.loadCustomOnly(compound, LevelTools.getOverworld().registryAccess());
+            RegistryAccess access = inv.player.level().registryAccess();
+            te.loadCustomOnly(compound, access);
 
             T container = containerFactory.create(windowId, pos, te, inv.player);
             container.setupInventories(new ItemStackHandler(slots), inv);
