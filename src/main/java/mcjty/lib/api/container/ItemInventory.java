@@ -17,4 +17,15 @@ public record ItemInventory(List<ItemStack> items) {
     public static final StreamCodec<RegistryFriendlyByteBuf, ItemInventory> ITEM_INVENTORY_STREAM_CODEC = StreamCodec.composite(
             ItemStack.OPTIONAL_LIST_STREAM_CODEC, ItemInventory::items,
             ItemInventory::new);
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ItemInventory that)) return false;
+        return ItemStack.listMatches(items, that.items);
+    }
+
+    @Override
+    public int hashCode() {
+        return ItemStack.hashStackList(items);
+    }
 }

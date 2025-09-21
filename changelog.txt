@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed a bug with blocks storing items potentially not saving their contents properly. Thanks to Penma and Raoul
+
 1.21-9.0.12:
 - Fixed a server side crash when opening the storage scanner through the tablet
 
