@@ -5,6 +5,7 @@ import mcjty.lib.setup.Registration;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -60,8 +61,8 @@ public class CustomTank implements IFluidHandler, IFluidTank {
     public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
         if (!fluid.isEmpty()) {
             CompoundTag nbt = new CompoundTag();
-            fluid.save(provider, nbt);
-            tag.put(tagName, nbt);
+            Tag saved = fluid.save(provider, nbt);
+            tag.put(tagName, saved);
         }
     }
 
