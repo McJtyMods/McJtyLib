@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import mcjty.lib.crafting.CopyComponentsRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.Util;
+import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
@@ -281,8 +282,8 @@ public class DataGen {
         return InventoryChangeTrigger.TriggerInstance.hasItems(item);
     }
 
-    public static InventoryChangeTrigger.TriggerInstance has(TagKey<Item> tag) {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(tag).build());
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(TagKey<Item> tag) {
+        return CriteriaTriggers.INVENTORY_CHANGED.createCriterion(inventoryTrigger(ItemPredicate.Builder.item().of(tag).build()));
     }
 
     public static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... itemPredicate) {
