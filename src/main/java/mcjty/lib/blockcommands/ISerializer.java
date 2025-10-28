@@ -19,7 +19,7 @@ public interface ISerializer<T> {
 
     BiConsumer<RegistryFriendlyByteBuf, T> getSerializer();
 
-    public static class IntegerSerializer implements ISerializer<Integer> {
+    class IntegerSerializer implements ISerializer<Integer> {
         @Override
         public Function<RegistryFriendlyByteBuf, Integer> getDeserializer() {
             return FriendlyByteBuf::readInt;
@@ -31,7 +31,7 @@ public interface ISerializer<T> {
         }
     }
 
-    public static class StringSerializer implements ISerializer<String> {
+    class StringSerializer implements ISerializer<String> {
         @Override
         public Function<RegistryFriendlyByteBuf, String> getDeserializer() {
             return buf -> buf.readUtf(32767);
@@ -43,7 +43,7 @@ public interface ISerializer<T> {
         }
     }
 
-    public static class BlockPosSerializer implements ISerializer<BlockPos> {
+    class BlockPosSerializer implements ISerializer<BlockPos> {
         @Override
         public Function<RegistryFriendlyByteBuf, BlockPos> getDeserializer() {
             return buf -> buf.readBlockPos();
@@ -55,7 +55,7 @@ public interface ISerializer<T> {
         }
     }
 
-    public static class ItemStackSerializer implements ISerializer<ItemStack> {
+    class ItemStackSerializer implements ISerializer<ItemStack> {
         @Override
         public Function<RegistryFriendlyByteBuf, ItemStack> getDeserializer() {
             return NetworkTools::readItemStack;
@@ -67,7 +67,7 @@ public interface ISerializer<T> {
         }
     }
 
-    public static class FluidStackSerializer implements ISerializer<FluidStack> {
+    class FluidStackSerializer implements ISerializer<FluidStack> {
         @Override
         public Function<RegistryFriendlyByteBuf, FluidStack> getDeserializer() {
             return buf -> NetworkTools.readFluidStack(buf);
