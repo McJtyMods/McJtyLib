@@ -206,9 +206,9 @@ public class Slider extends AbstractWidget<Slider> {
         if (divider <= 0) {
             first = 0;
         } else {
-            if (dx > 0) {
+            if (dy > 0) {
                 first -= 3;
-            } else if (dx < 0) {
+            } else if (dy < 0) {
                 first += 3;
             }
         }
