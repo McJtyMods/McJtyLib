@@ -109,7 +109,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
             if (fluid.isEmpty()) {
                 return Math.min(capacity, resource.getAmount());
             }
-            if (!fluid.isFluidEqual(resource)) {
+            if (!FluidStack.isSameFluidSameComponents(fluid, resource)) {
                 return 0;
             }
             return Math.min(capacity - fluid.getAmount(), resource.getAmount());
@@ -119,7 +119,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
             fluid = new FluidStack(resource.getFluidHolder(), Math.min(capacity, resource.getAmount()), resource.getComponentsPatch());
             return fluid.getAmount();
         }
-        if (!fluid.isFluidEqual(resource)) {
+        if (!FluidStack.isSameFluidSameComponents(fluid, resource)) {
             return 0;
         }
         int filled = capacity - fluid.getAmount();
@@ -138,7 +138,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
     @Nonnull
     @Override
     public FluidStack drain(FluidStack resource, FluidAction action) {
-        if (resource.isEmpty() || !resource.isFluidEqual(fluid)) {
+        if (resource.isEmpty() || !FluidStack.isSameFluidSameComponents(resource, fluid)) {
             return FluidStack.EMPTY;
         }
         return drain(resource.getAmount(), action);
