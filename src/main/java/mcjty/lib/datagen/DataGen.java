@@ -74,18 +74,19 @@ public class DataGen {
 
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
             for (Dob dob : dobs) {
-                // @todo 1.21
-//                Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
                 HolderLookup.Provider provider = dob.holderLookupSupplier().get(entry.getKey());
-//                if (!entries.isEmpty()) {
-                    generator.addProvider(event.includeServer(), new JsonCodecProvider<>(generator.getPackOutput(), PackOutput.Target.DATA_PACK, entry.getValue().directory(),
+                Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
+                if (!entries.isEmpty()) {
+                    JsonCodecProvider codecProvider = new JsonCodecProvider<>(generator.getPackOutput(), PackOutput.Target.DATA_PACK, entry.getValue().directory(),
                             PackType.SERVER_DATA, entry.getValue().codec(), CompletableFuture.completedFuture(provider), modid, event.getExistingFileHelper()) {
                         @Override
                         protected void gather() {
 
                         }
-                    });
-//                }
+                    };
+                    entries.forEach(codecProvider::unconditional);
+                    generator.addProvider(event.includeServer(), codecProvider);
+                }
             }
         }
 

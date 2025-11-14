@@ -29,7 +29,7 @@ public record Dob(
         Supplier<? extends Block> blockSupplier,
         Supplier<? extends Item> itemSupplier,
         Supplier<? extends EntityType> entitySupplier,
-//        Map<String, Supplier<Map<ResourceLocation, Object>>> codecObjectSupplier,
+        Map<String, Supplier<Map<ResourceLocation, Object>>> codecObjectSupplier,
         Map<String, HolderLookup.Provider> holderLookupSupplier,
         Map<String, Supplier<IGlobalLootModifier>> glmSupplier,
         String translatedName,
@@ -82,7 +82,7 @@ public record Dob(
         private final Supplier<? extends Block> blockSupplier;
         private final Supplier<? extends Item> itemSupplier;
         private final Supplier<? extends EntityType> entitySupplier;
-//        private final Map<String, Supplier<Map<ResourceLocation, Object>>> codecObjectSupplier = new HashMap<>();
+        private final Map<String, Supplier<Map<ResourceLocation, Object>>> codecObjectSupplier = new HashMap<>();
         private final Map<String, HolderLookup.Provider> holderLookupSupplier = new HashMap<>();
         private final Map<String, Supplier<IGlobalLootModifier>> glmSupplier = new HashMap<>();
         private String translatedName = null;
@@ -106,20 +106,19 @@ public record Dob(
             return this;
         }
 
-        // @todo 1.21?
-//        public Builder codecObjectSupplier(String name, Supplier<Map<ResourceLocation, Object>> supplier) {
-//            Supplier<Map<ResourceLocation, Object>> oldSupplier = codecObjectSupplier.get(name);
-//            if (oldSupplier == null) {
-//                codecObjectSupplier.put(name, supplier);
-//            } else {
-//                codecObjectSupplier.put(name, () -> {
-//                    Map<ResourceLocation, Object> old = new HashMap<>(oldSupplier.get());
-//                    old.putAll(supplier.get());
-//                    return old;
-//                });
-//            }
-//            return this;
-//        }
+        public Builder codecObjectSupplier(String name, Supplier<Map<ResourceLocation, Object>> supplier) {
+            Supplier<Map<ResourceLocation, Object>> oldSupplier = codecObjectSupplier.get(name);
+            if (oldSupplier == null) {
+                codecObjectSupplier.put(name, supplier);
+            } else {
+                codecObjectSupplier.put(name, () -> {
+                    Map<ResourceLocation, Object> old = new HashMap<>(oldSupplier.get());
+                    old.putAll(supplier.get());
+                    return old;
+                });
+            }
+            return this;
+        }
 
         public Builder glm(String lootName, Supplier<IGlobalLootModifier> modifier) {
             glmSupplier.put(lootName, modifier);
@@ -360,8 +359,8 @@ public record Dob(
 
         public Dob build() {
             return new Dob(blockSupplier, itemSupplier, entitySupplier,
+                    new HashMap<>(codecObjectSupplier),
                     new HashMap<>(holderLookupSupplier),
-//                    new HashMap<>(codecObjectSupplier),
                     new HashMap<>(glmSupplier),
                     translatedName, new HashMap<>(keyedMessages), new HashMap<>(messages),
                     loot, blockstate, item, blockTags, itemTags, recipe);
