@@ -1,4 +1,4 @@
-Upcoming:
+1.21-9.0.17:
 - Fixes for FancyTrinkets
 
 1.21-9.0.16:
