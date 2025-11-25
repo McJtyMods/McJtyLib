@@ -258,7 +258,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         if (window == null) {
             return;
         }
-//        renderBackground(graphics, x, y, partialTicks); // @todo 1.21 is this correct?
         GenericTileEntity te = getBE();
         if (te != null) {
             getWindowManager().syncBindings(te);

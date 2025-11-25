@@ -397,14 +397,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         };
     }
 
-    protected Direction getOrientation(BlockPos pos, LivingEntity entity) {
-        return switch (getRotationType()) {
-            case HORIZROTATION -> OrientationTools.determineOrientationHoriz(entity);
-            case ROTATION -> OrientationTools.determineOrientation(pos, entity);
-            case NONE -> null;
-        };
-    }
-
     public Direction getFrontDirection(BlockState state) {
         return switch (getRotationType()) {
             case HORIZROTATION -> state.getValue(BlockStateProperties.HORIZONTAL_FACING);

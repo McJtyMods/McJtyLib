@@ -497,7 +497,6 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     public <O> StreamCodec<RegistryFriendlyByteBuf, O> getStreamCodecForType(AttachmentType<O> type) {
-        // @todo 1.21 BAD PERFORMANCE
         for (DataListener<?, ?> dataListener : dataListeners) {
             if (dataListener.type() == type) {
                 return (StreamCodec<RegistryFriendlyByteBuf, O>) dataListener.streamCodec();
@@ -507,7 +506,6 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     public <O> Codec<O> getCodecForType(AttachmentType<O> type) {
-        // @todo 1.21 BAD PERFORMANCE
         for (DataListener<?, ?> dataListener : dataListeners) {
             if (dataListener.type() == type) {
                 return (Codec<O>) dataListener.codec();

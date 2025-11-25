@@ -18,16 +18,6 @@ public class ModSetup extends DefaultModSetup {
 
     public static boolean patchouli = false;
 
-    // @todo 1.21
-//    @SubscribeEvent
-//    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
-//        CapabilityContainerProvider.register(event);
-//        CapabilityInfusable.register(event);
-//        CapabilityPowerInformation.register(event);
-//        CapabilityModuleSupport.register(event);
-//        PreferencesProperties.register(event);
-//    }
-
     @Override
     public void init(FMLCommonSetupEvent e) {
         super.init(e);
@@ -50,18 +40,6 @@ public class ModSetup extends DefaultModSetup {
                 }
             }
         }
-
-        // @todo 1.21
-//        @SubscribeEvent
-//        public void onEntityConstructing(AttachCapabilitiesEvent<Entity> event){
-//            if (event.getObject() instanceof Player) {
-//                if (!event.getCapabilities().containsKey(PREFERENCES_CAPABILITY_KEY) && !event.getObject().getCapability(PREFERENCES_CAPABILITY).isPresent()) {
-//                    event.addCapability(PREFERENCES_CAPABILITY_KEY, new PreferencesDispatcher());
-//                } else {
-//                    throw new IllegalStateException(event.getObject().toString());
-//                }
-//            }
-//        }
 
         // @todo multipart
 //        @SubscribeEvent

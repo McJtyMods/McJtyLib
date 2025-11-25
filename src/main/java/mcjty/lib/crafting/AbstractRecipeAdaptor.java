@@ -60,24 +60,6 @@ public abstract class AbstractRecipeAdaptor implements CraftingRecipe /*, Recipe
         return recipe.matches(inv, worldIn);
     }
 
-
-//    @Override
-//    public int getWidth() {
-//        return recipe.getWidth();
-//    }
-//
-//    @Override
-//    public int getHeight() {
-//        return recipe.getHeight();
-//    }
-
-    // @todo 1.21
-//    @Override
-//    @Nonnull
-//    public ResourceLocation getId() {
-//        return recipe.getId();
-//    }
-
     @Override
     @Nonnull
     public RecipeType<?> getType() {

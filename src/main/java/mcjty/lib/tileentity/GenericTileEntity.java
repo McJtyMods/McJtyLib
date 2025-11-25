@@ -30,14 +30,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.common.util.Lazy;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 public class GenericTileEntity extends BlockEntity {
 
@@ -50,9 +50,6 @@ public class GenericTileEntity extends BlockEntity {
     // This is a generated function (from the annotated capabilities) that is initially (by the TE
     // constructor) set to be a function that looks for the annotations and replaces itself with
     // a function that does the actual testing
-    // @todo 1.21
-    private BiFunction<BlockCapability, Direction, Object> capSetup;
-    private final List<Lazy<?>> lazyOptsToClean = new ArrayList<>();
 
     public GenericTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);

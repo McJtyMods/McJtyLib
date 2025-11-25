@@ -1,13 +1,12 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.blocks.BaseBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 import javax.annotation.Nullable;
 
@@ -72,62 +71,6 @@ public class OrientationTools {
 
     public static Direction getOrientation(BlockState state) {
         return ((BaseBlock) state.getBlock()).getFrontDirection(state);
-    }
-
-    public static Direction determineOrientation(BlockPos pos, LivingEntity entity) {
-        return determineOrientation(pos.getX(), pos.getY(), pos.getZ(), entity);
-    }
-
-    public static Direction determineOrientation(int x, int y, int z, LivingEntity entity) {
-        if (Mth.abs((float) entity.getX() - x) < 2.0F && Mth.abs((float) entity.getZ() - z) < 2.0F) {
-            double d0 = entity.getY() + 1.82D - entity.getPassengerRidingPosition(entity).y;    // @todo 1.21 check
-
-            if (d0 - y > 2.0D) {
-                return Direction.UP;
-            }
-
-            if (y - d0 > 0.0D) {
-                return DOWN;
-            }
-        }
-        int i = (int) ((entity.getYRot() * 4.0F / 360.0F) + 0.5D);
-        int l = ((entity.getYRot()  * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
-        if (l == 0) {
-            return Direction.NORTH;
-        } else if (l == 1) {
-            return Direction.EAST;
-        } else if (l == 2) {
-            return SOUTH;
-        } else {
-            return Direction.WEST;
-        }
-    }
-
-    public static Direction determineOrientationHoriz(LivingEntity MobEntity) {
-        int i = (int) ((MobEntity.getYRot() * 4.0F / 360.0F) + 0.5D);
-        int l = ((MobEntity.getYRot()  * 4.0F / 360.0F) + 0.5D < i ? i - 1 : i) & 3;
-        return switch (l) {
-            case 0 -> Direction.NORTH;
-            case 1 -> Direction.EAST;
-            case 2 -> SOUTH;
-            default -> Direction.WEST;
-        };
-    }
-
-    public static Direction getTopDirection(Direction rotation) {
-        return switch (rotation) {
-            case DOWN -> SOUTH;
-            case UP -> Direction.NORTH;
-            default -> Direction.UP;
-        };
-    }
-
-    public static Direction getBottomDirection(Direction rotation) {
-        return switch (rotation) {
-            case DOWN -> Direction.NORTH;
-            case UP -> SOUTH;
-            default -> DOWN;
-        };
     }
 
     public static Direction getFacingFromEntity(BlockPos clickedBlock, @Nullable Entity entityIn) {

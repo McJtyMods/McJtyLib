@@ -61,11 +61,6 @@ public class ItemStackTools {
         GuiParser.GuiCommand object = new GuiParser.GuiCommand(name);
         object.parameter(Tools.getId(item).toString());
         object.parameter(item.getCount());
-        // @todo 1.21 FIX ME
-//        if (item.hasTag()) {
-//            String string = item.getTag().toString();
-//            object.command(new GuiParser.GuiCommand("tag").parameter(string));
-//        }
         return object;
     }
 
@@ -73,17 +68,7 @@ public class ItemStackTools {
         String itemName = obj.getOptionalPar(0, "minecraft:stick");
         Item item = Tools.getItem(ResourceLocation.parse(itemName));
         int amount = obj.getOptionalPar(1, 1);
-        ItemStack stack = new ItemStack(item, amount);
-        // @todo 1.21 FIX ME
-//        obj.findCommand("tag").ifPresent(cmd -> {
-//            try {
-//                CompoundTag nbt = TagParser.parseTag(cmd.getOptionalPar(0, ""));
-//                stack.setTag(nbt);
-//            } catch (CommandSyntaxException e) {
-//                Logging.logError("Error", e);
-//            }
-//        });
-        return stack;
+        return new ItemStack(item, amount);
     }
 
     public static void addCommonTags(Collection<TagKey<Item>> fromItem, Set<TagKey<Item>> tags) {
