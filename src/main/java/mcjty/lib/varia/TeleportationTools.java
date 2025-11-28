@@ -83,7 +83,7 @@ public class TeleportationTools {
         } else {
             var rot = fixOrientation(entity, newX, newY, newZ, facing);
             DimensionTransition transition = new DimensionTransition((ServerLevel) destWorld, new Vec3(newX, newY, newZ), Vec3.ZERO,
-                    rot.yaw(), rot.pitch(), DimensionTransition.DO_NOTHING);    // @todo 1.21 check?
+                    rot.yaw(), rot.pitch(), DimensionTransition.DO_NOTHING);    //  @todo 1.21 check?
             return entity.changeDimension(transition);
         }
     }
