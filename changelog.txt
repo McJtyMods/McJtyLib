@@ -1,3 +1,6 @@
+Upcoming:
+- Fixed F1 key showing in game manual in inventories
+
 1.21-9.0.18:
 - Changes for RFTools Dimensions
 
