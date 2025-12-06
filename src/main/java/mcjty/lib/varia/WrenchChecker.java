@@ -13,7 +13,7 @@ public class WrenchChecker {
 
     private static Set<ResourceLocation> wrenches;
 
-    public static final ResourceLocation WRENCH = ResourceLocation.fromNamespaceAndPath("forge", "tools/wrench");
+    public static final ResourceLocation WRENCH = ResourceLocation.fromNamespaceAndPath("c", "tools/wrench");
     public static final TagKey<Item> WRENCH_TAG = TagKey.create(Registries.ITEM, WRENCH);
 
 

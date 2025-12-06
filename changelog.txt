@@ -2,6 +2,7 @@ Upcoming:
 - Fixed log spawm when the open manual key was not bound
 - Fixed proper translation key to display what key is bound to open manual in the tooltips
 - Removed the 'open manual' line in tooltips in case the key is not bound
+- Fixed "forge:tools/wrench" tag to "c:tools/wrench"
 
 1.21-9.0.19:
 - Fixed F1 key showing in game manual in inventories
