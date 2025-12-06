@@ -72,11 +72,11 @@ public class TooltipRender {
         if (settings != null) {
             ManualEntry entry = settings.getManualEntry();
             if (entry.manual() != null) {
-                if (KeyBindings.openManual != null) {
+                if (KeyBindings.openManual != null && !KeyBindings.openManual.isUnbound()) {
                     if (!SafeClientTools.isSneaking()) {
-                        String translationKey = KeyBindings.openManual.saveString();
+                        Component translationKey = KeyBindings.openManual.getTranslatedKeyMessage();
                         event.getToolTip().add(ComponentFactory.literal("<Press ").withStyle(ChatFormatting.YELLOW)
-                                .append(ComponentFactory.translatable(translationKey).withStyle(ChatFormatting.GREEN))
+                                .append(translationKey)
                                 .append(ComponentFactory.literal(" for help>").withStyle(ChatFormatting.YELLOW)));
                     }
                 }

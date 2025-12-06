@@ -14,7 +14,12 @@ public class KeyInputHandler {
     public void onKeyInput(ClientTickEvent.Pre event) {
         KeyMapping kb = KeyBindings.openManual;
         boolean doStuff = switch (kb.getKey().getType()) {
-            case KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), kb.getKey().getValue());
+            case KEYSYM -> {
+                if (kb.isUnbound()) {
+                    yield false;
+                }
+                yield InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), kb.getKey().getValue());
+            }
             case MOUSE -> GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), kb.getKey().getValue()) == GLFW.GLFW_PRESS;
             default -> kb.isDown();
         };
