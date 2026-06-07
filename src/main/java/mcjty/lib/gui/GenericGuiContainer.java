@@ -302,6 +302,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     private boolean isPartiallyCoveredByModalWindow(Slot slotIn) {
+        if (window == null) {
+            return false;
+        }
         int xPos = slotIn.x + window.getToplevel().getBounds().x;
         int yPos = slotIn.y + window.getToplevel().getBounds().y;
 
