@@ -1,10 +1,10 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.McJtyLib;
+import mcjty.lib.compat.patchouli.PatchouliCompatibility;
 import mcjty.lib.gui.widgets.Button;
 import mcjty.lib.gui.widgets.Panel;
 import mcjty.lib.network.Networking;
-import mcjty.lib.network.PacketOpenManual;
 import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.Minecraft;
@@ -39,7 +39,7 @@ public class GuiSideWindow {
 
         Button helpButton = button(1, 1, 16, 16, "?")
                 .tooltips("Open manual")
-                .event(() -> help(mc));
+                .event(this::help);
         guiButton = button(1, 19, 16, 16, "s")
                 .event(() -> changeStyle());
         setStyleTooltip();
@@ -50,9 +50,9 @@ public class GuiSideWindow {
         sideWindow = new Window(gui, sidePanel);
     }
 
-    private void help(Minecraft mc) {
+    private void help() {
         if (manual != null) {
-            Networking.sendToServer(PacketOpenManual.create(manual, manualNode, page));
+            PatchouliCompatibility.openBookEntry(manual, manualNode, page);
         }
     }
 
