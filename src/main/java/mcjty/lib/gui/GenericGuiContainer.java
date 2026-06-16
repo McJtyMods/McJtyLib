@@ -126,6 +126,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public void drawHoveringText(GuiGraphics graphics, List<String> textLines, List<ItemStack> items, int x, int y, Font font) {
         if (!textLines.isEmpty()) {
             PoseStack matrixStack = graphics.pose();
+            matrixStack.translate(0.0D, 0.0D, 400.0f);
             matrixStack.pushPose();
             // @todo 1.17 RenderSystem.disableRescaleNormal();
             // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
@@ -200,7 +201,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             graphics.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
 //            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
-            matrixStack.translate(0.0D, 0.0D, 300.0f);
+            matrixStack.translate(0.0D, 0.0D, 100.0f);
 
             renderTextLines(graphics, textLines, items, font, xx, yy);
 
