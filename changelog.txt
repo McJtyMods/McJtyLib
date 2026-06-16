@@ -1,3 +1,6 @@
+1.20-8.0.8:
+- Various Patchouli documentation updates and fixes
+
 1.20-8.0.7:
 - StreamCodec backport from MC 1.21
 
