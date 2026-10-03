@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -34,7 +35,7 @@ public class McJtyLib {
 
     private static final Map<Pair<String, String>, IServerCommand> serverCommands = new HashMap<>();
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
-    private static final Map<String, CommandInfo> commandInfos = new HashMap<>();
+    private static final Map<String, CommandInfo> commandInfos = new ConcurrentHashMap<>();
 
     public McJtyLib(ModContainer container, IEventBus bus, Dist dist) {
 
