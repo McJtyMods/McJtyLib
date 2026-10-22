@@ -15,7 +15,7 @@ public class Networking {
                 .versioned("1.0")
                 .optional();
 
-        registrar.playBidirectional(PacketAttachmentData.TYPE, PacketAttachmentData.CODEC, PacketAttachmentData::handle);
+        registrar.playBidirectional(PacketAttachmentData.TYPE, PacketAttachmentData.CODEC, PacketAttachmentData::handle, PacketAttachmentData::handle);
 
         // Server side
         registrar.playToServer(PacketSetGuiStyle.TYPE, PacketSetGuiStyle.CODEC, PacketSetGuiStyle::handle);
