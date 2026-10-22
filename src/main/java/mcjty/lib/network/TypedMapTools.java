@@ -71,7 +71,7 @@ public class TypedMapTools {
             case TYPE_FLOAT -> args.accept(new Key<>(key, Type.FLOAT), buf.readFloat());
             case TYPE_DIMENSION_TYPE -> {
                 if (buf.readBoolean()) {
-                    args.accept(new Key<>(key, Type.DIMENSION_TYPE), LevelTools.getId(buf.readResourceLocation()));
+                    args.accept(new Key<>(key, Type.DIMENSION_TYPE), LevelTools.getId(buf.readIdentifier()));
                 } else {
                     args.accept(new Key<>(key, Type.DIMENSION_TYPE), null);
                 }
@@ -149,7 +149,7 @@ public class TypedMapTools {
                 ResourceKey<Level> type = (ResourceKey<Level>) value;
                 if (type != null) {
                     buf.writeBoolean(true);
-                    buf.writeResourceLocation(type.location());
+                    buf.writeIdentifier(type.identifier());
                 } else {
                     buf.writeBoolean(false);
                 }

@@ -5,7 +5,7 @@ import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -45,7 +45,7 @@ public class TooltipBuilder {
     }
 
 
-    public void makeTooltip(@Nonnull ResourceLocation id, @Nonnull ItemStack stack, @Nonnull List<Component> tooltip, TooltipFlag flag) {
+    public void makeTooltip(@Nonnull Identifier id, @Nonnull ItemStack stack, @Nonnull List<Component> tooltip, TooltipFlag flag) {
         String namespace = id.getNamespace();
         String path = id.getPath();
         String prefix = "message." + namespace + "." + path + ".";

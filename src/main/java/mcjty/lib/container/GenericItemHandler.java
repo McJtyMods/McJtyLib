@@ -8,7 +8,6 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
@@ -20,11 +19,63 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
+
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+
+public class GenericItemHandler implements IItemHandlerModifiable, ResourceHandler<ItemResource> {
 
     private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
     private final ItemStackHandler stacks;
+
+    private final SnapshotJournal<java.util.List<ItemStack>> transferJournal = new SnapshotJournal<>() {
+        @Override protected java.util.List<ItemStack> createSnapshot() {
+            var result = new java.util.ArrayList<ItemStack>();
+            for (int i = 0; i < getSlots(); i++) result.add(getStackInSlot(i).copy());
+            return result;
+        }
+        @Override protected void revertToSnapshot(java.util.List<ItemStack> snapshot) {
+            for (int i = 0; i < snapshot.size(); i++) stacks.setStackInSlot(i, snapshot.get(i));
+        }
+        @Override protected void onRootCommit(java.util.List<ItemStack> before) {
+            for (int i = 0; i < before.size(); i++) {
+                if (!ItemStack.matches(before.get(i), getStackInSlot(i))) onUpdate(i, getStackInSlot(i));
+            }
+        }
+    };
+    @Override public int size() { return getSlots(); }
+    @Override public ItemResource getResource(int index) { return ItemResource.of(getStackInSlot(index)); }
+    @Override public long getAmountAsLong(int index) { return getStackInSlot(index).getCount(); }
+    @Override public long getCapacityAsLong(int index, ItemResource resource) {
+        if (containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index)) return 0;
+        return Math.min(getSlotLimit(index), resource.isEmpty() ? 64 : resource.getMaxStackSize());
+    }
+    @Override public boolean isValid(int index, ItemResource resource) { return !resource.isEmpty() && isItemValid(index, resource.toStack()); }
+    @Override public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        if (amount == 0 || resource.isEmpty() || getCapacityAsLong(index, resource) == 0) return 0;
+        int inserted = amount - insertItem(index, resource.toStack(amount), true).getCount();
+        if (inserted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            stacks.setStackInSlot(index, resource.toStack(getStackInSlot(index).getCount() + inserted));
+        }
+        return inserted;
+    }
+    @Override public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        if (amount == 0 || resource.isEmpty() || !resource.matches(getStackInSlot(index)) || getCapacityAsLong(index, resource) == 0) return 0;
+        int extracted = extractItem(index, amount, true).getCount();
+        if (extracted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            stacks.setStackInSlot(index, getStackInSlot(index).copyWithCount(getStackInSlot(index).getCount() - extracted));
+        }
+        return extracted;
+    }
 
     public static BiPredicate<Integer, ItemStack> slot(int s) {
         return (slot, stack) -> slot == s;
@@ -324,14 +375,14 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
         return containerFactory;
     }
 
-    @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        return stacks.serializeNBT(provider);
+        var output = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, provider);
+        stacks.serialize(output);
+        return output.buildResult();
     }
 
-    @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
-        stacks.deserializeNBT(provider, nbt);
+        stacks.deserialize(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, provider, nbt));
     }
 
     public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
@@ -340,7 +391,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
 
     public void load(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
         if (tag.contains(tagName)) {
-            deserializeNBT(provider, tag.getCompound(tagName));
+            deserializeNBT(provider, tag.getCompoundOrEmpty(tagName));
         }
     }
 

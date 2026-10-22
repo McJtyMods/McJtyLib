@@ -1,6 +1,5 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -12,7 +11,7 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.util.Mth;
@@ -83,7 +82,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private static boolean isControlDown() {
-        long handle = Minecraft.getInstance().getWindow().getWindow();
+        var handle = Minecraft.getInstance().getWindow();
         return InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 
@@ -94,10 +93,10 @@ public class TextField extends AbstractWidget<TextField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            long handle = Minecraft.getInstance().getWindow().getWindow();
+            var handle = Minecraft.getInstance().getWindow();
             if (isControlDown()) {
                 if(keyCode == GLFW.GLFW_KEY_V) {
-                    String data = GLFW.glfwGetClipboardString(handle);
+                    String data = GLFW.glfwGetClipboardString(handle.handle());
                     if (data != null) {
                         if (isRegionSelected()) {
                             replaceSelectedRegion(data);
@@ -109,11 +108,11 @@ public class TextField extends AbstractWidget<TextField> {
                     }
                 } else if (keyCode == GLFW.GLFW_KEY_C) {
                     if (isRegionSelected()) {
-                        GLFW.glfwSetClipboardString(handle, getSelectedText());
+                        GLFW.glfwSetClipboardString(handle.handle(), getSelectedText());
                     }
                 } else if (keyCode == GLFW.GLFW_KEY_X) {
                     if (isRegionSelected()) {
-                        GLFW.glfwSetClipboardString(handle, getSelectedText());
+                        GLFW.glfwSetClipboardString(handle.handle(), getSelectedText());
                         replaceSelectedRegion("");
                         fireTextEvents(text);
                     }
@@ -257,7 +256,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     private void updateSelection() {
-        if (Screen.hasShiftDown()) {
+        if (mcjty.lib.varia.SafeClientTools.isShiftKeyDown()) {
             // Don't clear selection as long as shift is pressed
             if (!isRegionSelected()) {
                 selection = cursor;
@@ -297,7 +296,7 @@ public class TextField extends AbstractWidget<TextField> {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         super.draw(gui, graphics, x, y);
 
         int xx = x + bounds.x;
@@ -319,9 +318,9 @@ public class TextField extends AbstractWidget<TextField> {
         int textY = y + calculateVerticalOffset() + bounds.y;
         if (isEnabled()) {
             if (isEditable()) {
-                graphics.drawString(mc.font, renderedText, textX, textY, 0xff000000, false);
+                graphics.text(mc.font, renderedText, textX, textY, 0xff000000, false);
             } else {
-                graphics.drawString(mc.font, renderedText, textX, textY, 0xff333333, false);
+                graphics.text(mc.font, renderedText, textX, textY, 0xff333333, false);
             }
 
             if (isRegionSelected()) {
@@ -335,10 +334,10 @@ public class TextField extends AbstractWidget<TextField> {
                 String renderedPreSelection = renderedText.substring(0, renderedStart);
                 int selectionX = textX + mc.font.width(renderedPreSelection);
                 int selectionWidth = mc.font.width(renderedSelection);
-                RenderHelper.drawColorLogic(selectionX - 1, textY, selectionWidth + 1, mc.font.lineHeight, 60, 147, 242, GlStateManager.LogicOp.OR_REVERSE);
+                graphics.textHighlight(selectionX - 1, textY, selectionX + selectionWidth, textY + mc.font.lineHeight, true);
             }
         } else {
-            graphics.drawString(mc.font, renderedText, textX, textY, 0xffa0a0a0, false);
+            graphics.text(mc.font, renderedText, textX, textY, 0xffa0a0a0, false);
         }
 
         if (window.getTextFocus() == this) {

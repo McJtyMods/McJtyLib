@@ -6,7 +6,7 @@ import mcjty.lib.gui.widgets.AbstractContainerWidget;
 import mcjty.lib.gui.widgets.Widget;
 import mcjty.lib.client.GuiTools;
 import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
@@ -98,7 +98,7 @@ public class WindowManager {
         modalWindows.forEach(window -> window.syncBindings(te));
     }
 
-    public void draw(GuiGraphics graphics) {
+    public void draw(GuiGraphicsExtractor graphics) {
         mouseWheelX = 0;// @todo 1.14 Mouse.getDWheel();
         mouseWheelY = 0;// @todo 1.14 Mouse.getDWheel();
         windows.forEach(window -> window.draw(graphics));
@@ -125,7 +125,7 @@ public class WindowManager {
         return modalWindows.stream();
     }
 
-    public void drawTooltips(GuiGraphics graphics) {
+    public void drawTooltips(GuiGraphicsExtractor graphics) {
         int x = GuiTools.getRelativeX(gui);
         int y = GuiTools.getRelativeY(gui);
 
@@ -136,7 +136,7 @@ public class WindowManager {
                 gui.drawHoveringText(graphics, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().font);
             }
         });
-        com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
+
     }
 
     public Optional<Widget<?>> findWidgetAtPosition(double x, double y) {

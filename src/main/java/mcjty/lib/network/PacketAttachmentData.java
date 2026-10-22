@@ -7,25 +7,25 @@ import mcjty.lib.container.GenericContainer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record PacketAttachmentData(ResourceLocation attachmentTypeId, RegistryFriendlyByteBuf buffer) implements CustomPacketPayload {
+public record PacketAttachmentData(Identifier attachmentTypeId, RegistryFriendlyByteBuf buffer) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "attachmentdata");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "attachmentdata");
     public static final Type<PacketAttachmentData> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketAttachmentData> CODEC = StreamCodec.of(
             (buf, packet) -> {
-                buf.writeResourceLocation(packet.attachmentTypeId);
+                buf.writeIdentifier(packet.attachmentTypeId);
                 byte[] array = packet.buffer().array();
                 buf.writeInt(array.length);
                 buf.writeBytes(array);
             },
             buf -> {
-                ResourceLocation containerId = buf.readResourceLocation();
+                Identifier containerId = buf.readIdentifier();
                 int l = buf.readInt();
                 ByteBuf newbuf = Unpooled.buffer(l);
                 byte[] bytes = new byte[l];
@@ -41,7 +41,7 @@ public record PacketAttachmentData(ResourceLocation attachmentTypeId, RegistryFr
         return TYPE;
     }
 
-    public static PacketAttachmentData create(ResourceLocation id, RegistryFriendlyByteBuf buffer) {
+    public static PacketAttachmentData create(Identifier id, RegistryFriendlyByteBuf buffer) {
         return new PacketAttachmentData(id, buffer);
     }
 

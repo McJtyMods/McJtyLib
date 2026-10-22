@@ -93,7 +93,7 @@ public class ClientEventHandler {
                 }
                 if (focus != null) {
                     event.setCanceled(true);
-                    container.charTypedFromEvent(event.getCodePoint());
+                    container.charTypedFromEvent((char)event.getCodePoint());
                 }
             }
         }
@@ -118,11 +118,8 @@ public class ClientEventHandler {
         }
     }
 
-    // @todo 1.20 correct event?
     @SubscribeEvent
-    public void onGameRenderOverlay(RenderLevelStageEvent e) {
-        if (e.getStage() == RenderLevelStageEvent.Stage.AFTER_SOLID_BLOCKS) {
-            DelayedRenderer.render(e.getPoseStack());
-        }
+    public void onGameRenderOverlay(net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent event) {
+        DelayedRenderer.render(event.getPoseStack(), event.getSubmitNodeCollector(), event.getLevelRenderState().cameraRenderState.pos);
     }
 }

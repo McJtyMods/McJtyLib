@@ -3,7 +3,7 @@ package mcjty.lib.setup;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.network.Networking;
 import mcjty.lib.preferences.PreferencesProperties;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
@@ -33,7 +33,7 @@ public class ModSetup extends DefaultModSetup {
 
         @SubscribeEvent
         public void onPlayerTickEvent(PlayerTickEvent.Pre event) {
-            if (!event.getEntity().getCommandSenderWorld().isClientSide) {
+            if (!event.getEntity().level().isClientSide()) {
                 PreferencesProperties properties = McJtyLib.getPreferencesProperties(event.getEntity());
                 if (properties != null) {
                     properties.tick((ServerPlayer) event.getEntity());
@@ -50,7 +50,7 @@ public class ModSetup extends DefaultModSetup {
 //            if (state.getBlock() instanceof MultipartBlock) {
 //                BlockEntity tileEntity = world.getBlockEntity(pos);
 //                if (tileEntity instanceof MultipartTE) {
-//                    if (!world.isClientSide) {
+//                    if (!world.isClientSide()) {
 //
 //                        // @todo 1.14 until LeftClickBlock has 'hitVec' again we need to do this:
 //                        Player player = event.getEntity();
@@ -59,7 +59,7 @@ public class ModSetup extends DefaultModSetup {
 //                        float dist = 20;
 //                        Vec3 end = start.add(vec31.x * dist, vec31.y * dist, vec31.z * dist);
 //                        ClipContext context = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
-//                        HitResult result = player.getCommandSenderWorld().clip(context);
+//                        HitResult result = player.level().clip(context);
 //                        Vec3 hitVec = result.getLocation();
 //
 //                        if (MultipartHelper.removePart((MultipartTE) tileEntity, state, player, hitVec/*@todo*/)) {

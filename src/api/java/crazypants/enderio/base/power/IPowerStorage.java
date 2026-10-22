@@ -1,9 +1,9 @@
 package crazypants.enderio.base.power;
 
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface IPowerStorage {
 
@@ -17,7 +17,7 @@ public interface IPowerStorage {
   /**
    * If false this connection will be treated the same a regular powered block. No power will be drawn over the connection and it will not be used to balance
    * capacitor bank levels
-   * 
+   *
    * @param direction
    * @return
    */

@@ -29,7 +29,7 @@ public class FakePlayerGetter {
             ServerPlayer player = te.getLevel().getServer().getPlayerList().getPlayer(owner);
             if (player != null) {
                 // Check if the name matches
-                if (!Objects.equals(playerEntity.getGameProfile().getName(), player.getGameProfile().getName())) {
+                if (!Objects.equals(playerEntity.getGameProfile().name(), player.getGameProfile().name())) {
                     harvester = null;
                     playerEntity = getFakeHarvester();
                 }
@@ -62,7 +62,7 @@ public class FakePlayerGetter {
         if (player == null) {
             return fakeName;
         }
-        return player.getGameProfile().getName();
+        return player.getGameProfile().name();
     }
 
 

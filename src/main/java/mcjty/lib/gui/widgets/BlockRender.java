@@ -10,9 +10,9 @@ import mcjty.lib.gui.events.ItemStackDraggedEvent;
 import mcjty.lib.typed.Type;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.Tools;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -99,7 +99,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }
@@ -111,19 +111,19 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         if (renderItem != null) {
             int xx = x + bounds.x + offsetX;
             int yy = y + bounds.y + offsetY;
-            PoseStack matrixStack = graphics.pose();
-            matrixStack.pushPose();
-            matrixStack.translate(0, 0, 100f);
+            var matrixStack = graphics.pose();
+            matrixStack.pushMatrix();
+            matrixStack.translate(0, 0);
             RenderHelper.renderObject(graphics, xx, yy, renderItem, false);
-            matrixStack.popPose();
+            matrixStack.popMatrix();
             if (hilightOnHover && isHovering()) {
                 // @todo 1.17 RenderSystem.disableLighting();
-                RenderSystem.disableDepthTest();
-                RenderSystem.colorMask(true, true, true, false);
-                RenderHelper.drawVerticalGradientRect(xx, yy, xx + 16, yy + 16, -2130706433, -2130706433);
-                RenderSystem.colorMask(true, true, true, true);
+
+
+                RenderHelper.drawVerticalGradientRect(graphics, xx, yy, xx + 16, yy + 16, -2130706433, -2130706433);
+
 //                RenderSystem.enableLighting();
-                RenderSystem.enableDepthTest();
+
             }
 
             if (showLabel) {
@@ -141,7 +141,7 @@ public class BlockRender extends AbstractWidget<BlockRender> {
                 }
                 int h = mc.font.lineHeight;
                 int dy = (bounds.height - h)/2;
-                graphics.drawString(mc.font, name, xx+20, yy + dy, getLabelColor(), false);
+                graphics.text(mc.font, name, xx+20, yy + dy, getLabelColor(), false);
             }
         }
     }
@@ -249,11 +249,11 @@ public class BlockRender extends AbstractWidget<BlockRender> {
         if (value == null) {
             renderItem(null);
         } else {
-            Item item = Tools.getItem(ResourceLocation.parse(value.toString()));
+            Item item = Tools.getItem(Identifier.parse(value.toString()));
             if (item != null) {
                 renderItem(new ItemStack(item));
             } else {
-                Block block = Tools.getBlock(ResourceLocation.parse(value.toString()));
+                Block block = Tools.getBlock(Identifier.parse(value.toString()));
                 if (block != null) {
                     renderItem(new ItemStack(block));
                 } else {

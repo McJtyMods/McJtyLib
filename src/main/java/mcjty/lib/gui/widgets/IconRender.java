@@ -3,7 +3,7 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 
@@ -28,7 +28,7 @@ public class IconRender extends AbstractWidget<IconRender> {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }

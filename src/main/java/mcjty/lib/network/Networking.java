@@ -35,7 +35,7 @@ public class Networking {
     }
 
     public static void sendToServer(CustomPacketPayload msg) {
-        PacketDistributor.sendToServer(msg);
+        net.neoforged.neoforge.client.network.ClientPacketDistributor.sendToServer(msg);
     }
 
     public static <T extends CustomPacketPayload> void sendToPlayer(T packet, Player player) {

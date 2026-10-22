@@ -13,7 +13,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -24,7 +24,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  */
 public record PacketRequestDataFromServer(ResourceKey<Level> level, BlockPos pos, String command, TypedMap params, boolean dummy) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "requestdatafromserver");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "requestdatafromserver");
     public static final CustomPacketPayload.Type<PacketRequestDataFromServer> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketRequestDataFromServer> CODEC = StreamCodec.composite(
@@ -53,7 +53,7 @@ public record PacketRequestDataFromServer(ResourceKey<Level> level, BlockPos pos
         ctx.enqueueWork(() -> {
             Player player = ctx.player();
 
-            Level world = LevelTools.getLevel(player.getCommandSenderWorld(), level);
+            Level world = LevelTools.getLevel(player.level(), level);
             if (world.hasChunkAt(pos)) {
                 if (world.getBlockEntity(pos) instanceof GenericTileEntity generic) {
                     TypedMap result = generic.executeServerCommandWR(command, player, params);

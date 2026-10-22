@@ -25,14 +25,19 @@ public class SafeClientTools {
     }
 
     public static boolean isSneaking() {
-        return Screen.hasShiftDown();
+        return keyDown(340) || keyDown(344);
     }
 
     public static boolean isCtrlKeyDown() {
-        return Screen.hasControlDown();
+        return keyDown(341) || keyDown(345);
     }
 
     public static boolean isJumpKeyDown() {
         return Minecraft.getInstance().options.keyJump.isDown();
     }
+    private static boolean keyDown(int key) {
+        return com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), key);
+    }
+    public static boolean isShiftKeyDown() { return isSneaking(); }
+    public static boolean isControlKeyDown() { return isCtrlKeyDown(); }
 }

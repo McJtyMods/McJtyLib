@@ -9,7 +9,7 @@ import mcjty.lib.network.PacketSetGuiStyle;
 import mcjty.lib.preferences.PreferencesProperties;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import static mcjty.lib.gui.widgets.Widgets.button;
 import static mcjty.lib.gui.widgets.Widgets.positional;
@@ -24,11 +24,11 @@ public class GuiSideWindow {
     private Window sideWindow;
     private Button guiButton;
 
-    private final ResourceLocation manual;
-    private final ResourceLocation manualNode;
+    private final Identifier manual;
+    private final Identifier manualNode;
     private final int page;
 
-    public GuiSideWindow(ResourceLocation manual, ResourceLocation manualNode, int page) {
+    public GuiSideWindow(Identifier manual, Identifier manualNode, int page) {
         this.manual = manual;
         this.manualNode = manualNode;
         this.page = page;

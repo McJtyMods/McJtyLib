@@ -10,7 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -25,7 +25,7 @@ import java.util.function.Function;
  */
 public record PacketSendResultToClient(BlockPos pos, String command, List list) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "sendresulttoclient");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "sendresulttoclient");
     public static final CustomPacketPayload.Type<PacketSendResultToClient> TYPE = new Type<>(ID);
 
     public static final StreamCodec<FriendlyByteBuf, PacketSendResultToClient> CODEC = StreamCodec.of(

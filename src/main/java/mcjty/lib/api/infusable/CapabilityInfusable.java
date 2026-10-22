@@ -2,10 +2,10 @@ package mcjty.lib.api.infusable;
 
 import mcjty.lib.McJtyLib;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class CapabilityInfusable {
-    public static final BlockCapability<IInfusable, @Nullable Direction> INFUSABLE_CAPABILITY = BlockCapability.createSided(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "infusable"), IInfusable.class);
+    public static final BlockCapability<IInfusable, @Nullable Direction> INFUSABLE_CAPABILITY = BlockCapability.createSided(Identifier.fromNamespaceAndPath(McJtyLib.MODID, "infusable"), IInfusable.class);
 }

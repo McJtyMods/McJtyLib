@@ -6,7 +6,7 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.Key;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,13 +22,13 @@ public class Sync {
      *
      * Note that DefaultContainerProvider.setupSync() already calls this
      */
-    public static IContainerDataListener values(ResourceLocation id, GenericTileEntity te) {
+    public static IContainerDataListener values(Identifier id, GenericTileEntity te) {
         return new IContainerDataListener() {
 
             private Map<Key, Object> oldValues = new HashMap<>();
 
             @Override
-            public ResourceLocation getId() {
+            public Identifier getId() {
                 return id;
             }
 
@@ -75,13 +75,13 @@ public class Sync {
      * A data listener for a string. Use this
      * in a GenericContainer (using dataListener) to sync data for your gui
      */
-    public static IContainerDataListener string(ResourceLocation id, Supplier<String> getter, Consumer<String> setter) {
+    public static IContainerDataListener string(Identifier id, Supplier<String> getter, Consumer<String> setter) {
         return new IContainerDataListener() {
 
             private String oldString = null;
 
             @Override
-            public ResourceLocation getId() {
+            public Identifier getId() {
                 return id;
             }
 
@@ -111,13 +111,13 @@ public class Sync {
      * A data listener for a float. Use this
      * in a GenericContainer (using dataListener) to sync data for your gui
      */
-    public static IContainerDataListener flt(ResourceLocation id, Supplier<Float> getter, Consumer<Float> setter) {
+    public static IContainerDataListener flt(Identifier id, Supplier<Float> getter, Consumer<Float> setter) {
         return new IContainerDataListener() {
 
             private Float oldFloat = null;
 
             @Override
-            public ResourceLocation getId() {
+            public Identifier getId() {
                 return id;
             }
 

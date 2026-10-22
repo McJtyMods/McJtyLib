@@ -19,7 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -38,7 +38,7 @@ import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -51,7 +51,7 @@ import static mcjty.lib.api.container.DefaultContainerProvider.correctType;
  */
 public class GenericContainer extends AbstractContainerMenu implements IGenericContainer {
     protected final Map<String,IItemHandler> inventories = new HashMap<>();
-    private final Map<ResourceLocation, IContainerDataListener> containerData = new HashMap<>();
+    private final Map<Identifier, IContainerDataListener> containerData = new HashMap<>();
     private final List<DataListener<?, ?>> dataListeners = new ArrayList<>();
     private final Map<AttachmentType<?>, Object> previousData = new HashMap<>();
     private final ContainerFactory factory;
@@ -446,7 +446,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     @Override
-    public void clicked(int index, int button, @Nonnull ClickType mode, @Nonnull Player player) {
+    public void clicked(int index, int button, @Nonnull ContainerInput mode, @Nonnull Player player) {
         if (factory.isGhostSlot(index)) {
             Slot slot = getSlot(index);
             if (slot.hasItem()) {
@@ -465,7 +465,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         }
     }
 
-    public IContainerDataListener getListener(ResourceLocation id) {
+    public IContainerDataListener getListener(Identifier id) {
         return containerData.get(id);
     }
 
@@ -514,8 +514,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         return null;
     }
 
-    public void receiveData(ResourceLocation containerId, RegistryFriendlyByteBuf buffer) {
-        AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.get(containerId);
+    public void receiveData(Identifier containerId, RegistryFriendlyByteBuf buffer) {
+        AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.getValue(containerId);
         if (type == null) {
             Logging.log("Unknown container id: " + containerId);
             return;
@@ -573,7 +573,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 //    public static MenuType<AbstractContainerMenu> createContainerType(String registryName) {
 //        MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {
 //            BlockPos pos = data.readBlockPos();
-//            BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
+//            BlockEntity te = inv.player.level().getBlockEntity(pos);
 //            if (te == null) {
 //                throw new IllegalStateException("Something went wrong getting the GUI");
 //            }
@@ -585,7 +585,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     public static <T extends AbstractContainerMenu> MenuType<T> createContainerType() {
         MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
-            BlockEntity te = inv.player.getCommandSenderWorld().getBlockEntity(pos);
+            BlockEntity te = inv.player.level().getBlockEntity(pos);
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
@@ -615,10 +615,10 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         return IMenuTypeExtension.create((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
 
-            E te = dummyTEFactory.apply(LevelTools.getId(data.readResourceLocation()), pos);
+            E te = dummyTEFactory.apply(LevelTools.getId(data.readIdentifier()), pos);
             CompoundTag compound = data.readNbt();
             RegistryAccess access = inv.player.level().registryAccess();
-            te.loadCustomOnly(compound, access);
+            te.loadCustomOnly(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, access, compound));
 
             T container = containerFactory.create(windowId, pos, te, inv.player);
             container.setupInventories(new ItemStackHandler(slots), inv);

@@ -15,7 +15,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class ModuleTools {
 
@@ -64,7 +64,7 @@ public class ModuleTools {
 
     public static String getTargetString(String name, GlobalPos pos) {
         if (BlockPosTools.isValid(pos.pos())) {
-            return name + " (at " + pos.pos().getX() + "," + pos.pos().getY() + "," + pos.pos().getZ() + ", " + pos.dimension().location() + ")";
+            return name + " (at " + pos.pos().getX() + "," + pos.pos().getY() + "," + pos.pos().getZ() + ", " + pos.dimension().identifier() + ")";
         } else {
             return "<unset>";
         }
@@ -76,12 +76,12 @@ public class ModuleTools {
      * @return true if successful
      */
     public static boolean installModule(Player player, ItemStack heldItem, InteractionHand hand, BlockPos pos, int start, int stop) {
-        Level world = player.getCommandSenderWorld();
+        Level world = player.level();
         BlockEntity te = world.getBlockEntity(pos);
         if (te == null) {
             return false;
         }
-        IItemHandler inventory = world.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
+        IItemHandler inventory = mcjty.lib.varia.CapabilityTools.itemHandler(world.getCapability(Capabilities.Item.BLOCK, pos, null));
         if (inventory != null) {
             for (int i = start; i <= stop; i++) {
                 if (inventory.getStackInSlot(i).isEmpty()) {
@@ -96,8 +96,8 @@ public class ModuleTools {
                     if (heldItem.isEmpty()) {
                         player.setItemInHand(hand, ItemStack.EMPTY);
                     }
-                    if (world.isClientSide) {
-                        player.displayClientMessage(ComponentFactory.literal("Installed module"), false);
+                    if (world.isClientSide()) {
+                        player.sendSystemMessage(ComponentFactory.literal("Installed module"));
                     }
                     return true;
                 }

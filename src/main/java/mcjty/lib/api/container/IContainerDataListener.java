@@ -1,7 +1,7 @@
 package mcjty.lib.api.container;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * This represents generic data that a container can sync from server to client automatically
@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
 public interface IContainerDataListener {
 
     /// A unique ID for this data
-    ResourceLocation getId();
+    Identifier getId();
 
     /// Return if the data is dirty and clear the data flag
     boolean isDirtyAndClear();

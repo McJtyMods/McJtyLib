@@ -6,9 +6,9 @@ import mcjty.lib.gui.events.ChoiceEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     public static final boolean DEFAULT_WITH_BORDER = false;
 
     private record ChoiceEntry(String choice, List<String> tooltips,
-                               ResourceLocation image, int u, int v) {
+                               Identifier image, int u, int v) {
     }
 
     private final List<ChoiceEntry> choiceList = new ArrayList<>();
@@ -63,7 +63,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
         }
     }
 
-    public ImageChoiceLabel choice(String choice, String tooltips, ResourceLocation image, int u, int v) {
+    public ImageChoiceLabel choice(String choice, String tooltips, Identifier image, int u, int v) {
         choiceList.add(new ChoiceEntry(choice, Arrays.asList(StringUtils.split(tooltips, "\n")), image, u, v));
         if (currentChoice == -1) {
             setCurrentChoice(0);
@@ -166,7 +166,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (withBorder) {
             int xx = x + bounds.x;
             int yy = y + bounds.y;
@@ -199,7 +199,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
                                     .map(Object::toString)
                                     .collect(Collectors.toList()))
                             .orElse(Collections.emptyList());
-                    ResourceLocation image = ResourceLocation.parse(GuiParser.get(choiceCmd, "image", ""));
+                    Identifier image = Identifier.parse(GuiParser.get(choiceCmd, "image", ""));
                     int u = GuiParser.getIndexed(choiceCmd, "uv", 0, 0);
                     int v = GuiParser.getIndexed(choiceCmd, "uv", 1, 0);
                     ChoiceEntry entry = new ChoiceEntry(choice, tooltips, image, u, v);

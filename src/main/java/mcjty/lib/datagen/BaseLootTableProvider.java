@@ -4,13 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Tools;
-import net.minecraft.advancements.critereon.*;
+import net.minecraft.advancements.predicates.*;
+import net.minecraft.advancements.triggers.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -23,7 +24,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.*;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -43,7 +44,7 @@ public class BaseLootTableProvider {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     protected final Map<EntityType<?>, LootTable.Builder> entityLootTables = new HashMap<>();
-    protected final Map<ResourceLocation, LootTable.Builder> chestLootTables = new HashMap<>();
+    protected final Map<Identifier, LootTable.Builder> chestLootTables = new HashMap<>();
 
     protected final Map<Block, LootTable.Builder> lootTables = new HashMap<>();
 
@@ -55,7 +56,7 @@ public class BaseLootTableProvider {
         entityLootTables.put(entityType, createItemDropTable(Tools.getId(entityType).getPath(), item));
     }
 
-    public void addChestLootTable(ResourceLocation id, LootTable.Builder builder) {
+    public void addChestLootTable(Identifier id, LootTable.Builder builder) {
         chestLootTables.put(id, builder);
     }
 
@@ -98,7 +99,7 @@ public class BaseLootTableProvider {
                 .add(AlternativesEntry.alternatives(
                                 LootItem.lootTableItem(block)
                                         .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
-                                                .withSubPredicate(ItemSubPredicates.ENCHANTMENTS, ItemEnchantmentsPredicate.enchantments(List.of(silkTouchPredicate))))),
+                                                .withComponents(net.minecraft.advancements.predicates.DataComponentMatchers.Builder.components().partial(net.minecraft.core.component.predicates.DataComponentPredicates.ENCHANTMENTS, net.minecraft.core.component.predicates.EnchantmentsPredicate.enchantments(List.of(silkTouchPredicate))).build()))),
                                 LootItem.lootTableItem(lootItem)
                                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
                                         .apply(ApplyBonusCount.addUniformBonusCount(fortune.get(), 1))
@@ -128,7 +129,7 @@ public class BaseLootTableProvider {
 
 
     protected LootTable.Builder createStandardTable(String name, Block block, DataComponentType<?>... types) {
-        CopyComponentsFunction.Builder copyBuilder = CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+        CopyComponentsFunction.Builder copyBuilder = CopyComponentsFunction.copyComponentsFromBlockEntity(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY)
                 .include(Registration.ITEM_ENERGY.get())
                 .include(Registration.ITEM_INVENTORY.get());
         for (DataComponentType<?> type : types) {
@@ -138,7 +139,7 @@ public class BaseLootTableProvider {
                 .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
-                        .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
+                        .apply(CopyNameFunction.copyName(net.minecraft.world.level.storage.loot.LootContext.BlockEntityTarget.BLOCK_ENTITY))
                         .apply(copyBuilder)
                 );
         return LootTable.lootTable().withPool(builder);
@@ -164,23 +165,23 @@ public class BaseLootTableProvider {
         return LootTable.lootTable().withPool(builder);
     }
 
-    public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> builder, LootContextParamSet paramSet) {
-//        Map<ResourceLocation, LootTable> tables = new HashMap<>();
+    public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> builder, ContextKeySet paramSet) {
+//        Map<Identifier, LootTable> tables = new HashMap<>();
         if (paramSet == LootContextParamSets.BLOCK) {
             for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
-                builder.accept(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK));
-//            tables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK).build());
+                builder.accept(entry.getKey().getLootTable().orElseThrow(), entry.getValue().setParamSet(LootContextParamSets.BLOCK));
+//            tables.put(entry.getKey().getLootTable().orElseThrow(), entry.getValue().setParamSet(LootContextParamSets.BLOCK).build());
             }
         }
         if (paramSet == LootContextParamSets.ENTITY) {
             for (Map.Entry<EntityType<?>, LootTable.Builder> entry : entityLootTables.entrySet()) {
-                builder.accept(entry.getKey().getDefaultLootTable(), entry.getValue().setParamSet(LootContextParamSets.ENTITY));
-//            tables.put(entry.getKey().getDefaultLootTable(), entry.getValue().setParamSet(LootContextParamSets.ENTITY).build());
+                builder.accept(entry.getKey().getDefaultLootTable().orElseThrow(), entry.getValue().setParamSet(LootContextParamSets.ENTITY));
+//            tables.put(entry.getKey().getDefaultLootTable().orElseThrow(), entry.getValue().setParamSet(LootContextParamSets.ENTITY).build());
             }
         }
         if (paramSet == LootContextParamSets.CHEST) {
-            for (Map.Entry<ResourceLocation, LootTable.Builder> entry : chestLootTables.entrySet()) {
-                ResourceLocation id = entry.getKey();
+            for (Map.Entry<Identifier, LootTable.Builder> entry : chestLootTables.entrySet()) {
+                Identifier id = entry.getKey();
                 ResourceKey<LootTable> key = ResourceKey.create(Registries.LOOT_TABLE, id.withPrefix("chests/"));
                 builder.accept(key, entry.getValue().setParamSet(LootContextParamSets.CHEST));
 //            tables.put(id, entry.getValue().setParamSet(LootContextParamSets.CHEST).build());
@@ -188,7 +189,7 @@ public class BaseLootTableProvider {
         }
     }
 
-//    private void writeTables(CachedOutput cache, Map<ResourceLocation, LootTable> tables) {
+//    private void writeTables(CachedOutput cache, Map<Identifier, LootTable> tables) {
 //        Path outputFolder = this.generator.getOutputFolder();
 //        tables.forEach((key, lootTable) -> {
 //            Path path = outputFolder.resolve("data/" + key.getNamespace() + "/loot_tables/" + key.getPath() + ".json");

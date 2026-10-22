@@ -25,8 +25,8 @@ public class CopyComponentsRecipe extends AbstractRecipeAdaptor {
     }
 
     @Override
-    public ItemStack assemble(CraftingInput inv, HolderLookup.Provider access) {
-        ItemStack result = getRecipe().assemble(inv, access);
+    public ItemStack assemble(CraftingInput inv) {
+        ItemStack result = getRecipe().assemble(inv);
         CompoundTag nbt = null;
         for (int i = 0 ; i < inv.size() ; i++) {
             ItemStack stack = inv.getItem(i);
@@ -53,13 +53,8 @@ public class CopyComponentsRecipe extends AbstractRecipeAdaptor {
     }
 
     @Override
-    public ItemStack getResultItem(HolderLookup.Provider provider) {
-        return getRecipe().getResultItem(provider);
-    }
-
-    @Override
     @Nonnull
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<CopyComponentsRecipe> getSerializer() {
         return Registration.COPYNBT_SERIALIZER.get();
     }
 }

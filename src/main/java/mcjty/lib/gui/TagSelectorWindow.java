@@ -100,17 +100,17 @@ public class TagSelectorWindow {
     private java.util.List<String> getTags() {
         if (TYPE_BOTH.equals(type)) {
 
-            Stream<String> itemStream = BuiltInRegistries.ITEM.getTags().map(t -> t.getFirst().location().toString());
-            Stream<String> blockStream = BuiltInRegistries.BLOCK.getTags().map(t -> t.getFirst().location().toString());
+            Stream<String> itemStream = BuiltInRegistries.ITEM.getTags().map(t -> t.key().location().toString());
+            Stream<String> blockStream = BuiltInRegistries.BLOCK.getTags().map(t -> t.key().location().toString());
             Set<String> tags = itemStream.collect(Collectors.toSet());
             blockStream.forEach(tags::add);
             return tags.stream().sorted().collect(Collectors.toList());
         } else if (TYPE_ITEM.equals(type)) {
-            Stream<String> itemStream = BuiltInRegistries.ITEM.getTags().map(t -> t.getFirst().location().toString());
+            Stream<String> itemStream = BuiltInRegistries.ITEM.getTags().map(t -> t.key().location().toString());
             Set<String> tags = itemStream.collect(Collectors.toSet());
             return tags.stream().sorted().collect(Collectors.toList());
         } else {
-            Stream<String> blockStream = BuiltInRegistries.BLOCK.getTags().map(t -> t.getFirst().location().toString());
+            Stream<String> blockStream = BuiltInRegistries.BLOCK.getTags().map(t -> t.key().location().toString());
             Set<String> tags = blockStream.collect(Collectors.toSet());
             return tags.stream().sorted().collect(Collectors.toList());
         }

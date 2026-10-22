@@ -5,8 +5,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import mcjty.lib.varia.TriConsumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -29,10 +29,7 @@ public class DelayedRenderer {
     private static final Map<BlockPos, TriConsumer<PoseStack, Vec3, RenderType>> DELAYED_RENDERS = new HashMap<>();
     private static final Map<BlockPos, BiFunction<Level, BlockPos, Boolean>> RENDER_VALIDATIONS = new HashMap<>();
 
-    public static void render(PoseStack matrixStack) {
-        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
-        Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
-
+    public static void render(PoseStack matrixStack, SubmitNodeCollector collector, Vec3 projectedView) {
         Set<BlockPos> todelete = new HashSet<>();
         DELAYED_RENDERS.forEach((pos, consumer) -> {
             if (RENDER_VALIDATIONS.getOrDefault(pos, (level, blockPos) -> false).apply(Minecraft.getInstance().level, pos)) {
@@ -41,27 +38,19 @@ public class DelayedRenderer {
                 todelete.add(pos);
             }
         });
-        for (BlockPos pos : todelete) {
-            DELAYED_RENDERS.remove(pos);
-            RENDER_VALIDATIONS.remove(pos);
-        }
-
-        RENDERS.forEach((type, renderlist) -> {
-            VertexConsumer consumer = buffer.getBuffer(type);
-            renderlist.forEach(r -> {
-                RenderSystem.enableDepthTest();
-                BlockPos pos = r.getKey();
-                matrixStack.pushPose();
-                matrixStack.translate(pos.getX() - projectedView.x, pos.getY() - projectedView.y, pos.getZ() - projectedView.z);
-                r.getValue().accept(matrixStack, consumer);
-                matrixStack.popPose();
+        todelete.forEach(DelayedRenderer::removeRender);
+        RENDERS.forEach((type, renderlist) -> renderlist.forEach(render -> {
+            BlockPos pos = render.getKey();
+            matrixStack.pushPose();
+            matrixStack.translate(pos.getX() - projectedView.x, pos.getY() - projectedView.y, pos.getZ() - projectedView.z);
+            collector.submitCustomGeometry(matrixStack, type, (pose, buffer) -> {
+                PoseStack captured = new PoseStack();
+                captured.last().set(pose);
+                render.getValue().accept(captured, buffer);
             });
-            RenderSystem.enableDepthTest();
-            buffer.endBatch(type);
-        });
+            matrixStack.popPose();
+        }));
         RENDERS.clear();
-
-        buffer.endLastBatch();
     }
 
     public static void addRender(BlockPos pos, TriConsumer<PoseStack, Vec3, RenderType> renderer, BiFunction<Level, BlockPos, Boolean> validator) {

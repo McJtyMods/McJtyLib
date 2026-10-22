@@ -8,9 +8,9 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 
 import javax.imageio.ImageIO;
@@ -28,7 +28,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     public static final int DEFAULT_TXTDIM = 256;
 
     private boolean dragging = false;
-    private ResourceLocation image = null;
+    private Identifier image = null;
     private int u;
     private int v;
     private int txtWidth = DEFAULT_TXTDIM;
@@ -36,11 +36,11 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     private List<ImageEvent> imageEvents = null;
     private BufferedImage bufferedImage;
 
-    public ResourceLocation getImage() {
+    public Identifier getImage() {
         return image;
     }
 
-    public P image(ResourceLocation image, int u, int v) {
+    public P image(Identifier image, int u, int v) {
         this.image = image;
         this.u = u;
         this.v = v;
@@ -105,17 +105,17 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }
         super.draw(gui, graphics, x, y);
 
         if (image != null) {
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            graphics.blit(image, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
+            graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, image, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight, 256, 256);
         }
     }
 
@@ -153,7 +153,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
     @Override
     public void readFromGuiCommand(GuiParser.GuiCommand command) {
         super.readFromGuiCommand(command);
-        command.findCommand("image").ifPresent(cmd -> image = ResourceLocation.parse(cmd.getOptionalPar(0, "")));
+        command.findCommand("image").ifPresent(cmd -> image = Identifier.parse(cmd.getOptionalPar(0, "")));
         command.findCommand("dim").ifPresent(cmd -> {
             u = cmd.getOptionalPar(0, 0);
             v = cmd.getOptionalPar(1, 0);

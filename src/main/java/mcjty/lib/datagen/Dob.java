@@ -3,13 +3,13 @@ package mcjty.lib.datagen;
 import mcjty.lib.blocks.RBlock;
 import mcjty.lib.crafting.CopyComponentsRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.triggers.Criterion;
+import net.minecraft.advancements.triggers.InventoryChangeTrigger;
+import net.minecraft.advancements.predicates.MinMaxBounds;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.data.recipes.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
@@ -29,7 +29,7 @@ public record Dob(
         Supplier<? extends Block> blockSupplier,
         Supplier<? extends Item> itemSupplier,
         Supplier<? extends EntityType> entitySupplier,
-        Map<String, Supplier<Map<ResourceLocation, Object>>> codecObjectSupplier,
+        Map<String, Supplier<Map<Identifier, Object>>> codecObjectSupplier,
         Map<String, HolderLookup.Provider> holderLookupSupplier,
         Map<String, Supplier<IGlobalLootModifier>> glmSupplier,
         String translatedName,
@@ -67,22 +67,22 @@ public record Dob(
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(MinMaxBounds.Ints ints, ItemLike item) {
-        return RecipeProvider.has(ints, item);
+        return net.minecraft.advancements.triggers.CriteriaTriggers.INVENTORY_CHANGED.createCriterion(DataGen.inventoryTrigger(net.minecraft.advancements.predicates.ItemPredicate.Builder.item().of(DataGen.recipeItems(), item).withCount(ints).build()));
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item) {
-        return RecipeProvider.has(item);
+        return DataGen.has(item);
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(TagKey<Item> item) {
-        return RecipeProvider.has(item);
+        return DataGen.has(item);
     }
 
     public static class Builder {
         private final Supplier<? extends Block> blockSupplier;
         private final Supplier<? extends Item> itemSupplier;
         private final Supplier<? extends EntityType> entitySupplier;
-        private final Map<String, Supplier<Map<ResourceLocation, Object>>> codecObjectSupplier = new HashMap<>();
+        private final Map<String, Supplier<Map<Identifier, Object>>> codecObjectSupplier = new HashMap<>();
         private final Map<String, HolderLookup.Provider> holderLookupSupplier = new HashMap<>();
         private final Map<String, Supplier<IGlobalLootModifier>> glmSupplier = new HashMap<>();
         private String translatedName = null;
@@ -106,13 +106,13 @@ public record Dob(
             return this;
         }
 
-        public Builder codecObjectSupplier(String name, Supplier<Map<ResourceLocation, Object>> supplier) {
-            Supplier<Map<ResourceLocation, Object>> oldSupplier = codecObjectSupplier.get(name);
+        public Builder codecObjectSupplier(String name, Supplier<Map<Identifier, Object>> supplier) {
+            Supplier<Map<Identifier, Object>> oldSupplier = codecObjectSupplier.get(name);
             if (oldSupplier == null) {
                 codecObjectSupplier.put(name, supplier);
             } else {
                 codecObjectSupplier.put(name, () -> {
-                    Map<ResourceLocation, Object> old = new HashMap<>(oldSupplier.get());
+                    Map<Identifier, Object> old = new HashMap<>(oldSupplier.get());
                     old.putAll(supplier.get());
                     return old;
                 });
@@ -185,7 +185,7 @@ public record Dob(
             return this;
         }
 
-        public Builder cubeAll(ResourceLocation texture) {
+        public Builder cubeAll(Identifier texture) {
             this.item = f -> f.cubeAll(f.name(itemSupplier.get()), texture);
             return this;
         }
@@ -303,7 +303,7 @@ public record Dob(
             this.recipe = f -> {
                 orig.accept(f);
                 // @todo 1.19.3
-                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, getItemLike())), pattern);
+                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(f.items(), RecipeCategory.MISC, getItemLike())), pattern);
             };
             return this;
         }
@@ -313,7 +313,7 @@ public record Dob(
             this.recipe = f -> {
                 orig.accept(f);
                 // @todo 1.19.3
-                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, getItemLike(), amount)), pattern);
+                f.shaped(builder.apply(ShapedRecipeBuilder.shaped(f.items(), RecipeCategory.MISC, getItemLike(), amount)), pattern);
             };
             return this;
         }
@@ -323,7 +323,7 @@ public record Dob(
             this.recipe = f -> {
                 orig.accept(f);
                 // @todo 1.19.3
-                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, getItemLike())), pattern);
+                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(f.items(), RecipeCategory.MISC, getItemLike())), pattern);
             };
             return this;
         }
@@ -332,7 +332,7 @@ public record Dob(
             final Consumer<IRecipeFactory> orig = this.recipe;
             this.recipe = f -> {
                 orig.accept(f);
-                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(RecipeCategory.MISC, getItemLike(), amount)), pattern);
+                f.shaped(id, builder.apply(ShapedRecipeBuilder.shaped(f.items(), RecipeCategory.MISC, getItemLike(), amount)), pattern);
             };
             return this;
         }
@@ -342,7 +342,7 @@ public record Dob(
             this.recipe = f -> {
                 orig.accept(f);
                 // @todo 1.19.3
-                f.shapeless(builder.apply(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, getItemLike())));
+                f.shapeless(builder.apply(ShapelessRecipeBuilder.shapeless(f.items(), RecipeCategory.MISC, getItemLike())));
             };
             return this;
         }
@@ -352,7 +352,7 @@ public record Dob(
             this.recipe = f -> {
                 orig.accept(f);
                 // @todo 1.19.3
-                f.shapeless(id, builder.apply(ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, getItemLike())));
+                f.shapeless(id, builder.apply(ShapelessRecipeBuilder.shapeless(f.items(), RecipeCategory.MISC, getItemLike())));
             };
             return this;
         }

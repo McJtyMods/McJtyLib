@@ -13,7 +13,7 @@ public class BlockPosTools {
     }
 
     public static BlockPos read(CompoundTag tagCompound, String tagName) {
-        int[] array = tagCompound.getIntArray(tagName);
+        int[] array = tagCompound.getIntArray(tagName).orElseGet(() -> new int[0]);
         if (array.length == 0) {
             return null;
         } else {
@@ -40,6 +40,6 @@ public class BlockPosTools {
     }
 
     public static String toString(GlobalPos pos) {
-        return BlockPosTools.toString(pos.pos()) + " (" + pos.dimension().location().getPath() + ")";
+        return BlockPosTools.toString(pos.pos()) + " (" + pos.dimension().identifier().getPath() + ")";
     }
 }

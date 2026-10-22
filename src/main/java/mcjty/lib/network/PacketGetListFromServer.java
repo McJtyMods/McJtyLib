@@ -14,7 +14,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -30,7 +30,7 @@ import java.util.List;
  */
 public record PacketGetListFromServer(ResourceKey<Level> dimension, BlockPos pos, String command, TypedMap params) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "getlistfromserver");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "getlistfromserver");
     public static final CustomPacketPayload.Type<PacketGetListFromServer> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketGetListFromServer> CODEC = StreamCodec.composite(
@@ -59,7 +59,7 @@ public record PacketGetListFromServer(ResourceKey<Level> dimension, BlockPos pos
     public void handle(IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             Player player = ctx.player();
-            ServerLevel world = LevelTools.getLevel(player.getCommandSenderWorld(), dimension);
+            ServerLevel world = LevelTools.getLevel(player.level(), dimension);
             if (world.hasChunkAt(pos)) {
                 BlockEntity te = world.getBlockEntity(pos);
                 if (te instanceof GenericTileEntity generic) {

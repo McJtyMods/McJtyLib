@@ -23,6 +23,11 @@ public class DeferredBlocks {
         return register.register(name, supplier);
     }
 
+    /** Register with properties whose registry id has been set by NeoForge. */
+    public <T extends Block> DeferredBlock<T> register(String name, java.util.function.Function<net.minecraft.world.level.block.state.BlockBehaviour.Properties, T> factory) {
+        return register.registerBlock(name, factory);
+    }
+
     public static DeferredBlocks create(String modid) {
         return new DeferredBlocks(modid);
     }

@@ -1,9 +1,9 @@
 package mcjty.lib.gui.icons;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class ImageIcon implements IIcon, Cloneable {
 
-    private ResourceLocation image = null;
+    private Identifier image = null;
     private int u;
     private int v;
     private int width;
@@ -22,7 +22,7 @@ public class ImageIcon implements IIcon, Cloneable {
     private List<IIcon> overlays;
     private Map<String, Object> dataMap;
 
-    public ResourceLocation getImage() {
+    public Identifier getImage() {
         return image;
     }
 
@@ -99,7 +99,7 @@ public class ImageIcon implements IIcon, Cloneable {
         return dataMap;
     }
 
-    public ImageIcon setImage(ResourceLocation image, int u, int v) {
+    public ImageIcon setImage(Identifier image, int u, int v) {
         this.image = image;
         this.u = u;
         this.v = v;
@@ -113,9 +113,9 @@ public class ImageIcon implements IIcon, Cloneable {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        graphics.blit(image, x, y, u, v, width, height);
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
+
+        graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, image, x, y, u, v, width, height, 256, 256);
         if (overlays != null) {
             for (IIcon icon : overlays) {
                 icon.draw(gui, graphics, x, y);

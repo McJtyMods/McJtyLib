@@ -40,6 +40,6 @@ public class DefaultInfusable implements IInfusable {
     }
 
     public void load(CompoundTag tag, String tagName) {
-        infused = tag.getInt(tagName);
+        infused = tag.getIntOr(tagName, 0);
     }
 }

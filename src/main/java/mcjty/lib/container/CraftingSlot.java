@@ -71,10 +71,10 @@ public class CraftingSlot extends SlotItemHandler {
      */
     @Override
     protected void checkTakeAchievements(ItemStack stack) {
-        stack.onCraftedBy(player.level(), player, this.removeCount);
+        stack.onCraftedBy(player, this.removeCount);
         onCraft.accept(te, player, stack);
 
         this.removeCount = 0;
-        EventHooks.firePlayerSmeltedEvent(this.player, stack);
+        EventHooks.firePlayerSmeltedEvent(this.player, stack, this.removeCount);
     }
 }

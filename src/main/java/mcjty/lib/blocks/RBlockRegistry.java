@@ -17,10 +17,11 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -63,9 +64,23 @@ public class RBlockRegistry {
         } else {
             item = null;
         }
-        DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> BlockEntityType.Builder.of(tileSupplier, block.get()).build(null));
+        DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> new BlockEntityType<>(tileSupplier, block.get()));
         AnnotationHolder holder = AnnotationTools.createAnnotationHolder(clazz, block);
         holders.add(holder);
+        return new RBlock<>(block, item, tile);
+    }
+
+    /** Registry-aware factories ensure that block and item properties carry their 26.2 ids. */
+    public <B extends BaseBlock, I extends BlockItem, E extends GenericTileEntity> RBlock<B, I, E> registerBlock(
+            String name, Class<E> clazz,
+            Function<net.minecraft.world.level.block.state.BlockBehaviour.Properties, B> blockFactory,
+            @Nullable BiFunction<Supplier<? extends Block>, Item.Properties, I> itemFactory,
+            BlockEntityType.BlockEntitySupplier<E> tileFactory) {
+        DeferredBlock<B> block = BLOCKS.register(name, blockFactory);
+        DeferredItem<I> item = itemFactory == null ? null : ITEMS.register(name, properties -> itemFactory.apply(block, properties));
+        if (item != null) tab.accept(() -> new ItemStack(item.get()));
+        var tile = TILES.register(name, () -> new BlockEntityType<>(tileFactory, block.get()));
+        holders.add(AnnotationTools.createAnnotationHolder(clazz, block));
         return new RBlock<>(block, item, tile);
     }
 
@@ -78,7 +93,7 @@ public class RBlockRegistry {
             BlockEntityType.BlockEntitySupplier<E> tileSupplier) {
         DeferredBlock<B> block = BLOCKS.register(name, blockSupplier);
         DeferredItem<I> item = ITEMS.register(name, () -> itemSupplier.apply(block));
-        DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> BlockEntityType.Builder.of(tileSupplier, block.get()).build(null));
+        DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> new BlockEntityType<>(tileSupplier, block.get()));
         AnnotationHolder holder = AnnotationTools.createAnnotationHolder(clazz, block);
         holders.add(holder);
         return new RBlock<>(block, item, tile);
@@ -86,6 +101,12 @@ public class RBlockRegistry {
 
     public <T extends Item> DeferredItem<T> registerItem(String name, Supplier<T> itemSupplier) {
         DeferredItem<T> item = ITEMS.register(name, itemSupplier);
+        tab.accept(() -> new ItemStack(item.get()));
+        return item;
+    }
+
+    public <T extends Item> DeferredItem<T> registerItem(String name, Function<Item.Properties, T> factory) {
+        DeferredItem<T> item = ITEMS.register(name, factory);
         tab.accept(() -> new ItemStack(item.get()));
         return item;
     }

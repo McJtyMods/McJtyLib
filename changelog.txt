@@ -1,3 +1,9 @@
+26.2-10.0.0:
+- Ported to Minecraft 26.2 and NeoForge with Java 25
+- Updated GUI extraction, model helpers, recipes, block entity persistence, networking, and datagen
+- Added transactional item, fluid, and energy capability support
+- Updated TOP and JEI integration; Patchouli manuals await a compatible 26.2 API
+
 1.21-9.0.21:
 - Updated manual helper support for the Patchouli documentation updates
 

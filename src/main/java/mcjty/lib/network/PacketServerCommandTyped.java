@@ -12,7 +12,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -26,7 +26,7 @@ import java.util.Optional;
  */
 public record PacketServerCommandTyped(BlockPos pos, ResourceKey<Level> dimensionId, String command, TypedMap params) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "servercommandtyped");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "servercommandtyped");
     public static final CustomPacketPayload.Type<PacketServerCommandTyped> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketServerCommandTyped> CODEC = StreamCodec.composite(
@@ -55,7 +55,7 @@ public record PacketServerCommandTyped(BlockPos pos, ResourceKey<Level> dimensio
             Player player = ctx.player();
             Level world;
             if (dimensionId == null) {
-                world = player.getCommandSenderWorld();
+                world = player.level();
             } else {
                 world = LevelTools.getLevel(player.level(), dimensionId);
             }

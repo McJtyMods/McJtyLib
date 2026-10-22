@@ -9,16 +9,16 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.Objects;
 
 public class TeleportationTools {
 
     public static void teleport(Player player, ResourceKey<Level> dimension, double destX, double destY, double destZ, @Nullable Direction direction) {
-        ResourceKey<Level> oldId = player.getCommandSenderWorld().dimension();
+        ResourceKey<Level> oldId = player.level().dimension();
 
         float rotationYaw = player.getYRot();
         float rotationPitch = player.getXRot();
@@ -36,13 +36,13 @@ public class TeleportationTools {
     }
 
     public static void teleportToDimension(Player player, ResourceKey<Level> dimension, double x, double y, double z) {
-        ServerLevel world = LevelTools.getLevel(player.getCommandSenderWorld(), dimension);
+        ServerLevel world = LevelTools.getLevel(player.level(), dimension);
         if (world == null) {
-            McJtyLib.setup.getLogger().error("Something went wrong teleporting to dimension " + dimension.location().getPath());
+            McJtyLib.setup.getLogger().error("Something went wrong teleporting to dimension " + dimension.identifier().getPath());
             return;
         }
-        DimensionTransition transition = new DimensionTransition(world, new Vec3(x, y, z), new Vec3(0, 0, 0), 0, 0, DimensionTransition.DO_NOTHING);
-        player.changeDimension(transition);
+        TeleportTransition transition = new TeleportTransition(world, new Vec3(x, y, z), new Vec3(0, 0, 0), 0, 0, TeleportTransition.DO_NOTHING);
+        ((net.minecraft.server.level.ServerPlayer)player).teleport(transition);
     }
 
     private record Rot(float yaw, float pitch) {}
@@ -72,19 +72,19 @@ public class TeleportationTools {
      * entities to be killed and recreated)
      */
     public static Entity teleportEntity(Entity entity, Level destWorld, double newX, double newY, double newZ, Direction facing) {
-        Level world = entity.getCommandSenderWorld();
+        Level world = entity.level();
         if (Objects.equals(world.dimension(), destWorld.dimension())) {
             if (facing != null) {
                 fixOrientation(entity, newX, newY, newZ, facing);
             }
-            entity.moveTo(newX, newY, newZ, entity.getYRot(), entity.getXRot());
+            entity.snapTo(newX, newY, newZ, entity.getYRot(), entity.getXRot());
             ((ServerLevel) destWorld).tickNonPassenger(entity);
             return entity;
         } else {
             var rot = fixOrientation(entity, newX, newY, newZ, facing);
-            DimensionTransition transition = new DimensionTransition((ServerLevel) destWorld, new Vec3(newX, newY, newZ), Vec3.ZERO,
-                    rot.yaw(), rot.pitch(), DimensionTransition.DO_NOTHING);    //  @todo 1.21 check?
-            return entity.changeDimension(transition);
+            TeleportTransition transition = new TeleportTransition((ServerLevel) destWorld, new Vec3(newX, newY, newZ), Vec3.ZERO,
+                    rot.yaw(), rot.pitch(), TeleportTransition.DO_NOTHING);    //  @todo 1.21 check?
+            return entity.teleport(transition);
         }
     }
 

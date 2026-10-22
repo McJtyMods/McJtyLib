@@ -20,7 +20,7 @@ package mcjty.lib.font;
 
 import mcjty.lib.varia.Logging;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.awt.*;
 import java.io.IOException;
@@ -45,15 +45,15 @@ public class FontLoader {
         return out;
     }
 
-    public static TrueTypeFont createFont(ResourceLocation res, float defSize, boolean antialias) {
+    public static TrueTypeFont createFont(Identifier res, float defSize, boolean antialias) {
         return createFont(res, defSize, antialias, Font.TRUETYPE_FONT);
     }
 
-    public static TrueTypeFont createFont(ResourceLocation res, float defSize, boolean antialias, int type) {
+    public static TrueTypeFont createFont(Identifier res, float defSize, boolean antialias, int type) {
         return createFont(res, defSize, antialias, type, null);
     }
 
-    public static TrueTypeFont createFont(ResourceLocation res, float defSize, boolean antialias, int type, char[] additionalChars) {
+    public static TrueTypeFont createFont(Identifier res, float defSize, boolean antialias, int type, char[] additionalChars) {
         Font font;
         TrueTypeFont out = null;
         try {

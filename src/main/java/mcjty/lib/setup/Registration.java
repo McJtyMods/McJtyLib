@@ -34,15 +34,15 @@ public class Registration {
         REGISTRAR.register(bus);
     }
 
-    public static Supplier<CopyComponentsRecipeSerializer> COPYNBT_SERIALIZER = RECIPE_SERIALIZERS.register("copy_components", CopyComponentsRecipeSerializer::new);
+    public static Supplier<RecipeSerializer<mcjty.lib.crafting.CopyComponentsRecipe>> COPYNBT_SERIALIZER = RECIPE_SERIALIZERS.register("copy_components", CopyComponentsRecipeSerializer::create);
     public static final Supplier<AttachmentType<PreferencesProperties>> PREFERENCES_PROPERTIES = ATTACHMENT_TYPES.register(
             "preferences_properties", () -> AttachmentType.builder(PreferencesProperties::new)
-                    .serialize(PreferencesProperties.CODEC)
+                    .serialize(PreferencesProperties.CODEC.fieldOf("value"))
                     .build());
 
     public static final Supplier<AttachmentType<BaseBEData>> BASE_BE_DATA = ATTACHMENT_TYPES.register(
             "base_be_data", () -> AttachmentType.builder(() -> new BaseBEData("", null, -1, RedstoneMode.REDSTONE_IGNORED))
-                    .serialize(BaseBEData.CODEC)
+                    .serialize(BaseBEData.CODEC.fieldOf("value"))
                     .build());
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<BaseBEData>> ITEM_BASE_BE_DATA = REGISTRAR.registerComponentType(
             "base_be_data",

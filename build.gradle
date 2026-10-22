@@ -14,20 +14,24 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.1.4'
+    id 'net.neoforged.gradle.userdev' version '7.1.38'
 }
 
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
 
-if (project.file('../gradletools.gradle').exists()) {
-    apply from: '../gradletools.gradle'
+def sharedTools = rootProject.file('gradletools.gradle')
+if (sharedTools.isFile()) {
+    apply from: sharedTools
+} else if (file('gradletools.gradle').isFile()) {
+    // Temporary standalone copy while the 26.2 workspace is unpublished.
+    apply from: 'gradletools.gradle'
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/1.21_neo/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.2_neo/gradletools.gradle'
 }
 
 group = "com.github.mcjty"
-archivesBaseName = "mcjtylib"
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+base.archivesName = "mcjtylib"
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 if (System.getenv('BUILD_NUMBER') != null) {
     version += ".${System.getenv('BUILD_NUMBER')}"
@@ -41,22 +45,17 @@ jars()
 dependencies {
     mc()
     top()
-    patchouli()
     jei()
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.12.2'
 }
 
-subsystems {
-    parchment {
-        minecraftVersion = "${parchment_minecraft_version}"
-        mappingsVersion = "${parchment_version}"
-    }
-}
 
 
 task apiJar(type: Jar) {
     archiveClassifier = "api"
     from(sourceSets.main.output) {
-        include "mcjty/mcjtylib/api/**"
+        include "mcjty/lib/api/**"
     }
 }
 
@@ -69,7 +68,7 @@ publishing {
         from components.java
         artifact apiJar
 
-        artifactId = project.archivesBaseName
+        artifactId = base.archivesName.get()
         pom {
             name = 'McJtyLib'
             description = 'Base mod for all McJty tech mods'
@@ -111,9 +110,10 @@ publishing {
 modpublisher(['the-one-probe'], [], ['the-one-probe'], [], [])
 
 
-subsystems {
-    parchment {
-        minecraftVersion = "${parchment_minecraft_version}"
-        mappingsVersion = "${parchment_version}"
-    }
-}
+
+sourceSets.main.resources.srcDir 'src/generated/resources'
+
+tasks.named('test') { useJUnitPlatform() }
+
+// Convenient entry point for the checks that do not launch Minecraft.
+tasks.register('portingRegression') { dependsOn tasks.named('test') }

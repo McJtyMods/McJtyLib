@@ -3,7 +3,7 @@ package mcjty.lib.worlddata;
 import mcjty.lib.varia.LevelTools;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.storage.SavedDataStorage;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import javax.annotation.Nonnull;
@@ -26,11 +26,13 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
 
     @Nonnull
     public static <T extends AbstractWorldData<T>> T getData(Level world, Function<CompoundTag, T> loader, Supplier<T> supplier, String name) {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             throw new RuntimeException("Don't access this client-side!");
         }
-        DimensionDataStorage storage = LevelTools.getOverworld(world).getDataStorage();
-        return storage.computeIfAbsent(new Factory<>(supplier, (tag, provider) -> loader.apply(tag)), name);
+        SavedDataStorage storage = LevelTools.getOverworld(world).getDataStorage();
+        var codec = CompoundTag.CODEC.xmap(loader, data -> data.save(new CompoundTag(), world.registryAccess()));
+        return storage.computeIfAbsent(new net.minecraft.world.level.saveddata.SavedDataType<>(net.minecraft.resources.Identifier.parse(name), supplier, codec));
     }
 
+    public abstract CompoundTag save(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider);
 }

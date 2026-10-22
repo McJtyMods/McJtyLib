@@ -9,10 +9,17 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.world.inventory.DataSlot;
-import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<LongTag> {
+
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+
+public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
 
     private final GenericTileEntity tileEntity;
     private final boolean isReceiver;
@@ -20,6 +27,24 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
     private long energy;
     private final long capacity;
     private final long maxReceive;
+
+    private final SnapshotJournal<Long> transferJournal = new SnapshotJournal<>() {
+        @Override protected Long createSnapshot() { return energy; }
+        @Override protected void revertToSnapshot(Long snapshot) { energy = snapshot; }
+        @Override protected void onRootCommit(Long before) { if (energy != before) tileEntity.markDirtyQuick(); }
+    };
+    @Override public long getAmountAsLong() { return energy; }
+    @Override public long getCapacityAsLong() { return capacity; }
+    @Override public int insert(int amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        int inserted = receiveEnergy(amount, true);
+        if (inserted > 0) { transferJournal.updateSnapshots(transaction); energy += inserted; }
+        return inserted;
+    }
+    @Override public int extract(int amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        return 0; // This storage has always exposed energy input only.
+    }
 
     public GenericEnergyStorage(GenericTileEntity tileEntity, boolean isReceiver, long capacity, long maxReceive) {
         this.tileEntity = tileEntity;
@@ -99,14 +124,12 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
         tileEntity.markDirtyQuick();
     }
 
-    @Override
     public LongTag serializeNBT(HolderLookup.Provider provider) {
         return LongTag.valueOf(energy);
     }
 
-    @Override
     public void deserializeNBT(HolderLookup.Provider provider, LongTag nbt) {
-        energy = nbt.getAsLong();
+        energy = nbt.value();
     }
 
     @Override

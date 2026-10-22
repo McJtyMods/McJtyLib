@@ -30,7 +30,7 @@ public class MultipartTE {} /*extends BlockEntity {
     }
 
     private void dumpParts(String prefix) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             System.out.println("====== CLIENT(" + prefix + ") " + worldPosition.toString() + " ======");
         } else {
             System.out.println("====== SERVER(" + prefix + ") " + worldPosition.toString() + " ======");
@@ -47,14 +47,14 @@ public class MultipartTE {} /*extends BlockEntity {
     }
 
     public void addPart(PartSlot slot, BlockState state, BlockEntity te) {
-        System.out.println("MultipartTE.addPart: " + level.isClientSide);
+        System.out.println("MultipartTE.addPart: " + level.isClientSide());
         parts.put(slot, new Part(state, te));
 
         if (te instanceof GenericTileEntity) {
             ((GenericTileEntity) te).onPartAdded(slot, state, this);
         }
 
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             version++;
             markDirtyClient();
         } else {
@@ -69,7 +69,7 @@ public class MultipartTE {} /*extends BlockEntity {
         for (Map.Entry<PartSlot, Part> entry : parts.entrySet()) {
             if (entry.getValue().getState() == partState) {
                 parts.remove(entry.getKey());
-                if (!level.isClientSide) {
+                if (!level.isClientSide()) {
                     version++;
                     markDirtyClient();
                 }
@@ -80,7 +80,7 @@ public class MultipartTE {} /*extends BlockEntity {
     }
 
     public void dump() {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             System.out.println("CLIENT: " + worldPosition);
         } else {
             System.out.println("SERVER: " + worldPosition);
@@ -114,7 +114,7 @@ public class MultipartTE {} /*extends BlockEntity {
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
         int oldVersion = version;
         load(packet.getTag());
-        if (level.isClientSide && version != oldVersion) {
+        if (level.isClientSide() && version != oldVersion) {
             ModelDataManager.requestModelDataRefresh(this);
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS + Block.UPDATE_NEIGHBORS);
         }
@@ -160,19 +160,19 @@ public class MultipartTE {} /*extends BlockEntity {
         super.load(compound);
 
         Map<PartSlot, MultipartTE.Part> newparts = new HashMap<>();
-        version = compound.getInt("version");
+        version = compound.getIntOr("version", 0);
         ListTag list = compound.getList("parts", Tag.TAG_COMPOUND);
         for (int i = 0 ; i < list.size() ; i++) {
-            CompoundTag tag = list.getCompound(i);
+            CompoundTag tag = list.getCompoundOrEmpty(i);
 
-            PartSlot slot = PartSlot.byName(tag.getString("slot"));
+            PartSlot slot = PartSlot.byName(tag.getStringOr("slot", ""));
             if (slot != null) {
                 BlockState state = NbtUtils.readBlockState(tag);
                 if (partExists(slot, state)) {
                     // Part is already there. Just update it
                     Part part = this.parts.get(slot);
                     if (tag.contains("te")) {
-                        CompoundTag tc = tag.getCompound("te");
+                        CompoundTag tc = tag.getCompoundOrEmpty("te");
                         BlockEntity te = part.tileEntity;
                         if (te == null) {
                             if (state.getBlock() instanceof EntityBlock entityBlock) {
@@ -192,7 +192,7 @@ public class MultipartTE {} /*extends BlockEntity {
                 } else {
                     BlockEntity te = null;
                     if (tag.contains("te")) {
-                        CompoundTag tc = tag.getCompound("te");
+                        CompoundTag tc = tag.getCompoundOrEmpty("te");
                         if (state.getBlock() instanceof EntityBlock entityBlock) {
                             te = entityBlock.newBlockEntity(worldPosition, state);
                         }

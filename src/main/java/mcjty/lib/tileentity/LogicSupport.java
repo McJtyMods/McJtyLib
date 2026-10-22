@@ -35,7 +35,7 @@ public class LogicSupport {
         te.setChanged();
         BlockState state = te.getBlockState();
         Direction outputSide = getFacing(state).getInputSide().getOpposite();
-        te.getLevel().neighborChanged(te.getBlockPos().relative(outputSide), state.getBlock(), te.getBlockPos());
+        te.getLevel().neighborChanged(te.getBlockPos().relative(outputSide), state.getBlock(), null);
         //        getWorld().notifyNeighborsOfStateChange(this.pos, this.getBlockType());
     }
 

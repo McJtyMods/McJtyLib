@@ -9,7 +9,7 @@ import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
@@ -138,7 +138,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
 
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }
@@ -161,7 +161,7 @@ public class IconHolder extends AbstractWidget<IconHolder> {
     }
 
     @Override
-    public void drawPhase2(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void drawPhase2(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }

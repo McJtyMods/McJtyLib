@@ -1,114 +1,126 @@
 package mcjty.lib.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import mcjty.lib.base.StyleConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Position;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.*;
+import net.minecraft.client.renderer.texture.*;
+import net.minecraft.core.*;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-
+import org.joml.Vector3f;
+import mcjty.lib.base.StyleConfig;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
-import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
 
 public class RenderHelper {
+    public static final int MAX_BRIGHTNESS = LightCoordsUtil.FULL_BRIGHT;
+    public static final RenderSettings DEFAULT_SETTINGS = RenderSettings.builder().build();
+    public static final RenderSettings FULLBRIGHT_SETTINGS = RenderSettings.builder().brightness(MAX_BRIGHTNESS).build();
+    public enum FaceRotation { ZERO, CLOCKWISE_90, UPSIDE_DOWN, COUNTERCLOCKWISE_90 }
 
-    public static float rot = 0.0f;
-
-    public static final int MAX_BRIGHTNESS = 0xf000f0;
-
-    public static final RenderSettings DEFAULT_SETTINGS = RenderSettings.builder()
-            .color(255, 255, 255)
-            .alpha(128)
-            .build();
-
-    public static final RenderSettings FULLBRIGHT_SETTINGS = RenderSettings.builder()
-            .color(255, 255, 255)
-            .alpha(MAX_BRIGHTNESS)
-            .build();
-
-    public static void renderItemGround(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
-        itemRenderer.render(stack, ItemDisplayContext.GROUND.GROUND, false, matrixStack, buffer, brightness, combinedOverlay, ibakedmodel);
+    public static void renderAndDecorateItem(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y) {
+        graphics.item(stack, x, y);
+        graphics.itemDecorations(Minecraft.getInstance().font, stack, x, y);
     }
 
-    public static void renderItemGround(@Nonnull PoseStack poseStack, @Nonnull MultiBufferSource buffer, @Nonnull RenderType renderType, ItemStack stack, int lightmap, int overlay) {
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
-        itemRenderer.render(stack, ItemDisplayContext.GROUND, false, poseStack, type -> buffer.getBuffer(renderType), lightmap, overlay, ibakedmodel);
+    private static void submitItem(PoseStack pose, SubmitNodeCollector collector, ItemStack stack, ItemDisplayContext context, int light, int overlay) {
+        var mc = Minecraft.getInstance();
+        var state = new ItemStackRenderState();
+        mc.getItemModelResolver().updateForTopItem(state, stack, context, mc.level, mc.player, 0);
+        state.submit(pose, collector, light, overlay, 0);
     }
-
-    public static void renderItemGui(PoseStack matrixStack, MultiBufferSource buffer, RenderType renderType, ItemStack stack, int brightness, int combinedOverlay) {
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
-        itemRenderer.render(stack, ItemDisplayContext.GUI, false, matrixStack, type -> buffer.getBuffer(renderType), brightness, combinedOverlay, ibakedmodel);
+    public static void renderItemGround(PoseStack pose, SubmitNodeCollector collector, ItemStack stack, int light, int overlay) {
+        submitItem(pose, collector, stack, ItemDisplayContext.GROUND, light, overlay);
     }
-
-    public static void renderItemGui(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        BakedModel ibakedmodel = itemRenderer.getModel(stack, Minecraft.getInstance().level, null, 0);  // @todo last parameter?
-        itemRenderer.render(stack, ItemDisplayContext.GUI, false, matrixStack, buffer, brightness, combinedOverlay, ibakedmodel);
+    public static void renderItemGui(PoseStack pose, SubmitNodeCollector collector, ItemStack stack, int light, int overlay) {
+        submitItem(pose, collector, stack, ItemDisplayContext.GUI, light, overlay);
     }
-
-    public static void renderAndDecorateItem(GuiGraphics graphics, ItemStack stack, int x, int y) {
-        graphics.renderItem(stack, x, y, x * y * 31);
-        graphics.renderItemDecorations(Minecraft.getInstance().font, stack, x, y, null);
-//        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-//        itemRenderer.renderAndDecorateItem(matrixStack, stack, x, y);
+    public static void renderStaticFixed(PoseStack pose, SubmitNodeCollector collector, ItemStack stack, int light, int overlay) {
+        submitItem(pose, collector, stack, ItemDisplayContext.FIXED, light, overlay);
     }
-
-    public static void renderStaticFixed(PoseStack matrixStack, MultiBufferSource buffer, ItemStack stack, int brightness, int combinedOverlay) {
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        itemRenderer.renderStatic(stack, ItemDisplayContext.FIXED, RenderHelper.MAX_BRIGHTNESS, combinedOverlay, matrixStack, buffer, null, 0); // @todo 1.18 last parameter?
+    public static void renderText(Font font, String text, int x, int y, int color, PoseStack pose, SubmitNodeCollector collector, int light) {
+        pose.pushPose();
+        pose.translate(x, y, 0);
+        collector.submitText(pose, 0, 0, net.minecraft.util.FormattedCharSequence.forward(text, net.minecraft.network.chat.Style.EMPTY), false, Font.DisplayMode.NORMAL, light, color, 0, 0);
+        pose.popPose();
     }
-
-    public static void renderText(Font font, String text, int x, int y, int color, PoseStack poseStack, MultiBufferSource buffer, int lightmapValue) {
-        font.drawInBatch(text, x, y, color, false, poseStack.last().pose(), buffer, Font.DisplayMode.NORMAL, 0, lightmapValue);
+    public static boolean renderObject(GuiGraphicsExtractor graphics, int x, int y, Object object, boolean highlight) {
+        return renderObject(graphics, Minecraft.getInstance().getItemModelResolver(), x, y, object, highlight, 0);
     }
-
-    public static void renderModel(BlockRenderDispatcher renderer, PoseStack stack, VertexConsumer buffer, BlockState state, BakedModel model,
-                                   float r, float g, float b, int combinedLight, int combinedOverlay, ModelData modelData, RenderType renderType) {
-        renderer.getModelRenderer().renderModel(stack.last(), buffer, state, model, r, g, b, combinedLight, combinedOverlay, modelData, renderType);
+    public static boolean renderObject(GuiGraphicsExtractor graphics, ItemModelResolver resolver, int x, int y, Object object, boolean highlight, float level) {
+        if (object instanceof ItemStack stack) return renderItemStackWithCount(graphics, resolver, stack, x, y, highlight);
+        if (object instanceof Item item) return renderObject(graphics, x, y, new ItemStack(item), highlight);
+        if (object instanceof Block block) return renderObject(graphics, x, y, new ItemStack(block), highlight);
+        if (object instanceof FluidStack fluid) return renderFluidStack(graphics, fluid, x, y, highlight);
+        if (object instanceof TextureAtlasSprite sprite) {
+            graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, sprite, x, y, 16, 16);
+            return true;
+        }
+        if (object instanceof Entity entity) {
+            var state = Minecraft.getInstance().getEntityRenderDispatcher().extractEntity(entity, 1);
+            graphics.entity(state, 16, new Vector3f(0, state.boundingBoxHeight / 2, 0), new Quaternionf().rotateZ((float)Math.PI), null, x, y, x + 16, y + 16);
+            return true;
+        }
+        return false;
     }
-
+    public static boolean renderItemStackWithCount(GuiGraphicsExtractor graphics, ItemModelResolver resolver, ItemStack stack, int x, int y, boolean highlight) {
+        int count = stack.getCount();
+        String text = count <= 1 ? "" : count < 100000 ? Integer.toString(count) : count < 1000000 ? count / 1000 + "k" : count < 1000000000 ? count / 1000000 + "m" : count / 1000000000 + "g";
+        return renderItemStack(graphics, resolver, stack, x, y, text, highlight);
+    }
+    public static boolean renderItemStack(GuiGraphicsExtractor graphics, ItemModelResolver resolver, ItemStack stack, int x, int y, String text, boolean highlight) {
+        if (stack.isEmpty()) return false;
+        if (highlight) graphics.fillGradient(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
+        graphics.item(stack, x, y);
+        graphics.itemDecorations(Minecraft.getInstance().font, stack, x, y, text);
+        return true;
+    }
+    public static boolean renderFluidStack(GuiGraphicsExtractor graphics, FluidStack fluid, int x, int y, boolean highlight) {
+        if (fluid.isEmpty()) return false;
+        var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.getFluid().defaultFluidState());
+        int color = model.fluidTintSource() == null ? 0xffffffff : model.fluidTintSource().colorAsStack(fluid);
+        graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, model.stillMaterial().sprite(), x, y, 16, 16, color);
+        return true;
+    }
+    public static int renderText(GuiGraphicsExtractor graphics, int x, int y, String text) { return renderText(graphics, x, y, text, 0xffffffff); }
+    public static int renderText(GuiGraphicsExtractor graphics, int x, int y, String text, int color) {
+        var font = Minecraft.getInstance().font;
+        graphics.text(font, text, x, y, color | 0xff000000);
+        return font.width(text);
+    }
+    public static void drawVerticalGradientRect(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int color1, int color2) {
+        graphics.fillGradient(x1, y1, x2, y2, color1, color2);
+    }
+    public static void drawHorizontalGradientRect(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int color1, int color2) {
+        int width = x2 - x1;
+        for (int x = 0; x < width; x++) {
+            float t = width <= 1 ? 0 : (float)x / (width - 1);
+            int color = 0;
+            for (int shift = 0; shift <= 24; shift += 8) {
+                int a = (color1 >>> shift) & 255, b = (color2 >>> shift) & 255;
+                color |= Math.round(a + (b - a) * t) << shift;
+            }
+            graphics.fill(x1 + x, y1, x1 + x + 1, y2, color);
+        }
+    }
     public static void line(VertexConsumer builder, PoseStack matrixStack, float x1, float y1, float z1, float x2, float y2, float z2,
                             float red, float green, float blue, float alpha) {
-        builder.addVertex(matrixStack.last().pose(), x1, y1, 0).setColor(red, green, blue, alpha);
-        builder.addVertex(matrixStack.last().pose(), x2, y2, 0).setColor(red, green, blue, alpha);
+        drawLine3d(builder, matrixStack, new Vec3(x1, y1, z1), new Vec3(x2, y2, z2), red, green, blue, alpha);
+
     }
 
     // Adjust the given matrix to the specified direction
@@ -138,7 +150,7 @@ public class RenderHelper {
         matrixStack.translate(-0.5F, -0.5F, -0.5F);
     }
 
-    public static void renderNorthSouthQuad(PoseStack poseStack, VertexConsumer builder, TextureAtlasSprite sprite, ModelBuilder.FaceRotation rotation, float offset) {
+    public static void renderNorthSouthQuad(PoseStack poseStack, VertexConsumer builder, TextureAtlasSprite sprite, FaceRotation rotation, float offset) {
         Matrix4f matrix = poseStack.last().pose();
         switch (rotation) {
             case ZERO -> {
@@ -168,430 +180,43 @@ public class RenderHelper {
         }
     }
 
-    private static void renderEntity(GuiGraphics graphics, Entity entity, int xPos, int yPos, float scale) {
-        PoseStack matrixStack = graphics.pose();
-        matrixStack.pushPose();
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        // @todo 1.17 GlStateManager._enableRescaleNormal();
-        // @todo 1.17 GlStateManager._enableColorMaterial();
-        matrixStack.pushPose();
-        matrixStack.translate(xPos + 8, yPos + 16, 50F);
-        matrixStack.scale(-scale, scale, scale);
-        matrixStack.mulPose(Axis.ZP.rotationDegrees(180F));
-        matrixStack.mulPose(Axis.YP.rotationDegrees(135F));
-        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
-        matrixStack.mulPose(Axis.YN.rotationDegrees(135F));
-        matrixStack.mulPose(Axis.YP.rotationDegrees(rot));
-//        GlStateManager.rotatef(0.0F, 1.0F, 0.0F, 0.0F);
-//        entity.renderYawOffset = entity.rotationYaw = entity.prevRotationYaw = entity.prevRotationYawHead = entity.rotationYawHead = 0;//this.rotateTurret;
-        entity.setXRot(0.0F);
-        // @todo 1.21Forge, is getFirstPassenger correct?
-        Vec3 rp = entity.getPassengerRidingPosition(entity.getFirstPassenger());
-        matrixStack.translate(rp.x, rp.y, rp.z);
-        // @todo 1.15
-//        Minecraft.getInstance().getRenderManager().playerViewY = 180F;
-//        Minecraft.getInstance().getRenderManager().renderEntity(entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
-        matrixStack.popPose();
-        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
-
-        // @todo 1.17 GlStateManager._disableRescaleNormal();
-        matrixStack.translate(0F, 0F, 0.0F);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        // @todo 1.17 GlStateManager._enableRescaleNormal();
-        int i1 = FULL_BLOCK;
-        int k1 = FULL_BLOCK;
-
-        // @todo 1.14 check if right?
-        // @todo 1.15
-//        GLX.glMultiTexCoord2f(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
-//        OpenGlHelper.setLightmapTextureCoords(GLX.GL_TEXTURE1, i1 / 1.0F, k1 / 1.0F);
-
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        // @todo 1.17 GlStateManager._disableRescaleNormal();
-        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
-        // @todo 1.17 GlStateManager._disableLighting();
-        GlStateManager._disableDepthTest();
-        matrixStack.popPose();
-    }
-
-    public static boolean renderObject(GuiGraphics graphics, int x, int y, Object itm, boolean highlight) {
-        if (itm instanceof Entity) {
-            renderEntity(graphics, (Entity) itm, x, y, 10F);
-            return true;
-        }
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        return renderObject(graphics, itemRenderer, x, y, itm, highlight, 100);
-    }
-
-    public static boolean renderObject(GuiGraphics graphics, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
-        PoseStack matrixStack = graphics.pose();
-        matrixStack.pushPose();
-        matrixStack.translate(0, 0, lvl);
-//        itemRender.blitOffset = lvl;
-        boolean b = renderObjectInternal(graphics, itemRender, x, y, itm, highlight, lvl);
-        matrixStack.popPose();
-        return b;
-    }
-
-    private static boolean renderObjectInternal(GuiGraphics graphics, ItemRenderer itemRender, int x, int y, Object itm, boolean highlight, float lvl) {
-        if (itm == null) {
-            return renderItemStack(graphics, itemRender, ItemStack.EMPTY, x, y, "", highlight);
-        }
-        if (itm instanceof Item) {
-            return renderItemStack(graphics, itemRender, new ItemStack((Item) itm, 1), x, y, "", highlight);
-        }
-        if (itm instanceof Block) {
-            return renderItemStack(graphics, itemRender, new ItemStack((Block) itm, 1), x, y, "", highlight);
-        }
-        if (itm instanceof ItemStack) {
-            return renderItemStackWithCount(graphics, itemRender, (ItemStack) itm, x, y, highlight);
-        }
-        if (itm instanceof FluidStack) {
-            return renderFluidStack((FluidStack) itm, x, y, highlight);
-        }
-        if (itm instanceof TextureAtlasSprite) {
-            return renderIcon(graphics, itemRender, (TextureAtlasSprite) itm, x, y, highlight);
-        }
-        return renderItemStack(graphics, itemRender, ItemStack.EMPTY, x, y, "", highlight);
-    }
-
-    private static boolean renderIcon(GuiGraphics graphics, ItemRenderer itemRender, TextureAtlasSprite itm, int xo, int yo, boolean highlight) {
-        //itemRender.draw(xo, yo, itm, 16, 16); //TODO: Make
-        return true;
-    }
-
-    public static boolean renderFluidStack(FluidStack fluidStack, int x, int y, boolean highlight) {
-        Fluid fluid = fluidStack.getFluid();
-        if (fluid == null) {
-            return false;
-        }
-
-        IClientFluidTypeExtensions attributes = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-        ResourceLocation fluidStill = attributes.getStillTexture(fluidStack);
-        TextureAtlasSprite fluidStillSprite = null;
-        if (fluidStill != null) {
-            fluidStillSprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fluidStill);
-        }
-        if (fluidStillSprite == null) {
-            return false;
-        }
-
-        int fluidColor = attributes.getTintColor(fluidStack);
-        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
-//        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bindForSetup(InventoryMenu.BLOCK_ATLAS);
-        setGLColorFromInt(fluidColor);
-        drawFluidTexture(x, y, fluidStillSprite, 100);
-
-        return true;
-    }
-
-    private static void drawFluidTexture(double xCoord, double yCoord, TextureAtlasSprite textureSprite, double zLevel) {
-        float uMin = textureSprite.getU0();
-        float uMax = textureSprite.getU1();
-        float vMin = textureSprite.getV0();
-        float vMax = textureSprite.getV1();
-
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder vertexBuffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        vertexBuffer.addVertex((float) xCoord, (float) (yCoord + 16), (float) zLevel).setUv(uMin, vMax);
-        vertexBuffer.addVertex((float) (xCoord + 16), (float) (yCoord + 16), (float) zLevel).setUv(uMax, vMax);
-        vertexBuffer.addVertex((float) (xCoord + 16), (float) yCoord, (float) zLevel).setUv(uMax, vMin);
-        vertexBuffer.addVertex((float) xCoord, (float) yCoord, (float) zLevel).setUv(uMin, vMin);
-        BufferUploader.drawWithShader(vertexBuffer.buildOrThrow());
-    }
-
-
-    private static void setGLColorFromInt(int color) {
-        float red = (color >> 16 & 0xFF) / 255.0F;
-        float green = (color >> 8 & 0xFF) / 255.0F;
-        float blue = (color & 0xFF) / 255.0F;
-
-        RenderSystem.setShaderColor(red, green, blue, 1.0F);
-    }
-
-
-    public static boolean renderItemStackWithCount(GuiGraphics graphics, ItemRenderer itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
-        int size = itm.getCount();
-        String amount;
-        if (size <= 1) {
-            amount = "";
-        } else if (size < 100000) {
-            amount = String.valueOf(size);
-        } else if (size < 1000000) {
-            amount = size / 1000 + "k";
-        } else if (size < 1000000000) {
-            amount = size / 1000000 + "m";
-        } else {
-            amount = size / 1000000000 + "g";
-        }
-
-        return renderItemStack(graphics, itemRender, itm, xo, yo, amount, highlight);
-    }
-
-    public static boolean renderItemStack(GuiGraphics graphics, ItemRenderer itemRender, ItemStack itm, int x, int y, String txt, boolean highlight) {
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1f);
-
-        boolean rc = false;
-        if (highlight) {
-            // @todo 1.17 RenderSystem.disableLighting();
-            drawVerticalGradientRect(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
-        }
-        PoseStack matrixStack = graphics.pose();
-        if (!itm.isEmpty() && itm.getItem() != null) {
-            rc = true;
-            matrixStack.pushPose();
-            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-            // @todo 1.17 enderSystem.enableRescaleNormal();
-            // @todo 1.17 enderSystem.enableLighting();
-            // @todo 1.17 om.mojang.blaze3d.platform.Lighting.turnBackOn();
-            // @todo 1.14 check if right?
-            // @todo 1.15
-            // @todo 1.17 RenderSystem.glMultiTexCoord2f(GL13.GL_TEXTURE1, 240, 240);
-//            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, short1 / 1.0F, short2 / 1.0F);
-
-            graphics.renderItem(itm, x, y, x * y * 31);
-//            graphics.renderItemDecorations(Minecraft.getInstance().font, itm, x, y, null);
-//            itemRender.renderAndDecorateItem(matrixStack, itm, x, y);
-
-            renderGuiItemDecorations(itemRender, Minecraft.getInstance().font, itm, x, y, txt, txt.length() - 2);
-            matrixStack.popPose();
-            // @todo 1.17 RenderSystem.disableRescaleNormal();
-            // @todo 1.17 RenderSystem.disableLighting();
-        }
-
-        return rc;
-    }
-
-    private static void renderGuiItemDecorations(ItemRenderer itemRender, Font font, ItemStack stack, int x, int y, @Nullable String text, int scaled) {
-        if (!stack.isEmpty()) {
-            PoseStack posestack = new PoseStack();
-            if (stack.getCount() != 1 || text != null) {
-                String s = text == null ? String.valueOf(stack.getCount()) : text;
-                // @todo 1.19.4
-//                posestack.translate(0.0D, 0.0D, itemRender.blitOffset + 200.0F);
-                posestack.translate(0.0D, 0.0D, 180.0f + 200.0F);
-
-                MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
-
-                if (scaled >= 2) {
-                    posestack.pushPose();
-                    posestack.scale(.5f, .5f, .5f);
-                    font.drawInBatch(s, ((x + 19 - 2) * 2 - 1 - font.width(s)), y * 2 + 24, 16777215, true, posestack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
-                    posestack.popPose();
-                } else if (scaled == 1) {
-                    posestack.pushPose();
-                    posestack.scale(.75f, .75f, .75f);
-                    font.drawInBatch(s, ((x - 2) * 1.34f + 24 - font.width(s)), y * 1.34f + 14, 16777215, true, posestack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
-                    posestack.popPose();
-                } else {
-                    font.drawInBatch(s, (x + 19 - 2 - font.width(s)), (y + 6 + 3), 16777215, true, posestack.last().pose(), source, Font.DisplayMode.NORMAL, 0, 15728880);
-                }
-
-                source.endBatch();
-            }
-
-            if (stack.isBarVisible()) {
-                RenderSystem.disableDepthTest();
-//                RenderSystem.disableTexture();
-                RenderSystem.disableBlend();
-                Tesselator tesselator = Tesselator.getInstance();
-                int i = stack.getBarWidth();
-                int j = stack.getBarColor();
-                fillRect(x + 2, y + 13, 13, 2, 0, 0, 0, 255);
-                fillRect(x + 2, y + 13, i, 1, j >> 16 & 255, j >> 8 & 255, j & 255, 255);
-                RenderSystem.enableBlend();
-//                RenderSystem.enableTexture();
-                RenderSystem.enableDepthTest();
-            }
-
-            LocalPlayer localplayer = Minecraft.getInstance().player;
-            float f = localplayer == null ? 0.0F : localplayer.getCooldowns().getCooldownPercent(stack.getItem(), Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false));
-            if (f > 0.0F) {
-                RenderSystem.disableDepthTest();
-//                RenderSystem.disableTexture();
-                RenderSystem.enableBlend();
-                RenderSystem.defaultBlendFunc();
-                fillRect(x, y + Mth.floor(16.0F * (1.0F - f)), 16, Mth.ceil(16.0F * f), 255, 255, 255, 127);
-//                RenderSystem.enableTexture();
-                RenderSystem.enableDepthTest();
-            }
-        }
-    }
-
-    private static void fillRect(int pX, int pY, int pWidth, int pHeight, int pRed, int pGreen, int pBlue, int pAlpha) {
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        builder.addVertex(pX + 0, pY + 0, 0.0F).setColor(pRed, pGreen, pBlue, pAlpha);
-        builder.addVertex(pX + 0, pY + pHeight, 0.0F).setColor(pRed, pGreen, pBlue, pAlpha);
-        builder.addVertex(pX + pWidth, pY + pHeight, 0.0F).setColor(pRed, pGreen, pBlue, pAlpha);
-        builder.addVertex(pX + pWidth, pY + 0, 0.0F).setColor(pRed, pGreen, pBlue, pAlpha);
-        BufferUploader.drawWithShader(builder.buildOrThrow());
-    }
-
-
-    /**
-     * Draw with the WorldRenderer
-     */
-    private static void draw(int x, int y, int width, int height, int red, int green, int blue, int alpha) {
-        BufferBuilder renderer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        renderer.addVertex((x + 0), (y + 0), 0.0F).setColor(red, green, blue, alpha);
-        renderer.addVertex((x + 0), (y + height), 0.0F).setColor(red, green, blue, alpha);
-        renderer.addVertex((x + width), (y + height), 0.0F).setColor(red, green, blue, alpha);
-        renderer.addVertex((x + width), (y + 0), 0.0F).setColor(red, green, blue, alpha);
-        BufferUploader.drawWithShader(renderer.buildOrThrow());
-    }
-
-
-    /**
-     * Draws a rectangle with a vertical gradient between the specified colors.
-     * x2 and y2 are not included.
-     */
-    public static void drawVerticalGradientRect(int x1, int y1, int x2, int y2, int color1, int color2) {
-//        this.zLevel = 300.0F;
-        float zLevel = 0.0f;
-
-        float f = (color1 >> 24 & 255) / 255.0F;
-        float f1 = (color1 >> 16 & 255) / 255.0F;
-        float f2 = (color1 >> 8 & 255) / 255.0F;
-        float f3 = (color1 & 255) / 255.0F;
-        float f4 = (color2 >> 24 & 255) / 255.0F;
-        float f5 = (color2 >> 16 & 255) / 255.0F;
-        float f6 = (color2 >> 8 & 255) / 255.0F;
-        float f7 = (color2 & 255) / 255.0F;
-//        RenderSystem.disableTexture();
-        RenderSystem.enableBlend();
-        // @todo 1.17 GlStateManager._disableAlphaTest();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
-
-        // @todo 1.17 GlStateManager._shadeModel(GL11.GL_SMOOTH);
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.addVertex(x2, y1, zLevel).setColor(f1, f2, f3, f);
-        buffer.addVertex(x1, y1, zLevel).setColor(f1, f2, f3, f);
-        buffer.addVertex(x1, y2, zLevel).setColor(f5, f6, f7, f4);
-        buffer.addVertex(x2, y2, zLevel).setColor(f5, f6, f7, f4);
-        BufferUploader.drawWithShader(buffer.buildOrThrow());
-
-        // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
-        RenderSystem.disableBlend();
-        // @todo 1.17 GlStateManager._enableAlphaTest();
-//        RenderSystem.enableTexture();
-    }
-
-    /**
-     * Draws a rectangle with a horizontal gradient between the specified colors.
-     * x2 and y2 are not included.
-     */
-    public static void drawHorizontalGradientRect(int x1, int y1, int x2, int y2, int color1, int color2) {
-//        this.zLevel = 300.0F;
-        float zLevel = 0.0f;
-
-        float f = (color1 >> 24 & 255) / 255.0F;
-        float f1 = (color1 >> 16 & 255) / 255.0F;
-        float f2 = (color1 >> 8 & 255) / 255.0F;
-        float f3 = (color1 & 255) / 255.0F;
-        float f4 = (color2 >> 24 & 255) / 255.0F;
-        float f5 = (color2 >> 16 & 255) / 255.0F;
-        float f6 = (color2 >> 8 & 255) / 255.0F;
-        float f7 = (color2 & 255) / 255.0F;
-//        RenderSystem.disableTexture();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA.value, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA.value, GlStateManager.SourceFactor.ONE.value, GlStateManager.DestFactor.ZERO.value);
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-
-        // @todo 1.17 GlStateManager._shadeModel(GL11.GL_SMOOTH);
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        buffer.addVertex(x1, y1, zLevel).setColor(f1, f2, f3, f);
-        buffer.addVertex(x1, y2, zLevel).setColor(f1, f2, f3, f);
-        buffer.addVertex(x2, y2, zLevel).setColor(f5, f6, f7, f4);
-        buffer.addVertex(x2, y1, zLevel).setColor(f5, f6, f7, f4);
-        BufferUploader.drawWithShader(buffer.buildOrThrow());
-        // @todo 1.17 GlStateManager._shadeModel(GL11.GL_FLAT);
-        RenderSystem.disableBlend();
-        // @todo 1.17 GlStateManager._enableAlphaTest();
-//        RenderSystem.enableTexture();
-    }
-
-    /**
-     * Draws a rectangle with a horizontal gradient between the specified colors.
-     * x2 and y2 are not included.
-     */
-    public static void drawHorizontalGradientRect(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color1, int color2, int lightmap) {
-//        this.zLevel = 300.0F;
-        float zLevel = -0.5f;
-
-        float f = (color1 >> 24 & 255) / 255.0F;
-        float f1 = (color1 >> 16 & 255) / 255.0F;
-        float f2 = (color1 >> 8 & 255) / 255.0F;
-        float f3 = (color1 & 255) / 255.0F;
-        float f4 = (color2 >> 24 & 255) / 255.0F;
-        float f5 = (color2 >> 16 & 255) / 255.0F;
-        float f6 = (color2 >> 8 & 255) / 255.0F;
-        float f7 = (color2 & 255) / 255.0F;
-
-        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.QUADS_NOTEXTURE);
-
-        Matrix4f positionMatrix = graphics.pose().last().pose();
-        builder.addVertex(positionMatrix, x1, y1, zLevel).setColor(f1, f2, f3, f).setLight(lightmap);
-        builder.addVertex(positionMatrix, x1, y2, zLevel).setColor(f1, f2, f3, f).setLight(lightmap);
-        builder.addVertex(positionMatrix, x2, y2, zLevel).setColor(f5, f6, f7, f4).setLight(lightmap);
-        builder.addVertex(positionMatrix, x2, y1, zLevel).setColor(f5, f6, f7, f4).setLight(lightmap);
-    }
-
-    public static void drawHorizontalLine(GuiGraphics graphics, int x1, int y1, int x2, int color) {
+    public static void drawHorizontalLine(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int color) {
         graphics.fill(x1, y1, x2, y1 + 1, color);
     }
 
-    public static void drawVerticalLine(GuiGraphics graphics, int x1, int y1, int y2, int color) {
+    public static void drawVerticalLine(GuiGraphicsExtractor graphics, int x1, int y1, int y2, int color) {
         graphics.fill(x1, y1, x1 + 1, y2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the left point
-    public static void drawLeftTriangle(GuiGraphics graphics, int x, int y, int color) {
+    public static void drawLeftTriangle(GuiGraphicsExtractor graphics, int x, int y, int color) {
         drawVerticalLine(graphics, x, y, y, color);
         drawVerticalLine(graphics, x + 1, y - 1, y + 1, color);
         drawVerticalLine(graphics, x + 2, y - 2, y + 2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the right point
-    public static void drawRightTriangle(GuiGraphics graphics, int x, int y, int color) {
+    public static void drawRightTriangle(GuiGraphicsExtractor graphics, int x, int y, int color) {
         drawVerticalLine(graphics, x, y, y, color);
         drawVerticalLine(graphics, x - 1, y - 1, y + 1, color);
         drawVerticalLine(graphics, x - 2, y - 2, y + 2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the top point
-    public static void drawUpTriangle(GuiGraphics graphics, int x, int y, int color) {
+    public static void drawUpTriangle(GuiGraphicsExtractor graphics, int x, int y, int color) {
         drawHorizontalLine(graphics, x, y, x, color);
         drawHorizontalLine(graphics, x - 1, y + 1, x + 1, color);
         drawHorizontalLine(graphics, x - 2, y + 2, x + 2, color);
     }
 
     // Draw a small triangle. x,y is the coordinate of the bottom point
-    public static void drawDownTriangle(GuiGraphics graphics, int x, int y, int color) {
+    public static void drawDownTriangle(GuiGraphicsExtractor graphics, int x, int y, int color) {
         drawHorizontalLine(graphics, x, y, x, color);
         drawHorizontalLine(graphics, x - 1, y - 1, x + 1, color);
         drawHorizontalLine(graphics, x - 2, y - 2, x + 2, color);
     }
 
-    public static void drawColorLogic(int x, int y, int width, int height, int red, int green, int blue, GlStateManager.LogicOp colorLogic) {
-//        GlStateManager._disableTexture();
-        GlStateManager._enableColorLogicOp();
-        GlStateManager._logicOp(colorLogic.value);
-
-        draw(x, y, width, height, red, green, blue, 255);
-
-        GlStateManager._disableColorLogicOp();
-//        GlStateManager._enableTexture();
-    }
-
-    /**
-     * Draw a button box. x2 and y2 are not included.
-     */
-    public static void drawThickButtonBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+    public static void drawThickButtonBox(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
         graphics.fill(x1 + 2, y1 + 2, x2 - 2, y2 - 2, average);
         drawHorizontalLine(graphics, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(graphics, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -612,7 +237,7 @@ public class RenderHelper {
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawThinButtonBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+    public static void drawThinButtonBox(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
         graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average);
         drawHorizontalLine(graphics, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(graphics, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -629,8 +254,8 @@ public class RenderHelper {
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawThinButtonBoxGradient(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
-        drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
+    public static void drawThinButtonBoxGradient(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
+        drawVerticalGradientRect(graphics, x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
         drawHorizontalLine(graphics, x1 + 1, y1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawHorizontalLine(graphics, x1 + 1, y2 - 1, x2 - 1, StyleConfig.colorButtonExternalBorder);
         drawVerticalLine(graphics, x1, y1 + 1, y2 - 1, StyleConfig.colorButtonExternalBorder);
@@ -646,22 +271,15 @@ public class RenderHelper {
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawFlatButtonBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
+    public static void drawFlatButtonBox(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int bright, int average, int dark) {
         drawBeveledBox(graphics, x1, y1, x2, y2, bright, dark, average);
     }
 
     /**
      * Draw a button box. x2 and y2 are not included.
      */
-    public static void drawFlatButtonBox(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int bright, int average, int dark, int lightmap) {
-        drawBeveledBox(graphics, buffer, x1, y1, x2, y2, bright, dark, average, lightmap);
-    }
-
-    /**
-     * Draw a button box. x2 and y2 are not included.
-     */
-    public static void drawFlatButtonBoxGradient(GuiGraphics graphics, int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
-        drawVerticalGradientRect(x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
+    public static void drawFlatButtonBoxGradient(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int bright, int average1, int average2, int dark) {
+        drawVerticalGradientRect(graphics, x1 + 1, y1 + 1, x2 - 1, y2 - 1, average2, average1);
         drawHorizontalLine(graphics, x1, y1, x2 - 1, bright);
         drawVerticalLine(graphics, x1, y1, y2 - 1, bright);
         drawVerticalLine(graphics, x2 - 1, y1, y2 - 1, dark);
@@ -671,7 +289,7 @@ public class RenderHelper {
     /**
      * Draw a beveled box. x2 and y2 are not included.
      */
-    public static void drawBeveledBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
+    public static void drawBeveledBox(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
             graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
@@ -684,20 +302,7 @@ public class RenderHelper {
     /**
      * Draw a beveled box. x2 and y2 are not included. Use this version for GUI's
      */
-    public static void drawBeveledBox(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int topleftcolor, int botrightcolor, int fillcolor, int lightmap) {
-        if (fillcolor != -1) {
-            fill(graphics, buffer, x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor, lightmap);
-        }
-        fill(graphics, buffer, x1, y1, x2 - 1, y1 + 1, topleftcolor, lightmap);
-        fill(graphics, buffer, x1, y1, x1 + 1, y2 - 1, topleftcolor, lightmap);
-        fill(graphics, buffer, x2 - 1, y1, x2 - 1 + 1, y2 - 1, botrightcolor, lightmap);
-        fill(graphics, buffer, x1, y2 - 1, x2, y2 - 1 + 1, botrightcolor, lightmap);
-    }
-
-    /**
-     * Draw a thick beveled box. x2 and y2 are not included. Use this version for batched rendering
-     */
-    public static void drawThickBeveledBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
+    public static void drawThickBeveledBox(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int thickness, int topleftcolor, int botrightcolor, int fillcolor) {
         if (fillcolor != -1) {
             graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fillcolor);
         }
@@ -710,7 +315,7 @@ public class RenderHelper {
     /**
      * Draw a beveled box. x2 and y2 are not included.
      */
-    public static void drawFlatBox(GuiGraphics graphics, int x1, int y1, int x2, int y2, int border, int fill) {
+    public static void drawFlatBox(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int border, int fill) {
         if (fill != -1) {
             graphics.fill(x1 + 1, y1 + 1, x2 - 1, y2 - 1, fill);
         }
@@ -734,155 +339,6 @@ public class RenderHelper {
 
     /**
      * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height
-     */
-    public static void drawTexturedModalRect(PoseStack poseStack, int x, int y, int u, int v, int width, int height) {
-        Matrix4f matrix = poseStack.last().pose();
-        float zLevel = 0.01f;
-        float f = (1 / 256.0f);
-        float f1 = (1 / 256.0f);
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        buffer.addVertex(matrix, (x + 0), (y + height), zLevel).setUv(((u + 0) * f), ((v + height) * f1));
-        buffer.addVertex(matrix, (x + width), (y + height), zLevel).setUv(((u + width) * f), ((v + height) * f1));
-        buffer.addVertex(matrix, (x + width), (y + 0), zLevel).setUv(((u + width) * f), ((v + 0) * f1));
-        buffer.addVertex(matrix, (x + 0), (y + 0), zLevel).setUv(((u + 0) * f), ((v + 0) * f1));
-        BufferUploader.drawWithShader(buffer.buildOrThrow());
-    }
-
-    /**
-     * Render a billboard in four sections for better depth sorting
-     */
-    public static void renderSplitBillboard(PoseStack matrixStack, VertexConsumer buffer, float scale, Vec3 offset, ResourceLocation texture) {
-        int b1 = FULL_SKY;
-        int b2 = FULL_BLOCK;
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
-        matrixStack.pushPose();
-        matrixStack.translate(0.5, 0.5 + offset.y, 0.5);
-        RenderHelper.rotateToPlayer(matrixStack);
-        Matrix4f matrix = matrixStack.last().pose();
-
-        float u0 = sprite.getU0();
-        float v0 = sprite.getV0();
-        float u1 = sprite.getU1();
-        float v1 = sprite.getV1();
-        float um = (u0 + u1) / 2f;
-        float vm = (v0 + v1) / 2f;
-
-        buffer.addVertex(matrix, -scale, -scale, 0.0f).setColor(255, 255, 255, 255).setUv(u0, v0).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, -scale, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(u0, vm).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, 0.0f, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(um, vm).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, 0.0f, -scale, 0.0f).setColor(255, 255, 255, 255).setUv(um, v0).setUv2(b1, b2).setNormal(1, 0, 0);
-
-        buffer.addVertex(matrix, 0.0f, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(um, vm).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, 0.0f, scale, 0.0f).setColor(255, 255, 255, 255).setUv(um, v1).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, scale, scale, 0.0f).setColor(255, 255, 255, 255).setUv(u1, v1).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, scale, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(u1, vm).setUv2(b1, b2).setNormal(1, 0, 0);
-
-        buffer.addVertex(matrix, 0.0f, -scale, 0.0f).setColor(255, 255, 255, 255).setUv(um, v0).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, 0.0f, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(um, vm).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, scale, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(u1, vm).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, scale, -scale, 0.0f).setColor(255, 255, 255, 255).setUv(u1, v0).setUv2(b1, b2).setNormal(1, 0, 0);
-
-        buffer.addVertex(matrix, -scale, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(u0, vm).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, -scale, scale, 0.0f).setColor(255, 255, 255, 255).setUv(u0, v1).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, 0.0f, scale, 0.0f).setColor(255, 255, 255, 255).setUv(um, v1).setUv2(b1, b2).setNormal(1, 0, 0);
-        buffer.addVertex(matrix, 0.0f, 0.0f, 0.0f).setColor(255, 255, 255, 255).setUv(um, vm).setUv2(b1, b2).setNormal(1, 0, 0);
-        matrixStack.popPose();
-    }
-
-    public static void renderBillboardQuadBright(PoseStack matrixStack, MultiBufferSource buffer, float scale, ResourceLocation texture) {
-        renderBillboardQuadBright(matrixStack, buffer, scale, texture, DEFAULT_SETTINGS);
-    }
-
-    public static void renderBillboardQuadBright(PoseStack matrixStack, VertexConsumer builder, float scale, ResourceLocation texture, RenderSettings settings) {
-        int b1 = settings.brightness() >> 16 & 65535;
-        int b2 = settings.brightness() & 65535;
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(texture);
-        matrixStack.pushPose();
-        matrixStack.translate(0.5, 0.5, 0.5);
-        RenderHelper.rotateToPlayer(matrixStack);
-        Matrix4f matrix = matrixStack.last().pose();
-        builder.addVertex(matrix, -scale, -scale, 0.0f).setColor(settings.r(), settings.g(), settings.b(), settings.a()).setUv(sprite.getU0(), sprite.getV0()).setUv2(b1, b2).setNormal(1, 0, 0);
-        builder.addVertex(matrix, -scale, scale, 0.0f).setColor(settings.r(), settings.g(), settings.b(), settings.a()).setUv(sprite.getU0(), sprite.getV1()).setUv2(b1, b2).setNormal(1, 0, 0);
-        builder.addVertex(matrix, scale, scale, 0.0f).setColor(settings.r(), settings.g(), settings.b(), settings.a()).setUv(sprite.getU1(), sprite.getV1()).setUv2(b1, b2).setNormal(1, 0, 0);
-        builder.addVertex(matrix, scale, -scale, 0.0f).setColor(settings.r(), settings.g(), settings.b(), settings.a()).setUv(sprite.getU1(), sprite.getV0()).setUv2(b1, b2).setNormal(1, 0, 0);
-        matrixStack.popPose();
-    }
-
-    public static void renderBillboardQuadBright(PoseStack poseStack, MultiBufferSource buffer, float scale, ResourceLocation texture, RenderSettings settings) {
-        renderBillboardQuadBright(poseStack, buffer.getBuffer(settings.renderType()), scale, texture, settings);
-    }
-
-    public static void rotateToPlayer(PoseStack poseStack) {
-        Quaternionf cameraRotation = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
-        poseStack.mulPose(cameraRotation);
-        poseStack.mulPose(new Quaternionf().rotateY((float) Math.PI));  // Flip to face the camera
-    }
-
-    public static int renderText(GuiGraphics graphics, int x, int y, String txt) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1f);
-
-        PoseStack matrixStack = graphics.pose();
-        matrixStack.pushPose();
-        matrixStack.translate(0.0F, 0.0F, 32.0F);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        // @todo 1.17 GlStateManager._enableRescaleNormal();
-        // @todo 1.17 GlStateManager._enableLighting();
-        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
-
-        // @todo 1.17 GlStateManager._disableLighting();
-        GlStateManager._disableDepthTest();
-        GlStateManager._disableBlend();
-        Minecraft mc = Minecraft.getInstance();
-        int width = mc.font.width(txt);
-        mc.font.drawInBatch(txt, x, y, 0xffffff, true, matrixStack.last().pose(), graphics.bufferSource(), Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
-        // @todo 1.17 GlStateManager._enableLighting();
-        GlStateManager._enableDepthTest();
-        // Fixes opaque cooldown overlay a bit lower
-        // TODO: check if enabled blending still screws things up down the line.
-        GlStateManager._enableBlend();
-
-
-        matrixStack.popPose();
-        // @todo 1.17 GlStateManager._disableRescaleNormal();
-        // @todo 1.17 GlStateManager._disableLighting();
-
-        return width;
-    }
-
-    public static int renderText(GuiGraphics graphics, int x, int y, String txt, int color) {
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0f);
-
-        PoseStack matrixStack = graphics.pose();
-        matrixStack.pushPose();
-        matrixStack.translate(0.0F, 0.0F, 32.0F);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        // @todo 1.17 GlStateManager._enableRescaleNormal();
-        // @todo 1.17 GlStateManager._enableLighting();
-        // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
-
-        // @todo 1.17 GlStateManager._disableLighting();
-        GlStateManager._disableDepthTest();
-        GlStateManager._disableBlend();
-        Minecraft mc = Minecraft.getInstance();
-        int width = mc.font.width(txt);
-        graphics.drawString(mc.font, txt, x, y, color, false);
-        // @todo 1.17 GlStateManager._enableLighting();
-        GlStateManager._enableDepthTest();
-        // Fixes opaque cooldown overlay a bit lower
-        // TODO: check if enabled blending still screws things up down the line.
-        GlStateManager._enableBlend();
-
-
-        matrixStack.popPose();
-        // @todo 1.17 GlStateManager._disableRescaleNormal();
-        // @todo 1.17 GlStateManager._disableLighting();
-
-        return width;
-    }
-
-    /**
-     * Draw a beam with some thickness.
      */
     public static void drawBeam(PoseStack matrix, VertexConsumer builder, TextureAtlasSprite sprite, Vec3 S, Vec3 E, Vec3 P, float width) {
         Vec3 PS = S.subtract(P);
@@ -998,15 +454,11 @@ public class RenderHelper {
      * Render a block outline
      */
     public static void renderRect(PoseStack poseStack, VertexConsumer buffer, Rect rect, BlockPos p, float r, float g, float b, float a) {
-        Matrix4f matrix = poseStack.last().pose();
-        buffer.addVertex(matrix, (float) (p.getX() + rect.v1.x), (float) (p.getY() + rect.v1.y), (float) (p.getZ() + rect.v1.z)).setColor(r, g, b, a);
-        buffer.addVertex(matrix, (float) (p.getX() + rect.v2.x), (float) (p.getY() + rect.v2.y), (float) (p.getZ() + rect.v2.z)).setColor(r, g, b, a);
-        buffer.addVertex(matrix, (float) (p.getX() + rect.v2.x), (float) (p.getY() + rect.v2.y), (float) (p.getZ() + rect.v2.z)).setColor(r, g, b, a);
-        buffer.addVertex(matrix, (float) (p.getX() + rect.v3.x), (float) (p.getY() + rect.v3.y), (float) (p.getZ() + rect.v3.z)).setColor(r, g, b, a);
-        buffer.addVertex(matrix, (float) (p.getX() + rect.v3.x), (float) (p.getY() + rect.v3.y), (float) (p.getZ() + rect.v3.z)).setColor(r, g, b, a);
-        buffer.addVertex(matrix, (float) (p.getX() + rect.v4.x), (float) (p.getY() + rect.v4.y), (float) (p.getZ() + rect.v4.z)).setColor(r, g, b, a);
-        buffer.addVertex(matrix, (float) (p.getX() + rect.v4.x), (float) (p.getY() + rect.v4.y), (float) (p.getZ() + rect.v4.z)).setColor(r, g, b, a);
-        buffer.addVertex(matrix, (float) (p.getX() + rect.v1.x), (float) (p.getY() + rect.v1.y), (float) (p.getZ() + rect.v1.z)).setColor(r, g, b, a);
+        Vec3 offset = Vec3.atLowerCornerOf(p);
+        Vec3[] vertices = {rect.v1.add(offset), rect.v2.add(offset), rect.v3.add(offset), rect.v4.add(offset)};
+        for (int i = 0; i < vertices.length; i++) {
+            drawLine3d(buffer, poseStack, vertices[i], vertices[(i + 1) % vertices.length], r, g, b, a);
+        }
     }
 
     /**
@@ -1273,68 +725,29 @@ public class RenderHelper {
     }
 
     public static void renderHighLightedBlocksOutline(PoseStack poseStack, VertexConsumer buffer, float mx, float my, float mz, float r, float g, float b, float a) {
-        Matrix4f matrix = poseStack.last().pose();
-        buffer.addVertex(matrix, mx, my, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my + 1, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my + 1, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my + 1, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my + 1, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my + 1, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my + 1, mz).setColor(r, g, b, a);
-
-        buffer.addVertex(matrix, mx, my + 1, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my + 1, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my + 1, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my + 1, mz).setColor(r, g, b, a);
-
-        buffer.addVertex(matrix, mx + 1, my, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my, mz).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my + 1, mz).setColor(r, g, b, a);
-
-        buffer.addVertex(matrix, mx, my, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx + 1, my, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my, mz + 1).setColor(r, g, b, a);
-        buffer.addVertex(matrix, mx, my + 1, mz + 1).setColor(r, g, b, a);
+        for (int axis = 0; axis < 3; axis++) {
+            for (int first = 0; first < 2; first++) {
+                for (int second = 0; second < 2; second++) {
+                    double[] start = {mx, my, mz};
+                    start[(axis + 1) % 3] += first;
+                    start[(axis + 2) % 3] += second;
+                    double[] end = start.clone();
+                    end[axis]++;
+                    drawLine3d(buffer, poseStack, new Vec3(start[0], start[1], start[2]),
+                            new Vec3(end[0], end[1], end[2]), r, g, b, a);
+                }
+            }
+        }
     }
 
-    public static void fill(GuiGraphics graphics, MultiBufferSource buffer, int x1, int y1, int x2, int y2, int color,
-                            int lightmap) {
-        Matrix4f positionMatrix = graphics.pose().last().pose();
-        int swapper;
-        if (x1 < x2) {
-            swapper = x1;
-            x1 = x2;
-            x2 = swapper;
-        }
-
-        if (y1 < y2) {
-            swapper = y1;
-            y1 = y2;
-            y2 = swapper;
-        }
-
-        float a = (color >> 24 & 255) / 255.0F;
-        float r = (color >> 16 & 255) / 255.0F;
-        float g = (color >> 8 & 255) / 255.0F;
-        float b = (color & 255) / 255.0F;
-        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.QUADS_NOTEXTURE);
-//        RenderSystem.enableBlend();
-//        RenderSystem.disableTexture();
-//        RenderSystem.defaultBlendFunc();
-//        builder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        builder.addVertex(positionMatrix, x1, y2, -1F).setColor(r, g, b, a).setLight(lightmap);
-        builder.addVertex(positionMatrix, x2, y2, -1F).setColor(r, g, b, a).setLight(lightmap);
-        builder.addVertex(positionMatrix, x2, y1, -1F).setColor(r, g, b, a).setLight(lightmap);
-        builder.addVertex(positionMatrix, x1, y1, -1F).setColor(r, g, b, a).setLight(lightmap);
-//        builder.finishDrawing();
-//        RenderSystem.enableTexture();
-//        RenderSystem.disableBlend();
+    private static void drawLine3d(VertexConsumer buffer, PoseStack pose, Vec3 start, Vec3 end, float r, float g, float b, float a) {
+        Vec3 direction = end.subtract(start).normalize();
+        var normal = new Vector3f((float)direction.x, (float)direction.y, (float)direction.z);
+        pose.last().normal().transform(normal);
+        buffer.addVertex(pose.last().pose(), (float)start.x, (float)start.y, (float)start.z)
+                .setColor(r, g, b, a).setNormal(normal.x, normal.y, normal.z).setLineWidth(2);
+        buffer.addVertex(pose.last().pose(), (float)end.x, (float)end.y, (float)end.z)
+                .setColor(r, g, b, a).setNormal(normal.x, normal.y, normal.z).setLineWidth(2);
     }
 
     public static void rotateXP(PoseStack stack, float degrees) {

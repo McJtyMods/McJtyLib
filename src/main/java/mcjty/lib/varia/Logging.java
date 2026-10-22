@@ -68,10 +68,10 @@ public class Logging {
     }
 
     public static void message(@Nonnull Player player, String message) {
-        player.displayClientMessage(ComponentFactory.literal(message), false);
+        player.sendSystemMessage(ComponentFactory.literal(message));
     }
 
     public static void warn(@Nonnull Player player, String message) {
-        player.displayClientMessage(ComponentFactory.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.RED)), false);
+        player.sendSystemMessage(ComponentFactory.literal(message).setStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
     }
 }

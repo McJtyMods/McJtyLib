@@ -1,6 +1,6 @@
 package mcjty.lib.gui.icons;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ public interface IIcon {
     /**
      * Draw this icon on the GUI at the specific position
      */
-    void draw(Screen gui, GuiGraphics graphics, int x, int y);
+    void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y);
 
     void addOverlay(IIcon icon);
 

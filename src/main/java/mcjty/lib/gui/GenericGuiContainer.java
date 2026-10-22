@@ -19,10 +19,10 @@ import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
 import mcjty.lib.varia.Tools;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -41,7 +41,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -121,18 +121,18 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    protected void renderLabels(@Nonnull GuiGraphics graphics, int mouseX, int mouseY) {
+    protected void extractLabels(@Nonnull GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         getWindowManager().drawTooltips(graphics);
     }
 
-    public void drawHoveringText(GuiGraphics graphics, List<String> textLines, List<ItemStack> items, int x, int y, Font font) {
+    public void drawHoveringText(GuiGraphicsExtractor graphics, List<String> textLines, List<ItemStack> items, int x, int y, Font font) {
         if (!textLines.isEmpty()) {
-            PoseStack matrixStack = graphics.pose();
-            matrixStack.pushPose();
+            var matrixStack = graphics.pose();
+            matrixStack.pushMatrix();
             // @todo 1.17 RenderSystem.disableRescaleNormal();
             // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
             // @todo 1.17 RenderSystem.disableLighting();
-            RenderSystem.disableDepthTest();
+
             int i = 0;
 
             int linesWithItemStacks = 0;
@@ -185,7 +185,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 yy = 4 - topPos;
             }
 
-            matrixStack.translate(0.0D, 0.0D, 600.0f);
+
             // @todo 1.19.4
 //            setBlitOffset(300);
 //            this.itemRenderer.blitOffset = 300.0F;
@@ -202,22 +202,22 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             graphics.fillGradient(xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
             graphics.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
-//            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
+//
 
             renderTextLines(graphics, textLines, items, font, xx, yy);
 
             // @todo 1.19.4
 //            setBlitOffset(0);
 //            this.itemRenderer.blitOffset = 0.0F;
-            RenderSystem.enableDepthTest();
+
             // @todo 1.17 RenderSystem.enableLighting();
             // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
             // @todo 1.17 RenderSystem.enableRescaleNormal();
-            matrixStack.popPose();
+            matrixStack.popMatrix();
         }
     }
 
-    private void renderTextLines(GuiGraphics graphics, List<String> textLines, List<ItemStack> items, Font font, int xx, int yy) {
+    private void renderTextLines(GuiGraphicsExtractor graphics, List<String> textLines, List<ItemStack> items, Font font, int xx, int yy) {
         for (int i = 0; i < textLines.size(); ++i) {
             String s1 = textLines.get(i);
             if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
@@ -226,7 +226,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 boolean lineHasItemStacks = false;
                 for (Object o : list) {
                     if (o instanceof String s2) {
-                        font.drawInBatch(s2, curx, yy, 0xffffff, true, graphics.pose().last().pose(), graphics.bufferSource(), Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                        graphics.text(font, s2, curx, yy, 0xffffffff);
                         curx += font.width(s2);
                     } else {
                         RenderHelper.renderObject(graphics, curx + 1, yy, o, false);
@@ -238,7 +238,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                     yy += 8;
                 }
             } else {
-                font.drawInBatch(s1, xx, yy, 0xffffff, true, graphics.pose().last().pose(), graphics.bufferSource(), Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
+                graphics.text(font, s1, xx, yy, 0xffffffff);
             }
 
             if (i == 0) {
@@ -249,12 +249,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
     }
 
-    @Override
-    protected void renderBg(@Nonnull GuiGraphics graphics, float partialTicks, int x, int y) {
+    protected void renderBg(@Nonnull GuiGraphicsExtractor graphics, float partialTicks, int x, int y) {
         drawWindow(graphics, partialTicks, x, y);
     }
 
-    protected void drawWindow(GuiGraphics graphics, float partialTicks, int x, int y) {
+    protected void drawWindow(GuiGraphicsExtractor graphics, float partialTicks, int x, int y) {
         if (window == null) {
             return;
         }
@@ -266,21 +265,22 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public void render(@Nonnull GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
+    public void extractRenderState(@Nonnull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
         if (window == null) {
             return;
         }
-        super.render(graphics, mouseX, mouseY, partialTicks);
-        this.renderTooltip(graphics, mouseX, mouseY);
+        drawWindow(graphics, partialTicks, mouseX, mouseY);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
+        this.extractTooltip(graphics, mouseX, mouseY);
         drawStackTooltips(graphics, mouseX, mouseY);
     }
 
 
     @Override
-    public void renderSlot(@Nonnull GuiGraphics graphics, @Nonnull Slot slot) {
+    public void extractSlot(@Nonnull GuiGraphicsExtractor graphics, @Nonnull Slot slot, int mouseX, int mouseY) {
         // Prevent slots from being rendered if they are (partially) covered by a modal window
         if (!isPartiallyCoveredByModalWindow(slot)) {
-            super.renderSlot(graphics, slot);
+            super.extractSlot(graphics, slot, mouseX, mouseY);
         }
     }
 
@@ -316,7 +316,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     /**
      * Draw tooltips for itemstacks that are in BlockRender widgets
      */
-    protected void drawStackTooltips(GuiGraphics graphics, int mouseX, int mouseY) {
+    protected void drawStackTooltips(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int x = GuiTools.getRelativeX(window.getGui());
         int y = GuiTools.getRelativeY(window.getGui());
         Widget<?> widget = window.getToplevel().getWidgetAtPosition(x, y);
@@ -342,7 +342,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         return oldList;
     }
 
-    protected void customRenderToolTip(GuiGraphics graphics, BlockRender blockRender, ItemStack stack, int x, int y) {
+    protected void customRenderToolTip(GuiGraphicsExtractor graphics, BlockRender blockRender, ItemStack stack, int x, int y) {
         List<Component> list;
         //noinspection ConstantConditions
         if (stack.getItem() == null) {
@@ -356,7 +356,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         list = addCustomLines(list, blockRender, stack);
 
         // @todo 1.20 is this right?
-        graphics.renderTooltip(this.getMinecraft().font, list, Optional.empty(), stack, x, y);
+        graphics.setTooltipForNextFrame(this.getMinecraft().font, list, Optional.empty(), stack, x, y);
     }
 
     @Override
@@ -372,8 +372,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public boolean mouseClicked(double x, double y, int button) {
-        boolean rc = super.mouseClicked(x, y, button);
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double x = event.x(), y = event.y(); int button = event.button();
+        boolean rc = super.mouseClicked(event, doubleClick);
         if (window != null) {
             getWindowManager().mouseClicked(x, y, button);
         }
@@ -381,8 +382,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public boolean mouseDragged(double x, double y, int button, double scaledX, double scaledY) {
-        boolean rc = super.mouseDragged(x, y, button, scaledX, scaledY);
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double scaledX, double scaledY) {
+        double x = event.x(), y = event.y(); int button = event.button();
+        boolean rc = super.mouseDragged(event, scaledX, scaledY);
         if (window != null) {
             getWindowManager().mouseDragged(x, y, button);
         }
@@ -402,8 +404,9 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
      * 99% sure this is the correct one
      */
     @Override
-    public boolean mouseReleased(double x, double y, int button) {
-        boolean rc = super.mouseReleased(x, y, button);
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        double x = event.x(), y = event.y(); int button = event.button();
+        boolean rc = super.mouseReleased(event);
         if (window != null) {
             getWindowManager().mouseReleased(x, y, button);
         }
@@ -416,10 +419,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
         boolean b = window == null || getWindowManager().keyTyped(keyCode, scanCode);
         if (b) {
-            return super.keyPressed(keyCode, scanCode, modifiers);
+            return super.keyPressed(event);
         } else {
             return false;
         }
@@ -450,7 +454,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     public void keyTypedFromEvent(int keyCode, int scanCode) {
         if (window != null) {
             if (getWindowManager().keyTyped(keyCode, scanCode)) {
-                super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
+                super.keyPressed(new net.minecraft.client.input.KeyEvent(keyCode, scanCode, 0)); // @todo 1.14: modifiers?
             }
         }
     }
@@ -460,7 +464,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         if (window != null) {
             if (getWindowManager().charTyped(codePoint)) {
                 // @todo 1.14?
-//                super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
+//                super.keyPressed(new net.minecraft.client.input.KeyEvent(keyCode, scanCode, 0)); // @todo 1.14: modifiers?
             }
         }
     }
@@ -513,7 +517,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        IEnergyStorage power = getBE().getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, getBE().getBlockPos(), null);
+        IEnergyStorage power = mcjty.lib.varia.CapabilityTools.energyHandler(getBE().getLevel().getCapability(Capabilities.Energy.BLOCK, getBE().getBlockPos(), null));
         if (power != null) {
             energyBar.maxValue(power.getMaxEnergyStored());
             energyBar.value(power.getEnergyStored());

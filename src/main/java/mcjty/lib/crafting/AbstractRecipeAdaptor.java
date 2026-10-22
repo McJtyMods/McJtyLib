@@ -1,68 +1,22 @@
 package mcjty.lib.crafting;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
 import net.minecraft.world.level.Level;
+import java.util.List;
 
-import javax.annotation.Nonnull;
-
-public abstract class AbstractRecipeAdaptor implements CraftingRecipe /*, Recipe<CraftingInput>*/ {
-
+public abstract class AbstractRecipeAdaptor implements CraftingRecipe {
     private final ShapedRecipe recipe;
-
-    public AbstractRecipeAdaptor(ShapedRecipe recipe) {
-        this.recipe = recipe;
-    }
-
-    @Override
-    public boolean canCraftInDimensions(int width, int height) {
-        return recipe.canCraftInDimensions(width, height);
-    }
-
-    @Override
-    @Nonnull
-    public NonNullList<ItemStack> getRemainingItems(@Nonnull CraftingInput inv) {
-        return recipe.getRemainingItems(inv);
-    }
-
-    @Override
-    @Nonnull
-    public NonNullList<Ingredient> getIngredients() {
-        return recipe.getIngredients();
-    }
-
-    @Override
-    public boolean isSpecial() {
-        return recipe.isSpecial();
-    }
-
-    @Override
-    @Nonnull
-    public String getGroup() {
-        return recipe.getGroup();
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack getToastSymbol() {
-        return recipe.getToastSymbol();
-    }
-
-    public ShapedRecipe getRecipe() {
-        return recipe;
-    }
-
-    @Override
-    public boolean matches(@Nonnull CraftingInput inv, @Nonnull Level worldIn) {
-        return recipe.matches(inv, worldIn);
-    }
-
-    @Override
-    @Nonnull
-    public RecipeType<?> getType() {
-        return recipe.getType();
-    }
+    public AbstractRecipeAdaptor(ShapedRecipe recipe) { this.recipe = recipe; }
+    public ShapedRecipe getRecipe() { return recipe; }
+    @Override public boolean matches(CraftingInput input, Level level) { return recipe.matches(input, level); }
+    @Override public CraftingBookCategory category() { return recipe.category(); }
+    @Override public NonNullList<ItemStack> getRemainingItems(CraftingInput input) { return recipe.getRemainingItems(input); }
+    @Override public boolean isSpecial() { return recipe.isSpecial(); }
+    @Override public String group() { return recipe.group(); }
+    @Override public boolean showNotification() { return recipe.showNotification(); }
+    @Override public PlacementInfo placementInfo() { return recipe.placementInfo(); }
+    @Override public List<RecipeDisplay> display() { return recipe.display(); }
 }

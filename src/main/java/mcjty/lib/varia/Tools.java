@@ -8,7 +8,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffect;
@@ -37,7 +37,7 @@ import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -67,68 +67,68 @@ public class Tools {
         });
     }
 
-    public static Block getBlock(ResourceLocation id) {
-        return BuiltInRegistries.BLOCK.get(id);
+    public static Block getBlock(Identifier id) {
+        return BuiltInRegistries.BLOCK.getValue(id);
     }
 
-    public static Item getItem(ResourceLocation id) {
-        return BuiltInRegistries.ITEM.get(id);
+    public static Item getItem(Identifier id) {
+        return BuiltInRegistries.ITEM.getValue(id);
     }
 
-    public static EntityType<?> getEntity(ResourceLocation id) {
-        return BuiltInRegistries.ENTITY_TYPE.get(id);
+    public static EntityType<?> getEntity(Identifier id) {
+        return BuiltInRegistries.ENTITY_TYPE.getValue(id);
     }
 
-    public static Fluid getFluid(ResourceLocation id) {
-        return BuiltInRegistries.FLUID.get(id);
+    public static Fluid getFluid(Identifier id) {
+        return BuiltInRegistries.FLUID.getValue(id);
     }
 
-    public static MobEffect getEffect(ResourceLocation id) {
-        return BuiltInRegistries.MOB_EFFECT.get(id);
+    public static MobEffect getEffect(Identifier id) {
+        return BuiltInRegistries.MOB_EFFECT.getValue(id);
     }
 
-    public static SoundEvent getSound(ResourceLocation resourceLocation) {
-        return BuiltInRegistries.SOUND_EVENT.get(resourceLocation);
+    public static SoundEvent getSound(Identifier resourceLocation) {
+        return BuiltInRegistries.SOUND_EVENT.getValue(resourceLocation);
     }
 
-    public static ResourceLocation getId(EntityType<?> entityType) {
+    public static Identifier getId(EntityType<?> entityType) {
         return BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
     }
 
-    public static ResourceLocation getId(ItemStack item) {
+    public static Identifier getId(ItemStack item) {
         return BuiltInRegistries.ITEM.getKey(item.getItem());
     }
 
-    public static ResourceLocation getId(Item item) {
+    public static Identifier getId(Item item) {
         return BuiltInRegistries.ITEM.getKey(item);
     }
 
-    public static ResourceLocation getId(BlockState block) {
+    public static Identifier getId(BlockState block) {
         return BuiltInRegistries.BLOCK.getKey(block.getBlock());
     }
 
-    public static ResourceLocation getId(Block block) {
+    public static Identifier getId(Block block) {
         return BuiltInRegistries.BLOCK.getKey(block);
     }
 
-    public static ResourceLocation getId(FluidStack fluid) {
+    public static Identifier getId(FluidStack fluid) {
         return BuiltInRegistries.FLUID.getKey(fluid.getFluid());
     }
 
-    public static ResourceLocation getId(FluidState fluid) {
+    public static Identifier getId(FluidState fluid) {
         return BuiltInRegistries.FLUID.getKey(fluid.getType());
     }
 
-    public static ResourceLocation getId(Fluid fluid) {
+    public static Identifier getId(Fluid fluid) {
         return BuiltInRegistries.FLUID.getKey(fluid);
     }
 
-    public static ResourceLocation getId(CommonLevelAccessor level, Biome biome) {
-        return level.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome);
+    public static Identifier getId(CommonLevelAccessor level, Biome biome) {
+        return level.registryAccess().lookupOrThrow(Registries.BIOME).getKey(biome);
     }
 
-    public static ResourceLocation getId(CommonLevelAccessor level, Structure feature) {
-        return level.registryAccess().registryOrThrow(Registries.STRUCTURE).getKey(feature);
+    public static Identifier getId(CommonLevelAccessor level, Structure feature) {
+        return level.registryAccess().lookupOrThrow(Registries.STRUCTURE).getKey(feature);
     }
 
     public static String getModid(ItemStack stack) {
@@ -140,7 +140,7 @@ public class Tools {
     }
 
     public static String getModName(Fluid entry) {
-        ResourceLocation registryName = BuiltInRegistries.FLUID.getKey(entry);
+        Identifier registryName = BuiltInRegistries.FLUID.getKey(entry);
         String modId = registryName == null ? "minecraft" : registryName.getNamespace();
         return ModList.get().getModContainerById(modId)
                 .map(mod -> mod.getModInfo().getDisplayName())
@@ -148,7 +148,7 @@ public class Tools {
     }
 
     public static String getModName(Block entry) {
-        ResourceLocation registryName = BuiltInRegistries.BLOCK.getKey(entry);
+        Identifier registryName = BuiltInRegistries.BLOCK.getKey(entry);
         String modId = registryName == null ? "minecraft" : registryName.getNamespace();
         return ModList.get().getModContainerById(modId)
                 .map(mod -> mod.getModInfo().getDisplayName())
@@ -180,7 +180,7 @@ public class Tools {
 
     public static String getReadableName(Level world, BlockPos pos) {
         BlockState state = world.getBlockState(pos);
-        return getReadableName(state.getBlock().getCloneItemStack(world, pos, state));
+        return getReadableName(state.getBlock().getCloneItemStack(world, pos, state, false, null));
     }
 
     public static String getReadableName(ItemStack stack) {

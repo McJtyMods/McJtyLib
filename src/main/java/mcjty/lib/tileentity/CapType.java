@@ -8,14 +8,14 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 
 public enum CapType {
-    ITEMS(Capabilities.ItemHandler.BLOCK),
-    ITEMS_AUTOMATION(Capabilities.ItemHandler.BLOCK),
+    ITEMS(Capabilities.Item.BLOCK),
+    ITEMS_AUTOMATION(Capabilities.Item.BLOCK),
     CONTAINER(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY),
-    ENERGY(Capabilities.EnergyStorage.BLOCK),
+    ENERGY(Capabilities.Energy.BLOCK),
     INFUSABLE(CapabilityInfusable.INFUSABLE_CAPABILITY),
     MODULE(CapabilityModuleSupport.MODULE_CAPABILITY),
     POWER_INFO(CapabilityPowerInformation.POWER_INFORMATION_CAPABILITY),
-    FLUIDS(Capabilities.FluidHandler.BLOCK);
+    FLUIDS(Capabilities.Fluid.BLOCK);
 
     private final BlockCapability capability;
 

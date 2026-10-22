@@ -5,33 +5,32 @@ import mcjty.lib.blocks.RBlock;
 import mcjty.lib.varia.Tools;
 import net.minecraft.core.Direction;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.neoforged.neoforge.client.model.generators.*;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import mcjty.lib.datagen.model.*;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static net.neoforged.neoforge.client.model.generators.ModelProvider.BLOCK_FOLDER;
+import static mcjty.lib.datagen.model.ModelProvider.BLOCK_FOLDER;
 
 public abstract class BaseBlockStateProvider extends BlockStateProvider {
 
-    public static final ResourceLocation RFTOOLSBASE_SIDE = ResourceLocation.fromNamespaceAndPath("rftoolsbase", "block/base/machineside");
-    public static final ResourceLocation RFTOOLSBASE_TOP = ResourceLocation.fromNamespaceAndPath("rftoolsbase", "block/base/machinetop");
-    public static final ResourceLocation RFTOOLSBASE_BOTTOM = ResourceLocation.fromNamespaceAndPath("rftoolsbase", "block/base/machinebottom");
+    public static final Identifier RFTOOLSBASE_SIDE = Identifier.fromNamespaceAndPath("rftoolsbase", "block/base/machineside");
+    public static final Identifier RFTOOLSBASE_TOP = Identifier.fromNamespaceAndPath("rftoolsbase", "block/base/machinetop");
+    public static final Identifier RFTOOLSBASE_BOTTOM = Identifier.fromNamespaceAndPath("rftoolsbase", "block/base/machinebottom");
 
     public String name(Block block) {
         return Tools.getId(block).getPath();
     }
 
-    public BaseBlockStateProvider(DataGenerator gen, String modid, ExistingFileHelper exFileHelper) {
-        super(gen.getPackOutput(), modid, exFileHelper);
+    public BaseBlockStateProvider(DataGenerator gen, String modid) {
+        super(gen.getPackOutput(), modid);
     }
 
     public void simpleBlockC(Block block, Consumer<BlockModelBuilder> consumer) {
@@ -40,25 +39,25 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         simpleBlock(block, blockModelBuilder);
     }
 
-    public ModelFile frontBasedModel(String modelName, ResourceLocation texture) {
+    public ModelFile frontBasedModel(String modelName, Identifier texture) {
         return frontBasedModel(modelName, texture, RFTOOLSBASE_SIDE, RFTOOLSBASE_TOP, RFTOOLSBASE_BOTTOM);
     }
 
-    public ModelFile frontBasedModel(String modelName, ResourceLocation front, ResourceLocation side, ResourceLocation top, ResourceLocation bottom) {
+    public ModelFile frontBasedModel(String modelName, Identifier front, Identifier side, Identifier top, Identifier bottom) {
         return models().cube(modelName, bottom, top, front, side, side, side)
                 .texture("particle", front);
     }
 
-    public ModelFile topBasedModel(String modelName, ResourceLocation texture) {
+    public ModelFile topBasedModel(String modelName, Identifier texture) {
         return topBasedModel(modelName, texture, RFTOOLSBASE_SIDE, RFTOOLSBASE_BOTTOM);
     }
 
-    public ModelFile topBasedModel(String modelName, ResourceLocation top, ResourceLocation side, ResourceLocation bottom) {
+    public ModelFile topBasedModel(String modelName, Identifier top, Identifier side, Identifier bottom) {
         return models().cube(modelName, bottom, top, side, side, side, side)
                 .texture("particle", top);
     }
 
-    private ModelFile logicSlabModel(String modelName, ResourceLocation texture, ModelBuilder.FaceRotation faceRotation) {
+    private ModelFile logicSlabModel(String modelName, Identifier texture, BlockModelBuilder.FaceRotation faceRotation) {
         BlockModelBuilder model = models().getBuilder(BLOCK_FOLDER + "/" + modelName)
                 .parent(models().getExistingFile(mcLoc("block")));
         model.element().from(0, 0, 0).to(16, 4, 16)
@@ -69,14 +68,14 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
                 .face(Direction.NORTH).cullface(Direction.NORTH).texture("#side").end()
                 .face(Direction.SOUTH).cullface(Direction.SOUTH).texture("#side").end()
                 .end()
-                .texture("side", ResourceLocation.fromNamespaceAndPath("rftoolsbase", "block/base/machineside"))
+                .texture("side", Identifier.fromNamespaceAndPath("rftoolsbase", "block/base/machineside"))
                 .texture("down", RFTOOLSBASE_BOTTOM)
                 .texture("up", texture)
                 .texture("particle", texture);
         return model;
     }
 
-    public void logicSlabBlock(LogicSlabBlock block, String modelPrefix, ResourceLocation topTexture) {
+    public void logicSlabBlock(LogicSlabBlock block, String modelPrefix, Identifier topTexture) {
         ModelFile[] models = getLogicSlabModels(modelPrefix, topTexture);
         variantBlock(block,
                 state -> models[state.getValue(LogicSlabBlock.LOGIC_FACING).getRotationStep()],
@@ -85,12 +84,12 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
     }
 
     // Get logic slab models indexed by the logic facing rotation step
-    public ModelFile[] getLogicSlabModels(String modelPrefix, ResourceLocation topTexture) {
+    public ModelFile[] getLogicSlabModels(String modelPrefix, Identifier topTexture) {
         ModelFile[] models = new ModelFile[4];
-        models[0] = logicSlabModel(modelPrefix + "_0", topTexture, ModelBuilder.FaceRotation.ZERO);
-        models[1] = logicSlabModel(modelPrefix + "_1", topTexture, ModelBuilder.FaceRotation.UPSIDE_DOWN);
-        models[2] = logicSlabModel(modelPrefix + "_2", topTexture, ModelBuilder.FaceRotation.COUNTERCLOCKWISE_90);
-        models[3] = logicSlabModel(modelPrefix + "_3", topTexture, ModelBuilder.FaceRotation.CLOCKWISE_90);
+        models[0] = logicSlabModel(modelPrefix + "_0", topTexture, BlockModelBuilder.FaceRotation.ZERO);
+        models[1] = logicSlabModel(modelPrefix + "_1", topTexture, BlockModelBuilder.FaceRotation.UPSIDE_DOWN);
+        models[2] = logicSlabModel(modelPrefix + "_2", topTexture, BlockModelBuilder.FaceRotation.COUNTERCLOCKWISE_90);
+        models[3] = logicSlabModel(modelPrefix + "_3", topTexture, BlockModelBuilder.FaceRotation.CLOCKWISE_90);
         return models;
     }
 
@@ -213,7 +212,7 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         return directionBlock(block, model, BlockStateProperties.FACING);
     }
 
-    private VariantBlockStateBuilder directionBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model, DirectionProperty directionProperty) {
+    private VariantBlockStateBuilder directionBlock(Block block, BiConsumer<BlockState, ConfiguredModel.Builder<?>> model, EnumProperty<Direction> directionProperty) {
         VariantBlockStateBuilder builder = getVariantBuilder(block);
         builder.forAllStates(state -> {
             ConfiguredModel.Builder<?> bld = ConfiguredModel.builder();

@@ -3,11 +3,11 @@ package mcjty.lib.datagen;
 import com.mojang.serialization.Codec;
 import mcjty.lib.crafting.CopyComponentsRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
-import net.minecraft.Util;
-import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.util.Util;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
+import net.minecraft.advancements.triggers.Criterion;
+import net.minecraft.advancements.triggers.InventoryChangeTrigger;
+import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
@@ -16,8 +16,8 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.common.data.ItemTagsProvider;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -36,6 +36,24 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class DataGen {
+
+    private static final ThreadLocal<net.minecraft.core.HolderGetter<Item>> RECIPE_ITEMS = new ThreadLocal<>();
+
+    /** Registry lookup for recipe callbacks, including tags introduced by data generation. */
+    public static net.minecraft.core.HolderGetter<Item> recipeItems() {
+        var items = RECIPE_ITEMS.get();
+        return items == null ? BuiltInRegistries.ITEM : items;
+    }
+
+    private static void withRecipeItems(net.minecraft.core.HolderGetter<Item> items, Runnable recipes) {
+        var previous = RECIPE_ITEMS.get();
+        RECIPE_ITEMS.set(items);
+        try {
+            recipes.run();
+        } finally {
+            if (previous == null) RECIPE_ITEMS.remove(); else RECIPE_ITEMS.set(previous);
+        }
+    }
 
     private final String modid;
     private final GatherDataEvent event;
@@ -60,7 +78,7 @@ public class DataGen {
     public void generate() {
         DataGenerator generator = event.getGenerator();
 
-        generator.addProvider(event.includeServer(), new GlobalLootModifierProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
+        generator.addProvider(true, new GlobalLootModifierProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
             @Override
             protected void start() {
                 for (Dob dob : dobs) {
@@ -75,74 +93,83 @@ public class DataGen {
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
             for (Dob dob : dobs) {
                 HolderLookup.Provider provider = dob.holderLookupSupplier().get(entry.getKey());
-                Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
+                Map<Identifier, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
                 if (!entries.isEmpty()) {
                     JsonCodecProvider codecProvider = new JsonCodecProvider<>(generator.getPackOutput(), PackOutput.Target.DATA_PACK, entry.getValue().directory(),
-                            PackType.SERVER_DATA, entry.getValue().codec(), CompletableFuture.completedFuture(provider), modid, event.getExistingFileHelper()) {
+                            entry.getValue().codec(), CompletableFuture.completedFuture(provider), modid) {
                         @Override
                         protected void gather() {
 
                         }
                     };
                     entries.forEach(codecProvider::unconditional);
-                    generator.addProvider(event.includeServer(), codecProvider);
+                    generator.addProvider(true, codecProvider);
                 }
             }
         }
 
-        generator.addProvider(event.includeServer(), new BaseRecipeProvider(generator, event.getLookupProvider()) {
+        generator.addProvider(true, new net.minecraft.data.recipes.RecipeProvider.Runner(generator.getPackOutput(), event.getLookupProvider()) {
+            @Override public String getName() { return modid + " recipes"; }
+            @Override protected net.minecraft.data.recipes.RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+                return new BaseRecipeProvider(registries, output) {
 
-            @Override
-            protected void buildRecipes(RecipeOutput consumer) {
-                for (Dob dob : dobs) {
-                    dob.recipe().accept(new IRecipeFactory() {
-                        @Override
-                        public void recipe(Supplier<IRecipeBuilder> supplier) {
-                            supplier.get().build(consumer);
-                        }
+                    @Override
+                    protected void buildRecipes() {
+                        RecipeOutput consumer = output;
+                        withRecipeItems(items, () -> {
+                            for (Dob dob : dobs) {
+                                dob.recipe().accept(new IRecipeFactory() {
+                                    @Override public net.minecraft.core.HolderGetter<Item> items() { return items; }
+                                    @Override
+                                    public void recipe(Supplier<IRecipeBuilder> supplier) {
+                                        supplier.get().build(consumer);
+                                    }
 
-                        @Override
-                        public void recipeConsumer(Supplier<Consumer<RecipeOutput>> consumerSupplier) {
-                            consumerSupplier.get().accept(consumer);
-                        }
+                                    @Override
+                                    public void recipeConsumer(Supplier<Consumer<RecipeOutput>> consumerSupplier) {
+                                        consumerSupplier.get().accept(consumer);
+                                    }
 
-                        @Override
-                        public void recipe(String id, Supplier<IRecipeBuilder> supplier) {
-                            supplier.get().build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id));
-                        }
+                                    @Override
+                                    public void recipe(String id, Supplier<IRecipeBuilder> supplier) {
+                                        supplier.get().build(consumer, Identifier.fromNamespaceAndPath(modid, id));
+                                    }
 
-                        @Override
-                        public void shapedNBT(CopyComponentsRecipeBuilder builder, String... pattern) {
-                            build(consumer, builder, pattern);
-                        }
+                                    @Override
+                                    public void shapedNBT(CopyComponentsRecipeBuilder builder, String... pattern) {
+                                        build(consumer, builder, pattern);
+                                    }
 
-                        @Override
-                        public void shapedNBT(String id, CopyComponentsRecipeBuilder builder, String... pattern) {
-                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder, pattern);
+                                    @Override
+                                    public void shapedNBT(String id, CopyComponentsRecipeBuilder builder, String... pattern) {
+                                        build(consumer, Identifier.fromNamespaceAndPath(modid, id), builder, pattern);
 
-                        }
+                                    }
 
-                        @Override
-                        public void shaped(ShapedRecipeBuilder builder, String... pattern) {
-                            build(consumer, builder, pattern);
-                        }
+                                    @Override
+                                    public void shaped(ShapedRecipeBuilder builder, String... pattern) {
+                                        build(consumer, builder, pattern);
+                                    }
 
-                        @Override
-                        public void shaped(String id, ShapedRecipeBuilder builder, String... pattern) {
-                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder, pattern);
-                        }
+                                    @Override
+                                    public void shaped(String id, ShapedRecipeBuilder builder, String... pattern) {
+                                        build(consumer, Identifier.fromNamespaceAndPath(modid, id), builder, pattern);
+                                    }
 
-                        @Override
-                        public void shapeless(ShapelessRecipeBuilder builder) {
-                            build(consumer, builder);
-                        }
+                                    @Override
+                                    public void shapeless(ShapelessRecipeBuilder builder) {
+                                        build(consumer, builder);
+                                    }
 
-                        @Override
-                        public void shapeless(String id, ShapelessRecipeBuilder builder) {
-                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder);
-                        }
-                    });
-                }
+                                    @Override
+                                    public void shapeless(String id, ShapelessRecipeBuilder builder) {
+                                        build(consumer, Identifier.fromNamespaceAndPath(modid, id), builder);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                };
             }
         });
 
@@ -171,11 +198,11 @@ public class DataGen {
                     }
                     lootTableProvider.generate(builder, LootContextParamSets.ENTITY);
                 }, LootContextParamSets.ENTITY));
-        generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
+        generator.addProvider(true, new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
                 list, event.getLookupProvider()));
 
 
-//        generator.addProvider(event.includeServer(), new BaseLootTableProvider(generator) {
+//        generator.addProvider(true, new BaseLootTableProvider(generator) {
 //            @Override
 //            protected void addTables() {
 //                for (Dob dob : dobs) {
@@ -183,7 +210,7 @@ public class DataGen {
 //                }
 //            }
 //        });
-        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(generator, event.getLookupProvider(), modid, event.getExistingFileHelper()) {
+        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(generator, event.getLookupProvider(), modid) {
             @Override
             protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {
@@ -191,7 +218,7 @@ public class DataGen {
                         @Override
                         public void blockTags(Supplier<? extends Block> blockSupplier, List<TagKey> tags) {
                             for (TagKey<Block> tag : tags) {
-                                tag(tag).add(blockSupplier.get());
+                                tag(tag).add(BuiltInRegistries.BLOCK.getResourceKey(blockSupplier.get()).orElseThrow());
                             }
                         }
 
@@ -203,8 +230,8 @@ public class DataGen {
                 }
             }
         };
-        generator.addProvider(event.includeServer(), blockTags);
-        generator.addProvider(event.includeServer(), new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), blockTags.contentsGetter(), modid, event.getExistingFileHelper()) {
+        generator.addProvider(true, blockTags);
+        generator.addProvider(true, new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
             @Override
             protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {
@@ -217,7 +244,7 @@ public class DataGen {
                         @Override
                         public void itemTags(Supplier<? extends Item> itemSupplier, List<TagKey> tags) {
                             for (TagKey<Item> tag : tags) {
-                                tag(tag).add(itemSupplier.get());
+                                tag(tag).add(BuiltInRegistries.ITEM.getResourceKey(itemSupplier.get()).orElseThrow());
                             }
                         }
                     });
@@ -225,7 +252,7 @@ public class DataGen {
             }
         });
 
-        generator.addProvider(event.includeClient(), new LanguageProvider(generator.getPackOutput(), modid, "en_us") {
+        generator.addProvider(event instanceof GatherDataEvent.Client, new LanguageProvider(generator.getPackOutput(), modid, "en_us") {
             @Override
             protected void addTranslations() {
                 for (Dob dob : dobs) {
@@ -260,7 +287,7 @@ public class DataGen {
                 }
             }
         });
-        generator.addProvider(event.includeClient(), new BaseBlockStateProvider(generator, modid, event.getExistingFileHelper()) {
+        generator.addProvider(event instanceof GatherDataEvent.Client, new BaseBlockStateProvider(generator, modid) {
             @Override
             protected void registerStatesAndModels() {
                 for (Dob dob : dobs) {
@@ -268,7 +295,7 @@ public class DataGen {
                 }
             }
         });
-        generator.addProvider(event.includeClient(), new BaseItemModelProvider(generator, modid, event.getExistingFileHelper()) {
+        generator.addProvider(event instanceof GatherDataEvent.Client, new BaseItemModelProvider(generator, modid) {
             @Override
             protected void registerModels() {
                 BaseItemModelProvider provider = this;
@@ -280,11 +307,11 @@ public class DataGen {
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item) {
-        return InventoryChangeTrigger.TriggerInstance.hasItems(item);
+        return CriteriaTriggers.INVENTORY_CHANGED.createCriterion(inventoryTrigger(ItemPredicate.Builder.item().of(recipeItems(), item).build()));
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(TagKey<Item> tag) {
-        return CriteriaTriggers.INVENTORY_CHANGED.createCriterion(inventoryTrigger(ItemPredicate.Builder.item().of(tag).build()));
+        return CriteriaTriggers.INVENTORY_CHANGED.createCriterion(inventoryTrigger(ItemPredicate.Builder.item().of(recipeItems(), tag).build()));
     }
 
     public static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... itemPredicate) {

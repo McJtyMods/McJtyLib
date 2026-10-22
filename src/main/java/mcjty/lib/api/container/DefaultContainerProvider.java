@@ -12,7 +12,7 @@ import mcjty.lib.varia.Sync;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +24,7 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -107,7 +107,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
      * get properly propagated to the client when that client has this container open
      */
     public DefaultContainerProvider<C> setupSync(GenericTileEntity te) {
-        dataListener(Sync.values(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "data"), te));
+        dataListener(Sync.values(Identifier.fromNamespaceAndPath(McJtyLib.MODID, "data"), te));
         return this;
     }
 

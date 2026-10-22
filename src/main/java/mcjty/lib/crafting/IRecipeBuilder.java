@@ -1,7 +1,7 @@
 package mcjty.lib.crafting;
 
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -22,5 +22,5 @@ public interface IRecipeBuilder<T extends IRecipeBuilder<T>> {
 
     void build(RecipeOutput consumerIn, String save);
 
-    void build(RecipeOutput consumerIn, ResourceLocation id);
+    void build(RecipeOutput consumerIn, Identifier id);
 }

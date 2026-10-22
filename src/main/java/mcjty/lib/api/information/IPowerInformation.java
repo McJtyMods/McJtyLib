@@ -1,6 +1,6 @@
 package mcjty.lib.api.information;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Implement this capability based interface in your TE so that other

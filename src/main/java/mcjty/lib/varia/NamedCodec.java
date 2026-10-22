@@ -235,7 +235,7 @@ public class NamedCodec<T> {
         }
 
         // There was none, we need to look for other compound tags
-        for (String k : tag.getAllKeys()) {
+        for (String k : tag.keySet()) {
             Tag subTag = tag.get(k);
             switch (subTag.getId()) {
                 case Tag.TAG_COMPOUND -> {
@@ -252,17 +252,17 @@ public class NamedCodec<T> {
         }
         switch (tag.getId()) {
             case Tag.TAG_COMPOUND -> {
-                for (String k : ((CompoundTag) tag).getAllKeys()) {
+                for (String k : ((CompoundTag) tag).keySet()) {
                     scanTagForRead(((CompoundTag) tag).get(k), k, map);
                 }
             }
-            case Tag.TAG_STRING -> map.put(key, tag.getAsString());
-            case Tag.TAG_INT -> map.put(key, ((IntTag) tag).getAsInt());
-            case Tag.TAG_BYTE -> map.put(key, ((ByteTag) tag).getAsByte());
-            case Tag.TAG_SHORT -> map.put(key, ((ShortTag) tag).getAsShort());
-            case Tag.TAG_LONG -> map.put(key, ((LongTag) tag).getAsLong());
-            case Tag.TAG_FLOAT -> map.put(key, ((FloatTag) tag).getAsFloat());
-            case Tag.TAG_DOUBLE -> map.put(key, ((DoubleTag) tag).getAsDouble());
+            case Tag.TAG_STRING -> map.put(key, ((StringTag) tag).value());
+            case Tag.TAG_INT -> map.put(key, ((IntTag) tag).value());
+            case Tag.TAG_BYTE -> map.put(key, ((ByteTag) tag).value());
+            case Tag.TAG_SHORT -> map.put(key, ((ShortTag) tag).value());
+            case Tag.TAG_LONG -> map.put(key, ((LongTag) tag).value());
+            case Tag.TAG_FLOAT -> map.put(key, ((FloatTag) tag).value());
+            case Tag.TAG_DOUBLE -> map.put(key, ((DoubleTag) tag).value());
         }
     }
 
@@ -302,7 +302,7 @@ public class NamedCodec<T> {
             }
         }
         // There was none, we need to look for other compound tags
-        for (String k : parent.getAllKeys()) {
+        for (String k : parent.keySet()) {
             Tag tag = parent.get(k);
             switch (tag.getId()) {
                 case Tag.TAG_COMPOUND -> {

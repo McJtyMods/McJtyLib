@@ -2,13 +2,13 @@ package mcjty.lib.compat.theoneprobe;
 
 import mcjty.lib.varia.Logging;
 import mcjty.theoneprobe.api.*;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.fml.InterModComms;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.function.Function;
 
 public class TOPCompatibility {
@@ -37,8 +37,8 @@ public class TOPCompatibility {
             Logging.log("Enabled support for The One Probe");
             probe.registerProvider(new IProbeInfoProvider() {
                 @Override
-                public ResourceLocation getID() {
-                    return ResourceLocation.parse("mcjtylib:default");
+                public Identifier getID() {
+                    return Identifier.parse("mcjtylib:default");
                 }
 
                 @Override

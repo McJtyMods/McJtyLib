@@ -9,7 +9,7 @@ import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -19,8 +19,8 @@ public class JeiCompatibility implements IModPlugin {
 
     @Nonnull
     @Override
-    public ResourceLocation getPluginUid() {
-        return ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "mcjtylib");
+    public Identifier getPluginUid() {
+        return Identifier.fromNamespaceAndPath(McJtyLib.MODID, "mcjtylib");
     }
 
     @Override

@@ -3,7 +3,7 @@ package mcjty.lib.gui;
 import mcjty.lib.varia.Logging;
 import org.apache.logging.log4j.util.Strings;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Stream;

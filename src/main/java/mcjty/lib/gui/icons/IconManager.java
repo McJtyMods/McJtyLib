@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.IconHolder;
 import mcjty.lib.gui.widgets.Widget;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.Optional;
@@ -93,7 +93,7 @@ public class IconManager {
         return draggingIcon != null;
     }
 
-    public void draw(Screen gui, GuiGraphics graphics) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics) {
         if (draggingIcon != null) {
             draggingIcon.draw(gui, graphics, getRelativeX() - dx, getRelativeY() - dy);
         }

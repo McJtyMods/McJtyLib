@@ -3,7 +3,7 @@ package mcjty.lib.builder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.ItemStack;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;

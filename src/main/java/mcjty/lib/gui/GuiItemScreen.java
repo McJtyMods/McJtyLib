@@ -3,7 +3,7 @@ package mcjty.lib.gui;
 import mcjty.lib.client.GuiTools;
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
@@ -54,16 +54,18 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double x, double y, int button) {
-        boolean rc = super.mouseClicked(x, y, button);
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        double x = event.x(), y = event.y(); int button = event.button();
+        boolean rc = super.mouseClicked(event, doubleClick);
         window.mouseClicked(x, y, button);
         sideWindow.getWindow().mouseClicked(x, y, button);
         return rc;
     }
 
     @Override
-    public boolean mouseDragged(double x, double y, int button, double scaledX, double scaledY) {
-        boolean rc = super.mouseDragged(x, y, button, scaledX, scaledY);
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double scaledX, double scaledY) {
+        double x = event.x(), y = event.y(); int button = event.button();
+        boolean rc = super.mouseDragged(event, scaledX, scaledY);
         window.mouseDragged(x, y, button);
         sideWindow.getWindow().mouseDragged(x, y, button);
         return rc;
@@ -78,23 +80,25 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     @Override
-    public boolean mouseReleased(double x, double y, int state) {
-        boolean rc = super.mouseReleased(x, y, state);
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        double x = event.x(), y = event.y(); int state = event.button();
+        boolean rc = super.mouseReleased(event);
         window.mouseReleased(x, y, state);
         sideWindow.getWindow().mouseReleased(x, y, state);
         return rc;
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean rc = super.keyPressed(keyCode, scanCode, modifiers);
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
+        boolean rc = super.keyPressed(event);
 //        window.keyTyped(typedChar, keyCode);
         window.keyTyped(keyCode, scanCode);
         return rc;
     }
 
-    public void drawWindow(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(graphics, mouseX, mouseY, partialTicks);
+    public void drawWindow(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+        this.extractBackground(graphics, mouseX, mouseY, partialTicks);
         window.draw(graphics);
         sideWindow.getWindow().draw(graphics);
         List<String> tooltips = window.getTooltips();
@@ -104,7 +108,7 @@ public abstract class GuiItemScreen extends Screen {
             // @todo check on 1.16
             List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
             List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
-            graphics.renderTooltip(Minecraft.getInstance().font, processors, x-guiLeft, y-guiTop);
+            graphics.setTooltipForNextFrame(Minecraft.getInstance().font, processors, x-guiLeft, y-guiTop);
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
@@ -113,15 +117,15 @@ public abstract class GuiItemScreen extends Screen {
             // @todo check on 1.16
             List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
             List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
-            graphics.renderTooltip(Minecraft.getInstance().font, processors, x - guiLeft, y - guiTop);
+            graphics.setTooltipForNextFrame(Minecraft.getInstance().font, processors, x - guiLeft, y - guiTop);
         }
     }
 
-    protected abstract void renderInternal(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick);
+    protected abstract void renderInternal(GuiGraphicsExtractor graphics, int pMouseX, int pMouseY, float pPartialTick);
 
     @Override
-    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.extractRenderState(graphics, pMouseX, pMouseY, pPartialTick);
         renderInternal(graphics, pMouseX, pMouseY, pPartialTick);
     }
 }

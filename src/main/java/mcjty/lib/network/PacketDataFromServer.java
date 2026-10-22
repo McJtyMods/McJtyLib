@@ -11,7 +11,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -22,7 +22,7 @@ import java.util.Optional;
  * This packet is used (typically by PacketRequestDataFromServer) to send back a data to the client.
  */
 public record PacketDataFromServer(BlockPos pos, String command, TypedMap result) implements CustomPacketPayload {
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "datafromserver");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "datafromserver");
     public static final CustomPacketPayload.Type<PacketDataFromServer> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketDataFromServer> CODEC = StreamCodec.composite(

@@ -10,7 +10,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This inventory locator serves as a cache and a way to quickly items in an adjacent
@@ -29,7 +29,7 @@ public class InventoryLocator {
             }
             return null;
         }
-        if (worldObj.getCapability(Capabilities.ItemHandler.BLOCK, thisCoordinate, direction.getOpposite()) != null) {
+        if (mcjty.lib.varia.CapabilityTools.itemHandler(worldObj.getCapability(Capabilities.Item.BLOCK, thisCoordinate, direction.getOpposite())) != null) {
             // Remember in inventoryCoordinate (acts as a cache)
             inventoryCoordinate = thisCoordinate.relative(direction);
             inventorySide = direction.getOpposite();
@@ -41,7 +41,7 @@ public class InventoryLocator {
 
     @Nullable
     private IItemHandler getItemHandlerAtCoordinate(Level worldObj, BlockPos c, Direction direction) {
-        return worldObj.getCapability(Capabilities.ItemHandler.BLOCK, c, direction);
+        return mcjty.lib.varia.CapabilityTools.itemHandler(worldObj.getCapability(Capabilities.Item.BLOCK, c, direction));
     }
 
 

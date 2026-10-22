@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.BiConsumer;
@@ -60,7 +60,7 @@ public final class Type<V> {
         }
     });
     public static final Type<ItemStack> ITEMSTACK = create(ItemStack.class, (v, buf) -> NetworkTools.writeItemStack(buf, v), NetworkTools::readItemStack);
-    public static final Type<ResourceKey<Level>> DIMENSION_TYPE = create(ResourceKey.class, (v, buf) -> buf.writeResourceLocation(v.location()), buf -> LevelTools.getId(buf.readResourceLocation()));
+    public static final Type<ResourceKey<Level>> DIMENSION_TYPE = create(ResourceKey.class, (v, buf) -> buf.writeIdentifier(v.identifier()), buf -> LevelTools.getId(buf.readIdentifier()));
 
     public static final Type<List<String>> STRING_LIST = create(List.class, (v, buf) -> NetworkTools.writeStringList(buf, v), NetworkTools::readStringList);
     public static final Type<List<ItemStack>> ITEMSTACK_LIST = create(List.class, (v, buf) -> NetworkTools.writeItemStackList(buf, v), NetworkTools::readItemStackList);

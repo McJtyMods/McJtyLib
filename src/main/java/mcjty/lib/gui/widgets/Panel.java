@@ -3,7 +3,7 @@ package mcjty.lib.gui.widgets;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.*;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 
 public class Panel extends AbstractContainerWidget<Panel> {
@@ -31,7 +31,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }
@@ -53,7 +53,7 @@ public class Panel extends AbstractContainerWidget<Panel> {
     }
 
     @Override
-    public void drawPhase2(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void drawPhase2(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }

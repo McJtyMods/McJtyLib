@@ -4,7 +4,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.core.Registry;
@@ -43,17 +43,17 @@ public class LevelTools {
         return world.getServer().getLevel(type);
     }
 
-    public static ServerLevel getLevel(Level world, ResourceLocation id) {
+    public static ServerLevel getLevel(Level world, Identifier id) {
         // Worlds in 1.16 are always loaded
         return world.getServer().getLevel(ResourceKey.create(Registries.DIMENSION, id));
     }
 
-    public static ResourceKey<Level> getId(ResourceLocation id) {
+    public static ResourceKey<Level> getId(Identifier id) {
         return ResourceKey.create(Registries.DIMENSION, id);
     }
 
     public static ResourceKey<Level> getId(String id) {
-        return ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(id));
+        return ResourceKey.create(Registries.DIMENSION, Identifier.parse(id));
     }
 
     /**
@@ -62,7 +62,7 @@ public class LevelTools {
     public static Stream<ServerPlayer> getAllPlayersWatchingBlock(Level world, BlockPos pos) {
         if (world instanceof ServerLevel) {
             ChunkHolder.PlayerProvider playerManager = ((ServerLevel)world).getChunkSource().chunkMap;
-            return playerManager.getPlayers(new ChunkPos(pos), false).stream();
+            return playerManager.getPlayers(new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4), false).stream();
         }
         return Stream.empty();
     }

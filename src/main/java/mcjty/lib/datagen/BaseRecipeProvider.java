@@ -7,7 +7,7 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -36,7 +36,7 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
     }
 
     protected BaseRecipeProvider add(char c, TagKey<Item> itemTag) {
-        defaultIngredients.put(c, Ingredient.of(itemTag));
+        defaultIngredients.put(c, Ingredient.of(items.getOrThrow(itemTag)));
         return this;
     }
 
@@ -79,22 +79,22 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         builder.group(group).save(consumer);
     }
 
-    protected void build(RecipeOutput consumer, ResourceLocation id, ShapelessRecipeBuilder builder) {
-        builder.group(group).save(consumer, id);
+    protected void build(RecipeOutput consumer, Identifier id, ShapelessRecipeBuilder builder) {
+        builder.group(group).save(consumer, net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id));
     }
 
-    protected void build(RecipeOutput consumer, ResourceLocation id, IRecipeBuilder<?> builder, String... lines) {
+    protected void build(RecipeOutput consumer, Identifier id, IRecipeBuilder<?> builder, String... lines) {
         buildIntern(consumer, builder::patternLine, builder::define, lines);
         builder.setGroup(group).build(consumer, id);
     }
 
-    protected void build(RecipeOutput consumer, ResourceLocation id, ShapedRecipeBuilder builder, String... lines) {
+    protected void build(RecipeOutput consumer, Identifier id, ShapedRecipeBuilder builder, String... lines) {
         buildIntern(consumer, builder::pattern, builder::define, lines);
-        builder.group(group).save(consumer, id);
+        builder.group(group).save(consumer, net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id));
     }
 
-    public BaseRecipeProvider(DataGenerator datagen, CompletableFuture<HolderLookup.Provider> provider) {
-        super(datagen.getPackOutput(), provider);
+    public BaseRecipeProvider(HolderLookup.Provider provider, RecipeOutput output) {
+        super(provider, output);
         add('d', Items.DIAMOND);
         add('e', Items.EMERALD);
         add('o', Tags.Items.ENDER_PEARLS);

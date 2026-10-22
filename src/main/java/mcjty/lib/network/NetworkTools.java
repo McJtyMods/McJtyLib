@@ -18,19 +18,12 @@ public class NetworkTools {
 
     public static FluidStack readFluidStack(RegistryFriendlyByteBuf dataIn) {
         FriendlyByteBuf buf = new FriendlyByteBuf(dataIn);
-        CompoundTag nbt = buf.readNbt();
-        return FluidStack.parse(dataIn.registryAccess(), nbt).orElse(FluidStack.EMPTY);
+        return FluidStack.OPTIONAL_STREAM_CODEC.decode(dataIn);
     }
 
     public static void writeFluidStack(RegistryFriendlyByteBuf dataOut, FluidStack fluidStack) {
         FriendlyByteBuf buf = new FriendlyByteBuf(dataOut);
-        CompoundTag nbt = new CompoundTag();
-        fluidStack.save(dataOut.registryAccess(), nbt);
-        try {
-            buf.writeNbt(nbt);
-        } catch (RuntimeException e) {
-            Logging.logError("Error writing fluid stack", e);
-        }
+        FluidStack.OPTIONAL_STREAM_CODEC.encode(dataOut, fluidStack);
     }
 
     public static String readStringUTF8(FriendlyByteBuf dataIn) {

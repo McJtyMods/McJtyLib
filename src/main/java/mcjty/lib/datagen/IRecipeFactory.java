@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public interface IRecipeFactory {
+    net.minecraft.core.HolderGetter<net.minecraft.world.item.Item> items();
 
     void recipe(Supplier<IRecipeBuilder> supplier);
 

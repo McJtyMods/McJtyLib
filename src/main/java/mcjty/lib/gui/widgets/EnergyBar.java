@@ -4,7 +4,7 @@ import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
@@ -158,7 +158,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, final int x, final int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, final int x, final int y) {
         if (!visible) {
             return;
         }
@@ -196,7 +196,7 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
             } else {
                 s = currentValue + "/" + maximum;
             }
-            graphics.drawString(mc.font, mc.font.plainSubstrByWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.font.lineHeight)/2, getTextColor(), false);
+            graphics.text(mc.font, mc.font.plainSubstrByWidth(s, getBounds().width), x+bounds.x + 5, y+bounds.y+(bounds.height-mc.font.lineHeight)/2, getTextColor(), false);
         }
     }
 

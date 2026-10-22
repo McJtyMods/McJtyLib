@@ -4,7 +4,7 @@ import mcjty.lib.setup.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -13,12 +13,12 @@ import net.minecraft.world.level.Level;
 
 public class SoundTools {
 
-    public static SoundEvent createSoundEvent(ResourceLocation id) {
+    public static SoundEvent createSoundEvent(Identifier id) {
         return SoundEvent.createVariableRangeEvent(id);
     }
 
 
-    public static SoundEvent findSound(ResourceLocation name) {
+    public static SoundEvent findSound(Identifier name) {
         // @todo not nice. Hardcoded event names. For 1.19.3 compatibility
         return switch (name.toString()) {
             case "minecraft:block.note_block.bell" -> SoundEvents.NOTE_BLOCK_BELL.value();

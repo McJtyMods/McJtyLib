@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.function.Function;
 
 public class GuiTools {
@@ -76,16 +76,16 @@ public class GuiTools {
     public static boolean openRemoteGui(@Nonnull Player player, @Nullable ResourceKey<Level> dimensionType, @Nonnull BlockPos pos,
                                         Function<BlockEntity, MenuProvider> provider) {
         if (dimensionType == null) {
-            dimensionType = player.getCommandSenderWorld().dimension();
+            dimensionType = player.level().dimension();
         }
-        Level world = LevelTools.getLevel(player.getCommandSenderWorld(), dimensionType);
+        Level world = LevelTools.getLevel(player.level(), dimensionType);
         if (!LevelTools.isLoaded(world, pos)) {
-            player.displayClientMessage(ComponentFactory.literal(ChatFormatting.RED + "Position is not loaded!"), false);
+            player.sendSystemMessage(ComponentFactory.literal(ChatFormatting.RED + "Position is not loaded!"));
             return false;
         }
         BlockEntity te = world.getBlockEntity(pos);
         if (te == null) {
-            player.displayClientMessage(ComponentFactory.literal(ChatFormatting.RED + "Tile entity is missing!"), false);
+            player.sendSystemMessage(ComponentFactory.literal(ChatFormatting.RED + "Tile entity is missing!"));
             return false;
         }
 
@@ -93,7 +93,7 @@ public class GuiTools {
 
         player.openMenu(provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
-            buf.writeResourceLocation(world.dimension().location());
+            buf.writeIdentifier(world.dimension().identifier());
             buf.writeNbt(written);
         });
         return true;

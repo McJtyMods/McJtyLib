@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -14,19 +14,19 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 /**
  * Open the manual
  */
-public record PacketOpenManual(ResourceLocation manual, ResourceLocation entry, Integer page) implements CustomPacketPayload {
+public record PacketOpenManual(Identifier manual, Identifier entry, Integer page) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "openmanual");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "openmanual");
     public static final CustomPacketPayload.Type<PacketOpenManual> TYPE = new Type<>(ID);
 
     public static final StreamCodec<FriendlyByteBuf, PacketOpenManual> CODEC = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC, PacketOpenManual::manual,
-            ResourceLocation.STREAM_CODEC, PacketOpenManual::entry,
+            Identifier.STREAM_CODEC, PacketOpenManual::manual,
+            Identifier.STREAM_CODEC, PacketOpenManual::entry,
             ByteBufCodecs.INT, PacketOpenManual::page,
             PacketOpenManual::new
     );
 
-    public static PacketOpenManual create(ResourceLocation manual, ResourceLocation entry, int page) {
+    public static PacketOpenManual create(Identifier manual, Identifier entry, int page) {
         return new PacketOpenManual(manual, entry, page);
     }
 

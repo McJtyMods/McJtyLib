@@ -9,7 +9,7 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }
@@ -80,7 +80,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
             if (checkMarker) {
                 RenderHelper.drawBeveledBox(graphics, xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleNormalBorderTopLeft, colorToggleNormalBorderBottomRight, colorToggleNormalFiller);
                 if (pressed) {
-                    graphics.drawString(mc.font, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal, false);
+                    graphics.text(mc.font, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextNormal, false);
                 }
             }
         } else {
@@ -88,7 +88,7 @@ public class ToggleButton extends AbstractLabel<ToggleButton> {
             if (checkMarker) {
                 RenderHelper.drawBeveledBox(graphics, xx + 2, yy + bounds.height / 2 - 4, xx + 10, yy + bounds.height / 2 + 4, colorToggleDisabledBorderTopLeft, colorToggleDisabledBorderBottomRight, colorToggleDisabledFiller);
                 if (pressed) {
-                    graphics.drawString(mc.font, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled, false);
+                    graphics.text(mc.font, "v", xx + 3, yy + bounds.height / 2 - 4, StyleConfig.colorToggleTextDisabled, false);
                 }
             }
         }

@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
@@ -15,7 +15,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
  */
 public record PacketSetGuiStyle(String style) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "setguistyle");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "setguistyle");
     public static final CustomPacketPayload.Type<PacketSetGuiStyle> TYPE = new Type<>(ID);
 
     public static final StreamCodec<FriendlyByteBuf, PacketSetGuiStyle> CODEC = StreamCodec.composite(

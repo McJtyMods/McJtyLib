@@ -1,7 +1,7 @@
 package mcjty.lib.gui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.item.ItemStack;
 
@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 public class WindowTools {
 
-    public static void parseAndHandleClient(ResourceLocation guiDescription, Consumer<GuiParser.GuiCommand> consumer) {
+    public static void parseAndHandleClient(Identifier guiDescription, Consumer<GuiParser.GuiCommand> consumer) {
         try {
             Optional<Resource> res = Minecraft.getInstance().getResourceManager().getResource(guiDescription);
             res.ifPresent(resource -> {

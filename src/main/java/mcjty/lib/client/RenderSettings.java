@@ -1,8 +1,8 @@
 package mcjty.lib.client;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 
-import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
+import static net.minecraft.util.LightCoordsUtil.FULL_BRIGHT;
 
 public record RenderSettings(
     int brightness,
@@ -22,7 +22,7 @@ public record RenderSettings(
     }
 
     public static class Builder {
-        private int brightness = FULL_BLOCK;
+        private int brightness = FULL_BRIGHT;
         private int r = 255;
         private int g = 255;
         private int b = 255;

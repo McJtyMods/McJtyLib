@@ -32,7 +32,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.attachment.AttachmentType;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +92,14 @@ public class GenericTileEntity extends BlockEntity {
     public void onReplaced(Level world, BlockPos pos, BlockState state, BlockState newstate) {
     }
 
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        if (level != null && !level.isClientSide()) {
+            onReplaced(level, pos, getBlockState(), state);
+        }
+        super.preRemoveSideEffects(pos, state);
+    }
+
     public void onPartAdded(PartSlot slot, BlockState state, BlockEntity multipartTile) {
     }
 
@@ -128,12 +136,12 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     public RedstoneMode getRSMode() {
-        return getData(Registration.BASE_BE_DATA).rsMode();
+        return getData(mcjty.lib.setup.Registration.BASE_BE_DATA).rsMode();
     }
 
     public void setRSMode(RedstoneMode redstoneMode) {
-        BaseBEData data = getData(Registration.BASE_BE_DATA).withRedstoneMode(redstoneMode);
-        setData(Registration.BASE_BE_DATA, data);
+        BaseBEData data = getData(mcjty.lib.setup.Registration.BASE_BE_DATA).withRedstoneMode(redstoneMode);
+        setData(mcjty.lib.setup.Registration.BASE_BE_DATA, data);
         markDirtyClient();
     }
 
@@ -147,7 +155,7 @@ public class GenericTileEntity extends BlockEntity {
 
     // Use redstone mode and input power to decide if this is enabled or not
     public boolean isMachineEnabled() {
-        BaseBEData data = getData(Registration.BASE_BE_DATA);
+        BaseBEData data = getData(mcjty.lib.setup.Registration.BASE_BE_DATA);
         if (data.rsMode() != RedstoneMode.REDSTONE_IGNORED) {
             boolean rs = this.powerLevel > 0;
             if (data.rsMode() == RedstoneMode.REDSTONE_OFFREQUIRED && rs) {
@@ -168,28 +176,27 @@ public class GenericTileEntity extends BlockEntity {
     @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        CompoundTag tag = new CompoundTag();
-        this.saveClientDataToNBT(tag, level.registryAccess());
-        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity, RegistryAccess access) -> tag);
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider provider) {
         CompoundTag tag = super.getUpdateTag(provider);
-        saveClientDataToNBT(tag, provider);
+        CompoundTag client = new CompoundTag();
+        saveClientDataToNBT(client, provider);
+        tag.put("mcjtylib_client", client);
         return tag;
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider provider) {
-        CompoundTag tag = pkt.getTag();
-        loadClientDataFromNBT(tag, provider);
+    public void onDataPacket(Connection net, net.minecraft.world.level.storage.ValueInput input) {
+        handleUpdateTag(input);
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider provider) {
-        super.handleUpdateTag(tag, provider);
-        loadClientDataFromNBT(tag, provider);
+    public void handleUpdateTag(net.minecraft.world.level.storage.ValueInput input) {
+        super.handleUpdateTag(input);
+        loadClientDataFromNBT(input.read("mcjtylib_client", CompoundTag.CODEC).orElseGet(CompoundTag::new), input.lookup());
     }
 
     //    public void setInfused(int infused) {
@@ -210,15 +217,15 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider provider) {
-        super.saveAdditional(tag, provider);
+    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput tag) {
+        super.saveAdditional(tag);
         tag.putByte("power", powerLevel);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider provider) {
-        super.loadAdditional(tag, provider);
-        powerLevel = tag.getByte("power");
+    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput tag) {
+        super.loadAdditional(tag);
+        powerLevel = tag.getByteOr("power", (byte) 0);
     }
 
     /**
@@ -236,15 +243,15 @@ public class GenericTileEntity extends BlockEntity {
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
-        components.set(Registration.ITEM_BASE_BE_DATA, getData(Registration.BASE_BE_DATA));
+        components.set(mcjty.lib.setup.Registration.ITEM_BASE_BE_DATA, getData(mcjty.lib.setup.Registration.BASE_BE_DATA));
     }
 
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
-        BaseBEData data = input.get(Registration.ITEM_BASE_BE_DATA);
+        BaseBEData data = input.get(mcjty.lib.setup.Registration.ITEM_BASE_BE_DATA);
         if (data != null) {
-            setData(Registration.BASE_BE_DATA, data);
+            setData(mcjty.lib.setup.Registration.BASE_BE_DATA, data);
         }
     }
 
@@ -253,13 +260,13 @@ public class GenericTileEntity extends BlockEntity {
             return false;
         }
 
-        BaseBEData data = getData(Registration.BASE_BE_DATA);
+        BaseBEData data = getData(mcjty.lib.setup.Registration.BASE_BE_DATA);
         if (data.ownerUUID() != null) {
             // Already has an ownerUUID.
             return false;
         }
-        data = data.withOwner(player.getGameProfile().getId(), player.getName().getString());
-        setData(Registration.BASE_BE_DATA, data);
+        data = data.withOwner(player.getGameProfile().id(), player.getName().getString());
+        setData(mcjty.lib.setup.Registration.BASE_BE_DATA, data);
         markDirtyClient();
 
         return true;
@@ -269,30 +276,30 @@ public class GenericTileEntity extends BlockEntity {
         if (!GeneralConfig.manageOwnership.get()) {
             return;
         }
-        BaseBEData data = getData(Registration.BASE_BE_DATA);
+        BaseBEData data = getData(mcjty.lib.setup.Registration.BASE_BE_DATA);
         data = data.withOwner(null, "");
         data = data.withSecurityChannel(-1);
-        setData(Registration.BASE_BE_DATA, data);
+        setData(mcjty.lib.setup.Registration.BASE_BE_DATA, data);
         markDirtyClient();
     }
 
     public void setSecurityChannel(int id) {
-        BaseBEData data = getData(Registration.BASE_BE_DATA);
+        BaseBEData data = getData(mcjty.lib.setup.Registration.BASE_BE_DATA);
         data = data.withSecurityChannel(id);
-        setData(Registration.BASE_BE_DATA, data);
+        setData(mcjty.lib.setup.Registration.BASE_BE_DATA, data);
         markDirtyClient();
     }
 
     public int getSecurityChannel() {
-        return getData(Registration.BASE_BE_DATA).securityChannel();
+        return getData(mcjty.lib.setup.Registration.BASE_BE_DATA).securityChannel();
     }
 
     public String getOwnerName() {
-        return getData(Registration.BASE_BE_DATA).ownerName();
+        return getData(mcjty.lib.setup.Registration.BASE_BE_DATA).ownerName();
     }
 
     public UUID getOwnerUUID() {
-        return getData(Registration.BASE_BE_DATA).ownerUUID();
+        return getData(mcjty.lib.setup.Registration.BASE_BE_DATA).ownerUUID();
     }
 
     public boolean checkAccess(Player player) {

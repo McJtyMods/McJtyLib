@@ -17,12 +17,17 @@ public class BlockBuilder {
             .requiresCorrectToolForDrops()
             .sound(SoundType.METAL);
 
-    private BlockBehaviour.Properties properties = STANDARD_IRON;
+    private BlockBehaviour.Properties properties = standardProperties();
     private boolean infusable = false;
     private final TooltipBuilder tooltipBuilder = new TooltipBuilder();
     private BlockEntityType.BlockEntitySupplier<BlockEntity> tileEntitySupplier;
     private TOPDriver topDriver = McJtyLibTOPDriver.DRIVER;
     private ManualEntry manualEntry = ManualEntry.EMPTY;
+
+    public static BlockBehaviour.Properties standardProperties() {
+        return BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(2.0f)
+                .requiresCorrectToolForDrops().sound(SoundType.METAL);
+    }
 
     public BlockBehaviour.Properties getProperties() {
         return properties;

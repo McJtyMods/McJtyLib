@@ -4,17 +4,17 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.vertex.BufferBuilder;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
-import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
-import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
+import static net.minecraft.util.LightCoordsUtil.FULL_BRIGHT;
+import static net.minecraft.util.LightCoordsUtil.FULL_SKY;
 
 public class RenderGlowEffect {
 
@@ -22,22 +22,12 @@ public class RenderGlowEffect {
      * Render a glow effect at the given position. The texture to use
      * for glowing should be bound before calling this.
      */
-    public static void renderGlow(PoseStack matrixStack, MultiBufferSource buffer, ResourceLocation texture) {
-//        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_TEST);
-//        VertexConsumer builder = buffer.getBuffer(CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS);
-        VertexConsumer builder = buffer.getBuffer(RenderType.translucent());
-
-        TextureAtlasSprite sprite = Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(texture);
-
-        Matrix4f matrix = matrixStack.last().pose();
-        RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.UP.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.DOWN.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.NORTH.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.SOUTH.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.WEST.ordinal(), 1.1f, -0.05f);
-        RenderGlowEffect.addSideFullTexture(matrix, builder, sprite, Direction.EAST.ordinal(), 1.1f, -0.05f);
+    public static void renderGlow(PoseStack matrixStack, SubmitNodeCollector collector, Identifier texture) {
+        TextureAtlasSprite sprite = AbstractDynamicBakedModel.getTexture(texture);
+        collector.submitCustomGeometry(matrixStack, CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS, (pose, buffer) -> {
+            for (Direction side : Direction.values()) addSideFullTexture(pose.pose(), buffer, sprite, side.ordinal(), 1.1f, -0.05f);
+        });
     }
-
 
     private static final Quad[] QUADS = new Quad[] {
             new Quad(new Vt(0, 0, 0), new Vt(1, 0, 0), new Vt(1, 0, 1), new Vt(0, 0, 1)),       // DOWN
@@ -49,8 +39,8 @@ public class RenderGlowEffect {
     };
 
     public static void addSideFullTexture(BufferBuilder buffer, int side, float mult, float offset, Vec3 offs) {
-        int b1 = FULL_SKY;
-        int b2 = FULL_BLOCK;
+        int b1 = 240;
+        int b2 = 240;
         Quad quad = QUADS[side];
         buffer.addVertex((float) (offs.x + quad.v1.x * mult + offset), (float) (offs.y + quad.v1.y * mult + offset), (float) (offs.z + quad.v1.z * mult + offset)).setUv(0, 0).setUv2(b1, b2).setColor(255, 255, 255, 128);
         buffer.addVertex((float) (offs.x + quad.v2.x * mult + offset), (float) (offs.y + quad.v2.y * mult + offset), (float) (offs.z + quad.v2.z * mult + offset)).setUv(0, 1).setUv2(b1, b2).setColor(255, 255, 255, 128);
@@ -59,8 +49,8 @@ public class RenderGlowEffect {
     }
 
     public static void addSideFullTexture(Matrix4f positionMatrix, VertexConsumer buffer, TextureAtlasSprite sprite, int side, float mult, float offset) {
-        int b1 = FULL_SKY;
-        int b2 = FULL_BLOCK;
+        int b1 = 240;
+        int b2 = 240;
         Quad quad = QUADS[side];
         buffer.addVertex(positionMatrix, quad.v1.x * mult + offset, quad.v1.y * mult + offset, quad.v1.z * mult + offset).setColor(255, 255, 255, 128).setUv(sprite.getU0(), sprite.getV0()).setUv2(b1, b2).setNormal(1,0,0);
         buffer.addVertex(positionMatrix, quad.v2.x * mult + offset, quad.v2.y * mult + offset, quad.v2.z * mult + offset).setColor(255, 255, 255, 128).setUv(sprite.getU0(), sprite.getV1()).setUv2(b1, b2).setNormal(1,0,0);

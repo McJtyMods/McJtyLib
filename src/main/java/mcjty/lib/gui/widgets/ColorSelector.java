@@ -11,10 +11,10 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypeConvertors;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }
@@ -171,7 +171,7 @@ public class ColorSelector extends AbstractLabel<ColorSelector> {
         }
 
         ImageLabel colors = new ImageLabel()
-                .image(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "textures/gui/colorpicker.png"), 0, 0)
+                .image(Identifier.fromNamespaceAndPath(McJtyLib.MODID, "textures/gui/colorpicker.png"), 0, 0)
                 .setTextureDimensions(128, 128)
                 .hint(105, 5, 128, 128);
 

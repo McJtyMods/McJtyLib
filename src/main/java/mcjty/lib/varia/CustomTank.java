@@ -14,11 +14,55 @@ import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomTank implements IFluidHandler, IFluidTank {
+
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+
+public class CustomTank implements IFluidHandler, IFluidTank, ResourceHandler<FluidResource> {
 
     @Nonnull
     protected FluidStack fluid = FluidStack.EMPTY;
     protected int capacity;
+
+    private final SnapshotJournal<FluidStack> transferJournal = new SnapshotJournal<>() {
+        @Override protected FluidStack createSnapshot() { return fluid.copy(); }
+        @Override protected void revertToSnapshot(FluidStack snapshot) { fluid = snapshot; }
+        @Override protected void onRootCommit(FluidStack before) {
+            if (!FluidStack.matches(before, fluid)) onContentsChanged();
+        }
+    };
+    private void checkIndex(int index) { if (index != 0) throw new IndexOutOfBoundsException(index); }
+    @Override public int size() { return 1; }
+    @Override public FluidResource getResource(int index) { checkIndex(index); return FluidResource.of(fluid); }
+    @Override public long getAmountAsLong(int index) { checkIndex(index); return fluid.getAmount(); }
+    @Override public long getCapacityAsLong(int index, FluidResource resource) { checkIndex(index); return capacity; }
+    @Override public boolean isValid(int index, FluidResource resource) { checkIndex(index); return !resource.isEmpty() && isFluidValid(resource.toStack(1)); }
+    @Override public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
+        checkIndex(index);
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        if (amount == 0 || resource.isEmpty()) return 0;
+        int inserted = fill(resource.toStack(amount), FluidAction.SIMULATE);
+        if (inserted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            fluid = resource.toStack(fluid.getAmount() + inserted);
+        }
+        return inserted;
+    }
+    @Override public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
+        checkIndex(index);
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        if (amount == 0 || resource.isEmpty() || !resource.matches(fluid)) return 0;
+        int extracted = Math.min(amount, fluid.getAmount());
+        if (extracted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            fluid = fluid.copyWithAmount(fluid.getAmount() - extracted);
+        }
+        return extracted;
+    }
 
     public CustomTank(int capacity) {
         this.capacity = capacity;
@@ -52,8 +96,8 @@ public class CustomTank implements IFluidHandler, IFluidTank {
 
     public void load(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
         if (tag.contains(tagName)) {
-            CompoundTag nbt = tag.getCompound(tagName);
-            FluidStack fluid = FluidStack.parse(provider, nbt).orElse(FluidStack.EMPTY);
+            CompoundTag nbt = tag.getCompoundOrEmpty(tagName);
+            FluidStack fluid = FluidStack.CODEC.parse(provider.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), nbt).result().orElse(FluidStack.EMPTY);
             setFluid(fluid);
         }
     }
@@ -61,7 +105,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
     public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
         if (!fluid.isEmpty()) {
             CompoundTag nbt = new CompoundTag();
-            Tag saved = fluid.save(provider, nbt);
+            Tag saved = FluidStack.CODEC.encodeStart(provider.createSerializationContext(net.minecraft.nbt.NbtOps.INSTANCE), fluid).getOrThrow();
             tag.put(tagName, saved);
         }
     }
@@ -116,7 +160,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         }
         if (fluid.isEmpty()) {
             onContentsChanged();
-            fluid = new FluidStack(resource.getFluidHolder(), Math.min(capacity, resource.getAmount()), resource.getComponentsPatch());
+            fluid = new FluidStack(resource.getFluid().builtInRegistryHolder(), Math.min(capacity, resource.getAmount()), resource.getComponentsPatch());
             return fluid.getAmount();
         }
         if (!FluidStack.isSameFluidSameComponents(fluid, resource)) {
@@ -151,7 +195,7 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         if (fluid.getAmount() < drained) {
             drained = fluid.getAmount();
         }
-        FluidStack stack = new FluidStack(fluid.getFluidHolder(), drained, fluid.getComponentsPatch());
+        FluidStack stack = new FluidStack(fluid.getFluid().builtInRegistryHolder(), drained, fluid.getComponentsPatch());
         if (action.execute()) {
             onContentsChanged();
             fluid.shrink(drained);

@@ -4,7 +4,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
@@ -15,7 +14,15 @@ import javax.annotation.Nonnull;
  * and 'canAutomationExtract'. Most TE's have another IItemHandler that is used
  * for the container so that the player can interact with slots even if automation can't
  */
-public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
+
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+
+public class AutomationFilterItemHander implements IItemHandlerModifiable, ResourceHandler<ItemResource> {
 
     private final GenericItemHandler wrapped;
 
@@ -75,13 +82,22 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTS
         return wrapped.getContainerFactory().isOutputSlot(slot);
     }
 
-    @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         return wrapped.serializeNBT(provider);
     }
 
-    @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
         wrapped.deserializeNBT(provider, nbt);
+    }
+    @Override public int size() { return wrapped.size(); }
+    @Override public ItemResource getResource(int index) { return wrapped.getResource(index); }
+    @Override public long getAmountAsLong(int index) { return wrapped.getAmountAsLong(index); }
+    @Override public long getCapacityAsLong(int index, ItemResource resource) { return wrapped.getCapacityAsLong(index, resource); }
+    @Override public boolean isValid(int index, ItemResource resource) { return wrapped.isValid(index, resource); }
+    @Override public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+        return canAutomationInsert(index) ? wrapped.insert(index, resource, amount, transaction) : 0;
+    }
+    @Override public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+        return canAutomationExtract(index) ? wrapped.extract(index, resource, amount, transaction) : 0;
     }
 }

@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
@@ -11,9 +11,9 @@ import java.util.stream.Stream;
 
 public class WrenchChecker {
 
-    private static Set<ResourceLocation> wrenches;
+    private static Set<Identifier> wrenches;
 
-    public static final ResourceLocation WRENCH = ResourceLocation.fromNamespaceAndPath("c", "tools/wrench");
+    public static final Identifier WRENCH = Identifier.fromNamespaceAndPath("c", "tools/wrench");
     public static final TagKey<Item> WRENCH_TAG = TagKey.create(Registries.ITEM, WRENCH);
 
 
@@ -22,7 +22,7 @@ public class WrenchChecker {
             wrenches = Stream.of(
                     "rftoolsbase:smartwrench",
                     "rftoolsbase:smartwrench_select"
-            ).map(ResourceLocation::parse).collect(Collectors.toSet());
+            ).map(Identifier::parse).collect(Collectors.toSet());
         }
         if (wrenches.contains(Tools.getId(item))) {
             return true;

@@ -7,9 +7,9 @@ import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.layout.HorizontalAlignment;
 import mcjty.lib.gui.layout.VerticalAlignment;
 import mcjty.lib.typed.Type;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public abstract class AbstractLabel<P extends AbstractLabel<P>> extends AbstractWidget<P> {
 
@@ -29,18 +29,18 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
     private int txtDx = 0;
     private int txtDy = 0;
 
-    private ResourceLocation image = null;
+    private Identifier image = null;
     private int u;
     private int v;
     private int iw;
     private int ih;
 
 
-    public ResourceLocation getImage() {
+    public Identifier getImage() {
         return image;
     }
 
-    public P image(ResourceLocation image, int u, int v, int iw, int ih) {
+    public P image(Identifier image, int u, int v, int iw, int ih) {
         this.image = image;
         this.u = u;
         this.v = v;
@@ -134,11 +134,11 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         drawOffset(gui, graphics, x, y, 0, 0);
     }
 
-    public void drawOffset(Screen gui, GuiGraphics graphics, int x, int y, int offsetx, int offsety) {
+    public void drawOffset(Screen gui, GuiGraphicsExtractor graphics, int x, int y, int offsetx, int offsety) {
         if (!visible) {
             return;
         }
@@ -148,10 +148,10 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         int dy = calculateVerticalOffset() + offsety + txtDy;
 
         if (image != null) {
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+
             int xx = x + bounds.x + (bounds.width-iw) / 2;
             int yy = y + bounds.y + (bounds.height-ih) / 2;
-            graphics.blit(image, xx, yy, u, v, iw, ih);
+            graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, image, xx, yy, u, v, iw, ih, 256, 256);
         }
 
         int col = getColor();
@@ -160,9 +160,9 @@ public abstract class AbstractLabel<P extends AbstractLabel<P>> extends Abstract
         }
 
         if (text == null) {
-            graphics.drawString(mc.font, "", x+dx+bounds.x, y+dy+bounds.y, col, false);
+            graphics.text(mc.font, "", x+dx+bounds.x, y+dy+bounds.y, col, false);
         } else {
-            graphics.drawString(mc.font, mc.font.plainSubstrByWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col, false);
+            graphics.text(mc.font, mc.font.plainSubstrByWidth(text, bounds.width), x + dx + bounds.x, y + dy + bounds.y, col, false);
         }
     }
 

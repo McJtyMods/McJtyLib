@@ -23,6 +23,11 @@ public class DeferredItems {
         return register.register(name, supplier);
     }
 
+    /** Register with properties whose registry id has been set by NeoForge. */
+    public <T extends Item> DeferredItem<T> register(String name, java.util.function.Function<Item.Properties, T> factory) {
+        return register.registerItem(name, factory);
+    }
+
     public static DeferredItems create(String modid) {
         return new DeferredItems(modid);
     }

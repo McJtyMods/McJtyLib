@@ -18,9 +18,9 @@ public class KeyInputHandler {
                 if (kb.isUnbound()) {
                     yield false;
                 }
-                yield InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), kb.getKey().getValue());
+                yield InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), kb.getKey().getValue());
             }
-            case MOUSE -> GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), kb.getKey().getValue()) == GLFW.GLFW_PRESS;
+            case MOUSE -> GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), kb.getKey().getValue()) == GLFW.GLFW_PRESS;
             default -> kb.isDown();
         };
         if (doStuff) {

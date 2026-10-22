@@ -10,25 +10,25 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record PacketContainerDataToClient(ResourceLocation containerId, RegistryFriendlyByteBuf buffer) implements CustomPacketPayload {
+public record PacketContainerDataToClient(Identifier containerId, RegistryFriendlyByteBuf buffer) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "containerdata");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "containerdata");
     public static final CustomPacketPayload.Type<PacketContainerDataToClient> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketContainerDataToClient> CODEC = StreamCodec.of(
             (buf, packet) -> {
-                buf.writeResourceLocation(packet.containerId);
+                buf.writeIdentifier(packet.containerId);
                 byte[] array = packet.buffer().array();
                 buf.writeInt(array.length);
                 buf.writeBytes(array);
             },
             buf -> {
-                ResourceLocation containerId = buf.readResourceLocation();
+                Identifier containerId = buf.readIdentifier();
                 int l = buf.readInt();
                 ByteBuf newbuf = Unpooled.buffer(l);
                 byte[] bytes = new byte[l];
@@ -51,12 +51,12 @@ public record PacketContainerDataToClient(ResourceLocation containerId, Registry
         return TYPE;
     }
 
-    public static PacketContainerDataToClient create(ResourceLocation id, RegistryFriendlyByteBuf buffer) {
+    public static PacketContainerDataToClient create(Identifier id, RegistryFriendlyByteBuf buffer) {
         return new PacketContainerDataToClient(id, buffer);
     }
 
     public static PacketContainerDataToClient create(RegistryFriendlyByteBuf buf) {
-        ResourceLocation containerId = buf.readResourceLocation();
+        Identifier containerId = buf.readIdentifier();
         int l = buf.readInt();
 
         ByteBuf newbuf = Unpooled.buffer(l);

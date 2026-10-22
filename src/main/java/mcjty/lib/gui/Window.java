@@ -27,12 +27,12 @@ import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.NamedCodec;
 import mcjty.lib.varia.StringRegister;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -41,7 +41,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -78,7 +78,7 @@ public class Window {
         this.toplevel = toplevel;
     }
 
-    public Window(Screen gui, ResourceLocation guiDescription) {
+    public Window(Screen gui, Identifier guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
         final int[] sidesize = {0, 0};
@@ -94,7 +94,7 @@ public class Window {
         }
     }
 
-    public Window(Screen gui, GenericTileEntity tileEntity, ResourceLocation guiDescription) {
+    public Window(Screen gui, GenericTileEntity tileEntity, Identifier guiDescription) {
         this.gui = gui;
         final int[] dim = {-1, -1};
         final int[] sidesize = {0, 0};
@@ -112,7 +112,7 @@ public class Window {
 //        Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(true);
     }
 
-    private void parseInternal(@Nullable GenericGuiContainer<?, ?> gui, @Nullable GenericTileEntity tileEntity, ResourceLocation guiDescription, int[] dim, int[] sidesize) {
+    private void parseInternal(@Nullable GenericGuiContainer<?, ?> gui, @Nullable GenericTileEntity tileEntity, Identifier guiDescription, int[] dim, int[] sidesize) {
         try {
             WindowTools.parseAndHandleClient(guiDescription, command -> {
                 if ("window".equals(command.getId())) {
@@ -139,7 +139,7 @@ public class Window {
                             .forEach(cmd -> {
                                 String channel = cmd.getOptionalPar(0, "");
                                 String modidCmd = cmd.getOptionalPar(1, "");
-                                ResourceLocation rl = ResourceLocation.parse(modidCmd);
+                                Identifier rl = Identifier.parse(modidCmd);
                                 event(channel, (source, params) -> {
                                     Networking.sendToServer(PacketSendServerCommand.create(rl.getNamespace(), rl.getPath(), TypedMap.EMPTY));
                                 });
@@ -164,7 +164,7 @@ public class Window {
                                     String component = cmd.getOptionalPar(0, "");
                                     String attributeName = cmd.getOptionalPar(1, "");
                                     String attachmentKey = cmd.getOptionalPar(2, "");
-                                    AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.get(ResourceLocation.parse(attachmentKey));
+                                    AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.getValue(Identifier.parse(attachmentKey));
                                     if (type == null) {
                                         Logging.logError("Could not find attachment type '" + attachmentKey + "'!");
                                         return;
@@ -364,7 +364,7 @@ public class Window {
         bindings.entrySet().forEach(entry -> entry.getKey().setGenericValue(entry.getValue().apply(te)));
     }
 
-    public void draw(GuiGraphics graphics) {
+    public void draw(GuiGraphicsExtractor graphics) {
         int x = getRelativeX();
         int y = getRelativeY();
 
@@ -526,7 +526,7 @@ public class Window {
             Object oldValue = component.getGenericValue(attributeType);
             O newValue = ncOut.set(attributeName, oldValue);
             te.setData(type, newValue);
-            ResourceLocation id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
+            Identifier id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
             StreamCodec<RegistryFriendlyByteBuf, O> streamCodec = menu.getStreamCodecForType(type);
             if (streamCodec == null) {
                 Logging.message(Minecraft.getInstance().player, "Could not find stream codec for type '" + id + "'!");

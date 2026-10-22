@@ -9,7 +9,7 @@ import net.minecraft.world.inventory.DataSlot;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.items.IItemHandler;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface IGenericContainer {
 

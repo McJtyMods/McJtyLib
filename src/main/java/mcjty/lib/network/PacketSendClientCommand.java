@@ -7,12 +7,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record PacketSendClientCommand(String modid, String command, TypedMap arguments) implements CustomPacketPayload {
 
-    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "sendclientcommand");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(McJtyLib.MODID, "sendclientcommand");
     public static final CustomPacketPayload.Type<PacketSendClientCommand> TYPE = new Type<>(ID);
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketSendClientCommand> CODEC = StreamCodec.composite(

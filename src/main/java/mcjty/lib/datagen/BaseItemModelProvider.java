@@ -5,19 +5,18 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import mcjty.lib.datagen.model.ModelProvider;
+import mcjty.lib.datagen.model.ModelFile;
 
-public abstract class BaseItemModelProvider extends ItemModelProvider {
+public abstract class BaseItemModelProvider extends ModelProvider {
 
     protected String name(Item item) {
         return BuiltInRegistries.ITEM.getKey(item).getPath();
     }
 
 
-    public BaseItemModelProvider(DataGenerator generator, String modid, ExistingFileHelper existingFileHelper) {
-        super(generator.getPackOutput(), modid, existingFileHelper);
+    public BaseItemModelProvider(DataGenerator generator, String modid) {
+        super(generator.getPackOutput(), modid, "item");
     }
 
     public void parentedBlock(Block block) {

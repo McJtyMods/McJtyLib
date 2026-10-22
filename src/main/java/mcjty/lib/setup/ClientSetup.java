@@ -27,6 +27,10 @@ public class ClientSetup {
 //                });
     }
 
+    public static void registerPipelines(net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) {
+        mcjty.lib.client.CustomRenderTypes.registerPipelines(event);
+    }
+
     public static void registerKeyBinds(RegisterKeyMappingsEvent event) {
         KeyBindings.init(event);
     }

@@ -4,7 +4,7 @@ public class MultipartModelLoader {} /*implements IGeometryLoader<MultipartModel
 
 
     public static void register(ModelRegistryEvent event) {
-        ModelLoaderRegistry.registerLoader(ResourceLocation.fromNamespaceAndPath(McJtyLib.MODID, "multipartloader"), new MultipartModelLoader());
+        ModelLoaderRegistry.registerLoader(Identifier.fromNamespaceAndPath(McJtyLib.MODID, "multipartloader"), new MultipartModelLoader());
     }
 
     @Override
@@ -21,12 +21,12 @@ public class MultipartModelLoader {} /*implements IGeometryLoader<MultipartModel
     public static class MultipartModelGeometry implements IModelGeometry<MultipartModelGeometry> {
 
         @Override
-        public BakedModel bake(IModelConfiguration ownerUUID, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, ResourceLocation modelLocation) {
+        public BakedModel bake(IModelConfiguration ownerUUID, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides, Identifier modelLocation) {
             return new MultipartBakedModel();
         }
 
         @Override
-        public Collection<Material> getTextures(IModelConfiguration ownerUUID, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
+        public Collection<Material> getTextures(IModelConfiguration ownerUUID, Function<Identifier, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
             return Collections.emptyList();
         }
     }

@@ -3,10 +3,8 @@ package mcjty.lib.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class HudRenderHelper {
 
-    public static void renderHudItems(PoseStack matrixStack, MultiBufferSource buffer, List<Pair<ItemStack, String>> messages,
+    public static void renderHudItems(PoseStack matrixStack, SubmitNodeCollector buffer, List<Pair<ItemStack, String>> messages,
                                       HudPlacement hudPlacement,
                                       HudOrientation hudOrientation,
                                       Direction orientation,
@@ -36,12 +34,12 @@ public class HudRenderHelper {
             matrixStack.translate((float) x + 0.5F, (float) y + 1.75F, (float) z + 0.5F);
         }
 
-        Quaternionf quaternion = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+        Quaternionf quaternion = Minecraft.getInstance().gameRenderer.mainCamera().rotation();
         switch (hudOrientation) {
             case HUD_SOUTH -> matrixStack.mulPose(new Quaternionf().setAngleAxis(-getHudAngle(orientation), 0, 1, 0));
             case HUD_TOPLAYER_HORIZ -> {
                 // @todo not correct, it just faces camera
-                float yaw = Minecraft.getInstance().getEntityRenderDispatcher().camera.getYRot();
+                float yaw = Minecraft.getInstance().gameRenderer.mainCamera().yRot();
                 matrixStack.mulPose(new Quaternionf().rotateY((float) Math.toRadians(- yaw + 180)));
             }
             case HUD_TOPLAYER -> {
@@ -81,7 +79,7 @@ public class HudRenderHelper {
         return quaternion;
     }
 
-    public static void renderHud(PoseStack stack, MultiBufferSource buffer, List<String> messages,
+    public static void renderHud(PoseStack stack, SubmitNodeCollector buffer, List<String> messages,
                                  HudPlacement hudPlacement,
                                  HudOrientation hudOrientation,
                                  Direction orientation,
@@ -104,7 +102,7 @@ public class HudRenderHelper {
         return f3;
     }
 
-    private static void renderText(PoseStack matrixStack, MultiBufferSource buffer, Font fontrenderer, List<Pair<ItemStack, String>> messages, int lines, float scale) {
+    private static void renderText(PoseStack matrixStack, SubmitNodeCollector buffer, Font fontrenderer, List<Pair<ItemStack, String>> messages, int lines, float scale) {
         matrixStack.translate(-0.5F, 0.5F, 0.07F);
         float f3 = 0.0075F;
         matrixStack.scale(f3 * scale, -f3 * scale, f3);
@@ -114,7 +112,7 @@ public class HudRenderHelper {
         renderLog(matrixStack, buffer, fontrenderer, messages, lines);
     }
 
-    private static void renderLog(PoseStack matrixStack, MultiBufferSource buffer, Font fontrenderer, List<Pair<ItemStack, String>> messages, int lines) {
+    private static void renderLog(PoseStack matrixStack, SubmitNodeCollector buffer, Font fontrenderer, List<Pair<ItemStack, String>> messages, int lines) {
         int currenty = 7;
         int height = 10;
         int logsize = messages.size();
@@ -132,17 +130,13 @@ public class HudRenderHelper {
                         matrixStack.scale(10, -10, 16);
 //                        matrixStack.translate(0, 0, -150);
                         // @todo 1.15 this needs more work! we ignore 'currenty'!
-                        ItemRenderer itemRender = Minecraft.getInstance().getItemRenderer();
-                        BakedModel ibakedmodel = itemRender.getModel(stack, Minecraft.getInstance().level, null, 1);
-                        itemRender.render(stack, ItemDisplayContext.GUI, false, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS, OverlayTexture.NO_OVERLAY, ibakedmodel);
-
-//                        itemRender.renderItemAndEffectIntoGUI(stack, 0, currenty);
+                        RenderHelper.renderItemGui(matrixStack, buffer, stack, RenderHelper.MAX_BRIGHTNESS, OverlayTexture.NO_OVERLAY);
                         prefix = "    ";
                         matrixStack.popPose();
                     }
 
-                    fontrenderer.drawInBatch(fontrenderer.plainSubstrByWidth(prefix + s, 115), 7, currenty, 0xffffff, false, matrixStack.last().pose(), buffer, Font.DisplayMode.NORMAL, 0, RenderHelper.MAX_BRIGHTNESS);
-//                    fontrenderer.drawString(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff);
+                    RenderHelper.renderText(fontrenderer, fontrenderer.plainSubstrByWidth(prefix + s, 115), 7, currenty, 0xffffffff, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS);
+//                    fontrenderer.text(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff);
                     currenty += height;
                 }
             }

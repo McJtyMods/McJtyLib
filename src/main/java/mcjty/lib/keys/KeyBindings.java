@@ -11,7 +11,7 @@ public class KeyBindings {
     public static KeyMapping openManual;
 
     public static void init(RegisterKeyMappingsEvent event) {
-        openManual = new KeyMapping("key.openManual", KeyConflictContext.GUI, InputConstants.getKey("key.keyboard.f1"), "key.categories.mcjtylib");
+        openManual = new KeyMapping("key.openManual", KeyConflictContext.GUI, InputConstants.getKey("key.keyboard.f1"), KeyMapping.Category.register(net.minecraft.resources.Identifier.fromNamespaceAndPath("mcjtylib", "keys")));
         event.register(openManual);
     }
 }

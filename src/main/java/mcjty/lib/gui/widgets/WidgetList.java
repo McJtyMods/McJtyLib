@@ -9,7 +9,7 @@ import mcjty.lib.gui.events.SelectionEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 
 import java.awt.*;
@@ -161,7 +161,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void draw(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void draw(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }
@@ -185,11 +185,11 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
             }
             if (!invisibleselection) {
                 if (i == selected && hilighted) {
-                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedHighlightedGradient1, StyleConfig.colorListSelectedHighlightedGradient2);
+                    RenderHelper.drawHorizontalGradientRect(graphics, xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedHighlightedGradient1, StyleConfig.colorListSelectedHighlightedGradient2);
                 } else if (i == selected) {
-                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedGradient1, StyleConfig.colorListSelectedGradient2);        // 0xff515151
+                    RenderHelper.drawHorizontalGradientRect(graphics, xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListSelectedGradient1, StyleConfig.colorListSelectedGradient2);        // 0xff515151
                 } else if (hilighted) {
-                    RenderHelper.drawHorizontalGradientRect(xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListHighlightedGradient1, StyleConfig.colorListHighlightedGradient2);
+                    RenderHelper.drawHorizontalGradientRect(graphics, xx, yy + top + 1, xx + bounds.width - 5, yy + top + rh - 2, StyleConfig.colorListHighlightedGradient1, StyleConfig.colorListHighlightedGradient2);
                 }
             }
             if (isEnabledAndVisible()) {
@@ -207,7 +207,7 @@ public class WidgetList extends AbstractContainerWidget<WidgetList> implements S
     }
 
     @Override
-    public void drawPhase2(Screen gui, GuiGraphics graphics, int x, int y) {
+    public void drawPhase2(Screen gui, GuiGraphicsExtractor graphics, int x, int y) {
         if (!visible) {
             return;
         }

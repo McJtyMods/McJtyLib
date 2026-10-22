@@ -1,13 +1,11 @@
 package mcjty.lib.tooltips;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import mcjty.lib.client.RenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,8 +22,8 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
     }
 
     @Override
-    public int getHeight() {
-        return Math.max(1, (itemStack.size() / itemsPerLine) * 20);
+    public int getHeight(Font font) {
+        return Math.max(1, ((itemStack.size() + itemsPerLine - 1) / itemsPerLine) * 20);
     }
 
     @Override
@@ -34,23 +32,23 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
     }
 
     @Override
-    public void renderImage(Font font, int offsetX, int offsetY, GuiGraphics graphics) {
+    public void extractImage(Font font, int offsetX, int offsetY, int width, int height, GuiGraphicsExtractor graphics) {
         int j = 0;
         // Look through all the ItemStacks and add them to the tooltip at an x/y
         for (Pair<ItemStack, Integer> item : itemStack) {
             int x = offsetX + (Math.floorMod(j, itemsPerLine) * 21);
             int y = offsetY + (Math.floorDiv(j, itemsPerLine) * 20) - 20;
             // Render item
-            graphics.renderItem(item.getLeft(), x, y, x * y * 31);
+            graphics.item(item.getLeft(), x, y, x * y * 31);
             // Render durability and/or cool down bar
-            graphics.renderItemDecorations(Minecraft.getInstance().font, item.getLeft(), x, y, "");
+            graphics.itemDecorations(Minecraft.getInstance().font, item.getLeft(), x, y, "");
 
-            renderItemCount(font, x, y + 20, item.getLeft().getCount(), item.getRight());
+            renderItemCount(graphics, font, x, y + 20, item.getLeft().getCount(), item.getRight());
             j++;
         }
     }
 
-    private static void renderItemCount(Font font, int x, int y, int count, int errorAmount) {
+    private static void renderItemCount(GuiGraphicsExtractor graphics, Font font, int x, int y, int count, int errorAmount) {
         if (errorAmount == ITooltipExtras.NOAMOUNT) {
             return;
         }
@@ -59,38 +57,17 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
             return;
         }
 
-        MultiBufferSource.BufferSource source = Minecraft.getInstance().renderBuffers().bufferSource();
-
-        String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString(count);
-
-        PoseStack pose = new PoseStack();
-        pose.translate(0, 0, 200D); // @todo 1.19.4 + itemRenderer.blitOffset);
-        drawStringToWidth(font, source, pose, x, y, 18, 0xFFFFFF, s1);
-
-        if (errorAmount >= 0) {
-            String s2 = "(" + Integer.toString(errorAmount) + ")";
-            drawStringToWidth(font, source, pose, x + 8, y + 17, 18, 0xFFFF0000, s2);
-        }
-
-        source.endBatch();
+        String countText = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString(count);
+        drawStringToWidth(graphics, font, x, y, 18, 0xffffffff, countText);
+        if (errorAmount >= 0) drawStringToWidth(graphics, font, x + 8, y + 17, 18, 0xffff0000, "(" + errorAmount + ")");
     }
 
-    /**
-     * @param x bottom edge
-     * @param y right side
-     * @param width space to render in
-     */
-    private static void drawStringToWidth(Font font, MultiBufferSource.BufferSource buffersource, PoseStack pose, int x, int y, int width, int color, String str) {
-        pose.pushPose();
-        pose.translate(x + width, y, 0);
-        int strWidth = font.width(str);
-        if (strWidth > width) {
-            // Scale down to fit the space
-            pose.scale((float) width / strWidth, (float) width / strWidth, 1F);
-        }
-
-        font.drawInBatch(str, -strWidth, -font.lineHeight, color, true, pose.last().pose(), buffersource, Font.DisplayMode.NORMAL, 0, RenderHelper.MAX_BRIGHTNESS);
-
-        pose.popPose();
+    private static void drawStringToWidth(GuiGraphicsExtractor graphics, Font font, int x, int y, int width, int color, String text) {
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(x + width, y);
+        int textWidth = font.width(text);
+        if (textWidth > width) graphics.pose().scale((float)width / textWidth);
+        graphics.text(font, text, -textWidth, -font.lineHeight, color);
+        graphics.pose().popMatrix();
     }
 }

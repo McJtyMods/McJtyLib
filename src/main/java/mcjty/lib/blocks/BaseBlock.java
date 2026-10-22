@@ -52,7 +52,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -86,7 +86,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         stack.set(Registration.ITEM_INFUSABLE, new ItemInfusable(infused));
     }
 
-    @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
         intAddInformation(stack, tooltip);
 
@@ -213,7 +212,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     protected void breakAndRemember(Level world, Player player, BlockPos pos) {
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             playerDestroy(world, player, pos, world.getBlockState(pos), world.getBlockEntity(pos), ItemStack.EMPTY);
             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
@@ -240,7 +239,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
         MenuProvider h = world.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY, new BlockPos(x, y, z), null);
         if (h != null) {
-            if (world.isClientSide) {
+            if (world.isClientSide()) {
                 return true;
             }
             if (checkAccess(world, player, te)) {
@@ -261,7 +260,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @Override
     public void setPlacedBy(@Nonnull Level world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nullable LivingEntity placer, @Nonnull ItemStack stack) {
         super.setPlacedBy(world, pos, state, placer, stack);
-        if (!world.isClientSide && GeneralConfig.manageOwnership.get()) {
+        if (!world.isClientSide() && GeneralConfig.manageOwnership.get()) {
             setOwner(world, pos, placer);
         }
 
@@ -275,8 +274,8 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     @SuppressWarnings("deprecation")
     @Override
-    public void neighborChanged(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull Block blockIn, @Nonnull BlockPos fromPos, boolean isMoving) {
-        super.neighborChanged(state, world, pos, blockIn, fromPos, isMoving);
+    public void neighborChanged(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull Block blockIn, net.minecraft.world.level.redstone.@org.jspecify.annotations.Nullable Orientation orientation, boolean isMoving) {
+        super.neighborChanged(state, world, pos, blockIn, orientation, isMoving);
         checkRedstone(world, pos);
     }
 
@@ -351,18 +350,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     @Override
     public PartSlot getSlotFromState(Level world, BlockPos pos, BlockState newState) {
         return PartSlot.NONE;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onRemove(@Nonnull BlockState state, @Nonnull Level world, @Nonnull BlockPos pos, @Nonnull BlockState newstate, boolean isMoving) {
-        if (!world.isClientSide) {
-            BlockEntity te = world.getBlockEntity(pos);
-            if (te instanceof GenericTileEntity genericTileEntity) {
-                genericTileEntity.onReplaced(world, pos, state, newstate);
-            }
-        }
-        super.onRemove(state, world, pos, newstate, isMoving);
     }
 
     protected Property<?>[] getProperties() {

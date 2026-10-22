@@ -6,7 +6,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.*;
@@ -95,16 +95,16 @@ public class MultiblockDriver<T extends IMultiblock> {
 
     public void load(CompoundTag tagCompound) {
         clear();
-        ListTag lst = tagCompound.getList("mb", Tag.TAG_COMPOUND);
+        ListTag lst = tagCompound.getListOrEmpty("mb");
         for (int i = 0 ; i < lst.size() ; i++) {
-            CompoundTag tc = lst.getCompound(i);
-            int id = tc.getInt("id");
+            CompoundTag tc = lst.getCompoundOrEmpty(i);
+            int id = tc.getIntOr("id", 0);
             T value = loader.apply(tc);
             MultiblockHolder<T> holder = new MultiblockHolder<>(value);
             holder.load(tc);
             multiblocks.put(id, holder);
         }
-        lastId = tagCompound.getInt("lastId");
+        lastId = tagCompound.getIntOr("lastId", 0);
     }
 
     public CompoundTag save(CompoundTag tagCompound) {

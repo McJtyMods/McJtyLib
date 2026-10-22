@@ -45,10 +45,11 @@ public class McJtyLib {
         bus.addListener(Networking::registerMessages);
         bus.addListener(GeneralConfig::onLoad);
         bus.addListener(GeneralConfig::onFileChange);
-        
+
         if (dist.isClient()) {
             bus.addListener(ClientSetup::init);
             bus.addListener(ClientSetup::registerKeyBinds);
+            bus.addListener(ClientSetup::registerPipelines);
             bus.addListener(ClientSetup::registerClientComponentTooltips);
 //            bus.addListener(MultipartModelLoader::register);
         }

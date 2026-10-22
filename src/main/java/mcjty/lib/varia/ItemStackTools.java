@@ -5,7 +5,7 @@ import mcjty.lib.gui.GuiParser;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -16,7 +16,7 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +33,7 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+        IItemHandler handler = mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
         if (handler != null) {
             return handler.extractItem(slot, amount, false);
         } else {
@@ -49,7 +49,7 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        IItemHandler h = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+        IItemHandler h = mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
         if (h != null) {
             return h.getStackInSlot(slot);
         } else {
@@ -66,7 +66,7 @@ public class ItemStackTools {
 
     public static ItemStack guiCommandToItemStack(GuiParser.GuiCommand obj) {
         String itemName = obj.getOptionalPar(0, "minecraft:stick");
-        Item item = Tools.getItem(ResourceLocation.parse(itemName));
+        Item item = Tools.getItem(Identifier.parse(itemName));
         int amount = obj.getOptionalPar(1, 1);
         return new ItemStack(item, amount);
     }
@@ -94,16 +94,16 @@ public class ItemStackTools {
         if (commonTags == null) {
             commonTags = new HashSet<>();
             commonTags.add(ItemTags.SAND);
-            commonTags.add(ItemTags.FENCES);
+            commonTags.add(net.minecraft.tags.BlockItemTags.FENCES.item());
             commonTags.add(ItemTags.SAPLINGS);
             commonTags.add(ItemTags.LEAVES);
             commonTags.add(ItemTags.LOGS);
             commonTags.add(ItemTags.RAILS);
-            commonTags.add(ItemTags.SLABS);
+            commonTags.add(net.minecraft.tags.BlockItemTags.SLABS.item());
             commonTags.add(ItemTags.WOOL);
             commonTags.add(ItemTags.WOOL_CARPETS);
             commonTags.add(ItemTags.PLANKS);
-            commonTags.add(ItemTags.STAIRS);
+            commonTags.add(net.minecraft.tags.BlockItemTags.STAIRS.item());
             commonTags.add(ItemTags.DIRT);
             commonTags.add(Tags.Items.CROPS);
             commonTags.add(Tags.Items.GLASS_BLOCKS);
@@ -125,11 +125,11 @@ public class ItemStackTools {
             commonTags.add(Tags.Items.ORES_QUARTZ);
             commonTags.add(Tags.Items.ORES_IRON);
             commonTags.add(Tags.Items.ORES_LAPIS);
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/copper")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/tin")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/silver")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/manganese")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/platinum")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/copper")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/tin")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/silver")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/manganese")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/platinum")));
 
             commonTags.add(Tags.Items.STORAGE_BLOCKS_COAL);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_DIAMOND);
@@ -138,11 +138,11 @@ public class ItemStackTools {
             commonTags.add(Tags.Items.STORAGE_BLOCKS_REDSTONE);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_IRON);
             commonTags.add(Tags.Items.STORAGE_BLOCKS_LAPIS);
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/copper")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/tin")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/silver")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/manganese")));
-            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/platinum")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/copper")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/tin")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/silver")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/manganese")));
+            commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/platinum")));
         }
     }
 }
