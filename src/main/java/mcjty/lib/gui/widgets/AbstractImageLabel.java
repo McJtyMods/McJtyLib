@@ -115,7 +115,7 @@ public abstract class AbstractImageLabel<P extends AbstractImageLabel<P>> extend
 
             int xx = x + bounds.x;
             int yy = y + bounds.y;
-            graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, image, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight, 256, 256);
+            graphics.blit(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, image, xx, yy, u, v, bounds.width, bounds.height, txtWidth, txtHeight);
         }
     }
 
