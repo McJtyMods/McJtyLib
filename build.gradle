@@ -26,7 +26,7 @@ if (sharedTools.isFile()) {
     // Temporary standalone copy while the 26.2 workspace is unpublished.
     apply from: 'gradletools.gradle'
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.2_fabric/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkSpace/26.2_fabric/gradletools.gradle'
 }
 
 group = "com.github.mcjty"
