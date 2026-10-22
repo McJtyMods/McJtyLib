@@ -97,7 +97,7 @@ public class DataGen implements DataProvider {
                 return new BaseRecipeProvider(registries, output) {
 
                     @Override
-                    protected void buildRecipes() {
+                    public void buildRecipes() {
                         RecipeOutput consumer = output;
                         withRecipeItems(items, () -> {
                             for (Dob dob : dobs) {
