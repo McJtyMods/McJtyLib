@@ -7,8 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
-
+import mcjty.lib.varia.FluidStack;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;

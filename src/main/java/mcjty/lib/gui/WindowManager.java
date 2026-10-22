@@ -8,7 +8,6 @@ import mcjty.lib.client.GuiTools;
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -133,7 +132,7 @@ public class WindowManager {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 GenericGuiContainer<?,?> gui = (GenericGuiContainer<?,?>) this.gui;
-                gui.drawHoveringText(graphics, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().font);
+                gui.drawHoveringText(graphics, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), net.minecraft.client.Minecraft.getInstance().font);
             }
         });
 

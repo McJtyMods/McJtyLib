@@ -11,11 +11,17 @@ import net.minecraft.core.Registry;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
+
 
 import java.util.stream.Stream;
 
 public class LevelTools {
+    private static MinecraftServer currentServer;
+    public static void registerLifecycle() {
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTING.register(server -> currentServer=server);
+        net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STOPPED.register(server -> currentServer=null);
+    }
+
 
     public static boolean isLoaded(Level world, BlockPos pos) {
         if (world == null || pos == null) {
@@ -25,7 +31,7 @@ public class LevelTools {
     }
 
     public static ServerLevel getOverworld() {
-        MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
+        MinecraftServer server = currentServer;
         return server.getLevel(Level.OVERWORLD);
     }
 
@@ -35,7 +41,7 @@ public class LevelTools {
     }
 
     public static ServerLevel getLevel(ResourceKey<Level> type) {
-        return ServerLifecycleHooks.getCurrentServer().getLevel(type);
+        return currentServer.getLevel(type);
     }
 
     public static ServerLevel getLevel(Level world, ResourceKey<Level> type) {

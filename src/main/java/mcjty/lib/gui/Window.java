@@ -35,11 +35,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.network.connection.ConnectionType;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import org.lwjgl.glfw.GLFW;
-
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 import java.io.File;
@@ -164,7 +162,7 @@ public class Window {
                                     String component = cmd.getOptionalPar(0, "");
                                     String attributeName = cmd.getOptionalPar(1, "");
                                     String attachmentKey = cmd.getOptionalPar(2, "");
-                                    AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.getValue(Identifier.parse(attachmentKey));
+                                    AttachmentType<?> type = mcjty.lib.container.AttachmentTypes.get(Identifier.parse(attachmentKey));
                                     if (type == null) {
                                         Logging.logError("Could not find attachment type '" + attachmentKey + "'!");
                                         return;
@@ -394,7 +392,7 @@ public class Window {
             toplevel.setWindow(this);
             toplevel.mouseScrolled(x, y, dwheelX, dwheelY);
         }
-        PreferencesProperties preferencesProperties = McJtyLib.getPreferencesProperties(gui.getMinecraft().player);
+        PreferencesProperties preferencesProperties = McJtyLib.getPreferencesProperties(net.minecraft.client.Minecraft.getInstance().player);
         currentStyle = preferencesProperties != null ? preferencesProperties.getStyle() : GuiStyle.STYLE_FLAT_GRADIENT;
 
         toplevel.setWindow(this);
@@ -432,20 +430,20 @@ public class Window {
     }
 
     private int getRelativeX() {
-        int windowWidth = gui.getMinecraft().getWindow().getScreenWidth();
+        int windowWidth = net.minecraft.client.Minecraft.getInstance().getWindow().getScreenWidth();
         if (windowWidth == 0) {
             return 0;
         } else {
-            return (int) gui.getMinecraft().mouseHandler.xpos() * gui.width / windowWidth;
+            return (int) net.minecraft.client.Minecraft.getInstance().mouseHandler.xpos() * gui.width / windowWidth;
         }
     }
 
     private int getRelativeY() {
-        int windowHeight = gui.getMinecraft().getWindow().getScreenHeight();
+        int windowHeight = net.minecraft.client.Minecraft.getInstance().getWindow().getScreenHeight();
         if (windowHeight == 0) {
             return 0;
         } else {
-            return (int) gui.getMinecraft().mouseHandler.ypos() * gui.height / windowHeight;
+            return (int) net.minecraft.client.Minecraft.getInstance().mouseHandler.ypos() * gui.height / windowHeight;
         }
     }
 
@@ -526,14 +524,14 @@ public class Window {
             Object oldValue = component.getGenericValue(attributeType);
             O newValue = ncOut.set(attributeName, oldValue);
             te.setData(type, newValue);
-            Identifier id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
+            Identifier id = type.identifier();
             StreamCodec<RegistryFriendlyByteBuf, O> streamCodec = menu.getStreamCodecForType(type);
             if (streamCodec == null) {
                 Logging.message(Minecraft.getInstance().player, "Could not find stream codec for type '" + id + "'!");
                 return;
             }
             ByteBuf newbuf = Unpooled.buffer();
-            RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, te.getLevel().registryAccess(), ConnectionType.OTHER);
+            RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, te.getLevel().registryAccess());
             streamCodec.encode(buffer, newValue);
             Networking.sendToServer(PacketAttachmentData.create(id, buffer));
         });
@@ -545,10 +543,10 @@ public class Window {
         GenericContainer menu = (GenericContainer) guiContainer.getMenu();
         StreamCodec<RegistryFriendlyByteBuf, T> codec = menu.getStreamCodecForType(type);
         ByteBuf newbuf = Unpooled.buffer();
-        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, be.getLevel().registryAccess(), ConnectionType.OTHER);
+        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, be.getLevel().registryAccess());
         T data = be.getData(type);
         codec.encode(buffer, data);
-        Networking.sendToServer(PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type), buffer));
+        Networking.sendToServer(PacketAttachmentData.create(type.identifier(), buffer));
     }
 
     public <T extends GenericTileEntity> Window bind(String componentName, T te, String keyName) {

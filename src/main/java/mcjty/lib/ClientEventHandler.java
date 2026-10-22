@@ -4,122 +4,52 @@ import mcjty.lib.client.DelayedRenderer;
 import mcjty.lib.gui.IKeyReceiver;
 import mcjty.lib.gui.WindowManager;
 import mcjty.lib.gui.widgets.Widget;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.ScreenEvent;
-import net.neoforged.bus.api.SubscribeEvent;
+import net.fabricmc.fabric.api.client.screen.v1.*;
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
+import net.minecraft.client.gui.screens.Screen;
 
-public class ClientEventHandler {
+public final class ClientEventHandler {
 
-    public ClientEventHandler(){
-    }
+    private static WindowManager modal(Screen screen) {
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseDragged(ScreenEvent.MouseDragged.Pre event) {
-        if (event.getScreen() instanceof IKeyReceiver container) {
-            if (container.getWindow() != null) {
-                WindowManager manager = container.getWindow().getWindowManager();
-                if (manager != null) {
-                    if (manager.getModalWindows().findFirst().isPresent()) {
-                        // There is a modal window. Eat this event and send it directly to the window
-                        manager.mouseDragged(event.getMouseX(), event.getMouseY(), event.getMouseButton());
-                        event.setCanceled(true);
-                    }
-                }
-            }
+        if(screen instanceof IKeyReceiver c && c.getWindow()!=null) {
+            var m=c.getWindow().getWindowManager();
+            if(m!=null&&m.getModalWindows().findFirst().isPresent())return m;
         }
+        return null;
+
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseScolled(ScreenEvent.MouseScrolled.Pre event) {
-        if (event.getScreen() instanceof IKeyReceiver container) {
-            if (container.getWindow() != null) {
-                WindowManager manager = container.getWindow().getWindowManager();
-                if (manager != null) {
-                    if (manager.getModalWindows().findFirst().isPresent()) {
-                        // There is a modal window. Eat this event and send it directly to the window
-                        if (container.mouseScrolledFromEvent(event.getMouseX(), event.getMouseY(), event.getScrollDeltaX(), event.getScrollDeltaY())) {
-                            event.setCanceled(true);
-                        }
-                    }
-                }
-            }
+    private static Widget<?> focus(Screen screen) {
+
+        if(screen instanceof IKeyReceiver c&&c.getWindow()!=null) {
+            var w=c.getWindow();
+            return w.getWindowManager()==null?w.getTextFocus():w.getWindowManager().getTextFocus();
         }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseClicked(ScreenEvent.MouseButtonPressed.Pre event) {
-        if (event.getScreen() instanceof IKeyReceiver container) {
-            if (container.getWindow() != null) {
-                WindowManager manager = container.getWindow().getWindowManager();
-                if (manager != null) {
-                    if (manager.getModalWindows().findFirst().isPresent()) {
-                        // There is a modal window. Eat this event and send it directly to the window
-                        if (container.mouseClickedFromEvent(event.getMouseX(), event.getMouseY(), event.getButton())) {
-                            event.setCanceled(true);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseReleased(ScreenEvent.MouseButtonReleased.Pre event) {
-        if (event.getScreen() instanceof IKeyReceiver container) {
-            if (container.getWindow() != null) {
-                WindowManager manager = container.getWindow().getWindowManager();
-                if (manager != null) {
-                    if (manager.getModalWindows().findFirst().isPresent()) {
-                        // There is a modal window. Eat this event and send it directly to the window
-                        if (container.mouseReleasedFromEvent(event.getMouseX(), event.getMouseY(), event.getButton())) {
-                            event.setCanceled(true);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    public void onGuiInput(ScreenEvent.CharacterTyped.Pre event) {
-        if (event.getScreen() instanceof IKeyReceiver container) {
-            if (container.getWindow() != null) {
-                Widget<?> focus;
-                if (container.getWindow().getWindowManager() == null) {
-                    focus = container.getWindow().getTextFocus();
-                } else {
-                    focus = container.getWindow().getWindowManager().getTextFocus();
-                }
-                if (focus != null) {
-                    event.setCanceled(true);
-                    container.charTypedFromEvent((char)event.getCodePoint());
-                }
-            }
-        }
+        return null;
 
     }
 
-    @SubscribeEvent
-    public void onKeyboardInput(ScreenEvent.KeyPressed.Pre event) {
-        if (event.getScreen() instanceof IKeyReceiver container) {
-            if (container.getWindow() != null) {
-                Widget<?> focus;
-                if (container.getWindow().getWindowManager() == null) {
-                    focus = container.getWindow().getTextFocus();
-                } else {
-                    focus = container.getWindow().getWindowManager().getTextFocus();
-                }
-                if (focus != null) {
-                    event.setCanceled(true);
-                    container.keyTypedFromEvent(event.getKeyCode(), event.getScanCode());
-                }
-            }
-        }
+    public static void register() {
+
+        ScreenEvents.AFTER_INIT.register((client,screen,width,height)-> {
+
+            ScreenMouseEvents.allowMouseDrag(screen).register((s,e,dx,dy)-> {
+                var m=modal(s);if(m==null)return true;m.mouseDragged(e.x(),e.y(),e.button());return false;
+            });
+            ScreenMouseEvents.allowMouseClick(screen).register((s,e)->modal(s)==null||!((IKeyReceiver)s).mouseClickedFromEvent(e.x(),e.y(),e.button()));
+            ScreenMouseEvents.allowMouseRelease(screen).register((s,e)->modal(s)==null||!((IKeyReceiver)s).mouseReleasedFromEvent(e.x(),e.y(),e.button()));
+            ScreenMouseEvents.allowMouseScroll(screen).register((s,x,y,dx,dy)->modal(s)==null||!((IKeyReceiver)s).mouseScrolledFromEvent(x,y,dx,dy));
+            ScreenKeyboardEvents.allowCharType(screen).register((s,e)-> {
+                if(focus(s)==null)return true;((IKeyReceiver)s).charTypedFromEvent((char)e.codepoint());return false;
+            });
+            ScreenKeyboardEvents.allowKeyPress(screen).register((s,e)-> {
+                if(focus(s)==null)return true;((IKeyReceiver)s).keyTypedFromEvent(e.key(),e.scancode());return false;
+            });
+        });
+
+        LevelRenderEvents.COLLECT_SUBMITS.register(context -> DelayedRenderer.render(context.poseStack(),context.submitNodeCollector(),context.levelState().cameraRenderState.pos));
+
     }
 
-    @SubscribeEvent
-    public void onGameRenderOverlay(net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent event) {
-        DelayedRenderer.render(event.getPoseStack(), event.getSubmitNodeCollector(), event.getLevelRenderState().cameraRenderState.pos);
-    }
 }

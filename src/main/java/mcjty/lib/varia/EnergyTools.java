@@ -8,9 +8,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import team.reborn.energy.api.EnergyStorage;
+import mcjty.lib.varia.IEnergyStorage;
 import org.jspecify.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -23,7 +24,7 @@ public class EnergyTools {
         if (te == null) {
             return false;
         }
-        return mcjty.lib.varia.CapabilityTools.energyHandler(te.getLevel().getCapability(Capabilities.Energy.BLOCK, te.getBlockPos(), side)) != null;
+        return mcjty.lib.varia.CapabilityTools.energyHandler(EnergyStorage.SIDED.find(te.getLevel(), te.getBlockPos(), side)) != null;
     }
 
     public static boolean isEnergyItem(ItemStack stack) {
@@ -31,7 +32,7 @@ public class EnergyTools {
         if (item instanceof IEnergyItem) {
             return true;
         }
-        return CapabilityTools.energyHandler(stack.getCapability(Capabilities.Energy.ITEM, net.neoforged.neoforge.transfer.access.ItemAccess.forStack(stack))) != null;
+        return CapabilityTools.energyHandler(EnergyStorage.ITEM.find(stack, CapabilityTools.itemContext(stack))) != null;
     }
 
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
@@ -42,7 +43,7 @@ public class EnergyTools {
             maxEnergyStored = ((IBigPower) tileEntity).getCapacity();
             energyStored = ((IBigPower) tileEntity).getStoredPower();
         } else if (tileEntity != null) {
-            IEnergyStorage capability = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), side));
+            IEnergyStorage capability = mcjty.lib.varia.CapabilityTools.energyHandler(EnergyStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), side));
             if (capability == null) {
                 maxEnergyStored = 0;
                 energyStored = 0;
@@ -61,7 +62,7 @@ public class EnergyTools {
         AtomicLong maxEnergyStored = new AtomicLong();
         AtomicLong energyStored = new AtomicLong();
         if (tileEntity != null) {
-            IEnergyStorage handler = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), side));
+            IEnergyStorage handler = mcjty.lib.varia.CapabilityTools.energyHandler(EnergyStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), side));
             if (handler != null) {
                 maxEnergyStored.set(handler.getMaxEnergyStored());
                 energyStored.set(handler.getEnergyStored());
@@ -75,7 +76,7 @@ public class EnergyTools {
 
     public static long receiveEnergy(BlockEntity tileEntity, Direction from, long maxReceive) {
         if (tileEntity != null) {
-            IEnergyStorage handler = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), from));
+            IEnergyStorage handler = mcjty.lib.varia.CapabilityTools.energyHandler(EnergyStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), from));
             return handler != null ? handler.receiveEnergy(unsignedClampToInt(maxReceive), false) : 0;
         }
         return 0;
@@ -86,7 +87,7 @@ public class EnergyTools {
         if (item instanceof IEnergyItem) {
             return ((IEnergyItem)item).receiveEnergyL(stack, maxReceive, false);
         } else {
-            IEnergyStorage capability = CapabilityTools.energyHandler(stack.getCapability(Capabilities.Energy.ITEM, net.neoforged.neoforge.transfer.access.ItemAccess.forStack(stack)));
+            IEnergyStorage capability = CapabilityTools.energyHandler(EnergyStorage.ITEM.find(stack, CapabilityTools.itemContext(stack)));
             if (capability != null) {
                 return capability.receiveEnergy(unsignedClampToInt(maxReceive), false);
             } else {

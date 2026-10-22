@@ -13,11 +13,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.client.event.RenderTooltipEvent;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
-import net.neoforged.bus.api.SubscribeEvent;
 import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.List;
 
 /**
@@ -30,31 +26,11 @@ public class TooltipRender {
 
     public static ITooltipSettings lastUsedTooltipItem = null;
 
-    @SubscribeEvent
-    public void onMakeTooltip(ItemTooltipEvent event) {
-        //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
-        Minecraft mc = Minecraft.getInstance();
-        ItemStack stack = event.getItemStack();
-        if (stack.getItem() instanceof ITooltipExtras extras) {
-            List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
-            if (!items.isEmpty()) {
-                List<Component> tooltip = event.getToolTip();
-                int count = items.size();
-                int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
-                int width = Math.min(STACKS_PER_LINE, count) * 18;
-                String spaces = "";//"\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
-                while (mc.font.width(spaces) < width) {
-                    spaces += " ";
-                }
-
-                for (int j = 0; j < lines; j++) {
-                    tooltip.add(ComponentFactory.literal(spaces));
-                }
-            }
-        }
+    public static void register() {
+        net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack,context,flag,lines)->{onItemTooltip(stack,lines);wrapTooltip(stack,lines);});
     }
 
-    private static ITooltipSettings getSettings(Item item) {
+    public static ITooltipSettings getSettings(Item item) {
         if (item instanceof ITooltipSettings) {
             return (ITooltipSettings) item;
         } else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof ITooltipSettings) {
@@ -64,9 +40,8 @@ public class TooltipRender {
         }
     }
 
-    @SubscribeEvent
-    public void onItemTooltipEvent(ItemTooltipEvent event) {
-        Item item = event.getItemStack().getItem();
+    public static void onItemTooltip(ItemStack stack, List<Component> lines) {
+        Item item = stack.getItem();
         ITooltipSettings settings = getSettings(item);
         lastUsedTooltipItem = settings;
         if (settings != null) {
@@ -75,7 +50,7 @@ public class TooltipRender {
                 if (KeyBindings.openManual != null && !KeyBindings.openManual.isUnbound()) {
                     if (!SafeClientTools.isSneaking()) {
                         Component translationKey = KeyBindings.openManual.getTranslatedKeyMessage();
-                        event.getToolTip().add(ComponentFactory.literal("<Press ").withStyle(ChatFormatting.YELLOW)
+                        lines.add(ComponentFactory.literal("<Press ").withStyle(ChatFormatting.YELLOW)
                                 .append(translationKey)
                                 .append(ComponentFactory.literal(" for help>").withStyle(ChatFormatting.YELLOW)));
                     }
@@ -84,26 +59,20 @@ public class TooltipRender {
         }
     }
 
-    @SubscribeEvent
-    public void onTooltipGatherComponents(RenderTooltipEvent.GatherComponents event) {
-        Item item = event.getItemStack().getItem();
-        ITooltipSettings settings = getSettings(item);
-        lastUsedTooltipItem = settings;
-        if (settings != null) {
-            event.setMaxWidth(Math.max(event.getMaxWidth(), settings.getMaxWidth()));
+    private static void wrapTooltip(ItemStack stack,List<Component> lines) {
+        var settings=getSettings(stack.getItem());if(settings==null||settings.getMaxWidth()<=0)return;
+        var font=Minecraft.getInstance().font;var wrapped=new java.util.ArrayList<Component>();
+        for(var line:lines)for(var part:font.getSplitter().splitLines(line,settings.getMaxWidth(),net.minecraft.network.chat.Style.EMPTY)){
+            var text=Component.empty();part.visit((style,fragment)->{text.append(Component.literal(fragment).setStyle(style));return java.util.Optional.empty();},net.minecraft.network.chat.Style.EMPTY);wrapped.add(text);
         }
-
-        onTooltipAddIcons(event);
+        lines.clear();lines.addAll(wrapped);
     }
 
-    protected void onTooltipAddIcons(RenderTooltipEvent.GatherComponents event) {
-        ItemStack stack = event.getItemStack();
+    public static java.util.Optional<TooltipComponent> icons(ItemStack stack) {
         if (stack.getItem() instanceof ITooltipExtras extras) {
-            List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
-            List<Either<FormattedText, TooltipComponent>> components = event.getTooltipElements();
-
-            components.add(Either.right(new ClientTooltipIcon(items, STACKS_PER_LINE)));
+            var items=extras.getItems(stack);
+            if(!items.isEmpty())return java.util.Optional.of(new ClientTooltipIcon(items,STACKS_PER_LINE));
         }
+        return java.util.Optional.empty();
     }
-
 }

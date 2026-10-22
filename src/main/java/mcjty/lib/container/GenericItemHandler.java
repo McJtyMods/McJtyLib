@@ -8,9 +8,8 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemStackHandler;
-
+import mcjty.lib.container.IItemHandlerModifiable;
+import mcjty.lib.container.ItemStackHandler;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,56 +19,54 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import mcjty.lib.container.IndexedStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import team.reborn.energy.api.EnergyStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
-public class GenericItemHandler implements IItemHandlerModifiable, ResourceHandler<ItemResource> {
+public class GenericItemHandler implements IItemHandlerModifiable, IndexedStorage<ItemVariant> {
 
     private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
     private final ItemStackHandler stacks;
 
-    private final SnapshotJournal<java.util.List<ItemStack>> transferJournal = new SnapshotJournal<>() {
+    private final SnapshotParticipant<java.util.List<ItemStack>> transferJournal = new SnapshotParticipant<>() {
+        private java.util.List<ItemStack> before;
+        @Override protected void releaseSnapshot(java.util.List<ItemStack> snapshot) { before=snapshot; }
         @Override protected java.util.List<ItemStack> createSnapshot() {
             var result = new java.util.ArrayList<ItemStack>();
             for (int i = 0; i < getSlots(); i++) result.add(getStackInSlot(i).copy());
             return result;
         }
-        @Override protected void revertToSnapshot(java.util.List<ItemStack> snapshot) {
+        @Override protected void readSnapshot(java.util.List<ItemStack> snapshot) {
             for (int i = 0; i < snapshot.size(); i++) stacks.setStackInSlot(i, snapshot.get(i));
         }
-        @Override protected void onRootCommit(java.util.List<ItemStack> before) {
-            for (int i = 0; i < before.size(); i++) {
-                if (!ItemStack.matches(before.get(i), getStackInSlot(i))) onUpdate(i, getStackInSlot(i));
-            }
-        }
+        @Override protected void onFinalCommit() { for (int i=0;i<before.size();i++) if(!ItemStack.matches(before.get(i),getStackInSlot(i))) onUpdate(i,getStackInSlot(i)); }
     };
     @Override public int size() { return getSlots(); }
-    @Override public ItemResource getResource(int index) { return ItemResource.of(getStackInSlot(index)); }
+    @Override public ItemVariant getResource(int index) { return ItemVariant.of(getStackInSlot(index)); }
     @Override public long getAmountAsLong(int index) { return getStackInSlot(index).getCount(); }
-    @Override public long getCapacityAsLong(int index, ItemResource resource) {
+    @Override public long getCapacityAsLong(int index, ItemVariant resource) {
         if (containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index)) return 0;
-        return Math.min(getSlotLimit(index), resource.isEmpty() ? 64 : resource.getMaxStackSize());
+        return Math.min(getSlotLimit(index), resource.isBlank() ? 64 : resource.toStack().getMaxStackSize());
     }
-    @Override public boolean isValid(int index, ItemResource resource) { return !resource.isEmpty() && isItemValid(index, resource.toStack()); }
-    @Override public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+    @Override public boolean isValid(int index, ItemVariant resource) { return !resource.isBlank() && isItemValid(index, resource.toStack()); }
+    @Override public long insert(int index, ItemVariant resource, long amount, TransactionContext transaction) {
         if (amount < 0) throw new IllegalArgumentException("Negative amount");
-        if (amount == 0 || resource.isEmpty() || getCapacityAsLong(index, resource) == 0) return 0;
-        int inserted = amount - insertItem(index, resource.toStack(amount), true).getCount();
+        if (amount == 0 || resource.isBlank() || getCapacityAsLong(index, resource) == 0) return 0;
+        int inserted = (int)Math.min(amount, Integer.MAX_VALUE) - insertItem(index, resource.toStack((int)Math.min(amount, Integer.MAX_VALUE)), true).getCount();
         if (inserted > 0) {
             transferJournal.updateSnapshots(transaction);
             stacks.setStackInSlot(index, resource.toStack(getStackInSlot(index).getCount() + inserted));
         }
         return inserted;
     }
-    @Override public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+    @Override public long extract(int index, ItemVariant resource, long amount, TransactionContext transaction) {
         if (amount < 0) throw new IllegalArgumentException("Negative amount");
-        if (amount == 0 || resource.isEmpty() || !resource.matches(getStackInSlot(index)) || getCapacityAsLong(index, resource) == 0) return 0;
-        int extracted = extractItem(index, amount, true).getCount();
+        if (amount == 0 || resource.isBlank() || !resource.matches(getStackInSlot(index)) || getCapacityAsLong(index, resource) == 0) return 0;
+        int extracted = extractItem(index, (int)Math.min(amount, Integer.MAX_VALUE), true).getCount();
         if (extracted > 0) {
             transferJournal.updateSnapshots(transaction);
             stacks.setStackInSlot(index, getStackInSlot(index).copyWithCount(getStackInSlot(index).getCount() - extracted));
@@ -138,7 +135,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, ResourceHandl
         for (int i = 0; i < getSlots(); i++) {
             stacks.add(getStackInSlot(i));
         }
-        builder.set(Registration.ITEM_INVENTORY, new ItemInventory(stacks));
+        builder.set(Registration.ITEM_INVENTORY.get(), new ItemInventory(stacks));
     }
 
     public ItemStackHandler getStacks() {

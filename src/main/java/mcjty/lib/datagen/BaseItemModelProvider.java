@@ -2,7 +2,7 @@ package mcjty.lib.datagen;
 
 import mcjty.lib.varia.Tools;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.DataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import mcjty.lib.datagen.model.ModelProvider;
@@ -15,8 +15,8 @@ public abstract class BaseItemModelProvider extends ModelProvider {
     }
 
 
-    public BaseItemModelProvider(DataGenerator generator, String modid) {
-        super(generator.getPackOutput(), modid, "item");
+    public BaseItemModelProvider(FabricPackOutput generator, String modid) {
+        super(generator, modid, "item");
     }
 
     public void parentedBlock(Block block) {

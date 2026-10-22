@@ -2,9 +2,8 @@ package mcjty.lib.container;
 
 import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
-
+import mcjty.lib.container.IItemHandler;
+import mcjty.lib.container.SlotItemHandler;
 import javax.annotation.Nonnull;
 
 public class BaseSlot extends SlotItemHandler {
@@ -19,7 +18,7 @@ public class BaseSlot extends SlotItemHandler {
     @Override
     public void set(@Nonnull ItemStack stack) {
         if (te != null) {
-            te.onSlotChanged(getSlotIndex(), stack);
+            te.onSlotChanged(getContainerSlot(), stack);
         }
         super.set(stack);
     }

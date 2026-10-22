@@ -1,44 +1,65 @@
 package mcjty.lib.network;
 
-import mcjty.lib.McJtyLib;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-public class Networking {
+public final class Networking {
 
-    public static void registerMessages(RegisterPayloadHandlersEvent event) {
-        final PayloadRegistrar registrar = event.registrar(McJtyLib.MODID)
-                .versioned("1.0")
-                .optional();
+    public static void registerMessages() {
 
-        registrar.playBidirectional(PacketAttachmentData.TYPE, PacketAttachmentData.CODEC, PacketAttachmentData::handle, PacketAttachmentData::handle);
+        PayloadTypeRegistry.serverboundPlay().register(PacketAttachmentData.TYPE,PacketAttachmentData.CODEC);
 
-        // Server side
-        registrar.playToServer(PacketSetGuiStyle.TYPE, PacketSetGuiStyle.CODEC, PacketSetGuiStyle::handle);
-        registrar.playToServer(PacketOpenManual.TYPE, PacketOpenManual.CODEC, PacketOpenManual::handle);
-        registrar.playToServer(PacketGetListFromServer.TYPE, PacketGetListFromServer.CODEC, PacketGetListFromServer::handle);
-        registrar.playToServer(PacketServerCommandTyped.TYPE, PacketServerCommandTyped.CODEC, PacketServerCommandTyped::handle);
-        registrar.playToServer(PacketSendServerCommand.TYPE, PacketSendServerCommand.CODEC, PacketSendServerCommand::handle);
-        registrar.playToServer(PacketRequestDataFromServer.TYPE, PacketRequestDataFromServer.CODEC, PacketRequestDataFromServer::handle);
+        PayloadTypeRegistry.serverboundPlay().register(PacketSetGuiStyle.TYPE,PacketSetGuiStyle.CODEC);
 
-        // Client side
-        registrar.playToClient(PacketSendPreferencesToClient.TYPE, PacketSendPreferencesToClient.CODEC, PacketSendPreferencesToClient::handle);
-        registrar.playToClient(PacketContainerDataToClient.TYPE, PacketContainerDataToClient.CODEC, PacketContainerDataToClient::handle);
-        registrar.playToClient(PacketSendResultToClient.TYPE, PacketSendResultToClient.CODEC, PacketSendResultToClient::handle);
-        registrar.playToClient(PacketSendClientCommand.TYPE, PacketSendClientCommand.CODEC, PacketSendClientCommand::handle);
-        registrar.playToClient(PacketDataFromServer.TYPE, PacketDataFromServer.CODEC, PacketDataFromServer::handle);
-        registrar.playToClient(PacketFinalizeLogin.TYPE, PacketFinalizeLogin.CODEC, PacketFinalizeLogin::handle);
+        PayloadTypeRegistry.serverboundPlay().register(PacketOpenManual.TYPE,PacketOpenManual.CODEC);
+
+        PayloadTypeRegistry.serverboundPlay().register(PacketGetListFromServer.TYPE,PacketGetListFromServer.CODEC);
+
+        PayloadTypeRegistry.serverboundPlay().register(PacketServerCommandTyped.TYPE,PacketServerCommandTyped.CODEC);
+
+        PayloadTypeRegistry.serverboundPlay().register(PacketSendServerCommand.TYPE,PacketSendServerCommand.CODEC);
+
+        PayloadTypeRegistry.serverboundPlay().register(PacketRequestDataFromServer.TYPE,PacketRequestDataFromServer.CODEC);
+
+        PayloadTypeRegistry.clientboundPlay().register(PacketAttachmentData.TYPE,PacketAttachmentData.CODEC);
+
+        PayloadTypeRegistry.clientboundPlay().register(PacketSendPreferencesToClient.TYPE,PacketSendPreferencesToClient.CODEC);
+
+        PayloadTypeRegistry.clientboundPlay().register(PacketContainerDataToClient.TYPE,PacketContainerDataToClient.CODEC);
+
+        PayloadTypeRegistry.clientboundPlay().register(PacketSendResultToClient.TYPE,PacketSendResultToClient.CODEC);
+
+        PayloadTypeRegistry.clientboundPlay().register(PacketSendClientCommand.TYPE,PacketSendClientCommand.CODEC);
+
+        PayloadTypeRegistry.clientboundPlay().register(PacketDataFromServer.TYPE,PacketDataFromServer.CODEC);
+
+        PayloadTypeRegistry.clientboundPlay().register(PacketFinalizeLogin.TYPE,PacketFinalizeLogin.CODEC);
+
+        ServerPlayNetworking.registerGlobalReceiver(PacketAttachmentData.TYPE,(packet,context)->packet.handle(new PayloadContext(context.player(),context.server())));
+
+        ServerPlayNetworking.registerGlobalReceiver(PacketSetGuiStyle.TYPE,(packet,context)->packet.handle(new PayloadContext(context.player(),context.server())));
+
+        ServerPlayNetworking.registerGlobalReceiver(PacketOpenManual.TYPE,(packet,context)->packet.handle(new PayloadContext(context.player(),context.server())));
+
+        ServerPlayNetworking.registerGlobalReceiver(PacketGetListFromServer.TYPE,(packet,context)->packet.handle(new PayloadContext(context.player(),context.server())));
+
+        ServerPlayNetworking.registerGlobalReceiver(PacketServerCommandTyped.TYPE,(packet,context)->packet.handle(new PayloadContext(context.player(),context.server())));
+
+        ServerPlayNetworking.registerGlobalReceiver(PacketSendServerCommand.TYPE,(packet,context)->packet.handle(new PayloadContext(context.player(),context.server())));
+
+        ServerPlayNetworking.registerGlobalReceiver(PacketRequestDataFromServer.TYPE,(packet,context)->packet.handle(new PayloadContext(context.player(),context.server())));
+
     }
 
-    public static void sendToServer(CustomPacketPayload msg) {
-        net.neoforged.neoforge.client.network.ClientPacketDistributor.sendToServer(msg);
+    public static void sendToServer(CustomPacketPayload packet) {
+        ClientNetworking.sendToServer(packet);
     }
 
-    public static <T extends CustomPacketPayload> void sendToPlayer(T packet, Player player) {
-        PacketDistributor.sendToPlayer((ServerPlayer) player, packet);
+    public static <T extends CustomPacketPayload> void sendToPlayer(T packet,Player player) {
+        if(ServerPlayNetworking.canSend((ServerPlayer)player,packet.type()))ServerPlayNetworking.send((ServerPlayer)player,packet);
     }
+
 }

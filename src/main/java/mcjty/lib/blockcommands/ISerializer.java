@@ -5,8 +5,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.BlockPos;
-import net.neoforged.neoforge.fluids.FluidStack;
-
+import mcjty.lib.varia.FluidStack;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 

@@ -16,8 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
-
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,7 @@ public record Dob(
         Supplier<? extends EntityType> entitySupplier,
         Map<String, Supplier<Map<Identifier, Object>>> codecObjectSupplier,
         Map<String, HolderLookup.Provider> holderLookupSupplier,
-        Map<String, Supplier<IGlobalLootModifier>> glmSupplier,
+        Map<String, Supplier<LootItemFunction>> glmSupplier,
         String translatedName,
         Map<String, String> keyedMessages,
         Map<String, String> messages,
@@ -84,7 +83,7 @@ public record Dob(
         private final Supplier<? extends EntityType> entitySupplier;
         private final Map<String, Supplier<Map<Identifier, Object>>> codecObjectSupplier = new HashMap<>();
         private final Map<String, HolderLookup.Provider> holderLookupSupplier = new HashMap<>();
-        private final Map<String, Supplier<IGlobalLootModifier>> glmSupplier = new HashMap<>();
+        private final Map<String, Supplier<LootItemFunction>> glmSupplier = new HashMap<>();
         private String translatedName = null;
         private Map<String, String> keyedMessages = new HashMap<>();
         private Map<String, String> messages = new HashMap<>();
@@ -120,7 +119,7 @@ public record Dob(
             return this;
         }
 
-        public Builder glm(String lootName, Supplier<IGlobalLootModifier> modifier) {
+        public Builder glm(String lootName, Supplier<LootItemFunction> modifier) {
             glmSupplier.put(lootName, modifier);
             return this;
         }

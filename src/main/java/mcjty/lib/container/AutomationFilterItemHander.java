@@ -4,8 +4,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-
+import mcjty.lib.container.IItemHandlerModifiable;
 import javax.annotation.Nonnull;
 
 /**
@@ -15,14 +14,14 @@ import javax.annotation.Nonnull;
  * for the container so that the player can interact with slots even if automation can't
  */
 
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import mcjty.lib.container.IndexedStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import team.reborn.energy.api.EnergyStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
-public class AutomationFilterItemHander implements IItemHandlerModifiable, ResourceHandler<ItemResource> {
+public class AutomationFilterItemHander implements IItemHandlerModifiable, IndexedStorage<ItemVariant> {
 
     private final GenericItemHandler wrapped;
 
@@ -90,14 +89,14 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, Resou
         wrapped.deserializeNBT(provider, nbt);
     }
     @Override public int size() { return wrapped.size(); }
-    @Override public ItemResource getResource(int index) { return wrapped.getResource(index); }
+    @Override public ItemVariant getResource(int index) { return wrapped.getResource(index); }
     @Override public long getAmountAsLong(int index) { return wrapped.getAmountAsLong(index); }
-    @Override public long getCapacityAsLong(int index, ItemResource resource) { return wrapped.getCapacityAsLong(index, resource); }
-    @Override public boolean isValid(int index, ItemResource resource) { return wrapped.isValid(index, resource); }
-    @Override public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+    @Override public long getCapacityAsLong(int index, ItemVariant resource) { return wrapped.getCapacityAsLong(index, resource); }
+    @Override public boolean isValid(int index, ItemVariant resource) { return wrapped.isValid(index, resource); }
+    @Override public long insert(int index, ItemVariant resource, long amount, TransactionContext transaction) {
         return canAutomationInsert(index) ? wrapped.insert(index, resource, amount, transaction) : 0;
     }
-    @Override public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+    @Override public long extract(int index, ItemVariant resource, long amount, TransactionContext transaction) {
         return canAutomationExtract(index) ? wrapped.extract(index, resource, amount, transaction) : 0;
     }
 }

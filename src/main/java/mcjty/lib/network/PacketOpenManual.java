@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import mcjty.lib.network.PayloadContext;
 
 /**
  * Open the manual
@@ -35,11 +35,11 @@ public record PacketOpenManual(Identifier manual, Identifier entry, Integer page
         return TYPE;
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> handle(this, ctx));
     }
 
-    private static void handle(PacketOpenManual message, IPayloadContext ctx) {
+    private static void handle(PacketOpenManual message, PayloadContext ctx) {
         Player player = ctx.player();
         PatchouliCompatibility.openBookEntry((ServerPlayer) player, message.manual, message.entry, message.page);
     }

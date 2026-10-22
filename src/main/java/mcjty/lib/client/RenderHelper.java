@@ -18,8 +18,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.fluids.FluidStack;
+import mcjty.lib.varia.FluidStack;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -92,7 +91,7 @@ public class RenderHelper {
     public static boolean renderFluidStack(GuiGraphicsExtractor graphics, FluidStack fluid, int x, int y, boolean highlight) {
         if (fluid.isEmpty()) return false;
         var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.getFluid().defaultFluidState());
-        int color = model.fluidTintSource() == null ? 0xffffffff : model.fluidTintSource().colorAsStack(fluid);
+        int color = net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering.getColor(fluid.variant());
         graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, model.stillMaterial().sprite(), x, y, 16, 16, color);
         return true;
     }

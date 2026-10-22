@@ -4,26 +4,28 @@ import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.information.CapabilityPowerInformation;
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.module.CapabilityModuleSupport;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.capabilities.Capabilities;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import team.reborn.energy.api.EnergyStorage;
 
 public enum CapType {
-    ITEMS(Capabilities.Item.BLOCK),
-    ITEMS_AUTOMATION(Capabilities.Item.BLOCK),
+    ITEMS(ItemStorage.SIDED),
+    ITEMS_AUTOMATION(ItemStorage.SIDED),
     CONTAINER(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY),
-    ENERGY(Capabilities.Energy.BLOCK),
+    ENERGY(EnergyStorage.SIDED),
     INFUSABLE(CapabilityInfusable.INFUSABLE_CAPABILITY),
     MODULE(CapabilityModuleSupport.MODULE_CAPABILITY),
     POWER_INFO(CapabilityPowerInformation.POWER_INFORMATION_CAPABILITY),
-    FLUIDS(Capabilities.Fluid.BLOCK);
+    FLUIDS(FluidStorage.SIDED);
 
-    private final BlockCapability capability;
+    private final BlockApiLookup capability;
 
-    CapType(BlockCapability capability) {
+    CapType(BlockApiLookup capability) {
         this.capability = capability;
     }
 
-    public BlockCapability getCapability() {
+    public BlockApiLookup getCapability() {
         return capability;
     }
 }

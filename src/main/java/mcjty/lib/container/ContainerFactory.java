@@ -1,7 +1,6 @@
 package mcjty.lib.container;
 
-import net.neoforged.neoforge.common.util.Lazy;
-
+import mcjty.lib.varia.Lazy;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;

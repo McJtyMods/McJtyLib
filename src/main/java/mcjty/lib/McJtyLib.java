@@ -11,20 +11,13 @@ import mcjty.lib.setup.Registration;
 import mcjty.lib.typed.TypedMap;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@Mod(McJtyLib.MODID)
-public class McJtyLib {
+public class McJtyLib implements net.fabricmc.api.ModInitializer {
 
     public static final String MODID = "mcjtylib";
 
@@ -36,26 +29,18 @@ public class McJtyLib {
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
     private static final Map<String, CommandInfo> commandInfos = new HashMap<>();
 
-    public McJtyLib(ModContainer container, IEventBus bus, Dist dist) {
-
+    @Override public void onInitialize() {
         instance = this;
-        // Register the setup method for modloading
-        Registration.init(bus);
-        bus.addListener(setup::init);
-        bus.addListener(Networking::registerMessages);
-        bus.addListener(GeneralConfig::onLoad);
-        bus.addListener(GeneralConfig::onFileChange);
-
-        if (dist.isClient()) {
-            bus.addListener(ClientSetup::init);
-            bus.addListener(ClientSetup::registerKeyBinds);
-            bus.addListener(ClientSetup::registerPipelines);
-            bus.addListener(ClientSetup::registerClientComponentTooltips);
-//            bus.addListener(MultipartModelLoader::register);
-        }
-
-        container.registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
-        container.registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
+        Registration.init();
+        mcjty.lib.varia.ItemCapabilityProvider.register();
+        mcjty.lib.varia.GlobalLootFunctions.register();
+        mcjty.lib.varia.LevelTools.registerLifecycle();
+        Networking.registerMessages();
+        setup.init();
+        fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry.INSTANCE.register(MODID, net.neoforged.fml.config.ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
+        fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry.INSTANCE.register(MODID, net.neoforged.fml.config.ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
+        fuzs.forgeconfigapiport.fabric.api.v5.ModConfigEvents.loading(MODID).register(GeneralConfig::onLoad);
+        fuzs.forgeconfigapiport.fabric.api.v5.ModConfigEvents.reloading(MODID).register(GeneralConfig::onFileChange);
     }
 
     /**
@@ -98,10 +83,10 @@ public class McJtyLib {
     }
 
     public static PreferencesProperties getPreferencesProperties(Player player) {
-        return player.getData(Registration.PREFERENCES_PROPERTIES);
+        return ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget) player).getAttachedOrCreate(Registration.PREFERENCES_PROPERTIES);
     }
 
     public static void setPreferencesProperties(Player player, PreferencesProperties properties) {
-        player.setData(Registration.PREFERENCES_PROPERTIES, properties);
+        ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget) player).setAttached(Registration.PREFERENCES_PROPERTIES, properties);
     }
 }

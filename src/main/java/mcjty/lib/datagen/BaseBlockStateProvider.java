@@ -4,19 +4,17 @@ import mcjty.lib.blocks.LogicSlabBlock;
 import mcjty.lib.blocks.RBlock;
 import mcjty.lib.varia.Tools;
 import net.minecraft.core.Direction;
-import net.minecraft.data.DataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import mcjty.lib.datagen.model.*;
-
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
 import static mcjty.lib.datagen.model.ModelProvider.BLOCK_FOLDER;
 
 public abstract class BaseBlockStateProvider extends BlockStateProvider {
@@ -29,8 +27,8 @@ public abstract class BaseBlockStateProvider extends BlockStateProvider {
         return Tools.getId(block).getPath();
     }
 
-    public BaseBlockStateProvider(DataGenerator gen, String modid) {
-        super(gen.getPackOutput(), modid);
+    public BaseBlockStateProvider(FabricPackOutput gen, String modid) {
+        super(gen, modid);
     }
 
     public void simpleBlockC(Block block, Consumer<BlockModelBuilder> consumer) {

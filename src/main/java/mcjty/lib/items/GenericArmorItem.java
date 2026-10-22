@@ -18,7 +18,7 @@ public class GenericArmorItem extends Item {
         }));
     }
 
-    @Override public EquipmentSlot getEquipmentSlot(ItemStack stack) {
+    public EquipmentSlot getEquipmentSlot(ItemStack stack) {
         var equippable = stack.get(DataComponents.EQUIPPABLE);
         return equippable == null ? EquipmentSlot.MAINHAND : equippable.slot();
     }

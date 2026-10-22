@@ -3,7 +3,7 @@ package mcjty.lib.gui;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
+import mcjty.lib.network.StreamCodecs;
 
 public enum GuiStyle {
     STYLE_BEVEL("bevel"),
@@ -15,7 +15,7 @@ public enum GuiStyle {
     private final String style;
 
     public static final Codec<GuiStyle> CODEC = Codec.STRING.xmap(GuiStyle::getStyleByName, GuiStyle::name);
-    public static final StreamCodec<FriendlyByteBuf, GuiStyle> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(GuiStyle.class);
+    public static final StreamCodec<FriendlyByteBuf, GuiStyle> STREAM_CODEC = StreamCodecs.enumCodec(GuiStyle.class);
 
     GuiStyle(String style) {
         this.style = style;

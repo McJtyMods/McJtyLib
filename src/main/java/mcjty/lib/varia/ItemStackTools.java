@@ -11,10 +11,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.items.IItemHandler;
-
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import team.reborn.energy.api.EnergyStorage;
+import mcjty.lib.container.IItemHandler;
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 import java.util.Collection;
@@ -33,7 +33,7 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        IItemHandler handler = mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
+        IItemHandler handler = mcjty.lib.varia.CapabilityTools.itemHandler(ItemStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), null));
         if (handler != null) {
             return handler.extractItem(slot, amount, false);
         } else {
@@ -49,7 +49,7 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        IItemHandler h = mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
+        IItemHandler h = mcjty.lib.varia.CapabilityTools.itemHandler(ItemStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), null));
         if (h != null) {
             return h.getStackInSlot(slot);
         } else {
@@ -105,39 +105,39 @@ public class ItemStackTools {
             commonTags.add(ItemTags.PLANKS);
             commonTags.add(net.minecraft.tags.BlockItemTags.STAIRS.item());
             commonTags.add(ItemTags.DIRT);
-            commonTags.add(Tags.Items.CROPS);
-            commonTags.add(Tags.Items.GLASS_BLOCKS);
-            commonTags.add(Tags.Items.GLASS_PANES);
-            commonTags.add(Tags.Items.CHESTS);
-            commonTags.add(Tags.Items.COBBLESTONES);
-            commonTags.add(Tags.Items.NETHERRACKS);
-            commonTags.add(Tags.Items.OBSIDIANS);
-            commonTags.add(Tags.Items.GRAVELS);
-            commonTags.add(Tags.Items.SANDS);
-            commonTags.add(Tags.Items.END_STONES);
-            commonTags.add(Tags.Items.STONES);
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "crops")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "glass_blocks")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "glass_panes")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "chests")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "cobblestones")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "netherracks")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "obsidians")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "gravels")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "sands")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "end_stones")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "stones")));
 
-            commonTags.add(Tags.Items.ORES_COAL);
-            commonTags.add(Tags.Items.ORES_DIAMOND);
-            commonTags.add(Tags.Items.ORES_EMERALD);
-            commonTags.add(Tags.Items.ORES_GOLD);
-            commonTags.add(Tags.Items.ORES_REDSTONE);
-            commonTags.add(Tags.Items.ORES_QUARTZ);
-            commonTags.add(Tags.Items.ORES_IRON);
-            commonTags.add(Tags.Items.ORES_LAPIS);
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ores/coal")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ores/diamond")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ores/emerald")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ores/gold")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ores/redstone")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ores/quartz")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ores/iron")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ores/lapis")));
             commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/copper")));
             commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/tin")));
             commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/silver")));
             commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/manganese")));
             commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ores/platinum")));
 
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_COAL);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_DIAMOND);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_EMERALD);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_GOLD);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_REDSTONE);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_IRON);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_LAPIS);
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "storage_blocks/coal")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "storage_blocks/diamond")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "storage_blocks/emerald")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "storage_blocks/gold")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "storage_blocks/redstone")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "storage_blocks/iron")));
+            commonTags.add(net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "storage_blocks/lapis")));
             commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/copper")));
             commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/tin")));
             commonTags.add(TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/silver")));

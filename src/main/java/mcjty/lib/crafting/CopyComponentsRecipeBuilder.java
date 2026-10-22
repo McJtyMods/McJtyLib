@@ -15,7 +15,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.common.conditions.ICondition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
@@ -92,8 +91,8 @@ public class CopyComponentsRecipeBuilder implements IRecipeBuilder<CopyComponent
             }
 
             @Override
-            public void accept(net.minecraft.resources.ResourceKey<Recipe<?>> resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder, ICondition... iConditions) {
-                consumerIn.accept(resourceLocation, new CopyComponentsRecipe((ShapedRecipe) recipe), advancementHolder, iConditions);
+            public void accept(net.minecraft.resources.ResourceKey<Recipe<?>> resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
+                consumerIn.accept(resourceLocation, new CopyComponentsRecipe((ShapedRecipe) recipe), advancementHolder);
             }
         }, save);
     }
@@ -110,8 +109,8 @@ public class CopyComponentsRecipeBuilder implements IRecipeBuilder<CopyComponent
             }
 
             @Override
-            public void accept(net.minecraft.resources.ResourceKey<Recipe<?>> resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder, ICondition... iConditions) {
-                consumerIn.accept(resourceLocation, new CopyComponentsRecipe((ShapedRecipe) recipe), advancementHolder, iConditions);
+            public void accept(net.minecraft.resources.ResourceKey<Recipe<?>> resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
+                consumerIn.accept(resourceLocation, new CopyComponentsRecipe((ShapedRecipe) recipe), advancementHolder);
             }
         }, net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id));
     }

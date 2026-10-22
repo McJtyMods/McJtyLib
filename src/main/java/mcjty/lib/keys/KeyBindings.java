@@ -2,16 +2,14 @@ package mcjty.lib.keys;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.settings.KeyConflictContext;
 
 
 public class KeyBindings {
 
     public static KeyMapping openManual;
 
-    public static void init(RegisterKeyMappingsEvent event) {
-        openManual = new KeyMapping("key.openManual", KeyConflictContext.GUI, InputConstants.getKey("key.keyboard.f1"), KeyMapping.Category.register(net.minecraft.resources.Identifier.fromNamespaceAndPath("mcjtylib", "keys")));
-        event.register(openManual);
+    public static void init() {
+        openManual = new KeyMapping("key.openManual", InputConstants.Type.KEYSYM, org.lwjgl.glfw.GLFW.GLFW_KEY_F1, KeyMapping.Category.register(net.minecraft.resources.Identifier.fromNamespaceAndPath("mcjtylib", "keys")));
+        net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper.registerKeyMapping(openManual);
     }
 }

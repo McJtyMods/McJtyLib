@@ -14,8 +14,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-
+import mcjty.lib.network.PayloadContext;
 import java.util.Optional;
 
 /**
@@ -37,7 +36,7 @@ public record PacketDataFromServer(BlockPos pos, String command, TypedMap result
         return TYPE;
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> {
             BlockEntity te;
             if (pos == null) {

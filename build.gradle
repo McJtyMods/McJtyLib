@@ -14,7 +14,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.1.38'
+    id 'net.fabricmc.fabric-loom' version '1.17.17'
 }
 
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
@@ -26,24 +26,29 @@ if (sharedTools.isFile()) {
     // Temporary standalone copy while the 26.2 workspace is unpublished.
     apply from: 'gradletools.gradle'
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.2_neo/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.2_fabric/gradletools.gradle'
 }
 
 group = "com.github.mcjty"
-base.archivesName = "mcjtylib"
-java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+base.archivesName = "mcjtylib-fabric"
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
 
 if (System.getenv('BUILD_NUMBER') != null) {
     version += ".${System.getenv('BUILD_NUMBER')}"
 }
 
 repos()
-at()
+access()
 runs()
 jars()
 
 dependencies {
     mc()
+    config()
+    energy()
     top()
     jei()
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
@@ -107,7 +112,7 @@ publishing {
 }
 
 
-modpublisher(['the-one-probe'], [], ['the-one-probe'], [], [])
+modpublisher(['the-one-probe'], ['fabric-api', 'forge-config-api-port'], ['the-one-probe'], ['fabric-api', 'forge-config-api-port'], [])
 
 
 
@@ -117,3 +122,31 @@ tasks.named('test') { useJUnitPlatform() }
 
 // Convenient entry point for the checks that do not launch Minecraft.
 tasks.register('portingRegression') { dependsOn tasks.named('test') }
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand version: project.version }
+}
+
+// Opt-in native checks run in Fabric, where transfer API mixins are installed.
+if (providers.gradleProperty('transferTests').isPresent()) {
+    sourceSets {
+        fabricTest {
+            compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+            runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+        }
+    }
+    loom {
+        mods {
+            mcjtylib { sourceSet sourceSets.main }
+            mcjtylib_transfer_test { sourceSet sourceSets.fabricTest }
+        }
+        runs {
+            transferTest {
+                server()
+                source sourceSets.fabricTest
+                runDir 'build/transfer-test'
+            }
+        }
+    }
+}

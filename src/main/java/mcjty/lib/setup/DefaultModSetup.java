@@ -11,14 +11,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
-import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.common.util.Lazy;
+import mcjty.lib.varia.Lazy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jspecify.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -30,7 +26,7 @@ public abstract class DefaultModSetup {
     protected CreativeModeTab creativeTab;
     private List<Supplier<ItemStack>> tabItems = new ArrayList<>();   // Here we collect all tab items
 
-    public void init(FMLCommonSetupEvent e) {
+    public void init() {
         logger = LogManager.getLogger();
 
         setupModCompat();
@@ -80,25 +76,12 @@ public abstract class DefaultModSetup {
         return lazyItem;
     }
 
-    public Consumer<RegisterCapabilitiesEvent> getBlockCapabilityRegistrar(RBlockRegistry registry) {
-        return event -> {
-            for (AnnotationHolder holder : registry.getHolders()) {
-                for (int i = 0; i < holder.getCapSize(); i++) {
-                    var hd = holder.getCapHolder(i);
-                    var bc = hd.capability();
-                    var function = hd.function();
-                    event.registerBlock(bc, new IBlockCapabilityProvider<>() {
-                        @Nullable
-                        @Override
-                        public Object getCapability(Level level, BlockPos blockPos, BlockState blockState, @Nullable BlockEntity blockEntity, Object o) {
-                            if (blockEntity instanceof GenericTileEntity be) {
-                                return function.apply(be);
-                            }
-                            return null;
-                        }
-                    }, hd.block().get());
-                }
+    public void registerBlockCapabilities(RBlockRegistry registry) {
+        for (AnnotationHolder holder : registry.getHolders()) {
+            for (int i=0;i<holder.getCapSize();i++) {
+                var hd=holder.getCapHolder(i);
+                hd.capability().registerForBlocks((level,pos,state,be,side) -> be instanceof GenericTileEntity te ? hd.function().apply(te) : null, hd.block().get());
             }
-        };
+        }
     }
 }

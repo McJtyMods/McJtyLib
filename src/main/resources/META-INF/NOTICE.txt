@@ -1,0 +1,10 @@
+McJtyLib is licensed under MIT.
+
+The slot helpers mcjty.lib.container.ItemStackHandler, SlotItemHandler, and
+InvWrapper are adapted from NeoForge 26.2.0.75:
+https://github.com/neoforged/NeoForge
+Copyright (c) Forge Development LLC and contributors.
+SPDX-License-Identifier: LGPL-2.1-only
+Their copyright headers and LGPL 2.1 license are retained. Adaptations replace
+loader-specific types and remove loader-specific extensions. Corresponding
+source is distributed in the McJtyLib repository and sources jar.

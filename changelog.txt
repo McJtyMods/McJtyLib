@@ -1,3 +1,9 @@
+26.2-10.0.0-fabric
+- Ported the library and shared multi-mod build to Minecraft 26.2 Fabric.
+- Added native Fabric registration, networking, attachments, menus and transactional storage.
+- Preserved container helpers, modal input, tooltip icons and dynamic model colors.
+- Added native transfer regression checks and Fabric TOP/JEI integration settings.
+
 26.2-10.0.0:
 - Ported to Minecraft 26.2 and NeoForge with Java 25
 - Updated GUI extraction, model helpers, recipes, block entity persistence, networking, and datagen

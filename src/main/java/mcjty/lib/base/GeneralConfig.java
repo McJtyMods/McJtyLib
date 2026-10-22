@@ -1,7 +1,7 @@
 package mcjty.lib.base;
 
 import mcjty.lib.varia.Logging;
-import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class GeneralConfig {
@@ -39,13 +39,13 @@ public class GeneralConfig {
         SERVER_BUILDER.pop();
     }
 
-    public static void onLoad(final ModConfigEvent.Loading configEvent) {
-        if (configEvent.getConfig().getSpec() == CLIENT_CONFIG) {
+    public static void onLoad(final ModConfig configEvent) {
+        if (configEvent.getSpec() == CLIENT_CONFIG) {
             StyleConfig.updateColors();
         }
     }
 
-    public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
-        StyleConfig.updateColors();
+    public static void onFileChange(final ModConfig configEvent) {
+        onLoad(configEvent);
     }
 }

@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import mcjty.lib.network.PayloadContext;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
@@ -49,7 +49,7 @@ public record PacketRequestDataFromServer(ResourceKey<Level> level, BlockPos pos
         return new PacketRequestDataFromServer(type, pos, command.name(), params, dummy);
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> {
             Player player = ctx.player();
 

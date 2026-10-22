@@ -9,7 +9,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.tuple.Pair;
-
 import java.util.List;
 
 public class ClientTooltipIcon implements ClientTooltipComponent, TooltipComponent {
@@ -23,7 +22,7 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
 
     @Override
     public int getHeight(Font font) {
-        return Math.max(1, ((itemStack.size() + itemsPerLine - 1) / itemsPerLine) * 20);
+        return Math.max(1, ((itemStack.size() + itemsPerLine - 1) / itemsPerLine) * 38);
     }
 
     @Override
@@ -37,13 +36,13 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
         // Look through all the ItemStacks and add them to the tooltip at an x/y
         for (Pair<ItemStack, Integer> item : itemStack) {
             int x = offsetX + (Math.floorMod(j, itemsPerLine) * 21);
-            int y = offsetY + (Math.floorDiv(j, itemsPerLine) * 20) - 20;
+            int y = offsetY + (Math.floorDiv(j, itemsPerLine) * 38) - 20;
             // Render item
             graphics.item(item.getLeft(), x, y, x * y * 31);
             // Render durability and/or cool down bar
             graphics.itemDecorations(Minecraft.getInstance().font, item.getLeft(), x, y, "");
 
-            renderItemCount(graphics, font, x, y + 20, item.getLeft().getCount(), item.getRight());
+            renderItemCount(graphics, font, x, y + 18, item.getLeft().getCount(), item.getRight());
             j++;
         }
     }

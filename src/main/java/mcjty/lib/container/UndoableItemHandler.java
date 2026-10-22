@@ -1,8 +1,7 @@
 package mcjty.lib.container;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-
+import mcjty.lib.container.IItemHandlerModifiable;
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;

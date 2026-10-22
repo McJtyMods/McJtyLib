@@ -36,10 +36,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import team.reborn.energy.api.EnergyStorage;
+import mcjty.lib.varia.IEnergyStorage;
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 import java.awt.*;
@@ -52,6 +52,8 @@ import java.util.Optional;
  * The main parent for all container based gui's in McJtyLib based mods
  */
 public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends AbstractContainerMenu> extends AbstractContainerScreen<C> implements IKeyReceiver {
+    public int getGuiLeft(){return leftPos;} public int getGuiTop(){return topPos;}
+
 
     protected Window window;
     private WindowManager windowManager;
@@ -285,9 +287,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Nullable
-    @Override
     public Slot getSlotUnderMouse() {
-        Slot slot = super.getSlotUnderMouse();
+        Slot slot = this.hoveredSlot;
         if (slot == null) {
             return null;
         }
@@ -349,14 +350,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             // Protection for bad itemstacks
             list = new ArrayList<>();
         } else {
-            TooltipFlag flag = this.getMinecraft().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
-            list = stack.getTooltipLines(Item.TooltipContext.of(this.getMinecraft().level), this.getMinecraft().player, flag);
+            TooltipFlag flag = net.minecraft.client.Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
+            list = stack.getTooltipLines(Item.TooltipContext.of(net.minecraft.client.Minecraft.getInstance().level), net.minecraft.client.Minecraft.getInstance().player, flag);
         }
 
         list = addCustomLines(list, blockRender, stack);
 
         // @todo 1.20 is this right?
-        graphics.setTooltipForNextFrame(this.getMinecraft().font, list, Optional.empty(), stack, x, y);
+        graphics.setTooltipForNextFrame(net.minecraft.client.Minecraft.getInstance().font, list, mcjty.lib.tooltips.TooltipRender.icons(stack), x, y);
     }
 
     @Override
@@ -501,14 +502,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     // Register a container/gui on the client side
     public static <C extends GenericContainer, S extends GenericGuiContainer<T,C>, T extends GenericTileEntity> void register(
-            RegisterMenuScreensEvent event,
             MenuType<C> type,
             GuiSupplier<C, S, T> guiSupplier) {
         MenuScreens.ScreenConstructor<C, S> factory = (container, inventory, title) -> {
             BlockEntity te = SafeClientTools.getClientWorld().getBlockEntity(container.getPos());
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid be entity!");
         };
-        event.register(type, factory);
+        MenuScreens.register(type, factory);
     }
 
     @FunctionalInterface
@@ -517,7 +517,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        IEnergyStorage power = mcjty.lib.varia.CapabilityTools.energyHandler(getBE().getLevel().getCapability(Capabilities.Energy.BLOCK, getBE().getBlockPos(), null));
+        IEnergyStorage power = mcjty.lib.varia.CapabilityTools.energyHandler(EnergyStorage.SIDED.find(getBE().getLevel(), getBE().getBlockPos(), null));
         if (power != null) {
             energyBar.maxValue(power.getMaxEnergyStored());
             energyBar.value(power.getEnergyStored());

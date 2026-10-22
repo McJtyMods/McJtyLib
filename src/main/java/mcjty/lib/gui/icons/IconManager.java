@@ -6,7 +6,6 @@ import mcjty.lib.gui.widgets.IconHolder;
 import mcjty.lib.gui.widgets.Widget;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-
 import java.util.Optional;
 
 public class IconManager {
@@ -101,20 +100,20 @@ public class IconManager {
 
     private int getRelativeX() {
         Screen gui = windowManager.getGui();
-        int width = gui.getMinecraft().getWindow().getScreenWidth();
+        int width = net.minecraft.client.Minecraft.getInstance().getWindow().getScreenWidth();
         if (width <= 0) {
             return 0;
         }
-        return (int) gui.getMinecraft().mouseHandler.xpos() * gui.width / width;
+        return (int) net.minecraft.client.Minecraft.getInstance().mouseHandler.xpos() * gui.width / width;
     }
 
     private int getRelativeY() {
         Screen gui = windowManager.getGui();
-        int height = gui.getMinecraft().getWindow().getScreenHeight();
+        int height = net.minecraft.client.Minecraft.getInstance().getWindow().getScreenHeight();
         if (height <= 0) {
             return 0;
         }
-        return (int) gui.getMinecraft().mouseHandler.ypos() * gui.height / height;
+        return (int) net.minecraft.client.Minecraft.getInstance().mouseHandler.ypos() * gui.height / height;
     }
 
 }

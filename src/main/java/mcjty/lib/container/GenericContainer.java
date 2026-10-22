@@ -28,22 +28,19 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.network.connection.ConnectionType;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
-
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;
+import mcjty.lib.container.IItemHandler;
+import mcjty.lib.container.ItemStackHandler;
+import mcjty.lib.container.SlotItemHandler;
+import mcjty.lib.container.InvWrapper;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-
 import static mcjty.lib.api.container.DefaultContainerProvider.correctType;
 
 /**
@@ -201,7 +198,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         for (Slot slot : slots) {
             if (slot instanceof SlotItemHandler) {
                 IItemHandler itemHandler = ((SlotItemHandler) slot).getItemHandler();
-                if (itemHandler == inv && slot.getSlotIndex() == index) {
+                if (itemHandler == inv && slot.getContainerSlot() == index) {
                     return slot;
                 }
             }
@@ -479,18 +476,18 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         if (player instanceof ServerPlayer serverPlayer) {
             for (IContainerDataListener data : containerData.values()) {
                 ByteBuf newbuf = Unpooled.buffer();
-                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
+                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess());
                 data.toBytes(buffer);
                 PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
             }
             dataListeners.forEach(pair -> {
                 ByteBuf newbuf = Unpooled.buffer();
-                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
+                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess());
                 Object data = be.getData((AttachmentType) pair.type());
                 previousData.put(pair.type(), data);
                 ((StreamCodec) pair.streamCodec()).encode(buffer, data);
-                PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.type()), buffer);
+                PacketAttachmentData packet = PacketAttachmentData.create(pair.type().identifier(), buffer);
                 Networking.sendToPlayer(packet, serverPlayer);
             });
         }
@@ -515,7 +512,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     public void receiveData(Identifier containerId, RegistryFriendlyByteBuf buffer) {
-        AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.getValue(containerId);
+        AttachmentType<?> type = mcjty.lib.container.AttachmentTypes.get(containerId);
         if (type == null) {
             Logging.log("Unknown container id: " + containerId);
             return;
@@ -549,7 +546,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             for (IContainerDataListener data : containerData.values()) {
                 if (data.isDirtyAndClear()) {
                     ByteBuf newbuf = Unpooled.buffer();
-                    RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
+                    RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess());
                     data.toBytes(buffer);
                     PacketContainerDataToClient packet = PacketContainerDataToClient.create(data.getId(), buffer);
                     Networking.sendToPlayer(packet, serverPlayer);
@@ -561,9 +558,9 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 if (!Objects.equals(data, oldData)) {
                     previousData.put(pair.type(), data);
                     ByteBuf newbuf = Unpooled.buffer();
-                    RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess(), ConnectionType.OTHER);
+                    RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, serverPlayer.registryAccess());
                     ((StreamCodec) pair.streamCodec()).encode(buffer, data);
-                    PacketAttachmentData packet = PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(pair.type()), buffer);
+                    PacketAttachmentData packet = PacketAttachmentData.create(pair.type().identifier(), buffer);
                     Networking.sendToPlayer(packet, serverPlayer);
                 }
             });
@@ -571,7 +568,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
 //    public static MenuType<AbstractContainerMenu> createContainerType(String registryName) {
-//        MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {
+//        MenuType<AbstractContainerMenu> containerType = new ExtendedMenuType<>((windowId, inv, data) -> {
 //            BlockPos pos = data.readBlockPos();
 //            BlockEntity te = inv.player.level().getBlockEntity(pos);
 //            if (te == null) {
@@ -583,13 +580,13 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 //    }
 
     public static <T extends AbstractContainerMenu> MenuType<T> createContainerType() {
-        MenuType<AbstractContainerMenu> containerType = IMenuTypeExtension.create((windowId, inv, data) -> {
+        MenuType<AbstractContainerMenu> containerType = new ExtendedMenuType<>((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
             BlockEntity te = inv.player.level().getBlockEntity(pos);
             if (te == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
-            MenuProvider capability = te.getLevel().getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY, pos, null);
+            MenuProvider capability = CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY.find(te.getLevel(), pos, null);
             if (capability == null) {
                 throw new IllegalStateException("Something went wrong getting the GUI");
             }
@@ -598,7 +595,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
                 gc.readExtraData(data);
             }
             return menu;
-        });
+        }, MenuTools.CODEC);
         return (MenuType<T>) containerType;
     }
 
@@ -612,7 +609,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     public static <T extends GenericContainer, E extends GenericTileEntity> MenuType<T> createRemoteContainerType(
             BiFunction<ResourceKey<Level>, BlockPos, E> dummyTEFactory,
             ContainerSupplier<T, E> containerFactory, int slots) {
-        return IMenuTypeExtension.create((windowId, inv, data) -> {
+        return new ExtendedMenuType<>((windowId, inv, data) -> {
             BlockPos pos = data.readBlockPos();
 
             E te = dummyTEFactory.apply(LevelTools.getId(data.readIdentifier()), pos);
@@ -623,7 +620,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             T container = containerFactory.create(windowId, pos, te, inv.player);
             container.setupInventories(new ItemStackHandler(slots), inv);
             return container;
-        });
+        }, MenuTools.CODEC);
     }
 
     public interface ContainerSupplier<T extends GenericContainer, E extends GenericTileEntity> {

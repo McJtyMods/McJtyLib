@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
+
 
 public final class CustomRenderTypes {
     private static final RenderPipeline ADDITIVE = blockPipeline("additive", BlendFunction.ADDITIVE);
@@ -46,9 +46,9 @@ public final class CustomRenderTypes {
 
     public static RenderType translucent() { return TRANSLUCENTdup; }
 
-    public static void registerPipelines(RegisterRenderPipelinesEvent event) {
-        event.registerPipeline(ADDITIVE);
-        event.registerPipeline(OVERLAY);
-        event.registerPipeline(LIGHTNING);
+    public static void registerPipelines() {
+        RenderPipelines.register(ADDITIVE);
+        RenderPipelines.register(OVERLAY);
+        RenderPipelines.register(LIGHTNING);
     }
 }

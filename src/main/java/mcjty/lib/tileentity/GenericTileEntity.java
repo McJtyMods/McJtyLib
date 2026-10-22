@@ -29,8 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.attachment.AttachmentType;
-
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 import java.util.Collections;
@@ -188,16 +187,8 @@ public class GenericTileEntity extends BlockEntity {
         return tag;
     }
 
-    @Override
-    public void onDataPacket(Connection net, net.minecraft.world.level.storage.ValueInput input) {
-        handleUpdateTag(input);
-    }
-
-    @Override
-    public void handleUpdateTag(net.minecraft.world.level.storage.ValueInput input) {
-        super.handleUpdateTag(input);
-        loadClientDataFromNBT(input.read("mcjtylib_client", CompoundTag.CODEC).orElseGet(CompoundTag::new), input.lookup());
-    }
+    public <T> T getData(AttachmentType<T> type) { return ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget)this).getAttachedOrCreate(type); }
+    public <T> void setData(AttachmentType<T> type,T data) { ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget)this).setAttached(type,data); }
 
     //    public void setInfused(int infused) {
 //        this.infused = infused;
@@ -226,6 +217,7 @@ public class GenericTileEntity extends BlockEntity {
     protected void loadAdditional(net.minecraft.world.level.storage.ValueInput tag) {
         super.loadAdditional(tag);
         powerLevel = tag.getByteOr("power", (byte) 0);
+        tag.read("mcjtylib_client", CompoundTag.CODEC).ifPresent(client -> loadClientDataFromNBT(client, tag.lookup()));
     }
 
     /**
@@ -243,13 +235,13 @@ public class GenericTileEntity extends BlockEntity {
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
-        components.set(mcjty.lib.setup.Registration.ITEM_BASE_BE_DATA, getData(mcjty.lib.setup.Registration.BASE_BE_DATA));
+        components.set(mcjty.lib.setup.Registration.ITEM_BASE_BE_DATA.get(), getData(mcjty.lib.setup.Registration.BASE_BE_DATA));
     }
 
     @Override
     protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
         super.applyImplicitComponents(input);
-        BaseBEData data = input.get(mcjty.lib.setup.Registration.ITEM_BASE_BE_DATA);
+        BaseBEData data = input.get(mcjty.lib.setup.Registration.ITEM_BASE_BE_DATA.get());
         if (data != null) {
             setData(mcjty.lib.setup.Registration.BASE_BE_DATA, data);
         }

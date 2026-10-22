@@ -9,17 +9,17 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.world.inventory.DataSlot;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import mcjty.lib.varia.IEnergyStorage;
 
 
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import mcjty.lib.container.IndexedStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import team.reborn.energy.api.EnergyStorage;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
-public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
+public class GenericEnergyStorage implements IEnergyStorage, EnergyStorage {
 
     private final GenericTileEntity tileEntity;
     private final boolean isReceiver;
@@ -28,20 +28,23 @@ public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
     private final long capacity;
     private final long maxReceive;
 
-    private final SnapshotJournal<Long> transferJournal = new SnapshotJournal<>() {
+    private final SnapshotParticipant<Long> transferJournal = new SnapshotParticipant<>() {
+        private Long before;
+        @Override protected void releaseSnapshot(Long snapshot) { before=snapshot; }
         @Override protected Long createSnapshot() { return energy; }
-        @Override protected void revertToSnapshot(Long snapshot) { energy = snapshot; }
-        @Override protected void onRootCommit(Long before) { if (energy != before) tileEntity.markDirtyQuick(); }
+        @Override protected void readSnapshot(Long snapshot) { energy = snapshot; }
+        @Override protected void onFinalCommit() { if(energy!=before) tileEntity.markDirtyQuick(); }
     };
-    @Override public long getAmountAsLong() { return energy; }
-    @Override public long getCapacityAsLong() { return capacity; }
-    @Override public int insert(int amount, TransactionContext transaction) {
+    @Override public boolean supportsInsertion() { return isReceiver; }
+    @Override public boolean supportsExtraction() { return false; }
+    @Override public long getAmount() { return energy; }
+    @Override public long insert(long amount, TransactionContext transaction) {
         if (amount < 0) throw new IllegalArgumentException("Negative amount");
-        int inserted = receiveEnergy(amount, true);
+        long inserted = isReceiver ? Math.min(amount, Math.min(maxReceive, capacity-energy)) : 0;
         if (inserted > 0) { transferJournal.updateSnapshots(transaction); energy += inserted; }
         return inserted;
     }
-    @Override public int extract(int amount, TransactionContext transaction) {
+    @Override public long extract(long amount, TransactionContext transaction) {
         if (amount < 0) throw new IllegalArgumentException("Negative amount");
         return 0; // This storage has always exposed energy input only.
     }
@@ -97,7 +100,7 @@ public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
     }
 
     public void collectImplicitComponents(DataComponentMap.Builder builder) {
-        builder.set(Registration.ITEM_ENERGY, new ItemEnergy(getEnergy()));
+        builder.set(Registration.ITEM_ENERGY.get(), new ItemEnergy(getEnergy()));
     }
 
     public void setEnergy(long s) {

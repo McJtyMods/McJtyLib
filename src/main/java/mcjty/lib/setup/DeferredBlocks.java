@@ -1,10 +1,8 @@
 package mcjty.lib.setup;
 
 import net.minecraft.world.level.block.Block;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredRegister;
-
+import mcjty.lib.setup.DeferredBlock;
+import mcjty.lib.setup.DeferredRegister;
 import java.util.function.Supplier;
 
 public class DeferredBlocks {
@@ -15,15 +13,15 @@ public class DeferredBlocks {
         register = DeferredRegister.createBlocks(modid);
     }
 
-    public void register(IEventBus bus) {
-        register.register(bus);
+    public void register() {
+        register.register();
     }
 
     public <T extends Block> DeferredBlock<T> register(String name, Supplier<T> supplier) {
         return register.register(name, supplier);
     }
 
-    /** Register with properties whose registry id has been set by NeoForge. */
+    /** Register with properties whose registry id has been set by McJtyLib. */
     public <T extends Block> DeferredBlock<T> register(String name, java.util.function.Function<net.minecraft.world.level.block.state.BlockBehaviour.Properties, T> factory) {
         return register.registerBlock(name, factory);
     }

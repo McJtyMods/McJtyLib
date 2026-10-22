@@ -5,10 +5,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
+import team.reborn.energy.api.EnergyStorage;
+import mcjty.lib.container.IItemHandler;
+import mcjty.lib.container.ItemHandlerHelper;
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 
@@ -29,7 +30,7 @@ public class InventoryLocator {
             }
             return null;
         }
-        if (mcjty.lib.varia.CapabilityTools.itemHandler(worldObj.getCapability(Capabilities.Item.BLOCK, thisCoordinate, direction.getOpposite())) != null) {
+        if (mcjty.lib.varia.CapabilityTools.itemHandler(ItemStorage.SIDED.find(worldObj, thisCoordinate, direction.getOpposite())) != null) {
             // Remember in inventoryCoordinate (acts as a cache)
             inventoryCoordinate = thisCoordinate.relative(direction);
             inventorySide = direction.getOpposite();
@@ -41,7 +42,7 @@ public class InventoryLocator {
 
     @Nullable
     private IItemHandler getItemHandlerAtCoordinate(Level worldObj, BlockPos c, Direction direction) {
-        return mcjty.lib.varia.CapabilityTools.itemHandler(worldObj.getCapability(Capabilities.Item.BLOCK, c, direction));
+        return mcjty.lib.varia.CapabilityTools.itemHandler(ItemStorage.SIDED.find(worldObj, c, direction));
     }
 
 

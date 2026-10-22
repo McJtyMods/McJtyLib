@@ -20,9 +20,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.items.IItemHandler;
-
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import mcjty.lib.container.IItemHandler;
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
@@ -97,6 +96,11 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
         return this;
     }
 
+    public <T> DefaultContainerProvider<C> data(AttachmentType<T> type, StreamCodec<? extends ByteBuf, T> streamCodec, Codec<T> codec) {
+        dataListeners.add(new IGenericContainer.DataListener<>(type, streamCodec, codec));
+        return this;
+    }
+
     public <T> DefaultContainerProvider<C> data(Supplier<AttachmentType<T>> type, StreamCodec<? extends ByteBuf, T> streamCodec, Codec<T> codec) {
         dataListeners.add(new IGenericContainer.DataListener<>(type.get(), streamCodec, codec));
         return this;
@@ -141,7 +145,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
 
     public void writeExtraData(RegistryFriendlyByteBuf buf, BlockEntity te) {
         dataListeners.forEach(pair -> {
-            correctType(pair).streamCodec().encode(buf, te.getData(correctType(pair).type()));
+            correctType(pair).streamCodec().encode(buf, ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget)te).getAttachedOrCreate(correctType(pair).type()));
         });
     }
 

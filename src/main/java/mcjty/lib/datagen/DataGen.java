@@ -16,7 +16,10 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.neoforged.neoforge.common.data.ItemTagsProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider.ItemTagsProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
@@ -24,18 +27,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.neoforged.neoforge.common.data.GlobalLootModifierProvider;
-import net.neoforged.neoforge.common.data.JsonCodecProvider;
-import net.neoforged.neoforge.common.data.LanguageProvider;
-import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
-
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class DataGen {
+public class DataGen implements DataProvider {
 
     private static final ThreadLocal<net.minecraft.core.HolderGetter<Item>> RECIPE_ITEMS = new ThreadLocal<>();
 
@@ -56,14 +53,18 @@ public class DataGen {
     }
 
     private final String modid;
-    private final GatherDataEvent event;
+    private final FabricPackOutput output;
+    private final CompletableFuture<HolderLookup.Provider> registries;
+    private final List<DataProvider> providers = new ArrayList<>();
     private final List<Dob> dobs = new ArrayList<>();
     private final Map<String, CodecProvider> codecProviders = new HashMap<>();
 
-    public DataGen(String modid, GatherDataEvent event) {
-        this.modid = modid;
-        this.event = event;
+    public DataGen(FabricPackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        this.modid=output.getModId();this.output=output;this.registries=registries;
     }
+    @Override public String getName(){return modid+" McJtyLib data";}
+    @Override public CompletableFuture<?> run(CachedOutput cache){return CompletableFuture.allOf(providers.stream().map(provider->provider.run(cache)).toArray(CompletableFuture[]::new));}
+
 
     public void addCodecProvider(String name, String directory, Codec codec) {
         codecProviders.put(name, new CodecProvider(directory, codec));
@@ -76,39 +77,21 @@ public class DataGen {
     }
 
     public void generate() {
-        DataGenerator generator = event.getGenerator();
-
-        generator.addProvider(true, new GlobalLootModifierProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
-            @Override
-            protected void start() {
-                for (Dob dob : dobs) {
-                    for (Map.Entry<String, Supplier<IGlobalLootModifier>> entry : dob.glmSupplier().entrySet()) {
-                        add(entry.getKey(), entry.getValue().get());
-                    }
-                }
-            }
-        });
-
+        Map<Identifier,net.minecraft.world.level.storage.loot.functions.LootItemFunction> globalFunctions=new HashMap<>();
+        for(Dob dob:dobs)dob.glmSupplier().forEach((id,factory)->globalFunctions.put(Identifier.fromNamespaceAndPath(modid,id),factory.get()));
+        if(!globalFunctions.isEmpty())providers.add(new CodecDataProvider<>(output,"mcjtylib/loot_functions",net.minecraft.world.level.storage.loot.functions.LootItemFunctions.ROOT_CODEC,registries,globalFunctions));
 
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
             for (Dob dob : dobs) {
                 HolderLookup.Provider provider = dob.holderLookupSupplier().get(entry.getKey());
                 Map<Identifier, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
                 if (!entries.isEmpty()) {
-                    JsonCodecProvider codecProvider = new JsonCodecProvider<>(generator.getPackOutput(), PackOutput.Target.DATA_PACK, entry.getValue().directory(),
-                            entry.getValue().codec(), CompletableFuture.completedFuture(provider), modid) {
-                        @Override
-                        protected void gather() {
-
-                        }
-                    };
-                    entries.forEach(codecProvider::unconditional);
-                    generator.addProvider(true, codecProvider);
+                    providers.add(new CodecDataProvider<>(output,entry.getValue().directory(),entry.getValue().codec(),CompletableFuture.completedFuture(provider),entries));
                 }
             }
         }
 
-        generator.addProvider(true, new net.minecraft.data.recipes.RecipeProvider.Runner(generator.getPackOutput(), event.getLookupProvider()) {
+        providers.add( new net.minecraft.data.recipes.RecipeProvider.Runner(output, registries) {
             @Override public String getName() { return modid + " recipes"; }
             @Override protected net.minecraft.data.recipes.RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
                 return new BaseRecipeProvider(registries, output) {
@@ -198,11 +181,11 @@ public class DataGen {
                     }
                     lootTableProvider.generate(builder, LootContextParamSets.ENTITY);
                 }, LootContextParamSets.ENTITY));
-        generator.addProvider(true, new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
-                list, event.getLookupProvider()));
+        providers.add( new LootTableProvider(output, Collections.emptySet(),
+                list, registries));
 
 
-//        generator.addProvider(true, new BaseLootTableProvider(generator) {
+//        providers.add( new BaseLootTableProvider(generator) {
 //            @Override
 //            protected void addTables() {
 //                for (Dob dob : dobs) {
@@ -210,7 +193,7 @@ public class DataGen {
 //                }
 //            }
 //        });
-        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(generator, event.getLookupProvider(), modid) {
+        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(output, registries, modid) {
             @Override
             protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {
@@ -218,7 +201,7 @@ public class DataGen {
                         @Override
                         public void blockTags(Supplier<? extends Block> blockSupplier, List<TagKey> tags) {
                             for (TagKey<Block> tag : tags) {
-                                tag(tag).add(BuiltInRegistries.BLOCK.getResourceKey(blockSupplier.get()).orElseThrow());
+                                builder(tag).add(BuiltInRegistries.BLOCK.getResourceKey(blockSupplier.get()).orElseThrow());
                             }
                         }
 
@@ -230,8 +213,8 @@ public class DataGen {
                 }
             }
         };
-        generator.addProvider(true, blockTags);
-        generator.addProvider(true, new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
+        providers.add( blockTags);
+        providers.add( new ItemTagsProvider(output, registries) {
             @Override
             protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {
@@ -244,7 +227,7 @@ public class DataGen {
                         @Override
                         public void itemTags(Supplier<? extends Item> itemSupplier, List<TagKey> tags) {
                             for (TagKey<Item> tag : tags) {
-                                tag(tag).add(BuiltInRegistries.ITEM.getResourceKey(itemSupplier.get()).orElseThrow());
+                                builder(tag).add(BuiltInRegistries.ITEM.getResourceKey(itemSupplier.get()).orElseThrow());
                             }
                         }
                     });
@@ -252,7 +235,7 @@ public class DataGen {
             }
         });
 
-        generator.addProvider(event instanceof GatherDataEvent.Client, new LanguageProvider(generator.getPackOutput(), modid, "en_us") {
+        providers.add( new LanguageProvider(output, "en_us", registries) {
             @Override
             protected void addTranslations() {
                 for (Dob dob : dobs) {
@@ -287,7 +270,7 @@ public class DataGen {
                 }
             }
         });
-        generator.addProvider(event instanceof GatherDataEvent.Client, new BaseBlockStateProvider(generator, modid) {
+        providers.add( new BaseBlockStateProvider(output, modid) {
             @Override
             protected void registerStatesAndModels() {
                 for (Dob dob : dobs) {
@@ -295,7 +278,7 @@ public class DataGen {
                 }
             }
         });
-        generator.addProvider(event instanceof GatherDataEvent.Client, new BaseItemModelProvider(generator, modid) {
+        providers.add( new BaseItemModelProvider(output, modid) {
             @Override
             protected void registerModels() {
                 BaseItemModelProvider provider = this;

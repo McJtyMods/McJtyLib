@@ -1,18 +1,14 @@
 package mcjty.lib.client;
-
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.client.event.ModelEvent;
-
 import java.util.Map;
+import java.util.HashMap;
 import java.util.function.Consumer;
-
-public class ModelTools {
-
-    public static void registerModelBakeEvent(IEventBus bus, Consumer<Map<BlockState, BlockStateModel>> modelConsumer) {
-        bus.addListener((ModelEvent.ModifyBakingResult event) -> {
-            modelConsumer.accept(event.getBakingResult().blockStateModels());
-        });
-    }
+public final class ModelTools {
+ public static void registerModelBakeEvent(Consumer<Map<BlockState,BlockStateModel>> consumer){
+  ModelLoadingPlugin.register(plugin -> plugin.modifyBlockModelAfterBake().register((model,context)->{
+   Map<BlockState,BlockStateModel> models=new HashMap<>();models.put(context.state(),model);consumer.accept(models);return models.get(context.state());
+  }));
+ }
 }

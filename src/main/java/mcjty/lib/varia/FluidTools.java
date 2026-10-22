@@ -13,124 +13,105 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-
+import mcjty.lib.varia.FluidStack;
+import mcjty.lib.varia.IFluidHandler;
 import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 public class FluidTools {
 
-    /**
-     * Make sure the forge bucket is enabled. If needed do this in your mod constructor:
-     * FluidRegistry.enableUniversalBucket();
-     */
-    @Nonnull
-    public static ItemStack convertFluidToBucket(@Nonnull FluidStack fluidStack) {
-        //                return FluidContainerRegistry.fillFluidContainer(fluidStack, new ItemStack(Items.BUCKET));
-        return FluidUtil.getFluidHandler(new ItemStack(Items.BUCKET)).map(handler -> {
-            handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-            return handler.getContainer();
-        }).orElse(ItemStack.EMPTY);
+    public static ItemStack convertFluidToBucket(FluidStack stack) {
+        return fillContainer(stack,new ItemStack(Items.BUCKET));
     }
 
-    @Nonnull
-    public static FluidStack convertBucketToFluid(@Nonnull ItemStack bucket) {
-        return FluidUtil.getFluidHandler(bucket).map(handler -> {
-            for (int i = 0; i < handler.getTanks(); i++) {
-                FluidStack contents = handler.getFluidInTank(i);
-                if (!contents.isEmpty()) {
-                    return contents;
-                }
-            }
-            return FluidStack.EMPTY;
-        }).orElse(FluidStack.EMPTY);
+    public static FluidStack convertBucketToFluid(ItemStack stack) {
+        var handler=FluidContainers.handler(stack);
+        if(handler!=null)for(int i=0;i<handler.getTanks();i++) {
+            var fluid=handler.getFluidInTank(i);
+            if(!fluid.isEmpty())return fluid;
+        }
+        return FluidStack.EMPTY;
     }
 
-
-    public static boolean isEmptyContainer(@Nonnull ItemStack itemStack) {
-        return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            for (int i = 0; i < handler.getTanks(); i++) {
-                if (handler.getTankCapacity(i) > 0) {
-                    FluidStack contents = handler.getFluidInTank(i);
-                    if (contents.isEmpty()) {
-                        return true;
-                    } else if (contents.getAmount() > 0) {
-                        return false;
-                    }
-                }
-            }
-            return false;
-        }).orElse(false);
+    public static boolean isEmptyContainer(ItemStack stack) {
+        var h=FluidContainers.handler(stack);
+        if(h==null)return false;
+        for(int i=0;i<h.getTanks();i++)if(h.getTankCapacity(i)>0&&h.getFluidInTank(i).isEmpty())return true;
+        return false;
     }
 
-    public static boolean isFilledContainer(@Nonnull ItemStack itemStack) {
-        return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            for (int i = 0; i < handler.getTanks(); i++) {
-                FluidStack contents = handler.getFluidInTank(i);
-                if (contents.isEmpty() || contents.getAmount() < handler.getTankCapacity(i)) {
-                    return false;
-                }
-            }
-            return true;
-        }).orElse(false);
+    public static boolean isFilledContainer(ItemStack stack) {
+        var h=FluidContainers.handler(stack);
+        if(h==null||h.getTanks()==0)return false;
+        for(int i=0;i<h.getTanks();i++)if(h.getFluidInTank(i).getAmount()<h.getTankCapacity(i))return false;
+        return true;
     }
 
-    // Drain a fluid container and return an empty container
-    @Nonnull
-    public static ItemStack drainContainer(@Nonnull ItemStack container) {
-        ItemStack empty = container.copy();
-        empty.setCount(1);
-        return FluidUtil.getFluidHandler(empty).map(handler -> {
-            if (!handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE).isEmpty()) {
-                return handler.getContainer();
-            }
-            return ItemStack.EMPTY;
-        }).orElse(ItemStack.EMPTY);
+    public static ItemStack drainContainer(ItemStack stack) {
+        return FluidContainers.drain(stack);
     }
 
-    // Fill a container with a fluid and return the filled container
-    @Nonnull
-    public static ItemStack fillContainer(@Nonnull FluidStack fluidStack, @Nonnull ItemStack itemStack) {
-        return FluidUtil.getFluidHandler(itemStack.copy()).map(handler -> {
-            int filled = handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-            if (filled == 0) {
-                return ItemStack.EMPTY;
-            }
-            return handler.getContainer();
-        }).orElse(ItemStack.EMPTY);
+    public static ItemStack fillContainer(FluidStack fluid,ItemStack stack) {
+        return FluidContainers.fill(fluid,stack);
     }
 
     @Nonnull
     public static FluidStack pickupFluidBlock(Level world, BlockPos pos, @Nonnull Predicate<FluidStack> action, @Nonnull Runnable clearBlock) {
+
         BlockState blockstate = world.getBlockState(pos);
+
         FluidState fluidstate = world.getFluidState(pos);
+
         Fluid fluid = fluidstate.getType();
 
         if (blockstate.getBlock() instanceof LiquidBlock) {
-            FluidStack stack = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
+
+            FluidStack stack = new FluidStack(fluid, 1000);
+
             if (action.test(stack)) {
+
                 clearBlock.run();
+
             }
+
             return stack;
-        } else if (blockstate.getBlock() instanceof BucketPickup && fluid != Fluids.EMPTY) {
-            FluidStack stack = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
-            if (action.test(stack)) {
-                ItemStack fluidBucket = ((BucketPickup) blockstate.getBlock()).pickupBlock(null, world, pos, blockstate);
-                return FluidUtil.getFluidContained(fluidBucket).map(f -> new FluidStack(f.getFluid().builtInRegistryHolder(), FluidType.BUCKET_VOLUME, f.getComponentsPatch())).orElse(FluidStack.EMPTY);
-            }
-            return stack;
-        } else if (blockstate.getBlock() instanceof BucketPickup) { // @todo 1.20 right?
-            FluidStack stack = new FluidStack(Fluids.WATER, FluidType.BUCKET_VOLUME);
-            if (action.test(stack)) {
-                BlockEntity tileentity = blockstate.getBlock() instanceof EntityBlock ? world.getBlockEntity(pos) : null;
-                Block.dropResources(blockstate, world, pos, tileentity);
-                clearBlock.run();
-            }
-            return stack;
+
         }
+        else if (blockstate.getBlock() instanceof BucketPickup && fluid != Fluids.EMPTY) {
+
+            FluidStack stack = new FluidStack(fluid, 1000);
+
+            if (action.test(stack)) {
+
+                ItemStack fluidBucket = ((BucketPickup) blockstate.getBlock()).pickupBlock(null, world, pos, blockstate);
+
+                return convertBucketToFluid(fluidBucket);
+
+            }
+
+            return stack;
+
+        }
+        else if (blockstate.getBlock() instanceof BucketPickup) {
+            // @todo 1.20 right?
+            FluidStack stack = new FluidStack(Fluids.WATER, 1000);
+
+            if (action.test(stack)) {
+
+                BlockEntity tileentity = blockstate.getBlock() instanceof EntityBlock ? world.getBlockEntity(pos) : null;
+
+                Block.dropResources(blockstate, world, pos, tileentity);
+
+                clearBlock.run();
+
+            }
+
+            return stack;
+
+        }
+
         return FluidStack.EMPTY;
+
     }
+
 }

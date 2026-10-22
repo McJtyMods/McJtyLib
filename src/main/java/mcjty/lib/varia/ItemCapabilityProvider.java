@@ -2,89 +2,70 @@ package mcjty.lib.varia;
 
 import mcjty.lib.api.power.IBigPower;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.Direction;
-import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.Lazy;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import org.jspecify.annotations.Nullable;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import team.reborn.energy.api.EnergyStorage;
 
-import javax.annotation.Nonnull;
+public final class ItemCapabilityProvider implements IBigPower {
 
-public class ItemCapabilityProvider implements ICapabilityProvider, IBigPower {
-
-    private final ItemStack itemStack;
+    private final ItemStack stack;
     private final IEnergyItem item;
 
-    private final Lazy<IEnergyStorage> energy = Lazy.of(this::createEnergyStorage);
-
-    @Nonnull
-    private <T> IEnergyStorage createEnergyStorage() {
-        return new IEnergyStorage() {
-            @Override
-            public int receiveEnergy(int maxReceive, boolean simulate) {
-                return (int)item.receiveEnergyL(itemStack, maxReceive, simulate);
-            }
-
-            @Override
-            public int extractEnergy(int maxExtract, boolean simulate) {
-                return (int)item.extractEnergyL(itemStack, maxExtract, simulate);
-            }
-
-            @Override
-            public int getEnergyStored() {
-                return EnergyTools.getIntEnergyStored(item.getEnergyStoredL(itemStack), item.getMaxEnergyStoredL(itemStack));
-            }
-
-            @Override
-            public int getMaxEnergyStored() {
-                return EnergyTools.unsignedClampToInt(item.getMaxEnergyStoredL(itemStack));
-            }
-
-            @Override
-            public boolean canExtract() {
-                return true;
-            }
-
-            @Override
-            public boolean canReceive() {
-                return true;
-            }
-        };
+    public ItemCapabilityProvider(ItemStack stack,IEnergyItem item) {
+        this.stack=stack;
+        this.item=item;
     }
 
-    public ItemCapabilityProvider(ItemStack itemStack, IEnergyItem item) {
-        this.itemStack = itemStack;
-        this.item = item;
-    }
-
-    @Nullable
-    @Override
-    public Object getCapability(Object o, Object o2) {
-        return null;
-    }
-
-    //    @Nonnull
-//    @Override
-//    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-//        return getCapability(cap);
-//    }
-//
-//    @Nonnull
-//    @Override
-//    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability) {
-//        if (capability == ForgeCapabilities.ENERGY) {
-//            return energy.cast();
-//        }
-//        return LazyOptional.empty();
-//    }
-//
-    @Override
     public long getStoredPower() {
-        return item.getEnergyStoredL(itemStack);
+        return item.getEnergyStoredL(stack);
+    }
+    public long getCapacity() {
+        return item.getMaxEnergyStoredL(stack);
     }
 
-    @Override
-    public long getCapacity() {
-        return item.getMaxEnergyStoredL(itemStack);
+    public static void register() {
+        EnergyStorage.ITEM.registerFallback((stack,context)->stack.getItem() instanceof IEnergyItem item ? new Storage(context,item):null);
     }
+
+    private record Storage(ContainerItemContext context,IEnergyItem item) implements EnergyStorage {
+
+        private ItemStack current() {
+            return context.getItemVariant().toStack();
+        }
+
+        public long getAmount() {
+            return item.getEnergyStoredL(current());
+        }
+        public long getCapacity() {
+            return item.getMaxEnergyStoredL(current());
+        }
+
+        public long insert(long n,TransactionContext tx) {
+            return transfer(n,tx,true);
+        }
+        public long extract(long n,TransactionContext tx) {
+            return transfer(n,tx,false);
+        }
+
+        private long transfer(long n,TransactionContext tx,boolean insert) {
+
+            if(n<0)throw new IllegalArgumentException("Negative energy amount");
+            if(n==0)return 0;
+
+            ItemStack copy=current();
+            long moved=insert?item.receiveEnergyL(copy,n,false):item.extractEnergyL(copy,n,false);
+
+            if(moved<=0)return 0;
+
+            try(var nested=tx.openNested()) {
+                if(context.exchange(ItemVariant.of(copy),1,nested)!=1)return 0;
+                nested.commit();
+                return moved;
+            }
+
+        }
+
+    }
+
 }

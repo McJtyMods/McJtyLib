@@ -5,8 +5,7 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.neoforged.neoforge.common.util.FakePlayerFactory;
-
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -45,7 +44,7 @@ public class FakePlayerGetter {
                 owner = UUID.nameUUIDFromBytes("rftools_builder".getBytes());
             }
             ServerLevel serverLevel = (ServerLevel) te.getLevel();
-            harvester = FakePlayerFactory.get(serverLevel, new GameProfile(owner, getName()));
+            harvester = FakePlayer.get(serverLevel, new GameProfile(owner, getName()));
 //            harvester.setLevel(serverLevel);      // @todo 1.20
             BlockPos worldPosition = te.getBlockPos();
             harvester.setPos(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());

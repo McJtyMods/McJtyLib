@@ -1,10 +1,8 @@
 package mcjty.lib.setup;
 
 import net.minecraft.world.item.Item;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
-
+import mcjty.lib.setup.DeferredItem;
+import mcjty.lib.setup.DeferredRegister;
 import java.util.function.Supplier;
 
 public class DeferredItems {
@@ -15,15 +13,15 @@ public class DeferredItems {
         register = DeferredRegister.createItems(modid);
     }
 
-    public void register(IEventBus bus) {
-        register.register(bus);
+    public void register() {
+        register.register();
     }
 
     public <T extends Item> DeferredItem<T> register(String name, Supplier<T> supplier) {
         return register.register(name, supplier);
     }
 
-    /** Register with properties whose registry id has been set by NeoForge. */
+    /** Register with properties whose registry id has been set by McJtyLib. */
     public <T extends Item> DeferredItem<T> register(String name, java.util.function.Function<Item.Properties, T> factory) {
         return register.registerItem(name, factory);
     }

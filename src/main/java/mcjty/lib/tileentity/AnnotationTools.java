@@ -10,10 +10,9 @@ import mcjty.lib.typed.Type;
 import mcjty.lib.varia.NamedEnum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import mcjty.lib.varia.FluidStack;
+import mcjty.lib.setup.DeferredBlock;
 import org.apache.commons.lang3.reflect.FieldUtils;
-
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 import java.lang.reflect.Field;

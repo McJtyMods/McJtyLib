@@ -6,11 +6,9 @@ import mcjty.lib.blockcommands.IRunnableWithListResult;
 import mcjty.lib.blockcommands.IRunnableWithResult;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
-import net.neoforged.neoforge.registries.DeferredBlock;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
+import mcjty.lib.setup.DeferredBlock;
 import org.apache.commons.lang3.tuple.Pair;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +30,7 @@ public class AnnotationHolder {
 //    final List<Pair<Field, Cap>> capabilityList = new ArrayList<>();
     final List<CapHolder> caps = new ArrayList<>();
 
-    public record CapHolder<B, C>(BlockCapability<B, C> capability, Function<? super GenericTileEntity, Object> function, DeferredBlock<?> block) {}
+    public record CapHolder<B, C>(BlockApiLookup<B, C> capability, Function<? super GenericTileEntity, Object> function, DeferredBlock<?> block) {}
 
     public int getCapSize() {
         return caps.size();

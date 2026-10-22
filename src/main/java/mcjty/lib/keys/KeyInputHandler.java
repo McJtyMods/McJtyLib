@@ -4,23 +4,20 @@ import com.mojang.blaze3d.platform.InputConstants;
 import mcjty.lib.client.ClientManualHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyInputHandler {
 
-    @SubscribeEvent
-    public void onKeyInput(ClientTickEvent.Pre event) {
+    public static void onKeyInput() {
         KeyMapping kb = KeyBindings.openManual;
-        boolean doStuff = switch (kb.getKey().getType()) {
+        boolean doStuff = switch (net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper.getBoundKeyOf(kb).getType()) {
             case KEYSYM -> {
                 if (kb.isUnbound()) {
                     yield false;
                 }
-                yield InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), kb.getKey().getValue());
+                yield InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper.getBoundKeyOf(kb).getValue());
             }
-            case MOUSE -> GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), kb.getKey().getValue()) == GLFW.GLFW_PRESS;
+            case MOUSE -> GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper.getBoundKeyOf(kb).getValue()) == GLFW.GLFW_PRESS;
             default -> kb.isDown();
         };
         if (doStuff) {

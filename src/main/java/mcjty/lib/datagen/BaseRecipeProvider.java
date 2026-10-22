@@ -15,7 +15,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.Tags;
+
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -97,10 +97,10 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         super(provider, output);
         add('d', Items.DIAMOND);
         add('e', Items.EMERALD);
-        add('o', Tags.Items.ENDER_PEARLS);
+        add('o', net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ender_pearls")));
         add('r', Items.REDSTONE);
         add('R', Items.REDSTONE_BLOCK);
-        add('i', Tags.Items.INGOTS_IRON);
+        add('i', net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "ingots/iron")));
         add('p', Items.PAPER);
         add('c', ItemTags.COALS);
         add('B', Blocks.BRICKS);
@@ -109,7 +109,7 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         add('b', Items.BUCKET);
         add('T', Items.REDSTONE_TORCH);
         add('D', Blocks.DIRT);
-        add('G', Tags.Items.GLASS_BLOCKS);
+        add('G', net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM, net.minecraft.resources.Identifier.fromNamespaceAndPath("c", "glass_blocks")));
         add('O', Blocks.OBSIDIAN);
     }
 }

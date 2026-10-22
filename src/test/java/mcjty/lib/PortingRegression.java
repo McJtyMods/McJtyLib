@@ -6,29 +6,29 @@ import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.varia.NamedCodec;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import org.junit.jupiter.api.Test;
 
-/** Regression checks that do not require a running NeoForge game. */
+/** Regression checks that do not require a running Minecraft game. */
 public final class PortingRegression {
     @Test
     void energyTransactions() {
         // No block entity is needed: aborted transfers must never notify it.
         var energy = new GenericEnergyStorage(null, true, 1000, 200);
-        try (var outer = Transaction.openRoot()) {
+        try (var outer = Transaction.openOuter()) {
             require(energy.insert(500, outer) == 200, "Energy receive rate");
-            try (var inner = Transaction.open(outer)) {
+            try (var inner = outer.openNested()) {
                 energy.insert(100, inner);
                 inner.commit();
             }
             require(energy.getEnergy() == 300, "Nested commit");
-            try (var inner = Transaction.open(outer)) {
+            try (var inner = outer.openNested()) {
                 energy.insert(100, inner);
             }
             require(energy.getEnergy() == 300, "Nested rollback");
         }
         require(energy.getEnergy() == 0, "Outer rollback must undo nested commits");
-        try (var transaction = Transaction.openRoot()) {
+        try (var transaction = Transaction.openOuter()) {
             for (int i = 0; i < 6; i++) energy.insert(200, transaction);
             require(energy.getEnergy() == 1000, "Energy capacity");
             require(energy.extract(100, transaction) == 0, "Input-only energy storage");

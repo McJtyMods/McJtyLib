@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,7 @@ public abstract class GuiItemScreen extends Screen {
         super.init();
         guiLeft = (this.width - xSize) / 2;
         guiTop = (this.height - ySize) / 2;
-        sideWindow.initGui(getMinecraft(), this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(net.minecraft.client.Minecraft.getInstance(), this, guiLeft, guiTop, xSize, ySize);
     }
 
     @Override

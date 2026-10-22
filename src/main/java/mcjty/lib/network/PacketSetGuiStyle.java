@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import mcjty.lib.network.PayloadContext;
 
 /**
  * Change the GUI style.
@@ -31,11 +31,11 @@ public record PacketSetGuiStyle(String style) implements CustomPacketPayload {
         return TYPE;
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> handle(this, ctx));
     }
 
-    private static void handle(PacketSetGuiStyle message, IPayloadContext ctx) {
+    private static void handle(PacketSetGuiStyle message, PayloadContext ctx) {
         Player player = ctx.player();
         PreferencesProperties v = McJtyLib.getPreferencesProperties(player);
         if (v != null) {

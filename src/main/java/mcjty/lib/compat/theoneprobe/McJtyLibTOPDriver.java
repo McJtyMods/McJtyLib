@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.Level;
-
 import static mcjty.theoneprobe.api.TextStyleClass.ERROR;
 import static mcjty.theoneprobe.api.TextStyleClass.HIGHLIGHTED;
 
@@ -50,7 +49,7 @@ public class McJtyLibTOPDriver implements TOPDriver {
         if (mode == ProbeMode.EXTENDED) {
             BlockEntity te = world.getBlockEntity(data.getPos());
             if (te instanceof GenericTileEntity generic) {
-                IInfusable h = world.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY, data.getPos(), null);
+                IInfusable h = CapabilityInfusable.INFUSABLE_CAPABILITY.find(world, data.getPos(), null);
                 if (h != null) {
                     int infused = h.getInfused();
                     int pct = infused * 100 / GeneralConfig.maxInfuse.get();

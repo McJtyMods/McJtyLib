@@ -1,0 +1,1 @@
+{"required":true,"package":"mcjty.lib.test.mixin","compatibilityLevel":"JAVA_25","mixins":["SettingsTestMixin"],"injectors":{"defaultRequire":1}}

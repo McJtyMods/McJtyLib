@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 import java.util.function.Function;
@@ -63,7 +62,7 @@ public class GuiTools {
                     @Nullable
                     @Override
                     public AbstractContainerMenu createMenu(int id, @Nonnull Inventory inventory, @Nonnull Player player) {
-                        MenuProvider h = te.getLevel().getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY, te.getBlockPos(), null);
+                        MenuProvider h = CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY.find(te.getLevel(), te.getBlockPos(), null);
                         if (h != null) {
                             return h.createMenu(id, inventory, player);
                         } else {
@@ -91,7 +90,7 @@ public class GuiTools {
 
         CompoundTag written = te.saveWithoutMetadata(world.registryAccess());
 
-        player.openMenu(provider.apply(te), buf -> {
+        mcjty.lib.container.MenuTools.open(player,provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
             buf.writeIdentifier(world.dimension().identifier());
             buf.writeNbt(written);
