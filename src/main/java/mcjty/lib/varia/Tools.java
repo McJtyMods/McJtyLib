@@ -24,7 +24,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -45,7 +46,7 @@ public class Tools {
         return level.registryAccess();
     }
 
-    public static DeferredRegister<PlacementModifierType<?>> createPlacementRegistry(String modid) {
+    public static DeferredRegister<MapCodec<? extends PlacementModifier>> createPlacementRegistry(String modid) {
         return DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, modid);
     }
 

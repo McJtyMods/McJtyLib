@@ -7,6 +7,12 @@
   "entrypoints": {
     "main": [
       "mcjty.lib.test.TransferRegression"
+    ],
+    "fabric-datagen": [
+      "mcjty.lib.test.DataGenRegression"
+    ],
+    "client": [
+      "mcjty.lib.test.ClientRegression"
     ]
   },
   "depends": {

@@ -38,7 +38,7 @@ public final class TransferRegression implements ModInitializer {
 
             Class.forName("net.minecraft.world.entity.Mob");
 
-            Class.forName("net.minecraft.world.level.block.RedStoneWireBlock");
+            Class.forName("net.minecraft.world.level.block.RedstoneWireBlock");
 
         }
         catch (ClassNotFoundException error) {

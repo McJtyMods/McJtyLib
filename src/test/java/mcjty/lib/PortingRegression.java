@@ -70,8 +70,8 @@ public final class PortingRegression {
     void generatedItemDefinitions() {
         var definition = mcjty.lib.datagen.model.ModelProvider.itemDefinition(Identifier.parse("test:item/widget"));
         var reference = definition.getAsJsonObject("model");
-        require(reference.get("type").getAsString().equals("minecraft:model"), "26.2 client item type");
-        require(reference.get("model").getAsString().equals("test:item/widget"), "26.2 client item model reference");
+        require(reference.get("type").getAsString().equals("minecraft:model"), "26.3 client item type");
+        require(reference.get("model").getAsString().equals("test:item/widget"), "26.3 client item model reference");
         var provider = new mcjty.lib.datagen.model.ModelProvider(new net.minecraft.data.PackOutput(java.nio.file.Path.of("unused")), "test", "block") {
             @Override protected void registerModels() { }
         };

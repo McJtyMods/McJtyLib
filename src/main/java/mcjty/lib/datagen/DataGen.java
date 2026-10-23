@@ -79,7 +79,7 @@ public class DataGen implements DataProvider {
     public void generate() {
         Map<Identifier,net.minecraft.world.level.storage.loot.functions.LootItemFunction> globalFunctions=new HashMap<>();
         for(Dob dob:dobs)dob.glmSupplier().forEach((id,factory)->globalFunctions.put(Identifier.fromNamespaceAndPath(modid,id),factory.get()));
-        if(!globalFunctions.isEmpty())providers.add(new CodecDataProvider<>(output,"mcjtylib/loot_functions",net.minecraft.world.level.storage.loot.functions.LootItemFunctions.ROOT_CODEC,registries,globalFunctions));
+        if(!globalFunctions.isEmpty())providers.add(new CodecDataProvider<>(output,"mcjtylib/loot_functions",net.minecraft.world.level.storage.loot.functions.LootItemFunctions.DIRECT_CODEC,registries,globalFunctions));
 
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
             for (Dob dob : dobs) {
@@ -91,14 +91,20 @@ public class DataGen implements DataProvider {
             }
         }
 
-        providers.add( new net.minecraft.data.recipes.RecipeProvider.Runner(output, registries) {
-            @Override public String getName() { return modid + " recipes"; }
-            @Override protected net.minecraft.data.recipes.RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-                return new BaseRecipeProvider(registries, output) {
+        var reloadableEntries = new net.minecraft.core.RegistrySetBuilder();
+        reloadableEntries.add(new net.minecraft.core.registries.MultiRegistryBootstrap() {
+            @Override
+            public Set<net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<?>>> requestedRegistries() {
+                return Set.of(net.minecraft.core.registries.Registries.RECIPE, net.minecraft.core.registries.Registries.ADVANCEMENT);
+            }
 
+            @Override
+            public void run(BootstrapGetter contexts) {
+                new BaseRecipeProvider(contexts.get(net.minecraft.core.registries.Registries.RECIPE),
+                        contexts.get(net.minecraft.core.registries.Registries.ADVANCEMENT)) {
                     @Override
                     public void buildRecipes() {
-                        RecipeOutput consumer = output;
+                        RecipeOutput consumer = this.output;
                         withRecipeItems(items, () -> {
                             for (Dob dob : dobs) {
                                 dob.recipe().accept(new IRecipeFactory() {
@@ -152,37 +158,46 @@ public class DataGen implements DataProvider {
                             }
                         });
                     }
-                };
+                }.buildRecipes();
             }
         });
 
         // @todo 1.19.3, probably not right
         BaseLootTableProvider lootTableProvider = new BaseLootTableProvider();
 
-        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(provider -> builder -> {
+        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(context -> () -> {
                     for (Dob dob : dobs) {
                         if (dob.blockSupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
-                    lootTableProvider.generate(builder, LootContextParamSets.BLOCK);
+                    lootTableProvider.generate(context::accept, LootContextParamSets.BLOCK);
                 }, LootContextParamSets.BLOCK),
-                new LootTableProvider.SubProviderEntry(provider -> builder -> {
+                new LootTableProvider.SubProviderEntry(context -> () -> {
                     for (Dob dob : dobs) {
                         dob.loot().accept(lootTableProvider);
                     }
-                    lootTableProvider.generate(builder, LootContextParamSets.CHEST);
+                    lootTableProvider.generate(context::accept, LootContextParamSets.CHEST);
                 }, LootContextParamSets.CHEST),
-                new LootTableProvider.SubProviderEntry(provider -> builder -> {
+                new LootTableProvider.SubProviderEntry(context -> () -> {
                     for (Dob dob : dobs) {
                         if (dob.entitySupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
-                    lootTableProvider.generate(builder, LootContextParamSets.ENTITY);
+                    lootTableProvider.generate(context::accept, LootContextParamSets.ENTITY);
                 }, LootContextParamSets.ENTITY));
-        providers.add( new LootTableProvider(output, Collections.emptySet(),
-                list, registries));
+        reloadableEntries.add(net.minecraft.core.registries.Registries.LOOT_TABLE,
+                new LootTableProvider(Collections.emptySet(), list));
+        var reloadableKeys = net.fabricmc.fabric.api.event.registry.DynamicRegistries.getReloadableRegistries().stream()
+                .map(net.minecraft.resources.RegistryDataLoader.RegistryData::key).collect(java.util.stream.Collectors.toSet());
+        // Fabric supplies the combined lookup; reloadable patching needs the world layer separately.
+        var worldRegistries = registries.thenApply(lookup -> HolderLookup.Provider.create(lookup.listRegistries()
+                .filter(registry -> !reloadableKeys.contains(registry.key()))));
+        var reloadable = net.minecraft.data.registries.RegistryPatchGenerator
+                .createReloadableLookup(worldRegistries, registries, reloadableEntries)
+                .thenApply(net.minecraft.core.RegistrySetBuilder.PatchedRegistries::patches);
+        providers.add(net.minecraft.data.registries.RegistriesDatapackGenerator.forReloadableLayer(output, reloadable));
 
 
 //        providers.add( new BaseLootTableProvider(generator) {

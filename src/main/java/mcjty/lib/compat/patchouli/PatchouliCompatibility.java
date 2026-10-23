@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class PatchouliCompatibility {
 
-    // Patchouli has no 26.2 release yet. Keep callers functional and report the
+    // No compatible Patchouli API is configured. Keep callers functional and report the
     // unavailable manual without loading an incompatible 1.21 API.
     public static void openBookGUI(ServerPlayer player, Identifier id) {
         missingManual(player);
@@ -20,6 +20,6 @@ public class PatchouliCompatibility {
     }
 
     private static void missingManual(ServerPlayer player) {
-        player.sendSystemMessage(ComponentFactory.literal(ChatFormatting.RED + "Patchouli is unavailable for Minecraft 26.2. No manual present"));
+        player.sendSystemMessage(ComponentFactory.literal(ChatFormatting.RED + "Patchouli is unavailable for Minecraft 26.3. No manual present"));
     }
 }

@@ -367,9 +367,11 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     @Override
     public void removed() {
+        if (window != null) {
+            window.setFocus(null);
+            if (window.getWindowManager() != null) window.getWindowManager().clearFocus();
+        }
         super.removed();
-        // @todo 1.19.3
-//        getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
     }
 
     @Override
@@ -421,7 +423,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
+        int keyCode = event.key(), scanCode = event.keycode(), modifiers = event.modifiers();
         boolean b = window == null || getWindowManager().keyTyped(keyCode, scanCode);
         if (b) {
             return super.keyPressed(event);

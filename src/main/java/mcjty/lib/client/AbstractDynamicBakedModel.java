@@ -92,7 +92,7 @@ public abstract class AbstractDynamicBakedModel implements net.minecraft.client.
 
         var normal=v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
-        var material=BakedQuad.MaterialInfo.of(new Material.Baked(sprite,false),a < 1 ? com.mojang.blaze3d.platform.Transparency.TRANSLUCENT : sprite.contents().transparency(),-1,true,0);
+        var material=BakedQuad.MaterialInfo.of(new Material.Baked(sprite,false),a < 1 ? com.mojang.blaze3d.platform.Transparency.TRANSLUCENT : sprite.contents().transparency(),-1,Direction.getApproximateNearest(normal.x, normal.y, normal.z),0);
 
         var quad=new BakedQuad(point(v1),point(v2),point(v3),point(v4),uv(sprite,0,0),uv(sprite,0,1),uv(sprite,1,1),uv(sprite,1,0),Direction.getApproximateNearest(normal.x,normal.y,normal.z),material);
 

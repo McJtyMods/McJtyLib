@@ -212,7 +212,9 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
 
     protected void breakAndRemember(Level world, Player player, BlockPos pos) {
         if (!world.isClientSide()) {
-            playerDestroy(world, player, pos, world.getBlockState(pos), world.getBlockEntity(pos), ItemStack.EMPTY);
+            if (world instanceof net.minecraft.server.level.ServerLevel serverLevel && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                playerDestroy(serverLevel, serverPlayer, pos, world.getBlockState(pos), world.getBlockEntity(pos), ItemStack.EMPTY);
+            }
             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
     }

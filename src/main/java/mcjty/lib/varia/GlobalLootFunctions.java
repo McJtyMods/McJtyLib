@@ -44,7 +44,7 @@ public final class GlobalLootFunctions {
                 var ops=lookup.createSerializationContext(JsonOps.INSTANCE);var functions=new ArrayList<LootItemFunction>();
                 current.forEach((id,json)-> {
                     try {
-                        functions.add(LootItemFunctions.ROOT_CODEC.parse(ops,json).getOrThrow());
+                        functions.add(LootItemFunctions.DIRECT_CODEC.parse(ops,json).getOrThrow());
                     }
                     catch(Exception error) {
                         throw new IllegalStateException("Invalid global loot function "+id,error);

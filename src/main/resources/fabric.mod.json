@@ -15,6 +15,6 @@
   },
   "accessWidener": "mcjtylib.accesswidener",
   "mixins": ["mcjtylib.mixins.json"],
-  "depends": {"fabricloader": ">=0.19.3", "minecraft": "~26.2", "java": ">=25", "fabric-api": ">=0.155.2+26.2", "forgeconfigapiport": ">=26.2.1", "team_reborn_energy": ">=5.0.0"},
+  "depends": {"fabricloader": ">=0.19.5", "minecraft": "~26.3", "java": ">=25", "fabric-api": ">=0.164.0+26.3", "forgeconfigapiport": ">=26.3.1", "team_reborn_energy": ">=5.0.0"},
   "suggests": {"theoneprobe": "*", "jei": "*"}
 }

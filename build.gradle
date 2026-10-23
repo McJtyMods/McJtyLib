@@ -14,19 +14,21 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.fabricmc.fabric-loom' version '1.17.17'
+    id 'net.fabricmc.fabric-loom' version '1.17.21'
 }
 
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
 
+// Use the workspace script for integrated and sibling checkout layouts.
 def sharedTools = rootProject.file('gradletools.gradle')
-if (sharedTools.isFile()) {
+if (rootProject != project && sharedTools.isFile()) {
     apply from: sharedTools
-} else if (file('gradletools.gradle').isFile()) {
-    // Temporary standalone copy while the 26.2 workspace is unpublished.
-    apply from: 'gradletools.gradle'
+} else if (file('../Multi_fabric/gradletools.gradle').isFile()) {
+    apply from: '../Multi_fabric/gradletools.gradle'
+} else if (file('../gradletools.gradle').isFile()) {
+    apply from: '../gradletools.gradle'
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkSpace/26.2_fabric/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkSpace/26.3_fabric/gradletools.gradle'
 }
 
 group = "com.github.mcjty"
@@ -147,6 +149,19 @@ if (providers.gradleProperty('transferTests').isPresent()) {
                 source sourceSets.fabricTest
                 runDir 'build/transfer-test'
             }
+            datagenTest {
+                server()
+                source sourceSets.fabricTest
+                vmArg '-Dfabric-api.datagen'
+                vmArg '-Dfabric-api.datagen.modid=mcjtylib_transfer_test'
+                vmArg '-Dfabric-api.datagen.output-dir=' + file('build/datagen-test-output').absolutePath
+                runDir 'build/datagen-test'
+            }
         }
     }
+}
+
+if (project.hasProperty('clientTests')) {
+    if (!project.hasProperty('transferTests')) throw new GradleException('clientTests requires -PtransferTests')
+    loom.runs.client.vmArg '-Dmcjtylib.clientRegression=true'
 }

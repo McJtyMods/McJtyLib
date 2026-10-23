@@ -36,15 +36,15 @@ public class HudRenderHelper {
 
         Quaternionf quaternion = Minecraft.getInstance().gameRenderer.mainCamera().rotation();
         switch (hudOrientation) {
-            case HUD_SOUTH -> matrixStack.mulPose(new Quaternionf().setAngleAxis(-getHudAngle(orientation), 0, 1, 0));
+            case HUD_SOUTH -> matrixStack.rotate(new Quaternionf().setAngleAxis(-getHudAngle(orientation), 0, 1, 0));
             case HUD_TOPLAYER_HORIZ -> {
                 // @todo not correct, it just faces camera
                 float yaw = Minecraft.getInstance().gameRenderer.mainCamera().yRot();
-                matrixStack.mulPose(new Quaternionf().rotateY((float) Math.toRadians(- yaw + 180)));
+                matrixStack.rotate(new Quaternionf().rotateY((float) Math.toRadians(- yaw + 180)));
             }
             case HUD_TOPLAYER -> {
-                matrixStack.mulPose(quaternion);
-                matrixStack.mulPose(fromXYZ(0, 3.14159f, 0));
+                matrixStack.rotate(quaternion);
+                matrixStack.rotate(fromXYZ(0, 3.14159f, 0));
             }
         }
 

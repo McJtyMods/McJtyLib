@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -102,7 +103,7 @@ public class ChoiceLabel extends AbstractLabel<ChoiceLabel> {
                 return null;
             }
             int index = choiceList.indexOf(currentChoice);
-            if (button == 1 || SafeClientTools.isSneaking()) {
+            if (button == InputConstants.MOUSE_BUTTON_RIGHT || SafeClientTools.isSneaking()) {
                 index--;
                 if (index < 0) {
                     index = choiceList.size()-1;

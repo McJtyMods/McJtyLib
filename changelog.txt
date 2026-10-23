@@ -1,3 +1,8 @@
+26.3-11.0.0-fabric:
+- Port to Minecraft 26.3 and Fabric.
+- Update rendering pipelines, SDL input, reloadable registry data generation, and redstone mixins.
+- Use MultiWorkSpace's 26.3 Fabric build settings directly for sibling and integrated checkouts.
+
 26.2-10.0.0-fabric
 - Ported the library and shared multi-mod build to Minecraft 26.2 Fabric.
 - Added native Fabric registration, networking, attachments, menus and transactional storage.

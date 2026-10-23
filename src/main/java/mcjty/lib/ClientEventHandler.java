@@ -44,7 +44,7 @@ public final class ClientEventHandler {
                 if(focus(s)==null)return true;((IKeyReceiver)s).charTypedFromEvent((char)e.codepoint());return false;
             });
             ScreenKeyboardEvents.allowKeyPress(screen).register((s,e)-> {
-                if(focus(s)==null)return true;((IKeyReceiver)s).keyTypedFromEvent(e.key(),e.scancode());return false;
+                if(focus(s)==null)return true;((IKeyReceiver)s).keyTypedFromEvent(e.key(),e.keycode());return false;
             });
         });
 
