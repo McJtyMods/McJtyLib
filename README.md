@@ -24,6 +24,6 @@ For downstream ports:
 - Block entities use `ValueInput` / `ValueOutput`; client NBT hooks still travel in update packets. Server configuration uses `SYNCED` while retaining `mcjtylib-server.toml`.
 - Model helpers live in `mcjty.lib.datagen.model`. Recipe providers take recipe/advancement bootstrap contexts. `DataGen` generates recipes and loot through reloadable registry bootstraps; tags use world registry lookups. Placement registries now register `MapCodec<? extends PlacementModifier>` values.
 
-TOP is configured as `26.3_neo-16.0.0`; integrated builds use its source project. JEI is pinned to the published 26.3 version `31.12.0.65`. Patchouli integration remains unavailable until a compatible API is configured.
+TOP's Maven artifact is configured as `26.3_neo-16.0.0-1`; the build suffix does not change its mod dependency version. Integrated builds use its source project. JEI is pinned to the published 26.3 version `31.12.0.65`. Patchouli integration remains unavailable until a compatible API is configured.
 
 Port validation: main sources compiled against cached Minecraft 26.3 / NeoForge 26.3.0.83, all four JUnit checks passed, and all eight game tests passed in NeoForge with TOP installed. The sandbox prevented Gradle startup (local networking) and dependency downloads. Compile validation used the cached 26.2 JEI API; resolving the configured 26.3 JEI artifacts, a full Gradle build, datagen, and client rendering/input validation remain to be run outside that restriction.
