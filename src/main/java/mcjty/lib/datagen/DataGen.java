@@ -78,7 +78,7 @@ public class DataGen {
     public void generate() {
         DataGenerator generator = event.getGenerator();
 
-        generator.addProvider(true, new GlobalLootModifierProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
+        generator.addProvider(true, new GlobalLootModifierProvider(generator.getPackOutput(), event.getWorldLookupProvider(), modid) {
             @Override
             protected void start() {
                 for (Dob dob : dobs) {
@@ -108,14 +108,13 @@ public class DataGen {
             }
         }
 
-        generator.addProvider(true, new net.minecraft.data.recipes.RecipeProvider.Runner(generator.getPackOutput(), event.getLookupProvider()) {
-            @Override public String getName() { return modid + " recipes"; }
-            @Override protected net.minecraft.data.recipes.RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-                return new BaseRecipeProvider(registries, output) {
+        var reloadableEntries = new net.minecraft.core.RegistrySetBuilder();
+        reloadableEntries.add(net.minecraft.data.recipes.RecipeProvider.asBootstrap((recipes, advancements) ->
+                new BaseRecipeProvider(recipes, advancements) {
 
                     @Override
                     protected void buildRecipes() {
-                        RecipeOutput consumer = output;
+                        RecipeOutput consumer = this.output;
                         withRecipeItems(items, () -> {
                             for (Dob dob : dobs) {
                                 dob.recipe().accept(new IRecipeFactory() {
@@ -169,37 +168,36 @@ public class DataGen {
                             }
                         });
                     }
-                };
-            }
-        });
+                }));
 
         // @todo 1.19.3, probably not right
         BaseLootTableProvider lootTableProvider = new BaseLootTableProvider();
 
-        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(provider -> builder -> {
+        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(context -> () -> {
                     for (Dob dob : dobs) {
                         if (dob.blockSupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
-                    lootTableProvider.generate(builder, LootContextParamSets.BLOCK);
+                    lootTableProvider.generate(context::accept, LootContextParamSets.BLOCK);
                 }, LootContextParamSets.BLOCK),
-                new LootTableProvider.SubProviderEntry(provider -> builder -> {
+                new LootTableProvider.SubProviderEntry(context -> () -> {
                     for (Dob dob : dobs) {
                         dob.loot().accept(lootTableProvider);
                     }
-                    lootTableProvider.generate(builder, LootContextParamSets.CHEST);
+                    lootTableProvider.generate(context::accept, LootContextParamSets.CHEST);
                 }, LootContextParamSets.CHEST),
-                new LootTableProvider.SubProviderEntry(provider -> builder -> {
+                new LootTableProvider.SubProviderEntry(context -> () -> {
                     for (Dob dob : dobs) {
                         if (dob.entitySupplier() != null) {
                             dob.loot().accept(lootTableProvider);
                         }
                     }
-                    lootTableProvider.generate(builder, LootContextParamSets.ENTITY);
+                    lootTableProvider.generate(context::accept, LootContextParamSets.ENTITY);
                 }, LootContextParamSets.ENTITY));
-        generator.addProvider(true, new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
-                list, event.getLookupProvider()));
+        reloadableEntries.add(net.minecraft.core.registries.Registries.LOOT_TABLE,
+                new LootTableProvider(Collections.emptySet(), list));
+        event.getDefaultPackGenerator().createReloadableRegistryObjects(reloadableEntries);
 
 
 //        generator.addProvider(true, new BaseLootTableProvider(generator) {
@@ -210,7 +208,7 @@ public class DataGen {
 //                }
 //            }
 //        });
-        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(generator, event.getLookupProvider(), modid) {
+        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(generator, event.getWorldLookupProvider(), modid) {
             @Override
             protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {
@@ -231,7 +229,7 @@ public class DataGen {
             }
         };
         generator.addProvider(true, blockTags);
-        generator.addProvider(true, new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
+        generator.addProvider(true, new ItemTagsProvider(generator.getPackOutput(), event.getWorldLookupProvider(), modid) {
             @Override
             protected void addTags(HolderLookup.Provider provider) {
                 for (Dob dob : dobs) {

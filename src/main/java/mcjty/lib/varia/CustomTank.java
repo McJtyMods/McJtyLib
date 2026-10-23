@@ -7,8 +7,6 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.IFluidTank;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -16,13 +14,13 @@ import java.util.List;
 
 
 import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-public class CustomTank implements IFluidHandler, IFluidTank, ResourceHandler<FluidResource> {
+public class CustomTank implements ResourceHandler<FluidResource> {
 
     @Nonnull
     protected FluidStack fluid = FluidStack.EMPTY;
@@ -43,9 +41,10 @@ public class CustomTank implements IFluidHandler, IFluidTank, ResourceHandler<Fl
     @Override public boolean isValid(int index, FluidResource resource) { checkIndex(index); return !resource.isEmpty() && isFluidValid(resource.toStack(1)); }
     @Override public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
         checkIndex(index);
-        if (amount < 0) throw new IllegalArgumentException("Negative amount");
-        if (amount == 0 || resource.isEmpty()) return 0;
-        int inserted = fill(resource.toStack(amount), FluidAction.SIMULATE);
+        TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+        if (amount == 0) return 0;
+        if (!isValid(index, resource) || (!fluid.isEmpty() && !resource.matches(fluid))) return 0;
+        int inserted = Math.min(amount, Math.max(0, capacity - fluid.getAmount()));
         if (inserted > 0) {
             transferJournal.updateSnapshots(transaction);
             fluid = resource.toStack(fluid.getAmount() + inserted);
@@ -54,7 +53,7 @@ public class CustomTank implements IFluidHandler, IFluidTank, ResourceHandler<Fl
     }
     @Override public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
         checkIndex(index);
-        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
         if (amount == 0 || resource.isEmpty() || !resource.matches(fluid)) return 0;
         int extracted = Math.min(amount, fluid.getAmount());
         if (extracted > 0) {
@@ -65,31 +64,29 @@ public class CustomTank implements IFluidHandler, IFluidTank, ResourceHandler<Fl
     }
 
     public CustomTank(int capacity) {
+        if (capacity < 0) throw new IllegalArgumentException("Negative capacity");
         this.capacity = capacity;
     }
 
     public CustomTank setCapacity(int capacity) {
+        if (capacity < 0) throw new IllegalArgumentException("Negative capacity");
         this.capacity = capacity;
         return this;
     }
 
-    @Override
     public boolean isFluidValid(FluidStack stack) {
         return true;
     }
 
-    @Override
     public int getCapacity() {
         return capacity;
     }
 
-    @Override
     @Nonnull
     public FluidStack getFluid() {
         return fluid;
     }
 
-    @Override
     public int getFluidAmount() {
         return fluid.getAmount();
     }
@@ -123,87 +120,48 @@ public class CustomTank implements IFluidHandler, IFluidTank, ResourceHandler<Fl
     }
 
 
-    @Override
     public int getTanks() {
         return 1;
     }
 
     @Nonnull
-    @Override
     public FluidStack getFluidInTank(int tank) {
         return getFluid();
     }
 
-    @Override
     public int getTankCapacity(int tank) {
         return getCapacity();
     }
 
-    @Override
     public boolean isFluidValid(int tank, @Nonnull FluidStack stack) {
         return isFluidValid(stack);
     }
 
-    @Override
-    public int fill(FluidStack resource, FluidAction action) {
-        if (resource.isEmpty() || !isFluidValid(resource)) {
-            return 0;
+    /** Fill immediately, or roll back the transaction when simulating. */
+    public int fill(FluidStack resource, boolean simulate) {
+        if (resource.isEmpty()) return 0;
+        try (var transaction = Transaction.openRoot()) {
+            int inserted = insert(0, FluidResource.of(resource), resource.getAmount(), transaction);
+            if (!simulate) transaction.commit();
+            return inserted;
         }
-        if (action.simulate()) {
-            if (fluid.isEmpty()) {
-                return Math.min(capacity, resource.getAmount());
-            }
-            if (!FluidStack.isSameFluidSameComponents(fluid, resource)) {
-                return 0;
-            }
-            return Math.min(capacity - fluid.getAmount(), resource.getAmount());
-        }
-        if (fluid.isEmpty()) {
-            onContentsChanged();
-            fluid = new FluidStack(resource.getFluid().builtInRegistryHolder(), Math.min(capacity, resource.getAmount()), resource.getComponentsPatch());
-            return fluid.getAmount();
-        }
-        if (!FluidStack.isSameFluidSameComponents(fluid, resource)) {
-            return 0;
-        }
-        int filled = capacity - fluid.getAmount();
-
-        if (resource.getAmount() < filled) {
-            onContentsChanged();
-            fluid.grow(resource.getAmount());
-            filled = resource.getAmount();
-        } else {
-            onContentsChanged();
-            fluid.setAmount(capacity);
-        }
-        return filled;
     }
 
     @Nonnull
-    @Override
-    public FluidStack drain(FluidStack resource, FluidAction action) {
-        if (resource.isEmpty() || !FluidStack.isSameFluidSameComponents(resource, fluid)) {
-            return FluidStack.EMPTY;
-        }
-        return drain(resource.getAmount(), action);
+    public FluidStack drain(FluidStack resource, boolean simulate) {
+        if (resource.isEmpty() || !FluidStack.isSameFluidSameComponents(resource, fluid)) return FluidStack.EMPTY;
+        return drain(resource.getAmount(), simulate);
     }
 
     @Nonnull
-    @Override
-    public FluidStack drain(int maxDrain, FluidAction action) {
-        int drained = maxDrain;
-        if (fluid.getAmount() < drained) {
-            drained = fluid.getAmount();
+    public FluidStack drain(int amount, boolean simulate) {
+        if (fluid.isEmpty()) return FluidStack.EMPTY;
+        var resource = FluidResource.of(fluid);
+        try (var transaction = Transaction.openRoot()) {
+            int extracted = extract(0, resource, amount, transaction);
+            if (!simulate) transaction.commit();
+            return resource.toStack(extracted);
         }
-        FluidStack stack = new FluidStack(fluid.getFluid().builtInRegistryHolder(), drained, fluid.getComponentsPatch());
-        if (action.execute()) {
-            onContentsChanged();
-            fluid.shrink(drained);
-        }
-        if (fluid.getAmount() <= 0) {
-            fluid = FluidStack.EMPTY;
-        }
-        return stack;
     }
 
     protected void onContentsChanged() {

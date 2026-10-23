@@ -13,7 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
@@ -33,9 +34,9 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        IItemHandler handler = mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
+        ResourceHandler<ItemResource> handler = mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
         if (handler != null) {
-            return handler.extractItem(slot, amount, false);
+            return InventoryTools.extractItem(handler, slot, amount, false);
         } else {
             return ItemStack.EMPTY;
         }
@@ -49,9 +50,9 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        IItemHandler h = mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
+        ResourceHandler<ItemResource> h = mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
         if (h != null) {
-            return h.getStackInSlot(slot);
+            return net.neoforged.neoforge.transfer.item.ItemUtil.getStack(h, slot);
         } else {
             return ItemStack.EMPTY;
         }

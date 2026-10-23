@@ -6,8 +6,9 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import mcjty.lib.varia.InventoryTools;
 
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
@@ -22,7 +23,7 @@ public class InventoryLocator {
     private Direction inventorySide = null;
 
     @Nonnull
-    private IItemHandler getItemHandlerAtDirection(Level worldObj, BlockPos thisCoordinate, Direction direction) {
+    private ResourceHandler<ItemResource> getItemHandlerAtDirection(Level worldObj, BlockPos thisCoordinate, Direction direction) {
         if (direction == null) {
             if (inventoryCoordinate != null) {
                 return getItemHandlerAtCoordinate(worldObj, inventoryCoordinate, inventorySide);
@@ -40,7 +41,7 @@ public class InventoryLocator {
     }
 
     @Nullable
-    private IItemHandler getItemHandlerAtCoordinate(Level worldObj, BlockPos c, Direction direction) {
+    private ResourceHandler<ItemResource> getItemHandlerAtCoordinate(Level worldObj, BlockPos c, Direction direction) {
         return mcjty.lib.varia.CapabilityTools.itemHandler(worldObj.getCapability(Capabilities.Item.BLOCK, c, direction));
     }
 
@@ -50,9 +51,9 @@ public class InventoryLocator {
             if (stack.isEmpty()) {
                 break;
             }
-            IItemHandler itemHandler = getItemHandlerAtDirection(worldObj, thisCoordinate, dir);
+            ResourceHandler<ItemResource> itemHandler = getItemHandlerAtDirection(worldObj, thisCoordinate, dir);
             if (itemHandler != null) {
-                stack = ItemHandlerHelper.insertItem(itemHandler, stack, false);
+                stack = InventoryTools.insertItem(itemHandler, stack, false);
             }
         }
 

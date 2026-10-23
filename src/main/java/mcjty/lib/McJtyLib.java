@@ -55,7 +55,7 @@ public class McJtyLib {
         }
 
         container.registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
-        container.registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
+        container.registerConfig(ModConfig.Type.SYNCED, GeneralConfig.SERVER_CONFIG, "mcjtylib-server.toml");
     }
 
     /**

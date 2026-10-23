@@ -6,75 +6,145 @@ import mcjty.lib.tileentity.GenericTileEntity;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.ItemStackWithSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemStackHandler;
-
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.neoforged.neoforge.transfer.IndexModifier;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.TransferPreconditions;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.BiPredicate;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 
-
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
-
-public class GenericItemHandler implements IItemHandlerModifiable, ResourceHandler<ItemResource> {
-
+public class GenericItemHandler implements ResourceHandler<ItemResource>, IndexModifier<ItemResource> {
     private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
-    private final ItemStackHandler stacks;
-
-    private final SnapshotJournal<java.util.List<ItemStack>> transferJournal = new SnapshotJournal<>() {
-        @Override protected java.util.List<ItemStack> createSnapshot() {
-            var result = new java.util.ArrayList<ItemStack>();
-            for (int i = 0; i < getSlots(); i++) result.add(getStackInSlot(i).copy());
-            return result;
+    private final ItemStacksResourceHandler stacks;
+    private final SnapshotJournal<List<ItemStack>> transferJournal = new SnapshotJournal<>() {
+        @Override protected List<ItemStack> createSnapshot() {
+            var snapshot = new ArrayList<ItemStack>();
+            for (int i = 0; i < size(); i++) snapshot.add(getStackInSlot(i));
+            return snapshot;
         }
-        @Override protected void revertToSnapshot(java.util.List<ItemStack> snapshot) {
-            for (int i = 0; i < snapshot.size(); i++) stacks.setStackInSlot(i, snapshot.get(i));
+        @Override protected void revertToSnapshot(List<ItemStack> snapshot) {
+            for (int i = 0; i < snapshot.size(); i++) setStoredStack(i, snapshot.get(i));
         }
-        @Override protected void onRootCommit(java.util.List<ItemStack> before) {
+        @Override protected void onRootCommit(List<ItemStack> before) {
             for (int i = 0; i < before.size(); i++) {
                 if (!ItemStack.matches(before.get(i), getStackInSlot(i))) onUpdate(i, getStackInSlot(i));
             }
         }
     };
-    @Override public int size() { return getSlots(); }
-    @Override public ItemResource getResource(int index) { return ItemResource.of(getStackInSlot(index)); }
-    @Override public long getAmountAsLong(int index) { return getStackInSlot(index).getCount(); }
-    @Override public long getCapacityAsLong(int index, ItemResource resource) {
-        if (containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index)) return 0;
-        return Math.min(getSlotLimit(index), resource.isEmpty() ? 64 : resource.getMaxStackSize());
+
+    public GenericItemHandler(GenericTileEntity te, ContainerFactory factory) {
+        tileEntity = te;
+        containerFactory = factory;
+        stacks = new ItemStacksResourceHandler(factory.getContainerSlots());
     }
-    @Override public boolean isValid(int index, ItemResource resource) { return !resource.isEmpty() && isItemValid(index, resource.toStack()); }
+
+    @Override public int size() { return stacks.size(); }
+    @Override public ItemResource getResource(int index) { return stacks.getResource(index); }
+    @Override public long getAmountAsLong(int index) { return stacks.getAmountAsLong(index); }
+    @Override public long getCapacityAsLong(int index, ItemResource resource) {
+        java.util.Objects.checkIndex(index, size());
+        if (isGhost(index)) return 0;
+        return Math.min(getSlotLimit(index), resource.isEmpty() ? Item.ABSOLUTE_MAX_STACK_SIZE : resource.getMaxStackSize());
+    }
+    @Override public boolean isValid(int index, ItemResource resource) {
+        java.util.Objects.checkIndex(index, size());
+        return !resource.isEmpty() && isItemValid(index, resource.toStack());
+    }
     @Override public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-        if (amount < 0) throw new IllegalArgumentException("Negative amount");
-        if (amount == 0 || resource.isEmpty() || getCapacityAsLong(index, resource) == 0) return 0;
-        int inserted = amount - insertItem(index, resource.toStack(amount), true).getCount();
+        TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+        if (isGhost(index) || !isItemInsertable(index, resource.toStack()) || !isValid(index, resource)) return 0;
+        var current = getResource(index);
+        if (!current.isEmpty() && !current.equals(resource)) return 0;
+        int inserted = (int) Math.min(amount, Math.max(0, getCapacityAsLong(index, resource) - getAmountAsLong(index)));
         if (inserted > 0) {
             transferJournal.updateSnapshots(transaction);
-            stacks.setStackInSlot(index, resource.toStack(getStackInSlot(index).getCount() + inserted));
+            setStoredStack(index, resource.toStack(getStackInSlot(index).getCount() + inserted));
         }
         return inserted;
     }
     @Override public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
-        if (amount < 0) throw new IllegalArgumentException("Negative amount");
-        if (amount == 0 || resource.isEmpty() || !resource.matches(getStackInSlot(index)) || getCapacityAsLong(index, resource) == 0) return 0;
-        int extracted = extractItem(index, amount, true).getCount();
+        TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+        var current = getStackInSlot(index);
+        if (isGhost(index) || !resource.matches(current) || !isItemExtractable(index, current)) return 0;
+        int extracted = Math.min(amount, current.getCount());
         if (extracted > 0) {
             transferJournal.updateSnapshots(transaction);
-            stacks.setStackInSlot(index, getStackInSlot(index).copyWithCount(getStackInSlot(index).getCount() - extracted));
+            setStoredStack(index, current.copyWithCount(current.getCount() - extracted));
         }
         return extracted;
+    }
+    @Override public void set(int index, ItemResource resource, int amount) { setStackInSlot(index, resource.toStack(amount)); }
+    private boolean isGhost(int index) { return containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index); }
+    private void setStoredStack(int slot, ItemStack stack) { stacks.set(slot, ItemResource.of(stack), stack.getCount()); }
+    protected void onUpdate(int index, ItemStack stack) { if (tileEntity != null) tileEntity.markDirtyQuick(); }
+
+    public int getSlots() { return size(); }
+    public ItemStack getStackInSlot(int slot) { return ItemUtil.getStack(stacks, slot); }
+    public ItemStacksResourceHandler getStacks() { return stacks; }
+    public void setStackInSlot(int slot, @Nonnull ItemStack stack) { setStoredStack(slot, stack); onUpdate(slot, stack); }
+    public int getSlotLimit(int slot) { return 64; }
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack) { return true; }
+    public boolean isItemInsertable(int slot, @Nonnull ItemStack stack) { return isItemValid(slot, stack); }
+    public boolean isItemExtractable(int slot, @Nonnull ItemStack stack) { return true; }
+    public ContainerFactory getContainerFactory() { return containerFactory; }
+
+    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+        return ItemUtil.insertItemReturnRemaining(this, slot, stack, simulate, null);
+    }
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        return mcjty.lib.varia.InventoryTools.extractItem(this, slot, amount, simulate);
+    }
+    public ItemStack decrStackSize(int index, int amount) {
+        if (isGhost(index)) { setStackInSlot(index, ItemStack.EMPTY); return ItemStack.EMPTY; }
+        return extractItem(index, amount, false);
+    }
+    public void setInventorySlotContents(int stackLimit, int index, ItemStack stack) {
+        int limit = containerFactory.isGhostSlot(index) && index < 9 ? 1 : Math.max(0, stackLimit);
+        setStackInSlot(index, stack.copyWithCount(Math.min(limit, stack.getCount())));
+    }
+    public void setStacks(List<ItemStack> items) {
+        for (int i = 0; i < size(); i++) setStoredStack(i, i < items.size() ? items.get(i) : ItemStack.EMPTY);
+    }
+    public void applyImplicitComponents(ItemInventory inventory) { if (inventory != null) setStacks(inventory.items()); }
+    public void collectImplicitComponents(DataComponentMap.Builder builder) {
+        var items = new ArrayList<ItemStack>();
+        for (int i = 0; i < size(); i++) items.add(getStackInSlot(i));
+        builder.set(Registration.ITEM_INVENTORY, new ItemInventory(items));
+    }
+    // Retain the indexed 26.2 save format, including empty/ghost slot positions.
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
+        var output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, provider);
+        var items = output.list("Items", ItemStackWithSlot.CODEC);
+        for (int i = 0; i < size(); i++) {
+            var stack = getStackInSlot(i);
+            if (!stack.isEmpty()) items.add(new ItemStackWithSlot(i, stack));
+        }
+        output.putInt("Size", size());
+        return output.buildResult();
+    }
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
+        var input = TagValueInput.create(ProblemReporter.DISCARDING, provider, nbt);
+        for (int i = 0; i < size(); i++) setStoredStack(i, ItemStack.EMPTY);
+        input.listOrEmpty("Items", ItemStackWithSlot.CODEC).forEach(item -> {
+            if (item.isValidInContainer(size())) setStoredStack(item.slot(), item.stack());
+        });
+    }
+    public void save(CompoundTag tag, String name, HolderLookup.Provider provider) { tag.put(name, serializeNBT(provider)); }
+    public void load(CompoundTag tag, String name, HolderLookup.Provider provider) {
+        if (tag.contains(name)) deserializeNBT(provider, tag.getCompoundOrEmpty(name));
     }
 
     public static BiPredicate<Integer, ItemStack> slot(int s) {
@@ -114,285 +184,6 @@ public class GenericItemHandler implements IItemHandlerModifiable, ResourceHandl
      */
     public static GenericItemHandler basic(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
         return new GenericItemHandler(te, factorySupplier.get());
-    }
-
-    // Called when something changed
-    protected void onUpdate(int index, ItemStack stack) {
-        tileEntity.markDirtyQuick();
-    }
-
-    public GenericItemHandler(GenericTileEntity te, ContainerFactory factory) {
-        this.tileEntity = te;
-        this.containerFactory = factory;
-        stacks = new ItemStackHandler(containerFactory.getContainerSlots());
-    }
-
-    public void applyImplicitComponents(ItemInventory inventory) {
-        if (inventory != null) {
-            setStacks(inventory.items());
-        }
-    }
-
-    public void collectImplicitComponents(DataComponentMap.Builder builder) {
-        List<ItemStack> stacks = new ArrayList<>();
-        for (int i = 0; i < getSlots(); i++) {
-            stacks.add(getStackInSlot(i));
-        }
-        builder.set(Registration.ITEM_INVENTORY, new ItemInventory(stacks));
-    }
-
-    public ItemStackHandler getStacks() {
-        return stacks;
-    }
-
-    public void setStacks(List<ItemStack> items) {
-        for (int i = 0; i < stacks.getSlots(); i++) {
-            if (i < items.size()) {
-                stacks.setStackInSlot(i, items.get(i));
-            } else {
-                stacks.setStackInSlot(i, ItemStack.EMPTY);
-            }
-        }
-    }
-
-
-    @Override
-    public int getSlots() {
-        return stacks.getSlots();
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        if (slot >= stacks.getSlots()) {
-            return ItemStack.EMPTY;
-        }
-        return stacks.getStackInSlot(slot);
-    }
-
-    @Nonnull
-    @Override
-    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-        if (stack.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-        if (!isItemInsertable(slot, stack)) {
-            return stack;
-        }
-
-        ItemStack stackInSlot = getStackInSlot(slot);
-
-        int m;
-        if (!stackInSlot.isEmpty()) {
-            if (stackInSlot.getCount() >= Math.min(stackInSlot.getMaxStackSize(), getSlotLimit(slot))) {
-                return stack;
-            }
-
-            if (!ItemStack.isSameItemSameComponents(stack, stackInSlot)) {
-                return stack;
-            }
-
-            if (!isItemValid(slot, stack)) {
-                return stack;
-            }
-
-            m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot)) - stackInSlot.getCount();
-
-            if (stack.getCount() <= m) {
-                if (!simulate) {
-                    ItemStack copy = stack.copy();
-                    copy.grow(stackInSlot.getCount());
-                    setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
-                    onUpdate(slot, copy);
-                }
-
-                return ItemStack.EMPTY;
-            } else {
-                // copy the stack to not modify the original one
-                stack = stack.copy();
-                if (!simulate) {
-                    ItemStack copy = stack.split(m);
-                    copy.grow(stackInSlot.getCount());
-                    setInventorySlotContents(copy.getMaxStackSize(), slot, copy);
-                    onUpdate(slot, copy);
-                    return stack;
-                } else {
-                    stack.shrink(m);
-                    return stack;
-                }
-            }
-        } else {
-            if (!isItemValid(slot, stack)) {
-                return stack;
-            }
-
-            m = Math.min(stack.getMaxStackSize(), getSlotLimit(slot));
-            if (m < stack.getCount()) {
-                // copy the stack to not modify the original one
-                stack = stack.copy();
-                if (!simulate) {
-                    ItemStack split = stack.split(m);
-                    setInventorySlotContents(stack.getMaxStackSize(), slot, split);
-                    onUpdate(slot, split);
-                    return stack;
-                } else {
-                    stack.shrink(m);
-                    return stack;
-                }
-            } else {
-                if (!simulate) {
-                    setInventorySlotContents(stack.getMaxStackSize(), slot, stack);
-                    onUpdate(slot, stack);
-                }
-                return ItemStack.EMPTY;
-            }
-        }
-
-    }
-
-    public void setInventorySlotContents(int stackLimit, int index, ItemStack stack) {
-        if (index >= stacks.getSlots()) {
-            return;
-        }
-
-        if (containerFactory.isGhostSlot(index)) {
-            if (!stack.isEmpty()) {
-                ItemStack stack1 = stack.copy();
-                if (index < 9) {
-                    stack1.setCount(1);
-                }
-                stacks.setStackInSlot(index, stack1);
-            } else {
-                stacks.setStackInSlot(index, ItemStack.EMPTY);
-            }
-        } else if (containerFactory.isGhostOutputSlot(index)) {
-            if (!stack.isEmpty()) {
-                stacks.setStackInSlot(index, stack.copy());
-            } else {
-                stacks.setStackInSlot(index, ItemStack.EMPTY);
-            }
-        } else {
-            stacks.setStackInSlot(index, stack);
-            if (!stack.isEmpty() && stack.getCount() > stackLimit) {
-                stack.setCount(Math.max(stackLimit, 0));
-            }
-            tileEntity.setChanged();
-        }
-    }
-
-
-    @Nonnull
-    @Override
-    public ItemStack extractItem(int slot, int amount, boolean simulate) {
-        if (amount == 0) {
-            return ItemStack.EMPTY;
-        }
-
-        ItemStack stackInSlot = getStackInSlot(slot);
-
-        if (stackInSlot.isEmpty()) {
-            return ItemStack.EMPTY;
-        }
-
-        if (!isItemExtractable(slot, stackInSlot)) {
-            return ItemStack.EMPTY;
-        }
-
-        if (simulate) {
-            if (stackInSlot.getCount() < amount) {
-                return stackInSlot.copy();
-            } else {
-                ItemStack copy = stackInSlot.copy();
-                copy.setCount(amount);
-                return copy;
-            }
-        } else {
-            int m = Math.min(stackInSlot.getCount(), amount);
-
-            ItemStack decrStackSize = decrStackSize(slot, m);
-            onUpdate(slot, decrStackSize);
-            return decrStackSize;
-        }
-    }
-
-    public ItemStack decrStackSize(int index, int amount) {
-        if (index >= stacks.getSlots()) {
-            return ItemStack.EMPTY;
-        }
-
-        if (containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index)) {
-            ItemStack old = stacks.getStackInSlot(index);
-            stacks.setStackInSlot(index, ItemStack.EMPTY);
-            if (old.isEmpty()) {
-                return ItemStack.EMPTY;
-            }
-            old.setCount(0);
-            return old;
-        } else {
-            if (!stacks.getStackInSlot(index).isEmpty()) {
-                if (stacks.getStackInSlot(index).getCount() <= amount) {
-                    ItemStack old = stacks.getStackInSlot(index);
-                    stacks.setStackInSlot(index, ItemStack.EMPTY);
-                    tileEntity.setChanged();
-                    return old;
-                }
-                ItemStack its = stacks.getStackInSlot(index).split(amount);
-                if (stacks.getStackInSlot(index).isEmpty()) {
-                    stacks.setStackInSlot(index, ItemStack.EMPTY);
-                }
-                tileEntity.setChanged();
-                return its;
-            }
-            return ItemStack.EMPTY;
-        }
-    }
-
-    @Override
-    public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
-        stacks.setStackInSlot(slot, stack);
-        onUpdate(slot, stack);
-    }
-
-    @Override
-    public int getSlotLimit(int slot) {
-        return 64;
-    }
-
-    @Override
-    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-        return true;
-    }
-
-    public boolean isItemInsertable(int slot, @Nonnull ItemStack stack) {
-        return isItemValid(slot, stack);
-    }
-
-    public boolean isItemExtractable(int slot, @Nonnull ItemStack stack) {
-        return true;
-    }
-
-    public ContainerFactory getContainerFactory() {
-        return containerFactory;
-    }
-
-    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-        var output = net.minecraft.world.level.storage.TagValueOutput.createWithContext(net.minecraft.util.ProblemReporter.DISCARDING, provider);
-        stacks.serialize(output);
-        return output.buildResult();
-    }
-
-    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
-        stacks.deserialize(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, provider, nbt));
-    }
-
-    public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
-        tag.put(tagName, serializeNBT(provider));
-    }
-
-    public void load(CompoundTag tag, String tagName, HolderLookup.Provider provider) {
-        if (tag.contains(tagName)) {
-            deserializeNBT(provider, tag.getCompoundOrEmpty(tagName));
-        }
     }
 
     public static class Builder {

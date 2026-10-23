@@ -30,10 +30,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import mcjty.lib.varia.InventoryTools;
+import net.neoforged.neoforge.transfer.item.PlayerInventoryWrapper;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
@@ -50,7 +52,7 @@ import static mcjty.lib.api.container.DefaultContainerProvider.correctType;
  * Generic container support
  */
 public class GenericContainer extends AbstractContainerMenu implements IGenericContainer {
-    protected final Map<String,IItemHandler> inventories = new HashMap<>();
+    protected final Map<String,ResourceHandler<ItemResource>> inventories = new HashMap<>();
     private final Map<Identifier, IContainerDataListener> containerData = new HashMap<>();
     private final List<DataListener<?, ?>> dataListeners = new ArrayList<>();
     private final Map<AttachmentType<?>, Object> previousData = new HashMap<>();
@@ -166,7 +168,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         this.dataListeners.add(dataListener);
     }
 
-    public void addInventory(String name, @Nullable IItemHandler inventory) {
+    public void addInventory(String name, @Nullable ResourceHandler<ItemResource> inventory) {
         if (inventory != null) {
             inventories.put(name, inventory);
         }
@@ -176,7 +178,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         return pos;
     }
 
-    public IItemHandler getInventory(String name) {
+    public ResourceHandler<ItemResource> getInventory(String name) {
         return inventories.get(name);
     }
 
@@ -194,13 +196,15 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
 
     @Nullable
     public Slot getSlotByInventoryAndIndex(String name, int index) {
-        IItemHandler inv = inventories.get(name);
+        ResourceHandler<ItemResource> inv = inventories.get(name);
         if (inv == null) {
             return null;
         }
         for (Slot slot : slots) {
-            if (slot instanceof SlotItemHandler) {
-                IItemHandler itemHandler = ((SlotItemHandler) slot).getItemHandler();
+            if (name.equals(ContainerFactory.CONTAINER_PLAYER) && slot.getSlotIndex() == index
+                    && slot.container instanceof Inventory) return slot;
+            if (slot instanceof ResourceHandlerSlot) {
+                ResourceHandler<ItemResource> itemHandler = ((ResourceHandlerSlot) slot).getResourceHandler();
                 if (itemHandler == inv && slot.getSlotIndex() == index) {
                     return slot;
                 }
@@ -210,15 +214,15 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
     }
 
     @Override
-    public void setupInventories(IItemHandler itemHandler, Inventory inventory) {
+    public void setupInventories(ResourceHandler<ItemResource> itemHandler, Inventory inventory) {
         addInventory(ContainerFactory.CONTAINER_CONTAINER, itemHandler);
-        addInventory(ContainerFactory.CONTAINER_PLAYER, new InvWrapper(inventory));
+        addInventory(ContainerFactory.CONTAINER_PLAYER, PlayerInventoryWrapper.of(inventory.player));
         generateSlots(inventory.player);
     }
 
     public void generateSlots(Player player) {
         for (SlotFactory slotFactory : factory.getSlots()) {
-            IItemHandler inventory = inventories.get(slotFactory.inventoryName());
+            ResourceHandler<ItemResource> inventory = inventories.get(slotFactory.inventoryName());
             int index = slotFactory.index();
             int x = slotFactory.x();
             int y = slotFactory.y();
@@ -228,7 +232,10 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
         }
     }
 
-    protected Slot createSlot(SlotFactory slotFactory, Player playerEntity, final IItemHandler inventory, final int index, final int x, final int y, SlotType slotType) {
+    protected Slot createSlot(SlotFactory slotFactory, Player playerEntity, final ResourceHandler<ItemResource> inventory, final int index, final int x, final int y, SlotType slotType) {
+        if (inventory == inventories.get(ContainerFactory.CONTAINER_PLAYER)) {
+            return new Slot(playerEntity.getInventory(), index, x, y);
+        }
         Slot slot;
         if (slotType == SlotType.SLOT_GHOST) {
             slot = new GhostSlot(inventory, index, x, y);
@@ -236,7 +243,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             slot = new GhostOutputSlot(inventory, index, x, y);
         } else if (slotType == SlotType.SLOT_SPECIFICITEM) {
             final SlotDefinition slotDefinition = slotFactory.slotDefinition();
-            slot = new SlotItemHandler(inventory, index, x, y) {
+            slot = new ResourceHandlerSlot(inventory, InventoryTools.modifier(inventory), index, x, y) {
                 @Override
                 public boolean mayPlace(@Nonnull ItemStack stack) {
                     return slotDefinition.itemStackMatches(stack);
@@ -621,7 +628,7 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             te.loadCustomOnly(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, access, compound));
 
             T container = containerFactory.create(windowId, pos, te, inv.player);
-            container.setupInventories(new ItemStackHandler(slots), inv);
+            container.setupInventories(new ItemStacksResourceHandler(slots), inv);
             return container;
         });
     }

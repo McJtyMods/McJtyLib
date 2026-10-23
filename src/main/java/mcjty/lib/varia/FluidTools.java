@@ -15,92 +15,92 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.capabilities.Capabilities;
 
 import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 public class FluidTools {
 
-    /**
-     * Make sure the forge bucket is enabled. If needed do this in your mod constructor:
-     * FluidRegistry.enableUniversalBucket();
-     */
     @Nonnull
     public static ItemStack convertFluidToBucket(@Nonnull FluidStack fluidStack) {
-        //                return FluidContainerRegistry.fillFluidContainer(fluidStack, new ItemStack(Items.BUCKET));
-        return FluidUtil.getFluidHandler(new ItemStack(Items.BUCKET)).map(handler -> {
-            handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-            return handler.getContainer();
-        }).orElse(ItemStack.EMPTY);
+        return fillContainer(fluidStack, new ItemStack(Items.BUCKET));
     }
 
     @Nonnull
     public static FluidStack convertBucketToFluid(@Nonnull ItemStack bucket) {
-        return FluidUtil.getFluidHandler(bucket).map(handler -> {
-            for (int i = 0; i < handler.getTanks(); i++) {
-                FluidStack contents = handler.getFluidInTank(i);
-                if (!contents.isEmpty()) {
-                    return contents;
-                }
-            }
-            return FluidStack.EMPTY;
-        }).orElse(FluidStack.EMPTY);
+        return FluidUtil.getFirstStackContained(bucket);
     }
 
-
-    public static boolean isEmptyContainer(@Nonnull ItemStack itemStack) {
-        return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            for (int i = 0; i < handler.getTanks(); i++) {
-                if (handler.getTankCapacity(i) > 0) {
-                    FluidStack contents = handler.getFluidInTank(i);
-                    if (contents.isEmpty()) {
-                        return true;
-                    } else if (contents.getAmount() > 0) {
-                        return false;
-                    }
-                }
-            }
-            return false;
-        }).orElse(false);
+    private static ResourceHandler<FluidResource> getHandler(ItemStack stack) {
+        return stack.isEmpty() ? null : ItemAccess.forStack(stack).oneByOne().getCapability(Capabilities.Fluid.ITEM);
     }
 
-    public static boolean isFilledContainer(@Nonnull ItemStack itemStack) {
-        return FluidUtil.getFluidHandler(itemStack).map(handler -> {
-            for (int i = 0; i < handler.getTanks(); i++) {
-                FluidStack contents = handler.getFluidInTank(i);
-                if (contents.isEmpty() || contents.getAmount() < handler.getTankCapacity(i)) {
-                    return false;
-                }
-            }
-            return true;
-        }).orElse(false);
+    public static boolean isEmptyContainer(@Nonnull ItemStack stack) {
+        var handler = getHandler(stack);
+        if (handler == null) return false;
+        for (int i = 0; i < handler.size(); i++) {
+            var resource = handler.getResource(i);
+            if (handler.getCapacityAsLong(i, resource) > 0) return handler.getAmountAsLong(i) == 0;
+        }
+        return false;
     }
 
-    // Drain a fluid container and return an empty container
+    public static boolean isFilledContainer(@Nonnull ItemStack stack) {
+        var handler = getHandler(stack);
+        if (handler == null || handler.size() == 0) return false;
+        for (int i = 0; i < handler.size(); i++) {
+            var resource = handler.getResource(i);
+            if (resource.isEmpty() || handler.getAmountAsLong(i) < handler.getCapacityAsLong(i, resource)) return false;
+        }
+        return true;
+    }
+
+    // Use a slot-backed access so a bucket can change its underlying item.
+    private static ItemStacksResourceHandler containerSlot(ItemStack stack) {
+        var slot = new ItemStacksResourceHandler(1);
+        if (!stack.isEmpty()) slot.set(0, ItemResource.of(stack), 1);
+        return slot;
+    }
+
     @Nonnull
     public static ItemStack drainContainer(@Nonnull ItemStack container) {
-        ItemStack empty = container.copy();
-        empty.setCount(1);
-        return FluidUtil.getFluidHandler(empty).map(handler -> {
-            if (!handler.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE).isEmpty()) {
-                return handler.getContainer();
+        if (container.isEmpty()) return ItemStack.EMPTY;
+        var slot = containerSlot(container);
+        var handler = ItemAccess.forHandlerIndexStrict(slot, 0).getCapability(Capabilities.Fluid.ITEM);
+        if (handler == null) return ItemStack.EMPTY;
+        try (var transaction = Transaction.openRoot()) {
+            for (int i = 0; i < handler.size(); i++) {
+                var resource = handler.getResource(i);
+                if (!resource.isEmpty() && handler.extract(resource, Integer.MAX_VALUE, transaction) > 0) {
+                    transaction.commit();
+                    return slot.getResource(0).toStack(slot.getAmountAsInt(0));
+                }
             }
-            return ItemStack.EMPTY;
-        }).orElse(ItemStack.EMPTY);
+        }
+        return ItemStack.EMPTY;
     }
 
-    // Fill a container with a fluid and return the filled container
     @Nonnull
-    public static ItemStack fillContainer(@Nonnull FluidStack fluidStack, @Nonnull ItemStack itemStack) {
-        return FluidUtil.getFluidHandler(itemStack.copy()).map(handler -> {
-            int filled = handler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-            if (filled == 0) {
-                return ItemStack.EMPTY;
+    public static ItemStack fillContainer(@Nonnull FluidStack fluid, @Nonnull ItemStack container) {
+        if (fluid.isEmpty() || container.isEmpty()) return ItemStack.EMPTY;
+        var slot = containerSlot(container);
+        var handler = ItemAccess.forHandlerIndexStrict(slot, 0).getCapability(Capabilities.Fluid.ITEM);
+        if (handler == null) return ItemStack.EMPTY;
+        try (var transaction = Transaction.openRoot()) {
+            if (handler.insert(FluidResource.of(fluid), fluid.getAmount(), transaction) > 0) {
+                transaction.commit();
+                return slot.getResource(0).toStack(slot.getAmountAsInt(0));
             }
-            return handler.getContainer();
-        }).orElse(ItemStack.EMPTY);
+        }
+        return ItemStack.EMPTY;
     }
 
     @Nonnull
@@ -119,7 +119,7 @@ public class FluidTools {
             FluidStack stack = new FluidStack(fluid, FluidType.BUCKET_VOLUME);
             if (action.test(stack)) {
                 ItemStack fluidBucket = ((BucketPickup) blockstate.getBlock()).pickupBlock(null, world, pos, blockstate);
-                return FluidUtil.getFluidContained(fluidBucket).map(f -> new FluidStack(f.getFluid().builtInRegistryHolder(), FluidType.BUCKET_VOLUME, f.getComponentsPatch())).orElse(FluidStack.EMPTY);
+                return FluidUtil.getFirstStackContained(fluidBucket).copyWithAmount(FluidType.BUCKET_VOLUME);
             }
             return stack;
         } else if (blockstate.getBlock() instanceof BucketPickup) { // @todo 1.20 right?

@@ -2,27 +2,22 @@ package mcjty.lib.container;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
+
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.IndexModifier;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
 /**
  * This item handler is meant for automation and is usually returned as the result
  * of TE.getCapability(). Specific methods to override are 'canAutomationInsert'
- * and 'canAutomationExtract'. Most TE's have another IItemHandler that is used
+ * and 'canAutomationExtract'. Most TE's have another ResourceHandler<ItemResource> that is used
  * for the container so that the player can interact with slots even if automation can't
  */
-
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
-
-public class AutomationFilterItemHander implements IItemHandlerModifiable, ResourceHandler<ItemResource> {
+public class AutomationFilterItemHander implements ResourceHandler<ItemResource>, IndexModifier<ItemResource> {
 
     private final GenericItemHandler wrapped;
 
@@ -31,23 +26,24 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, Resou
     }
 
     @Override
+    public void set(int index, ItemResource resource, int amount) {
+        wrapped.set(index, resource, amount);
+    }
+
     public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
         wrapped.setStackInSlot(slot, stack);
     }
 
-    @Override
     public int getSlots() {
         return wrapped.getSlots();
     }
 
     @Nonnull
-    @Override
     public ItemStack getStackInSlot(int slot) {
         return wrapped.getStackInSlot(slot);
     }
 
     @Nonnull
-    @Override
     public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
         if (!canAutomationInsert(slot)) {
             return stack;
@@ -56,7 +52,6 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, Resou
     }
 
     @Nonnull
-    @Override
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (!canAutomationExtract(slot)) {
             return ItemStack.EMPTY;
@@ -64,12 +59,10 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, Resou
         return wrapped.extractItem(slot, amount, simulate);
     }
 
-    @Override
     public int getSlotLimit(int slot) {
         return wrapped.getSlotLimit(slot);
     }
 
-    @Override
     public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
         return wrapped.isItemValid(slot, stack);
     }

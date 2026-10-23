@@ -112,7 +112,7 @@ public class ClientEventHandler {
                 }
                 if (focus != null) {
                     event.setCanceled(true);
-                    container.keyTypedFromEvent(event.getKeyCode(), event.getScanCode());
+                    container.keyTypedFromEvent(event.getKey(), event.getKeycode());
                 }
             }
         }

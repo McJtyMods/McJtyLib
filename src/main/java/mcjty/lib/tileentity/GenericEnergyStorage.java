@@ -9,17 +9,13 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.world.inventory.DataSlot;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-
-
-import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+
+
 import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
+public class GenericEnergyStorage implements EnergyHandler {
 
     private final GenericTileEntity tileEntity;
     private final boolean isReceiver;
@@ -31,7 +27,7 @@ public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
     private final SnapshotJournal<Long> transferJournal = new SnapshotJournal<>() {
         @Override protected Long createSnapshot() { return energy; }
         @Override protected void revertToSnapshot(Long snapshot) { energy = snapshot; }
-        @Override protected void onRootCommit(Long before) { if (energy != before) tileEntity.markDirtyQuick(); }
+        @Override protected void onRootCommit(Long before) { if (energy != before && tileEntity != null) tileEntity.markDirtyQuick(); }
     };
     @Override public long getAmountAsLong() { return energy; }
     @Override public long getCapacityAsLong() { return capacity; }
@@ -50,19 +46,19 @@ public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
         this.tileEntity = tileEntity;
         this.isReceiver = isReceiver;
 
+        if (capacity < 0 || maxReceive < 0) throw new IllegalArgumentException("Negative energy capacity or receive limit");
         this.capacity = capacity;
         this.maxReceive = maxReceive;
         this.energy = 0;
     }
 
-    @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
         if (isReceiver) {
             if (!canReceive()) {
                 return 0;
             }
 
-            long energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
+            long energyReceived = Math.max(0, Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive)));
             if (!simulate) {
                 energy += energyReceived;
                 tileEntity.markDirtyQuick();
@@ -72,12 +68,10 @@ public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
         return 0;
     }
 
-    @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
         return 0;
     }
 
-    @Override
     public int getEnergyStored() {
         return EnergyTools.getIntEnergyStored(energy, capacity);
     }
@@ -132,17 +126,14 @@ public class GenericEnergyStorage implements IEnergyStorage, EnergyHandler {
         energy = nbt.value();
     }
 
-    @Override
     public int getMaxEnergyStored() {
         return EnergyTools.unsignedClampToInt(capacity);
     }
 
-    @Override
     public boolean canExtract() {
         return false;
     }
 
-    @Override
     public boolean canReceive() {
         return isReceiver;
     }

@@ -14,7 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -159,7 +159,7 @@ public class LogicSlabBlock extends BaseBlock {
             BlockState blockState = world.getBlockState(pos.relative(side));
             Block b = blockState.getBlock();
             if (b == Blocks.REDSTONE_WIRE) {
-                power = Math.max(power, blockState.getValue(RedStoneWireBlock.POWER));
+                power = Math.max(power, blockState.getValue(RedstoneWireBlock.POWER));
             }
         }
 
@@ -181,7 +181,7 @@ public class LogicSlabBlock extends BaseBlock {
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
+    public boolean shouldRedstoneWireConnectTo(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
         BlockEntity te = world.getBlockEntity(pos);
         if (state.getBlock() instanceof LogicSlabBlock && te instanceof GenericTileEntity) {
             Direction direction = LogicSupport.getFacing(state).getInputSide();

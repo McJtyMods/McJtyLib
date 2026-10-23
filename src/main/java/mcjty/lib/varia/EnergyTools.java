@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 
 import org.jspecify.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,6 +27,7 @@ public class EnergyTools {
     }
 
     public static boolean isEnergyItem(ItemStack stack) {
+        if (stack.isEmpty()) return false;
         Item item = stack.getItem();
         if (item instanceof IEnergyItem) {
             return true;
@@ -42,13 +43,13 @@ public class EnergyTools {
             maxEnergyStored = ((IBigPower) tileEntity).getCapacity();
             energyStored = ((IBigPower) tileEntity).getStoredPower();
         } else if (tileEntity != null) {
-            IEnergyStorage capability = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), side));
+            EnergyHandler capability = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), side));
             if (capability == null) {
                 maxEnergyStored = 0;
                 energyStored = 0;
             } else {
-                maxEnergyStored = capability.getMaxEnergyStored();
-                energyStored = capability.getEnergyStored();
+                maxEnergyStored = capability.getCapacityAsLong();
+                energyStored = capability.getAmountAsLong();
             }
         } else {
             maxEnergyStored = 0;
@@ -61,10 +62,10 @@ public class EnergyTools {
         AtomicLong maxEnergyStored = new AtomicLong();
         AtomicLong energyStored = new AtomicLong();
         if (tileEntity != null) {
-            IEnergyStorage handler = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), side));
+            EnergyHandler handler = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), side));
             if (handler != null) {
-                maxEnergyStored.set(handler.getMaxEnergyStored());
-                energyStored.set(handler.getEnergyStored());
+                maxEnergyStored.set(handler.getCapacityAsLong());
+                energyStored.set(handler.getAmountAsLong());
             }
         } else {
             maxEnergyStored.set(0);
@@ -75,23 +76,32 @@ public class EnergyTools {
 
     public static long receiveEnergy(BlockEntity tileEntity, Direction from, long maxReceive) {
         if (tileEntity != null) {
-            IEnergyStorage handler = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), from));
-            return handler != null ? handler.receiveEnergy(unsignedClampToInt(maxReceive), false) : 0;
+            EnergyHandler handler = mcjty.lib.varia.CapabilityTools.energyHandler(tileEntity.getLevel().getCapability(Capabilities.Energy.BLOCK, tileEntity.getBlockPos(), from));
+            return handler != null ? receiveEnergy(handler, maxReceive) : 0;
         }
         return 0;
     }
 
     public static long receiveEnergy(ItemStack stack, long maxReceive) {
+        if (stack.isEmpty()) return 0;
         Item item = stack.getItem();
         if (item instanceof IEnergyItem) {
             return ((IEnergyItem)item).receiveEnergyL(stack, maxReceive, false);
         } else {
-            IEnergyStorage capability = CapabilityTools.energyHandler(stack.getCapability(Capabilities.Energy.ITEM, net.neoforged.neoforge.transfer.access.ItemAccess.forStack(stack)));
+            EnergyHandler capability = CapabilityTools.energyHandler(stack.getCapability(Capabilities.Energy.ITEM, net.neoforged.neoforge.transfer.access.ItemAccess.forStack(stack)));
             if (capability != null) {
-                return capability.receiveEnergy(unsignedClampToInt(maxReceive), false);
+                return receiveEnergy(capability, maxReceive);
             } else {
                 return 0;
             }
+        }
+    }
+
+    private static int receiveEnergy(EnergyHandler handler, long amount) {
+        try (var transaction = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            int inserted = handler.insert(unsignedClampToInt(Math.max(0, amount)), transaction);
+            transaction.commit();
+            return inserted;
         }
     }
 

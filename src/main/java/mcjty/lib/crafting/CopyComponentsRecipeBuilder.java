@@ -84,7 +84,15 @@ public class CopyComponentsRecipeBuilder implements IRecipeBuilder<CopyComponent
     @Override
     public void build(RecipeOutput consumerIn, String save) {
         builder.save(new RecipeOutput() {
-            @Override public void includeRootAdvancement() { consumerIn.includeRootAdvancement(); }
+            @Override
+            public <S> net.minecraft.core.HolderGetter<S> lookup(net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<? extends S>> key) {
+                return consumerIn.lookup(key);
+            }
+
+            @Override
+            public <S> java.util.stream.Stream<net.minecraft.core.Holder.Reference<S>> listContextElements(net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<? extends S>> key) {
+                return consumerIn.listContextElements(key);
+            }
 
             @Override
             public Advancement.Builder advancement() {
@@ -102,7 +110,15 @@ public class CopyComponentsRecipeBuilder implements IRecipeBuilder<CopyComponent
     public void build(RecipeOutput consumerIn, Identifier id) {
         Advancement.Builder advancementBuilder = this.advancementBuilder;
         builder.save(new RecipeOutput() {
-            @Override public void includeRootAdvancement() { consumerIn.includeRootAdvancement(); }
+            @Override
+            public <S> net.minecraft.core.HolderGetter<S> lookup(net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<? extends S>> key) {
+                return consumerIn.lookup(key);
+            }
+
+            @Override
+            public <S> java.util.stream.Stream<net.minecraft.core.Holder.Reference<S>> listContextElements(net.minecraft.resources.ResourceKey<? extends net.minecraft.core.Registry<? extends S>> key) {
+                return consumerIn.listContextElements(key);
+            }
 
             @Override
             public Advancement.Builder advancement() {

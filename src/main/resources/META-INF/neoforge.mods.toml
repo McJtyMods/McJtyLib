@@ -19,13 +19,13 @@ Base mod for all McJty mods
 [[dependencies.mcjtylib]]
 modId="neoforge"
 type="required"
-versionRange="[26.2.0.75,)"
+versionRange="[26.3.0.83,)"
 ordering="NONE"
 side="BOTH"
 
 [[dependencies.mcjtylib]]
 modId="minecraft"
 type="required"
-versionRange="[26.2]"
+versionRange="[26.3]"
 ordering="NONE"
 side="BOTH"

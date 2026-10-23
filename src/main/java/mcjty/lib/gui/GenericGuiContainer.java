@@ -38,7 +38,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
@@ -67,6 +67,15 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         super(container, inventory, title);
         sideWindow = new GuiSideWindow(manualEntry.manual(), manualEntry.entry(), manualEntry.page());
         windowManager = null;
+    }
+
+    @Override
+    public void removed() {
+        if (window != null) {
+            window.setFocus(null);
+            if (window.getWindowManager() != null) window.getWindowManager().clearFocus();
+        }
+        super.removed();
     }
 
     public <T extends GenericTileEntity> T getBE() {
@@ -286,8 +295,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     @Nullable
     @Override
-    public Slot getSlotUnderMouse() {
-        Slot slot = super.getSlotUnderMouse();
+    public Slot getHoveredSlot() {
+        Slot slot = super.getHoveredSlot();
         if (slot == null) {
             return null;
         }
@@ -365,13 +374,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
-    public void removed() {
-        super.removed();
-        // @todo 1.19.3
-//        getMinecraft().keyboardHandler.setSendRepeatsToGui(false);
-    }
-
-    @Override
     public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
         double x = event.x(), y = event.y(); int button = event.button();
         boolean rc = super.mouseClicked(event, doubleClick);
@@ -420,7 +422,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
+        int keyCode = event.key(), scanCode = event.keycode(), modifiers = event.modifiers();
         boolean b = window == null || getWindowManager().keyTyped(keyCode, scanCode);
         if (b) {
             return super.keyPressed(event);
@@ -517,10 +519,10 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        IEnergyStorage power = mcjty.lib.varia.CapabilityTools.energyHandler(getBE().getLevel().getCapability(Capabilities.Energy.BLOCK, getBE().getBlockPos(), null));
+        EnergyHandler power = mcjty.lib.varia.CapabilityTools.energyHandler(getBE().getLevel().getCapability(Capabilities.Energy.BLOCK, getBE().getBlockPos(), null));
         if (power != null) {
-            energyBar.maxValue(power.getMaxEnergyStored());
-            energyBar.value(power.getEnergyStored());
+            energyBar.maxValue(power.getCapacityAsLong());
+            energyBar.value(power.getAmountAsLong());
         }
     }
 }

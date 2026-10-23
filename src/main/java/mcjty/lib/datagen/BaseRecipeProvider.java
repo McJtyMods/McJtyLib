@@ -93,8 +93,9 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         builder.group(group).save(consumer, net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.RECIPE, id));
     }
 
-    public BaseRecipeProvider(HolderLookup.Provider provider, RecipeOutput output) {
-        super(provider, output);
+    public BaseRecipeProvider(net.minecraft.data.worldgen.BootstrapContext<net.minecraft.world.item.crafting.Recipe<?>> recipes,
+                              net.minecraft.data.worldgen.BootstrapContext<net.minecraft.advancements.Advancement> advancements) {
+        super(recipes, advancements);
         add('d', Items.DIAMOND);
         add('e', Items.EMERALD);
         add('o', Tags.Items.ENDER_PEARLS);

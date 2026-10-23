@@ -3,15 +3,17 @@ package mcjty.lib.varia;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import org.jspecify.annotations.Nullable;
 
 public class CapabilityTools {
 
     @Nullable
-    public static IItemHandler getItemCapabilitySafe(BlockEntity tileEntity) {
+    public static ResourceHandler<ItemResource> getItemCapabilitySafe(BlockEntity tileEntity) {
         if (tileEntity != null) {
             try {
                 return mcjty.lib.varia.CapabilityTools.itemHandler(tileEntity.getLevel().getCapability(Capabilities.Item.BLOCK, tileEntity.getBlockPos(), null));
@@ -23,7 +25,7 @@ public class CapabilityTools {
     }
 
     @Nullable
-    public static IFluidHandler getFluidCapabilitySafe(BlockEntity tileEntity) {
+    public static ResourceHandler<FluidResource> getFluidCapabilitySafe(BlockEntity tileEntity) {
         if (tileEntity != null) {
             try {
                 return mcjty.lib.varia.CapabilityTools.fluidHandler(tileEntity.getLevel().getCapability(Capabilities.Fluid.BLOCK, tileEntity.getBlockPos(), null));
@@ -44,13 +46,15 @@ public class CapabilityTools {
             Logging.logError("Exception", e);
         }
     }
-    public static net.neoforged.neoforge.items.IItemHandler itemHandler(net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.item.ItemResource> handler) {
-        return handler == null ? null : net.neoforged.neoforge.items.IItemHandler.of(handler);
+    public static ResourceHandler<ItemResource> itemHandler(ResourceHandler<ItemResource> handler) {
+        return handler;
     }
-    public static net.neoforged.neoforge.energy.IEnergyStorage energyHandler(net.neoforged.neoforge.transfer.energy.EnergyHandler handler) {
-        return handler == null ? null : net.neoforged.neoforge.energy.IEnergyStorage.of(handler);
+
+    public static EnergyHandler energyHandler(EnergyHandler handler) {
+        return handler;
     }
-    public static net.neoforged.neoforge.fluids.capability.IFluidHandler fluidHandler(net.neoforged.neoforge.transfer.ResourceHandler<net.neoforged.neoforge.transfer.fluid.FluidResource> handler) {
-        return handler == null ? null : net.neoforged.neoforge.fluids.capability.IFluidHandler.of(handler);
+
+    public static ResourceHandler<FluidResource> fluidHandler(ResourceHandler<FluidResource> handler) {
+        return handler;
     }
 }

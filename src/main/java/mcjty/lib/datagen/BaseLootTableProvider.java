@@ -27,8 +27,8 @@ import net.minecraft.world.level.storage.loot.functions.*;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
+import net.minecraft.world.level.storage.loot.providers.number.floats.ContextFloatProviders;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -70,7 +70,7 @@ public class BaseLootTableProvider {
     public LootTable.Builder createItemDropTable(String name, ItemLike item) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantValue.exactly(1))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(item));
         return LootTable.lootTable().withPool(builder);
     }
@@ -80,12 +80,12 @@ public class BaseLootTableProvider {
                                                  float lmin, float lmax) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantValue.exactly(1))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(item)
                         .apply(SetItemCountFunction
-                                .setCount(UniformGenerator.between(min, max)))
+                                .setCount(ContextIntProviders.between((int) min, (int) max)))
                         .apply(EnchantedCountIncreaseFunction
-                                .lootingMultiplier(provider, UniformGenerator.between(lmin, lmax))));
+                                .lootingMultiplier(provider.lookupOrThrow(Registries.ENCHANTMENT), ContextFloatProviders.between(lmin, lmax))));
         return LootTable.lootTable().withPool(builder);
     }
 
@@ -95,13 +95,13 @@ public class BaseLootTableProvider {
         EnchantmentPredicate silkTouchPredicate = new EnchantmentPredicate(silkTouch.get(), MinMaxBounds.Ints.atLeast(1));
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantValue.exactly(1))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(AlternativesEntry.alternatives(
                                 LootItem.lootTableItem(block)
                                         .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
                                                 .withComponents(net.minecraft.advancements.predicates.DataComponentMatchers.Builder.components().partial(net.minecraft.core.component.predicates.DataComponentPredicates.ENCHANTMENTS, net.minecraft.core.component.predicates.EnchantmentsPredicate.enchantments(List.of(silkTouchPredicate))).build()))),
                                 LootItem.lootTableItem(lootItem)
-                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
+                                        .apply(SetItemCountFunction.setCount(ContextIntProviders.between((int) min, (int) max)))
                                         .apply(ApplyBonusCount.addUniformBonusCount(fortune.get(), 1))
                                         .apply(ApplyExplosionDecay.explosionDecay())
                         )
@@ -116,7 +116,7 @@ public class BaseLootTableProvider {
     protected LootTable.Builder createBlockStateTable(String name, Block block, Property<?> property) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(Tools.getId(block).getPath())
-                .setRolls(ConstantValue.exactly(1))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyBlockState.copyState(block).copy(property))
                 );
@@ -137,7 +137,7 @@ public class BaseLootTableProvider {
         }
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantValue.exactly(1))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyNameFunction.copyName(net.minecraft.world.level.storage.loot.LootContext.BlockEntityTarget.BLOCK_ENTITY))
                         .apply(copyBuilder)
@@ -152,7 +152,7 @@ public class BaseLootTableProvider {
     protected LootTable.Builder createSimpleTable(String name, Block block) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantValue.exactly(1))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(block));
         return LootTable.lootTable().withPool(builder);
     }
@@ -160,7 +160,7 @@ public class BaseLootTableProvider {
     protected LootTable.Builder createSimpleTable(String name, Item item) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantValue.exactly(1))
+                .setRolls(ContextIntProviders.exactly(1))
                 .add(LootItem.lootTableItem(item));
         return LootTable.lootTable().withPool(builder);
     }

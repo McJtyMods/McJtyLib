@@ -21,7 +21,8 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
@@ -34,7 +35,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
 
     private final String name;
     private BiFunction<Integer, Player, C> containerSupplier;
-    private Supplier<? extends IItemHandler> itemHandler = () -> null;
+    private Supplier<? extends ResourceHandler<ItemResource>> itemHandler = () -> null;
     private Supplier<? extends GenericEnergyStorage> energyHandler = () -> null;
     private final List<DataSlot> integerListeners = new ArrayList<>();
     private final List<DataSlot> shortListeners = new ArrayList<>();
@@ -72,7 +73,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
         return this;
     }
 
-    public DefaultContainerProvider<C> itemHandler(Supplier<? extends IItemHandler> itemHandler) {
+    public DefaultContainerProvider<C> itemHandler(Supplier<? extends ResourceHandler<ItemResource>> itemHandler) {
         this.itemHandler = itemHandler;
         return this;
     }
@@ -115,7 +116,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
     @Override
     public AbstractContainerMenu createMenu(int windowId, @Nonnull Inventory playerInventory, @Nonnull Player playerEntity) {
         C container = containerSupplier.apply(windowId, playerEntity);
-        IItemHandler itemHandler = this.itemHandler.get();
+        ResourceHandler<ItemResource> itemHandler = this.itemHandler.get();
         container.setupInventories(itemHandler, playerInventory);
         GenericEnergyStorage energyHandler = this.energyHandler.get();
         if (energyHandler != null) {

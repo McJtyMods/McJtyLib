@@ -11,8 +11,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
@@ -81,16 +82,15 @@ public class ModuleTools {
         if (te == null) {
             return false;
         }
-        IItemHandler inventory = mcjty.lib.varia.CapabilityTools.itemHandler(world.getCapability(Capabilities.Item.BLOCK, pos, null));
+        ResourceHandler<ItemResource> inventory = mcjty.lib.varia.CapabilityTools.itemHandler(world.getCapability(Capabilities.Item.BLOCK, pos, null));
         if (inventory != null) {
             for (int i = start; i <= stop; i++) {
-                if (inventory.getStackInSlot(i).isEmpty()) {
+                if (net.neoforged.neoforge.transfer.item.ItemUtil.getStack(inventory, i).isEmpty()) {
                     ItemStack copy = heldItem.copy();
                     copy.setCount(1);
-                    if (inventory instanceof IItemHandlerModifiable) {
-                        ((IItemHandlerModifiable) inventory).setStackInSlot(i, copy);
-                    } else {
-                        throw new IllegalStateException("Not an IItemHandlerModifiable!");
+                    try (var transaction = Transaction.openRoot()) {
+                        if (inventory.insert(i, ItemResource.of(copy), 1, transaction) != 1) continue;
+                        transaction.commit();
                     }
                     heldItem.shrink(1);
                     if (heldItem.isEmpty()) {

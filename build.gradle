@@ -14,19 +14,19 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.1.38'
+    id 'net.neoforged.gradle.userdev' version '7.1.39'
 }
 
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
 
-def sharedTools = rootProject.file('gradletools.gradle')
-if (sharedTools.isFile()) {
+// Use the same workspace script for integrated and standalone checkouts.
+def sharedTools = rootProject == project
+        ? [file('../Multi_neo/gradletools.gradle'), file('../gradletools.gradle')].find { it.isFile() }
+        : rootProject.file('gradletools.gradle')
+if (sharedTools != null && sharedTools.isFile()) {
     apply from: sharedTools
-} else if (file('gradletools.gradle').isFile()) {
-    // Temporary standalone copy while the 26.2 workspace is unpublished.
-    apply from: 'gradletools.gradle'
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.2_neo/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.3_neo/gradletools.gradle'
 }
 
 group = "com.github.mcjty"
@@ -37,9 +37,26 @@ if (System.getenv('BUILD_NUMBER') != null) {
     version += ".${System.getenv('BUILD_NUMBER')}"
 }
 
+sourceSets {
+    gametest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+configurations {
+    gametestImplementation.extendsFrom implementation
+    gametestCompileOnly.extendsFrom compileOnly
+    gametestRuntimeOnly.extendsFrom runtimeOnly
+}
+
 repos()
 at()
 runs()
+runs.gameTestServer {
+    modSource sourceSets.gametest
+    argument '--test'
+    argument 'mcjtylib:*'
+}
 jars()
 
 dependencies {

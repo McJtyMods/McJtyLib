@@ -38,7 +38,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
@@ -281,8 +281,7 @@ public class Window {
 
     public void mouseClicked(double x, double y, int button) {
         if (textFocus != null) {
-            textFocus = null;
-            fireFocusEvents(null);
+            setFocus(null);
         }
         if (toplevel.in(x, y) && toplevel.isVisible()) {
             toplevel.setWindow(this);
@@ -316,6 +315,7 @@ public class Window {
     void setFocus(Widget<?> focus) {
         if (textFocus != focus) {
             textFocus = focus;
+            Minecraft.getInstance().textInputManager().onTextInputFocusChange(this, focus != null);
             fireFocusEvents(focus);
         }
     }
@@ -332,7 +332,7 @@ public class Window {
     }
 
     public boolean keyTyped(int keyCode, int scanCode) {
-        if (keyCode == GLFW.GLFW_KEY_F12) {
+        if (keyCode == InputConstants.KEY_F12) {
             GuiParser.GuiCommand windowCmd = createWindowCommand();
             GuiParser.GuiCommand command = toplevel.createGuiCommand();
             toplevel.fillGuiCommand(command);

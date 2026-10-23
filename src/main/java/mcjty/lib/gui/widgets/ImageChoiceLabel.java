@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.Window;
 import mcjty.lib.gui.events.ChoiceEvent;
@@ -80,7 +81,7 @@ public class ImageChoiceLabel extends AbstractImageLabel<ImageChoiceLabel> {
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             int c = currentChoice;
-            if (button == 1) { // @todo 1.14 || SafeClientTools.isSneaking()) {
+            if (button == InputConstants.MOUSE_BUTTON_RIGHT) { // @todo 1.14 || SafeClientTools.isSneaking()) {
                 c--;
                 if (c < 0) {
                     c = choiceList.size() - 1;

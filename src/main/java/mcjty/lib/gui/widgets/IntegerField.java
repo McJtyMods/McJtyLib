@@ -1,6 +1,5 @@
 package mcjty.lib.gui.widgets;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -10,11 +9,10 @@ import mcjty.lib.gui.events.IntegerEvent;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,7 +98,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible() && editable) {
             window.setTextFocus(this);
-            if (button == 1) {
+            if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
                 integer(0);
                 fireIntegerEvents(0);
             }
@@ -110,8 +108,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
     }
 
     private static boolean isControlDown() {
-        var handle = Minecraft.getInstance().getWindow();
-        return InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_LEFT_CONTROL) || InputConstants.isKeyDown(handle, GLFW.GLFW_KEY_RIGHT_CONTROL);
+        return InputConstants.isKeyDown(InputConstants.KEY_LCONTROL) || InputConstants.isKeyDown(InputConstants.KEY_RCONTROL);
     }
 
     @Override
@@ -121,10 +118,9 @@ public class IntegerField extends AbstractWidget<IntegerField> {
             return true;
         }
         if (isEnabledAndVisible() && editable) {
-            var handle = Minecraft.getInstance().getWindow();
             if (isControlDown()) {
-                if(keyCode == GLFW.GLFW_KEY_V) {
-                    String data = GLFW.glfwGetClipboardString(handle.handle());
+                if(keyCode == InputConstants.KEY_V) {
+                    String data = mc.keyboardHandler.getClipboard();
                     if (data != null) {
                         if (isRegionSelected()) {
                             replaceSelectedRegion(data);
@@ -135,36 +131,36 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                         validate();
                         fireIntegerEvents(getInt());
                     }
-                } else if (keyCode == GLFW.GLFW_KEY_C) {
+                } else if (keyCode == InputConstants.KEY_C) {
                     if (isRegionSelected()) {
-                        GLFW.glfwSetClipboardString(handle.handle(), getSelectedText());
+                        mc.keyboardHandler.setClipboard(getSelectedText());
                     }
-                } else if (keyCode == GLFW.GLFW_KEY_X) {
+                } else if (keyCode == InputConstants.KEY_X) {
                     if (isRegionSelected()) {
-                        GLFW.glfwSetClipboardString(handle.handle(), getSelectedText());
+                        mc.keyboardHandler.setClipboard(getSelectedText());
                         replaceSelectedRegion("");
                         fireIntegerEvents(getInt());
                     }
-                } else if (keyCode == GLFW.GLFW_KEY_A) {
+                } else if (keyCode == InputConstants.KEY_A) {
                     selectAll();
-                } else if (keyCode == GLFW.GLFW_KEY_LEFT) {
+                } else if (keyCode == InputConstants.KEY_LEFT) {
                     updateSelection();
                     if (cursor > 0) {
                         cursor = findNextWord(true);
                     }
-                } else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
+                } else if (keyCode == InputConstants.KEY_RIGHT) {
                     updateSelection();
                     if (cursor < text.length()) {
                         cursor = findNextWord(false);
                     }
                 }
-            } else if (keyCode == GLFW.GLFW_KEY_ENTER) {
+            } else if (keyCode == InputConstants.KEY_RETURN) {
                 fireIntegerEnterEvents(getInt());
 //                window.setTextFocus(null);
                 return false;
-            } else if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            } else if (keyCode == InputConstants.KEY_ESCAPE) {
                 return false;
-            } else if (keyCode == GLFW.GLFW_KEY_BACKSPACE) {
+            } else if (keyCode == InputConstants.KEY_BACKSPACE) {
                 if (isRegionSelected()) {
                     replaceSelectedRegion("");
                     fireIntegerEvents(getInt());
@@ -174,7 +170,7 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                     validate();
                     fireIntegerEvents(getInt());
                 }
-            } else if (keyCode == GLFW.GLFW_KEY_DELETE) {
+            } else if (keyCode == InputConstants.KEY_DELETE) {
                 if (isRegionSelected()) {
                     replaceSelectedRegion("");
                     fireIntegerEvents(getInt());
@@ -183,24 +179,24 @@ public class IntegerField extends AbstractWidget<IntegerField> {
                     validate();
                     fireIntegerEvents(getInt());
                 }
-            } else if (keyCode == GLFW.GLFW_KEY_HOME) {
+            } else if (keyCode == InputConstants.KEY_HOME) {
                 updateSelection();
                 cursor = 0;
-            } else if (keyCode == GLFW.GLFW_KEY_END) {
+            } else if (keyCode == InputConstants.KEY_END) {
                 updateSelection();
                 cursor = text.length();
-//            } else if (keyCode == GLFW.GLFW_KEY_DOWN) {
+//            } else if (keyCode == InputConstants.KEY_DOWN) {
 //                fireArrowDownEvents();
-//            } else if (keyCode == GLFW.GLFW_KEY_UP) {
+//            } else if (keyCode == InputConstants.KEY_UP) {
 //                fireArrowUpEvents();
-//            } else if (keyCode == GLFW.GLFW_KEY_TAB) {
+//            } else if (keyCode == InputConstants.KEY_TAB) {
 //                fireTabEvents();
-            } else if (keyCode == GLFW.GLFW_KEY_LEFT) {
+            } else if (keyCode == InputConstants.KEY_LEFT) {
                 updateSelection();
                 if (cursor > 0) {
                     cursor--;
                 }
-            } else if (keyCode == GLFW.GLFW_KEY_RIGHT) {
+            } else if (keyCode == InputConstants.KEY_RIGHT) {
                 updateSelection();
                 if (cursor < text.length()) {
                     cursor++;

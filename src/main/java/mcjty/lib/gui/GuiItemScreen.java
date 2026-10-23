@@ -41,6 +41,15 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     @Override
+    public void removed() {
+        if (window != null) {
+            window.setFocus(null);
+            if (window.getWindowManager() != null) window.getWindowManager().clearFocus();
+        }
+        super.removed();
+    }
+
+    @Override
     public boolean isPauseScreen() {
         return false;
     }
@@ -90,7 +99,7 @@ public abstract class GuiItemScreen extends Screen {
 
     @Override
     public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
-        int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
+        int keyCode = event.key(), scanCode = event.keycode(), modifiers = event.modifiers();
         boolean rc = super.keyPressed(event);
 //        window.keyTyped(typedChar, keyCode);
         window.keyTyped(keyCode, scanCode);

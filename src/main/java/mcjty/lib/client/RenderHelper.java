@@ -129,21 +129,21 @@ public class RenderHelper {
 
         switch (facing) {
             case DOWN -> {
-                matrixStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+                matrixStack.rotate(Axis.XP.rotationDegrees(90.0F));
             }
             case UP -> {
-                matrixStack.mulPose(Axis.XP.rotationDegrees(-90.0F));
+                matrixStack.rotate(Axis.XP.rotationDegrees(-90.0F));
             }
             case NORTH -> {
-                matrixStack.mulPose(Axis.YP.rotationDegrees(-180.0F));
+                matrixStack.rotate(Axis.YP.rotationDegrees(-180.0F));
             }
             case SOUTH -> {
             }
             case WEST -> {
-                matrixStack.mulPose(Axis.YP.rotationDegrees(-90.0F));
+                matrixStack.rotate(Axis.YP.rotationDegrees(-90.0F));
             }
             case EAST -> {
-                matrixStack.mulPose(Axis.YP.rotationDegrees(90.0F));
+                matrixStack.rotate(Axis.YP.rotationDegrees(90.0F));
             }
         }
 
@@ -751,15 +751,15 @@ public class RenderHelper {
     }
 
     public static void rotateXP(PoseStack stack, float degrees) {
-        stack.mulPose(Axis.XP.rotationDegrees(degrees));
+        stack.rotate(Axis.XP.rotationDegrees(degrees));
     }
 
     public static void rotateYP(PoseStack stack, float degrees) {
-        stack.mulPose(Axis.YP.rotationDegrees(degrees));
+        stack.rotate(Axis.YP.rotationDegrees(degrees));
     }
 
     public static void rotateZP(PoseStack stack, float degrees) {
-        stack.mulPose(Axis.ZP.rotationDegrees(degrees));
+        stack.rotate(Axis.ZP.rotationDegrees(degrees));
     }
 
     public record Rect(Vec3 v1, Vec3 v2,

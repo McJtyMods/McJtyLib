@@ -1,3 +1,10 @@
+26.3-11.0.0:
+- Ported to Minecraft 26.3 and NeoForge 26.3.0.83 with Java 25
+- Standalone and integrated builds use MultiWorkspace's 26.3 shared Gradle script
+- Migrated containers, fluids, and energy to NeoForge's transaction APIs while preserving indexed inventory saves
+- Updated Renderpearl pipelines, SDL input and text focus, synced configuration, recipes, loot, and registry datagen
+- Added game tests for rollback, ghost slots, notifications, automation, persistence, undo, and fluid containers
+
 26.2-10.0.0:
 - Ported to Minecraft 26.2 and NeoForge with Java 25
 - Updated GUI extraction, model helpers, recipes, block entity persistence, networking, and datagen

@@ -1,5 +1,6 @@
 package mcjty.lib.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.gui.icons.IconManager;
 import mcjty.lib.gui.widgets.AbstractContainerWidget;
@@ -78,6 +79,7 @@ public class WindowManager {
     }
 
     public void closeWindow(Window window) {
+        window.setFocus(null);
         if (windows.contains(window)) {
             windows.remove(window);
         } else if (modalWindows.contains(window)) {
@@ -133,7 +135,7 @@ public class WindowManager {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 GenericGuiContainer<?,?> gui = (GenericGuiContainer<?,?>) this.gui;
-                gui.drawHoveringText(graphics, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().font);
+                gui.drawHoveringText(graphics, tooltips, w.getTooltipItems(), x - gui.getLeftPos(), y - gui.getTopPos(), gui.getMinecraft().font);
             }
         });
 
@@ -146,7 +148,7 @@ public class WindowManager {
 
     public void mouseClicked(double x, double y, int button) {
         if ((!iconManager.isClickHoldToDrag()) && iconManager.isDragging()) {
-            if (button == 1) {
+            if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
                 iconManager.cancelDragging();
             } else {
                 iconManager.stopDragging(x, y);

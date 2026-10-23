@@ -7,7 +7,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 
 import org.jspecify.annotations.Nullable;
 
@@ -23,7 +24,7 @@ public interface IGenericContainer {
 
     void addDataListener(DataListener<?, ?> dataListener);
 
-    void setupInventories(@Nullable IItemHandler itemHandler, Inventory inventory);
+    void setupInventories(@Nullable ResourceHandler<ItemResource> itemHandler, Inventory inventory);
 
     AbstractContainerMenu getAsContainer();
 }

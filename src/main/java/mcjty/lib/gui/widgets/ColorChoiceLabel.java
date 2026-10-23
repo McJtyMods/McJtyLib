@@ -1,5 +1,6 @@
 package mcjty.lib.gui.widgets;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
@@ -89,7 +90,7 @@ public class ColorChoiceLabel extends AbstractLabel<ColorChoiceLabel> {
     public Widget<?> mouseClick(double x, double y, int button) {
         if (isEnabledAndVisible()) {
             int index = colorList.indexOf(currentColor);
-            if (button == 1) {// @todo 1.14 || SafeClientTools.isSneaking()) {
+            if (button == InputConstants.MOUSE_BUTTON_RIGHT) {// @todo 1.14 || SafeClientTools.isSneaking()) {
                 index--;
                 if (index < 0) {
                     index = colorList.size()-1;

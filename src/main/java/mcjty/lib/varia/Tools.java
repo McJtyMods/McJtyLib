@@ -24,7 +24,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
+import net.minecraft.world.level.levelgen.placement.PlacementModifier;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
@@ -33,7 +34,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewDatapackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.commons.lang3.StringUtils;
 
@@ -48,7 +49,7 @@ public class Tools {
         return level.registryAccess();
     }
 
-    public static DeferredRegister<PlacementModifierType<?>> createPlacementRegistry(String modid) {
+    public static DeferredRegister<MapCodec<? extends PlacementModifier>> createPlacementRegistry(String modid) {
         return DeferredRegister.create(Registries.PLACEMENT_MODIFIER_TYPE, modid);
     }
 
@@ -57,11 +58,11 @@ public class Tools {
     }
 
     public static void onDataPackRegistry(IEventBus bus, Consumer<IDPRegister> consumer) {
-        bus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
+        bus.addListener((NewDatapackRegistryEvent event) -> {
             consumer.accept(new IDPRegister() {
                 @Override
                 public <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec) {
-                    event.dataPackRegistry(key, codec, codec);
+                    event.worldRegistry(key, codec, codec);
                 }
             });
         });

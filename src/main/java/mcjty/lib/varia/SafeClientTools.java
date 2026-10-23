@@ -36,7 +36,7 @@ public class SafeClientTools {
         return Minecraft.getInstance().options.keyJump.isDown();
     }
     private static boolean keyDown(int key) {
-        return com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), key);
+        return com.mojang.blaze3d.platform.InputConstants.isKeyDown(key);
     }
     public static boolean isShiftKeyDown() { return isSneaking(); }
     public static boolean isControlKeyDown() { return isCtrlKeyDown(); }
