@@ -52,7 +52,8 @@ configurations {
 repos()
 at()
 runs()
-runs.gameTestServer {
+// The shared script also defines a helper closure named 'runs'.
+extensions.getByName('runs').named('gameTestServer') {
     modSource sourceSets.gametest
     argument '--test'
     argument 'mcjtylib:*'
