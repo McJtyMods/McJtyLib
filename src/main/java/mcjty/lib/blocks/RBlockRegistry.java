@@ -70,7 +70,7 @@ public class RBlockRegistry {
         return new RBlock<>(block, item, tile);
     }
 
-    /** Registry-aware factories ensure that block and item properties carry their 26.2 ids. */
+    /** Registry-aware factories ensure that block and item properties carry their 26.1.2 ids. */
     public <B extends BaseBlock, I extends BlockItem, E extends GenericTileEntity> RBlock<B, I, E> registerBlock(
             String name, Class<E> clazz,
             Function<net.minecraft.world.level.block.state.BlockBehaviour.Properties, B> blockFactory,

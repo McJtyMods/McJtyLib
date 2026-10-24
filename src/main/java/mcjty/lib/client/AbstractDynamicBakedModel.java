@@ -30,7 +30,7 @@ public abstract class AbstractDynamicBakedModel implements DynamicBlockStateMode
         Vec3 normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
         QuadBakingVertexConsumer builder = new QuadBakingVertexConsumer();
-        builder.setSprite(new net.minecraft.client.resources.model.sprite.Material.Baked(sprite, false));
+        builder.setSprite(new Material.Baked(sprite, false), sprite.transparency());
         builder.setDirection(Direction.getApproximateNearest(normal.x, normal.y, normal.z));
         RenderHelper.putVertex(builder, normal, v1.x, v1.y, v1.z, 0, 0, sprite, r, g, b, a);
         RenderHelper.putVertex(builder, normal, v2.x, v2.y, v2.z, 0, 1, sprite, r, g, b, a);
@@ -44,7 +44,7 @@ public abstract class AbstractDynamicBakedModel implements DynamicBlockStateMode
         Vec3 normal = v3.subtract(v2).cross(v1.subtract(v2)).normalize();
 
         QuadBakingVertexConsumer builder = new QuadBakingVertexConsumer();
-        builder.setSprite(new net.minecraft.client.resources.model.sprite.Material.Baked(sprite, false));
+        builder.setSprite(new Material.Baked(sprite, false), sprite.transparency());
         builder.setDirection(Direction.getApproximateNearest(normal.x, normal.y, normal.z));
         RenderHelper.putVertex(builder, normal, v1.x, v1.y, v1.z, 0, 0, sprite, hilight, hilight, hilight, hilight);
         RenderHelper.putVertex(builder, normal, v2.x, v2.y, v2.z, 0, 1, sprite, hilight, hilight, hilight, hilight);

@@ -23,10 +23,10 @@ def sharedTools = rootProject.file('gradletools.gradle')
 if (sharedTools.isFile()) {
     apply from: sharedTools
 } else if (file('gradletools.gradle').isFile()) {
-    // Temporary standalone copy while the 26.2 workspace is unpublished.
+    // Temporary standalone copy while the 26.1.2 workspace is unpublished.
     apply from: 'gradletools.gradle'
 } else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.2_neo/gradletools.gradle'
+    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.1.2_neo/gradletools.gradle'
 }
 
 group = "com.github.mcjty"

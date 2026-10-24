@@ -94,16 +94,16 @@ public class ItemStackTools {
         if (commonTags == null) {
             commonTags = new HashSet<>();
             commonTags.add(ItemTags.SAND);
-            commonTags.add(net.minecraft.tags.BlockItemTags.FENCES.item());
+            commonTags.add(ItemTags.FENCES);
             commonTags.add(ItemTags.SAPLINGS);
             commonTags.add(ItemTags.LEAVES);
             commonTags.add(ItemTags.LOGS);
             commonTags.add(ItemTags.RAILS);
-            commonTags.add(net.minecraft.tags.BlockItemTags.SLABS.item());
+            commonTags.add(ItemTags.SLABS);
             commonTags.add(ItemTags.WOOL);
             commonTags.add(ItemTags.WOOL_CARPETS);
             commonTags.add(ItemTags.PLANKS);
-            commonTags.add(net.minecraft.tags.BlockItemTags.STAIRS.item());
+            commonTags.add(ItemTags.STAIRS);
             commonTags.add(ItemTags.DIRT);
             commonTags.add(Tags.Items.CROPS);
             commonTags.add(Tags.Items.GLASS_BLOCKS);

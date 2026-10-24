@@ -24,24 +24,24 @@ public class BaseBlockTagsProvider extends BlockTagsProvider {
     protected void ironPickaxe(Supplier... blocks) {
         for (Supplier b : blocks) {
             Block block = (Block) b.get();
-            tag(BlockTags.MINEABLE_WITH_PICKAXE).add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow());
-            tag(BlockTags.NEEDS_IRON_TOOL).add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow());
+            tag(BlockTags.MINEABLE_WITH_PICKAXE).add(block);
+            tag(BlockTags.NEEDS_IRON_TOOL).add(block);
         }
     }
 
     protected void diamondPickaxe(Supplier... blocks) {
         for (Supplier b : blocks) {
             Block block = (Block) b.get();
-            tag(BlockTags.MINEABLE_WITH_PICKAXE).add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow());
-            tag(BlockTags.NEEDS_DIAMOND_TOOL).add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow());
+            tag(BlockTags.MINEABLE_WITH_PICKAXE).add(block);
+            tag(BlockTags.NEEDS_DIAMOND_TOOL).add(block);
         }
     }
 
     protected void stonePickaxe(Supplier... blocks) {
         for (Supplier b : blocks) {
             Block block = (Block) b.get();
-            tag(BlockTags.MINEABLE_WITH_PICKAXE).add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow());
-            tag(BlockTags.NEEDS_STONE_TOOL).add(net.minecraft.core.registries.BuiltInRegistries.BLOCK.getResourceKey(block).orElseThrow());
+            tag(BlockTags.MINEABLE_WITH_PICKAXE).add(block);
+            tag(BlockTags.NEEDS_STONE_TOOL).add(block);
         }
     }
 }

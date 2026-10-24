@@ -1,3 +1,8 @@
+26.1.2-10.0.0:
+- Backported the 26.2 NeoForge library to Minecraft 26.1.2 with Java 25
+- Adapted advancement criteria, block/item tags, and camera access to the 26.1.2 APIs
+- Retained transactional capabilities and the shared MultiWorkspace build structure
+
 26.2-10.0.0:
 - Ported to Minecraft 26.2 and NeoForge with Java 25
 - Updated GUI extraction, model helpers, recipes, block entity persistence, networking, and datagen
