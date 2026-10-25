@@ -1,4 +1,5 @@
 26.1.2-10.0.0:
+- Fixed a crash when typing after right-clicking to clear a text field with selected text (#187)
 - Backported the 26.2 NeoForge library to Minecraft 26.1.2 with Java 25
 - Adapted advancement criteria, block/item tags, and camera access to the 26.1.2 APIs
 - Retained transactional capabilities and the shared MultiWorkspace build structure
