@@ -4,8 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Tools;
-import net.minecraft.advancements.predicates.*;
-import net.minecraft.advancements.triggers.*;
+import net.minecraft.advancements.criterion.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
@@ -95,7 +94,7 @@ public class BaseLootTableProvider {
                 .add(AlternativesEntry.alternatives(
                                 LootItem.lootTableItem(block)
                                         .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
-                                                .withComponents(net.minecraft.advancements.predicates.DataComponentMatchers.Builder.components().partial(net.minecraft.core.component.predicates.DataComponentPredicates.ENCHANTMENTS, net.minecraft.core.component.predicates.EnchantmentsPredicate.enchantments(List.of(silkTouchPredicate))).build()))),
+                                                .withComponents(net.minecraft.advancements.criterion.DataComponentMatchers.Builder.components().partial(net.minecraft.core.component.predicates.DataComponentPredicates.ENCHANTMENTS, net.minecraft.core.component.predicates.EnchantmentsPredicate.enchantments(List.of(silkTouchPredicate))).build()))),
                                 LootItem.lootTableItem(lootItem)
                                         .apply(SetItemCountFunction.setCount(UniformGenerator.between(min, max)))
                                         .apply(ApplyBonusCount.addUniformBonusCount(fortune.get(), 1))

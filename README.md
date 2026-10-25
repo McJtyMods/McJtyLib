@@ -1,6 +1,6 @@
-# McJtyLib for Minecraft 26.2 / Fabric
+# McJtyLib for Minecraft 26.1.2 / Fabric
 
-Shared library for McJty's mods. Requires Java 25, Fabric Loader 0.19.3+, Fabric API 0.155.2+26.2 and Forge Config API Port 26.2.1. Team Reborn Energy 5.0.0 is included in the built mod. Forge Config API Port preserves the TOML configuration API; its `net.neoforged` config classes do not require the NeoForge loader.
+Shared library for McJty's mods. Requires Java 25, Fabric Loader 0.19.3+, Fabric API 0.155.3+26.1.2 and Forge Config API Port 26.1.5. Team Reborn Energy 5.0.0 is included in the built mod. Forge Config API Port preserves the TOML configuration API; its `net.neoforged` config classes do not require the NeoForge loader.
 
 Build with `./gradlew build`. Four JUnit regression tests cover nested energy transactions, NBT conversion, block models and client item definitions. Native item and fluid transfer checks run with Fabric's actual mixins:
 
@@ -12,7 +12,7 @@ That opt-in test mod checks item rollback and commit notifications, fluid rollba
 
 ## Shared build settings
 
-The build uses MultiWorkSpace's root `gradletools.gradle`, then an optional standalone local copy, then the remote `26.2_fabric` script. While the workspace branch is unpublished, run this from the standalone library checkout:
+The build uses MultiWorkSpace's root `gradletools.gradle`, then an optional standalone local copy, then the remote `26.1.2_fabric` script. While the workspace branch is unpublished, run this from the standalone library checkout:
 
 ```sh
 cp ../Multi_fabric/gradletools.gradle gradletools.gradle
@@ -20,7 +20,7 @@ cp ../Multi_fabric/gradletools.gradle gradletools.gradle
 
 Keep the files byte-for-byte identical. Exclude `/gradletools.gradle` in `.git/info/exclude`. This local build aid must not be committed or pushed.
 
-For integrated development, open `../Multi_fabric/build.gradle` and run `:workspace:runClient` or `:workspace:runServer`. TOP can be supplied from another Fabric checkout with `-Pmod.TheOneProbe=/data/Projects/Top26_2_fabric`.
+For integrated development, open `../Multi_fabric/build.gradle` and run `:workspace:runClient` or `:workspace:runServer`. TOP can be supplied from a compatible 26.1.2 Fabric checkout with `-Pmod.TheOneProbe=<path>`. Without one, the workspace compiles against the published TOP Fabric API only; it does not load the 26.2 TOP mod at runtime. An explicitly supplied `-Ptop_version=<compatible Fabric version>` enables a published runtime dependency.
 
 ## Downstream Fabric ports
 
@@ -35,3 +35,11 @@ For integrated development, open `../Multi_fabric/build.gradle` and run `:worksp
 - Data generation uses Fabric `DataGeneratorEntrypoint`: `pack.addProvider((output, lookup) -> { var data = new DataGen(output, lookup); modules.datagen(data, lookup); data.generate(); return data; })`. The existing `Dob` recipe/model/tag callbacks remain available. Global loot data now supplies native `LootItemFunction` values via `Dob.Builder.glm`; these are generated under `data/<namespace>/mcjtylib/loot_functions` and applied through Fabric's loot-drop event. Mods needing to add or remove arbitrary drops should use `LootTableEvents.MODIFY_DROPS` directly.
 
 The three adapted container slot helpers retain their LGPL 2.1 notices and license under `META-INF`; other library code remains MIT.
+
+## Backport validation
+
+This branch starts from the 26.2 Fabric port. Minecraft advancement imports, camera access and item tags follow the 26.1.2 NeoForge reference. Fabric tag builders retain resource keys, as required by Fabric's 26.1.2 API.
+
+All main sources and both test source sets compiled directly with Java 25 against cached vanilla Minecraft 26.1.2 classes. The four JUnit regression tests passed, and the five main/test mixin targets were checked against Minecraft 26.1.2. The offline compilation used cached Fabric 26.2 API binaries after comparing the used APIs with upstream 26.1.2 sources, with the 26.1.2 tag provider compiled from those sources. Forge Config API Port 26.2.1 and JEI's cached 26.1.2 common API 29.43.0.106 were used for compilation; the build pins the published 26.1.5 Fabric config port and JEI Fabric 29.35.0.95.
+
+A complete Gradle build, dependency resolution, datagen, native transfer checks and client/server launches remain unverified: this sandbox has a read-only default Gradle cache, cannot open Gradle's lock-coordination socket with an isolated cache, and has no shell network access. Run `../Multi_fabric/gradlew -p ../Multi_fabric :McJtyLib:build :workspace:classes` and the game checks above in a normal environment.

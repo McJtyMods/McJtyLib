@@ -3,9 +3,9 @@ package mcjty.lib.datagen;
 import mcjty.lib.blocks.RBlock;
 import mcjty.lib.crafting.CopyComponentsRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
-import net.minecraft.advancements.triggers.Criterion;
-import net.minecraft.advancements.triggers.InventoryChangeTrigger;
-import net.minecraft.advancements.predicates.MinMaxBounds;
+import net.minecraft.advancements.Criterion;
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.advancements.criterion.MinMaxBounds;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.data.recipes.*;
@@ -66,7 +66,7 @@ public record Dob(
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(MinMaxBounds.Ints ints, ItemLike item) {
-        return net.minecraft.advancements.triggers.CriteriaTriggers.INVENTORY_CHANGED.createCriterion(DataGen.inventoryTrigger(net.minecraft.advancements.predicates.ItemPredicate.Builder.item().of(DataGen.recipeItems(), item).withCount(ints).build()));
+        return net.minecraft.advancements.CriteriaTriggers.INVENTORY_CHANGED.createCriterion(DataGen.inventoryTrigger(net.minecraft.advancements.criterion.ItemPredicate.Builder.item().of(DataGen.recipeItems(), item).withCount(ints).build()));
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item) {
