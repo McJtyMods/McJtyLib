@@ -1,4 +1,7 @@
-26.2-10.0.0-fabric
+26.2-10.0.1-fabric:
+- Various fixes ported from 26.1.2
+
+26.2-10.0.0-fabric:
 - Ported the library and shared multi-mod build to Minecraft 26.2 Fabric.
 - Added native Fabric registration, networking, attachments, menus and transactional storage.
 - Preserved container helpers, modal input, tooltip icons and dynamic model colors.

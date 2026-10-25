@@ -7,6 +7,7 @@ import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.core.*;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,7 +18,7 @@ public abstract class AbstractDynamicBakedModel implements net.minecraft.client.
 
     public static TextureAtlasSprite getTexture(Identifier resource) {
 
-        return Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(TextureAtlas.LOCATION_BLOCKS).getSprite(resource);
+        return Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(resource);
 
     }
 
