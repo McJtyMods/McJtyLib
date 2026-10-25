@@ -20,7 +20,7 @@ cp ../Multi_fabric/gradletools.gradle gradletools.gradle
 
 Keep the files byte-for-byte identical. Exclude `/gradletools.gradle` in `.git/info/exclude`. This local build aid must not be committed or pushed.
 
-For integrated development, open `../Multi_fabric/build.gradle` and run `:workspace:runClient` or `:workspace:runServer`. TOP can be supplied from a compatible 26.1.2 Fabric checkout with `-Pmod.TheOneProbe=<path>`. Without one, the workspace compiles against the published TOP Fabric API only; it does not load the 26.2 TOP mod at runtime. An explicitly supplied `-Ptop_version=<compatible Fabric version>` enables a published runtime dependency.
+For integrated development, open `../Multi_fabric/build.gradle` and run `:workspace:runClient` or `:workspace:runServer`. The sibling `../TheOneProbe_fabric` checkout is now included automatically and supplies the TOP 26.1.2 Fabric source project. Override its location with `-Pmod.TheOneProbe=<path>`. Standalone builds without that source project compile against the published TOP Fabric API only; they do not load the 26.2 TOP mod at runtime. An explicitly supplied `-Ptop_version=<compatible Fabric version>` enables a published runtime dependency.
 
 ## Downstream Fabric ports
 
@@ -40,6 +40,17 @@ The three adapted container slot helpers retain their LGPL 2.1 notices and licen
 
 This branch starts from the 26.2 Fabric port. Minecraft advancement imports, camera access and item tags follow the 26.1.2 NeoForge reference. Fabric tag builders retain resource keys, as required by Fabric's 26.1.2 API.
 
-All main sources and both test source sets compiled directly with Java 25 against cached vanilla Minecraft 26.1.2 classes. The four JUnit regression tests passed, and the five main/test mixin targets were checked against Minecraft 26.1.2. The offline compilation used cached Fabric 26.2 API binaries after comparing the used APIs with upstream 26.1.2 sources, with the 26.1.2 tag provider compiled from those sources. Forge Config API Port 26.2.1 and JEI's cached 26.1.2 common API 29.43.0.106 were used for compilation; the build pins the published 26.1.5 Fabric config port and JEI Fabric 29.35.0.95.
+The full integrated Gradle build now passes against the pinned Minecraft 26.1.2 Fabric dependencies:
 
-A complete Gradle build, dependency resolution, datagen, native transfer checks and client/server launches remain unverified: this sandbox has a read-only default Gradle cache, cannot open Gradle's lock-coordination socket with an isolated cache, and has no shell network access. Run `../Multi_fabric/gradlew -p ../Multi_fabric :McJtyLib:build :workspace:classes` and the game checks above in a normal environment.
+```sh
+cd ../Multi_fabric
+./gradlew :TheOneProbe:build :TheOneProbe:gametestClasses :McJtyLib:build :workspace:classes
+```
+
+Both mods build, their access wideners validate, TOP's game-test sources compile, and all four McJtyLib JUnit regression tests pass. McJtyLib explicitly widens the block-entity supplier and constructor required by its registry helpers on Fabric 26.1.2. TOP's client game test also passes on this Minecraft version, exercising its real client and integrated server.
+
+Native Fabric transfer regression checks also passed with both McJtyLib and TOP loaded; the log confirms McJtyLib registered its TOP provider. Run them from `../Multi_fabric` with `./gradlew -PtransferTests :McJtyLib:runTransferTest`.
+
+TOP's client game test also passed with McJtyLib and JEI added to its runtime through a temporary Gradle init script, confirming the combined client/server runtime and TOP addon registration.
+
+A fresh standalone checkout at `d572713b`, using the remote shared Gradle script and no local copy, reproduced Jenkins's eight compilation errors. Applying only the two block-entity access-widener entries made `./gradlew clean build` pass, including all four JUnit tests and access-widener validation. These entries must be committed and pushed with this branch for Jenkins to receive the fix.
