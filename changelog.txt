@@ -1,3 +1,6 @@
+1.20-8.0.9:
+- Fixed a crash when typing after right-clicking to clear a text field with selected text (#187)
+
 1.20-8.0.8:
 - Various Patchouli documentation updates and fixes
 
