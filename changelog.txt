@@ -1,3 +1,6 @@
+26.3-11.0.1:
+- Various fixes ported from 26.2.1
+
 26.3-11.0.0:
 - Ported to Minecraft 26.3 and NeoForge 26.3.0.83 with Java 25
 - Standalone and integrated builds use MultiWorkspace's 26.3 shared Gradle script

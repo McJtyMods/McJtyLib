@@ -95,7 +95,8 @@ public class GenericTileEntity extends BlockEntity {
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         if (level != null && !level.isClientSide()) {
-            onReplaced(level, pos, getBlockState(), state);
+            // Minecraft passes the old state; the chunk already contains its replacement.
+            onReplaced(level, pos, state, level.getBlockState(pos));
         }
         super.preRemoveSideEffects(pos, state);
     }

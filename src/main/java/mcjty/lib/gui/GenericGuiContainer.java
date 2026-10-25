@@ -278,7 +278,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         if (window == null) {
             return;
         }
-        drawWindow(graphics, partialTicks, mouseX, mouseY);
+        // Subclass hooks refresh widgets and request server data as well as drawing.
+        renderBg(graphics, partialTicks, mouseX, mouseY);
         super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
         this.extractTooltip(graphics, mouseX, mouseY);
         drawStackTooltips(graphics, mouseX, mouseY);
