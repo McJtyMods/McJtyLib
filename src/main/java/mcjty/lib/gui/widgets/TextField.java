@@ -57,6 +57,7 @@ public class TextField extends AbstractWidget<TextField> {
         }
         this.text = text;
         cursor = text.length();
+        clearSelection();
         if (startOffset >= cursor) {
             startOffset = cursor - 1;
             if (startOffset < 0) {
