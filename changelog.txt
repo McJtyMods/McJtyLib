@@ -1,3 +1,6 @@
+26.3-11.0.1-fabric:
+- Various fixes ported from 26.2.1
+
 26.3-11.0.0-fabric:
 - Port to Minecraft 26.3 and Fabric.
 - Update rendering pipelines, SDL input, reloadable registry data generation, and redstone mixins.
