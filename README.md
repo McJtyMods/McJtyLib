@@ -12,13 +12,7 @@ That opt-in test mod checks item rollback and commit notifications, fluid rollba
 
 ## Shared build settings
 
-The build uses MultiWorkSpace's root `gradletools.gradle`, then an optional standalone local copy, then the remote `26.2_fabric` script. While the workspace branch is unpublished, run this from the standalone library checkout:
-
-```sh
-cp ../Multi_fabric/gradletools.gradle gradletools.gradle
-```
-
-Keep the files byte-for-byte identical. Exclude `/gradletools.gradle` in `.git/info/exclude`. This local build aid must not be committed or pushed.
+The build applies [MultiWorkSpace's shared Fabric 26.2 script](https://github.com/McJtyMods/MultiWorkSpace/blob/26.2_fabric/gradletools.gradle) directly from the remote branch, both standalone and in the workspace. No local copy is needed.
 
 For integrated development, open `../Multi_fabric/build.gradle` and run `:workspace:runClient` or `:workspace:runServer`. TOP can be supplied from another Fabric checkout with `-Pmod.TheOneProbe=/data/Projects/Top26_2_fabric`.
 
