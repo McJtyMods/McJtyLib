@@ -17,6 +17,7 @@ public final class CustomRenderTypes {
     private static final RenderPipeline ADDITIVE = blockPipeline("additive", BlendFunction.ADDITIVE);
     private static final RenderPipeline OVERLAY = RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath("mcjtylib", "pipeline/overlay_lines"))
+            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
             .withDepthStencilState(java.util.Optional.empty()).build();
     private static final RenderPipeline LIGHTNING = blockPipeline("lightning", BlendFunction.LIGHTNING);
 

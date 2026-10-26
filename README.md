@@ -13,7 +13,7 @@ Build settings come from MultiWorkspace's `26.3_neo/gradletools.gradle`. An inte
 ./gradlew runGameTestServer
 ```
 
-`check` runs four JUnit checks for energy rollback, NBT conversion, and model JSON. `runGameTestServer` loads the separate `gametest` source set and runs eight checks for item/fluid transactions, notifications, ghost slots, automation, inventory save data, undo, and bucket replacement. Game-test classes and structures are excluded from release jars. The historical `src/testmod` fixture remains unconfigured.
+`check` runs JUnit regression checks for energy rollback, NBT conversion, model JSON, text fields, and overlay pipeline compatibility with the world render pass. `runGameTestServer` loads the separate `gametest` source set and runs eight checks for item/fluid transactions, notifications, ghost slots, automation, inventory save data, undo, and bucket replacement. Game-test classes and structures are excluded from release jars. The historical `src/testmod` fixture remains unconfigured.
 
 For downstream ports:
 
