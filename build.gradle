@@ -163,5 +163,8 @@ if (providers.gradleProperty('transferTests').isPresent()) {
 
 if (project.hasProperty('clientTests')) {
     if (!project.hasProperty('transferTests')) throw new GradleException('clientTests requires -PtransferTests')
-    loom.runs.client.vmArg '-Dmcjtylib.clientRegression=true'
+    loom.runs.client {
+        source sourceSets.fabricTest
+        vmArg '-Dmcjtylib.clientRegression=true'
+    }
 }

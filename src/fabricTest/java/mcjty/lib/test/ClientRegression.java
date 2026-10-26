@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.client.gui.screens.AccessibilityOnboardingScreen;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.network.chat.Component;
 
@@ -28,7 +29,8 @@ public final class ClientRegression implements ClientModInitializer {
             if (finished) return;
             try {
                 if (++ticks > 1200) throw new AssertionError("Client startup timed out at " + client.gui.screen());
-                if (screen == null && client.gui.screen() instanceof TitleScreen) {
+                if (screen == null && (client.gui.screen() instanceof TitleScreen
+                        || client.gui.screen() instanceof AccessibilityOnboardingScreen)) {
                     screen = new RegressionScreen();
                     client.gui.setScreen(screen);
                 } else if (screen != null && client.gui.screen() == screen) {
