@@ -1,11 +1,8 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.client.GuiTools;
-import mcjty.lib.client.RenderHelper;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.widgets.BlockRender;
 import mcjty.lib.gui.widgets.EnergyBar;
@@ -14,6 +11,7 @@ import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tooltips.ClientTooltipLine;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
@@ -135,127 +133,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     public void drawHoveringText(GuiGraphicsExtractor graphics, List<String> textLines, List<ItemStack> items, int x, int y, Font font) {
-        if (!textLines.isEmpty()) {
-            var matrixStack = graphics.pose();
-            matrixStack.pushMatrix();
-            // @todo 1.17 RenderSystem.disableRescaleNormal();
-            // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnOff();
-            // @todo 1.17 RenderSystem.disableLighting();
-
-            int i = 0;
-
-            int linesWithItemStacks = 0;
-            for (String s : textLines) {
-                int j;
-                if (s != null && items != null && s.contains("@") && !items.isEmpty()) {
-                    List<Object> list = WindowTools.parseString(s, items);
-                    boolean lineHasItemStacks = false;
-                    j = 0;
-                    for (Object o : list) {
-                        if (o instanceof String) {
-                            j += font.width((String) o);
-                        } else {
-                            j += 20;    // ItemStack
-                            lineHasItemStacks = true;
-                        }
-                    }
-                    if(lineHasItemStacks) {
-                        ++linesWithItemStacks;
-                    }
-
-                } else {
-                    j = font.width(s);
-                }
-
-                if (j > i) {
-                    i = j;
-                }
-            }
-
-            int xx = x + 12;
-            int yy = y - 12;
-            int k = 8;
-
-            if (textLines.size() > 1) {
-                k += 2 + (textLines.size() - 1) * 10 + linesWithItemStacks * 8;
-            }
-
-            if (xx > this.width - leftPos - i - 5) {
-                xx -= 28 + i;
-            }
-
-            if (xx < 4 - leftPos) {
-                xx = 4 - leftPos;
-            }
-
-            if (yy > this.height - topPos - k - 4) {
-                yy = this.height - topPos - k - 4;
-            } else if (yy < 4 - topPos) {
-                yy = 4 - topPos;
-            }
-
-
-            // @todo 1.19.4
-//            setBlitOffset(300);
-//            this.itemRenderer.blitOffset = 300.0F;
-            int l = -267386864;
-            graphics.fillGradient(xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
-            graphics.fillGradient(xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
-            graphics.fillGradient(xx - 3, yy - 3, xx + i + 3, yy + k + 3, l, l);
-            graphics.fillGradient(xx - 4, yy - 3, xx - 3, yy + k + 3, l, l);
-            graphics.fillGradient(xx + i + 3, yy - 3, xx + i + 4, yy + k + 3, l, l);
-            int i1 = 1347420415;
-            int j1 = (i1 & 16711422) >> 1 | i1 & -16777216;
-            graphics.fillGradient(xx - 3, yy - 3 + 1, xx - 3 + 1, yy + k + 3 - 1, i1, j1);
-            graphics.fillGradient(xx + i + 2, yy - 3 + 1, xx + i + 3, yy + k + 3 - 1, i1, j1);
-            graphics.fillGradient(xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
-            graphics.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
-
-//
-
-            renderTextLines(graphics, textLines, items, font, xx, yy);
-
-            // @todo 1.19.4
-//            setBlitOffset(0);
-//            this.itemRenderer.blitOffset = 0.0F;
-
-            // @todo 1.17 RenderSystem.enableLighting();
-            // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
-            // @todo 1.17 RenderSystem.enableRescaleNormal();
-            matrixStack.popMatrix();
-        }
-    }
-
-    private void renderTextLines(GuiGraphicsExtractor graphics, List<String> textLines, List<ItemStack> items, Font font, int xx, int yy) {
-        for (int i = 0; i < textLines.size(); ++i) {
-            String s1 = textLines.get(i);
-            if (s1 != null && items != null && s1.contains("@") && !items.isEmpty()) {
-                List<Object> list = WindowTools.parseString(s1, items);
-                int curx = xx;
-                boolean lineHasItemStacks = false;
-                for (Object o : list) {
-                    if (o instanceof String s2) {
-                        graphics.text(font, s2, curx, yy, 0xffffffff);
-                        curx += font.width(s2);
-                    } else {
-                        RenderHelper.renderObject(graphics, curx + 1, yy, o, false);
-                        curx += 20;
-                        lineHasItemStacks = true;
-                    }
-                }
-                if(lineHasItemStacks) {
-                    yy += 8;
-                }
-            } else {
-                graphics.text(font, s1, xx, yy, 0xffffffff);
-            }
-
-            if (i == 0) {
-                yy += 2;
-            }
-
-            yy += 10;
-        }
+        // Native tooltips are extracted after slots, carried stacks, and external item overlays.
+        ClientTooltipLine.queue(graphics, font, textLines, items, x + leftPos, y + topPos);
     }
 
     protected void renderBg(@Nonnull GuiGraphicsExtractor graphics, float partialTicks, int x, int y) {

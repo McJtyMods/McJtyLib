@@ -4,6 +4,7 @@ import mcjty.lib.ClientEventHandler;
 import mcjty.lib.keys.KeyBindings;
 import mcjty.lib.keys.KeyInputHandler;
 import mcjty.lib.tooltips.ClientTooltipIcon;
+import mcjty.lib.tooltips.ClientTooltipLine;
 import mcjty.lib.tooltips.TooltipRender;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -37,6 +38,7 @@ public class ClientSetup {
 
     public static void registerClientComponentTooltips(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(ClientTooltipIcon.class, (a) -> a);
+        event.register(ClientTooltipLine.class, line -> line);
     }
 
 }

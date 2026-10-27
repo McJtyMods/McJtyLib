@@ -1,3 +1,8 @@
+26.3-11.0.3:
+- Fixed color formatting in GUI tooltips and in-world HUDs
+- Fixed GUI tooltips rendering behind inventory and JEI items
+- Fixed Shift-expanded item tooltips and Ctrl modifier detection
+
 26.3-11.0.2:
 - Fixed the overlay render pipeline crashing when displaying XNet connector outlines or highlighted blocks
 
