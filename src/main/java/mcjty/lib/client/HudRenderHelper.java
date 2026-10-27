@@ -1,5 +1,6 @@
 package mcjty.lib.client;
 
+import mcjty.lib.varia.ComponentFactory;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -135,7 +136,7 @@ public class HudRenderHelper {
                         matrixStack.popPose();
                     }
 
-                    RenderHelper.renderText(fontrenderer, fontrenderer.plainSubstrByWidth(prefix + s, 115), 7, currenty, 0xffffffff, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS);
+                    RenderHelper.renderText(fontrenderer, fontrenderer.substrByWidth(ComponentFactory.formatted(prefix + s), 115), 7, currenty, 0xffffffff, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS);
 //                    fontrenderer.text(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff);
                     currenty += height;
                 }

@@ -1,5 +1,8 @@
 package mcjty.lib.client;
 
+import mcjty.lib.varia.ComponentFactory;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.FormattedText;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -53,9 +56,12 @@ public class RenderHelper {
         submitItem(pose, collector, stack, ItemDisplayContext.FIXED, light, overlay);
     }
     public static void renderText(Font font, String text, int x, int y, int color, PoseStack pose, SubmitNodeCollector collector, int light) {
+        renderText(font, ComponentFactory.formatted(text), x, y, color, pose, collector, light);
+    }
+    public static void renderText(Font font, FormattedText text, int x, int y, int color, PoseStack pose, SubmitNodeCollector collector, int light) {
         pose.pushPose();
         pose.translate(x, y, 0);
-        collector.submitText(pose, 0, 0, net.minecraft.util.FormattedCharSequence.forward(text, net.minecraft.network.chat.Style.EMPTY), false, Font.DisplayMode.NORMAL, light, color, 0, 0);
+        collector.submitText(pose, 0, 0, Language.getInstance().getVisualOrder(text), false, Font.DisplayMode.NORMAL, light, color, 0, 0);
         pose.popPose();
     }
     public static boolean renderObject(GuiGraphicsExtractor graphics, int x, int y, Object object, boolean highlight) {
@@ -99,8 +105,9 @@ public class RenderHelper {
     public static int renderText(GuiGraphicsExtractor graphics, int x, int y, String text) { return renderText(graphics, x, y, text, 0xffffffff); }
     public static int renderText(GuiGraphicsExtractor graphics, int x, int y, String text, int color) {
         var font = Minecraft.getInstance().font;
-        graphics.text(font, text, x, y, color | 0xff000000);
-        return font.width(text);
+        var formatted = ComponentFactory.formatted(text);
+        graphics.text(font, formatted, x, y, color | 0xff000000);
+        return font.width(formatted);
     }
     public static void drawVerticalGradientRect(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int color1, int color2) {
         graphics.fillGradient(x1, y1, x2, y2, color1, color2);

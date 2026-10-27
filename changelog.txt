@@ -1,3 +1,7 @@
+26.2-10.0.2:
+- Fixed color formatting in GUI tooltips and in-world HUDs
+- Fixed GUI tooltips rendering behind inventory and JEI items
+
 26.2-10.0.1:
 - Fixed a crash when typing after right-clicking to clear a text field with selected text (#187)
 - Various fixes ported from 26.1.2
