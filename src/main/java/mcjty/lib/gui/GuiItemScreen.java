@@ -1,16 +1,14 @@
 package mcjty.lib.gui;
 
+import java.util.List;
 import mcjty.lib.client.GuiTools;
+import mcjty.lib.tooltips.ClientTooltipLine;
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.util.FormattedCharSequence;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 
 /**
  * This class can be used by items that want to show a GUI.
@@ -54,7 +52,7 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         double x = event.x(), y = event.y(); int button = event.button();
         boolean rc = super.mouseClicked(event, doubleClick);
         window.mouseClicked(x, y, button);
@@ -63,7 +61,7 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     @Override
-    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double scaledX, double scaledY) {
+    public boolean mouseDragged(MouseButtonEvent event, double scaledX, double scaledY) {
         double x = event.x(), y = event.y(); int button = event.button();
         boolean rc = super.mouseDragged(event, scaledX, scaledY);
         window.mouseDragged(x, y, button);
@@ -80,7 +78,7 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     @Override
-    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+    public boolean mouseReleased(MouseButtonEvent event) {
         double x = event.x(), y = event.y(); int state = event.button();
         boolean rc = super.mouseReleased(event);
         window.mouseReleased(x, y, state);
@@ -89,7 +87,7 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+    public boolean keyPressed(KeyEvent event) {
         int keyCode = event.key(), scanCode = event.scancode(), modifiers = event.modifiers();
         boolean rc = super.keyPressed(event);
 //        window.keyTyped(typedChar, keyCode);
@@ -103,21 +101,13 @@ public abstract class GuiItemScreen extends Screen {
         sideWindow.getWindow().draw(graphics);
         List<String> tooltips = window.getTooltips();
         if (tooltips != null) {
-            int x = GuiTools.getRelativeX(this);
-            int y = GuiTools.getRelativeY(this);
-            // @todo check on 1.16
-            List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
-            List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
-            graphics.setTooltipForNextFrame(Minecraft.getInstance().font, processors, x-guiLeft, y-guiTop);
+            ClientTooltipLine.queue(graphics, Minecraft.getInstance().font, tooltips, window.getTooltipItems(),
+                    GuiTools.getRelativeX(this), GuiTools.getRelativeY(this));
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
-            int x = GuiTools.getRelativeX(this);
-            int y = GuiTools.getRelativeY(this);
-            // @todo check on 1.16
-            List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
-            List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
-            graphics.setTooltipForNextFrame(Minecraft.getInstance().font, processors, x - guiLeft, y - guiTop);
+            ClientTooltipLine.queue(graphics, Minecraft.getInstance().font, tooltips, sideWindow.getWindow().getTooltipItems(),
+                    GuiTools.getRelativeX(this), GuiTools.getRelativeY(this));
         }
     }
 

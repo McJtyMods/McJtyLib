@@ -1,14 +1,17 @@
 package mcjty.lib.setup;
 
 import mcjty.lib.ClientEventHandler;
+import mcjty.lib.client.CustomRenderTypes;
 import mcjty.lib.keys.KeyBindings;
 import mcjty.lib.keys.KeyInputHandler;
 import mcjty.lib.tooltips.ClientTooltipIcon;
+import mcjty.lib.tooltips.ClientTooltipLine;
 import mcjty.lib.tooltips.TooltipRender;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class ClientSetup {
 
@@ -27,8 +30,8 @@ public class ClientSetup {
 //                });
     }
 
-    public static void registerPipelines(net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent event) {
-        mcjty.lib.client.CustomRenderTypes.registerPipelines(event);
+    public static void registerPipelines(RegisterRenderPipelinesEvent event) {
+        CustomRenderTypes.registerPipelines(event);
     }
 
     public static void registerKeyBinds(RegisterKeyMappingsEvent event) {
@@ -37,6 +40,7 @@ public class ClientSetup {
 
     public static void registerClientComponentTooltips(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(ClientTooltipIcon.class, (a) -> a);
+        event.register(ClientTooltipLine.class, line -> line);
     }
 
 }

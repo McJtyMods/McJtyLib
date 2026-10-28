@@ -1,7 +1,7 @@
 package mcjty.lib.varia;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -25,19 +25,22 @@ public class SafeClientTools {
     }
 
     public static boolean isSneaking() {
-        return keyDown(340) || keyDown(344);
+        return keyDown(InputConstants.KEY_LSHIFT) || keyDown(InputConstants.KEY_RSHIFT);
     }
 
     public static boolean isCtrlKeyDown() {
-        return keyDown(341) || keyDown(345);
+        return keyDown(InputConstants.KEY_LCONTROL) || keyDown(InputConstants.KEY_RCONTROL);
     }
 
     public static boolean isJumpKeyDown() {
         return Minecraft.getInstance().options.keyJump.isDown();
     }
+
     private static boolean keyDown(int key) {
-        return com.mojang.blaze3d.platform.InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), key);
+        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), key);
     }
+
     public static boolean isShiftKeyDown() { return isSneaking(); }
+
     public static boolean isControlKeyDown() { return isCtrlKeyDown(); }
 }

@@ -2,15 +2,21 @@ package mcjty.lib.client;
 
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
+import javax.annotation.Nonnull;
+import mcjty.lib.base.StyleConfig;
+import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.*;
 import net.minecraft.client.renderer.texture.*;
 import net.minecraft.core.*;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.entity.Entity;
@@ -23,8 +29,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import mcjty.lib.base.StyleConfig;
-import javax.annotation.Nonnull;
 
 public class RenderHelper {
     public static final int MAX_BRIGHTNESS = LightCoordsUtil.FULL_BRIGHT;
@@ -43,31 +47,41 @@ public class RenderHelper {
         mc.getItemModelResolver().updateForTopItem(state, stack, context, mc.level, mc.player, 0);
         state.submit(pose, collector, light, overlay, 0);
     }
+
     public static void renderItemGround(PoseStack pose, SubmitNodeCollector collector, ItemStack stack, int light, int overlay) {
         submitItem(pose, collector, stack, ItemDisplayContext.GROUND, light, overlay);
     }
+
     public static void renderItemGui(PoseStack pose, SubmitNodeCollector collector, ItemStack stack, int light, int overlay) {
         submitItem(pose, collector, stack, ItemDisplayContext.GUI, light, overlay);
     }
+
     public static void renderStaticFixed(PoseStack pose, SubmitNodeCollector collector, ItemStack stack, int light, int overlay) {
         submitItem(pose, collector, stack, ItemDisplayContext.FIXED, light, overlay);
     }
+
     public static void renderText(Font font, String text, int x, int y, int color, PoseStack pose, SubmitNodeCollector collector, int light) {
+        renderText(font, ComponentFactory.formatted(text), x, y, color, pose, collector, light);
+    }
+
+    public static void renderText(Font font, FormattedText text, int x, int y, int color, PoseStack pose, SubmitNodeCollector collector, int light) {
         pose.pushPose();
         pose.translate(x, y, 0);
-        collector.submitText(pose, 0, 0, net.minecraft.util.FormattedCharSequence.forward(text, net.minecraft.network.chat.Style.EMPTY), false, Font.DisplayMode.NORMAL, light, color, 0, 0);
+        collector.submitText(pose, 0, 0, Language.getInstance().getVisualOrder(text), false, Font.DisplayMode.NORMAL, light, color, 0, 0);
         pose.popPose();
     }
+
     public static boolean renderObject(GuiGraphicsExtractor graphics, int x, int y, Object object, boolean highlight) {
         return renderObject(graphics, Minecraft.getInstance().getItemModelResolver(), x, y, object, highlight, 0);
     }
+
     public static boolean renderObject(GuiGraphicsExtractor graphics, ItemModelResolver resolver, int x, int y, Object object, boolean highlight, float level) {
         if (object instanceof ItemStack stack) return renderItemStackWithCount(graphics, resolver, stack, x, y, highlight);
         if (object instanceof Item item) return renderObject(graphics, x, y, new ItemStack(item), highlight);
         if (object instanceof Block block) return renderObject(graphics, x, y, new ItemStack(block), highlight);
         if (object instanceof FluidStack fluid) return renderFluidStack(graphics, fluid, x, y, highlight);
         if (object instanceof TextureAtlasSprite sprite) {
-            graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, sprite, x, y, 16, 16);
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, 16, 16);
             return true;
         }
         if (object instanceof Entity entity) {
@@ -77,11 +91,13 @@ public class RenderHelper {
         }
         return false;
     }
+
     public static boolean renderItemStackWithCount(GuiGraphicsExtractor graphics, ItemModelResolver resolver, ItemStack stack, int x, int y, boolean highlight) {
         int count = stack.getCount();
         String text = count <= 1 ? "" : count < 100000 ? Integer.toString(count) : count < 1000000 ? count / 1000 + "k" : count < 1000000000 ? count / 1000000 + "m" : count / 1000000000 + "g";
         return renderItemStack(graphics, resolver, stack, x, y, text, highlight);
     }
+
     public static boolean renderItemStack(GuiGraphicsExtractor graphics, ItemModelResolver resolver, ItemStack stack, int x, int y, String text, boolean highlight) {
         if (stack.isEmpty()) return false;
         if (highlight) graphics.fillGradient(x, y, x + 16, y + 16, 0x80ffffff, 0xffffffff);
@@ -89,22 +105,28 @@ public class RenderHelper {
         graphics.itemDecorations(Minecraft.getInstance().font, stack, x, y, text);
         return true;
     }
+
     public static boolean renderFluidStack(GuiGraphicsExtractor graphics, FluidStack fluid, int x, int y, boolean highlight) {
         if (fluid.isEmpty()) return false;
         var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.getFluid().defaultFluidState());
         int color = model.fluidTintSource() == null ? 0xffffffff : model.fluidTintSource().colorAsStack(fluid);
-        graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, model.stillMaterial().sprite(), x, y, 16, 16, color);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, model.stillMaterial().sprite(), x, y, 16, 16, color);
         return true;
     }
+
     public static int renderText(GuiGraphicsExtractor graphics, int x, int y, String text) { return renderText(graphics, x, y, text, 0xffffffff); }
+
     public static int renderText(GuiGraphicsExtractor graphics, int x, int y, String text, int color) {
         var font = Minecraft.getInstance().font;
-        graphics.text(font, text, x, y, color | 0xff000000);
-        return font.width(text);
+        var formatted = ComponentFactory.formatted(text);
+        graphics.text(font, formatted, x, y, color | 0xff000000);
+        return font.width(formatted);
     }
+
     public static void drawVerticalGradientRect(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int color1, int color2) {
         graphics.fillGradient(x1, y1, x2, y2, color1, color2);
     }
+
     public static void drawHorizontalGradientRect(GuiGraphicsExtractor graphics, int x1, int y1, int x2, int y2, int color1, int color2) {
         int width = x2 - x1;
         for (int x = 0; x < width; x++) {
@@ -117,6 +139,7 @@ public class RenderHelper {
             graphics.fill(x1 + x, y1, x1 + x + 1, y2, color);
         }
     }
+
     public static void line(VertexConsumer builder, PoseStack matrixStack, float x1, float y1, float z1, float x2, float y2, float z2,
                             float red, float green, float blue, float alpha) {
         drawLine3d(builder, matrixStack, new Vec3(x1, y1, z1), new Vec3(x2, y2, z2), red, green, blue, alpha);
