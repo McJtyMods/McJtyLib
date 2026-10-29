@@ -1,19 +1,16 @@
 package mcjty.lib.client;
 
+import mcjty.lib.varia.ComponentFactory;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Direction;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Math;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -135,7 +132,7 @@ public class HudRenderHelper {
                         matrixStack.popPose();
                     }
 
-                    RenderHelper.renderText(fontrenderer, fontrenderer.plainSubstrByWidth(prefix + s, 115), 7, currenty, 0xffffffff, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS);
+                    RenderHelper.renderText(fontrenderer, fontrenderer.substrByWidth(ComponentFactory.formatted(prefix + s), 115), 7, currenty, 0xffffffff, matrixStack, buffer, RenderHelper.MAX_BRIGHTNESS);
 //                    fontrenderer.text(fontrenderer.trimStringToWidth(prefix + s, 115), 7, currenty, 0xffffff);
                     currenty += height;
                 }
