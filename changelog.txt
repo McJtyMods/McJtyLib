@@ -1,3 +1,8 @@
+26.1.2-10.0.2-fabric:
+- Fixed block entity client updates resetting projector settings and interrupting continuous rotation
+- Fixed color formatting in GUI tooltips and in-world HUDs
+- Fixed GUI tooltips rendering behind inventory and JEI items
+
 26.1.2-10.0.1-fabric:
 - Backported the 26.2 Fabric library to Minecraft 26.1.2
 

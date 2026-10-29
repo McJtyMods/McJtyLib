@@ -20,7 +20,7 @@ cp ../Multi_fabric/gradletools.gradle gradletools.gradle
 
 Keep the files byte-for-byte identical. Exclude `/gradletools.gradle` in `.git/info/exclude`. This local build aid must not be committed or pushed.
 
-For integrated development, open `../Multi_fabric/build.gradle` and run `:workspace:runClient` or `:workspace:runServer`. The sibling `../TheOneProbe_fabric` checkout is now included automatically and supplies the TOP 26.1.2 Fabric source project. Override its location with `-Pmod.TheOneProbe=<path>`. Standalone builds without that source project compile against the published TOP Fabric API only; they do not load the 26.2 TOP mod at runtime. An explicitly supplied `-Ptop_version=<compatible Fabric version>` enables a published runtime dependency.
+For integrated development, open `../Multi_fabric/build.gradle`. The workspace uses Jenkins McJtyLib and TOP artifacts by default. Add `-PsourceLibraries` to include the sibling library source projects for `:workspace:runClient`, `:workspace:runServer` and library build tasks. Override TOP's source location with `-Pmod.TheOneProbe=<path>`. Standalone builds use the compatible Jenkins TOP runtime pinned by the shared script.
 
 ## Downstream Fabric ports
 
@@ -44,12 +44,12 @@ The full integrated Gradle build now passes against the pinned Minecraft 26.1.2 
 
 ```sh
 cd ../Multi_fabric
-./gradlew :TheOneProbe:build :TheOneProbe:gametestClasses :McJtyLib:build :workspace:classes
+./gradlew -PsourceLibraries :TheOneProbe:build :TheOneProbe:gametestClasses :McJtyLib:build :workspace:classes
 ```
 
 Both mods build, their access wideners validate, TOP's game-test sources compile, and all four McJtyLib JUnit regression tests pass. McJtyLib explicitly widens the block-entity supplier and constructor required by its registry helpers on Fabric 26.1.2. TOP's client game test also passes on this Minecraft version, exercising its real client and integrated server.
 
-Native Fabric transfer regression checks also passed with both McJtyLib and TOP loaded; the log confirms McJtyLib registered its TOP provider. Run them from `../Multi_fabric` with `./gradlew -PtransferTests :McJtyLib:runTransferTest`.
+Native Fabric transfer regression checks also passed with both McJtyLib and TOP loaded; the log confirms McJtyLib registered its TOP provider. Run them from `../Multi_fabric` with `./gradlew -PsourceLibraries -PtransferTests :McJtyLib:runTransferTest`.
 
 TOP's client game test also passed with McJtyLib and JEI added to its runtime through a temporary Gradle init script, confirming the combined client/server runtime and TOP addon registration.
 

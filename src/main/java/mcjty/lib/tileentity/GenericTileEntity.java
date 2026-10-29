@@ -218,7 +218,6 @@ public class GenericTileEntity extends BlockEntity {
     protected void loadAdditional(net.minecraft.world.level.storage.ValueInput tag) {
         super.loadAdditional(tag);
         powerLevel = tag.getByteOr("power", (byte) 0);
-        tag.read("mcjtylib_client", CompoundTag.CODEC).ifPresent(client -> loadClientDataFromNBT(client, tag.lookup()));
     }
 
     /**

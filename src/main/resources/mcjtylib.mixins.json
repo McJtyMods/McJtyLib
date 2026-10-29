@@ -1,8 +1,18 @@
 {
- "required":true,
- "package":"mcjty.lib.mixin",
- "compatibilityLevel":"JAVA_25",
- "mixins":["MobSpawnMixin","ServerLevelMixin","RedStoneWireMixin"],
- "client":["client.ItemStackTooltipMixin"],
- "injectors":{"defaultRequire":1}
+  "required": true,
+  "package": "mcjty.lib.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "MobSpawnMixin",
+    "ServerLevelMixin",
+    "RedStoneWireMixin",
+    "BlockEntityMixin"
+  ],
+  "client": [
+    "client.ItemStackTooltipMixin",
+    "client.GuiGraphicsTooltipAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
