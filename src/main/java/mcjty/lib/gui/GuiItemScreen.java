@@ -1,15 +1,12 @@
 package mcjty.lib.gui;
 
 import mcjty.lib.client.GuiTools;
+import mcjty.lib.tooltips.ClientTooltipLine;
 import mcjty.lib.varia.ComponentFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.util.FormattedCharSequence;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class can be used by items that want to show a GUI.
@@ -58,7 +55,7 @@ public abstract class GuiItemScreen extends Screen {
         super.init();
         guiLeft = (this.width - xSize) / 2;
         guiTop = (this.height - ySize) / 2;
-        sideWindow.initGui(net.minecraft.client.Minecraft.getInstance(), this, guiLeft, guiTop, xSize, ySize);
+        sideWindow.initGui(Minecraft.getInstance(), this, guiLeft, guiTop, xSize, ySize);
     }
 
     @Override
@@ -111,21 +108,13 @@ public abstract class GuiItemScreen extends Screen {
         sideWindow.getWindow().draw(graphics);
         List<String> tooltips = window.getTooltips();
         if (tooltips != null) {
-            int x = GuiTools.getRelativeX(this);
-            int y = GuiTools.getRelativeY(this);
-            // @todo check on 1.16
-            List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
-            List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
-            graphics.setTooltipForNextFrame(Minecraft.getInstance().font, processors, x-guiLeft, y-guiTop);
+            ClientTooltipLine.queue(graphics, Minecraft.getInstance().font, tooltips, window.getTooltipItems(),
+                    GuiTools.getRelativeX(this), GuiTools.getRelativeY(this));
         }
         tooltips = sideWindow.getWindow().getTooltips();
         if (tooltips != null) {
-            int x = GuiTools.getRelativeX(this);
-            int y = GuiTools.getRelativeY(this);
-            // @todo check on 1.16
-            List<FormattedText> properties = tooltips.stream().map(ComponentFactory::literal).collect(Collectors.toList());
-            List<FormattedCharSequence> processors = Language.getInstance().getVisualOrder(properties);
-            graphics.setTooltipForNextFrame(Minecraft.getInstance().font, processors, x - guiLeft, y - guiTop);
+            ClientTooltipLine.queue(graphics, Minecraft.getInstance().font, tooltips, sideWindow.getWindow().getTooltipItems(),
+                    GuiTools.getRelativeX(this), GuiTools.getRelativeY(this));
         }
     }
 

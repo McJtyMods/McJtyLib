@@ -1,3 +1,9 @@
+26.3-11.0.3-fabric:
+- Fixed block entity client updates resetting projector settings and interrupting continuous rotation
+- Fixed color formatting in GUI tooltips and in-world HUDs
+- Fixed GUI tooltips rendering behind inventory and JEI items
+- Fixed Shift-expanded item tooltips and Ctrl modifier detection
+
 26.3-11.0.2-fabric:
 - Fixed the overlay render pipeline crashing when displaying XNet cable outlines or highlighted blocks
 

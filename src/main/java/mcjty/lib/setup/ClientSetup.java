@@ -4,6 +4,7 @@ import mcjty.lib.ClientEventHandler;
 import mcjty.lib.keys.KeyBindings;
 import mcjty.lib.keys.KeyInputHandler;
 import mcjty.lib.tooltips.ClientTooltipIcon;
+import mcjty.lib.tooltips.ClientTooltipLine;
 import mcjty.lib.tooltips.TooltipRender;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
@@ -24,7 +25,7 @@ public final class ClientSetup implements ClientModInitializer {
 
         mcjty.lib.client.CustomRenderTypes.registerPipelines();
 
-        ClientTooltipComponentCallback.EVENT.register(component -> component instanceof ClientTooltipIcon icon ? icon : component instanceof mcjty.lib.tooltips.TooltipBundle bundle ? bundle.client() : null);
+        ClientTooltipComponentCallback.EVENT.register(component -> component instanceof ClientTooltipLine line ? line : component instanceof ClientTooltipIcon icon ? icon : component instanceof mcjty.lib.tooltips.TooltipBundle bundle ? bundle.client() : null);
 
     }
 
