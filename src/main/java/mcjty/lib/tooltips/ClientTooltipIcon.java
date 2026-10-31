@@ -1,13 +1,9 @@
 package mcjty.lib.tooltips;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import mcjty.lib.client.RenderHelper;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.tuple.Pair;
@@ -15,6 +11,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.List;
 
 public class ClientTooltipIcon implements ClientTooltipComponent, TooltipComponent {
+
     protected List<Pair<ItemStack, Integer>> itemStack;
     protected int itemsPerLine;
 
@@ -25,7 +22,11 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
 
     @Override
     public int getHeight() {
-        return Math.max(1, (itemStack.size() / itemsPerLine) * 20);
+        return ((itemStack.size() + itemsPerLine - 1) / itemsPerLine) * getRowHeight();
+    }
+
+    private int getRowHeight() {
+        return itemStack.stream().anyMatch(item -> item.getRight() >= 0) ? 37 : 20;
     }
 
     @Override
@@ -36,21 +37,22 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
     @Override
     public void renderImage(Font font, int offsetX, int offsetY, GuiGraphics graphics) {
         int j = 0;
+        int rowHeight = getRowHeight();
         // Look through all the ItemStacks and add them to the tooltip at an x/y
         for (Pair<ItemStack, Integer> item : itemStack) {
             int x = offsetX + (Math.floorMod(j, itemsPerLine) * 21);
-            int y = offsetY + (Math.floorDiv(j, itemsPerLine) * 20) - 20;
+            int y = offsetY + (Math.floorDiv(j, itemsPerLine) * rowHeight);
             // Render item
             graphics.renderItem(item.getLeft(), x, y, x * y * 31);
             // Render durability and/or cool down bar
-            graphics.renderItemDecorations(Minecraft.getInstance().font, item.getLeft(), x, y, "");
+            graphics.renderItemDecorations(font, item.getLeft(), x, y, "");
 
-            renderItemCount(font, x, y + 20, item.getLeft().getCount(), item.getRight());
+            renderItemCount(font, graphics, x, y + 20, item.getLeft().getCount(), item.getRight());
             j++;
         }
     }
 
-    private static void renderItemCount(Font font, int x, int y, int count, int errorAmount) {
+    private static void renderItemCount(Font font, GuiGraphics graphics, int x, int y, int count, int errorAmount) {
         if (errorAmount == ITooltipExtras.NOAMOUNT) {
             return;
         }
@@ -59,20 +61,14 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
             return;
         }
 
-        MultiBufferSource.BufferSource buffersource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-
         String s1 = count == Integer.MAX_VALUE ? "\u221E" : Integer.toString(count);
 
-        PoseStack pose = new PoseStack();
-        pose.translate(0, 0, 200D); // @todo 1.19.4 + itemRenderer.blitOffset);
-        drawStringToWidth(font, buffersource, pose, x, y, 18, 0xFFFFFF, s1);
+        drawStringToWidth(font, graphics, x, y, 18, 0xFFFFFFFF, s1);
 
         if (errorAmount >= 0) {
             String s2 = "(" + Integer.toString(errorAmount) + ")";
-            drawStringToWidth(font, buffersource, pose, x + 8, y + 17, 18, 0xFFFF0000, s2);
+            drawStringToWidth(font, graphics, x + 8, y + 17, 18, 0xFFFF0000, s2);
         }
-
-        buffersource.endBatch();
     }
 
     /**
@@ -80,16 +76,17 @@ public class ClientTooltipIcon implements ClientTooltipComponent, TooltipCompone
      * @param y right side
      * @param width space to render in
      */
-    private static void drawStringToWidth(Font font, MultiBufferSource.BufferSource buffersource, PoseStack pose, int x, int y, int width, int color, String str) {
+    private static void drawStringToWidth(Font font, GuiGraphics graphics, int x, int y, int width, int color, String str) {
+        PoseStack pose = graphics.pose();
         pose.pushPose();
-        pose.translate(x + width, y, 0);
+        pose.translate(x + width, y, 200);
         int strWidth = font.width(str);
         if (strWidth > width) {
             // Scale down to fit the space
             pose.scale((float) width / strWidth, (float) width / strWidth, 1F);
         }
 
-        font.drawInBatch(str, -strWidth, -font.lineHeight, color, true, pose.last().pose(), buffersource, Font.DisplayMode.NORMAL, 0, RenderHelper.MAX_BRIGHTNESS);
+        graphics.drawString(font, str, -strWidth, -font.lineHeight, color, true);
 
         pose.popPose();
     }

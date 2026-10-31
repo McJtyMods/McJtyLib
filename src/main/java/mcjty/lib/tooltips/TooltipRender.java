@@ -6,8 +6,6 @@ import mcjty.lib.keys.KeyBindings;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SafeClientTools;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.BlockItem;
@@ -29,30 +27,6 @@ public class TooltipRender {
     private static final int STACKS_PER_LINE = 8;
 
     public static ITooltipSettings lastUsedTooltipItem = null;
-
-    @SubscribeEvent
-    public void onMakeTooltip(ItemTooltipEvent event) {
-        //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
-        Minecraft mc = Minecraft.getInstance();
-        ItemStack stack = event.getItemStack();
-        if (stack.getItem() instanceof ITooltipExtras extras) {
-            List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
-            if (!items.isEmpty()) {
-                List<Component> tooltip = event.getToolTip();
-                int count = items.size();
-                int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
-                int width = Math.min(STACKS_PER_LINE, count) * 18;
-                String spaces = "";//"\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
-                while (mc.font.width(spaces) < width) {
-                    spaces += " ";
-                }
-
-                for (int j = 0; j < lines; j++) {
-                    tooltip.add(ComponentFactory.literal(spaces));
-                }
-            }
-        }
-    }
 
     private static ITooltipSettings getSettings(Item item) {
         if (item instanceof ITooltipSettings) {
@@ -100,9 +74,10 @@ public class TooltipRender {
         ItemStack stack = event.getItemStack();
         if (stack.getItem() instanceof ITooltipExtras extras) {
             List<Pair<ItemStack, Integer>> items = extras.getItems(stack);
-            List<Either<FormattedText, TooltipComponent>> components = event.getTooltipElements();
-
-            components.add(Either.right(new ClientTooltipIcon(items, STACKS_PER_LINE)));
+            if (!items.isEmpty()) {
+                List<Either<FormattedText, TooltipComponent>> components = event.getTooltipElements();
+                components.add(Either.right(new ClientTooltipIcon(items, STACKS_PER_LINE)));
+            }
         }
     }
 
