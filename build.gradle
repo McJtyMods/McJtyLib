@@ -20,16 +20,14 @@ plugins {
 apply plugin: 'com.hypherionmc.modutils.modpublisher'
 
 // Use the workspace script for integrated and sibling checkout layouts.
-def sharedTools = rootProject.file('gradletools.gradle')
-if (rootProject != project && sharedTools.isFile()) {
-    apply from: sharedTools
-} else if (file('../Multi_fabric/gradletools.gradle').isFile()) {
-    apply from: '../Multi_fabric/gradletools.gradle'
-} else if (file('../gradletools.gradle').isFile()) {
-    apply from: '../gradletools.gradle'
-} else {
-    apply from: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkSpace/26.3_fabric/gradletools.gradle'
-}
+def localGradleTools = [
+        project.findProperty('gradletools_path') ? file(project.property('gradletools_path')) : null,
+        rootProject.file('gradletools.gradle'),
+        file('../Multi_fabric/gradletools.gradle'),
+        file('../gradletools.gradle'),
+        file('gradletools.gradle')
+].find { it != null && it.isFile() }
+apply from: localGradleTools ?: 'https://raw.githubusercontent.com/McJtyMods/MultiWorkspace/26.3_fabric/gradletools.gradle'
 
 group = "com.github.mcjty"
 base.archivesName = "mcjtylib-fabric"

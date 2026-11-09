@@ -1,5 +1,8 @@
 package mcjty.lib.setup;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -20,6 +23,8 @@ public class DeferredRegister<R> {
 
     private final List<Runnable> entries=new ArrayList<>();
     private boolean registered;
+    private final List<Runnable> registrations = new ArrayList<>();
+    private final List<DeferredHolder<R, ? extends R>> holders = new ArrayList<>();
 
     protected DeferredRegister(ResourceKey<? extends Registry<R>> key,String namespace) {
         this.key=key;
@@ -33,6 +38,7 @@ public class DeferredRegister<R> {
     public static Items createItems(String ns) {
         return new Items(ns);
     }
+
     public static Blocks createBlocks(String ns) {
         return new Blocks(ns);
     }
@@ -49,8 +55,11 @@ public class DeferredRegister<R> {
 
         if(registered)throw new IllegalStateException("Registration already finished: "+namespace);
 
-        entries.add(()-> {
-            Registry<R> registry=(Registry<R>)BuiltInRegistries.REGISTRY.getValue(key.identifier());holder.bind(Registry.register(registry,holder.getId(),factory.get()));
+        holders.add(holder);
+        entries.add(() -> holder.bind(factory.get()));
+        registrations.add(() -> {
+            Registry<R> registry = (Registry<R>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
+            Registry.register(registry, holder.getId(), holder.get());
         });
         return holder;
 
@@ -60,10 +69,15 @@ public class DeferredRegister<R> {
         return enqueue(new DeferredHolder<>(id(name)),factory);
     }
 
+    public Collection<DeferredHolder<R, ? extends R>> getEntries() {
+        return Collections.unmodifiableList(holders);
+    }
+
     public void register() {
         if(registered)return;
         registered=true;
         entries.forEach(Runnable::run);
+        registrations.forEach(Runnable::run);
     }
 
     public static final class Items extends DeferredRegister<Item> {

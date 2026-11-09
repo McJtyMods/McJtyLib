@@ -1,6 +1,10 @@
 package mcjty.lib.test;
 
+import mcjty.lib.varia.CapabilityTools;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.item.ItemStack;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 /** Runs inside Fabric so variants, lookups, attachments and mixins are available. */
@@ -48,6 +52,7 @@ public final class TransferRegression implements ModInitializer {
         fluidUnitsAndTransactions();
 
         itemTransfers();
+        nativeInventorySlots();
         itemEnergyTransactions();
 
         System.out.println("McJtyLib Fabric transfer regression checks passed");
@@ -165,6 +170,22 @@ public final class TransferRegression implements ModInitializer {
 
     }
 
+    private static void nativeInventorySlots() {
+        var inventory = new SimpleContainer(2);
+        var handler = CapabilityTools.itemHandler(ContainerStorage.of(inventory, null));
+        require(handler.getSlots() == 2, "Native inventory keeps empty slots");
+        require(handler.extractItem(0, 1, false).isEmpty(), "Empty native slot extraction");
+        require(handler.extractItem(0, 0, true).isEmpty(), "Zero native extraction");
+        require(handler.insertItem(1, new ItemStack(fixtureItem, 12), true).isEmpty(), "Simulated native insertion");
+        require(inventory.isEmpty(), "Simulated insertion preserves the inventory");
+        require(handler.insertItem(1, new ItemStack(fixtureItem, 12), false).isEmpty(), "Native slot insertion");
+        require(inventory.getItem(0).isEmpty() && inventory.getItem(1).getCount() == 12, "Insertion uses the requested slot");
+        require(handler.extractItem(1, 5, true).getCount() == 5, "Simulated native extraction");
+        require(inventory.getItem(1).getCount() == 12, "Simulated extraction preserves the inventory");
+        require(handler.extractItem(1, 5, false).getCount() == 5, "Native slot extraction");
+        require(inventory.getItem(1).getCount() == 7, "Native extraction commits the requested amount");
+    }
+
     private static void itemEnergyTransactions() {
         var stack = new net.minecraft.world.item.ItemStack(fixtureItem);
         var storage = team.reborn.energy.api.EnergyStorage.ITEM.find(stack, mcjty.lib.varia.CapabilityTools.itemContext(stack));
@@ -177,16 +198,20 @@ public final class TransferRegression implements ModInitializer {
 
     private static class TestEnergyItem extends net.minecraft.world.item.Item implements mcjty.lib.varia.IEnergyItem {
         TestEnergyItem(Properties properties) { super(properties); }
+
         public long getEnergyStoredL(net.minecraft.world.item.ItemStack stack) {
             return stack.getOrDefault(mcjty.lib.setup.Registration.ITEM_ENERGY.get(), new mcjty.lib.api.power.ItemEnergy(0)).energy();
         }
+
         public long getMaxEnergyStoredL(net.minecraft.world.item.ItemStack stack) { return 1000; }
+
         public long receiveEnergyL(net.minecraft.world.item.ItemStack stack, long amount, boolean simulate) {
             long stored = getEnergyStoredL(stack);
             long moved = Math.min(amount, 1000 - stored);
             if (!simulate) stack.set(mcjty.lib.setup.Registration.ITEM_ENERGY.get(), new mcjty.lib.api.power.ItemEnergy(stored + moved));
             return moved;
         }
+
         public long extractEnergyL(net.minecraft.world.item.ItemStack stack, long amount, boolean simulate) {
             long stored = getEnergyStoredL(stack);
             long moved = Math.min(stored, amount);

@@ -1,10 +1,15 @@
 package mcjty.lib.tileentity;
 
+import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.gui.widgets.ImageChoiceLabel;
 import mcjty.lib.multipart.PartSlot;
-import mcjty.lib.setup.Registration;
 import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
@@ -188,8 +193,9 @@ public class GenericTileEntity extends BlockEntity {
         return tag;
     }
 
-    public <T> T getData(AttachmentType<T> type) { return ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget)this).getAttachedOrCreate(type); }
-    public <T> void setData(AttachmentType<T> type,T data) { ((net.fabricmc.fabric.api.attachment.v1.AttachmentTarget)this).setAttached(type,data); }
+    public <T> T getData(AttachmentType<T> type) { return ((AttachmentTarget)this).getAttachedOrCreate(type); }
+
+    public <T> void setData(AttachmentType<T> type,T data) { ((AttachmentTarget)this).setAttached(type,data); }
 
     //    public void setInfused(int infused) {
 //        this.infused = infused;
@@ -204,18 +210,32 @@ public class GenericTileEntity extends BlockEntity {
 //        return ((float) infused) / GeneralConfig.maxInfuse.get();
 //    }
 
+    public void onLoad() {
+    }
+
+    public void onChunkUnloaded() {
+    }
+
+    public void onDataPacket(Connection connection, ValueInput input) {
+        loadClientDataFromNBT(input.read("mcjtylib_client", CompoundTag.CODEC).orElseGet(CompoundTag::new), input.lookup());
+    }
+
+    public AABB getRenderBoundingBox() {
+        return new AABB(getBlockPos());
+    }
+
     public boolean canPlayerAccess(Player player) {
         return !isRemoved() && player.distanceToSqr(new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(new Vec3(0.5D, 0.5D, 0.5D))) <= 64D;
     }
 
     @Override
-    protected void saveAdditional(net.minecraft.world.level.storage.ValueOutput tag) {
+    protected void saveAdditional(ValueOutput tag) {
         super.saveAdditional(tag);
         tag.putByte("power", powerLevel);
     }
 
     @Override
-    protected void loadAdditional(net.minecraft.world.level.storage.ValueInput tag) {
+    protected void loadAdditional(ValueInput tag) {
         super.loadAdditional(tag);
         powerLevel = tag.getByteOr("power", (byte) 0);
     }
@@ -239,7 +259,7 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     @Override
-    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter input) {
+    protected void applyImplicitComponents(DataComponentGetter input) {
         super.applyImplicitComponents(input);
         BaseBEData data = input.get(mcjty.lib.setup.Registration.ITEM_BASE_BE_DATA.get());
         if (data != null) {

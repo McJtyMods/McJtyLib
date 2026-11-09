@@ -6,7 +6,9 @@
     "MobSpawnMixin",
     "ServerLevelMixin",
     "RedStoneWireMixin",
-    "BlockEntityMixin"
+    "BlockEntityMixin",
+    "RegistryOpsAccessor",
+    "HolderLookupAdapterAccessor"
   ],
   "client": [
     "client.ItemStackTooltipMixin",
