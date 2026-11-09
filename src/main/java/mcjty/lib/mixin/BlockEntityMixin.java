@@ -17,8 +17,9 @@ abstract class BlockEntityMixin {
         // Subclass save-data readers must finish before applying the separate client payload.
         // Both initial chunk data and subsequent block entity packets use these entrypoints.
         if ((Object) this instanceof GenericTileEntity tile) {
-            input.read("mcjtylib_client", CompoundTag.CODEC)
-                    .ifPresent(client -> tile.loadClientDataFromNBT(client, input.lookup()));
+            if (input.read("mcjtylib_client", CompoundTag.CODEC).isPresent()) {
+                tile.onDataPacket(null, input);
+            }
         }
     }
 }

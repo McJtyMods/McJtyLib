@@ -1,3 +1,7 @@
+26.2-10.0.3-fabric:
+- Fixed automation inspecting empty inventory slots and inserting into sided inventories
+- Fixed block entity synchronization and saves for unloaded machines
+
 26.2-10.0.2-fabric:
 - Fixed block entity client updates resetting projector settings and interrupting continuous rotation
 - Fixed color formatting in GUI tooltips and in-world HUDs

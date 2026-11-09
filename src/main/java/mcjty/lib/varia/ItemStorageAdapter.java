@@ -1,69 +1,89 @@
 package mcjty.lib.varia;
 
+import java.util.ArrayList;
+import java.util.List;
 import mcjty.lib.container.IItemHandler;
+import mcjty.lib.container.IndexedStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
-import net.fabricmc.fabric.api.transfer.v1.storage.*;
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.SlottedStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.minecraft.world.item.ItemStack;
-import java.util.*;
 
-/** A live slot view over third-party Fabric inventories. */
+/** A live slot view over native Fabric inventories. */
 final class ItemStorageAdapter implements IItemHandler {
 
     private final Storage<ItemVariant> storage;
 
     ItemStorageAdapter(Storage<ItemVariant> storage) {
-        this.storage=storage;
+        this.storage = storage;
     }
 
     private List<StorageView<ItemVariant>> views() {
-        var result=new ArrayList<StorageView<ItemVariant>>();
+        var result = new ArrayList<StorageView<ItemVariant>>();
         storage.forEach(result::add);
         return result;
     }
 
+    @Override
     public int getSlots() {
-        return views().size();
+        return storage instanceof IndexedStorage<ItemVariant> indexed ? indexed.size() : views().size();
     }
 
-    public ItemStack getStackInSlot(int i) {
-        var v=views().get(i);
-        return v.getResource().toStack((int)Math.min(v.getAmount(),Integer.MAX_VALUE));
-    }
-
-    public int getSlotLimit(int i) {
-        return (int)Math.min(views().get(i).getCapacity(),Integer.MAX_VALUE);
-    }
-
-    public boolean isItemValid(int i,ItemStack s) {
-        return storage.supportsInsertion();
-    }
-
-    public ItemStack insertItem(int i,ItemStack s,boolean simulate) {
-
-        Storage<ItemVariant> target;
-
-        if(storage instanceof SlottedStorage<ItemVariant> slotted)target=slotted.getSlot(i);
-
-        else if(i==0)target=storage;
-        else return s;
-
-        try(var tx=Transaction.openOuter()) {
-            long n=target.insert(ItemVariant.of(s),s.getCount(),tx);
-            if(!simulate)tx.commit();
-            return s.copyWithCount(s.getCount()-(int)n);
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        if (storage instanceof IndexedStorage<ItemVariant> indexed) {
+            return indexed.getResource(slot).toStack((int) Math.min(Integer.MAX_VALUE, indexed.getAmountAsLong(slot)));
         }
-
+        var view = views().get(slot);
+        return view.getResource().toStack((int) Math.min(Integer.MAX_VALUE, view.getAmount()));
     }
 
-    public ItemStack extractItem(int i,int n,boolean simulate) {
-        var v=views().get(i);
-        var item=v.getResource();
-        try(var tx=Transaction.openOuter()) {
-            long moved=v.extract(item,n,tx);
-            if(!simulate)tx.commit();
-            return item.toStack((int)moved);
+    @Override
+    public int getSlotLimit(int slot) {
+        if (storage instanceof IndexedStorage<ItemVariant> indexed) {
+            return (int) Math.min(Integer.MAX_VALUE, indexed.getCapacityAsLong(slot, indexed.getResource(slot)));
+        }
+        return (int) Math.min(Integer.MAX_VALUE, views().get(slot).getCapacity());
+    }
+
+    @Override
+    public boolean isItemValid(int slot, ItemStack stack) {
+        return !stack.isEmpty() && (storage instanceof IndexedStorage<ItemVariant> indexed
+                ? indexed.isValid(slot, ItemVariant.of(stack)) : storage.supportsInsertion());
+    }
+
+    @Override
+    public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+        if (stack.isEmpty()) return ItemStack.EMPTY;
+        try (var tx = Transaction.openOuter()) {
+            long moved;
+            if (storage instanceof IndexedStorage<ItemVariant> indexed) {
+                moved = indexed.insert(slot, ItemVariant.of(stack), stack.getCount(), tx);
+            } else if (storage instanceof SlottedStorage<ItemVariant> slotted) {
+                moved = slotted.getSlot(slot).insert(ItemVariant.of(stack), stack.getCount(), tx);
+            } else if (slot == 0) {
+                moved = storage.insert(ItemVariant.of(stack), stack.getCount(), tx);
+            } else {
+                return stack;
+            }
+            if (!simulate) tx.commit();
+            return stack.copyWithCount(stack.getCount() - (int) moved);
         }
     }
 
+    @Override
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        if (amount <= 0) return ItemStack.EMPTY;
+        ItemStack current = getStackInSlot(slot);
+        if (current.isEmpty()) return ItemStack.EMPTY;
+        ItemVariant resource = ItemVariant.of(current);
+        try (var tx = Transaction.openOuter()) {
+            long moved = storage instanceof IndexedStorage<ItemVariant> indexed
+                    ? indexed.extract(slot, resource, amount, tx) : views().get(slot).extract(resource, amount, tx);
+            if (!simulate) tx.commit();
+            return resource.toStack((int) moved);
+        }
+    }
 }
