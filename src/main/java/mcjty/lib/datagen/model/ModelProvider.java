@@ -24,8 +24,13 @@ public abstract class ModelProvider implements DataProvider {
         this.folder = folder;
     }
 
-    public Identifier modLoc(String path) { return Identifier.fromNamespaceAndPath(modid, path); }
-    public Identifier mcLoc(String path) { return Identifier.withDefaultNamespace(path); }
+    public Identifier modLoc(String path) {
+        return Identifier.fromNamespaceAndPath(modid, path);
+    }
+
+    public Identifier mcLoc(String path) {
+        return Identifier.withDefaultNamespace(path);
+    }
 
     public BlockModelBuilder getBuilder(String name) {
         var id = modLoc(name.contains("/") ? name : folder + "/" + name);
@@ -47,6 +52,25 @@ public abstract class ModelProvider implements DataProvider {
                 .texture("south", south).texture("east", east).texture("west", west);
     }
 
+    public BlockModelBuilder withExistingParent(String name, Identifier parent) {
+        return getBuilder(name).parent(getExistingFile(parent));
+    }
+
+    public BlockModelBuilder cubeBottomTop(String name, Identifier side, Identifier bottom, Identifier top) {
+        return withExistingParent(name, mcLoc("block/cube_bottom_top"))
+                .texture("side", side).texture("bottom", bottom).texture("top", top);
+    }
+
+    public BlockModelBuilder slab(String name, Identifier side, Identifier bottom, Identifier top) {
+        return withExistingParent(name, mcLoc("block/slab"))
+                .texture("side", side).texture("bottom", bottom).texture("top", top);
+    }
+
+    public BlockModelBuilder slabTop(String name, Identifier side, Identifier bottom, Identifier top) {
+        return withExistingParent(name, mcLoc("block/slab_top"))
+                .texture("side", side).texture("bottom", bottom).texture("top", top);
+    }
+
     protected abstract void registerModels();
 
     @Override
@@ -60,10 +84,14 @@ public abstract class ModelProvider implements DataProvider {
             var items = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "items");
             models.forEach((id, model) -> {
                 var itemId = id.withPath(id.getPath().replaceFirst("^item/", ""));
-                tasks.add(DataProvider.saveStable(cache, itemDefinition(id), items.json(itemId)));
+                tasks.add(DataProvider.saveStable(cache, itemDefinitionFor(id), items.json(itemId)));
             });
         }
         return CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
+    }
+
+    protected JsonObject itemDefinitionFor(Identifier model) {
+        return itemDefinition(model);
     }
 
     public static JsonObject itemDefinition(Identifier model) {
@@ -76,5 +104,7 @@ public abstract class ModelProvider implements DataProvider {
     }
 
     @Override
-    public String getName() { return modid + " " + folder + " models"; }
+    public String getName() {
+        return modid + " " + folder + " models";
+    }
 }

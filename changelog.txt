@@ -1,3 +1,6 @@
+26.2-10.0.3:
+- Added support for the HoloGui, Ariente and ArienteWorld ports to Minecraft 26.2 on NeoForge.
+
 26.2-10.0.2:
 - Fixed color formatting in GUI tooltips and in-world HUDs
 - Fixed GUI tooltips rendering behind inventory and JEI items
