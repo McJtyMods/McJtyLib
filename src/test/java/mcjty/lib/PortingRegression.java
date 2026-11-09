@@ -2,12 +2,16 @@ package mcjty.lib;
 
 import mcjty.lib.datagen.model.BlockModelBuilder;
 import mcjty.lib.datagen.model.ConfiguredModel;
+import mcjty.lib.datagen.model.ModelProvider;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.varia.NamedCodec;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.junit.jupiter.api.Test;
+
+import java.nio.file.Path;
 
 /** Regression checks that do not require a running NeoForge game. */
 public final class PortingRegression {
@@ -67,13 +71,29 @@ public final class PortingRegression {
     }
 
     @Test
+    void modelTexturesKeepTheirNamespace() {
+        var model = new BlockModelBuilder(Identifier.parse("ariente:item/energy_holder"));
+        model.texture("layer0", "item/tools/energy_holder");
+        model.texture("particle", "#layer0");
+        model.texture("overlay", "minecraft:block/stone");
+        var textures = model.toJson().getAsJsonObject("textures");
+        require(textures.get("layer0").getAsString().equals("ariente:item/tools/energy_holder"),
+                "Relative item textures must use the model's namespace instead of minecraft");
+        require(textures.get("particle").getAsString().equals("#layer0"), "Texture aliases must stay references");
+        require(textures.get("overlay").getAsString().equals("minecraft:block/stone"), "Explicit texture namespaces must stay intact");
+    }
+
+    @Test
     void generatedItemDefinitions() {
-        var definition = mcjty.lib.datagen.model.ModelProvider.itemDefinition(Identifier.parse("test:item/widget"));
+        var definition = ModelProvider.itemDefinition(Identifier.parse("test:item/widget"));
         var reference = definition.getAsJsonObject("model");
         require(reference.get("type").getAsString().equals("minecraft:model"), "26.1.2 client item type");
         require(reference.get("model").getAsString().equals("test:item/widget"), "26.1.2 client item model reference");
-        var provider = new mcjty.lib.datagen.model.ModelProvider(new net.minecraft.data.PackOutput(java.nio.file.Path.of("unused")), "test", "block") {
-            @Override protected void registerModels() { }
+        var provider = new ModelProvider(new PackOutput(Path.of("unused")), "test", "block") {
+
+            @Override
+            protected void registerModels() {
+            }
         };
         require(provider.getExistingFile(Identifier.parse("minecraft:block")).getLocation().toString().equals("minecraft:block/block"),
                 "Vanilla parent model folder");
