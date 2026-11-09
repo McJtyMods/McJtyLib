@@ -1,5 +1,10 @@
 package mcjty.lib.setup;
 
+import mcjty.lib.network.ClientNetworking;
+import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tooltips.TooltipBundle;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
+
 import mcjty.lib.ClientEventHandler;
 import mcjty.lib.client.CustomRenderTypes;
 import mcjty.lib.keys.KeyBindings;
@@ -15,8 +20,15 @@ public final class ClientSetup implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((tile, level) -> {
+            if (tile instanceof GenericTileEntity generic) generic.onLoad();
+        });
+        ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((tile, level) -> {
+            if (tile instanceof GenericTileEntity generic) generic.onChunkUnloaded();
+        });
 
-        mcjty.lib.network.ClientNetworking.registerReceivers();
+
+        ClientNetworking.registerReceivers();
 
         ClientEventHandler.register();
         TooltipRender.register();
@@ -26,7 +38,7 @@ public final class ClientSetup implements ClientModInitializer {
 
         CustomRenderTypes.registerPipelines();
 
-        ClientTooltipComponentCallback.EVENT.register(component -> component instanceof ClientTooltipLine line ? line : component instanceof ClientTooltipIcon icon ? icon : component instanceof mcjty.lib.tooltips.TooltipBundle bundle ? bundle.client() : null);
+        ClientTooltipComponentCallback.EVENT.register(component -> component instanceof ClientTooltipLine line ? line : component instanceof ClientTooltipIcon icon ? icon : component instanceof TooltipBundle bundle ? bundle.client() : null);
 
     }
 
