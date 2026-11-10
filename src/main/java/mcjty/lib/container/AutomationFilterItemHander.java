@@ -1,11 +1,10 @@
 package mcjty.lib.container;
 
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 
@@ -15,7 +14,8 @@ import javax.annotation.Nonnull;
  * and 'canAutomationExtract'. Most TE's have another IItemHandler that is used
  * for the container so that the player can interact with slots even if automation can't
  */
-public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
+public class AutomationFilterItemHander
+        implements IItemHandlerModifiable, IndexedStorage<ItemVariant> {
 
     private final GenericItemHandler wrapped;
 
@@ -75,13 +75,52 @@ public class AutomationFilterItemHander implements IItemHandlerModifiable, INBTS
         return wrapped.getContainerFactory().isOutputSlot(slot);
     }
 
-    @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         return wrapped.serializeNBT(provider);
     }
 
-    @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
         wrapped.deserializeNBT(provider, nbt);
+    }
+
+    @Override
+    public int size() {
+        return wrapped.size();
+    }
+
+    @Override
+    public ItemVariant getResource(int index) {
+        return wrapped.getResource(index);
+    }
+
+    @Override
+    public long getAmountAsLong(int index) {
+        return wrapped.getAmountAsLong(index);
+    }
+
+    @Override
+    public long getCapacityAsLong(int index, ItemVariant resource) {
+        return wrapped.getCapacityAsLong(index, resource);
+    }
+
+    @Override
+    public boolean isValid(int index, ItemVariant resource) {
+        return wrapped.isValid(index, resource);
+    }
+
+    @Override
+    public long insert(
+            int index, ItemVariant resource, long amount, TransactionContext transaction) {
+        return canAutomationInsert(index)
+                ? wrapped.insert(index, resource, amount, transaction)
+                : 0;
+    }
+
+    @Override
+    public long extract(
+            int index, ItemVariant resource, long amount, TransactionContext transaction) {
+        return canAutomationExtract(index)
+                ? wrapped.extract(index, resource, amount, transaction)
+                : 0;
     }
 }

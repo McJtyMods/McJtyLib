@@ -1,14 +1,13 @@
 package mcjty.lib.varia;
 
 import com.mojang.authlib.GameProfile;
-import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.neoforged.neoforge.common.util.FakePlayerFactory;
-
 import java.util.Objects;
 import java.util.UUID;
+import mcjty.lib.tileentity.GenericTileEntity;
+import net.fabricmc.fabric.api.entity.FakePlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 public class FakePlayerGetter {
 
@@ -45,7 +44,7 @@ public class FakePlayerGetter {
                 owner = UUID.nameUUIDFromBytes("rftools_builder".getBytes());
             }
             ServerLevel serverLevel = (ServerLevel) te.getLevel();
-            harvester = FakePlayerFactory.get(serverLevel, new GameProfile(owner, getName()));
+            harvester = FakePlayer.get(serverLevel, new GameProfile(owner, getName()));
 //            harvester.setLevel(serverLevel);      // @todo 1.20
             BlockPos worldPosition = te.getBlockPos();
             harvester.setPos(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ());
@@ -64,6 +63,5 @@ public class FakePlayerGetter {
         }
         return player.getGameProfile().getName();
     }
-
 
 }

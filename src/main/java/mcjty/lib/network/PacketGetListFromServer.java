@@ -1,5 +1,7 @@
 package mcjty.lib.network;
 
+import java.util.List;
+import javax.annotation.Nonnull;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -19,10 +21,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * This is executed clientside
@@ -56,7 +54,7 @@ public record PacketGetListFromServer(ResourceKey<Level> dimension, BlockPos pos
         return new PacketGetListFromServer(dimension, pos, cmd, TypedMap.EMPTY);
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> {
             Player player = ctx.player();
             ServerLevel world = LevelTools.getLevel(player.getCommandSenderWorld(), dimension);

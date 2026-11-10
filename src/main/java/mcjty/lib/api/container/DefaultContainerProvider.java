@@ -2,13 +2,22 @@ package mcjty.lib.api.container;
 
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.ContainerFactory;
 import mcjty.lib.container.GenericContainer;
+import mcjty.lib.container.IItemHandler;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.Sync;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
@@ -20,15 +29,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.items.IItemHandler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public class DefaultContainerProvider<C extends IGenericContainer> implements MenuProvider {
 
@@ -97,6 +97,11 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
         return this;
     }
 
+    public <T> DefaultContainerProvider<C> data(AttachmentType<T> type, StreamCodec<? extends ByteBuf, T> streamCodec, Codec<T> codec) {
+        dataListeners.add(new IGenericContainer.DataListener<>(type, streamCodec, codec));
+        return this;
+    }
+
     public <T> DefaultContainerProvider<C> data(Supplier<AttachmentType<T>> type, StreamCodec<? extends ByteBuf, T> streamCodec, Codec<T> codec) {
         dataListeners.add(new IGenericContainer.DataListener<>(type.get(), streamCodec, codec));
         return this;
@@ -141,7 +146,7 @@ public class DefaultContainerProvider<C extends IGenericContainer> implements Me
 
     public void writeExtraData(RegistryFriendlyByteBuf buf, BlockEntity te) {
         dataListeners.forEach(pair -> {
-            correctType(pair).streamCodec().encode(buf, te.getData(correctType(pair).type()));
+            correctType(pair).streamCodec().encode(buf, ((AttachmentTarget)te).getAttachedOrCreate(correctType(pair).type()));
         });
     }
 

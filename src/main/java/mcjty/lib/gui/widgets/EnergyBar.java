@@ -1,15 +1,14 @@
 package mcjty.lib.gui.widgets;
 
+import java.util.ArrayList;
+import java.util.List;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.typed.Type;
+import mcjty.lib.varia.IEnergyStorage;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class EnergyBar extends AbstractWidget<EnergyBar> {
 
@@ -227,7 +226,6 @@ public class EnergyBar extends AbstractWidget<EnergyBar> {
         }
         return color;
     }
-
 
     @Override
     public void readFromGuiCommand(GuiParser.GuiCommand command) {

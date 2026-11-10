@@ -1,5 +1,10 @@
 package mcjty.lib.blocks;
 
+import static mcjty.lib.varia.LogicFacing.*;
+import static net.minecraft.core.Direction.*;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.builder.BlockBuilder;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tileentity.LogicSupport;
@@ -24,12 +29,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import static mcjty.lib.varia.LogicFacing.*;
-import static net.minecraft.core.Direction.*;
 
 /**
  * The superclass for logic slabs.
@@ -180,10 +179,8 @@ public class LogicSlabBlock extends BaseBlock {
         }
     }
 
-    @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter world, BlockPos pos, @Nullable Direction side) {
-        BlockEntity te = world.getBlockEntity(pos);
-        if (state.getBlock() instanceof LogicSlabBlock && te instanceof GenericTileEntity) {
+        if (state.getBlock() instanceof LogicSlabBlock) {
             Direction direction = LogicSupport.getFacing(state).getInputSide();
             return switch (direction) {
                 case NORTH, SOUTH -> side == NORTH || side == SOUTH;

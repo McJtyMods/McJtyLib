@@ -9,8 +9,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.neoforged.neoforge.network.connection.ConnectionType;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record PacketAttachmentData(ResourceLocation attachmentTypeId, RegistryFriendlyByteBuf buffer) implements CustomPacketPayload {
 
@@ -20,18 +18,20 @@ public record PacketAttachmentData(ResourceLocation attachmentTypeId, RegistryFr
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketAttachmentData> CODEC = StreamCodec.of(
             (buf, packet) -> {
                 buf.writeResourceLocation(packet.attachmentTypeId);
-                byte[] array = packet.buffer().array();
+                byte[] array = new byte[packet.buffer().readableBytes()];
+                packet.buffer().getBytes(packet.buffer().readerIndex(), array);
                 buf.writeInt(array.length);
                 buf.writeBytes(array);
             },
             buf -> {
                 ResourceLocation containerId = buf.readResourceLocation();
                 int l = buf.readInt();
+                if (l < 0 || l > 1048576 || l > buf.readableBytes()) throw new IllegalArgumentException("Invalid payload length: " + l);
                 ByteBuf newbuf = Unpooled.buffer(l);
                 byte[] bytes = new byte[l];
                 buf.readBytes(bytes);
                 newbuf.writeBytes(bytes);
-                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, buf.registryAccess(), ConnectionType.OTHER);
+                RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, buf.registryAccess());
                 return new PacketAttachmentData(containerId, buffer);
             }
     );
@@ -45,7 +45,7 @@ public record PacketAttachmentData(ResourceLocation attachmentTypeId, RegistryFr
         return new PacketAttachmentData(id, buffer);
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> {
             AbstractContainerMenu container = ctx.player().containerMenu;
             if (container instanceof GenericContainer gc) {

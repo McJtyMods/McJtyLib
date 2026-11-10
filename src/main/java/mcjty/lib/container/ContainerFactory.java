@@ -1,13 +1,12 @@
 package mcjty.lib.container;
 
-import net.neoforged.neoforge.common.util.Lazy;
-
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import javax.annotation.Nonnull;
+import mcjty.lib.varia.Lazy;
 
 /**
  * This class can be used to help build containers. It's used in combination with GenericContainer which
@@ -63,6 +62,7 @@ public class ContainerFactory {
     public boolean isGenericSlot(int index) {
         return getSlotType(index) == SlotType.SLOT_GENERIC;
     }
+
     public boolean isOutputSlot(int index) {
         return getSlotDefinition(index).isOutput();
     }

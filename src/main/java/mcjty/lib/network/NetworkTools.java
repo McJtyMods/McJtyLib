@@ -1,18 +1,17 @@
 package mcjty.lib.network;
 
 import io.netty.buffer.ByteBuf;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import javax.annotation.Nonnull;
+import mcjty.lib.varia.FluidStack;
 import mcjty.lib.varia.Logging;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
-
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class NetworkTools {
 
@@ -77,7 +76,6 @@ public class NetworkTools {
         buf.writeInt(itemStack.getCount());
     }
 
-
     public static <T extends Enum<T>> void writeEnum(ByteBuf buf, T value, T nullValue) {
         if (value == null) {
             buf.writeInt(nullValue.ordinal());
@@ -136,6 +134,5 @@ public class NetworkTools {
         }
         return list;
     }
-
 
 }

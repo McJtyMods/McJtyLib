@@ -2,6 +2,12 @@ package mcjty.lib.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.client.GuiTools;
@@ -14,10 +20,14 @@ import mcjty.lib.network.Networking;
 import mcjty.lib.network.PacketSendServerCommand;
 import mcjty.lib.network.PacketServerCommandTyped;
 import mcjty.lib.tileentity.GenericTileEntity;
+import mcjty.lib.tooltips.TooltipRender;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.CapabilityTools;
+import mcjty.lib.varia.IEnergyStorage;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.SafeClientTools;
 import mcjty.lib.varia.Tools;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -36,22 +46,13 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import team.reborn.energy.api.EnergyStorage;
 
 /**
  * The main parent for all container based gui's in McJtyLib based mods
  */
 public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends AbstractContainerMenu> extends AbstractContainerScreen<C> implements IKeyReceiver {
+    public int getGuiLeft(){return leftPos;} public int getGuiTop(){return topPos;}
 
     protected Window window;
     private WindowManager windowManager;
@@ -90,7 +91,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         }
         return bounds;
     }
-
 
     @Override
     public void init() {
@@ -275,7 +275,6 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
         drawStackTooltips(graphics, mouseX, mouseY);
     }
 
-
     @Override
     public void renderSlot(@Nonnull GuiGraphics graphics, @Nonnull Slot slot) {
         // Prevent slots from being rendered if they are (partially) covered by a modal window
@@ -285,9 +284,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Nullable
-    @Override
     public Slot getSlotUnderMouse() {
-        Slot slot = super.getSlotUnderMouse();
+        Slot slot = this.hoveredSlot;
         if (slot == null) {
             return null;
         }
@@ -349,14 +347,14 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             // Protection for bad itemstacks
             list = new ArrayList<>();
         } else {
-            TooltipFlag flag = this.getMinecraft().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
-            list = stack.getTooltipLines(Item.TooltipContext.of(this.getMinecraft().level), this.getMinecraft().player, flag);
+            TooltipFlag flag = Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL;
+            list = stack.getTooltipLines(Item.TooltipContext.of(Minecraft.getInstance().level), Minecraft.getInstance().player, flag);
         }
 
         list = addCustomLines(list, blockRender, stack);
 
         // @todo 1.20 is this right?
-        graphics.renderTooltip(this.getMinecraft().font, list, Optional.empty(), stack, x, y);
+        graphics.renderTooltip(Minecraft.getInstance().font, list, TooltipRender.icons(stack), x, y);
     }
 
     @Override
@@ -456,11 +454,20 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     @Override
+    public boolean charTyped(char codePoint, int modifiers) {
+        if (window != null && getWindowManager().getTextFocus() != null) {
+            charTypedFromEvent(codePoint);
+            return true;
+        }
+        return super.charTyped(codePoint, modifiers);
+    }
+
+    @Override
     public void charTypedFromEvent(char codePoint) {
         if (window != null) {
             if (getWindowManager().charTyped(codePoint)) {
                 // @todo 1.14?
-//                super.keyPressed(keyCode, scanCode, 0); // @todo 1.14: modifiers?
+//                super.keyPressed(new KeyEvent(keyCode, scanCode, 0)); // @todo 1.14: modifiers?
             }
         }
     }
@@ -497,14 +504,13 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
 
     // Register a container/gui on the client side
     public static <C extends GenericContainer, S extends GenericGuiContainer<T,C>, T extends GenericTileEntity> void register(
-            RegisterMenuScreensEvent event,
             MenuType<C> type,
             GuiSupplier<C, S, T> guiSupplier) {
         MenuScreens.ScreenConstructor<C, S> factory = (container, inventory, title) -> {
             BlockEntity te = SafeClientTools.getClientWorld().getBlockEntity(container.getPos());
             return Tools.safeMap(te, (T tile) -> guiSupplier.create(tile, container, inventory), "Invalid be entity!");
         };
-        event.register(type, factory);
+        MenuScreens.register(type, factory);
     }
 
     @FunctionalInterface
@@ -513,7 +519,7 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
     }
 
     protected void updateEnergyBar(EnergyBar energyBar) {
-        IEnergyStorage power = getBE().getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, getBE().getBlockPos(), null);
+        IEnergyStorage power = CapabilityTools.energyHandler(EnergyStorage.SIDED.find(getBE().getLevel(), getBE().getBlockPos(), null));
         if (power != null) {
             energyBar.maxValue(power.getMaxEnergyStored());
             energyBar.value(power.getEnergyStored());

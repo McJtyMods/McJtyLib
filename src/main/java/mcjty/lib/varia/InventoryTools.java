@@ -1,17 +1,16 @@
 package mcjty.lib.varia;
 
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import mcjty.lib.container.IItemHandler;
+import mcjty.lib.container.ItemHandlerHelper;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-
-import javax.annotation.Nonnull;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public class InventoryTools {
     /**
@@ -22,7 +21,7 @@ public class InventoryTools {
             return 0;
         }
 
-        IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+        IItemHandler handler = CapabilityTools.itemHandler(ItemStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), null));
         if (handler != null) {
             return handler.getSlots();
         } else {
@@ -31,7 +30,7 @@ public class InventoryTools {
     }
 
     public static boolean isInventory(BlockEntity te) {
-        return te != null && te.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, te.getBlockPos(), null) != null;
+        return te != null && CapabilityTools.itemHandler(ItemStorage.SIDED.find(te.getLevel(), te.getBlockPos(), null)) != null;
     }
 
     /**
@@ -41,7 +40,7 @@ public class InventoryTools {
         Stream.Builder<ItemStack> builder = Stream.builder();
 
         if (tileEntity != null) {
-            IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+            IItemHandler handler = CapabilityTools.itemHandler(ItemStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), null));
             if (handler != null) {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack itemStack = handler.getStackInSlot(i);
@@ -60,7 +59,7 @@ public class InventoryTools {
     @Nonnull
     public static ItemStack getFirstMatchingItem(BlockEntity tileEntity, Predicate<ItemStack> predicate) {
         if (tileEntity != null) {
-            IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+            IItemHandler handler = CapabilityTools.itemHandler(ItemStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), null));
             if (handler != null) {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack itemStack = handler.getStackInSlot(i);
@@ -84,7 +83,7 @@ public class InventoryTools {
         BlockEntity te = world.getBlockEntity(direction == null ? pos : pos.relative(direction));
         if (te != null) {
             Direction opposite = direction == null ? null : direction.getOpposite();
-            IItemHandler handler = te.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, te.getBlockPos(), opposite);
+            IItemHandler handler = CapabilityTools.itemHandler(ItemStorage.SIDED.find(te.getLevel(), te.getBlockPos(), opposite));
             if (handler != null) {
                 return ItemHandlerHelper.insertItem(handler, s, false);
             } else {

@@ -1,5 +1,6 @@
 package mcjty.lib.network;
 
+import java.util.Optional;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
@@ -15,9 +16,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-
-import java.util.Optional;
 
 /**
  * This is a packet that can be used to send a command from the client side (typically the GUI) to
@@ -50,7 +48,7 @@ public record PacketServerCommandTyped(BlockPos pos, ResourceKey<Level> dimensio
         return TYPE;
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> {
             Player player = ctx.player();
             Level world;

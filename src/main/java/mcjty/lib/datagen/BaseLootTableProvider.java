@@ -2,6 +2,11 @@ package mcjty.lib.datagen;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.Tools;
 import net.minecraft.advancements.critereon.*;
@@ -30,12 +35,6 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
 
 public class BaseLootTableProvider {
 
@@ -68,7 +67,6 @@ public class BaseLootTableProvider {
 
     public LootTable.Builder createItemDropTable(String name, ItemLike item) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item));
         return LootTable.lootTable().withPool(builder);
@@ -78,7 +76,6 @@ public class BaseLootTableProvider {
                                                  float min, float max,
                                                  float lmin, float lmax) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item)
                         .apply(SetItemCountFunction
@@ -93,7 +90,6 @@ public class BaseLootTableProvider {
         Optional<Holder.Reference<Enchantment>> fortune = provider.lookup(Registries.ENCHANTMENT).get().get(Enchantments.FORTUNE);
         EnchantmentPredicate silkTouchPredicate = new EnchantmentPredicate(silkTouch.get(), MinMaxBounds.Ints.atLeast(1));
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(AlternativesEntry.alternatives(
                                 LootItem.lootTableItem(block)
@@ -114,7 +110,6 @@ public class BaseLootTableProvider {
 
     protected LootTable.Builder createBlockStateTable(String name, Block block, Property<?> property) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(Tools.getId(block).getPath())
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyBlockState.copyState(block).copy(property))
@@ -126,7 +121,6 @@ public class BaseLootTableProvider {
         lootTables.put(block, createStandardTable(Tools.getId(block).getPath(), block, types));
     }
 
-
     protected LootTable.Builder createStandardTable(String name, Block block, DataComponentType<?>... types) {
         CopyComponentsFunction.Builder copyBuilder = CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
                 .include(Registration.ITEM_ENERGY.get())
@@ -135,7 +129,6 @@ public class BaseLootTableProvider {
             copyBuilder.include(type);
         }
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block)
                         .apply(CopyNameFunction.copyName(CopyNameFunction.NameSource.BLOCK_ENTITY))
@@ -150,7 +143,6 @@ public class BaseLootTableProvider {
 
     protected LootTable.Builder createSimpleTable(String name, Block block) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(block));
         return LootTable.lootTable().withPool(builder);
@@ -158,7 +150,6 @@ public class BaseLootTableProvider {
 
     protected LootTable.Builder createSimpleTable(String name, Item item) {
         LootPool.Builder builder = LootPool.lootPool()
-                .name(name)
                 .setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(item));
         return LootTable.lootTable().withPool(builder);

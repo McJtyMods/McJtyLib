@@ -1,8 +1,12 @@
 package mcjty.lib.datagen;
 
 import com.mojang.serialization.Codec;
+
 import mcjty.lib.crafting.CopyComponentsRecipeBuilder;
 import mcjty.lib.crafting.IRecipeBuilder;
+
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider.ItemTagProvider;
 import net.minecraft.Util;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.Criterion;
@@ -10,41 +14,52 @@ import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
+import net.minecraft.data.CachedOutput;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunctions;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.neoforged.neoforge.common.data.GlobalLootModifierProvider;
-import net.neoforged.neoforge.common.data.JsonCodecProvider;
-import net.neoforged.neoforge.common.data.LanguageProvider;
-import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class DataGen {
+public class DataGen implements DataProvider {
 
     private final String modid;
-    private final GatherDataEvent event;
+    private final FabricDataOutput output;
+    private final CompletableFuture<HolderLookup.Provider> registries;
+    private final List<DataProvider> providers = new ArrayList<>();
     private final List<Dob> dobs = new ArrayList<>();
     private final Map<String, CodecProvider> codecProviders = new HashMap<>();
 
-    public DataGen(String modid, GatherDataEvent event) {
-        this.modid = modid;
-        this.event = event;
+    public DataGen(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registries) {
+        this.modid = output.getModId();
+        this.output = output;
+        this.registries = registries;
+    }
+
+    @Override
+    public String getName() {
+        return modid + " McJtyLib data";
+    }
+
+    @Override
+    public CompletableFuture<?> run(CachedOutput cache) {
+        return CompletableFuture.allOf(
+                providers.stream()
+                        .map(provider -> provider.run(cache))
+                        .toArray(CompletableFuture[]::new));
     }
 
     public void addCodecProvider(String name, String directory, Codec codec) {
@@ -58,225 +73,317 @@ public class DataGen {
     }
 
     public void generate() {
-        DataGenerator generator = event.getGenerator();
-
-        generator.addProvider(event.includeServer(), new GlobalLootModifierProvider(generator.getPackOutput(), event.getLookupProvider(), modid) {
-            @Override
-            protected void start() {
-                for (Dob dob : dobs) {
-                    for (Map.Entry<String, Supplier<IGlobalLootModifier>> entry : dob.glmSupplier().entrySet()) {
-                        add(entry.getKey(), entry.getValue().get());
-                    }
-                }
-            }
-        });
-
+        Map<ResourceLocation, LootItemFunction> globalFunctions = new HashMap<>();
+        for (Dob dob : dobs)
+            dob.glmSupplier()
+                    .forEach(
+                            (id, factory) ->
+                                    globalFunctions.put(
+                                            ResourceLocation.fromNamespaceAndPath(modid, id),
+                                            factory.get()));
+        if (!globalFunctions.isEmpty())
+            providers.add(
+                    new CodecDataProvider<>(
+                            output,
+                            "mcjtylib/loot_functions",
+                            LootItemFunctions.ROOT_CODEC,
+                            registries,
+                            globalFunctions));
 
         for (Map.Entry<String, CodecProvider> entry : codecProviders.entrySet()) {
             for (Dob dob : dobs) {
                 HolderLookup.Provider provider = dob.holderLookupSupplier().get(entry.getKey());
-                Map<ResourceLocation, Object> entries = dob.codecObjectSupplier().getOrDefault(entry.getKey(), Collections::emptyMap).get();
+                Map<ResourceLocation, Object> entries =
+                        dob.codecObjectSupplier()
+                                .getOrDefault(entry.getKey(), Collections::emptyMap)
+                                .get();
                 if (!entries.isEmpty()) {
-                    JsonCodecProvider codecProvider = new JsonCodecProvider<>(generator.getPackOutput(), PackOutput.Target.DATA_PACK, entry.getValue().directory(),
-                            PackType.SERVER_DATA, entry.getValue().codec(), CompletableFuture.completedFuture(provider), modid, event.getExistingFileHelper()) {
-                        @Override
-                        protected void gather() {
-
-                        }
-                    };
-                    entries.forEach(codecProvider::unconditional);
-                    generator.addProvider(event.includeServer(), codecProvider);
+                    providers.add(
+                            new CodecDataProvider<>(
+                                    output,
+                                    entry.getValue().directory(),
+                                    entry.getValue().codec(),
+                                    CompletableFuture.completedFuture(provider),
+                                    entries));
                 }
             }
         }
 
-        generator.addProvider(event.includeServer(), new BaseRecipeProvider(generator, event.getLookupProvider()) {
+        providers.add(
+                new BaseRecipeProvider(output, registries) {
+                    @Override
+                    public void buildRecipes(RecipeOutput consumer) {
+                        for (Dob dob : dobs) {
+                            dob.recipe()
+                                    .accept(
+                                            new IRecipeFactory() {
+                                                @Override
+                                                public void recipe(
+                                                        Supplier<IRecipeBuilder> supplier) {
+                                                    supplier.get().build(consumer);
+                                                }
 
-            @Override
-            protected void buildRecipes(RecipeOutput consumer) {
-                for (Dob dob : dobs) {
-                    dob.recipe().accept(new IRecipeFactory() {
-                        @Override
-                        public void recipe(Supplier<IRecipeBuilder> supplier) {
-                            supplier.get().build(consumer);
+                                                @Override
+                                                public void recipeConsumer(
+                                                        Supplier<Consumer<RecipeOutput>>
+                                                                consumerSupplier) {
+                                                    consumerSupplier.get().accept(consumer);
+                                                }
+
+                                                @Override
+                                                public void recipe(
+                                                        String id,
+                                                        Supplier<IRecipeBuilder> supplier) {
+                                                    supplier.get()
+                                                            .build(
+                                                                    consumer,
+                                                                    ResourceLocation
+                                                                            .fromNamespaceAndPath(
+                                                                                    modid, id));
+                                                }
+
+                                                @Override
+                                                public void shapedNBT(
+                                                        CopyComponentsRecipeBuilder builder,
+                                                        String... pattern) {
+                                                    build(consumer, builder, pattern);
+                                                }
+
+                                                @Override
+                                                public void shapedNBT(
+                                                        String id,
+                                                        CopyComponentsRecipeBuilder builder,
+                                                        String... pattern) {
+                                                    build(
+                                                            consumer,
+                                                            ResourceLocation.fromNamespaceAndPath(
+                                                                    modid, id),
+                                                            builder,
+                                                            pattern);
+                                                }
+
+                                                @Override
+                                                public void shaped(
+                                                        ShapedRecipeBuilder builder,
+                                                        String... pattern) {
+                                                    build(consumer, builder, pattern);
+                                                }
+
+                                                @Override
+                                                public void shaped(
+                                                        String id,
+                                                        ShapedRecipeBuilder builder,
+                                                        String... pattern) {
+                                                    build(
+                                                            consumer,
+                                                            ResourceLocation.fromNamespaceAndPath(
+                                                                    modid, id),
+                                                            builder,
+                                                            pattern);
+                                                }
+
+                                                @Override
+                                                public void shapeless(
+                                                        ShapelessRecipeBuilder builder) {
+                                                    build(consumer, builder);
+                                                }
+
+                                                @Override
+                                                public void shapeless(
+                                                        String id, ShapelessRecipeBuilder builder) {
+                                                    build(
+                                                            consumer,
+                                                            ResourceLocation.fromNamespaceAndPath(
+                                                                    modid, id),
+                                                            builder);
+                                                }
+                                            });
                         }
-
-                        @Override
-                        public void recipeConsumer(Supplier<Consumer<RecipeOutput>> consumerSupplier) {
-                            consumerSupplier.get().accept(consumer);
-                        }
-
-                        @Override
-                        public void recipe(String id, Supplier<IRecipeBuilder> supplier) {
-                            supplier.get().build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id));
-                        }
-
-                        @Override
-                        public void shapedNBT(CopyComponentsRecipeBuilder builder, String... pattern) {
-                            build(consumer, builder, pattern);
-                        }
-
-                        @Override
-                        public void shapedNBT(String id, CopyComponentsRecipeBuilder builder, String... pattern) {
-                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder, pattern);
-
-                        }
-
-                        @Override
-                        public void shaped(ShapedRecipeBuilder builder, String... pattern) {
-                            build(consumer, builder, pattern);
-                        }
-
-                        @Override
-                        public void shaped(String id, ShapedRecipeBuilder builder, String... pattern) {
-                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder, pattern);
-                        }
-
-                        @Override
-                        public void shapeless(ShapelessRecipeBuilder builder) {
-                            build(consumer, builder);
-                        }
-
-                        @Override
-                        public void shapeless(String id, ShapelessRecipeBuilder builder) {
-                            build(consumer, ResourceLocation.fromNamespaceAndPath(modid, id), builder);
-                        }
-                    });
-                }
-            }
-        });
+                    }
+                });
 
         // @todo 1.19.3, probably not right
         BaseLootTableProvider lootTableProvider = new BaseLootTableProvider();
 
-        List<LootTableProvider.SubProviderEntry> list = List.of(new LootTableProvider.SubProviderEntry(provider -> builder -> {
-                    for (Dob dob : dobs) {
-                        if (dob.blockSupplier() != null) {
-                            dob.loot().accept(lootTableProvider);
+        List<LootTableProvider.SubProviderEntry> list =
+                List.of(
+                        new LootTableProvider.SubProviderEntry(
+                                provider ->
+                                        builder -> {
+                                            for (Dob dob : dobs) {
+                                                if (dob.blockSupplier() != null) {
+                                                    dob.loot().accept(lootTableProvider);
+                                                }
+                                            }
+                                            lootTableProvider.generate(
+                                                    builder, LootContextParamSets.BLOCK);
+                                        },
+                                LootContextParamSets.BLOCK),
+                        new LootTableProvider.SubProviderEntry(
+                                provider ->
+                                        builder -> {
+                                            for (Dob dob : dobs) {
+                                                dob.loot().accept(lootTableProvider);
+                                            }
+                                            lootTableProvider.generate(
+                                                    builder, LootContextParamSets.CHEST);
+                                        },
+                                LootContextParamSets.CHEST),
+                        new LootTableProvider.SubProviderEntry(
+                                provider ->
+                                        builder -> {
+                                            for (Dob dob : dobs) {
+                                                if (dob.entitySupplier() != null) {
+                                                    dob.loot().accept(lootTableProvider);
+                                                }
+                                            }
+                                            lootTableProvider.generate(
+                                                    builder, LootContextParamSets.ENTITY);
+                                        },
+                                LootContextParamSets.ENTITY));
+        providers.add(new LootTableProvider(output, Collections.emptySet(), list, registries));
+
+        //        providers.add( new BaseLootTableProvider(generator) {
+        //            @Override
+        //            protected void addTables() {
+        //                for (Dob dob : dobs) {
+        //                    dob.loot().accept(this);
+        //                }
+        //            }
+        //        });
+        BaseBlockTagsProvider blockTags =
+                new BaseBlockTagsProvider(output, registries, modid) {
+                    @Override
+                    protected void addTags(HolderLookup.Provider provider) {
+                        for (Dob dob : dobs) {
+                            dob.blockTags()
+                                    .accept(
+                                            new ITagFactory() {
+                                                @Override
+                                                public void blockTags(
+                                                        Supplier<? extends Block> blockSupplier,
+                                                        List<TagKey> tags) {
+                                                    for (TagKey<Block> tag : tags) {
+                                                        tag(tag).add(
+                                                                        BuiltInRegistries.BLOCK
+                                                                                .getResourceKey(
+                                                                                        blockSupplier
+                                                                                                .get())
+                                                                                .orElseThrow());
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void itemTags(
+                                                        Supplier<? extends Item> itemSupplier,
+                                                        List<TagKey> tags) {
+                                                    // No op
+                                                }
+                                            });
                         }
                     }
-                    lootTableProvider.generate(builder, LootContextParamSets.BLOCK);
-                }, LootContextParamSets.BLOCK),
-                new LootTableProvider.SubProviderEntry(provider -> builder -> {
-                    for (Dob dob : dobs) {
-                        dob.loot().accept(lootTableProvider);
-                    }
-                    lootTableProvider.generate(builder, LootContextParamSets.CHEST);
-                }, LootContextParamSets.CHEST),
-                new LootTableProvider.SubProviderEntry(provider -> builder -> {
-                    for (Dob dob : dobs) {
-                        if (dob.entitySupplier() != null) {
-                            dob.loot().accept(lootTableProvider);
+                };
+        providers.add(blockTags);
+        providers.add(
+                new ItemTagProvider(output, registries) {
+                    @Override
+                    protected void addTags(HolderLookup.Provider provider) {
+                        for (Dob dob : dobs) {
+                            dob.itemTags()
+                                    .accept(
+                                            new ITagFactory() {
+                                                @Override
+                                                public void blockTags(
+                                                        Supplier<? extends Block> blockSupplier,
+                                                        List<TagKey> tags) {
+                                                    // No op
+                                                }
+
+                                                @Override
+                                                public void itemTags(
+                                                        Supplier<? extends Item> itemSupplier,
+                                                        List<TagKey> tags) {
+                                                    for (TagKey<Item> tag : tags) {
+                                                        tag(tag).add(
+                                                                        BuiltInRegistries.ITEM
+                                                                                .getResourceKey(
+                                                                                        itemSupplier
+                                                                                                .get())
+                                                                                .orElseThrow());
+                                                    }
+                                                }
+                                            });
                         }
                     }
-                    lootTableProvider.generate(builder, LootContextParamSets.ENTITY);
-                }, LootContextParamSets.ENTITY));
-        generator.addProvider(event.includeServer(), new LootTableProvider(generator.getPackOutput(), Collections.emptySet(),
-                list, event.getLookupProvider()));
+                });
 
-
-//        generator.addProvider(event.includeServer(), new BaseLootTableProvider(generator) {
-//            @Override
-//            protected void addTables() {
-//                for (Dob dob : dobs) {
-//                    dob.loot().accept(this);
-//                }
-//            }
-//        });
-        BaseBlockTagsProvider blockTags = new BaseBlockTagsProvider(generator, event.getLookupProvider(), modid, event.getExistingFileHelper()) {
-            @Override
-            protected void addTags(HolderLookup.Provider provider) {
-                for (Dob dob : dobs) {
-                    dob.blockTags().accept(new ITagFactory() {
-                        @Override
-                        public void blockTags(Supplier<? extends Block> blockSupplier, List<TagKey> tags) {
-                            for (TagKey<Block> tag : tags) {
-                                tag(tag).add(blockSupplier.get());
+        providers.add(
+                new LanguageProvider(output, "en_us", registries) {
+                    @Override
+                    protected void addTranslations() {
+                        for (Dob dob : dobs) {
+                            String name = dob.translatedName();
+                            if (name != null) {
+                                if (dob.blockSupplier() != null) {
+                                    this.add(dob.blockSupplier().get(), name);
+                                } else if (dob.itemSupplier() != null) {
+                                    this.add(dob.itemSupplier().get(), name);
+                                } else if (dob.entitySupplier() != null) {
+                                    this.add(dob.entitySupplier().get(), name);
+                                }
+                            }
+                            Map<String, String> keyedMessages = dob.keyedMessages();
+                            for (Map.Entry<String, String> entry : keyedMessages.entrySet()) {
+                                String key;
+                                if (dob.blockSupplier() != null) {
+                                    key =
+                                            Util.makeDescriptionId(
+                                                    "message",
+                                                    BuiltInRegistries.BLOCK.getKey(
+                                                            dob.blockSupplier().get()));
+                                } else if (dob.itemSupplier() != null) {
+                                    key =
+                                            Util.makeDescriptionId(
+                                                    "message",
+                                                    BuiltInRegistries.ITEM.getKey(
+                                                            dob.itemSupplier().get()));
+                                } else if (dob.entitySupplier() != null) {
+                                    key =
+                                            Util.makeDescriptionId(
+                                                    "message",
+                                                    BuiltInRegistries.ENTITY_TYPE.getKey(
+                                                            dob.entitySupplier().get()));
+                                } else {
+                                    throw new RuntimeException("Not supported!");
+                                }
+                                this.add(key + "." + entry.getKey(), entry.getValue());
+                            }
+                            Map<String, String> messages = dob.messages();
+                            for (Map.Entry<String, String> entry : messages.entrySet()) {
+                                this.add(entry.getKey(), entry.getValue());
                             }
                         }
-
-                        @Override
-                        public void itemTags(Supplier<? extends Item> itemSupplier, List<TagKey> tags) {
-                            // No op
-                        }
-                    });
-                }
-            }
-        };
-        generator.addProvider(event.includeServer(), blockTags);
-        generator.addProvider(event.includeServer(), new ItemTagsProvider(generator.getPackOutput(), event.getLookupProvider(), blockTags.contentsGetter(), modid, event.getExistingFileHelper()) {
-            @Override
-            protected void addTags(HolderLookup.Provider provider) {
-                for (Dob dob : dobs) {
-                    dob.itemTags().accept(new ITagFactory() {
-                        @Override
-                        public void blockTags(Supplier<? extends Block> blockSupplier, List<TagKey> tags) {
-                            // No op
-                        }
-
-                        @Override
-                        public void itemTags(Supplier<? extends Item> itemSupplier, List<TagKey> tags) {
-                            for (TagKey<Item> tag : tags) {
-                                tag(tag).add(itemSupplier.get());
-                            }
-                        }
-                    });
-                }
-            }
-        });
-
-        generator.addProvider(event.includeClient(), new LanguageProvider(generator.getPackOutput(), modid, "en_us") {
-            @Override
-            protected void addTranslations() {
-                for (Dob dob : dobs) {
-                    String name = dob.translatedName();
-                    if (name != null) {
-                        if (dob.blockSupplier() != null) {
-                            this.add(dob.blockSupplier().get(), name);
-                        } else if (dob.itemSupplier() != null) {
-                            this.add(dob.itemSupplier().get(), name);
-                        } else if (dob.entitySupplier() != null) {
-                            this.add(dob.entitySupplier().get(), name);
+                    }
+                });
+        providers.add(
+                new BaseBlockStateProvider(output, modid) {
+                    @Override
+                    protected void registerStatesAndModels() {
+                        for (Dob dob : dobs) {
+                            dob.blockstate().accept(this);
                         }
                     }
-                    Map<String, String> keyedMessages = dob.keyedMessages();
-                    for (Map.Entry<String, String> entry : keyedMessages.entrySet()) {
-                        String key;
-                        if (dob.blockSupplier() != null) {
-                            key = Util.makeDescriptionId("message", BuiltInRegistries.BLOCK.getKey(dob.blockSupplier().get()));
-                        } else if (dob.itemSupplier() != null) {
-                            key = Util.makeDescriptionId("message", BuiltInRegistries.ITEM.getKey(dob.itemSupplier().get()));
-                        } else if (dob.entitySupplier() != null) {
-                            key = Util.makeDescriptionId("message", BuiltInRegistries.ENTITY_TYPE.getKey(dob.entitySupplier().get()));
-                        } else {
-                            throw new RuntimeException("Not supported!");
+                });
+        providers.add(
+                new BaseItemModelProvider(output, modid) {
+                    @Override
+                    protected void registerModels() {
+                        BaseItemModelProvider provider = this;
+                        for (Dob dob : dobs) {
+                            dob.item().accept(provider);
                         }
-                        this.add(key + "." + entry.getKey(), entry.getValue());
                     }
-                    Map<String, String> messages = dob.messages();
-                    for (Map.Entry<String, String> entry : messages.entrySet()) {
-                        this.add(entry.getKey(), entry.getValue());
-                    }
-                }
-            }
-        });
-        generator.addProvider(event.includeClient(), new BaseBlockStateProvider(generator, modid, event.getExistingFileHelper()) {
-            @Override
-            protected void registerStatesAndModels() {
-                for (Dob dob : dobs) {
-                    dob.blockstate().accept(this);
-                }
-            }
-        });
-        generator.addProvider(event.includeClient(), new BaseItemModelProvider(generator, modid, event.getExistingFileHelper()) {
-            @Override
-            protected void registerModels() {
-                BaseItemModelProvider provider = this;
-                for (Dob dob : dobs) {
-                    dob.item().accept(provider);
-                }
-            }
-        });
+                });
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item) {
@@ -284,14 +391,17 @@ public class DataGen {
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(TagKey<Item> tag) {
-        return CriteriaTriggers.INVENTORY_CHANGED.createCriterion(inventoryTrigger(ItemPredicate.Builder.item().of(tag).build()));
+        return CriteriaTriggers.INVENTORY_CHANGED.createCriterion(
+                inventoryTrigger(ItemPredicate.Builder.item().of(tag).build()));
     }
 
-    public static InventoryChangeTrigger.TriggerInstance inventoryTrigger(ItemPredicate... itemPredicate) {
-        return new InventoryChangeTrigger.TriggerInstance(Optional.empty(), InventoryChangeTrigger.TriggerInstance.Slots.ANY, List.of(itemPredicate));
+    public static InventoryChangeTrigger.TriggerInstance inventoryTrigger(
+            ItemPredicate... itemPredicate) {
+        return new InventoryChangeTrigger.TriggerInstance(
+                Optional.empty(),
+                InventoryChangeTrigger.TriggerInstance.Slots.ANY,
+                List.of(itemPredicate));
     }
 
-    record CodecProvider(String directory, Codec codec) {
-
-    }
+    record CodecProvider(String directory, Codec codec) {}
 }

@@ -1,25 +1,20 @@
 package mcjty.lib.varia;
 
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import mcjty.lib.container.IItemHandler;
 import mcjty.lib.gui.GuiParser;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.items.IItemHandler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ItemStackTools {
 
@@ -33,7 +28,7 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        IItemHandler handler = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+        IItemHandler handler = CapabilityTools.itemHandler(ItemStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), null));
         if (handler != null) {
             return handler.extractItem(slot, amount, false);
         } else {
@@ -49,7 +44,7 @@ public class ItemStackTools {
         if (tileEntity == null) {
             return ItemStack.EMPTY;
         }
-        IItemHandler h = tileEntity.getLevel().getCapability(Capabilities.ItemHandler.BLOCK, tileEntity.getBlockPos(), null);
+        IItemHandler h = CapabilityTools.itemHandler(ItemStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), null));
         if (h != null) {
             return h.getStackInSlot(slot);
         } else {
@@ -105,39 +100,39 @@ public class ItemStackTools {
             commonTags.add(ItemTags.PLANKS);
             commonTags.add(ItemTags.STAIRS);
             commonTags.add(ItemTags.DIRT);
-            commonTags.add(Tags.Items.CROPS);
-            commonTags.add(Tags.Items.GLASS_BLOCKS);
-            commonTags.add(Tags.Items.GLASS_PANES);
-            commonTags.add(Tags.Items.CHESTS);
-            commonTags.add(Tags.Items.COBBLESTONES);
-            commonTags.add(Tags.Items.NETHERRACKS);
-            commonTags.add(Tags.Items.OBSIDIANS);
-            commonTags.add(Tags.Items.GRAVELS);
-            commonTags.add(Tags.Items.SANDS);
-            commonTags.add(Tags.Items.END_STONES);
-            commonTags.add(Tags.Items.STONES);
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "crops")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "glass_blocks")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "glass_panes")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "chests")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "cobblestones")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "netherracks")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "obsidians")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "gravels")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "sands")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "end_stones")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "stones")));
 
-            commonTags.add(Tags.Items.ORES_COAL);
-            commonTags.add(Tags.Items.ORES_DIAMOND);
-            commonTags.add(Tags.Items.ORES_EMERALD);
-            commonTags.add(Tags.Items.ORES_GOLD);
-            commonTags.add(Tags.Items.ORES_REDSTONE);
-            commonTags.add(Tags.Items.ORES_QUARTZ);
-            commonTags.add(Tags.Items.ORES_IRON);
-            commonTags.add(Tags.Items.ORES_LAPIS);
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/coal")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/diamond")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/emerald")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/gold")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/redstone")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/quartz")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/iron")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/lapis")));
             commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/copper")));
             commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/tin")));
             commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/silver")));
             commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/manganese")));
             commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ores/platinum")));
 
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_COAL);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_DIAMOND);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_EMERALD);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_GOLD);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_REDSTONE);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_IRON);
-            commonTags.add(Tags.Items.STORAGE_BLOCKS_LAPIS);
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/coal")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/diamond")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/emerald")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/gold")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/redstone")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/iron")));
+            commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/lapis")));
             commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/copper")));
             commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/tin")));
             commonTags.add(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "storage_blocks/silver")));

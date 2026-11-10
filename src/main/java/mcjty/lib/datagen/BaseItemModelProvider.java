@@ -1,23 +1,21 @@
 package mcjty.lib.datagen;
 
+import mcjty.lib.datagen.model.ModelFile;
+import mcjty.lib.datagen.model.ModelProvider;
 import mcjty.lib.varia.Tools;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.client.model.generators.ItemModelProvider;
-import net.neoforged.neoforge.client.model.generators.ModelFile;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
-public abstract class BaseItemModelProvider extends ItemModelProvider {
+public abstract class BaseItemModelProvider extends ModelProvider {
 
     protected String name(Item item) {
         return BuiltInRegistries.ITEM.getKey(item).getPath();
     }
 
-
-    public BaseItemModelProvider(DataGenerator generator, String modid, ExistingFileHelper existingFileHelper) {
-        super(generator.getPackOutput(), modid, existingFileHelper);
+    public BaseItemModelProvider(FabricDataOutput generator, String modid) {
+        super(generator, modid, "item");
     }
 
     public void parentedBlock(Block block) {

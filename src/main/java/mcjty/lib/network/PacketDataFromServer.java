@@ -1,5 +1,6 @@
 package mcjty.lib.network;
 
+import java.util.Optional;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -14,9 +15,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-
-import java.util.Optional;
 
 /**
  * This packet is used (typically by PacketRequestDataFromServer) to send back a data to the client.
@@ -37,7 +35,7 @@ public record PacketDataFromServer(BlockPos pos, String command, TypedMap result
         return TYPE;
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> {
             BlockEntity te;
             if (pos == null) {

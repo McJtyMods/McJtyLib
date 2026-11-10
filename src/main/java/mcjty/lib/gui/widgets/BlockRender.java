@@ -2,12 +2,15 @@ package mcjty.lib.gui.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import java.util.ArrayList;
+import java.util.List;
 import mcjty.lib.base.StyleConfig;
 import mcjty.lib.client.RenderHelper;
 import mcjty.lib.gui.GuiParser;
 import mcjty.lib.gui.events.BlockRenderEvent;
 import mcjty.lib.gui.events.ItemStackDraggedEvent;
 import mcjty.lib.typed.Type;
+import mcjty.lib.varia.FluidStack;
 import mcjty.lib.varia.ItemStackTools;
 import mcjty.lib.varia.Tools;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,10 +19,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.fluids.FluidStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class BlockRender extends AbstractWidget<BlockRender> {
 

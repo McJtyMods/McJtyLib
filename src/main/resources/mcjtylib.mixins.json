@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "mcjty.lib.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "MobSpawnMixin",
+    "ServerLevelMixin",
+    "RedStoneWireMixin",
+    "BlockEntityMixin",
+    "RegistryOpsAccessor",
+    "HolderLookupAdapterAccessor",
+    "LootTableMixin"
+  ],
+  "client": [
+    "client.ItemStackTooltipMixin",
+    "client.ItemRendererMixin",
+    "client.MinecraftMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

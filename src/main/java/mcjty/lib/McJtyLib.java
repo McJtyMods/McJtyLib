@@ -1,30 +1,32 @@
 package mcjty.lib;
 
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import mcjty.lib.base.GeneralConfig;
 import mcjty.lib.blockcommands.CommandInfo;
 import mcjty.lib.network.IServerCommand;
 import mcjty.lib.network.Networking;
 import mcjty.lib.preferences.PreferencesProperties;
-import mcjty.lib.setup.ClientSetup;
 import mcjty.lib.setup.ModSetup;
 import mcjty.lib.setup.Registration;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.typed.TypedMap;
+import mcjty.lib.varia.GlobalLootFunctions;
+import mcjty.lib.varia.ItemCapabilityProvider;
+import mcjty.lib.varia.LevelTools;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
-@Mod(McJtyLib.MODID)
-public class McJtyLib {
+public class McJtyLib implements ModInitializer {
 
     public static final String MODID = "mcjtylib";
 
@@ -36,25 +38,25 @@ public class McJtyLib {
     private static final Map<Pair<String, String>, IServerCommand> clientCommands = new HashMap<>();
     private static final Map<String, CommandInfo> commandInfos = new HashMap<>();
 
-    public McJtyLib(ModContainer container, IEventBus bus, Dist dist) {
-
+    @Override
+    public void onInitialize() {
         instance = this;
-        // Register the setup method for modloading
-        Registration.init(bus);
-        bus.addListener(setup::init);
-        bus.addListener(Networking::registerMessages);
-        bus.addListener(GeneralConfig::onLoad);
-        bus.addListener(GeneralConfig::onFileChange);
-        
-        if (dist.isClient()) {
-            bus.addListener(ClientSetup::init);
-            bus.addListener(ClientSetup::registerKeyBinds);
-            bus.addListener(ClientSetup::registerClientComponentTooltips);
-//            bus.addListener(MultipartModelLoader::register);
-        }
-
-        container.registerConfig(ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
-        container.registerConfig(ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
+        Registration.init();
+        ItemCapabilityProvider.register();
+        GlobalLootFunctions.register();
+        LevelTools.registerLifecycle();
+        ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.register((tile, level) -> {
+            if (tile instanceof GenericTileEntity generic) generic.onLoad();
+        });
+        ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((tile, level) -> {
+            if (tile instanceof GenericTileEntity generic) generic.onChunkUnloaded();
+        });
+        Networking.registerMessages();
+        setup.init();
+        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.CLIENT, GeneralConfig.CLIENT_CONFIG);
+        NeoForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.SERVER, GeneralConfig.SERVER_CONFIG);
+        NeoForgeModConfigEvents.loading(MODID).register(GeneralConfig::onLoad);
+        NeoForgeModConfigEvents.reloading(MODID).register(GeneralConfig::onFileChange);
     }
 
     /**
@@ -97,10 +99,10 @@ public class McJtyLib {
     }
 
     public static PreferencesProperties getPreferencesProperties(Player player) {
-        return player.getData(Registration.PREFERENCES_PROPERTIES);
+        return ((AttachmentTarget) player).getAttachedOrCreate(Registration.PREFERENCES_PROPERTIES);
     }
 
     public static void setPreferencesProperties(Player player, PreferencesProperties properties) {
-        player.setData(Registration.PREFERENCES_PROPERTIES, properties);
+        ((AttachmentTarget) player).setAttached(Registration.PREFERENCES_PROPERTIES, properties);
     }
 }

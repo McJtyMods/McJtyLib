@@ -9,7 +9,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Send a packet from the client to the server in order to execute a server side command
@@ -36,7 +35,7 @@ public record PacketSendServerCommand(String modid, String command, TypedMap arg
         return new PacketSendServerCommand(modid, command, arguments);
     }
 
-    public void handle(IPayloadContext ctx) {
+    public void handle(PayloadContext ctx) {
         ctx.enqueueWork(() -> {
             Player player = ctx.player();
             try {

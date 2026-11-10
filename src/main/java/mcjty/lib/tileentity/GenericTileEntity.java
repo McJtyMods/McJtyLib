@@ -9,6 +9,9 @@ import mcjty.lib.typed.Key;
 import mcjty.lib.typed.Type;
 import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.RedstoneMode;
+
+import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.core.*;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
@@ -27,23 +30,25 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.attachment.AttachmentType;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class GenericTileEntity extends BlockEntity {
 
     public static final Key<Integer> VALUE_RSMODE = new Key<>("rsmode", Type.INTEGER);
 
-//    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> attachments = new HashMap<>();
+    //    private final Map<AttachmentType<?>, StreamCodec<? extends ByteBuf, ?>> attachments = new
+    // HashMap<>();
 
     protected byte powerLevel;
 
@@ -65,7 +70,12 @@ public class GenericTileEntity extends BlockEntity {
         setChanged();
         if (getLevel() != null) {
             BlockState state = getLevel().getBlockState(getBlockPos());
-            getLevel().sendBlockUpdated(getBlockPos(), state, state, Block.UPDATE_CLIENTS + Block.UPDATE_NEIGHBORS);
+            getLevel()
+                    .sendBlockUpdated(
+                            getBlockPos(),
+                            state,
+                            state,
+                            Block.UPDATE_CLIENTS + Block.UPDATE_NEIGHBORS);
         }
     }
 
@@ -81,25 +91,23 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     // @todo 1.14
-//    @Override
-//    public boolean shouldRefresh(Level world, BlockPos pos, BlockState oldState, BlockState newSate) {
-//        return oldState.getBlock() != newSate.getBlock();
-//    }
+    //    @Override
+    //    public boolean shouldRefresh(Level world, BlockPos pos, BlockState oldState, BlockState
+    // newSate) {
+    //        return oldState.getBlock() != newSate.getBlock();
+    //    }
 
-    public void onBlockPlacedBy(Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-    }
+    public void onBlockPlacedBy(
+            Level world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {}
 
-    public void onReplaced(Level world, BlockPos pos, BlockState state, BlockState newstate) {
-    }
+    public void onReplaced(Level world, BlockPos pos, BlockState state, BlockState newstate) {}
 
-    public void onPartAdded(PartSlot slot, BlockState state, BlockEntity multipartTile) {
-    }
+    public void onPartAdded(PartSlot slot, BlockState state, BlockEntity multipartTile) {}
 
-    public void onDataChanged(AttachmentType<?> type, Object oldData, Object newData) {
+    public void onDataChanged(AttachmentType<?> type, Object oldData, Object newData) {}
 
-    }
-
-    public InteractionResult onBlockActivated(BlockState state, Player player, InteractionHand hand, BlockHitResult result) {
+    public InteractionResult onBlockActivated(
+            BlockState state, Player player, InteractionHand hand, BlockHitResult result) {
         return InteractionResult.PASS;
     }
 
@@ -114,7 +122,6 @@ public class GenericTileEntity extends BlockEntity {
         int powered = world.getBestNeighborSignal(pos); // @todo check
         setPowerInput(powered);
     }
-
 
     public void setPowerInput(int powered) {
         if (this.powerLevel != powered) {
@@ -162,15 +169,15 @@ public class GenericTileEntity extends BlockEntity {
     // ------------------------------------------------------
 
     // Called when a slot is changed.
-    public void onSlotChanged(int index, ItemStack stack) {
-    }
+    public void onSlotChanged(int index, ItemStack stack) {}
 
     @Nullable
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         CompoundTag tag = new CompoundTag();
         this.saveClientDataToNBT(tag, level.registryAccess());
-        return ClientboundBlockEntityDataPacket.create(this, (BlockEntity entity, RegistryAccess access) -> tag);
+        return ClientboundBlockEntityDataPacket.create(
+                this, (BlockEntity entity, RegistryAccess access) -> tag);
     }
 
     @Override
@@ -180,33 +187,56 @@ public class GenericTileEntity extends BlockEntity {
         return tag;
     }
 
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider provider) {
-        CompoundTag tag = pkt.getTag();
-        loadClientDataFromNBT(tag, provider);
+    public <T> T getData(AttachmentType<T> type) {
+        return ((AttachmentTarget) this).getAttachedOrCreate(type);
     }
 
-    @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider provider) {
-        super.handleUpdateTag(tag, provider);
-        loadClientDataFromNBT(tag, provider);
+    public <T> void setData(AttachmentType<T> type, T data) {
+        ((AttachmentTarget) this).setAttached(type, data);
     }
 
     //    public void setInfused(int infused) {
-//        this.infused = infused;
-//        markDirtyClient();
-//    }
-//
-//    public int getInfused() {
-//        return infused;
-//    }
-//
-//    public float getInfusedFactor() {
-//        return ((float) infused) / GeneralConfig.maxInfuse.get();
-//    }
+    //        this.infused = infused;
+    //        markDirtyClient();
+    //    }
+    //
+    //    public int getInfused() {
+    //        return infused;
+    //    }
+    //
+    //    public float getInfusedFactor() {
+    //        return ((float) infused) / GeneralConfig.maxInfuse.get();
+    //    }
+
+    public void onLoad() {}
+
+    public void onChunkUnloaded() {}
+
+    public void onDataPacket(
+            Connection connection, CompoundTag tag, HolderLookup.Provider provider) {
+        loadClientDataFromNBT(tag, provider);
+    }
+
+    public void onDataPacket(
+            Connection connection,
+            ClientboundBlockEntityDataPacket packet,
+            HolderLookup.Provider provider) {
+        onDataPacket(connection, packet.getTag(), provider);
+    }
+
+    public AABB getRenderBoundingBox() {
+        return new AABB(getBlockPos());
+    }
 
     public boolean canPlayerAccess(Player player) {
-        return !isRemoved() && player.distanceToSqr(new Vec3(worldPosition.getX(), worldPosition.getY(), worldPosition.getZ()).add(new Vec3(0.5D, 0.5D, 0.5D))) <= 64D;
+        return !isRemoved()
+                && player.distanceToSqr(
+                                new Vec3(
+                                                worldPosition.getX(),
+                                                worldPosition.getY(),
+                                                worldPosition.getZ())
+                                        .add(new Vec3(0.5D, 0.5D, 0.5D)))
+                        <= 64D;
     }
 
     @Override
@@ -224,25 +254,23 @@ public class GenericTileEntity extends BlockEntity {
     /**
      * Override to write only the data you need on the client
      */
-    public void saveClientDataToNBT(CompoundTag tagCompound, HolderLookup.Provider provider) {
-    }
+    public void saveClientDataToNBT(CompoundTag tagCompound, HolderLookup.Provider provider) {}
 
     /**
      * Override to read only the data you need on the client
      */
-    public void loadClientDataFromNBT(CompoundTag tagCompound, HolderLookup.Provider provider) {
-    }
+    public void loadClientDataFromNBT(CompoundTag tagCompound, HolderLookup.Provider provider) {}
 
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
-        components.set(Registration.ITEM_BASE_BE_DATA, getData(Registration.BASE_BE_DATA));
+        components.set(Registration.ITEM_BASE_BE_DATA.get(), getData(Registration.BASE_BE_DATA));
     }
 
     @Override
     protected void applyImplicitComponents(DataComponentInput input) {
         super.applyImplicitComponents(input);
-        BaseBEData data = input.get(Registration.ITEM_BASE_BE_DATA);
+        BaseBEData data = input.get(Registration.ITEM_BASE_BE_DATA.get());
         if (data != null) {
             setData(Registration.BASE_BE_DATA, data);
         }
@@ -299,66 +327,75 @@ public class GenericTileEntity extends BlockEntity {
         return false;
     }
 
-//    @Optional.Method(modid = "theoneprobe")
-//    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world, BlockState blockState, IProbeHitData data) {
-//        if (blockState.getBlock() instanceof Infusable) {
-//            int infused = getInfused();
-//            int pct = infused * 100 / GeneralConfig.maxInfuse;
-//            probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
-//        }
-//        if (mode == ProbeMode.EXTENDED) {
-//            if (GeneralConfig.manageOwnership) {
-//                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
-//                    int securityChannel = getSecurityChannel();
-//                    if (securityChannel == -1) {
-//                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
-//                    } else {
-//                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName() + " (channel " + securityChannel + ")");
-//                    }
-//                    if (getOwnerUUID() == null) {
-//                        probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    @SideOnly(Side.CLIENT)
-//    @Optional.Method(modid = "waila")
-//    public void addWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
-//        Block block = accessor.getBlock();
-//        if (block instanceof Infusable) {
-//            int infused = getInfused();
-//            int pct = infused * 100 / GeneralConfig.maxInfuse;
-//            currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
-//        }
-//        if (SafeClientTools.isSneaking()) {
-//            if (GeneralConfig.manageOwnership) {
-//                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
-//                    int securityChannel = getSecurityChannel();
-//                    if (securityChannel == -1) {
-//                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
-//                    } else {
-//                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName() + " (channel " + securityChannel + ")");
-//                    }
-//                    if (getOwnerUUID() == null) {
-//                        currenttip.add(TextFormatting.RED + "Warning! Ownership not correctly set! Please place block again!");
-//                    }
-//                }
-//            }
-//        }
-//    }
+    //    @Optional.Method(modid = "theoneprobe")
+    //    public void addProbeInfo(ProbeMode mode, IProbeInfo probeInfo, Player player, Level world,
+    // BlockState blockState, IProbeHitData data) {
+    //        if (blockState.getBlock() instanceof Infusable) {
+    //            int infused = getInfused();
+    //            int pct = infused * 100 / GeneralConfig.maxInfuse;
+    //            probeInfo.text(TextFormatting.YELLOW + "Infused: " + pct + "%");
+    //        }
+    //        if (mode == ProbeMode.EXTENDED) {
+    //            if (GeneralConfig.manageOwnership) {
+    //                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
+    //                    int securityChannel = getSecurityChannel();
+    //                    if (securityChannel == -1) {
+    //                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
+    //                    } else {
+    //                        probeInfo.text(TextFormatting.YELLOW + "Owned by: " + getOwnerName() +
+    // " (channel " + securityChannel + ")");
+    //                    }
+    //                    if (getOwnerUUID() == null) {
+    //                        probeInfo.text(TextFormatting.RED + "Warning! Ownership not correctly
+    // set! Please place block again!");
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //
+    //    @SideOnly(Side.CLIENT)
+    //    @Optional.Method(modid = "waila")
+    //    public void addWailaBody(ItemStack itemStack, List<String> currenttip, IWailaDataAccessor
+    // accessor, IWailaConfigHandler config) {
+    //        Block block = accessor.getBlock();
+    //        if (block instanceof Infusable) {
+    //            int infused = getInfused();
+    //            int pct = infused * 100 / GeneralConfig.maxInfuse;
+    //            currenttip.add(TextFormatting.YELLOW + "Infused: " + pct + "%");
+    //        }
+    //        if (SafeClientTools.isSneaking()) {
+    //            if (GeneralConfig.manageOwnership) {
+    //                if (getOwnerName() != null && !getOwnerName().isEmpty()) {
+    //                    int securityChannel = getSecurityChannel();
+    //                    if (securityChannel == -1) {
+    //                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName());
+    //                    } else {
+    //                        currenttip.add(TextFormatting.YELLOW + "Owned by: " + getOwnerName() +
+    // " (channel " + securityChannel + ")");
+    //                    }
+    //                    if (getOwnerUUID() == null) {
+    //                        currenttip.add(TextFormatting.RED + "Warning! Ownership not correctly
+    // set! Please place block again!");
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
 
-    public int getRedstoneOutput(BlockState state, BlockGetter world, BlockPos pos, Direction side) {
+    public int getRedstoneOutput(
+            BlockState state, BlockGetter world, BlockPos pos, Direction side) {
         return -1;
     }
 
-    public void getDrops(NonNullList<ItemStack> drops, BlockGetter world, BlockPos pos, BlockState metadata, int fortune) {
-    }
+    public void getDrops(
+            NonNullList<ItemStack> drops,
+            BlockGetter world,
+            BlockPos pos,
+            BlockState metadata,
+            int fortune) {}
 
-    public void rotateBlock(Rotation axis) {
-
-    }
+    public void rotateBlock(Rotation axis) {}
 
     /**
      * Return false if this was not handled here. In that case the default rotateBlock() will be done
@@ -378,7 +415,8 @@ public class GenericTileEntity extends BlockEntity {
         return null;
     }
 
-    /// Override this function if you have a be entity that needs to be opened remotely and thus has to 'fake' the real dimension
+    /// Override this function if you have a be entity that needs to be opened remotely and thus has
+    // to 'fake' the real dimension
     public ResourceKey<Level> getDimension() {
         return level.dimension();
     }
@@ -424,7 +462,8 @@ public class GenericTileEntity extends BlockEntity {
      * This is meant to be called server side. If you want to call this client-side use the
      * PacketGetListFromServer packet
      */
-    public <T> List<T> executeServerCommandList(String command, Player player, @Nonnull TypedMap params, @Nonnull Class<T> type) {
+    public <T> List<T> executeServerCommandList(
+            String command, Player player, @Nonnull TypedMap params, @Nonnull Class<T> type) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnableWithListResult cmd = holder.serverCommandsWithListResult.get(command);
         if (cmd != null) {
@@ -436,7 +475,8 @@ public class GenericTileEntity extends BlockEntity {
     /**
      * Execute a client side command that handles the list sent by the server side ListCommand
      */
-    public <T> boolean handleListFromServer(String command, Player player, @Nonnull TypedMap params, @Nonnull List<T> list) {
+    public <T> boolean handleListFromServer(
+            String command, Player player, @Nonnull TypedMap params, @Nonnull List<T> list) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnableWithList cmd = holder.clientCommandsWithList.get(command);
         if (cmd != null) {
@@ -452,7 +492,8 @@ public class GenericTileEntity extends BlockEntity {
      * PacketRequestDataFromServer packet
      */
     @Nullable
-    public TypedMap executeServerCommandWR(String command, Player player, @Nonnull TypedMap params) {
+    public TypedMap executeServerCommandWR(
+            String command, Player player, @Nonnull TypedMap params) {
         AnnotationHolder holder = getAnnotationHolder();
         IRunnableWithResult serverCommand = holder.serverCommandsWithResult.get(command);
         if (serverCommand != null) {
@@ -466,12 +507,18 @@ public class GenericTileEntity extends BlockEntity {
     }
 
     @ServerCommand
-    public static final Command<?> COMMAND_SYNC_BINDING = Command.create("generic.syncBinding",
-            (te, playerEntity, params) -> te.syncBinding(params));
+    public static final Command<?> COMMAND_SYNC_BINDING =
+            Command.create(
+                    "generic.syncBinding", (te, playerEntity, params) -> te.syncBinding(params));
 
     @ServerCommand
-    public static final Command<?> CMD_RSMODE = Command.create("mcjtylib.setRsMode",
-            (te, playerEntity, params) -> te.setRSMode(RedstoneMode.values()[params.get(ImageChoiceLabel.PARAM_CHOICE_IDX)]));
+    public static final Command<?> CMD_RSMODE =
+            Command.create(
+                    "mcjtylib.setRsMode",
+                    (te, playerEntity, params) ->
+                            te.setRSMode(
+                                    RedstoneMode.values()[
+                                            params.get(ImageChoiceLabel.PARAM_CHOICE_IDX)]));
 
     private <T> void syncBindingHelper(TypedMap params, Key<T> bkey) {
         T o = params.get(bkey);

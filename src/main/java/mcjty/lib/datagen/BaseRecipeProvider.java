@@ -1,8 +1,16 @@
 package mcjty.lib.datagen;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import mcjty.lib.crafting.IRecipeBuilder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.DataGenerator;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
@@ -15,15 +23,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.common.Tags;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public abstract class BaseRecipeProvider extends RecipeProvider {
 
@@ -93,14 +92,14 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         builder.group(group).save(consumer, id);
     }
 
-    public BaseRecipeProvider(DataGenerator datagen, CompletableFuture<HolderLookup.Provider> provider) {
-        super(datagen.getPackOutput(), provider);
+    public BaseRecipeProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> provider) {
+        super(output, provider);
         add('d', Items.DIAMOND);
         add('e', Items.EMERALD);
-        add('o', Tags.Items.ENDER_PEARLS);
+        add('o', TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ender_pearls")));
         add('r', Items.REDSTONE);
         add('R', Items.REDSTONE_BLOCK);
-        add('i', Tags.Items.INGOTS_IRON);
+        add('i', TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "ingots/iron")));
         add('p', Items.PAPER);
         add('c', ItemTags.COALS);
         add('B', Blocks.BRICKS);
@@ -109,7 +108,7 @@ public abstract class BaseRecipeProvider extends RecipeProvider {
         add('b', Items.BUCKET);
         add('T', Items.REDSTONE_TORCH);
         add('D', Blocks.DIRT);
-        add('G', Tags.Items.GLASS_BLOCKS);
+        add('G', TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "glass_blocks")));
         add('O', Blocks.OBSIDIAN);
     }
 }

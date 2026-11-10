@@ -1,7 +1,12 @@
 package mcjty.lib.varia;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.api.modules.ItemModule;
+import mcjty.lib.container.IItemHandler;
+import mcjty.lib.container.IItemHandlerModifiable;
 import mcjty.lib.setup.Registration;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.resources.ResourceKey;
@@ -10,30 +15,24 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class ModuleTools {
 
     public static boolean hasModuleTarget(ItemStack stack) {
-        return stack.get(Registration.ITEM_MODULE) != null;
+        return stack.get(Registration.ITEM_MODULE.get()) != null;
     }
 
     public static void setPositionInModule(ItemStack stack, ResourceKey<Level> dimension, BlockPos pos, String name) {
-        stack.set(Registration.ITEM_MODULE, new ItemModule(GlobalPos.of(dimension, pos), name));
+        stack.set(Registration.ITEM_MODULE.get(), new ItemModule(GlobalPos.of(dimension, pos), name));
     }
 
     public static void clearPositionInModule(ItemStack stack) {
-        stack.remove(Registration.ITEM_MODULE);
+        stack.remove(Registration.ITEM_MODULE.get());
     }
 
     @Nonnull
     public static BlockPos getPositionFromModule(ItemStack stack) {
-        ItemModule module = stack.get(Registration.ITEM_MODULE);
+        ItemModule module = stack.get(Registration.ITEM_MODULE.get());
         if (module != null) {
             return module.pos().pos();
         } else {
@@ -43,7 +42,7 @@ public class ModuleTools {
 
     @Nullable
     public static ResourceKey<Level> getDimensionFromModule(ItemStack stack) {
-        ItemModule module = stack.get(Registration.ITEM_MODULE);
+        ItemModule module = stack.get(Registration.ITEM_MODULE.get());
         if (module != null) {
             return module.pos().dimension();
         } else {
@@ -52,7 +51,7 @@ public class ModuleTools {
     }
 
     public static String getTargetString(ItemStack stack) {
-        ItemModule module = stack.get(Registration.ITEM_MODULE);
+        ItemModule module = stack.get(Registration.ITEM_MODULE.get());
         if (module != null) {
             String name = module.name();
             GlobalPos pos = module.pos();
@@ -81,7 +80,7 @@ public class ModuleTools {
         if (te == null) {
             return false;
         }
-        IItemHandler inventory = world.getCapability(Capabilities.ItemHandler.BLOCK, pos, null);
+        IItemHandler inventory = CapabilityTools.itemHandler(ItemStorage.SIDED.find(world, pos, null));
         if (inventory != null) {
             for (int i = start; i <= stop; i++) {
                 if (inventory.getStackInSlot(i).isEmpty()) {

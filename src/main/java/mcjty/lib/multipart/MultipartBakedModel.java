@@ -1,8 +1,11 @@
 package mcjty.lib.multipart;
 
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.client.AbstractDynamicBakedModel;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
@@ -12,13 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
 
 public class MultipartBakedModel extends AbstractDynamicBakedModel {
 
@@ -31,7 +28,7 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
 
     @Override
     @NotNull
-    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType) {
+    public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, @NotNull RandomSource rand) {
 //        if (state == null) {
 //            return Collections.emptyList();
 //        }
@@ -60,7 +57,6 @@ public class MultipartBakedModel extends AbstractDynamicBakedModel {
 //        }
         return Collections.emptyList();
     }
-
 
     @Override
     public boolean useAmbientOcclusion() {

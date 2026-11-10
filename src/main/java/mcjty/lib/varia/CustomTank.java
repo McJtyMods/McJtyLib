@@ -1,24 +1,115 @@
 package mcjty.lib.varia;
 
 import mcjty.lib.api.fluids.ItemFluids;
+import mcjty.lib.container.IndexedStorage;
 import mcjty.lib.setup.Registration;
+
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.IFluidTank;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomTank implements IFluidHandler, IFluidTank {
+import javax.annotation.Nonnull;
 
-    @Nonnull
-    protected FluidStack fluid = FluidStack.EMPTY;
+public class CustomTank implements IFluidHandler, IFluidTank, IndexedStorage<FluidVariant> {
+
+    @Nonnull protected FluidStack fluid = FluidStack.EMPTY;
     protected int capacity;
+
+    private final SnapshotParticipant<FluidStack> transferJournal =
+            new SnapshotParticipant<>() {
+                private FluidStack before;
+
+                @Override
+                protected void releaseSnapshot(FluidStack snapshot) {
+                    before = snapshot;
+                }
+
+                @Override
+                protected FluidStack createSnapshot() {
+                    return fluid.copy();
+                }
+
+                @Override
+                protected void readSnapshot(FluidStack snapshot) {
+                    fluid = snapshot;
+                }
+
+                @Override
+                protected void onFinalCommit() {
+                    if (!FluidStack.matches(before, fluid)) onContentsChanged();
+                }
+            };
+
+    private void checkIndex(int index) {
+        if (index != 0) throw new IndexOutOfBoundsException(index);
+    }
+
+    @Override
+    public int size() {
+        return 1;
+    }
+
+    @Override
+    public FluidVariant getResource(int index) {
+        checkIndex(index);
+        return fluid.variant();
+    }
+
+    @Override
+    public long getAmountAsLong(int index) {
+        checkIndex(index);
+        return fluid.getAmount() * 81L;
+    }
+
+    @Override
+    public long getCapacityAsLong(int index, FluidVariant resource) {
+        checkIndex(index);
+        return capacity * 81L;
+    }
+
+    @Override
+    public boolean isValid(int index, FluidVariant resource) {
+        checkIndex(index);
+        return !resource.isBlank() && isFluidValid(new FluidStack(resource, 1));
+    }
+
+    @Override
+    public long insert(
+            int index, FluidVariant resource, long amount, TransactionContext transaction) {
+        checkIndex(index);
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        if (amount == 0 || resource.isBlank()) return 0;
+        int inserted =
+                fill(
+                        new FluidStack(resource, (int) Math.min(amount / 81, Integer.MAX_VALUE)),
+                        FluidAction.SIMULATE);
+        if (inserted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            fluid = new FluidStack(resource, fluid.getAmount() + inserted);
+        }
+        return inserted * 81L;
+    }
+
+    @Override
+    public long extract(
+            int index, FluidVariant resource, long amount, TransactionContext transaction) {
+        checkIndex(index);
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        if (amount == 0 || resource.isBlank() || !resource.equals(fluid.variant())) return 0;
+        int extracted = (int) Math.min(amount / 81, fluid.getAmount());
+        if (extracted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            fluid = fluid.copyWithAmount(fluid.getAmount() - extracted);
+        }
+        return extracted * 81L;
+    }
 
     public CustomTank(int capacity) {
         this.capacity = capacity;
@@ -75,9 +166,8 @@ public class CustomTank implements IFluidHandler, IFluidTank {
     public void collectImplicitComponents(DataComponentMap.Builder builder) {
         List<FluidStack> fluidStacks = new ArrayList<>();
         fluidStacks.add(fluid);
-        builder.set(Registration.ITEM_FLUIDS, new ItemFluids(fluidStacks));
+        builder.set(Registration.ITEM_FLUIDS.get(), new ItemFluids(fluidStacks));
     }
-
 
     @Override
     public int getTanks() {
@@ -116,7 +206,11 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         }
         if (fluid.isEmpty()) {
             onContentsChanged();
-            fluid = new FluidStack(resource.getFluidHolder(), Math.min(capacity, resource.getAmount()), resource.getComponentsPatch());
+            fluid =
+                    new FluidStack(
+                            resource.getFluidHolder(),
+                            Math.min(capacity, resource.getAmount()),
+                            resource.getComponentsPatch());
             return fluid.getAmount();
         }
         if (!FluidStack.isSameFluidSameComponents(fluid, resource)) {
@@ -151,20 +245,19 @@ public class CustomTank implements IFluidHandler, IFluidTank {
         if (fluid.getAmount() < drained) {
             drained = fluid.getAmount();
         }
-        FluidStack stack = new FluidStack(fluid.getFluidHolder(), drained, fluid.getComponentsPatch());
+        FluidStack stack =
+                new FluidStack(fluid.getFluidHolder(), drained, fluid.getComponentsPatch());
         if (action.execute()) {
             onContentsChanged();
             fluid.shrink(drained);
         }
-        if (fluid.getAmount() <= 0) {
+        if (action.execute() && fluid.getAmount() <= 0) {
             fluid = FluidStack.EMPTY;
         }
         return stack;
     }
 
-    protected void onContentsChanged() {
-
-    }
+    protected void onContentsChanged() {}
 
     public void setFluid(@Nonnull FluidStack stack) {
         this.fluid = stack;
@@ -177,5 +270,4 @@ public class CustomTank implements IFluidHandler, IFluidTank {
     public int getSpace() {
         return Math.max(0, capacity - fluid.getAmount());
     }
-
 }

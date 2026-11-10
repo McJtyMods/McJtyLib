@@ -1,25 +1,20 @@
 package mcjty.lib.compat.theoneprobe;
 
+import static mcjty.theoneprobe.api.TextStyleClass.ERROR;
+import static mcjty.theoneprobe.api.TextStyleClass.HIGHLIGHTED;
+
 import mcjty.lib.api.infusable.CapabilityInfusable;
 import mcjty.lib.api.infusable.IInfusable;
 import mcjty.lib.base.GeneralConfig;
-import mcjty.lib.blocks.BaseBlock;
-import mcjty.lib.multipart.MultipartBlock;
-import mcjty.lib.multipart.MultipartHelper;
-import mcjty.lib.multipart.MultipartTE;
-import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.theoneprobe.api.CompoundText;
 import mcjty.theoneprobe.api.IProbeHitData;
 import mcjty.theoneprobe.api.IProbeInfo;
 import mcjty.theoneprobe.api.ProbeMode;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.Level;
-
-import static mcjty.theoneprobe.api.TextStyleClass.ERROR;
-import static mcjty.theoneprobe.api.TextStyleClass.HIGHLIGHTED;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class McJtyLibTOPDriver implements TOPDriver {
 
@@ -50,7 +45,7 @@ public class McJtyLibTOPDriver implements TOPDriver {
         if (mode == ProbeMode.EXTENDED) {
             BlockEntity te = world.getBlockEntity(data.getPos());
             if (te instanceof GenericTileEntity generic) {
-                IInfusable h = world.getCapability(CapabilityInfusable.INFUSABLE_CAPABILITY, data.getPos(), null);
+                IInfusable h = CapabilityInfusable.INFUSABLE_CAPABILITY.find(world, data.getPos(), null);
                 if (h != null) {
                     int infused = h.getInfused();
                     int pct = infused * 100 / GeneralConfig.maxInfuse.get();

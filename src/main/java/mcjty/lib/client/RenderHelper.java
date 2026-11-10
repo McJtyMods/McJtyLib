@@ -1,10 +1,18 @@
 package mcjty.lib.client;
 
+import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
+import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.base.StyleConfig;
+import mcjty.lib.datagen.model.BlockModelBuilder;
+import mcjty.lib.varia.FluidStack;
+import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -31,18 +39,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.generators.ModelBuilder;
-import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import static net.minecraft.client.renderer.LightTexture.FULL_BLOCK;
-import static net.minecraft.client.renderer.LightTexture.FULL_SKY;
 
 public class RenderHelper {
 
@@ -101,8 +99,8 @@ public class RenderHelper {
     }
 
     public static void renderModel(BlockRenderDispatcher renderer, PoseStack stack, VertexConsumer buffer, BlockState state, BakedModel model,
-                                   float r, float g, float b, int combinedLight, int combinedOverlay, ModelData modelData, RenderType renderType) {
-        renderer.getModelRenderer().renderModel(stack.last(), buffer, state, model, r, g, b, combinedLight, combinedOverlay, modelData, renderType);
+                                   float r, float g, float b, int combinedLight, int combinedOverlay, Object modelData, RenderType renderType) {
+        renderer.getModelRenderer().renderModel(stack.last(), buffer, state, model, r, g, b, combinedLight, combinedOverlay);
     }
 
     public static void line(VertexConsumer builder, PoseStack matrixStack, float x1, float y1, float z1, float x2, float y2, float z2,
@@ -138,7 +136,7 @@ public class RenderHelper {
         matrixStack.translate(-0.5F, -0.5F, -0.5F);
     }
 
-    public static void renderNorthSouthQuad(PoseStack poseStack, VertexConsumer builder, TextureAtlasSprite sprite, ModelBuilder.FaceRotation rotation, float offset) {
+    public static void renderNorthSouthQuad(PoseStack poseStack, VertexConsumer builder, TextureAtlasSprite sprite, BlockModelBuilder.FaceRotation rotation, float offset) {
         Matrix4f matrix = poseStack.last().pose();
         switch (rotation) {
             case ZERO -> {
@@ -266,8 +264,8 @@ public class RenderHelper {
             return false;
         }
 
-        IClientFluidTypeExtensions attributes = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-        ResourceLocation fluidStill = attributes.getStillTexture(fluidStack);
+        TextureAtlasSprite stillSprite = FluidVariantRendering.getSprite(fluidStack.variant());
+        ResourceLocation fluidStill = stillSprite == null ? null : stillSprite.contents().name();
         TextureAtlasSprite fluidStillSprite = null;
         if (fluidStill != null) {
             fluidStillSprite = Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(fluidStill);
@@ -276,7 +274,7 @@ public class RenderHelper {
             return false;
         }
 
-        int fluidColor = attributes.getTintColor(fluidStack);
+        int fluidColor = FluidVariantRendering.getColor(fluidStack.variant());
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
 //        Minecraft.getInstance().getEntityRenderDispatcher().textureManager.bindForSetup(InventoryMenu.BLOCK_ATLAS);
         setGLColorFromInt(fluidColor);
@@ -300,7 +298,6 @@ public class RenderHelper {
         BufferUploader.drawWithShader(vertexBuffer.buildOrThrow());
     }
 
-
     private static void setGLColorFromInt(int color) {
         float red = (color >> 16 & 0xFF) / 255.0F;
         float green = (color >> 8 & 0xFF) / 255.0F;
@@ -308,7 +305,6 @@ public class RenderHelper {
 
         RenderSystem.setShaderColor(red, green, blue, 1.0F);
     }
-
 
     public static boolean renderItemStackWithCount(GuiGraphics graphics, ItemRenderer itemRender, ItemStack itm, int xo, int yo, boolean highlight) {
         int size = itm.getCount();
@@ -428,7 +424,6 @@ public class RenderHelper {
         BufferUploader.drawWithShader(builder.buildOrThrow());
     }
 
-
     /**
      * Draw with the WorldRenderer
      */
@@ -440,7 +435,6 @@ public class RenderHelper {
         renderer.addVertex((x + width), (y + 0), 0.0F).setColor(red, green, blue, alpha);
         BufferUploader.drawWithShader(renderer.buildOrThrow());
     }
-
 
     /**
      * Draws a rectangle with a vertical gradient between the specified colors.
@@ -731,7 +725,6 @@ public class RenderHelper {
         builder.addVertex(matrix, (x + 0), (y + 0), zLevel).setUv(parentU + ((textureX + 0) * f), parentV + ((textureY + 0) * f1));
     }
 
-
     /**
      * Draws a textured rectangle at the stored z-value. Args: x, y, u, v, width, height
      */
@@ -842,7 +835,6 @@ public class RenderHelper {
         // TODO: check if enabled blending still screws things up down the line.
         GlStateManager._enableBlend();
 
-
         matrixStack.popPose();
         // @todo 1.17 GlStateManager._disableRescaleNormal();
         // @todo 1.17 GlStateManager._disableLighting();
@@ -872,7 +864,6 @@ public class RenderHelper {
         // Fixes opaque cooldown overlay a bit lower
         // TODO: check if enabled blending still screws things up down the line.
         GlStateManager._enableBlend();
-
 
         matrixStack.popPose();
         // @todo 1.17 GlStateManager._disableRescaleNormal();
@@ -1237,7 +1228,6 @@ public class RenderHelper {
                 .setNormal(1, 0, 0)
                 ;
     }
-
 
     private static void vt(VertexConsumer renderer, Matrix4f matrix, float x, float y, float z, float u, float v) {
         renderer

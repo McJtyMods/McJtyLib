@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "id": "mcjtylib",
+  "version": "${version}",
+  "name": "McJtyLib",
+  "description": "Shared library for McJty's mods",
+  "authors": [
+    "McJty"
+  ],
+  "contact": {
+    "sources": "https://github.com/McJtyMods/McJtyLib",
+    "issues": "https://github.com/McJtyMods/McJtyLib/issues"
+  },
+  "license": [
+    "MIT",
+    "LGPL-2.1-only"
+  ],
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "mcjty.lib.McJtyLib"
+    ],
+    "client": [
+      "mcjty.lib.setup.ClientSetup"
+    ],
+    "theoneprobe": [
+      "mcjty.lib.compat.theoneprobe.TOPCompatibility"
+    ]
+  },
+  "accessWidener": "mcjtylib.accesswidener",
+  "mixins": [
+    "mcjtylib.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.14",
+    "minecraft": "=1.21.1",
+    "java": ">=21",
+    "fabric-api": ">=0.116.6+1.21.1",
+    "forgeconfigapiport": ">=21.1.6",
+    "team_reborn_energy": ">=4.1.0"
+  },
+  "suggests": {
+    "theoneprobe": "*",
+    "jei": "*"
+  }
+}

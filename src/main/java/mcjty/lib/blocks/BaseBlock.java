@@ -1,5 +1,9 @@
 package mcjty.lib.blocks;
 
+import java.util.Collections;
+import java.util.List;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.api.ITabExpander;
 import mcjty.lib.api.container.CapabilityContainerProvider;
 import mcjty.lib.api.container.DefaultContainerProvider;
@@ -15,6 +19,7 @@ import mcjty.lib.builder.TooltipBuilder;
 import mcjty.lib.compat.theoneprobe.TOPDriver;
 import mcjty.lib.compat.theoneprobe.TOPInfoProvider;
 import mcjty.lib.compat.waila.WailaInfoProvider;
+import mcjty.lib.container.MenuTools;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.multipart.IPartBlock;
 import mcjty.lib.multipart.PartSlot;
@@ -51,11 +56,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.Collections;
-import java.util.List;
-
 public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvider, IPartBlock, ITooltipSettings, EntityBlock, ITabExpander {
 
     private final boolean infusable;
@@ -83,7 +83,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public static void setInfused(ItemStack stack, int infused) {
-        stack.set(Registration.ITEM_INFUSABLE, new ItemInfusable(infused));
+        stack.set(Registration.ITEM_INFUSABLE.get(), new ItemInfusable(infused));
     }
 
     @Override
@@ -96,17 +96,17 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     private void intAddInformation(ItemStack itemStack, List<Component> list) {
-        ItemEnergy itemEnergy = itemStack.get(Registration.ITEM_ENERGY);
+        ItemEnergy itemEnergy = itemStack.get(Registration.ITEM_ENERGY.get());
         if (itemEnergy != null) {
             list.add(ComponentFactory.literal(ChatFormatting.GREEN + "Energy: " + itemEnergy.energy() + " rf"));
         }
-        ItemInfusable itemInfusable = itemStack.get(Registration.ITEM_INFUSABLE);
+        ItemInfusable itemInfusable = itemStack.get(Registration.ITEM_INFUSABLE.get());
         if (itemInfusable != null) {
             int infused = itemInfusable.infused();
             int pct = infused * 100 / GeneralConfig.maxInfuse.get();
             list.add(ComponentFactory.literal(ChatFormatting.YELLOW + "Infused: " + pct + "%"));
         }
-        ItemSecurity itemSecurity = itemStack.get(Registration.ITEM_SECURITY);
+        ItemSecurity itemSecurity = itemStack.get(Registration.ITEM_SECURITY.get());
         if (itemSecurity != null) {
             String owner = itemSecurity.owner();
             int securityChannel = itemSecurity.channel();
@@ -119,7 +119,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
     }
 
     public static int getInfused(ItemStack itemStack) {
-        ItemInfusable itemInfusable = itemStack.get(Registration.ITEM_INFUSABLE);
+        ItemInfusable itemInfusable = itemStack.get(Registration.ITEM_INFUSABLE.get());
         if (itemInfusable != null) {
             return itemInfusable.infused();
         } else {
@@ -182,7 +182,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         if (!heldItem.isEmpty()) {
             BlockEntity te = world.getBlockEntity(pos);
             if (te != null) {
-                IModuleSupport h = world.getCapability(CapabilityModuleSupport.MODULE_CAPABILITY, pos, null);
+                IModuleSupport h = CapabilityModuleSupport.MODULE_CAPABILITY.find(world, pos, null);
                 if (h != null) {
                     if (h.isModule(heldItem)) {
                         return ModuleTools.installModule(player, heldItem, hand, pos, h.getFirstSlot(), h.getLastSlot());
@@ -219,7 +219,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
     }
 
-
     protected boolean wrenchDisabled(Level world, BlockPos pos, Player player) {
         return false;
     }
@@ -238,7 +237,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             return false;
         }
 
-        MenuProvider h = world.getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY, new BlockPos(x, y, z), null);
+        MenuProvider h = CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY.find(world, new BlockPos(x, y, z), null);
         if (h != null) {
             if (world.isClientSide) {
                 return true;
@@ -246,7 +245,7 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             if (checkAccess(world, player, te)) {
                 return true;
             }
-            player.openMenu(h, buf -> {
+            MenuTools.open(player, h, buf -> {
                 buf.writeBlockPos(te.getBlockPos());
                 if (h instanceof DefaultContainerProvider<?> provider) {
                     provider.writeExtraData(buf, te);
@@ -256,7 +255,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         }
         return false;
     }
-
 
     @Override
     public void setPlacedBy(@Nonnull Level world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nullable LivingEntity placer, @Nonnull ItemStack stack) {
@@ -286,7 +284,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
             genericTileEntity.checkRedstone(world, pos);
         }
     }
-
 
     protected void setOwner(Level world, BlockPos pos, LivingEntity entity) {
         BlockEntity te = world.getBlockEntity(pos);
@@ -414,7 +411,6 @@ public class BaseBlock extends Block implements WailaInfoProvider, TOPInfoProvid
         };
     }
 
-    @Override
     public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rot) {
         state = rotate(state, rot);
         BlockEntity tileEntity = world.getBlockEntity(pos);

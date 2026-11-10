@@ -1,14 +1,13 @@
 package mcjty.lib.blockcommands;
 
-import mcjty.lib.network.NetworkTools;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.BlockPos;
-import net.neoforged.neoforge.fluids.FluidStack;
-
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import mcjty.lib.network.NetworkTools;
+import mcjty.lib.varia.FluidStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Implement this interface in a small helper object that knows how to serialize something. Used

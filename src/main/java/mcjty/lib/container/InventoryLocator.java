@@ -1,16 +1,14 @@
 package mcjty.lib.container;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import mcjty.lib.varia.CapabilityTools;
+import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * This inventory locator serves as a cache and a way to quickly items in an adjacent
@@ -29,7 +27,7 @@ public class InventoryLocator {
             }
             return null;
         }
-        if (worldObj.getCapability(Capabilities.ItemHandler.BLOCK, thisCoordinate, direction.getOpposite()) != null) {
+        if (CapabilityTools.itemHandler(ItemStorage.SIDED.find(worldObj, thisCoordinate, direction.getOpposite())) != null) {
             // Remember in inventoryCoordinate (acts as a cache)
             inventoryCoordinate = thisCoordinate.relative(direction);
             inventorySide = direction.getOpposite();
@@ -41,9 +39,8 @@ public class InventoryLocator {
 
     @Nullable
     private IItemHandler getItemHandlerAtCoordinate(Level worldObj, BlockPos c, Direction direction) {
-        return worldObj.getCapability(Capabilities.ItemHandler.BLOCK, c, direction);
+        return CapabilityTools.itemHandler(ItemStorage.SIDED.find(worldObj, c, direction));
     }
-
 
     public void ejectStack(Level worldObj, BlockPos pos, ItemStack stack, BlockPos thisCoordinate, Direction[] directions) {
         for (Direction dir : directions) {
@@ -61,7 +58,6 @@ public class InventoryLocator {
             worldObj.addFreshEntity(entityItem);
         }
     }
-
 
     public Direction getInventorySide() {
         return inventorySide;

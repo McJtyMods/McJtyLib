@@ -1,7 +1,18 @@
 package mcjty.lib.blocks;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import javax.annotation.Nullable;
+import mcjty.lib.setup.DeferredBlock;
 import mcjty.lib.setup.DeferredBlocks;
+import mcjty.lib.setup.DeferredHolder;
+import mcjty.lib.setup.DeferredItem;
 import mcjty.lib.setup.DeferredItems;
+import mcjty.lib.setup.DeferredRegister;
 import mcjty.lib.tileentity.AnnotationHolder;
 import mcjty.lib.tileentity.AnnotationTools;
 import mcjty.lib.tileentity.GenericTileEntity;
@@ -11,18 +22,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredBlock;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredItem;
-import net.neoforged.neoforge.registries.DeferredRegister;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 
 public class RBlockRegistry {
     private final DeferredBlocks BLOCKS;
@@ -39,10 +39,10 @@ public class RBlockRegistry {
         this.tab = tab;
     }
 
-    public void register(IEventBus bus) {
-        BLOCKS.register(bus);
-        ITEMS.register(bus);
-        TILES.register(bus);
+    public void register() {
+        BLOCKS.register();
+        ITEMS.register();
+        TILES.register();
     }
 
     public List<AnnotationHolder> getHolders() {
@@ -66,6 +66,20 @@ public class RBlockRegistry {
         DeferredHolder<BlockEntityType<?>, BlockEntityType<E>> tile = TILES.register(name, () -> BlockEntityType.Builder.of(tileSupplier, block.get()).build(null));
         AnnotationHolder holder = AnnotationTools.createAnnotationHolder(clazz, block);
         holders.add(holder);
+        return new RBlock<>(block, item, tile);
+    }
+
+    /** Factories receive the properties used to create each registered block and item. */
+    public <B extends BaseBlock, I extends BlockItem, E extends GenericTileEntity> RBlock<B, I, E> registerBlock(
+            String name, Class<E> clazz,
+            Function<BlockBehaviour.Properties, B> blockFactory,
+            @Nullable BiFunction<Supplier<? extends Block>, Item.Properties, I> itemFactory,
+            BlockEntityType.BlockEntitySupplier<E> tileFactory) {
+        DeferredBlock<B> block = BLOCKS.register(name, blockFactory);
+        DeferredItem<I> item = itemFactory == null ? null : ITEMS.register(name, properties -> itemFactory.apply(block, properties));
+        if (item != null) tab.accept(() -> new ItemStack(item.get()));
+        var tile = TILES.register(name, () -> BlockEntityType.Builder.of(tileFactory, block.get()).build(null));
+        holders.add(AnnotationTools.createAnnotationHolder(clazz, block));
         return new RBlock<>(block, item, tile);
     }
 

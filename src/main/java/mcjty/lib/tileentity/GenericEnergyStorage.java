@@ -4,15 +4,19 @@ import mcjty.lib.api.container.IGenericContainer;
 import mcjty.lib.api.power.ItemEnergy;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.varia.EnergyTools;
+import mcjty.lib.varia.IEnergyStorage;
+
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.LongTag;
 import net.minecraft.world.inventory.DataSlot;
-import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.energy.IEnergyStorage;
 
-public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<LongTag> {
+import team.reborn.energy.api.EnergyStorage;
+
+public class GenericEnergyStorage implements IEnergyStorage, EnergyStorage {
 
     private final GenericTileEntity tileEntity;
     private final boolean isReceiver;
@@ -21,7 +25,65 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
     private final long capacity;
     private final long maxReceive;
 
-    public GenericEnergyStorage(GenericTileEntity tileEntity, boolean isReceiver, long capacity, long maxReceive) {
+    private final SnapshotParticipant<Long> transferJournal =
+            new SnapshotParticipant<>() {
+                private Long before;
+
+                @Override
+                protected void releaseSnapshot(Long snapshot) {
+                    before = snapshot;
+                }
+
+                @Override
+                protected Long createSnapshot() {
+                    return energy;
+                }
+
+                @Override
+                protected void readSnapshot(Long snapshot) {
+                    energy = snapshot;
+                }
+
+                @Override
+                protected void onFinalCommit() {
+                    if (energy != before) tileEntity.markDirtyQuick();
+                }
+            };
+
+    @Override
+    public boolean supportsInsertion() {
+        return isReceiver;
+    }
+
+    @Override
+    public boolean supportsExtraction() {
+        return false;
+    }
+
+    @Override
+    public long getAmount() {
+        return energy;
+    }
+
+    @Override
+    public long insert(long amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        long inserted = isReceiver ? Math.min(amount, Math.min(maxReceive, capacity - energy)) : 0;
+        if (inserted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            energy += inserted;
+        }
+        return inserted;
+    }
+
+    @Override
+    public long extract(long amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        return 0; // This storage has always exposed energy input only.
+    }
+
+    public GenericEnergyStorage(
+            GenericTileEntity tileEntity, boolean isReceiver, long capacity, long maxReceive) {
         this.tileEntity = tileEntity;
         this.isReceiver = isReceiver;
 
@@ -37,7 +99,8 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
                 return 0;
             }
 
-            long energyReceived = Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
+            long energyReceived =
+                    Math.min(capacity - energy, Math.min(this.maxReceive, maxReceive));
             if (!simulate) {
                 energy += energyReceived;
                 tileEntity.markDirtyQuick();
@@ -72,7 +135,7 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
     }
 
     public void collectImplicitComponents(DataComponentMap.Builder builder) {
-        builder.set(Registration.ITEM_ENERGY, new ItemEnergy(getEnergy()));
+        builder.set(Registration.ITEM_ENERGY.get(), new ItemEnergy(getEnergy()));
     }
 
     public void setEnergy(long s) {
@@ -99,12 +162,10 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
         tileEntity.markDirtyQuick();
     }
 
-    @Override
     public LongTag serializeNBT(HolderLookup.Provider provider) {
         return LongTag.valueOf(energy);
     }
 
-    @Override
     public void deserializeNBT(HolderLookup.Provider provider, LongTag nbt) {
         energy = nbt.getAsLong();
     }
@@ -126,33 +187,35 @@ public class GenericEnergyStorage implements IEnergyStorage, INBTSerializable<Lo
 
     public void addIntegerListeners(IGenericContainer container) {
         // Least significant part
-        container.addIntegerListener(new DataSlot() {
-            @Override
-            public int get() {
-                return (int) (getEnergy());     // Least significant bits
-            }
+        container.addIntegerListener(
+                new DataSlot() {
+                    @Override
+                    public int get() {
+                        return (int) (getEnergy()); // Least significant bits
+                    }
 
-            @Override
-            public void set(int i) {
-                long orig = getEnergy() & ~0xffffffffL;
-                orig |= i;
-                setEnergy(orig);
-            }
-        });
+                    @Override
+                    public void set(int i) {
+                        long orig = getEnergy() & ~0xffffffffL;
+                        orig |= i;
+                        setEnergy(orig);
+                    }
+                });
         // Most significant part
-        container.addIntegerListener(new DataSlot() {
-            @Override
-            public int get() {
-                return (int) (getEnergy() >> 32L);     // Most significant bits
-            }
+        container.addIntegerListener(
+                new DataSlot() {
+                    @Override
+                    public int get() {
+                        return (int) (getEnergy() >> 32L); // Most significant bits
+                    }
 
-            @Override
-            public void set(int i) {
-                long orig = getEnergy() & 0xffffffffL;
-                orig |= (long) i << 32L;
-                setEnergy(orig);
-            }
-        });
+                    @Override
+                    public void set(int i) {
+                        long orig = getEnergy() & 0xffffffffL;
+                        orig |= (long) i << 32L;
+                        setEnergy(orig);
+                    }
+                });
     }
 
     public void save(CompoundTag tag, String tagName, HolderLookup.Provider provider) {

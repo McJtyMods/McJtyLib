@@ -3,36 +3,37 @@ package mcjty.lib.setup;
 import mcjty.lib.ClientEventHandler;
 import mcjty.lib.keys.KeyBindings;
 import mcjty.lib.keys.KeyInputHandler;
+import mcjty.lib.network.ClientNetworking;
+import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.tooltips.ClientTooltipIcon;
+import mcjty.lib.tooltips.TooltipBundle;
 import mcjty.lib.tooltips.TooltipRender;
-import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 
-public class ClientSetup {
+public final class ClientSetup implements ClientModInitializer {
 
-    public static void init(FMLClientSetupEvent e) {
-        NeoForge.EVENT_BUS.register(new TooltipRender());
-        NeoForge.EVENT_BUS.register(new ClientEventHandler());
+    @Override
+    public void onInitializeClient() {
+        ClientBlockEntityEvents.BLOCK_ENTITY_LOAD.register((tile, level) -> {
+            if (tile instanceof GenericTileEntity generic) generic.onLoad();
+        });
+        ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((tile, level) -> {
+            if (tile instanceof GenericTileEntity generic) generic.onChunkUnloaded();
+        });
 
-        NeoForge.EVENT_BUS.register(new KeyInputHandler());
+        ClientNetworking.registerReceivers();
 
-//        ItemBlockRenderTypes.setRenderLayer(Registration.MULTIPART_BLOCK, (RenderType) -> true);
-//        Arrays.stream(new RenderType[]{
-//                        CustomRenderTypes.TRANSLUCENT_LIGHTNING_NOLIGHTMAPS, CustomRenderTypes.TRANSLUCENT_ADD_NOLIGHTMAPS,
-//                        CustomRenderTypes.TRANSLUCENT_ADD, CustomRenderTypes.OVERLAY_LINES, CustomRenderTypes.QUADS_NOTEXTURE})
-//                .forEach(type -> {
-//                    Minecraft.getInstance().renderBuffers().fixedBuffers.put(type, new BufferBuilder(type.bufferSize()));
-//                });
-    }
+        ClientEventHandler.register();
+        TooltipRender.register();
+        KeyBindings.init();
 
-    public static void registerKeyBinds(RegisterKeyMappingsEvent event) {
-        KeyBindings.init(event);
-    }
+        ClientTickEvents.START_CLIENT_TICK.register(client -> KeyInputHandler.onKeyInput());
 
-    public static void registerClientComponentTooltips(RegisterClientTooltipComponentFactoriesEvent event) {
-        event.register(ClientTooltipIcon.class, (a) -> a);
+        TooltipComponentCallback.EVENT.register(component -> component instanceof ClientTooltipIcon icon ? icon : component instanceof TooltipBundle bundle ? bundle.client() : null);
+
     }
 
 }

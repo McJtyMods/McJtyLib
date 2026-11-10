@@ -2,12 +2,11 @@ package mcjty.lib.api.fluids;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.List;
+import mcjty.lib.varia.FluidStack;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.neoforged.neoforge.fluids.FluidStack;
-
-import java.util.List;
 
 // Used as a data component for items that can store fluids
 public record ItemFluids(List<FluidStack> fluids) {

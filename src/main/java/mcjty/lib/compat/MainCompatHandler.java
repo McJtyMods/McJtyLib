@@ -1,19 +1,19 @@
 package mcjty.lib.compat;
 
 import mcjty.lib.compat.theoneprobe.TOPCompatibility;
-import net.neoforged.fml.ModList;
+import net.fabricmc.loader.api.FabricLoader;
 
 public class MainCompatHandler {
 
     public static void registerWaila() {
-//        if (ModList.get().isLoaded("waila")) {
+//        if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("waila")) {
             // @todo 1.14
 //            WailaCompatibility.register();
 //        }
     }
 
     public static void registerTOP() {
-        if (ModList.get().isLoaded("theoneprobe")) {
+        if (FabricLoader.getInstance().isModLoaded("theoneprobe")) {
             TOPCompatibility.register();
         }
     }

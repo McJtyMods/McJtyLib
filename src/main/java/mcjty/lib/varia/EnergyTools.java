@@ -1,5 +1,7 @@
 package mcjty.lib.varia;
 
+import java.util.concurrent.atomic.AtomicLong;
+import javax.annotation.Nullable;
 import mcjty.lib.api.power.IBigPower;
 import mcjty.lib.tileentity.GenericEnergyStorage;
 import net.minecraft.core.BlockPos;
@@ -8,11 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-
-import javax.annotation.Nullable;
-import java.util.concurrent.atomic.AtomicLong;
+import team.reborn.energy.api.EnergyStorage;
 
 public class EnergyTools {
 
@@ -23,7 +21,7 @@ public class EnergyTools {
         if (te == null) {
             return false;
         }
-        return te.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, te.getBlockPos(), side) != null;
+        return CapabilityTools.energyHandler(EnergyStorage.SIDED.find(te.getLevel(), te.getBlockPos(), side)) != null;
     }
 
     public static boolean isEnergyItem(ItemStack stack) {
@@ -31,7 +29,7 @@ public class EnergyTools {
         if (item instanceof IEnergyItem) {
             return true;
         }
-        return stack.getCapability(Capabilities.EnergyStorage.ITEM) != null;
+        return CapabilityTools.energyHandler(EnergyStorage.ITEM.find(stack, CapabilityTools.itemContext(stack))) != null;
     }
 
     // Get energy level with possible support for multiblocks (like EnderIO capacitor bank).
@@ -42,7 +40,7 @@ public class EnergyTools {
             maxEnergyStored = ((IBigPower) tileEntity).getCapacity();
             energyStored = ((IBigPower) tileEntity).getStoredPower();
         } else if (tileEntity != null) {
-            IEnergyStorage capability = tileEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, tileEntity.getBlockPos(), side);
+            IEnergyStorage capability = CapabilityTools.energyHandler(EnergyStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), side));
             if (capability == null) {
                 maxEnergyStored = 0;
                 energyStored = 0;
@@ -61,7 +59,7 @@ public class EnergyTools {
         AtomicLong maxEnergyStored = new AtomicLong();
         AtomicLong energyStored = new AtomicLong();
         if (tileEntity != null) {
-            IEnergyStorage handler = tileEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, tileEntity.getBlockPos(), side);
+            IEnergyStorage handler = CapabilityTools.energyHandler(EnergyStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), side));
             if (handler != null) {
                 maxEnergyStored.set(handler.getMaxEnergyStored());
                 energyStored.set(handler.getEnergyStored());
@@ -75,7 +73,7 @@ public class EnergyTools {
 
     public static long receiveEnergy(BlockEntity tileEntity, Direction from, long maxReceive) {
         if (tileEntity != null) {
-            IEnergyStorage handler = tileEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, tileEntity.getBlockPos(), from);
+            IEnergyStorage handler = CapabilityTools.energyHandler(EnergyStorage.SIDED.find(tileEntity.getLevel(), tileEntity.getBlockPos(), from));
             return handler != null ? handler.receiveEnergy(unsignedClampToInt(maxReceive), false) : 0;
         }
         return 0;
@@ -86,7 +84,7 @@ public class EnergyTools {
         if (item instanceof IEnergyItem) {
             return ((IEnergyItem)item).receiveEnergyL(stack, maxReceive, false);
         } else {
-            IEnergyStorage capability = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+            IEnergyStorage capability = CapabilityTools.energyHandler(EnergyStorage.ITEM.find(stack, CapabilityTools.itemContext(stack)));
             if (capability != null) {
                 return capability.receiveEnergy(unsignedClampToInt(maxReceive), false);
             } else {
@@ -147,6 +145,5 @@ public class EnergyTools {
             }
         }
     }
-
 
 }

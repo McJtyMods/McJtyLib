@@ -1,26 +1,34 @@
 package mcjty.lib.client;
 
-import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import net.neoforged.neoforge.client.model.geometry.IUnbakedGeometry;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
 
-public abstract class BaseGeometry<T extends IUnbakedGeometry<T>> implements IUnbakedGeometry<T> {
+public abstract class BaseGeometry<T> implements UnbakedModel {
 
     public abstract BakedModel bake();
 
     public abstract Collection<Material> getMaterials();
 
+    public Collection<ResourceLocation> getDependencies() {
+        return List.of();
+    }
+
+    public void resolveParents(Function<ResourceLocation, UnbakedModel> models) {}
+
     @Override
-    public BakedModel bake(IGeometryBakingContext context, ModelBaker modelBaker, Function<Material, TextureAtlasSprite> function, ModelState modelState, ItemOverrides itemOverrides) {
+    public BakedModel bake(
+            ModelBaker modelBaker,
+            Function<Material, TextureAtlasSprite> function,
+            ModelState modelState) {
         return bake();
     }
 }

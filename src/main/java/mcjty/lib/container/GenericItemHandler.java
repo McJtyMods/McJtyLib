@@ -3,16 +3,16 @@ package mcjty.lib.container;
 import mcjty.lib.api.container.ItemInventory;
 import mcjty.lib.setup.Registration;
 import mcjty.lib.tileentity.GenericTileEntity;
+
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.ItemStackHandler;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -20,11 +20,112 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializable<CompoundTag> {
+import javax.annotation.Nonnull;
+
+public class GenericItemHandler implements IItemHandlerModifiable, IndexedStorage<ItemVariant> {
 
     private final GenericTileEntity tileEntity;
     private final ContainerFactory containerFactory;
     private final ItemStackHandler stacks;
+
+    private final SnapshotParticipant<List<ItemStack>> transferJournal =
+            new SnapshotParticipant<>() {
+                private List<ItemStack> before;
+
+                @Override
+                protected void releaseSnapshot(List<ItemStack> snapshot) {
+                    before = snapshot;
+                }
+
+                @Override
+                protected List<ItemStack> createSnapshot() {
+                    var result = new ArrayList<ItemStack>();
+                    for (int i = 0; i < getSlots(); i++) result.add(getStackInSlot(i).copy());
+                    return result;
+                }
+
+                @Override
+                protected void readSnapshot(List<ItemStack> snapshot) {
+                    for (int i = 0; i < snapshot.size(); i++)
+                        stacks.setStackInSlot(i, snapshot.get(i));
+                }
+
+                @Override
+                protected void onFinalCommit() {
+                    for (int i = 0; i < before.size(); i++)
+                        if (!ItemStack.matches(before.get(i), getStackInSlot(i)))
+                            onUpdate(i, getStackInSlot(i));
+                }
+            };
+
+    @Override
+    public int size() {
+        return getSlots();
+    }
+
+    @Override
+    public ItemVariant getResource(int index) {
+        return ItemVariant.of(getStackInSlot(index));
+    }
+
+    @Override
+    public long getAmountAsLong(int index) {
+        return getStackInSlot(index).getCount();
+    }
+
+    @Override
+    public long getCapacityAsLong(int index, ItemVariant resource) {
+        if (containerFactory.isGhostSlot(index) || containerFactory.isGhostOutputSlot(index))
+            return 0;
+        return Math.min(
+                getSlotLimit(index),
+                resource.isBlank() ? 64 : resource.toStack().getMaxStackSize());
+    }
+
+    @Override
+    public boolean isValid(int index, ItemVariant resource) {
+        return !resource.isBlank() && isItemValid(index, resource.toStack());
+    }
+
+    @Override
+    public long insert(
+            int index, ItemVariant resource, long amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        if (amount == 0 || resource.isBlank() || getCapacityAsLong(index, resource) == 0) return 0;
+        int inserted =
+                (int) Math.min(amount, Integer.MAX_VALUE)
+                        - insertItem(
+                                        index,
+                                        resource.toStack((int) Math.min(amount, Integer.MAX_VALUE)),
+                                        true)
+                                .getCount();
+        if (inserted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            stacks.setStackInSlot(
+                    index, resource.toStack(getStackInSlot(index).getCount() + inserted));
+        }
+        return inserted;
+    }
+
+    @Override
+    public long extract(
+            int index, ItemVariant resource, long amount, TransactionContext transaction) {
+        if (amount < 0) throw new IllegalArgumentException("Negative amount");
+        if (amount == 0
+                || resource.isBlank()
+                || !resource.matches(getStackInSlot(index))
+                || getCapacityAsLong(index, resource) == 0) return 0;
+        int extracted =
+                extractItem(index, (int) Math.min(amount, Integer.MAX_VALUE), true).getCount();
+        if (extracted > 0) {
+            transferJournal.updateSnapshots(transaction);
+            stacks.setStackInSlot(
+                    index,
+                    getStackInSlot(index)
+                            .copyWithCount(getStackInSlot(index).getCount() - extracted));
+        }
+        return extracted;
+    }
 
     public static BiPredicate<Integer, ItemStack> slot(int s) {
         return (slot, stack) -> slot == s;
@@ -54,14 +155,16 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
     /**
      * Make a builder for a GenericItemHandler
      */
-    public static GenericItemHandler.Builder create(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
+    public static GenericItemHandler.Builder create(
+            GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
         return new Builder(te, factorySupplier);
     }
 
     /**
      * Conveniance method to create a basic item handler with no restrictions
      */
-    public static GenericItemHandler basic(GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
+    public static GenericItemHandler basic(
+            GenericTileEntity te, Supplier<ContainerFactory> factorySupplier) {
         return new GenericItemHandler(te, factorySupplier.get());
     }
 
@@ -87,7 +190,7 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
         for (int i = 0; i < getSlots(); i++) {
             stacks.add(getStackInSlot(i));
         }
-        builder.set(Registration.ITEM_INVENTORY, new ItemInventory(stacks));
+        builder.set(Registration.ITEM_INVENTORY.get(), new ItemInventory(stacks));
     }
 
     public ItemStackHandler getStacks() {
@@ -103,7 +206,6 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
             }
         }
     }
-
 
     @Override
     public int getSlots() {
@@ -133,7 +235,8 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
 
         int m;
         if (!stackInSlot.isEmpty()) {
-            if (stackInSlot.getCount() >= Math.min(stackInSlot.getMaxStackSize(), getSlotLimit(slot))) {
+            if (stackInSlot.getCount()
+                    >= Math.min(stackInSlot.getMaxStackSize(), getSlotLimit(slot))) {
                 return stack;
             }
 
@@ -196,7 +299,6 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
                 return ItemStack.EMPTY;
             }
         }
-
     }
 
     public void setInventorySlotContents(int stackLimit, int index, ItemStack stack) {
@@ -228,7 +330,6 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
             tileEntity.setChanged();
         }
     }
-
 
     @Nonnull
     @Override
@@ -324,12 +425,10 @@ public class GenericItemHandler implements IItemHandlerModifiable, INBTSerializa
         return containerFactory;
     }
 
-    @Override
     public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         return stacks.serializeNBT(provider);
     }
 
-    @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
         stacks.deserializeNBT(provider, nbt);
     }

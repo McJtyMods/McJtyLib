@@ -3,9 +3,17 @@ package mcjty.lib.gui;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.*;
+import java.util.function.Function;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.blockcommands.Command;
 import mcjty.lib.blockcommands.IRunnable;
+import mcjty.lib.container.AttachmentTypes;
 import mcjty.lib.container.GenericContainer;
 import mcjty.lib.gui.events.ChannelEvent;
 import mcjty.lib.gui.events.FocusEvent;
@@ -26,6 +34,7 @@ import mcjty.lib.typed.TypedMap;
 import mcjty.lib.varia.Logging;
 import mcjty.lib.varia.NamedCodec;
 import mcjty.lib.varia.StringRegister;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -35,18 +44,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.network.connection.ConnectionType;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.lwjgl.glfw.GLFW;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.*;
-import java.util.function.Function;
 
 /**
  * This class represents a window. It contains a single Widget which
@@ -164,7 +162,7 @@ public class Window {
                                     String component = cmd.getOptionalPar(0, "");
                                     String attributeName = cmd.getOptionalPar(1, "");
                                     String attachmentKey = cmd.getOptionalPar(2, "");
-                                    AttachmentType<?> type = NeoForgeRegistries.ATTACHMENT_TYPES.get(ResourceLocation.parse(attachmentKey));
+                                    AttachmentType<?> type = AttachmentTypes.get(ResourceLocation.parse(attachmentKey));
                                     if (type == null) {
                                         Logging.logError("Could not find attachment type '" + attachmentKey + "'!");
                                         return;
@@ -394,7 +392,7 @@ public class Window {
             toplevel.setWindow(this);
             toplevel.mouseScrolled(x, y, dwheelX, dwheelY);
         }
-        PreferencesProperties preferencesProperties = McJtyLib.getPreferencesProperties(gui.getMinecraft().player);
+        PreferencesProperties preferencesProperties = McJtyLib.getPreferencesProperties(Minecraft.getInstance().player);
         currentStyle = preferencesProperties != null ? preferencesProperties.getStyle() : GuiStyle.STYLE_FLAT_GRADIENT;
 
         toplevel.setWindow(this);
@@ -432,20 +430,20 @@ public class Window {
     }
 
     private int getRelativeX() {
-        int windowWidth = gui.getMinecraft().getWindow().getScreenWidth();
+        int windowWidth = Minecraft.getInstance().getWindow().getScreenWidth();
         if (windowWidth == 0) {
             return 0;
         } else {
-            return (int) gui.getMinecraft().mouseHandler.xpos() * gui.width / windowWidth;
+            return (int) Minecraft.getInstance().mouseHandler.xpos() * gui.width / windowWidth;
         }
     }
 
     private int getRelativeY() {
-        int windowHeight = gui.getMinecraft().getWindow().getScreenHeight();
+        int windowHeight = Minecraft.getInstance().getWindow().getScreenHeight();
         if (windowHeight == 0) {
             return 0;
         } else {
-            return (int) gui.getMinecraft().mouseHandler.ypos() * gui.height / windowHeight;
+            return (int) Minecraft.getInstance().mouseHandler.ypos() * gui.height / windowHeight;
         }
     }
 
@@ -456,7 +454,6 @@ public class Window {
         focusEvents.add(event);
         return this;
     }
-
 
     private void fireFocusEvents(Widget<?> widget) {
         if (focusEvents != null) {
@@ -473,6 +470,7 @@ public class Window {
         channelEvents.get(channel).add(event);
         return this;
     }
+
     public <T extends GenericTileEntity> Window action(String componentName, T te, Command<?> command) {
         return action(componentName, te, command.name());
     }
@@ -526,14 +524,14 @@ public class Window {
             Object oldValue = component.getGenericValue(attributeType);
             O newValue = ncOut.set(attributeName, oldValue);
             te.setData(type, newValue);
-            ResourceLocation id = NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type);
+            ResourceLocation id = type.identifier();
             StreamCodec<RegistryFriendlyByteBuf, O> streamCodec = menu.getStreamCodecForType(type);
             if (streamCodec == null) {
                 Logging.message(Minecraft.getInstance().player, "Could not find stream codec for type '" + id + "'!");
                 return;
             }
             ByteBuf newbuf = Unpooled.buffer();
-            RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, te.getLevel().registryAccess(), ConnectionType.OTHER);
+            RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, te.getLevel().registryAccess());
             streamCodec.encode(buffer, newValue);
             Networking.sendToServer(PacketAttachmentData.create(id, buffer));
         });
@@ -545,10 +543,10 @@ public class Window {
         GenericContainer menu = (GenericContainer) guiContainer.getMenu();
         StreamCodec<RegistryFriendlyByteBuf, T> codec = menu.getStreamCodecForType(type);
         ByteBuf newbuf = Unpooled.buffer();
-        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, be.getLevel().registryAccess(), ConnectionType.OTHER);
+        RegistryFriendlyByteBuf buffer = new RegistryFriendlyByteBuf(newbuf, be.getLevel().registryAccess());
         T data = be.getData(type);
         codec.encode(buffer, data);
-        Networking.sendToServer(PacketAttachmentData.create(NeoForgeRegistries.ATTACHMENT_TYPES.getKey(type), buffer));
+        Networking.sendToServer(PacketAttachmentData.create(type.identifier(), buffer));
     }
 
     public <T extends GenericTileEntity> Window bind(String componentName, T te, String keyName) {

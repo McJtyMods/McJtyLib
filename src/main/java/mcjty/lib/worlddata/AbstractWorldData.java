@@ -1,15 +1,13 @@
 package mcjty.lib.worlddata;
 
+import java.util.function.Function;
+import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 import mcjty.lib.varia.LevelTools;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.level.saveddata.SavedData;
-
-import javax.annotation.Nonnull;
-
-import java.util.function.Function;
-import java.util.function.Supplier;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 
 /**
  * Global world data (always attached to the overworld)
@@ -30,7 +28,7 @@ public abstract class AbstractWorldData<T extends AbstractWorldData<T>> extends 
             throw new RuntimeException("Don't access this client-side!");
         }
         DimensionDataStorage storage = LevelTools.getOverworld(world).getDataStorage();
-        return storage.computeIfAbsent(new Factory<>(supplier, (tag, provider) -> loader.apply(tag)), name);
+        return storage.computeIfAbsent(new Factory<>(supplier, (tag, provider) -> loader.apply(tag), null), name);
     }
 
 }

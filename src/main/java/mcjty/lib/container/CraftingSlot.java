@@ -1,15 +1,11 @@
 package mcjty.lib.container;
 
+import javax.annotation.Nonnull;
 import mcjty.lib.tileentity.GenericTileEntity;
 import mcjty.lib.varia.TriConsumer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.event.EventHooks;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
-
-import javax.annotation.Nonnull;
 
 public class CraftingSlot extends SlotItemHandler {
     private final GenericTileEntity te;
@@ -44,7 +40,7 @@ public class CraftingSlot extends SlotItemHandler {
     @Override
     public void set(@Nonnull ItemStack stack) {
         if (te != null) {
-            te.onSlotChanged(getSlotIndex(), stack);
+            te.onSlotChanged(getContainerSlot(), stack);
         }
         super.set(stack);
     }
@@ -75,6 +71,5 @@ public class CraftingSlot extends SlotItemHandler {
         onCraft.accept(te, player, stack);
 
         this.removeCount = 0;
-        EventHooks.firePlayerSmeltedEvent(this.player, stack);
     }
 }

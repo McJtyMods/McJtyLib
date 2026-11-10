@@ -1,25 +1,24 @@
 package mcjty.lib.tileentity;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.function.Function;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.McJtyLib;
 import mcjty.lib.bindings.GuiValue;
 import mcjty.lib.bindings.Value;
 import mcjty.lib.blockcommands.*;
 import mcjty.lib.container.AutomationFilterItemHander;
 import mcjty.lib.container.GenericItemHandler;
+import mcjty.lib.setup.DeferredBlock;
 import mcjty.lib.typed.Type;
+import mcjty.lib.varia.FluidStack;
 import mcjty.lib.varia.NamedEnum;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.registries.DeferredBlock;
 import org.apache.commons.lang3.reflect.FieldUtils;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.function.Function;
 
 public class AnnotationTools {
 

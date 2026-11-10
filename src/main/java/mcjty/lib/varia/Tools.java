@@ -1,6 +1,12 @@
 package mcjty.lib.varia;
 
 import com.mojang.serialization.Codec;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import javax.annotation.Nullable;
+import mcjty.lib.setup.DeferredRegister;
+import net.fabricmc.fabric.api.event.registry.DynamicRegistries;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -30,17 +36,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
 import org.apache.commons.lang3.StringUtils;
-
-import javax.annotation.Nullable;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class Tools {
 
@@ -56,15 +52,8 @@ public class Tools {
         <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec);
     }
 
-    public static void onDataPackRegistry(IEventBus bus, Consumer<IDPRegister> consumer) {
-        bus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
-            consumer.accept(new IDPRegister() {
-                @Override
-                public <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec) {
-                    event.dataPackRegistry(key, codec, codec);
-                }
-            });
-        });
+    public static void onDataPackRegistry(Consumer<IDPRegister> consumer) {
+        consumer.accept(new IDPRegister() { public <T> void register(ResourceKey<Registry<T>> key, Codec<T> codec) { DynamicRegistries.registerSynced(key,codec); } });
     }
 
     public static Block getBlock(ResourceLocation id) {
@@ -142,16 +131,16 @@ public class Tools {
     public static String getModName(Fluid entry) {
         ResourceLocation registryName = BuiltInRegistries.FLUID.getKey(entry);
         String modId = registryName == null ? "minecraft" : registryName.getNamespace();
-        return ModList.get().getModContainerById(modId)
-                .map(mod -> mod.getModInfo().getDisplayName())
+        return FabricLoader.getInstance().getModContainer(modId)
+                .map(mod -> mod.getMetadata().getName())
                 .orElse(StringUtils.capitalize(modId));
     }
 
     public static String getModName(Block entry) {
         ResourceLocation registryName = BuiltInRegistries.BLOCK.getKey(entry);
         String modId = registryName == null ? "minecraft" : registryName.getNamespace();
-        return ModList.get().getModContainerById(modId)
-                .map(mod -> mod.getModInfo().getDisplayName())
+        return FabricLoader.getInstance().getModContainer(modId)
+                .map(mod -> mod.getMetadata().getName())
                 .orElse(StringUtils.capitalize(modId));
     }
 

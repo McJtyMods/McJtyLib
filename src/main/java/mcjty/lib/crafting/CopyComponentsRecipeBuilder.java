@@ -15,7 +15,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.common.conditions.ICondition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -90,8 +89,8 @@ public class CopyComponentsRecipeBuilder implements IRecipeBuilder<CopyComponent
             }
 
             @Override
-            public void accept(ResourceLocation resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder, ICondition... iConditions) {
-                consumerIn.accept(resourceLocation, new CopyComponentsRecipe((ShapedRecipe) recipe), advancementHolder, iConditions);
+            public void accept(ResourceLocation resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
+                consumerIn.accept(resourceLocation, new CopyComponentsRecipe((ShapedRecipe) recipe), advancementHolder);
             }
         }, save);
     }
@@ -106,8 +105,8 @@ public class CopyComponentsRecipeBuilder implements IRecipeBuilder<CopyComponent
             }
 
             @Override
-            public void accept(ResourceLocation resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder, ICondition... iConditions) {
-                consumerIn.accept(resourceLocation, new CopyComponentsRecipe((ShapedRecipe) recipe), advancementHolder, iConditions);
+            public void accept(ResourceLocation resourceLocation, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
+                consumerIn.accept(resourceLocation, new CopyComponentsRecipe((ShapedRecipe) recipe), advancementHolder);
             }
         }, id);
     }

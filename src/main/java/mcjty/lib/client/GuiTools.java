@@ -1,6 +1,10 @@
 package mcjty.lib.client;
 
+import java.util.function.Function;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import mcjty.lib.api.container.CapabilityContainerProvider;
+import mcjty.lib.container.MenuTools;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.LevelTools;
 import net.minecraft.ChatFormatting;
@@ -11,17 +15,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.function.Function;
 
 public class GuiTools {
 
@@ -63,7 +62,7 @@ public class GuiTools {
                     @Nullable
                     @Override
                     public AbstractContainerMenu createMenu(int id, @Nonnull Inventory inventory, @Nonnull Player player) {
-                        MenuProvider h = te.getLevel().getCapability(CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY, te.getBlockPos(), null);
+                        MenuProvider h = CapabilityContainerProvider.CONTAINER_PROVIDER_CAPABILITY.find(te.getLevel(), te.getBlockPos(), null);
                         if (h != null) {
                             return h.createMenu(id, inventory, player);
                         } else {
@@ -91,7 +90,7 @@ public class GuiTools {
 
         CompoundTag written = te.saveWithoutMetadata(world.registryAccess());
 
-        player.openMenu(provider.apply(te), buf -> {
+        MenuTools.open(player,provider.apply(te), buf -> {
             buf.writeBlockPos(pos);
             buf.writeResourceLocation(world.dimension().location());
             buf.writeNbt(written);

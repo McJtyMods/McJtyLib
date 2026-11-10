@@ -22,7 +22,7 @@ public class GenericArmorItem extends ArmorItem {
         };
     }
 
-    public static EquipmentSlot getSlotForItem(ItemStack stack) {
-        return ((ArmorItem) stack.getItem()).getEquipmentSlot();
+    public EquipmentSlot getEquipmentSlot(ItemStack stack) {
+        return getEquipmentSlot();
     }
 }

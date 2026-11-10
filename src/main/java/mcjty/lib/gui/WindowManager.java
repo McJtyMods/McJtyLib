@@ -1,19 +1,19 @@
 package mcjty.lib.gui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import mcjty.lib.gui.icons.IconManager;
-import mcjty.lib.gui.widgets.AbstractContainerWidget;
-import mcjty.lib.gui.widgets.Widget;
-import mcjty.lib.client.GuiTools;
-import mcjty.lib.tileentity.GenericTileEntity;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
-
+import com.mojang.blaze3d.platform.Lighting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
+import mcjty.lib.client.GuiTools;
+import mcjty.lib.gui.icons.IconManager;
+import mcjty.lib.gui.widgets.AbstractContainerWidget;
+import mcjty.lib.gui.widgets.Widget;
+import mcjty.lib.tileentity.GenericTileEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 
 /**
  * Use a window manager if you need multipole windows and/or want icon support
@@ -133,10 +133,10 @@ public class WindowManager {
             List<String> tooltips = w.getTooltips();
             if (tooltips != null) {
                 GenericGuiContainer<?,?> gui = (GenericGuiContainer<?,?>) this.gui;
-                gui.drawHoveringText(graphics, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), gui.getMinecraft().font);
+                gui.drawHoveringText(graphics, tooltips, w.getTooltipItems(), x - gui.getGuiLeft(), y - gui.getGuiTop(), Minecraft.getInstance().font);
             }
         });
-        com.mojang.blaze3d.platform.Lighting.setupForFlatItems();
+        Lighting.setupForFlatItems();
     }
 
     public Optional<Widget<?>> findWidgetAtPosition(double x, double y) {
