@@ -11,10 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage;
-import team.reborn.energy.api.EnergyStorage;
 import mcjty.lib.container.IItemHandler;
-import mcjty.lib.container.IItemHandlerModifiable;
 import javax.annotation.Nonnull;
 import org.jspecify.annotations.Nullable;
 
@@ -88,10 +85,8 @@ public class ModuleTools {
                 if (inventory.getStackInSlot(i).isEmpty()) {
                     ItemStack copy = heldItem.copy();
                     copy.setCount(1);
-                    if (inventory instanceof IItemHandlerModifiable) {
-                        ((IItemHandlerModifiable) inventory).setStackInSlot(i, copy);
-                    } else {
-                        throw new IllegalStateException("Not an IItemHandlerModifiable!");
+                    if (!inventory.insertItem(i, copy, false).isEmpty()) {
+                        continue;
                     }
                     heldItem.shrink(1);
                     if (heldItem.isEmpty()) {
