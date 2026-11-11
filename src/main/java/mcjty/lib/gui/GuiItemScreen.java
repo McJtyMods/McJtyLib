@@ -103,7 +103,7 @@ public abstract class GuiItemScreen extends Screen {
     }
 
     public void drawWindow(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
-        this.extractBackground(graphics, mouseX, mouseY, partialTicks);
+        // Screen already extracts the background before calling extractRenderState.
         window.draw(graphics);
         sideWindow.getWindow().draw(graphics);
         List<String> tooltips = window.getTooltips();
