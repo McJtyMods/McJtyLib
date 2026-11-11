@@ -1,3 +1,7 @@
+26.2-10.0.4-fabric:
+- Fixed crashes when opening item screens such as the advanced charged porter
+- Fixed installing screen modules into machines
+
 26.2-10.0.3-fabric:
 - Fixed automation inspecting empty inventory slots and inserting into sided inventories
 - Fixed block entity synchronization and saves for unloaded machines
