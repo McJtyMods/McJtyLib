@@ -1,3 +1,6 @@
+26.2-10.0.4:
+- Fixed installing modules by right-clicking compatible machines
+
 26.2-10.0.3:
 - Added support for the HoloGui, Ariente and ArienteWorld ports to Minecraft 26.2 on NeoForge.
 
