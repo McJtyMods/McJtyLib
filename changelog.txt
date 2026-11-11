@@ -1,4 +1,5 @@
 26.1.2-10.0.3:
+- Fixed crashes when opening item screens such as the advanced charged porter
 - Fixed installing modules by right-clicking compatible machines
 
 26.1.2-10.0.2:
