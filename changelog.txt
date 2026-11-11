@@ -1,3 +1,6 @@
+26.1.2-10.0.3:
+- Fixed installing modules by right-clicking compatible machines
+
 26.1.2-10.0.2:
 - Added support for HoloGui, Ariente and ArienteWorld on Minecraft 26.1.2
 
