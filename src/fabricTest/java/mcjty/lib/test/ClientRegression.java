@@ -35,8 +35,9 @@ public final class ClientRegression implements ClientModInitializer {
                     client.gui.setScreen(screen);
                 } else if (screen != null && client.gui.screen() == screen) {
                     screen.checkInput();
+                    CreativeSearchRegression.check();
                     finished = true;
-                    System.out.println("McJtyLib Fabric client regression checks passed: pipelines, SDL input, text focus and choice widgets");
+                    System.out.println("McJtyLib Fabric client regression checks passed: pipelines, SDL input, text focus, choice widgets and creative search");
                     client.stop();
                 }
             } catch (Throwable error) {

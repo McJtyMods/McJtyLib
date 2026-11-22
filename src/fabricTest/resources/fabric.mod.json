@@ -6,7 +6,8 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "mcjty.lib.test.TransferRegression"
+      "mcjty.lib.test.TransferRegression",
+      "mcjty.lib.test.CreativeSearchRegression"
     ],
     "fabric-datagen": [
       "mcjty.lib.test.DataGenRegression"
