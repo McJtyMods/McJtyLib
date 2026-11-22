@@ -46,6 +46,8 @@ public class GeneralConfig {
     }
 
     public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
-        StyleConfig.updateColors();
+        if (configEvent.getConfig().getSpec() == CLIENT_CONFIG) {
+            StyleConfig.updateColors();
+        }
     }
 }

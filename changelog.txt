@@ -1,3 +1,6 @@
+26.3-11.0.6:
+- Fixed an error when reloading McJtyLib's config on dedicated servers (#182)
+
 26.3-11.0.5:
 - Fixed crashes when opening item screens such as the advanced charged porter
 
