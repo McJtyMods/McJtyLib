@@ -1,10 +1,12 @@
 package mcjty.lib.tooltips;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Either;
 import mcjty.lib.gui.ManualEntry;
 import mcjty.lib.keys.KeyBindings;
 import mcjty.lib.varia.ComponentFactory;
 import mcjty.lib.varia.SafeClientTools;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -27,7 +29,13 @@ public class TooltipRender {
     public static ITooltipSettings lastUsedTooltipItem = null;
 
     public static void register() {
-        net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT.register((stack,context,flag,lines)->{onItemTooltip(stack,lines);wrapTooltip(stack,lines);});
+        ItemTooltipCallback.EVENT.register((stack, context, flag, lines) -> {
+            // Creative search collects tooltip text on a worker, where font measurement can trigger glyph uploads.
+            if (RenderSystem.isOnRenderThread()) {
+                onItemTooltip(stack, lines);
+                wrapTooltip(stack, lines);
+            }
+        });
     }
 
     public static ITooltipSettings getSettings(Item item) {
