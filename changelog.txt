@@ -1,3 +1,6 @@
+1.21-9.0.23:
+- Fixed an error when reloading McJtyLib's config on dedicated servers (#182)
+
 1.21-9.0.22:
 - Fixed a crash when typing after right-clicking to clear a text field with selected text (#187)
 
