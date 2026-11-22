@@ -1,3 +1,6 @@
+1.20-8.0.11:
+- Fixed custom GUI colors failing to apply when the client config loads or reloads (#182)
+
 1.20-8.0.10:
 - Fixed ingredient icons and counts overlapping text in item tooltips, including Ariente blueprints.
 

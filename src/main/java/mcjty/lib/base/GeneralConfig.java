@@ -7,7 +7,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 
-@Mod.EventBusSubscriber(modid = McJtyLib.MODID)
+@Mod.EventBusSubscriber(modid = McJtyLib.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class GeneralConfig {
 
     private static final ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
@@ -45,11 +45,16 @@ public class GeneralConfig {
 
     @SubscribeEvent
     public static void onLoad(final ModConfigEvent.Loading configEvent) {
-        StyleConfig.updateColors();
+        if (configEvent.getConfig().getSpec() == CLIENT_CONFIG) {
+            StyleConfig.updateColors();
+        }
     }
 
     @SubscribeEvent
     public static void onFileChange(final ModConfigEvent.Reloading configEvent) {
-        StyleConfig.updateColors();
+        // Forge can start watching the file before attaching it to the spec.
+        if (configEvent.getConfig().getSpec() == CLIENT_CONFIG && CLIENT_CONFIG.isLoaded()) {
+            StyleConfig.updateColors();
+        }
     }
 }
