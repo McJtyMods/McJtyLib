@@ -1,5 +1,6 @@
 26.2-10.0.5-fabric:
 - Fixed remote menus opening with default block settings instead of the saved settings
+- Fixed creative inventory text search failing when indexing item tooltips (#188)
 
 26.2-10.0.4-fabric:
 - Fixed crashes when opening item screens such as the advanced charged porter
