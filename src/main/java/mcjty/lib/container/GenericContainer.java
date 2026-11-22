@@ -21,6 +21,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -28,6 +29,7 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.menu.v1.ExtendedMenuType;
 import mcjty.lib.container.IItemHandler;
@@ -615,7 +617,8 @@ public class GenericContainer extends AbstractContainerMenu implements IGenericC
             E te = dummyTEFactory.apply(LevelTools.getId(data.readIdentifier()), pos);
             CompoundTag compound = data.readNbt();
             RegistryAccess access = inv.player.level().registryAccess();
-            te.loadCustomOnly(net.minecraft.world.level.storage.TagValueInput.create(net.minecraft.util.ProblemReporter.DISCARDING, access, compound));
+            // Fabric restores persistent block entity attachments through loadWithComponents.
+            te.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, access, compound));
 
             T container = containerFactory.create(windowId, pos, te, inv.player);
             container.setupInventories(new ItemStackHandler(slots), inv);
