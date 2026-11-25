@@ -1,3 +1,6 @@
+1.20-8.0.12:
+- Fixed item icons and stack counts covering tooltips in the RFTools Storage Scanner.
+
 1.20-8.0.11:
 - Fixed custom GUI colors failing to apply when the client config loads or reloads (#182)
 

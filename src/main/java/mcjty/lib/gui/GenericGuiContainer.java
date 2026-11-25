@@ -183,9 +183,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                 yy = 4 - topPos;
             }
 
-            // @todo 1.19.4
-//            setBlitOffset(300);
-//            this.itemRenderer.blitOffset = 300.0F;
+            // Keep the tooltip background and text above item models and stack counts.
+            matrixStack.translate(0.0D, 0.0D, 600.0D);
             int l = -267386864;
             graphics.fillGradient(xx - 3, yy - 4, xx + i + 3, yy - 3, l, l);
             graphics.fillGradient(xx - 3, yy + k + 3, xx + i + 3, yy + k + 4, l, l);
@@ -199,14 +198,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
             graphics.fillGradient(xx - 3, yy - 3, xx + i + 3, yy - 3 + 1, i1, i1);
             graphics.fillGradient(xx - 3, yy + k + 2, xx + i + 3, yy + k + 3, j1, j1);
 
-//            matrixStack.translate(0.0D, 0.0D, this.itemRenderer.blitOffset);
-            matrixStack.translate(0.0D, 0.0D, 300.0f);
-
             renderTextLines(graphics, textLines, items, font, xx, yy);
 
-            // @todo 1.19.4
-//            setBlitOffset(0);
-//            this.itemRenderer.blitOffset = 0.0F;
             RenderSystem.enableDepthTest();
             // @todo 1.17 RenderSystem.enableLighting();
             // @todo 1.17 com.mojang.blaze3d.platform.Lighting.turnBackOn();
@@ -226,8 +219,8 @@ public abstract class GenericGuiContainer<T extends GenericTileEntity, C extends
                     if (o instanceof String s2) {
                         font.drawInBatch(s2, curx, yy, 0xffffff, true, graphics.pose().last().pose(), graphics.bufferSource(), Font.DisplayMode.NORMAL, 0, LightTexture.FULL_BRIGHT);
                         curx += font.width(s2);
-                    } else {
-                        RenderHelper.renderObject(graphics, curx + 1, yy, o, false);
+                    } else if (o instanceof ItemStack stack) {
+                        RenderHelper.renderAndDecorateItem(graphics, stack, curx + 1, yy);
                         curx += 20;
                         lineHasItemStacks = true;
                     }
